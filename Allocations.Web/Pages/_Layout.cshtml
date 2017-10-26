@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Reflection
+<!DOCTYPE html>
 <html lang="en" data-ng-app="app" id="ng-app">
 <head>
     <meta charset="utf-8">
@@ -80,7 +81,7 @@
             <div class="footer-meta-inner">
                 <div class="open-government-licence">
                     <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence</a></p>
-                    <p>All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
+                    <p>@Assembly.GetExecutingAssembly().GetName().Version All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
                 </div>
             </div>
             <div class="copyright">
