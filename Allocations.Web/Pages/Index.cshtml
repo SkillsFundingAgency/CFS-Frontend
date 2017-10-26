@@ -1,0 +1,26 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<p>
+    GOV.UK Boostrap combines the <a href="http://govuk-elements.herokuapp.com/">GOV.UK Element</a>
+    and <a href="http://getbootstrap.com/">Bootstrap</a> style frameworks, and is published as an NPM <a href="https://www.npmjs.com/package/govuk_bootstrap">package</a>.
+</p>
+<h2>Usage</h2>
+<p>
+    Include the dependency in the <code>package.json</code> file of your front end application. No further dependencies are required.
+</p>
+<p>
+    <code>
+        {
+        "govuk_bootstrap": "^0.0.5"
+        }
+    </code>
+</p>
+<p>
+    Once the module is installed, serve the <code>dist/assets</code> directory which contains the compiled css stylesheet and the image files.
+    Alternatively, the source files are available in the <code>dist/sass</code> directory for manual compilation and/or extension.
+</p>
