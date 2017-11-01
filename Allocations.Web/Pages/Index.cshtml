@@ -1,9 +1,19 @@
 ﻿@page
-@model IndexModel
+@using ApiClient
+@inject AllocationsApiClient ApiClient;
 @{
     ViewData["Title"] = "Home page";
 }
 
+
+@functions
+{
+    public object Budgets { get; set; }
+    public async Task OnGetAsync()
+    {
+        Budgets = await ApiClient.GetAsync<object>("api/v1/results/budgets/");
+    }
+}
 
 <p>
     GOV.UK Boostrap combines the <a href="http://govuk-elements.herokuapp.com/">GOV.UK Element</a>
