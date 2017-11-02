@@ -8,29 +8,24 @@
 
 @functions
 {
-    public object Budgets { get; set; }
+    public BudgetSummary[] Budgets { get; set; }
     public async Task OnGetAsync()
     {
-        Budgets = await ApiClient.GetAsync<object>("api/v1/results/budgets/");
+        Budgets = (await ApiClient.GetAsync<BudgetSummary[]>("api/v1/results/budgets/"))?.Content;
     }
 }
 
-<p>
-    GOV.UK Boostrap combines the <a href="http://govuk-elements.herokuapp.com/">GOV.UK Element</a>
-    and <a href="http://getbootstrap.com/">Bootstrap</a> style frameworks, and is published as an NPM <a href="https://www.npmjs.com/package/govuk_bootstrap">package</a>.
-</p>
-<h2>Usage</h2>
-<p>
-    Include the dependency in the <code>package.json</code> file of your front end application. No further dependencies are required.
-</p>
-<p>
-    <code>
-        {
-        "govuk_bootstrap": "^0.0.5"
-        }
-    </code>
-</p>
-<p>
-    Once the module is installed, serve the <code>dist/assets</code> directory which contains the compiled css stylesheet and the image files.
-    Alternatively, the source files are available in the <code>dist/sass</code> directory for manual compilation and/or extension.
-</p>
+@foreach (var budget in Budgets)
+{
+    <h1>@budget.Budget.Name</h1>
+    <p>Total @budget.TotalAmount.ToString("C")</p>
+    <p>@budget.TestSummary.Failed providers failing tests</p>
+    foreach (var fundingPolicySummary in budget.FundingPolicies)
+    {
+        <h2>@fundingPolicySummary.FundingPolicy.Name</h2>
+        <p>Total @fundingPolicySummary.TotalAmount.ToString("C")</p>
+        <p>@fundingPolicySummary.TestSummary.Failed providers failing tests</p>
+
+    }
+
+}
