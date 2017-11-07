@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-xs-8">
-        <h1 class="heading-xlarge">SBS Product Test Results</h1>
+        <h1 class="heading-xlarge">Pupil-led factor</h1>
     </div>
 </div>
 <div class="row">
@@ -132,11 +132,11 @@
                                 <tbody>
                                     <tr>
                                         <td><a class="test" asp-page="Results2">Only Primary providers should have Primary Rate</a></td>                                        
-                                        <td><p class="error-message">7 providers failing</p></td>
+                                        <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message">7 Providers failed tests</span></a></p></td>
                                     </tr>
                                     <tr>
                                         <td><a class="test" asp-page="Results2">Non primary schools don't have primary subtotals</a></td>
-                                        <td><p class="error-message">25 providers failing</p></td>
+                                        <td><p class="text-success">All tests passed</p></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -149,14 +149,70 @@
                 <div class="panel-heading">
                     <h2 class="panel-title">
                         <a href="#">
-                            Other Factors
+                            P006_NSEN_PriBE
                         </a>
-                    </h2>
+                    </h2>                    
                     <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>FSM</p>
                 </div>
                 <div id="two" class="panel-collapse collapse">
                     <div class="panel-body">
-                        Where is the harp on the harpstring, and the red fire glowing? Where is the spring and the harvest and the tall corn growing?
+                        <p>The Primary Basic entitlement NSEN percentage is multiplied by the Primary Basic Entitlement funding to produce the full year NSEN amount attributable to primary basic entitlement</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Scenario test results</th>
+                                    <th>For 152 Providers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a asp-page="Results2">QA Scenario 1</a></td>
+                                    <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                </tr>
+                                <tr>
+                                    <td><a asp-page="Results2">QA Scenario 2</a></td>
+                                    <td><p class="text-success">All tests passed</p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed basic-entitlement">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            P005_PriBESubtotal
+                        </a>
+                    </h2>                    
+                    <div class="flex-row">                        
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>Full year amount of basic entitlemet for academies that have primary pupils calculated by multiplying primary pupils by the LA-determinded rate, except for in-year openers funded on census, where the LA -calculated allocation is picked up from the New ISB sheet of the APT Aggregation</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Scenario test results</th>
+                                        <th>For 152 Providers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><a asp-page="Results2">Primary school has a primarysubtotal </a></td>
+                                        <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a asp-page="Results2">Non Primary school don’t have primary subtotal</a></td>
+                                        <td><p class="text-success">All tests passed</p></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,26 +226,6 @@
                     </h2>
                     <div class="flex-row">
                         <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>IDACI</p>
-                    </div>
-                </div>
-                <div class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="panel">
-                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- end of panel -->
-            <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed basic-entitlement">
-                <div class="panel-heading">
-                    <h2 class="heading-large panel-title">
-                        <a href="#">
-                            P08_PriRate
-                        </a>
-                    </h2>
-                    <div class="flex-row">
-                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
                     </div>
                 </div>
                 <div class="panel-collapse collapse">

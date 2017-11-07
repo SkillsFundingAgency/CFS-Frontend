@@ -105,6 +105,7 @@ a.button:hover {
                 .list-title {
                     display: inline-block;
                     text-decoration: none;
+                    font-weight: normal;
                 }
             }
         }
@@ -373,6 +374,9 @@ details {
 .qa-passed-report {
     summary {
         color: $green;
+        &:hover {
+            color: $green;
+        }
     }
     .panel {
         &.panel-border-narrow {
@@ -383,7 +387,12 @@ details {
 .qa-failed-report {
     summary {
         color: $red;
+
+        &:hover {
+            color: $red;
+        }
     }
+
     .panel {
         &.panel-border-narrow {
             border-color: $red !important;
@@ -417,7 +426,14 @@ a.test {
 
 .error-message {
     font-size: 19px !important;
-    font-weight: normal !important;    
+    font-weight: normal !important;
+    
+    a {
+        color: $red !important;
+        &:hover {
+            color: $red !important;
+        }
+    }
 }
 .text-success {
     font-weight: normal;
@@ -427,5 +443,23 @@ a.test {
         display: inline-block;
         text-decoration: underline;
         text-decoration-color: $red;
+    }
+}
+.year-form {
+    .form-control {
+        width: 25% !important;
+        &:focus {
+            outline: 3px solid #ffbf47 !important;
+            border-color: initial !important;
+            box-shadow: none !important;
+        }
+    }
+}
+.graph {
+    width: 100%;
+    margin-bottom: 30px;
+    
+    img {
+        width: 100%;
     }
 }

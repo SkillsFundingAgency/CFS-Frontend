@@ -1739,7 +1739,8 @@ a.button:hover {
       border-top: none !important; }
       .esfa-collapse .panel .panel-collapse .panel-body .list-title {
         display: inline-block;
-        text-decoration: none; }
+        text-decoration: none;
+        font-weight: normal; }
   .esfa-collapse .panel .item-detail {
     display: inline-block;
     margin-right: 10px; }
@@ -1903,12 +1904,16 @@ details summary {
 
 .qa-passed-report summary {
   color: #006435; }
+  .qa-passed-report summary:hover {
+    color: #006435; }
 
 .qa-passed-report .panel.panel-border-narrow {
   border-color: #006435 !important; }
 
 .qa-failed-report summary {
   color: #b10e1e; }
+  .qa-failed-report summary:hover {
+    color: #b10e1e; }
 
 .qa-failed-report .panel.panel-border-narrow {
   border-color: #b10e1e !important; }
@@ -1934,6 +1939,10 @@ a.test {
 .error-message {
   font-size: 19px !important;
   font-weight: normal !important; }
+  .error-message a {
+    color: #b10e1e !important; }
+    .error-message a:hover {
+      color: #b10e1e !important; }
 
 .text-success {
   font-weight: normal; }
@@ -1942,3 +1951,16 @@ a.test {
   display: inline-block;
   text-decoration: underline;
   text-decoration-color: #b10e1e; }
+
+.year-form .form-control {
+  width: 25% !important; }
+  .year-form .form-control:focus {
+    outline: 3px solid #ffbf47 !important;
+    border-color: initial !important;
+    box-shadow: none !important; }
+
+.graph {
+  width: 100%;
+  margin-bottom: 30px; }
+  .graph img {
+    width: 100%; }
