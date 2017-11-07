@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Allocations.Web.ApiClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +22,6 @@ namespace Allocations.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.Configure<AllocationApiOptions>(Configuration);
-            services.AddTransient<AllocationsApiClient, AllocationsApiClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,8 +36,6 @@ namespace Allocations.Web
             {
                 app.UseExceptionHandler("/Error");
             }
-
-
 
             app.UseStaticFiles();
 
