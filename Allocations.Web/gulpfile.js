@@ -1,4 +1,5 @@
-﻿/// <binding BeforeBuild='sass, copy-assets' />
+﻿/// <binding BeforeBuild='copy-assets, sass' ProjectOpened='watch-sass' />
+
 "use strict";
 
 var lodash = require("lodash"),
@@ -57,7 +58,10 @@ gulp.task("sass", function () {
         .pipe(gulp.dest('wwwroot/assets/css'));
 });
 
-/// <binding BeforeBuild='copy-assets' />
+gulp.task('watch-sass', function () {
+    gulp.watch('.wwwroot/assets/scss/*.scss', ['sass']);
+});
+
 "use strict";
 
 var _ = require('lodash'),
