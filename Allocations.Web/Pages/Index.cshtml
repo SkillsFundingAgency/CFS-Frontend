@@ -1,26 +1,189 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+ViewData["Title"] = "Allocations overview";
 }
+<div class="row">
+    <div class="col-xs-8">
+        <h1 class="heading-xlarge">Allocations overview</h1>
+        <form class="year-form" method="get">
+            <div class="form-group">
+                <label class="form-label" for="select-box">Select year:</label>
+                <select class="form-control" id="select-box" name="select-box">
+                    <option>2017/2018</option>
+                    <option>2016/2017</option>
+                    <option>2015/2016</option>
+                </select>
+            </div>
+        </form>
+        <div class="graph">
+            <img src="~/assets/images/graph.png" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-8">
+        <div class="panel-group wrap esfa-collapse" id="esfa-list">
+            <div class="funding-streams">
+                <button class="accordion-toggle">Open all</button>
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a href="#">
+                                General Annual Grants (GAG)
+                            </a>
+                        </h2>
+                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;45.5 billion</span></p>
+                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message">182 Providers failed tests</span></a></p>
+                    </div>
+                    <div class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="panel">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <details>
+                                                    <summary>
+                                                        <h3 class="heading-medium list-title summary">Schools Budget Share (SBS)</h3>
+                                                        <div>
+                                                            <p class="item-detail font-xsmall">Total <span class="amount">&pound;22 billion</span></p>
+                                                            <p class="item-detail font-xsmall"><a href="#"><span class="error-message">162 Providers failed tests</span></a></p>
+                                                        </div>
+                                                    </summary>
 
+                                                    <div class="panel panel-border-narrow">
+                                                        <ul class="list-group">
+                                                            <li class="list-group-item sublist-item">
+                                                                <h4 class="heading-small">
+                                                                    <a asp-page="Results">Pupil Led Factor</a>
+                                                                </h4>
+                                                                <p class="item-detail font-xsmall">Total <span class="amount">&pound;17 billion</span></p>
+                                                                <p class="item-detail font-xsmall"><a href="#"><span class="error-message">73 providers failed tests</span></a></p>
+                                                            </li>
+                                                            <li class="list-group-item sublist-item">
+                                                                <h4 class="heading-small">
+                                                                    <a href="#">Other Factor</a>
+                                                                </h4>
+                                                                <div>
+                                                                    <p class="item-detail font-xsmall">Total <span class="amount">&pound;3 billion</span></p>
+                                                                    <p class="item-detail font-xsmall"><span class="text-success">No failures</span></p>
+                                                                </div>
+                                                            </li>
+                                                            <li class="list-group-item sublist-item">
+                                                                <h4 class="heading-small">
+                                                                    <a href="#">Exceptional Factor</a>
+                                                                </h4>
+                                                                <div>
+                                                                    <p class="item-detail font-xsmall">Total <span class="amount">&pound;500m</span></p>
+                                                                    <p class="item-detail font-xsmall"><a href="#"><span class="error-message">22 providers failed tests</span></a></p>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </details>
+                                            </div>
+                                        </div>
 
-<p>
-    GOV.UK Boostrap combines the <a href="http://govuk-elements.herokuapp.com/">GOV.UK Element</a>
-    and <a href="http://getbootstrap.com/">Bootstrap</a> style frameworks, and is published as an NPM <a href="https://www.npmjs.com/package/govuk_bootstrap">package</a>.
-</p>
-<h2>Usage</h2>
-<p>
-    Include the dependency in the <code>package.json</code> file of your front end application. No further dependencies are required.
-</p>
-<p>
-    <code>
-        {
-        "govuk_bootstrap": "^0.0.5"
-        }
-    </code>
-</p>
-<p>
-    Once the module is installed, serve the <code>dist/assets</code> directory which contains the compiled css stylesheet and the image files.
-    Alternatively, the source files are available in the <code>dist/sass</code> directory for manual compilation and/or extension.
-</p>
+                                    </li>
+                                    @{
+                                        string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
+                                    }
+
+                                    @foreach (var allocationLine in allocationLinesMockups)
+                                    {
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+
+                                                    <details>
+                                                        <summary>
+                                                            <h3 class="heading-medium list-title summary">@allocationLine</h3>
+                                                            <div>
+                                                                <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                                                                <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
+                                                            </div>
+                                                        </summary>
+
+                                                        <div class="panel panel-border-narrow">
+                                                            <ul class="list-group allocation-lines-list">
+                                                                @for (var i = 1; i < 5; i++)
+                                                                {
+                                                                    <li class="list-group-item sublist-item">
+                                                                        <h4 class="heading-small">
+                                                                            <a asp-page="Results">Allocation line @i</a>
+                                                                        </h4>
+                                                                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                                                                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># providers failed tests</span></a></p>
+                                                                    </li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end of panel -->
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a href="#">
+                                16-19 Funding
+                            </a>
+                        </h2>
+                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
+                    </div>
+                    <div class="panel-collapse collapse">
+                        <div class="panel-body">
+                            
+                        </div>
+                    </div>
+                </div>
+                <!-- end of panel -->
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a href="#">
+                                High Needs Funding
+                            </a>
+                        </h2>
+                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
+                    </div>
+                    <div id="three" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            
+                        </div>
+                    </div>
+                </div>
+                <!-- end of panel -->
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a href="#">
+                                Another funding stream
+                            </a>
+                        </h2>
+                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
+                    </div>
+                    <div id="four" class="panel-collapse collapse">
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                </div>
+                <!-- end of panel -->
+            </div>
+        </div>
+        <!-- end of #esfa-collapse  -->
+    </div>
+    <!-- end of .col-xs-12  -->
+</div>
+<!-- end of .row  -->

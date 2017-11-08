@@ -7,8 +7,10 @@
     <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon" />
     <link rel="mask-icon" href="assets/images/gov.uk_logotype_crown.svg" color="#0b0c0c">
-    <title>@ViewData["Title"] - ESFA Allocations</title>
-    <link rel="stylesheet" href="assets/govuk_bootstrap.css" type="text/css" />
+    <title>@ViewData["Title"] - Calculate funding</title>
+    <link href="~/assets/libs/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/libs/govuk_bootstrap/govuk_bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/main.css" type="text/css" />
 </head>
 <body id="top">
     <header role="banner" id="global-header" class="with-proposition">
@@ -25,19 +27,14 @@
                     <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
                     <nav id="proposition-menu">
 
-                        <a href="index.html" id="proposition-name">ESFA Allocations</a>
+                        <a href="/" id="proposition-name">Calculate funding</a>
 
-                        <ul id="proposition-links">
-                            0
-                            1
+                        @*<ul id="proposition-links">
                             <li><a href="layout.html">Layout</a></li>
-                            2
                             <li><a href="content.html">Content</a></li>
-                            3
                             <li><a href="elements.html">Components</a></li>
-                            4
                             <li><a href="developer_guide.html">Developer Guide</a></li>
-                        </ul>
+                        </ul>*@
                     </nav>
                 </div>
             </div>
@@ -66,11 +63,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-xs-8">
-                    <h1 class="heading-xlarge">GOV.UK Bootstrap</h1>
-                </div>
-            </div>
             @RenderBody()
 
         </div>
@@ -90,6 +82,10 @@
         </div>
     </div>
 </footer>
-@RenderSection("Scripts", required: false)
+
+    @RenderSection("Scripts", required: false)
+    <script src="~/assets/libs/js/jquery.min.js"></script>
+    <script src="~/assets/libs/js/bootstrap.js"></script>    
+    <script src="~/assets/js/main.js"></script>
 </body>
 </html>

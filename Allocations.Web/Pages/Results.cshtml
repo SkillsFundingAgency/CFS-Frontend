@@ -1,0 +1,324 @@
+﻿@page
+@model Allocations.Web.Pages.ResultsModel
+@{
+    ViewData["Title"] = "Results";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xs-8">
+        <h1 class="heading-xlarge">Pupil-led factor</h1>
+    </div>
+</div>
+<div class="row">
+    <div id="sidebar">
+        <div class="col-md-4">
+            <div class="panel-group wrap esfa-collapse" id="esfa-filter">
+                <form class="filter-form" method="get">
+                    <div class="panel search-panel">
+                        <div class="panel-heading no-collapse">
+                            <fieldset>
+                                <label class="form-label" for="esfa-filter-search">Search</label>
+                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search">
+                            </fieldset>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                <a class="plain-link" href="#">Status</a>
+                            </h3>                            
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body">
+                                <fieldset>
+                                    <div class="multiple-choice">
+                                        <input id="pass-test" name="esfa-filter-status" type="checkbox" value="passed">
+                                        <label for="pass-test">Pass</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="fail-test" name="esfa-filter-status" type="checkbox" value="failed" checked="checked">
+                                        <label for="fail-test">Failed</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                <a class="plain-link" href="#">Product Folder</a>
+                            </h3>
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body scroll-body">
+                                <fieldset>
+                                    <div class="multiple-choice">
+                                        <input id="pupil-led-factors" name="esfa-filter-folder" type="checkbox" value="basic-entitlement" checked="checked">
+                                        <label for="pass-test">Basic Entitlement</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="other-factors" name="esfa-filter-folder" type="checkbox" value="fsm">
+                                        <label for="other-factors">FSM</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="idaci" name="esfa-filter-folder" type="checkbox" value="idaci">
+                                        <label for="exceptional-factors">IDACI</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="lac" name="esfa-filter-folder" type="checkbox" value="lac">
+                                        <label for="lac">LAC</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="prior-attainment" name="esfa-filter-folder" type="checkbox" value="prior-attainment">
+                                        <label for="prior-attainment">Prior Attainment</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="eal" name="esfa-filter-folder" type="checkbox" value="eal">
+                                        <label for="eal">EAL</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="mobility" name="esfa-filter-folder" type="checkbox" value="mobility">
+                                        <label for="mobility">Mobility</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="sparsity" name="esfa-filter-folder" type="checkbox" value="sparsity">
+                                        <label for="sparsity">Sparsity</label>
+                                    </div>
+                                    <div class="multiple-choice">
+                                        <input id="other-factors" name="esfa-filter-folder" type="checkbox" value="other-factors-folder">
+                                        <label for="other-factors">Other factors</label>
+                                    </div>
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                </form>
+            </div>
+            <!-- end of #esfa-collapse  -->
+        </div>
+    </div>
+    <div id="main">
+        <div class="col-md-8">
+        <div class="panel-group wrap esfa-collapse filtr-container" id="esfa-list">
+            <button class="accordion-toggle">Open all</button>
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed basic-entitlement">
+                <div class="panel-heading">                    
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            P005_PriBESubTotal
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>                        
+                    </div>
+                </div>
+                <div class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>Full year amount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
+                          
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Scenario test results</th>
+                                        <th>For 152 Providers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><a class="test" asp-page="Results2">Only Primary providers should have Primary Rate</a></td>                                        
+                                        <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message">7 Providers failed tests</span></a></p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="test" asp-page="Results2">Non primary schools don't have primary subtotals</a></td>
+                                        <td><p class="text-success">All tests passed</p></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="other-factors" data-category="passed fsm">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        <a href="#">
+                            P006_NSEN_PriBE
+                        </a>
+                    </h2>                    
+                    <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>FSM</p>
+                </div>
+                <div id="two" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <p>The Primary Basic entitlement NSEN percentage is multiplied by the Primary Basic Entitlement funding to produce the full year NSEN amount attributable to primary basic entitlement</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Scenario test results</th>
+                                    <th>For 152 Providers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a asp-page="Results2">QA Scenario 1</a></td>
+                                    <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                </tr>
+                                <tr>
+                                    <td><a asp-page="Results2">QA Scenario 2</a></td>
+                                    <td><p class="text-success">All tests passed</p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed basic-entitlement">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            P005_PriBESubtotal
+                        </a>
+                    </h2>                    
+                    <div class="flex-row">                        
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>Full year amount of basic entitlemet for academies that have primary pupils calculated by multiplying primary pupils by the LA-determinded rate, except for in-year openers funded on census, where the LA -calculated allocation is picked up from the New ISB sheet of the APT Aggregation</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Scenario test results</th>
+                                        <th>For 152 Providers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><a asp-page="Results2">Primary school has a primarysubtotal </a></td>
+                                        <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a asp-page="Results2">Non Primary school don’t have primary subtotal</a></td>
+                                        <td><p class="text-success">All tests passed</p></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed idaci">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            IDACI_Prod001
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>IDACI</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed fsm">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            FSM_Prod007
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>FSM</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed lac">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            Lac_Prod01
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>LAC</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed LAC">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            LAC_Prod02
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>LAC</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->
+            <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed idaci">
+                <div class="panel-heading">
+                    <h2 class="heading-large panel-title">
+                        <a href="#">
+                            IDACI_ProdPri
+                        </a>
+                    </h2>
+                    <div class="flex-row">
+                        <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>IDACI</p>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="panel">
+                            <p>This is obtained from the '1617' APT Proforma Dataset - Basic Entitlement Primary Amount Per Pupil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of panel -->       
+        </div>
+        <!-- end of #esfa-collapse  -->        
+        </div>
+    </div>
+</div><!-- end of .row -->
