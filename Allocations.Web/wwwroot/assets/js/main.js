@@ -2,7 +2,7 @@
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
-        headingSiblings = $('.esfa-summary > div > div').add($('.panel-title:not(.stream-title)')),
+        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title:not(.stream-title)')),
         headingText = $('panel-title'),
         summaryText = $('summary > p');
 
