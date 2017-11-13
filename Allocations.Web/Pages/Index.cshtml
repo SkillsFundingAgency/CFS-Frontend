@@ -20,7 +20,9 @@ ViewData["Title"] = "Allocations overview";
             <img src="~/assets/images/graph.png" />
         </div>
     </div>
+    @*end of col-xs-8*@
 </div>
+@*end of row*@
 <div class="row">
     <div class="col-xs-12 col-md-8">
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
@@ -29,13 +31,33 @@ ViewData["Title"] = "Allocations overview";
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
-                                General Annual Grants (GAG)
-                            </a>
-                            <span class="ammount">&pound;45.5 billion</span>
+                        <a href="#">
+                            General Annual Grants (GAG)
+                        </a>
+                        <span class="ammount">&pound;45.5 billion</span>
                         </h2>
-                        <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">182 Providers failed tests</span></a></p>
-                        <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
+                        <div class="esfa-summary">
+                            <div class="total-providers">
+                                <p class="item-detail font-xsmall total-providers">
+                                    <a asp-page="Providers/Index">
+                                        <span class="providers-number">1000</span> total providers
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="coverage">
+                                <p class="item-detail font-xsmall failing">
+                                    <a asp-page="Products/Index">
+                                        <span class="providers-number error-message">300 failing</span>
+                                    </a>
+                                </p>
+                                <p class="item-detail font-xsmall text-success covered">
+                                    <a asp-page="Products/Index">
+                                        <span class="providers-number text-success">500 covered</span>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        @*end of .esfa-summary*@
                     </div>
                     <div class="panel-collapse collapse">
                         <div class="panel-body">
@@ -83,10 +105,12 @@ ViewData["Title"] = "Allocations overview";
                                                             </li>
                                                         </ul>
                                                     </div>
+                                                    @*end of panel.panel-border-narrow*@
                                                 </details>
                                             </div>
+                                            @*end of col-xs-12*@
                                         </div>
-
+                                        @*end of row*@
                                     </li>
                                     @{
                                     string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
@@ -126,15 +150,20 @@ ViewData["Title"] = "Allocations overview";
                                                     </div>
                                                 </details>
                                             </div>
+                                            @*end of .col-xs-12*@
                                         </div>
+                                        @*end of row*@
                                     </li>
                                     }
                                 </ul>
                             </div>
+                            @*end of panel inside panel-body*@
                         </div>
+                        @*end of panel-body*@
                     </div>
+                    @*end of panel-collapse*@
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@                
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -151,7 +180,7 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@ 
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -168,7 +197,7 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                 @*end of panel*@ 
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -184,11 +213,11 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@
             </div>
         </div>
-        <!-- end of #esfa-collapse  -->
+         @*end of #esfa-collapse*@  
     </div>
-    <!-- end of .col-xs-12  -->
+     @*end of .col-xs-12*@  
 </div>
-<!-- end of .row  -->
+ @*end of .row*@  
