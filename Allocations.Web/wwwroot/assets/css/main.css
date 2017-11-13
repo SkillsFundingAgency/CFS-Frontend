@@ -1752,6 +1752,7 @@ a.button:hover {
       font-size: 19px; }
       .esfa-collapse .panel .item-detail > span.glyphicon {
         font-family: glyphicons-halflings-regular;
+        margin: 0;
         margin-right: 10px;
         color: #6f777b; }
   .esfa-collapse .panel a {
@@ -1857,6 +1858,8 @@ a.button:hover {
 details summary {
   width: 100%;
   text-decoration: none; }
+  details summary .data-item.medium {
+    color: initial; }
   details summary .list-title {
     display: inline-block;
     margin: 0; }
