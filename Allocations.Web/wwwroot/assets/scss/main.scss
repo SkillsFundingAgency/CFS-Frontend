@@ -102,10 +102,14 @@ a.button:hover {
             .panel-body {
                 border-top: none !important;
 
-                .list-title {
+                .list-title:not(.heading-medium) {
                     display: inline-block;
-                    text-decoration: none;
                     font-weight: normal;
+                    text-decoration: none;
+                }
+
+                .heading-medium {
+                    text-decoration: none !important;
                 }
             }
         }
@@ -160,6 +164,12 @@ a.button:hover {
                     outline-offset: 0;
                 }
             }
+        }
+
+        .ammount {
+            color: initial !important;
+            font-weight: normal !important;
+            font-size: initial !important;
         }
     }
 

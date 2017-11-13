@@ -1737,10 +1737,12 @@ a.button:hover {
     display: none; }
     .esfa-collapse .panel .panel-collapse .panel-body {
       border-top: none !important; }
-      .esfa-collapse .panel .panel-collapse .panel-body .list-title {
+      .esfa-collapse .panel .panel-collapse .panel-body .list-title:not(.heading-medium) {
         display: inline-block;
-        text-decoration: none;
-        font-weight: normal; }
+        font-weight: normal;
+        text-decoration: none; }
+      .esfa-collapse .panel .panel-collapse .panel-body .heading-medium {
+        text-decoration: none !important; }
   .esfa-collapse .panel .item-detail {
     display: inline-block;
     margin-right: 10px; }
@@ -1772,6 +1774,10 @@ a.button:hover {
         color: #0b0c0c; }
       .esfa-collapse .panel a.plain-link:focus {
         outline-offset: 0; }
+  .esfa-collapse .panel .ammount {
+    color: initial !important;
+    font-weight: normal !important;
+    font-size: initial !important; }
 
 .esfa-collapse#esfa-list .panel-heading:before {
   content: "";

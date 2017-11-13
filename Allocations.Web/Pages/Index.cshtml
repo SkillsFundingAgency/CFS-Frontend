@@ -32,9 +32,10 @@ ViewData["Title"] = "Allocations overview";
                             <a href="#">
                                 General Annual Grants (GAG)
                             </a>
+                            <span class="ammount">&pound;45.5 billion</span>
                         </h2>
-                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;45.5 billion</span></p>
-                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message">182 Providers failed tests</span></a></p>
+                        <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">182 Providers failed tests</span></a></p>
+                        <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
                     </div>
                     <div class="panel-collapse collapse">
                         <div class="panel-body">
@@ -45,10 +46,10 @@ ViewData["Title"] = "Allocations overview";
                                             <div class="col-xs-12">
                                                 <details>
                                                     <summary>
-                                                        <h3 class="heading-medium list-title summary">Schools Budget Share (SBS)</h3>
+                                                        <h3 class="heading-medium list-title summary">Schools Budget Share (SBS) <span class="ammount">&pound;22 billion</span></h3>
                                                         <div>
-                                                            <p class="item-detail font-xsmall">Total <span class="amount">&pound;22 billion</span></p>
-                                                            <p class="item-detail font-xsmall"><a href="#"><span class="error-message">162 Providers failed tests</span></a></p>
+                                                            <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">162 Providers failed tests</span></a></p>
+                                                            <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
                                                         </div>
                                                     </summary>
 
@@ -56,26 +57,27 @@ ViewData["Title"] = "Allocations overview";
                                                         <ul class="list-group">
                                                             <li class="list-group-item sublist-item">
                                                                 <h4 class="heading-small">
-                                                                    <a asp-page="Results">Pupil Led Factor</a>
+                                                                    <a asp-page="Products/Index">Pupil Led Factor</a>
+                                                                    <span class="ammount">&pound;17 billion</span>
                                                                 </h4>
-                                                                <p class="item-detail font-xsmall">Total <span class="amount">&pound;17 billion</span></p>
-                                                                <p class="item-detail font-xsmall"><a href="#"><span class="error-message">73 providers failed tests</span></a></p>
+                                                                <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">73 providers failed tests</span></a></p>
+                                                                <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
                                                             </li>
-                                                            <li class="list-group-item sublist-item">
+                                                            <li class="list-group-item sublist-tem">
                                                                 <h4 class="heading-small">
                                                                     <a href="#">Other Factor</a>
+                                                                    <span class="ammount">&pound;3 billion</span>
                                                                 </h4>
                                                                 <div>
-                                                                    <p class="item-detail font-xsmall">Total <span class="amount">&pound;3 billion</span></p>
                                                                     <p class="item-detail font-xsmall"><span class="text-success">No failures</span></p>
                                                                 </div>
                                                             </li>
                                                             <li class="list-group-item sublist-item">
                                                                 <h4 class="heading-small">
                                                                     <a href="#">Exceptional Factor</a>
+                                                                    <span class="ammount">&pound;1.5 billion</span>
                                                                 </h4>
                                                                 <div>
-                                                                    <p class="item-detail font-xsmall">Total <span class="amount">&pound;500m</span></p>
                                                                     <p class="item-detail font-xsmall"><a href="#"><span class="error-message">22 providers failed tests</span></a></p>
                                                                 </div>
                                                             </li>
@@ -87,42 +89,45 @@ ViewData["Title"] = "Allocations overview";
 
                                     </li>
                                     @{
-                                        string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
+                                    string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
                                     }
 
                                     @foreach (var allocationLine in allocationLinesMockups)
                                     {
-                                        <li class="list-group-item">
-                                            <div class="row">
-                                                <div class="col-xs-12">
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-xs-12">
 
-                                                    <details>
-                                                        <summary>
-                                                            <h3 class="heading-medium list-title summary">@allocationLine</h3>
-                                                            <div>
-                                                                <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
-                                                                <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
-                                                            </div>
-                                                        </summary>
-
-                                                        <div class="panel panel-border-narrow">
-                                                            <ul class="list-group allocation-lines-list">
-                                                                @for (var i = 1; i < 5; i++)
-                                                                {
-                                                                    <li class="list-group-item sublist-item">
-                                                                        <h4 class="heading-small">
-                                                                            <a asp-page="Results">Allocation line @i</a>
-                                                                        </h4>
-                                                                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
-                                                                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># providers failed tests</span></a></p>
-                                                                    </li>
-                                                                }
-                                                            </ul>
+                                                <details>
+                                                    <summary>
+                                                        <h3 class="heading-medium list-title summary">
+                                                            @allocationLine
+                                                            <span class="ammount">&pound;</span>
+                                                        </h3>
+                                                        <div>
+                                                            <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message"># Providers failed tests</span></a></p>
+                                                            <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message"># Scenarios failing</span></a></p>
                                                         </div>
-                                                    </details>
-                                                </div>
+                                                    </summary>
+
+                                                    <div class="panel panel-border-narrow">
+                                                        <ul class="list-group allocation-lines-list">
+                                                            @for (var i = 1; i < 5; i++)
+                                                            {
+                                                            <li class="list-group-item sublist-item">
+                                                                <h4 class="heading-small">
+                                                                    <a asp-page="Results">Allocation line @i</a>
+                                                                </h4>
+                                                                <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
+                                                                <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># providers failed tests</span></a></p>
+                                                            </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             </div>
-                                        </li>
+                                        </div>
+                                    </li>
                                     }
                                 </ul>
                             </div>
@@ -137,12 +142,12 @@ ViewData["Title"] = "Allocations overview";
                                 16-19 Funding
                             </a>
                         </h2>
-                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
                         <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
                     </div>
                     <div class="panel-collapse collapse">
                         <div class="panel-body">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -154,12 +159,12 @@ ViewData["Title"] = "Allocations overview";
                                 High Needs Funding
                             </a>
                         </h2>
-                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
                         <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
                     </div>
                     <div id="three" class="panel-collapse collapse">
                         <div class="panel-body">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -171,7 +176,7 @@ ViewData["Title"] = "Allocations overview";
                                 Another funding stream
                             </a>
                         </h2>
-                        <p class="item-detail font-xsmall">Total <span class="amount">&pound;</span></p>
+                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
                         <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
                     </div>
                     <div id="four" class="panel-collapse collapse">
