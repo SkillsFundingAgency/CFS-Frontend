@@ -20,7 +20,9 @@ ViewData["Title"] = "Allocations overview";
             <img src="~/assets/images/graph.png" />
         </div>
     </div>
+    @*end of col-xs-8*@
 </div>
+@*end of row*@
 <div class="row">
     <div class="col-xs-12 col-md-8">
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
@@ -28,14 +30,75 @@ ViewData["Title"] = "Allocations overview";
                 <button class="accordion-toggle">Open all</button>
                 <div class="panel">
                     <div class="panel-heading">
-                        <h2 class="panel-title">
-                            <a href="#">
-                                General Annual Grants (GAG)
-                            </a>
-                            <span class="ammount">&pound;45.5 billion</span>
+                        <h2 class="panel-title stream-title">
+                        <a href="#">
+                            General Annual Grants (GAG)
+                        </a>
+                        <span class="ammount">&pound;45.5 billion</span>
                         </h2>
-                        <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">182 Providers failed tests</span></a></p>
-                        <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
+                        <div class="esfa-summary">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-3">
+                                    <div class="data">
+                                        <span class="data-item medium">1000</span>
+                                        <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-3">
+                                    <div class="data">
+                                        <span class="data-item medium">700</span>
+                                        <a class="data-link success" asp-page="Products/Index" ><span class="data-item bold-xsmall text-success">covered</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-3">
+                                    <div class="data">
+                                        <span class="data-item medium">300</span>
+                                        <a class="data-link failing" asp-page="Products/Index" ><span class="data-item bold-xsmall error-message">test failing</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-11 col-sm-2">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                             aria-valuemin="0" aria-valuemax="100" style="width:70%">
+                                            70% Complete (success)
+                                        </div>
+                                    </div>
+                                    <div class="data">
+                                        <span class="data-item bold-xsmall">coverage</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*end of esfa-summary*@
+                        @*<div class="esfa-summary">
+                            <div class="total-providers pull-right">
+                                <p class="item-detail font-xsmall total-providers">
+                                    <a asp-page="Providers/Index">
+                                        <span class="providers-number">1000</span> total providers
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="coverage pull-left">
+                                <p class="item-detail font-xsmall failing">
+                                    <a asp-page="Products/Index">
+                                        <span class="providers-number error-message">300 failing</span>
+                                    </a>
+                                </p>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                         aria-valuemin="0" aria-valuemax="100" style="width:40%">
+                                        40% Complete (success)
+                                    </div>
+                                </div>
+                                <p class="item-detail font-xsmall text-success covered">
+                                    <a asp-page="Products/Index">
+                                        <span class="providers-number text-success">500 covered</span>
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>*@
+                        @*end of .esfa-summary*@
                     </div>
                     <div class="panel-collapse collapse">
                         <div class="panel-body">
@@ -47,9 +110,38 @@ ViewData["Title"] = "Allocations overview";
                                                 <details>
                                                     <summary>
                                                         <h3 class="heading-medium list-title summary">Schools Budget Share (SBS) <span class="ammount">&pound;22 billion</span></h3>
-                                                        <div>
-                                                            <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">162 Providers failed tests</span></a></p>
-                                                            <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
+                                                        <div class="esfa-summary">
+                                                            <div class="row">
+                                                                <div class="col-xs-12 col-sm-3">
+                                                                    <div class="data">
+                                                                        <span class="data-item medium">1000</span>
+                                                                        <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 col-sm-3">
+                                                                    <div class="data">
+                                                                        <span class="data-item medium">700</span>
+                                                                        <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 col-sm-3">
+                                                                    <div class="data">
+                                                                        <span class="data-item medium">300</span>
+                                                                        <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-11 col-sm-2">
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                                                             aria-valuemin="0" aria-valuemax="100" style="width:70%">
+                                                                            70% Complete (success)
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="data">
+                                                                        <span class="data-item bold-xsmall">coverage</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </summary>
 
@@ -60,8 +152,39 @@ ViewData["Title"] = "Allocations overview";
                                                                     <a asp-page="Products/Index">Pupil Led Factor</a>
                                                                     <span class="ammount">&pound;17 billion</span>
                                                                 </h4>
-                                                                <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message">73 providers failed tests</span></a></p>
-                                                                <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message">3 Calculations failing</span></a></p>
+                                                                <div class="esfa-summary">
+                                                                    <div class="row">
+                                                                        <div class="col-xs-12 col-sm-3">
+                                                                            <div class="data">
+                                                                                <span class="data-item medium">1000</span>
+                                                                                <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-3">
+                                                                            <div class="data">
+                                                                                <span class="data-item medium">700</span>
+                                                                                <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-xs-12 col-sm-3">
+                                                                            <div class="data">
+                                                                                <span class="data-item medium">300</span>
+                                                                                <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-xs-11 col-sm-2">
+                                                                            <div class="progress">
+                                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                                                                     aria-valuemin="0" aria-valuemax="100" style="width:70%">
+                                                                                    70% Complete (success)
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="data">
+                                                                                <span class="data-item bold-xsmall">coverage</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </li>
                                                             <li class="list-group-item sublist-tem">
                                                                 <h4 class="heading-small">
@@ -83,10 +206,12 @@ ViewData["Title"] = "Allocations overview";
                                                             </li>
                                                         </ul>
                                                     </div>
+                                                    @*end of panel.panel-border-narrow*@
                                                 </details>
                                             </div>
+                                            @*end of col-xs-12*@
                                         </div>
-
+                                        @*end of row*@
                                     </li>
                                     @{
                                     string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
@@ -126,15 +251,20 @@ ViewData["Title"] = "Allocations overview";
                                                     </div>
                                                 </details>
                                             </div>
+                                            @*end of .col-xs-12*@
                                         </div>
+                                        @*end of row*@
                                     </li>
                                     }
                                 </ul>
                             </div>
+                            @*end of panel inside panel-body*@
                         </div>
+                        @*end of panel-body*@
                     </div>
+                    @*end of panel-collapse*@
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@                
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -151,7 +281,7 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@ 
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -168,7 +298,7 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                 @*end of panel*@ 
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -184,11 +314,11 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                     </div>
                 </div>
-                <!-- end of panel -->
+                @*end of panel*@
             </div>
         </div>
-        <!-- end of #esfa-collapse  -->
+         @*end of #esfa-collapse*@  
     </div>
-    <!-- end of .col-xs-12  -->
+     @*end of .col-xs-12*@  
 </div>
-<!-- end of .row  -->
+ @*end of .row*@  
