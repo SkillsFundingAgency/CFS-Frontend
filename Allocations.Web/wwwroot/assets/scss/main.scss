@@ -128,6 +128,7 @@ a.button:hover {
 
                 &.glyphicon {
                     font-family: glyphicons-halflings-regular;
+                    margin: 0;
                     margin-right: 10px;
                     color: $secondary-text-colour;
                 }
@@ -297,6 +298,12 @@ details {
     summary {
         width: 100%;
         text-decoration: none;
+
+        .data-item {
+            &.medium {
+                color: initial;
+            }
+        }
 
         .list-title {
             display: inline-block;
