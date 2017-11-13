@@ -2,7 +2,7 @@
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
-        headingSiblings = $('.item-detail').add($('.panel-title')),
+        headingSiblings = $('.esfa-summary > div > div').add($('.panel-title:not(.stream-title)')),
         headingText = $('panel-title'),
         summaryText = $('summary > p');
 
@@ -28,9 +28,6 @@
         return false;
     });
     headingSiblings.click(function (e) {
-        e.stopImmediatePropagation();
-    });
-    summaryText.click(function (e) {
         e.stopImmediatePropagation();
     });
 
