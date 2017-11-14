@@ -1,7 +1,10 @@
 ﻿$(document).ready(function () {
-    var heading = $('.esfa-collapse .panel-heading'),
+    var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
-        expandLink = $('.accordion-toggle');
+        expandLink = $('.accordion-toggle'),
+        headingSiblings = $('.esfa-summary > div > div').add($('.panel-title:not(.stream-title)')),
+        headingText = $('panel-title'),
+        summaryText = $('summary > p');
 
     //add the accordion functionality
     heading.click(function (e) {
@@ -9,19 +12,23 @@
             isOpen = panel.is(':visible'),
             active = $(this).addClass('active'),
             inactive = $(this).removeClass('active');
+        console.log($(e.target));
         //open or close as necessary
         panel[isOpen ? 'hide' : 'show']()
             //trigger the correct custom event
             .trigger(isOpen ? 'hide' : 'show')
         if (isOpen) {
             panel.prev(heading).removeClass('active');
-           
+
         }
         else {
             panel.prev(heading).addClass('active');
         }
         //stop this to cause a page scroll
-        return false;       
+        return false;
+    });
+    headingSiblings.click(function (e) {
+        e.stopImmediatePropagation();
     });
 
     // hook up the expand/collapse all
@@ -57,7 +64,7 @@
     var $filterCheckboxes = $('#esfa-filter input[type="checkbox"]');
 
     $filterCheckboxes.on('change', function () {
-       
+
         var selectedFilters = {};
 
         $filterCheckboxes.filter(':checked').each(function () {
@@ -89,7 +96,7 @@
                     // set matched to true, and stop looping. as we're ORing in each
                     // set of filters, we only need to match once
 
-                    if ($.inArray(currentFilterValue, filterValues) != -1) {
+                    if ($.inArray(currentFilterValue, filterValues) !== -1) {
                         matched = true;
                         return false;
                     }
