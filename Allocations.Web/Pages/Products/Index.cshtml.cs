@@ -11,7 +11,11 @@ namespace Allocations.Web.Pages.Products
     {
         public void OnGet()
         {
-
+            //var searchTerm = RouteData.Values["id"];
+            //var x = 3;
+            //var y = 5;
+            //var a = RouteData.Values["id"];
+            //var z = x + y;
         }
     }
 }

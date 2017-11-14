@@ -25,6 +25,12 @@ namespace Allocations.Web.Pages
             }
             return Page();
         }
+        [HttpGet]
+        public ActionResult GetThese(string id)
+        {
+            var test = id;
+            return Page();
+        }
     }
 
     public class Budget

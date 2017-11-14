@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{id?}"
 @model Allocations.Web.Pages.Products.IndexModel
 @{
     ViewData["Title"] = "Productss";
@@ -10,7 +10,7 @@
 }
 <div class="row">
     <div class="col-xs-8">
-        <h1 class="heading-xlarge">Pupil-led factor</h1>
+        <h1 class="heading-xlarge">@Model.RouteData.Values["id"]</h1>
     </div>
 </div>
 <div class="row">
