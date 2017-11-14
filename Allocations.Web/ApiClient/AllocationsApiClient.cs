@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient.Models;
+using Allocations.Web.Pages;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -15,16 +16,19 @@ namespace Allocations.Web.ApiClient
     {
         public string AllocationsApiKey { get; set; }
         public string AllocationsApiEndpoint { get; set; }
+        public string ResultsPath { get; set; }
     }
     public class AllocationsApiClient
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings{Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()};
+        private string _resultsPath;
 
         public AllocationsApiClient(IOptions<AllocationApiOptions> options)
         {
             _httpClient = new HttpClient(){BaseAddress = new Uri(options.Value.AllocationsApiEndpoint)};
             _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.AllocationsApiKey);
+            _resultsPath = options.Value.ResultsPath ?? "api/v1/results";
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -36,6 +40,11 @@ namespace Allocations.Web.ApiClient
                 return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync(), _serializerSettings));
             }
             return new ApiResponse<T>(response.StatusCode);
+        }
+
+        public async Task<ApiResponse<RootObject[]>> GetBudgetResults()
+        {
+            return await GetAsync<RootObject[]>($"{_resultsPath}/budgets");
         }
 
         public async Task<ApiResponse<Budget>> GetBudget(string id)
