@@ -1,0 +1,24 @@
+﻿@model ApiClient.Models.Budget
+@{
+}
+<h2>
+    <a asp-page="Budget" asp-route-id="@Model.Id">@Model.Name</a>
+</h2>
+          
+         <h3>Products</h3>
+         @foreach (var productFolder in Model.FundingPolicies
+             .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders)))
+         {
+             <h4><span class="glyphicon glyphicon-folder-close"></span> @productFolder.Name</h4>
+             foreach (var product in productFolder.Products)
+             {
+                 <h5><a asp-page="Product" asp-route-id="@Model.Id">@product.Name</a></h5>
+             }
+
+         }
+        <h3>Dataset definitions</h3>
+        @foreach (var dataset in Model.DatasetDefinitions)
+        {
+            <h5><a asp-page="Dataset" asp-route-id="@Model.Id">@dataset.Name</a></h5>
+        }
+

@@ -1,0 +1,25 @@
+﻿@page
+@using ApiClient.Models
+@model TestScenarioModel
+@{
+}
+<div class="row">
+    <div class="col-xs-8">
+        <h2>@Model.Product.Name</h2>
+        <p>@Model.Product.Description</p>
+        <h1 class="heading-xlarge">Create new scenario</h1>
+    </div>
+</div>
+<div class="row">
+        <div class="col-md-12">
+
+            <form>
+
+                <div class="form-group">
+                    <label for="name">Name of the scenario</label>
+                    <input class="form-control" id="name" value="@Model.Product.Name">
+                </div>
+                <button type="submit" class="btn btn-default">Save</button>
+            </form>
+        </div>
+</div><!-- end of .row -->
