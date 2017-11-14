@@ -22,7 +22,7 @@ namespace Allocations.Web.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var results = await _apiClient.GetAsync<RootObject[]>("api/v1/results/budgets");
+            var results = await _apiClient.GetBudgetResults();
 
             Rootobjects = results.Content;
             return Page();
