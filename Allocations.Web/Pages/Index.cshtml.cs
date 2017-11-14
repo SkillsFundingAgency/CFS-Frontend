@@ -4,39 +4,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Allocations.Web.ApiClient;
+using Allocations.Web.ApiClient.Models;
 using Newtonsoft.Json;
 
 namespace Allocations.Web.Pages
 {
     public class IndexModel : PageModel
     {
+        private readonly AllocationsApiClient _apiClient;
         public IList<RootObject> Rootobjects;
+
+        public IndexModel(AllocationsApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://localhost:7071");
+            var results = await _apiClient.GetAsync<RootObject[]>("api/v1/results/budgets");
 
-                //HTTP GET
-                var responseTask = await client.GetStringAsync("/api/budgets");
-                var results = JsonConvert.DeserializeObject<List<RootObject>>(responseTask);
-                Rootobjects = results;
-            }
+            Rootobjects = results.Content;
             return Page();
         }
+
         [HttpGet]
         public ActionResult GetThese(string id)
         {
             var test = id;
             return Page();
         }
-    }
-
-    public class Budget
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
     }
 
     public class TestSummary
@@ -64,7 +61,7 @@ namespace Allocations.Web.Pages
     }
     public class RootObject
     {
-        public Budget Budget { get; set; }
+        public Reference Budget { get; set; }
         public IList<FundingPolicy> FundingPolicies { get; set; }
         public double TotalAmount { get; set; }
         public TestSummary TestSummary { get; set; }

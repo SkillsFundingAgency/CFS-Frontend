@@ -28,7 +28,7 @@ namespace Allocations.Web.ApiClient
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        private async Task<ApiResponse<T>> GetAsync<T>(string url)
+        public async Task<ApiResponse<T>> GetAsync<T>(string url)
         {
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
