@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Allocations.Web.Pages
+namespace Allocations.Web.Pages.Providers
 {
-    public class results2Model : PageModel
+    public class IndexModel : PageModel
     {
         public void OnGet()
         {

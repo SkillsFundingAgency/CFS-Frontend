@@ -102,10 +102,14 @@ a.button:hover {
             .panel-body {
                 border-top: none !important;
 
-                .list-title {
+                .list-title:not(.heading-medium) {
                     display: inline-block;
-                    text-decoration: none;
                     font-weight: normal;
+                    text-decoration: none;
+                }
+
+                .heading-medium {
+                    text-decoration: none !important;
                 }
             }
         }
@@ -160,6 +164,12 @@ a.button:hover {
                     outline-offset: 0;
                 }
             }
+        }
+
+        .ammount {
+            color: initial !important;
+            font-weight: normal !important;
+            font-size: initial !important;
         }
     }
 
@@ -285,7 +295,7 @@ a.button:hover {
 }
 details {
     summary {
-
+        width: 100%;
         text-decoration: none;
 
         .list-title {
@@ -425,7 +435,6 @@ a.test {
 }
 
 .error-message {
-    font-size: 19px !important;
     font-weight: normal !important;
     
     a {
@@ -442,8 +451,12 @@ a.test {
     > a {
         display: inline-block;
         text-decoration: underline;
-        text-decoration-color: $red;
+        text-decoration-color: inherit;
     }
+}
+.progress {
+    display: inline-block;
+    width: 20%;
 }
 .year-form {
     .form-control {
@@ -461,5 +474,48 @@ a.test {
     
     img {
         width: 100%;
+    }
+}
+
+.esfa-summary {
+    margin-top: 30px;
+
+    .data {
+        margin-top: 0;
+
+        .data-link {
+            padding: 0 !important;
+            text-decoration: underline;
+
+            &.success {
+                text-decoration-color: $green;
+            }
+
+            &.failing {
+                text-decoration-color: $error-colour;
+            }
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        .data-item {
+            padding: 0;
+            font-size: inherit;
+            font-weight: normal;
+            line-height: 1;
+        }
+    }
+
+    .progress {
+        margin-bottom: 0;
+        display: block;
+        width: 100%;
+        background-color: $mellow-red;
+
+        .progress-bar-success {
+            background-color: $green;
+        }
     }
 }
