@@ -1,4 +1,4 @@
-﻿namespace Allocations.Web.ApiClient
+﻿namespace Allocations.Web.ApiClient.Models
 {
     public class TestSummary
     {

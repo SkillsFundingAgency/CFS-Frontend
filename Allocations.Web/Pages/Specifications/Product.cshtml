@@ -1,0 +1,119 @@
+﻿@page
+@using ApiClient.Models
+@model ProductModel
+@{
+}
+<div class="row">
+    <div class="col-xs-8">
+        <h1 class="heading-xlarge">Budget specification</h1>
+    </div>
+</div>
+<div class="row">
+    <div id="sidebar">
+        <div class="col-md-4">
+            @Html.Partial("_SpecMenu", Model.Budget)
+        </div>
+    </div>
+    <div id="main">
+        <div class="col-md-8">
+ 
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Calculation</a></li>
+                        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Specification</a></li>
+                        <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Test Scenarios</a></li>
+                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Test Providers</a></li>
+                    </ul>
+
+                    <!-- Tab panes -->
+            <div class="tab-content">
+               
+                <div role="tabpanel" class="tab-pane active" id="home">
+                    <form method="post">
+                        <div class="form-group">
+                            <textarea style="font-family: monospace" class="form-control" id="calculation" name="calculation" rows="11">@Model.Product.Calculation.SourceCode</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-default">Build</button>
+                        <button type="submit" class="btn btn-default">Save</button>
+                    </form>
+
+                </div>
+                
+                <div role="tabpanel" class="tab-pane" id="profile">
+                    <form>
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input class="form-control" id="name" value="@Model.Product.Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea  class="form-control" id="description" rows="5">@Model.Product.Description</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-default">Save</button>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="messages">
+
+                    <div class="form-group">
+                        <label for="description">Test Scenarios</label>
+                        <textarea style="font-family: monospace" class="form-control" id="description" rows="15">@Model.Product.FeatureFile</textarea>
+                    </div>
+                    <h5><a asp-page="TestScenario" asp-route-id="@Model.Budget.Id">Add scenario</a></h5>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="settings">
+                    <div class="form-group">
+                        <label for="description">Test Providers</label>
+                        @if (Model.Product.TestProviders != null)
+                        {
+                            foreach (var testProvider in Model.Product.TestProviders)
+                            {
+                                <p>@testProvider.Name</p>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <h2>Results</h2>
+
+                @if (Model.Preview.CompilerOutput.Success)
+                {
+                    <h3>Compilation succeeded</h3>
+                }
+                else
+                {
+                    <h4>Compilation failed</h4>
+                }
+            <table class="table table-condensed">
+
+                @foreach (var diagostic in Model?.Preview?.CompilerOutput?.CompilerMessages.Where(x => x.Severity != Severity.Hidden))
+                {
+                    <tr>
+                        <td>@diagostic.Severity</td>
+                        <td>@diagostic.Message</td>
+                    </tr>
+                    
+                }
+
+            </table>
+            <h3>Test Results</h3>
+            @foreach (var tr in Model.Preview.TestResults)
+            {
+                <h4>@tr.Provider.Name</h4>
+                @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
+                 {
+                     <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
+                     foreach (var scenario in scenarioResult)
+                     {
+                         <p>@scenario.ScenarioName @scenario.TestResult</p>
+                     }
+                }
+            }
+        </div>
+
+
+
+
+
+    </div>
+</div><!-- end of .row -->
