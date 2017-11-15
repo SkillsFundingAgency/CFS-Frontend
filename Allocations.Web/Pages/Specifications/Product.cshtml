@@ -29,9 +29,10 @@
             <div class="tab-content">
                
                 <div role="tabpanel" class="tab-pane active" id="home">
+                    <p>@Model.Product.Description</p>
                     <form method="post">
                         <div class="form-group">
-                            <textarea style="font-family: monospace" class="form-control" id="calculation" name="calculation" rows="11">@Model.Product.Calculation.SourceCode</textarea>
+                            <div class="editor" id="calculation" name="calculation">@Model.Product.Calculation.SourceCode</div>
                         </div>
                         <button type="submit" class="btn btn-default">Build</button>
                         <button type="submit" class="btn btn-default">Save</button>

@@ -2004,5 +2004,7 @@ a.test {
     .esfa-summary .progress .progress-bar-success {
       background-color: #006435; }
 
-#editor {
-  height: 250px; }
+.editor {
+  min-height: 250px;
+  border: 1px solid #bfc1c3;
+  width: 100%; }
