@@ -2003,3 +2003,6 @@ a.test {
     background-color: #df3034; }
     .esfa-summary .progress .progress-bar-success {
       background-color: #006435; }
+
+#editor {
+  height: 250px; }
