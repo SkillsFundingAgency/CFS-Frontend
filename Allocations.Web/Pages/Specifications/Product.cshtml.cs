@@ -48,8 +48,13 @@ namespace Allocations.Web.Pages.Specifications
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
-                Calculation = Product.Calculation?.SourceCode
+                Calculation = calculation ?? Product.Calculation?.SourceCode
             });
+
+            if (!string.IsNullOrEmpty(calculation))
+            {
+                Product.Calculation = new ProductCalculation {SourceCode = calculation};
+            }
 
             Preview = response.Content;
         }
