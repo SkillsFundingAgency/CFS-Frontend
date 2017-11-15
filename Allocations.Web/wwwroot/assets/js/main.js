@@ -114,3 +114,16 @@
 
 
 });
+
+//Embed Ace Editor
+var editor = ace.edit("editor");
+//editor.setTheme("ace/theme/twilight");
+editor.setReadOnly(true);
+var JavaScriptMode = ace.require("ace/mode/csharp").Mode;
+editor.session.setMode(new JavaScriptMode());
+ace.require("ace/ext/language_tools");
+editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableSnippets: true,
+    enableLiveAutocompletion: false
+});
