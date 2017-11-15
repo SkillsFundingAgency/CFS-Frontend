@@ -72,10 +72,15 @@ namespace Allocations.Web.Pages.Specifications
                     var split = givenStep.Field.Split('|');
                     givenStep.Dataset = split[0].Trim();
                     givenStep.Field = split[1].Trim();
+                    givenStep.StepType = TestStepType.GivenSourceField;
                 }
 
                 TestScenario.ThenSteps = TestScenario.ThenSteps.Where(x =>
                     !string.IsNullOrEmpty(x.Value)).ToList();
+                foreach (var thenStep in TestScenario.ThenSteps)
+                {
+                    thenStep.StepType = TestStepType.ThenProductValue;
+                }
 
                 Budget = (await _apiClient.GetBudget(id))?.Content;
 

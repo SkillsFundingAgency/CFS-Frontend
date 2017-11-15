@@ -54,17 +54,34 @@
                     </form>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="messages">
-
-                    @foreach (var testScenario in Model.Product.TestScenarios)
-                    {
-                        <h5>@testScenario.Name</h5>
-                        <h6>Given</h6>
-                        if (testScenario.ThenSteps.Any())
+                    <p>
+                        @foreach (var testScenario in Model.Product.TestScenarios)
                         {
-                            @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+                            <h2>@testScenario.Name</h2>
+
+                            if (testScenario.GivenSteps.Any())
+                            {
+                                <h3>Given</h3>
+                                @Html.Partial("_TestStep", testScenario.GivenSteps.First())
+                                foreach (var givenStep in testScenario.GivenSteps.Skip(1))
+                                {
+                                    <h3>And</h3>
+                                    @Html.Partial("_TestStep", givenStep)
+                                }
+                            }
+
+                            if (testScenario.ThenSteps.Any())
+                            {
+                                <h6>Then</h6>
+                                @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+                                foreach (var thenStep in testScenario.ThenSteps.Skip(1))
+                                {
+                                    <h3>And</h3>
+                                    @Html.Partial("_TestStep", thenStep)
+                                }
+                            }
                         }
-                        <h6>Then</h6>
-                    }
+                    </p>
                     <h5><a asp-page="TestScenario" asp-route-id="@Model.Budget.Id">Add scenario</a></h5>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="settings">
