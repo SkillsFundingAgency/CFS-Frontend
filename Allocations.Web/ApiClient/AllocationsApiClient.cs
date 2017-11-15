@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient.Models;
 using Allocations.Web.Pages;
@@ -31,8 +32,8 @@ namespace Allocations.Web.ApiClient
         {
             _httpClient = new HttpClient(){BaseAddress = new Uri(options.Value.AllocationsApiEndpoint)};
             _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.AllocationsApiKey);
-            _resultsPath = options.Value.ResultsPath ?? "api/v1/results";
-            _specsPath = options.Value.SpecsPath ?? "api/v1/specs";
+            _resultsPath = options.Value.ResultsPath ?? "/api/v1/results";
+            _specsPath = options.Value.SpecsPath ?? "/api/v1/specs";
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -71,7 +72,7 @@ namespace Allocations.Web.ApiClient
         private async Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest request)
         {
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            var response = await _httpClient.PostAsync(url, new StringContent(json));
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
@@ -82,7 +83,7 @@ namespace Allocations.Web.ApiClient
         private async Task<HttpStatusCode> PostAsync<TRequest>(string url, TRequest request)
         {
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            var response = await _httpClient.PostAsync(url, new StringContent(json));
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
             return response.StatusCode;
         }
 
