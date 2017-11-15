@@ -1,8 +1,8 @@
 ﻿@page
+@using Allocations.Web.Pages.Specifications
 @using ApiClient.Models
-@model TestScenarioModel
-@{
-}
+@model Allocations.Web.Pages.Specifications.TestScenarioModel
+
 <div class="row">
     <div class="col-xs-8">
         <h2>@Model.Product.Name</h2>
@@ -10,16 +10,114 @@
         <h1 class="heading-xlarge">Create new scenario</h1>
     </div>
 </div>
+<form method="post">
 <div class="row">
         <div class="col-md-12">
-
-            <form>
-
                 <div class="form-group">
                     <label for="name">Name of the scenario</label>
-                    <input class="form-control" id="name" value="@Model.Product.Name">
+                    <input asp-for="TestScenario.Id" type="hidden" >
+                    <input asp-for="TestScenario.Name" class="form-control" id="name" >
                 </div>
-                <button type="submit" class="btn btn-default">Save</button>
-            </form>
+    </div></div><!-- end of .row -->  
+    
+    
+
+<div class="row">
+    <div class="col-md-5 col-md-offset-1" >
+        Dataset Field
+    </div>
+    <div class="col-md-3">
+        Operator
+    </div>
+    <div class="col-md-3">
+        Value
+    </div>
+</div>
+                
+@for(var i = 0; i < Model.TestScenario.GivenSteps.Count;i++)
+{
+    var step = Model.TestScenario.GivenSteps[i];
+    <div class="row">
+        <div class="col-md-1">
+            @if (i == 0)
+            {
+                <span>Given</span>
+            }
+            else
+            {
+                <span>And</span>
+            }
         </div>
-</div><!-- end of .row -->
+        <div class="col-md-5">
+            <select name="TestScenario.GivenSteps[@i].Field">
+                <option></option>
+                @foreach (var dataset in Model.Budget.DatasetDefinitions)
+                {
+                    foreach (var fieldDefinition in dataset.FieldDefinitions)
+                    {
+                        <option value="@dataset.Id|@fieldDefinition.Id">@dataset.Name -> @fieldDefinition.Name</option>
+                    }
+
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="TestScenario.GivenSteps[@i].Operator">
+                @foreach (var op in Model.Operators)
+                {
+                    <option>@op</option>
+
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input name="TestScenario.GivenSteps[@i].Value" type="text"/>
+        </div>
+    </div>
+}
+    
+    <div class="row">
+        <div class="col-md-5 col-md-offset-1" >
+        </div>
+        <div class="col-md-3">
+            Operator
+        </div>
+        <div class="col-md-3">
+            Value
+        </div>
+    </div>
+                
+    @for(var i = 0; i < Model.TestScenario.ThenSteps.Count;i++)
+    {
+        var step = Model.TestScenario.ThenSteps[i];
+        <div class="row">
+            <div class="col-md-1">
+                @if (i == 0)
+                {
+                    <span>Then</span>
+                }
+                else
+                {
+                    <span>And</span>
+                }
+            </div>
+            <div class="col-md-5">
+                the product 
+            </div>
+            <div class="col-md-3">
+                <select name="TestScenario.ThenSteps[@i].Operator">
+                    @foreach (var op in Model.Operators)
+                    {
+                        <option>@op</option>
+
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input name="TestScenario.ThenSteps[@i].Value" type="text"/>
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-default">Save</button>
+            </form>
