@@ -119,7 +119,6 @@
                             <td>@diagostic.Severity</td>
                             <td>@diagostic.Message</td>
                         </tr>
-
                     }
 
                 </table>
@@ -132,7 +131,7 @@
                           <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
                           foreach (var scenario in scenarioResult)
                           {
-                              <p>@scenario.ScenarioName @scenario.TestResult</p>
+                              <p>@scenario.Scenario?.Name @scenario.TestResult</p>
                           }
                       }
                  }
