@@ -25,13 +25,12 @@ namespace Allocations.Web.Pages.Specifications
                 .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
                 .Skip(1).FirstOrDefault();
 
-            var response = (await _apiClient.PostAsync<PreviewResponse, PreviewRequest>("api/v1/engine/preview",
-                new PreviewRequest
-                {
-                    BudgetId = Budget.Id,
-                    ProductId = Product.Id,
-                    Calculation = Product.Calculation?.SourceCode
-                }));
+            var response = await _apiClient.PostPreview(new PreviewRequest
+            {
+                BudgetId = Budget.Id,
+                ProductId = Product.Id,
+                Calculation = Product.Calculation?.SourceCode
+            });
 
             Preview = response.Content;
         }
@@ -44,13 +43,13 @@ namespace Allocations.Web.Pages.Specifications
                 .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
                 .Skip(1).FirstOrDefault();
 
-            var response = (await _apiClient.PostAsync<PreviewResponse, PreviewRequest>("api/v1/engine/preview",
-                new PreviewRequest
-                {
-                    BudgetId = Budget.Id,
-                    ProductId = Product.Id,
-                    Calculation = calculation ?? Product.Calculation?.SourceCode
-                }));
+
+            var response = await _apiClient.PostPreview(new PreviewRequest
+            {
+                BudgetId = Budget.Id,
+                ProductId = Product.Id,
+                Calculation = Product.Calculation?.SourceCode
+            });
 
             Preview = response.Content;
         }

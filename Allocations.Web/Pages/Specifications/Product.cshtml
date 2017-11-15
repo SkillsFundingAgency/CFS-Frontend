@@ -55,10 +55,16 @@
                 </div>
                 <div role="tabpanel" class="tab-pane" id="messages">
 
-                    <div class="form-group">
-                        <label for="description">Test Scenarios</label>
-                        <textarea style="font-family: monospace" class="form-control" id="description" rows="15">@Model.Product.FeatureFile</textarea>
-                    </div>
+                    @foreach (var testScenario in Model.Product.TestScenarios)
+                    {
+                        <h5>@testScenario.Name</h5>
+                        <h6>Given</h6>
+                        if (testScenario.ThenSteps.Any())
+                        {
+                            @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+                        }
+                        <h6>Then</h6>
+                    }
                     <h5><a asp-page="TestScenario" asp-route-id="@Model.Budget.Id">Add scenario</a></h5>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="settings">
@@ -74,40 +80,45 @@
                     </div>
                 </div>
             </div>
-            <h2>Results</h2>
+            @if (Model.Preview != null)
+            {
+
+
+                <h2>Results</h2>
 
                 @if (Model.Preview.CompilerOutput.Success)
-                {
-                    <h3>Compilation succeeded</h3>
-                }
-                else
-                {
-                    <h4>Compilation failed</h4>
-                }
-            <table class="table table-condensed">
-
-                @foreach (var diagostic in Model?.Preview?.CompilerOutput?.CompilerMessages.Where(x => x.Severity != Severity.Hidden))
-                {
-                    <tr>
-                        <td>@diagostic.Severity</td>
-                        <td>@diagostic.Message</td>
-                    </tr>
-                    
-                }
-
-            </table>
-            <h3>Test Results</h3>
-            @foreach (var tr in Model.Preview.TestResults)
-            {
-                <h4>@tr.Provider.Name</h4>
-                @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
                  {
-                     <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
-                     foreach (var scenario in scenarioResult)
-                     {
-                         <p>@scenario.ScenarioName @scenario.TestResult</p>
-                     }
-                }
+                     <h3>Compilation succeeded</h3>
+                 }
+                 else
+                 {
+                     <h4>Compilation failed</h4>
+                 }
+                <table class="table table-condensed">
+
+                    @foreach (var diagostic in Model?.Preview?.CompilerOutput?.CompilerMessages.Where(x => x.Severity != Severity.Hidden))
+                    {
+                        <tr>
+                            <td>@diagostic.Severity</td>
+                            <td>@diagostic.Message</td>
+                        </tr>
+
+                    }
+
+                </table>
+                <h3>Test Results</h3>
+                @foreach (var tr in Model.Preview.TestResults)
+                 {
+                     <h4>@tr.Provider.Name</h4>
+                     @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
+                      {
+                          <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
+                          foreach (var scenario in scenarioResult)
+                          {
+                              <p>@scenario.ScenarioName @scenario.TestResult</p>
+                          }
+                      }
+                 }
             }
         </div>
 
