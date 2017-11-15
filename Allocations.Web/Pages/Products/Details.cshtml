@@ -18,9 +18,15 @@
 </div>
 <div class="row">
     <div class="col-xs-8">
-        <div id="editor">
-            
-        </div>
+        <div class="editor read-only">Dim t As DateTime = New DateTime(2018, 4, 1)
+Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
+Dim result As Decimal
+If flag Then
+result = Me.APTBasicEntitlement.PrimaryAmount
+Else
+result = Me.P004_PriRate() * Me.CensusNumberCounts.NORPrimary
+End If
+Return result</div>
     </div>
 </div>
 <div class="row">
