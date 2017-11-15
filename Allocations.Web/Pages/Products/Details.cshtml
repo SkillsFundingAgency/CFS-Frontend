@@ -11,13 +11,13 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 <div class="row">
-    <div class="col-xs-8">
+    <div class="col-xs-12 col-sm-8">
         <h1 class="heading-xlarge">Pri005_PriBESubTotal Summary</h1>
         <p>Full year ammount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-8">
+    <div class="col-xs-12 col-sm-8">
         <div class="editor read-only">Dim t As DateTime = New DateTime(2018, 4, 1)
 Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
 Dim result As Decimal
@@ -44,7 +44,7 @@ Return result</div>
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-12 col-sm-8">
         <h2 class="heading-large">Scenarios:</h2>
     </div>
     <div class="col-xs-12 col-md-8">
