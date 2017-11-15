@@ -71,7 +71,18 @@ gulp.task('copy-assets', function () {
     var assets = {
         js: [
             './node_modules/bootstrap/dist/js/bootstrap.js',
-            './node_modules/jquery/dist/jquery.min.js'
+            './node_modules/jquery/dist/jquery.min.js',
+            './node_modules/ace-builds/src-noconflict/',
+            './node_modules/ace-builds/src-noconflict/mode-csharp.js',
+            './node_modules/ace-builds/src-noconflict/mode-gherkin.js',
+            './node_modules/ace-builds/src-noconflict/mode-vbscript.js',
+            './node_modules/ace-builds/src-noconflict/theme-twilight.js',
+            './node_modules/ace-builds/src-noconflict/keybinding-emacs.js',
+            './node_modules/ace-builds/src-noconflict/keybinding-vim.js',
+            './node_modules/ace-builds/src-noconflict/ext-language_tools.js',
+            './node_modules/ace-builds/src-noconflict/snippets/csharp.js',
+            './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
+            './node_modules/ace-builds/src-noconflict/snippets/vbscripts.js'
         ],
         css: ['./node_modules/bootstrap/dist/css/bootstrap.css'],
         fonts: ['./node_modules/bootstrap/dist/fonts/*.*'],
