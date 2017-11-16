@@ -2,6 +2,8 @@
 @using ApiClient.Models
 @model ProductModel
 @{
+    ViewData["Title"] = "Details";
+    Layout = "~/Pages/_Layout.cshtml";
 }
     <div class="row">
         <div class="col-xs-12 col-sm-8">
@@ -19,9 +21,11 @@
     </div>*@
     <div id="main">        
         <div class="col-xs-12 col-sm-8">
+            <p>@Model.Product.Calculation.CalculationType</p>
             <form method="post">                
                 <div class="form-group">
-                    <div class="editor" id="calculation" name="calculation">@Model.Product.Calculation.SourceCode</div>
+                    <div class="editor" id="calculation" name="calculation">@Model.Product.Calculation.SourceCode
+                    </div>
                 </div>
                 @if (Model.Preview != null)
                 {
@@ -47,23 +51,51 @@
                         </tr>
                     }
                 </table>
-                <div class="col-xs-12 col-sm-8">
-                    <h2 class="heading-large">Test Results</h2>
-                </div>
-                    @foreach (var tr in Model.Preview.TestResults)
-                    {
-                    
-                        @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
-                        {                               
-                            <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
-                            foreach (var scenario in scenarioResult)
-                            {                            
-                                <p>@scenario.Scenario?.Name @scenario.TestResult</p>
-                            }
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8">
+                        <h2 class="heading-large">Test Results</h2>
+                    </div>
+                    <div class="panel-group wrap esfa-collapse" id="esfa-list">
+                        @foreach (var tr in Model.Preview.TestResults)
+                        {
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">
+                                        <a href="#">
+                                            @tr.Provider.Name
+                                        </a>
+                                    </h2>
+                                </div>                                
+                                <div class="panel-collapse collapse">
+ 
+                                   <h3> P004_PriRate 5616,84</h3>
+                                    <div class="details inner-collapse">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                    
+                                    @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
+                                    {
+                                        
+                                            <h3 class="heading-medium list-title summary">
+                                            @scenarioResult.Key @scenarioResult.First().ProductValue.ToString()
+                                            </h3>  
+                                                @foreach (var scenario in scenarioResult)
+                                                {
+                                                    <h1>she</h1>
+                                                    <p>@scenario.Scenario?.Name @scenario.TestResult</p>
+                                                }
+</div>
+                                    }
+                                </div>
+                            </div>
                         }
-                    }
+                    </div>
+                </div>
+                @*end of esfa-collapse*@
                 }
-                </form>        
+            </form>        
 
                 <div class="form-group">
                     <label for="name">Name</label>

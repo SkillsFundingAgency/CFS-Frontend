@@ -1979,7 +1979,7 @@ a.test {
     width: 100%; }
 
 .esfa-summary {
-  margin-top: 30px; }
+  margin-bottom: 30px; }
   .esfa-summary .data {
     margin-top: 0; }
     .esfa-summary .data .data-link {
@@ -2008,3 +2008,13 @@ a.test {
   min-height: 250px;
   border: 1px solid #bfc1c3;
   width: 100%; }
+
+.summary {
+  cursor: pointer; }
+  .summary:before {
+    content: "\e250";
+    font-family: "glyphicons-halflings-regular";
+    margin-right: 5px;
+    vertical-align: middle; }
+  .summary.collapsed:before {
+    content: "\e252"; }

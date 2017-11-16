@@ -1,18 +1,17 @@
 ﻿$(document).ready(function () {
+    //accordions with open/close all button
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
         headingSiblings = $('.esfa-summary .data-link').add($('.panel-title:not(.stream-title)')),
         headingText = $('panel-title'),
         summaryText = $('summary > p');
-
     //add the accordion functionality
     heading.click(function (e) {
         var panel = $(this).next('.panel-collapse'),
             isOpen = panel.is(':visible'),
             active = $(this).addClass('active'),
             inactive = $(this).removeClass('active');
-        console.log($(e.target));
         //open or close as necessary
         panel[isOpen ? 'hide' : 'show']()
             //trigger the correct custom event
@@ -61,6 +60,12 @@
             }
         }
     })
+    //Inner collapse
+    $(".summary").on("click", function () {
+        $(this).next('.details').toggle();
+        $(this).toggleClass('collapsed');
+    });
+    //Sidebar filters
     var $filterCheckboxes = $('#esfa-filter input[type="checkbox"]');
 
     $filterCheckboxes.on('change', function () {

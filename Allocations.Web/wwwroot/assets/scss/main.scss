@@ -485,7 +485,7 @@ a.test {
 }
 
 .esfa-summary {
-    margin-top: 30px;
+    margin-bottom: 30px;
 
     .data {
         margin-top: 0;
@@ -530,4 +530,21 @@ a.test {
     min-height: 250px;
     border: 1px solid $border-colour;
     width: 100%;
+}
+
+.summary {
+
+    cursor: pointer;
+
+    &:before {
+        content: "\e250";
+        font-family: $glyph;
+        margin-right: 5px;
+        //display: inline-block;
+        vertical-align: middle;
+    }
+
+    &.collapsed:before {
+        content: "\e252";
+    }
 }
