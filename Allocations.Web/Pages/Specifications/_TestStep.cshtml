@@ -1,4 +1,5 @@
-﻿@using Allocations.Web.ApiClient.Models
+﻿@using Allocations.Web.ApiClient
+@using Allocations.Web.ApiClient.Models
 @model ApiClient.Models.TestStep
 @if (Model != null)
 {
@@ -8,7 +9,7 @@
         {
             var givenStep = Model as GivenStep;
 
-            <p><span>@givenStep.Field</span> in <span>@givenStep.Dataset</span> @givenStep.Operator <span>@givenStep.Value</span></p>
+            <p><span>@givenStep.Field</span> in <span>@givenStep.Dataset</span> @givenStep.Operator.GetDisplayText() <span>@givenStep.Value</span></p>
 
         }
             break;
@@ -17,7 +18,7 @@
         {
             var thenStep = Model as ThenStep;
 
-            <p>the value @thenStep.Operator <span>@thenStep.Value</span></p>
+            <p>the value @thenStep.Operator.GetDisplayText() <span>@thenStep.Value</span></p>
         }
 
             break;
