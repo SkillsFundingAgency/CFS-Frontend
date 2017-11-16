@@ -1732,7 +1732,8 @@ a.button:hover {
       display: none !important; }
     .esfa-collapse .panel .panel-heading .panel-title {
       font-size: 24px;
-      line-height: 1.25; }
+      line-height: 1.25;
+      margin-bottom: 20px; }
   .esfa-collapse .panel .panel-collapse {
     display: none; }
     .esfa-collapse .panel .panel-collapse .panel-body {
@@ -1855,26 +1856,9 @@ a.button:hover {
     .esfa-collapse#esfa-filter .panel:hover .panel-collapse {
       background-color: #bfc1c3; }
 
-details summary {
-  width: 100%;
-  text-decoration: none; }
-  details summary .data-item.medium {
-    color: initial; }
-  details summary .list-title {
-    display: inline-block;
-    margin: 0; }
-  details summary .item-detail {
-    color: #0b0c0c; }
-    details summary .item-detail:hover {
-      color: #0b0c0c; }
-  details summary:focus {
-    outline: none; }
-    details summary:focus .list-title {
-      outline: 3px solid #ffbf47; }
-
-.product-details summary {
+.product-details .summary {
   display: block; }
-  .product-details summary > div:first-of-type {
+  .product-details .summary > div:first-of-type {
     display: inline-block;
     vertical-align: middle;
     /*Standard*/
@@ -1885,14 +1869,14 @@ details summary {
     width: -webkit-calc(100% - 25px);
     /*Opera*/
     width: -o-calc(100% - 25px); }
-    .product-details summary > div:first-of-type .list-title {
+    .product-details .summary > div:first-of-type .list-title {
       float: left;
       margin: 0; }
-    .product-details summary > div:first-of-type .folder {
+    .product-details .summary > div:first-of-type .folder {
       float: right;
       display: inline-block;
       margin: 0; }
-      .product-details summary > div:first-of-type .folder > span {
+      .product-details .summary > div:first-of-type .folder > span {
         margin-right: 5px; }
 
 .provider-stats ul > li dt, .provider-stats ul > li dd {
@@ -1978,31 +1962,32 @@ a.test {
   .graph img {
     width: 100%; }
 
-.esfa-summary {
-  margin-bottom: 30px; }
-  .esfa-summary .data {
-    margin-top: 0; }
-    .esfa-summary .data .data-link {
-      padding: 0 !important;
-      text-decoration: underline; }
-      .esfa-summary .data .data-link.success {
-        text-decoration-color: #006435; }
-      .esfa-summary .data .data-link.failing {
-        text-decoration-color: #b10e1e; }
-      .esfa-summary .data .data-link:hover {
-        text-decoration: none; }
-    .esfa-summary .data .data-item {
-      padding: 0;
-      font-size: inherit;
-      font-weight: normal;
-      line-height: 1; }
-  .esfa-summary .progress {
-    margin-bottom: 0;
-    display: block;
-    width: 100%;
-    background-color: #df3034; }
-    .esfa-summary .progress .progress-bar-success {
-      background-color: #006435; }
+.esfa-summary .data {
+  margin-top: 0;
+  display: inline-block; }
+  .esfa-summary .data .data-link {
+    padding: 0 !important;
+    text-decoration: underline; }
+    .esfa-summary .data .data-link.success {
+      text-decoration-color: #006435; }
+    .esfa-summary .data .data-link.failing {
+      text-decoration-color: #b10e1e; }
+    .esfa-summary .data .data-link:hover {
+      text-decoration: none; }
+  .esfa-summary .data .data-item {
+    padding: 0;
+    font-size: inherit;
+    font-weight: normal;
+    line-height: 1; }
+
+.esfa-summary .progress {
+  margin-bottom: 0;
+  display: block;
+  width: 100%;
+  max-width: 100px;
+  background-color: #df3034; }
+  .esfa-summary .progress .progress-bar-success {
+    background-color: #006435; }
 
 .editor {
   min-height: 250px;
@@ -2011,10 +1996,11 @@ a.test {
 
 .summary {
   cursor: pointer; }
-  .summary:before {
+  .summary > a:before {
     content: "\e250";
     font-family: "glyphicons-halflings-regular";
     margin-right: 5px;
+    margin-left: -12px;
     vertical-align: middle; }
-  .summary.collapsed:before {
+  .summary.collapsed > a:before {
     content: "\e252"; }

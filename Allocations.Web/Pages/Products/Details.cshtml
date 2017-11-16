@@ -1,11 +1,10 @@
 ﻿@page
+@using ApiClient.Models
 @model Allocations.Web.Pages.Products.DetailsModel
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Pages/_Layout.cshtml";
 }
-
-<h2>Details</h2>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -54,7 +53,7 @@ Return result</div>
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 Primary school has a primary subtotal
                             </a>
                         </h2>
@@ -111,7 +110,7 @@ Return result</div>
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 Non primary schools don't have primary subtotals
                             </a>
                         </h2>
@@ -420,3 +419,31 @@ Return result</div>
     </div>
     <!-- end of .col-xs-12  -->
 </div>
+@*<div class="row">
+    @foreach (var testScenario in Model.Product.TestScenarios)
+    {
+        <h2>@testScenario.Name</h2>
+
+        if (testScenario.GivenSteps.Any())
+        {
+            <h3 class="heading-medium">Given</h3>
+                                @Html.Partial("_TestStep", testScenario.GivenSteps.First())
+            foreach (var givenStep in testScenario.GivenSteps.Skip(1))
+            {
+                <h3 class="heading-medium">And</h3>
+                                    @Html.Partial("_TestStep", givenStep)
+            }
+        }
+
+        if (testScenario.ThenSteps.Any())
+        {
+            <h6>Then</h6>
+                                @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+            foreach (var thenStep in testScenario.ThenSteps.Skip(1))
+            {
+                <h3 class="heading-medium">And</h3>
+                                    @Html.Partial("_TestStep", thenStep)
+            }
+        }
+    }
+</div>*@
