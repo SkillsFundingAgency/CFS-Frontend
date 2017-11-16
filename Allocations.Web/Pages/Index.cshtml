@@ -34,9 +34,9 @@ ViewData["Title"] = "Allocations overview";
                         <div class="panel-heading">
                             <h2 class="panel-title stream-title">
                             <a href="#">
-                                @budget.Budget.Name - @budget.Budget.Id
+                                @budget.Budget.Name
                             </a>
-                            <span class="ammount">&pound;45.5 billion</span>
+                            <span class="ammount">&pound;@budget.TotalAmount.ToString("0")</span>
                             </h2>
                             <div class="esfa-summary">
                                 <div class="row">
@@ -121,7 +121,7 @@ ViewData["Title"] = "Allocations overview";
 
                                                             <div class="panel panel-border-narrow">
                                                                 <ul class="list-group">
-                                                                    @foreach (var allocationLine in policy.AllocationLines)
+                                                                    @foreach (var allocationLine in policy.AllocationLines ?? new List<AllocationLine>())
                                                                     {
                                                                         <li class="list-group-item sublist-item">
                                                                             <h4 class="heading-small">

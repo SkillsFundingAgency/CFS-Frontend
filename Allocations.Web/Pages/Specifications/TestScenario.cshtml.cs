@@ -82,9 +82,9 @@ namespace Allocations.Web.Pages.Specifications
                     var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
                     if (field != null)
                     {
-                        givenStep.Dataset = dataset.Id;
+
                         //givenStep.Field = field.Id;
-                        givenStep.Field = ValidateFieldType(field.Type, givenStep.Value, i);
+                        givenStep.Value = ValidateFieldType(field.Type, givenStep.Value, i);
                     }
                 }
                 i++;
