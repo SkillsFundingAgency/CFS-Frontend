@@ -32,7 +32,7 @@ namespace Allocations.Web.ApiClient.Models
             switch (StepType)
             {
                 case TestStepType.GivenSourceField:
-                    if (!string.IsNullOrEmpty(Dataset) || !string.IsNullOrEmpty(Field) || !string.IsNullOrEmpty(Value))
+                    if (Operator != ComparisonOperator.None || !string.IsNullOrEmpty(Field) || !string.IsNullOrEmpty(Value))
                     {
                         if (string.IsNullOrEmpty(Dataset)) yield return new ValidationResult("Dataset must be specified");
                         if(Operator == ComparisonOperator.None) yield return new ValidationResult("Operator must be specified");
