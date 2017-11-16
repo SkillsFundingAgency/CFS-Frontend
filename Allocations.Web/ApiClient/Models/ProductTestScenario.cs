@@ -23,12 +23,12 @@ namespace Allocations.Web.ApiClient.Models
         {
             var testScenario = validationContext.ObjectInstance as ProductTestScenario;
 
-            if (testScenario == null || testScenario.GivenSteps.Any())
+            if (testScenario == null || !testScenario.GivenSteps.Any())
             {
                 yield return new ValidationResult("There must be at least one given step");
             }
 
-            if (testScenario == null || testScenario.ThenSteps.Any())
+            if (testScenario == null || !testScenario.ThenSteps.Any())
             {
                 yield return new ValidationResult("There must be at least one then step");
             }
