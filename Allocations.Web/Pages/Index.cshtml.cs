@@ -41,6 +41,7 @@ namespace Allocations.Web.Pages
         public int Passed { get; set; }
         public int Failed { get; set; }
         public int Ignored { get; set; }
+        public int TotalCovered { get; set; }
     }
 
     public class AllocationLine

@@ -1,18 +1,17 @@
 ﻿$(document).ready(function () {
+    //accordions with open/close all button
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
-        headingSiblings = $('.esfa-summary > div > div').add($('.panel-title:not(.stream-title)')),
+        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title:not(.stream-title)')),
         headingText = $('panel-title'),
-        summaryText = $('summary > p');
-
+        summary = $('.summary');
     //add the accordion functionality
     heading.click(function (e) {
         var panel = $(this).next('.panel-collapse'),
             isOpen = panel.is(':visible'),
             active = $(this).addClass('active'),
             inactive = $(this).removeClass('active');
-        console.log($(e.target));
         //open or close as necessary
         panel[isOpen ? 'hide' : 'show']()
             //trigger the correct custom event
@@ -51,7 +50,7 @@
             }
         },
         // on panel close, check if all open
-        // if not all open, swap the button to expander
+        //not all open, swap the button to expander
         hide: function () {
             var isAllOpen = !panelCollapse.is(':hidden');
             if (!isAllOpen) {
@@ -60,7 +59,9 @@
                 $(this).prev(heading).removeClass('active');
             }
         }
-    })
+
+    });
+    //Sidebar filters
     var $filterCheckboxes = $('#esfa-filter input[type="checkbox"]');
 
     $filterCheckboxes.on('change', function () {
@@ -73,8 +74,7 @@
                 selectedFilters[this.name] = [];
             }
 
-            selectedFilters[this.name].push(this.value);
-            console.log(selectedFilters);
+            selectedFilters[this.name].push(this.value);            
         });
 
         // create a collection containing all of the filterable elements
@@ -111,6 +111,37 @@
         $('.filtr-item').hide().filter($filteredResults).show();
 
     });
-
-
+    //Embed Ace Editor
+    var editor,
+        editorSession,
+        JavaScriptMode;
+    ace.require("ace/ext/language_tools");
+    $('.editor').each(function () {
+        var JavaScriptMode = ace.require("ace/mode/vbscript").Mode;
+        editor = ace.edit(this);
+        editorSession = editor.getSession();
+        editorSession.setMode('ace/mode/vbscript');
+        editorSession.setUseWrapMode(true);
+        editor.resize()
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false
+        });
+        editor.session.setMode(new JavaScriptMode());
+        this.style.fontSize = '16px';
+        $(this).hasClass('read-only') ? editor.setReadOnly(true) : editor.setReadOnly(false);
+        var input = $('#calculation-engine #calculation');        
+        var valedit = editor.getValue();
+        input.val(valedit);
+        editor.getSession().on("change", function () {
+            input.val(editor.getSession().getValue());;
+        });
+    });    
+    //Summary collapse
+    summary.click(function () {
+        console.log('hello');
+        $(this).siblings('.details').toggle();
+        $(this).toggleClass('collapsed');
+    });
 });

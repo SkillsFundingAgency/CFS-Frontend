@@ -30,7 +30,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="#">Status</a>
+                                <a class="plain-link" href="javascript:void(0);">Status</a>
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -52,7 +52,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="#">Product Folder</a>
+                                <a class="plain-link" href="javascript:void(0);">Product Folder</a>
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -111,14 +111,42 @@
                 <button class="accordion-toggle">Open all</button>
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed basic-entitlement">
                     <div class="panel-heading">
-                        <h2 class="heading-large panel-title">
-                            <a href="#">
-                                P005_PriBESubTotal
-                            </a>
-                        </h2>
-                        <div class="flex-row">
-                            <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <h2 class="heading-large panel-title">
+                                    <a href="javascript:void(0);">
+                                        P005_PriBESubTotal
+                                    </a>
+                                </h2>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
+
+                            </div>
+
                         </div>
+                        <div class="esfa-summary">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="data">
+                                        <span class="data-item medium">300/400</span>
+                                        <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">providers covered</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-5">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                             aria-valuemin="0" aria-valuemax="100" style="width:75%">
+                                            75%
+                                        </div>
+                                    </div>
+                                    <div class="data">
+                                        <span class="data-item bold-xsmall">coverage</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*end of esfa-summary*@
                     </div>
                     <div class="panel-collapse collapse in">
                         <div class="panel-body">
@@ -129,13 +157,19 @@
                                     <thead>
                                         <tr>
                                             <th>Scenario test results</th>
-                                            <th>For 152 Providers</th>
+                                            <th>For 400 Providers</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td><a class="test" asp-page="Results2">Only Primary providers should have Primary Rate</a></td>
-                                            <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message">7 Providers failed tests</span></a></p></td>
+                                            <td>
+                                                <div class="esfa-summary">
+                                                    <div class="data">
+                                                        <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">300 test failing</span></a>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td><a class="test" asp-page="Results2">Non primary schools don't have primary subtotals</a></td>
@@ -143,6 +177,9 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <br />
+                                <button class="button" href="javascript:void(0);" role="button">Add new scenario</button>
+                                
                             </div>
                         </div>
                     </div>
@@ -151,7 +188,7 @@
                 <div class="panel filtr-item" data-id="other-factors" data-category="passed fsm">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 P006_NSEN_PriBE
                             </a>
                         </h2>
@@ -170,7 +207,7 @@
                                 <tbody>
                                     <tr>
                                         <td><a asp-page="Results2">QA Scenario 1</a></td>
-                                        <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                        <td><p class="item-detail font-xsmall"><a href="javascript:void(0);"><span class="error-message"># Providers failed tests</span></a></p></td>
                                     </tr>
                                     <tr>
                                         <td><a asp-page="Results2">QA Scenario 2</a></td>
@@ -185,7 +222,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed basic-entitlement">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 P005_PriBESubtotal
                             </a>
                         </h2>
@@ -207,7 +244,7 @@
                                     <tbody>
                                         <tr>
                                             <td><a asp-page="Results2">Primary school has a primarysubtotal </a></td>
-                                            <td><p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p></td>
+                                            <td><p class="item-detail font-xsmall"><a href="javascript:void(0);"><span class="error-message"># Providers failed tests</span></a></p></td>
                                         </tr>
                                         <tr>
                                             <td><a asp-page="Results2">Non Primary school don’t have primary subtotal</a></td>
@@ -223,7 +260,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed idaci">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 IDACI_Prod001
                             </a>
                         </h2>
@@ -243,7 +280,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed fsm">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 FSM_Prod007
                             </a>
                         </h2>
@@ -263,7 +300,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed lac">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 Lac_Prod01
                             </a>
                         </h2>
@@ -283,7 +320,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="passed LAC">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 LAC_Prod02
                             </a>
                         </h2>
@@ -303,7 +340,7 @@
                 <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed idaci">
                     <div class="panel-heading">
                         <h2 class="heading-large panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 IDACI_ProdPri
                             </a>
                         </h2>

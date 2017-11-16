@@ -1,23 +1,49 @@
 ﻿@page
+@using ApiClient.Models
 @model Allocations.Web.Pages.Products.DetailsModel
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
-<h2>Details</h2>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 <div class="row">
-    <div class="col-xs-8">
+    <div class="col-xs-12 col-sm-8">
         <h1 class="heading-xlarge">Pri005_PriBESubTotal Summary</h1>
         <p>Full year ammount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
     </div>
 </div>
 <div class="row">
+    <div class="col-xs-12 col-sm-8">
+        <div class="editor read-only">Dim t As DateTime = New DateTime(2018, 4, 1)
+Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
+Dim result As Decimal
+If flag Then
+result = Me.APTBasicEntitlement.PrimaryAmount
+Else
+result = Me.P004_PriRate() * Me.CensusNumberCounts.NORPrimary
+End If
+Return result</div>
+    </div>
+</div>
+<div class="row">
     <div class="col-xs-12">
+        <div id="editor">
+            
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div id="editor">
+            
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-sm-8">
         <h2 class="heading-large">Scenarios:</h2>
     </div>
     <div class="col-xs-12 col-md-8">
@@ -27,12 +53,12 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 Primary school has a primary subtotal
                             </a>
                         </h2>
                     </div>
-                    <div id="one" class="panel-collapse collapse">
+                    <div class="panel-collapse collapse">
                         <div class="panel-body">
                             <div class="panel">
                                 <ul class="list-group">
@@ -84,12 +110,12 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <h2 class="panel-title">
-                            <a href="#">
+                            <a href="javascript:void(0);">
                                 Non primary schools don't have primary subtotals
                             </a>
                         </h2>
                     </div>
-                    <div id="two" class="panel-collapse collapse">
+                    <div class="panel-collapse collapse">
                         <div class="panel-body">
                             <div class="panel">
                                 <ul class="list-group">
@@ -393,3 +419,31 @@
     </div>
     <!-- end of .col-xs-12  -->
 </div>
+@*<div class="row">
+    @foreach (var testScenario in Model.Product.TestScenarios)
+    {
+        <h2>@testScenario.Name</h2>
+
+        if (testScenario.GivenSteps.Any())
+        {
+            <h3 class="heading-medium">Given</h3>
+                                @Html.Partial("_TestStep", testScenario.GivenSteps.First())
+            foreach (var givenStep in testScenario.GivenSteps.Skip(1))
+            {
+                <h3 class="heading-medium">And</h3>
+                                    @Html.Partial("_TestStep", givenStep)
+            }
+        }
+
+        if (testScenario.ThenSteps.Any())
+        {
+            <h6>Then</h6>
+                                @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+            foreach (var thenStep in testScenario.ThenSteps.Skip(1))
+            {
+                <h3 class="heading-medium">And</h3>
+                                    @Html.Partial("_TestStep", thenStep)
+            }
+        }
+    }
+</div>*@

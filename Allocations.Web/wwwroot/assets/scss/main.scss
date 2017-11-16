@@ -93,6 +93,7 @@ a.button:hover {
             .panel-title {
                 font-size: 24px;
                 line-height: 1.25;
+                margin-bottom: 20px;
             }
         }
 
@@ -128,6 +129,7 @@ a.button:hover {
 
                 &.glyphicon {
                     font-family: glyphicons-halflings-regular;
+                    margin: 0;
                     margin-right: 10px;
                     color: $secondary-text-colour;
                 }
@@ -293,35 +295,9 @@ a.button:hover {
         }
     }
 }
-details {
-    summary {
-        width: 100%;
-        text-decoration: none;
 
-        .list-title {
-            display: inline-block;
-            margin: 0;
-        }
-
-        .item-detail {
-            color: $text-colour;
-
-            &:hover {
-                color: $text-colour;
-            }
-        }
-
-        &:focus {
-            outline: none;
-
-            .list-title {
-                outline: 3px solid #ffbf47;
-            }
-        }
-    }
-}
 .product-details {
-    summary {
+    .summary {
         display: block;
 
         > div:first-of-type {
@@ -478,10 +454,10 @@ a.test {
 }
 
 .esfa-summary {
-    margin-top: 30px;
 
     .data {
         margin-top: 0;
+        display: inline-block;
 
         .data-link {
             padding: 0 !important;
@@ -512,10 +488,31 @@ a.test {
         margin-bottom: 0;
         display: block;
         width: 100%;
+        max-width: 100px;
         background-color: $mellow-red;
 
         .progress-bar-success {
             background-color: $green;
         }
+    }
+}
+.editor {
+    min-height: 250px;
+    border: 1px solid $border-colour;
+    width: 100%;
+}
+.summary {
+    cursor: pointer;
+    > a:before {
+        content: "\e250";
+        font-family: $glyph;
+        margin-right: 5px;
+        margin-left: -12px;
+        //display: inline-block;
+        vertical-align: middle;
+    }
+
+    &.collapsed > a:before {
+        content: "\e252";
     }
 }
