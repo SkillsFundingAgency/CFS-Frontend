@@ -11,6 +11,7 @@ using Allocations.Web.Pages;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using BudgetSummary = Allocations.Web.Pages.BudgetSummary;
 
 namespace Allocations.Web.ApiClient
 {
@@ -47,9 +48,9 @@ namespace Allocations.Web.ApiClient
             return new ApiResponse<T>(response.StatusCode);
         }
 
-        public async Task<ApiResponse<RootObject[]>> GetBudgetResults()
+        public async Task<ApiResponse<BudgetSummary[]>> GetBudgetResults()
         {
-            return await GetAsync<RootObject[]>($"{_resultsPath}/budgets");
+            return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
         }
 
         public async Task<ApiResponse<Budget>> GetBudget(string id)
