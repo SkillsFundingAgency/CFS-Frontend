@@ -144,24 +144,34 @@
         $(this).siblings('.details').toggle();
         $(this).toggleClass('collapsed');
     });
-});
+}); 
 
-$(document).on('click', '.step-btn', function () {
+$(document).on('click', '.step-btn', function (e) {
     var $this = $(this);
     var step = $this.text();
-    var placeholder = $this.data('placeholder');
     var stepLabel = '<label>' + step + '</label><span class="remove-step glyphicon glyphicon-remove-circle pull-right"></span>';
-
-    //initSortable();
     var $clone = $('.gherkin-step:last').clone();
     $clone.find('.step-label').html(stepLabel);
-    $('.gherkin-scenario').append($clone).find('input:last').focus();
+    $clone.addClass('generated');
+    $('.gherkin-scenario').append($clone);
 });
-
 $(document).on('click', '.remove-step', function () {
     $(this).closest('.row').remove();
 });
-
+$(document).on('click', '.reset-btn', function () {
+    var $this = $(this);
+    if ($this.hasClass('remove')) {
+        $('.raw-display').html('');
+        $('.formatted-display').html('')
+        $this.removeClass('remove').text('Reset');
+        $('.generated').remove();
+    } else {
+        $this.addClass('remove').text('Are you sure?');
+        setTimeout(function () {
+            $this.removeClass('remove').text('Reset');
+        }, 2000)
+    }
+});
 //function initSortable() {
 //    $('.steps').sortable({
 //        placeholder: "ui-state-highlight",

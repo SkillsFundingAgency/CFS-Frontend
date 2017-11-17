@@ -1985,9 +1985,11 @@ a.test {
   display: block;
   width: 100%;
   max-width: 100px;
-  background-color: #df3034; }
+  background-color: #dee0e2; }
   .esfa-summary .progress .progress-bar-success {
     background-color: #006435; }
+  .esfa-summary .progress .progress-bar-error {
+    background-color: #df3034; }
 
 .editor {
   min-height: 250px;
