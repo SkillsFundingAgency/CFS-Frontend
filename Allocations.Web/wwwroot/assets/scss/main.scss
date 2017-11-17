@@ -516,3 +516,20 @@ a.test {
         content: "\e252";
     }
 }
+
+/*Gherkin scenario page*/
+
+.gherkin-scenario {
+    #scenario-name {
+
+    }
+    .form-control {
+        width: 100%;
+    }
+    .remove-step {
+        cursor: pointer;
+        &:hover {
+            color: $red;
+        }
+    }
+}
