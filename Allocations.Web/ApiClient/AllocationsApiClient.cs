@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient.Models;
+using Allocations.Web.ApiClient.Models.Results;
 using Allocations.Web.Pages;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -47,9 +48,9 @@ namespace Allocations.Web.ApiClient
             return new ApiResponse<T>(response.StatusCode);
         }
 
-        public async Task<ApiResponse<RootObject[]>> GetBudgetResults()
+        public async Task<ApiResponse<BudgetSummary[]>> GetBudgetResults()
         {
-            return await GetAsync<RootObject[]>($"{_resultsPath}/budgets");
+            return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
         }
 
         public async Task<ApiResponse<Budget>> GetBudget(string id)
