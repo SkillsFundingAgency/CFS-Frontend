@@ -145,7 +145,7 @@
                         {
                             <h2>@testScenario.Name</h2>
 
-                            if (testScenario.GivenSteps.Any())
+                            if (testScenario.GivenSteps != null && testScenario.GivenSteps.Any())
                             {
                                 <h3 class="heading-medium">Given</h3>
                                 @Html.Partial("_TestStep", testScenario.GivenSteps.First())

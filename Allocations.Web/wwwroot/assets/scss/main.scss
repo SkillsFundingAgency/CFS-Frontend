@@ -489,10 +489,14 @@ a.test {
         display: block;
         width: 100%;
         max-width: 100px;
-        background-color: $mellow-red;
+        background-color: $panel-colour;
 
         .progress-bar-success {
             background-color: $green;
+        }
+
+        .progress-bar-error {
+            background-color: $mellow-red;
         }
     }
 }

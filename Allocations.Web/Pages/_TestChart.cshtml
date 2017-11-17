@@ -1,0 +1,11 @@
+﻿@using Allocations.Web.ApiClient.Models
+@model ApiClient.Models.Results.TestSummary
+
+<div class="progress">
+    <div class="progress-bar progress-bar-success" role="progressbar" style="width: @Model.PassedRate%">
+
+    </div>
+    <div class="progress-bar progress-bar-error" role="progressbar" style="width: @Model.FailedRate%">
+
+    </div>    
+</div>
