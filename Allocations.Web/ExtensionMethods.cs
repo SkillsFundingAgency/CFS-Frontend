@@ -26,15 +26,15 @@ namespace Allocations.Web
            
             if (money > oneBillion)
             {
-                var output = $"£{(money / oneBillion):0.00}B";
+                var output = $"£{(money / oneBillion):0,000.00}B";
                 return output.EndsWith(".00B") ? output.Replace(".00B", "B") : output;
             }
             if (money > oneMillion)
             {
-                var output = $"£{(money / oneMillion):0.00}M";
+                var output = $"£{(money / oneMillion):0,000.00}M";
                 return output.EndsWith(".00M") ? output.Replace(".00M", "M") : output;
             }
-            return money.ToString("C0");
+            return $"£{money:0.00}";
         }
     }
 }
