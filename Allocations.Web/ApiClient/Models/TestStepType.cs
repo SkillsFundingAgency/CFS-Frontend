@@ -7,6 +7,8 @@ namespace Allocations.Web.ApiClient.Models
     public enum TestStepType
     {
         GivenSourceField,
-        ThenProductValue
+        ThenProductValue,
+        ThenSourceField,
+        ThenExceptionNotThrown
     }
 }
