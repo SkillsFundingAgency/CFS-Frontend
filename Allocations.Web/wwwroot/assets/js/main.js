@@ -25,7 +25,7 @@
         }
         //stop this to cause a page scroll
         return false;
-    });
+    });    
     headingSiblings.click(function (e) {
         e.stopImmediatePropagation();
     });
