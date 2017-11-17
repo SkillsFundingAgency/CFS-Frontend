@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient;
 using Allocations.Web.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Allocations.Web.Pages.Specifications
 {
@@ -85,8 +82,9 @@ namespace Allocations.Web.Pages.Specifications
                     var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
                     if (field != null)
                     {
-                        givenStep.Dataset = dataset.Id;
-                        givenStep.Field = field.Id;
+
+                        //givenStep.Field = field.Id;
+                        givenStep.Value = ValidateFieldType(field.Type, givenStep.Value, i);
                     }
                 }
                 i++;
@@ -140,9 +138,20 @@ namespace Allocations.Web.Pages.Specifications
                 {
                     Product.TestScenarios.Add(TestScenario);
                 }
-                var result = await _apiClient.PostProduct(budgetId, Product);
+
+                var response = await _apiClient.PostPreview(new PreviewRequest
+                {
+                    BudgetId = Budget.Id,
+                    ProductId = Product.Id,
+                    TestScenario = TestScenario
+                });
+
+                Preview = response.Content;
+                // to save: var result = await _apiClient.PostProduct(budgetId, Product);
             }
         }
+
+        public PreviewResponse Preview { get; set; }
 
         private string ValidateFieldType(FieldType fieldType, string value, int i)
         {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Allocations.Web.ApiClient;
+using Allocations.Web.ApiClient.Models;
 
 namespace Allocations.Web.Pages.Products
 {

@@ -13,7 +13,7 @@ namespace Allocations.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly AllocationsApiClient _apiClient;
-        public IList<RootObject> Rootobjects;
+        public IList<BudgetSummary> Rootobjects;
 
         public IndexModel(AllocationsApiClient apiClient)
         {
@@ -25,13 +25,6 @@ namespace Allocations.Web.Pages
             var results = await _apiClient.GetBudgetResults();
 
             Rootobjects = results.Content;
-            return Page();
-        }
-
-        [HttpGet]
-        public ActionResult GetThese(string id)
-        {
-            var test = id;
             return Page();
         }
     }
@@ -60,10 +53,11 @@ namespace Allocations.Web.Pages
         public double TotalAmount { get; set; }
         public TestSummary TestSummary { get; set; }
     }
-    public class RootObject
+    public class BudgetSummary
     {
         public Reference Budget { get; set; }
         public IList<FundingPolicy> FundingPolicies { get; set; }
+        public int TotalProviders { get; set; }
         public double TotalAmount { get; set; }
         public TestSummary TestSummary { get; set; }
     }
