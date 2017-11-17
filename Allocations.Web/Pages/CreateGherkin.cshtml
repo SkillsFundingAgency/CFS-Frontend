@@ -1,0 +1,86 @@
+﻿@page
+@model Allocations.Web.Pages.CreateGherkinModel
+@{
+    ViewData["Title"] = "CreateGherkin";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+<h2>CreateGherkin</h2>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<div class="row">
+    <div class="col-xs-12 col-sm-8">
+        <h1 class="heading-xlarge">Create new scenario for *product-name*</h1>
+        <p class="text-muted">Full year ammount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
+        <h2 class="heading-large">Create rules for your scenario</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <form class="form gherkin-scenario">
+            <div class="row gherkin-step">
+                <div class="col-xs-12 col-sm-8">
+                    <div class="form-group">
+                        <label for="scenario-name">
+                            Scenario name
+                        </label>
+                        <input class="form-control" id="scenario-name" type="text" name="ni-number">
+                    </div>
+                </div>
+            </div>
+            <div class="row spec-labels">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <div class="row">
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Dataset</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Field</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Operator</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Value</label></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gherkin-step">
+                <div class="col-xs-2">
+                    <div class="step-label">
+                        <label>Given</label>
+                    </div>
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <button type="button" class="btn step-btn">And</button>
+        <button type="button" class="btn step-btn">When</button>
+    </div>
+</div>

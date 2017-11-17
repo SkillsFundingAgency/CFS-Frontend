@@ -2004,3 +2004,12 @@ a.test {
     vertical-align: middle; }
   .summary.collapsed > a:before {
     content: "\e252"; }
+
+/*Gherkin scenario page*/
+.gherkin-scenario .form-control {
+  width: 100%; }
+
+.gherkin-scenario .remove-step {
+  cursor: pointer; }
+  .gherkin-scenario .remove-step:hover {
+    color: #b10e1e; }

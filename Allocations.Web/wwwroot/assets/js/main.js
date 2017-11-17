@@ -145,3 +145,33 @@
         $(this).toggleClass('collapsed');
     });
 });
+
+$(document).on('click', '.step-btn', function () {
+    var $this = $(this);
+    var step = $this.text();
+    var placeholder = $this.data('placeholder');
+    var stepLabel = '<label>' + step + '</label><span class="remove-step glyphicon glyphicon-remove-circle pull-right"></span>';
+
+    //initSortable();
+    var $clone = $('.gherkin-step:last').clone();
+    $clone.find('.step-label').html(stepLabel);
+    $('.gherkin-scenario').append($clone).find('input:last').focus();
+});
+
+$(document).on('click', '.remove-step', function () {
+    $(this).closest('.row').remove();
+});
+
+//function initSortable() {
+//    $('.steps').sortable({
+//        placeholder: "ui-state-highlight",
+//        items: '> .row:not(.non-sortable)',
+//        helper: 'clone',
+//        connectWith: '.steps',
+//        activeClass: "ui-state-hover",
+//        hoverClass: "ui-state-active",
+//        update: function () {
+//            compile();
+//        }
+//    }).disableSelection();
+//}
