@@ -7,11 +7,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient.Models;
+using Allocations.Web.ApiClient.Models.Results;
 using Allocations.Web.Pages;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using BudgetSummary = Allocations.Web.Pages.BudgetSummary;
 
 namespace Allocations.Web.ApiClient
 {
