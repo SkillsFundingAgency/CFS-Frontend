@@ -9,100 +9,153 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 <div class="row">
-    <div class="col-xs-12 col-sm-8">
-        <h1 class="heading-xlarge">Create new scenario for *product-name*</h1>
-        <p class="text-muted">Full year ammount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
-        <h2 class="heading-large">Create rules for your scenario</h2>
+    <div class="col-xs-8">
+        <h2>@*@Model.Product.Name*@</h2>
+        <p>@*@Model.Product.Description*@</p>
+        <h1 class="heading-xlarge">Create new scenario</h1>
     </div>
 </div>
-<div class="row">
-    <div class="col-xs-12">
-        <form method="post" class="form gherkin-scenario">
-            <div class="row gherkin-step">
-                <div class="col-xs-12 col-sm-8">
-                    <div class="form-group">
-                        <label for="scenario-name">
-                            Scenario name
-                        </label>
-                        <input asp-for="TestScenario.Id" type="hidden">
-                        <input asp-for="TestScenario.Name" class="form-control" id="scenario-name" type="text">
-                    </div>
-                </div>
+<form method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="name">Name of the scenario</label>
+                <input asp-for="TestScenario.Id" type="hidden">
+                <input asp-for="TestScenario.Name" class="form-control" id="name">
             </div>
-            <div class="row spec-labels">
-                <div class="col-sm-10 col-sm-offset-2">
-                    <div class="row">
-                        <div class="col-sm-3"><label class="form-label" for="select-box">Dataset</label></div>
-                        <div class="col-sm-3"><label class="form-label" for="select-box">Field</label></div>
-                        <div class="col-sm-3"><label class="form-label" for="select-box">Operator</label></div>
-                        <div class="col-sm-3"><label class="form-label" for="select-box">Value</label></div>
-                    </div>
-                </div>
-            </div>
-            @for (var i = 0; i < Model.TestScenario.GivenSteps.Count; i++)
-            {
-                var step = Model.TestScenario.GivenSteps[i];
-                <div class="row gherkin-step">
-                    <div class="col-xs-2">
-                        <div class="step-label">
-                            <label>Given</label>
-                        </div>
-                    </div>
-                    <div class="col-xs-10">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" name="TestScenario.GivenSteps[@i].Field">
-                                        <option></option>
-                                        @foreach (var dataset in Model.Budget.DatasetDefinitions)
-                                        {
-                                            <optgroup label="@dataset.Name">
-                                                @foreach (var fieldDefinition in dataset.FieldDefinitions)
-                                                {
-                                                    var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
-                                                    <option selected="@(compositeKey == step.Field)" value="@compositeKey">@fieldDefinition.Name</option>
-                                                }
-                                            </optgroup>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" id="select-box" name="select-box">
-                                        <option>GOV.UK elements option 1</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" name="TestScenario.GivenSteps[@i].Operator">
-                                        <option></option>
-                                        @foreach (var op in Model.Operators)
-                                        {
-                                            <option selected="@(op == step.Operator)" value="@op">@op.GetDisplayText()</option>
+        </div>
+    </div><!-- end of .row -->
 
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <input class="form-control" name="TestScenario.GivenSteps[@i].Value" type="text" value="@step.Value" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        </form>
-        <button type="button" class="button step-btn">And</button>
-        <button type="button" class="button step-btn">When</button>
-        <button class="button reset-btn">Reset</button>
-        <div asp-validation-summary="All"></div>
-        <button type="submit" class="btn btn-default">Run Test</button>
+
+
+
+    @for (var i = 0; i < Model.TestScenario.GivenSteps.Count; i++)
+    {
+        var step = Model.TestScenario.GivenSteps[i];
+        <div class="row" hidden="@(i > 0)">
+            <div class="col-md-11">
+                @if (i == 0)
+                {
+                    <span>Given</span>
+                }
+                else
+                {
+                    <span>And</span>
+                }
+            </div>
+        </div>
+
+
+        <div class="row" hidden="@(i > 0)">
+
+            <div class="col-md-5">
+                <input type="hidden" name="TestScenario.GivenSteps[@i].Dataset" value="???" />
+                <select class="form-control" name="TestScenario.GivenSteps[@i].Field">
+                    <option></option>
+                    @foreach (var dataset in Model.Budget.DatasetDefinitions)
+                    {
+                        <optgroup label="@dataset.Name">
+                            @foreach (var fieldDefinition in dataset.FieldDefinitions)
+                            {
+                                var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
+                                <option selected="@(compositeKey == step.Field)" value="@compositeKey">@fieldDefinition.Name</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="TestScenario.GivenSteps[@i].Operator">
+                    @foreach (var op in Model.Operators)
+                    {
+                        <option selected="@(op == step.Operator)" value="@op">@op.GetDisplayText()</option>
+
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="TestScenario.GivenSteps[@i].Value" type="text" value="@step.Value" />
+            </div>
+            <div class="col-md-1">
+                <i class="glyphicon glyphicon-remove"></i>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <a><i class="glyphicon glyphicon-plus"></i> Add new clause</a>
+        </div>
     </div>
-</div>
+
+
+    @for (var i = 0; i < Model.TestScenario.ThenSteps.Count; i++)
+    {
+        var step = Model.TestScenario.ThenSteps[i];
+        <div class="row" hidden="@(i > 0)">
+            <div class="col-md-11">
+                @if (i == 0)
+                {
+                    <span>Then</span>
+                }
+                else
+                {
+                    <span>And</span>
+                }
+            </div>
+        </div>
+        <div class="row" hidden="@(i > 0)">
+
+            <div class="col-md-5">
+                <select class="form-control formhaserror" name="TestScenario.GivenSteps[@i].Field">
+                    <option></option>
+                    <option selected="selected" value="product">Model product name</option>
+                    @foreach (var dataset in Model.Budget.DatasetDefinitions)
+                    {
+                        <optgroup label="@dataset.Name">
+                            @foreach (var fieldDefinition in dataset.FieldDefinitions)
+                            {
+                                var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
+                                <option disabled="disabled" value="@compositeKey">@fieldDefinition.Name</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="TestScenario.ThenSteps[@i].Operator">
+                    @foreach (var op in Model.Operators)
+                    {
+                        <option selected="@(op == step.Operator)" value="@op">@op.GetDisplayText()</option>
+
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="TestScenario.ThenSteps[@i].Value" type="text" value="@step.Value" />
+            </div>
+            <div class="col-md-1">
+                @if (i > 0)
+                {
+                    <i class="glyphicon glyphicon-remove"></i>
+                }
+
+            </div>
+
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <a><i class="glyphicon glyphicon-plus"></i> Add new clause</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="All"></div>
+            <button type="submit" class="btn btn-default">Run Test</button>
+        </div>
+    </div>
+
+</form>
 <div class="row">
     <div class="col-md-12">
         @if (Model.Preview != null)
@@ -146,3 +199,4 @@
         }
     </div>
 </div>
+<div class="deletebefore"></div>
