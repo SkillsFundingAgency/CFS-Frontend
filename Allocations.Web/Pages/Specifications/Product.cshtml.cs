@@ -53,7 +53,7 @@ namespace Allocations.Web.Pages.Specifications
 
             if (!string.IsNullOrEmpty(calculation))
             {
-                Product.Calculation = new ProductCalculation {SourceCode = calculation};
+                Product.Calculation = new ProductCalculation { SourceCode = calculation };
             }
 
             Preview = response.Content;

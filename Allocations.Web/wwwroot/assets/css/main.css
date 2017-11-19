@@ -1687,7 +1687,7 @@ input[type=number] {
 @font-face {
   font-family: 'glyphicons-halflings-regular';
   src: url("../libs/fonts/glyphicons-halflings-regular.eot");
-  src: url("../libs//glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../libs/fonts/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
+  src: url("../libs/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../libs/fonts/glyphicons-halflings-regular.woff2") format("woff"), url("../libs/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
 
 a.button:hover {
   text-decoration: none; }
@@ -1724,6 +1724,8 @@ a.button:hover {
     border-bottom: none;
     border-radius: 0;
     border-top: 1px solid #bfc1c3; }
+    .esfa-collapse .panel .panel-heading:focus {
+      outline: 3px solid #ffbf47; }
     .esfa-collapse .panel .panel-heading:hover {
       background-color: #f8f8f8; }
       .esfa-collapse .panel .panel-heading:hover a {
@@ -1733,7 +1735,9 @@ a.button:hover {
     .esfa-collapse .panel .panel-heading .panel-title {
       font-size: 24px;
       line-height: 1.25;
-      margin-bottom: 20px; }
+      margin-bottom: 20px;
+      font-weight: 700;
+      margin-right: 10px; }
   .esfa-collapse .panel .panel-collapse {
     display: none; }
     .esfa-collapse .panel .panel-collapse .panel-body {
@@ -1779,7 +1783,8 @@ a.button:hover {
   .esfa-collapse .panel .ammount {
     color: initial !important;
     font-weight: normal !important;
-    font-size: initial !important; }
+    font-size: initial !important;
+    margin-left: 10px; }
 
 .esfa-collapse#esfa-list .panel-heading:before {
   content: "";
@@ -1998,14 +2003,17 @@ a.test {
 
 .summary {
   cursor: pointer; }
-  .summary > a:before {
-    content: "\e250";
+  .summary:focus {
+    outline: 3px solid #ffbf47; }
+  .summary:before {
+    content: "\e258";
     font-family: "glyphicons-halflings-regular";
+    font-weight: normal;
+    font-size: 14px;
     margin-right: 5px;
-    margin-left: -12px;
     vertical-align: middle; }
-  .summary.collapsed > a:before {
-    content: "\e252"; }
+  .summary.collapsed:before {
+    content: "\e259"; }
 
 /*Gherkin scenario page*/
 .gherkin-scenario .form-control {

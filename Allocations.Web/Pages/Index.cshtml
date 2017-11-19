@@ -3,7 +3,7 @@
 @using ApiClient.Models.Results
 @model IndexModel
 @{
-ViewData["Title"] = "Allocations overview";
+    ViewData["Title"] = "Allocations overview";
 }
 <div class="row">
     <div class="col-xs-8">
@@ -30,15 +30,13 @@ ViewData["Title"] = "Allocations overview";
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
             <div class="funding-streams">
                 <button class="accordion-toggle">Open all</button>
-                @foreach(var budget in Model.Budgets)
+                @foreach (var budget in Model.Budgets)
                 {
                     <div class="panel">
-                        <div class="panel-heading">
+                        <div class="panel-heading" tabindex="0">
                             <h2 class="panel-title stream-title">
-                            <a href="#">
                                 @budget.Budget.Name
-                            </a>
-                            <span class="ammount">@budget.TotalAmount.AsMoney()</span>
+                                <span class="ammount">@budget.TotalAmount.AsMoney()</span>
                             </h2>
                             <div class="esfa-summary">
                                 <div class="row">
@@ -51,13 +49,13 @@ ViewData["Title"] = "Allocations overview";
                                     <div class="col-xs-12 col-sm-3">
                                         <div class="data">
                                             <span class="data-item medium">@budget.TestSummary.Passed </span>
-                                            <a class="data-link success" asp-page="Products/Index" ><span class="data-item bold-xsmall text-success">covered</span></a>
+                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-3">
                                         <div class="data">
                                             <span class="data-item medium">@budget.TestSummary.Failed</span>
-                                            <a class="data-link failing" asp-page="Products/Index" ><span class="data-item bold-xsmall error-message"> tests failing</span></a>
+                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message"> tests failing</span></a>
                                         </div>
                                     </div>
                                     <div class="col-xs-11 col-sm-2">
@@ -78,41 +76,43 @@ ViewData["Title"] = "Allocations overview";
                                             <li class="list-group-item">
                                                 <div class="row">
                                                     <div class="col-xs-12">
-                                                        <details>
-                                                            <summary>
-                                                                <h3 class="heading-medium list-title summary">@policy.Name <span class="ammount">@policy.TotalAmount.AsMoney()</span></h3>
-                                                                <div class="esfa-summary">
-                                                                    <div class="row">
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">@policy.TotalProviders</span>
-                                                                                <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
-                                                                            </div>
+                                                        <div cass="inner-header ">
+                                                            <h2 class="heading-medium list-title summary">
+                                                                @policy.Name
+                                                                <span class="ammount">@policy.TotalAmount.AsMoney()</span>
+                                                            </h2>
+                                                            <div class="esfa-summary">
+                                                                <div class="row">
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TotalProviders</span>
+                                                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
                                                                         </div>
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">@policy.TestSummary.Passed</span>
-                                                                                <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                            </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TestSummary.Passed</span>
+                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
                                                                         </div>
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">@policy.TestSummary.Failed</span>
-                                                                                <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                            </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TestSummary.Failed</span>
+                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
                                                                         </div>
-                                                                        <div class="col-xs-11 col-sm-2">
-                                                                            @Html.Partial("_TestChart", policy.TestSummary)
-   
-                                                                            <div class="data">
-                                                                                <span class="data-item bold-xsmall">coverage</span>
-                                                                            </div>
+                                                                    </div>
+                                                                    <div class="col-xs-11 col-sm-2">
+                                                                        @Html.Partial("_TestChart", policy.TestSummary)
+
+                                                                        <div class="data">
+                                                                            <span class="data-item bold-xsmall">coverage</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </summary>
+                                                            </div>
 
-                                                            <div class="panel panel-border-narrow">
+
+                                                            <div class="details collapse panel panel-border-narrow">
                                                                 <ul class="list-group">
                                                                     @foreach (var allocationLine in policy.AllocationLines ?? new List<AllocationLineSummary>())
                                                                     {
@@ -154,14 +154,14 @@ ViewData["Title"] = "Allocations overview";
                                                                 </ul>
                                                             </div>
                                                             @*end of panel.panel-border-narrow*@
-                                                        </details>
+                                                        </div>
                                                     </div>
                                                     @*end of col-xs-12*@
                                                 </div>
                                                 @*end of row*@
                                             </li>
-                                         }
-    
+                                        }
+
                                     </ul>
                                 </div>
                                 @*end of panel inside panel-body*@
@@ -170,13 +170,13 @@ ViewData["Title"] = "Allocations overview";
                         </div>
                         @*end of panel-collapse*@
                     </div>
-                    @*end of panel*@
+                        @*end of panel*@
                 }
                 @*end of foreach*@
             </div>
         </div>
-         @*end of #esfa-collapse*@  
+        @*end of #esfa-collapse*@
     </div>
-     @*end of .col-xs-12*@  
+    @*end of .col-xs-12*@
 </div>
- @*end of .row*@  
+@*end of .row*@  

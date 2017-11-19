@@ -16,7 +16,7 @@
 @import "govuk-elements";
 
 // Functions
-@import "url-helpers";                         // Function to output image-url, or prefixed path (Rails and Compass only)
+@import "url-helpers"; // Function to output image-url, or prefixed path (Rails and Compass only)
 $path: "wwwroot/assets/images";
 
 //colors
@@ -27,8 +27,9 @@ $filter-hover-bg: #bfc1c3;
 @font-face {
     font-family: 'glyphicons-halflings-regular';
     src: url("../libs/fonts/glyphicons-halflings-regular.eot");
-    src: url('../libs//glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../libs/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+    src: url('../libs/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../libs/fonts/glyphicons-halflings-regular.woff2') format('woff'), url('../libs/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
+
 $glyph: 'glyphicons-halflings-regular';
 
 a.button:hover {
@@ -78,6 +79,10 @@ a.button:hover {
             border-radius: 0;
             border-top: 1px solid $border-colour;
 
+            &:focus {
+                outline: 3px solid $focus-colour;
+            }
+
             &:hover {
                 background-color: $canvas-colour;
 
@@ -94,6 +99,8 @@ a.button:hover {
                 font-size: 24px;
                 line-height: 1.25;
                 margin-bottom: 20px;
+                font-weight: 700;
+                margin-right: 10px;
             }
         }
 
@@ -172,6 +179,7 @@ a.button:hover {
             color: initial !important;
             font-weight: normal !important;
             font-size: initial !important;
+            margin-left: 10px;
         }
     }
 
@@ -228,7 +236,7 @@ a.button:hover {
                     width: 100%;
 
                     &:focus {
-                        outline: 3px solid #ffbf47;
+                        outline: 3px solid $focus-colour;
                     }
                 }
                 /*&:before {
@@ -329,9 +337,10 @@ a.button:hover {
         }
     }
 }
+
 .provider-stats {
     ul {
-        >li {
+        > li {
             dt, dd {
                 display: inline-block;
                 font-size: 19px;
@@ -339,12 +348,14 @@ a.button:hover {
         }
     }
 }
+
 .gherkin-scenario {
 
     p {
         margin-bottom: 20px !important;
         line-height: 2.5;
     }
+
     span.data-tag {
         background-color: $panel-colour;
         color: $link-colour;
@@ -357,19 +368,23 @@ a.button:hover {
         }
     }
 }
+
 .qa-passed-report {
     summary {
         color: $green;
+
         &:hover {
             color: $green;
         }
     }
+
     .panel {
         &.panel-border-narrow {
             border-color: $green !important;
         }
     }
 }
+
 .qa-failed-report {
     summary {
         color: $red;
@@ -386,22 +401,24 @@ a.button:hover {
     }
 }
 
-    .visible {
-        display: block !important;
-    }
-    ///////////////////////////////////////
-    //          Sidebar pages           //
-    /////////////////////////////////////
-    /*
+.visible {
+    display: block !important;
+}
+///////////////////////////////////////
+//          Sidebar pages           //
+/////////////////////////////////////
+/*
  * off Canvas sidebar
  * --------------------------------------------------
  */
 table {
     border: 1px solid gray;
+
     p.error-message {
         font-weight: normal;
     }
 }
+
 th, tr, td, thead, tbody {
     border: none !important;
 }
@@ -412,17 +429,20 @@ a.test {
 
 .error-message {
     font-weight: normal !important;
-    
+
     a {
         color: $red !important;
+
         &:hover {
             color: $red !important;
         }
     }
 }
+
 .text-success {
     font-weight: normal;
 }
+
 .item-detail {
     > a {
         display: inline-block;
@@ -430,24 +450,28 @@ a.test {
         text-decoration-color: inherit;
     }
 }
+
 .progress {
     display: inline-block;
     width: 20%;
 }
+
 .year-form {
     .form-control {
         width: 25% !important;
+
         &:focus {
-            outline: 3px solid #ffbf47 !important;
+            outline: 3px solid $focus-colour !important;
             border-color: initial !important;
             box-shadow: none !important;
         }
     }
 }
+
 .graph {
     width: 100%;
     margin-bottom: 30px;
-    
+
     img {
         width: 100%;
     }
@@ -500,24 +524,32 @@ a.test {
         }
     }
 }
+
 .editor {
     min-height: 250px;
     border: 1px solid $border-colour;
     width: 100%;
 }
+
 .summary {
     cursor: pointer;
-    > a:before {
-        content: "\e250";
+
+    &:focus {
+        outline: 3px solid $focus-colour;
+    }
+
+    &:before {
+        content: "\e258";
         font-family: $glyph;
+        font-weight: normal;
+        font-size: 14px;
         margin-right: 5px;
-        margin-left: -12px;
         //display: inline-block;
         vertical-align: middle;
     }
 
-    &.collapsed > a:before {
-        content: "\e252";
+    &.collapsed:before {
+        content: "\e259";
     }
 }
 
@@ -525,13 +557,15 @@ a.test {
 
 .gherkin-scenario {
     #scenario-name {
-
     }
+
     .form-control {
         width: 100%;
     }
+
     .remove-step {
         cursor: pointer;
+
         &:hover {
             color: $red;
         }

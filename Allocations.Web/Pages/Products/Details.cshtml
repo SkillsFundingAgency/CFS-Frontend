@@ -17,28 +17,30 @@
 </div>
 <div class="row">
     <div class="col-xs-12 col-sm-8">
-        <div class="editor read-only">Dim t As DateTime = New DateTime(2018, 4, 1)
-Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
-Dim result As Decimal
-If flag Then
-result = Me.APTBasicEntitlement.PrimaryAmount
-Else
-result = Me.P004_PriRate() * Me.CensusNumberCounts.NORPrimary
-End If
-Return result</div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-12">
-        <div id="editor">
-            
+        <div class="editor read-only">
+            Dim t As DateTime = New DateTime(2018, 4, 1)
+            Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
+            Dim result As Decimal
+            If flag Then
+            result = Me.APTBasicEntitlement.PrimaryAmount
+            Else
+            result = Me.P004_PriRate() * Me.CensusNumberCounts.NORPrimary
+            End If
+            Return result
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12">
         <div id="editor">
-            
+
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div id="editor">
+
         </div>
     </div>
 </div>
@@ -81,7 +83,7 @@ Return result</div>
                                                     <div class="panel panel-border-narrow">
 
                                                     </div>
-                                                </detailsails>
+                                                    </detailsails>
                                             </div>
                                         </div>
 
@@ -323,7 +325,6 @@ Return result</div>
                                                                                     <th class="numeric" scope="col">PrimaryNOR</th>
                                                                                     <th class="numeric" scope="col">Rate</th>
                                                                                     <th class="numeric" scope="col">P005_PriB E Subtotal</th>
-
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
@@ -339,12 +340,10 @@ Return result</div>
                                                                 </details>
                                                             </li>
                                                             <li class="list-group-item sublist-item">
-                                                                <details class="provider-report">
-                                                                    <summary>
-                                                                        <h4 class="heading-small list-title">
-                                                                            Mengham Junior School
-                                                                        </h4>
-                                                                    </summary>
+                                                                <div class="provider-report">
+                                                                    <h4 class="heading-small list-title">
+                                                                        <a href="javascript:void(0)">                                                                        </a>
+                                                                    </h4>
                                                                     <div class="provider-stats">
                                                                         <ul class="list-inline">
                                                                             <li>
@@ -398,7 +397,7 @@ Return result</div>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
-                                                                </details>
+                                                                </div>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -420,30 +419,30 @@ Return result</div>
     <!-- end of .col-xs-12  -->
 </div>
 @*<div class="row">
-    @foreach (var testScenario in Model.Product.TestScenarios)
-    {
-        <h2>@testScenario.Name</h2>
-
-        if (testScenario.GivenSteps.Any())
+        @foreach (var testScenario in Model.Product.TestScenarios)
         {
-            <h3 class="heading-medium">Given</h3>
-                                @Html.Partial("_TestStep", testScenario.GivenSteps.First())
-            foreach (var givenStep in testScenario.GivenSteps.Skip(1))
+            <h2>@testScenario.Name</h2>
+
+            if (testScenario.GivenSteps.Any())
             {
-                <h3 class="heading-medium">And</h3>
-                                    @Html.Partial("_TestStep", givenStep)
+                <h3 class="heading-medium">Given</h3>
+                                    @Html.Partial("_TestStep", testScenario.GivenSteps.First())
+                foreach (var givenStep in testScenario.GivenSteps.Skip(1))
+                {
+                    <h3 class="heading-medium">And</h3>
+                                        @Html.Partial("_TestStep", givenStep)
+                }
+            }
+
+            if (testScenario.ThenSteps.Any())
+            {
+                <h6>Then</h6>
+                                    @Html.Partial("_TestStep", testScenario.ThenSteps.First())
+                foreach (var thenStep in testScenario.ThenSteps.Skip(1))
+                {
+                    <h3 class="heading-medium">And</h3>
+                                        @Html.Partial("_TestStep", thenStep)
+                }
             }
         }
-
-        if (testScenario.ThenSteps.Any())
-        {
-            <h6>Then</h6>
-                                @Html.Partial("_TestStep", testScenario.ThenSteps.First())
-            foreach (var thenStep in testScenario.ThenSteps.Skip(1))
-            {
-                <h3 class="heading-medium">And</h3>
-                                    @Html.Partial("_TestStep", thenStep)
-            }
-        }
-    }
-</div>*@
+    </div>*@

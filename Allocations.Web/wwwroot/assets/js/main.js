@@ -25,7 +25,7 @@
         }
         //stop this to cause a page scroll
         return false;
-    });    
+    });
     headingSiblings.click(function (e) {
         e.stopImmediatePropagation();
     });
@@ -74,7 +74,7 @@
                 selectedFilters[this.name] = [];
             }
 
-            selectedFilters[this.name].push(this.value);            
+            selectedFilters[this.name].push(this.value);
         });
 
         // create a collection containing all of the filterable elements
@@ -109,7 +109,10 @@
         });
 
         $('.filtr-item').hide().filter($filteredResults).show();
+    });
 
+    $('#sidebar input:checkbox:checked').each(function () {
+        $(this).prop('checked', false);
     });
     //Embed Ace Editor
     var editor,
@@ -131,20 +134,19 @@
         editor.session.setMode(new JavaScriptMode());
         this.style.fontSize = '16px';
         $(this).hasClass('read-only') ? editor.setReadOnly(true) : editor.setReadOnly(false);
-        var input = $('#calculation-engine #calculation');        
+        var input = $('#calculation-engine #calculation');
         var valedit = editor.getValue();
         input.val(valedit);
         editor.getSession().on("change", function () {
             input.val(editor.getSession().getValue());;
         });
-    });    
+    });
     //Summary collapse
     summary.click(function () {
-        console.log('hello');
         $(this).siblings('.details').toggle();
         $(this).toggleClass('collapsed');
     });
-}); 
+});
 
 $(document).on('click', '.step-btn', function (e) {
     var $this = $(this);

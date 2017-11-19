@@ -38,64 +38,64 @@
                 </div>
             </div>
             <div class="row gherkin-step">
-                    <div class="col-xs-2">
-                        <div class="step-label">
-                            <label>Given</label>
-                        </div>
+                <div class="col-xs-2">
+                    <div class="step-label">
+                        <label>Given</label>
                     </div>
-                    <div class="col-xs-10">
-                        <div class="row">
-                            @*@for (var i = 0; i < Model.TestScenario.GivenSteps.Count; i++)
-                                        {
-                                            var step = Model.TestScenario.GivenSteps[i];*@
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" name="">
-                                        @foreach (var dataset in Model.Budget.DatasetDefinitions)
-                                        {
-                                            <optgroup label="@dataset.Name">
-                                                @foreach (var fieldDefinition in dataset.FieldDefinitions)
-                                                {
-                                                    var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
-                                                    <option selected="" value="@compositeKey">@fieldDefinition.Name</option>
-                                                    //selected = @(compositeKey == step.Field)
-                                                }
-                                            </optgroup>
-                                        }
-                                    </select>
-                                </div>
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        @*@for (var i = 0; i < Model.TestScenario.GivenSteps.Count; i++)
+                            {
+                                var step = Model.TestScenario.GivenSteps[i];*@
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" name="">
+                                    @foreach (var dataset in Model.Budget.DatasetDefinitions)
+                                    {
+                                        <optgroup label="@dataset.Name">
+                                            @foreach (var fieldDefinition in dataset.FieldDefinitions)
+                                            {
+                                                var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
+                                                <option selected="" value="@compositeKey">@fieldDefinition.Name</option>
+                                                //selected = @(compositeKey == step.Field)
+                                            }
+                                        </optgroup>
+                                    }
+                                </select>
                             </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" id="select-box" name="select-box">
-                                        <option>GOV.UK elements option 1</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <select class="form-control" name="">
-                                        @*TestScenario.GivenSteps[@i].Operator*@
-                                        <option></option>
-                                        @foreach (var op in Model.Operators)
-                                        {
-                                            <option selected="" value="@op">@op.GetDisplayText()</option>
-                                            //selected= @(op == step.Operator)
-
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <input class="form-control" name="" type="text" value="" />
-                                           @*@step.Value*@
-                                </div>
-                            </div>
-                            @*}*@
-
                         </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" name="">
+                                    @*TestScenario.GivenSteps[@i].Operator*@
+                                    <option></option>
+                                    @foreach (var op in Model.Operators)
+                                    {
+                                        <option selected="" value="@op">@op.GetDisplayText()</option>
+                                        //selected= @(op == step.Operator)
+
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <input class="form-control" name="" type="text" value="" />
+                                @*@step.Value*@
+                            </div>
+                        </div>
+                        @*}*@
+
                     </div>
+                </div>
             </div>
         </form>
         <button type="button" class="button step-btn">And</button>
