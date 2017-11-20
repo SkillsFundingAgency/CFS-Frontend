@@ -133,7 +133,7 @@
                 }
             </form>        
 
-                <div class="form-group">
+                @*<div class="form-group">
                     <label for="name">Name</label>
                     <input class="form-control" id="name" value="@Model.Product.Name">
                 </div>
@@ -167,9 +167,9 @@
                                     @Html.Partial("_TestStep", thenStep)
                                 }
                             }
-                        }
+                        }*@
                     <a class="button" asp-page="TestScenario" asp-route-id="@Model.Budget.Id">Add scenario</a>
-                <div class="form-group">
+                @*<div class="form-group">
                     <label for="description">Test Providers</label>
                     @if (Model.Product.TestProviders != null)
                     {
@@ -178,7 +178,7 @@
                             <p>@testProvider.Name</p>
                         }
                     }
-                </div>
+                </div>*@
 
         </div>
     </div>

@@ -1692,6 +1692,33 @@ input[type=number] {
 a.button:hover {
   text-decoration: none; }
 
+.button-start {
+  background-repeat: no-repeat;
+  background-position: 100% 50%;
+  background-image: url(../images/icon-pointer.png); }
+
+.govuk-related-items {
+  margin-top: 30px;
+  border-top: 10px solid #005ea5;
+  padding-top: 5px; }
+
+.button-error {
+  background-color: #df3034; }
+  .button-error:hover {
+    background-color: #bf1d21; }
+  .button-error.remove {
+    background-color: #006435; }
+    .button-error.remove:hover {
+      background-color: #00311a; }
+
+/*.button-view {
+    background-color: $govuk-blue;
+}*/
+.button-edit {
+  background-color: #005ea5; }
+  .button-edit:hover {
+    background-color: #004172; }
+
 .esfa-collapse .accordion-toggle {
   color: #005ea5;
   cursor: pointer;
@@ -1920,20 +1947,15 @@ a.button:hover {
 .visible {
   display: block !important; }
 
-/*
- * off Canvas sidebar
- * --------------------------------------------------
- */
-table {
-  border: 1px solid gray; }
-  table p.error-message, table .esfa-collapse .panel .item-detail > span.error-message, .esfa-collapse .panel table .item-detail > span.error-message {
-    font-weight: normal; }
-
-th, tr, td, thead, tbody {
+th, tr, td, tbody {
   border: none !important; }
 
-a.test {
-  font-weight: normal !important; }
+table {
+  border: none; }
+  table p.error-message, table .esfa-collapse .panel .item-detail > span.error-message, .esfa-collapse .panel table .item-detail > span.error-message {
+    font-weight: normal; }
+  table thead {
+    border-bottom: 2px solid #bfc1c3 !important; }
 
 .error-message {
   font-weight: normal !important; }

@@ -35,7 +35,44 @@ $glyph: 'glyphicons-halflings-regular';
 a.button:hover {
     text-decoration: none;
 }
+///////////////////////////////////////
+//             Start Page           //
+/////////////////////////////////////
+.button-start {
+    background-repeat: no-repeat;
+    background-position: 100% 50%;
+    background-image: url(../images/icon-pointer.png);
+}
+.govuk-related-items {
+    margin-top: 30px;
+    border-top: 10px solid #005ea5;
+    padding-top: 5px;
+}
+///////////////////////////////////////
+/////             Buttons       //////
+/////////////////////////////////////
+.button-error {
+    background-color: $mellow-red;
+    &:hover {
+        background-color: darken($mellow-red, 10%);       
+    }
+    &.remove {
+        background-color: $green;
+        &:hover {
+            background-color: darken($green, 10%);
+        }       
+    }
+}
+/*.button-view {
+    background-color: $govuk-blue;
+}*/
+.button-edit {
+    background-color: $govuk-blue;
 
+    &:hover {
+        background-color: darken($govuk-blue, 10%);
+    }
+}
 ///////////////////////////////////////
 //    Accordion list and sublist    //
 /////////////////////////////////////
@@ -407,26 +444,19 @@ a.button:hover {
 ///////////////////////////////////////
 //          Sidebar pages           //
 /////////////////////////////////////
-/*
- * off Canvas sidebar
- * --------------------------------------------------
- */
+th, tr, td, tbody {
+    border: none !important;
+}
 table {
-    border: 1px solid gray;
+    border: none;
 
     p.error-message {
         font-weight: normal;
     }
+    thead {
+        border-bottom: 2px solid $border-colour !important;
+    } 
 }
-
-th, tr, td, thead, tbody {
-    border: none !important;
-}
-
-a.test {
-    font-weight: normal !important;
-}
-
 .error-message {
     font-weight: normal !important;
 
