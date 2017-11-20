@@ -1,6 +1,7 @@
 ﻿@page
 @using ApiClient.Models
-@model ProductModel
+@using Specifications
+@model Specifications.ProductModel
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Pages/_Layout.cshtml";
@@ -29,7 +30,7 @@
                 </div>
                 @if (Model.Preview != null)
                 {
-                    @if (Model.Preview.CompilerOutput.Success)
+                    if (Model.Preview.CompilerOutput.Success)
                     {
 
                           <button type="submit" class="button">Build</button>

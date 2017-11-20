@@ -17,7 +17,7 @@ namespace Allocations.Web.Pages.Specifications
         {
             _apiClient = apiClient;
         }
-        public async Task OnGet(string id)
+        public async Task OnGet(string id, string productId)
         {
             Budget = (await _apiClient.GetBudget(id))?.Content;
 

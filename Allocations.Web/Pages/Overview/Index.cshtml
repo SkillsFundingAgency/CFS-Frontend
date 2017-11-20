@@ -1,4 +1,7 @@
 ﻿@page
+@using System.Collections.Generic
+@using Allocations.Web
+@using Allocations.Web.ApiClient.Models.Results
 @using ApiClient.Models.Results
 @model Allocations.Web.Pages.Overview.IndexModel
 @{
@@ -117,7 +120,15 @@
                                                                     {
                                                                         <li class="list-group-item sublist-item">
                                                                             <h4 class="heading-small">
-                                                                                <a asp-page="Products/Index" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
+                                                                                @{
+                                                                                    var routeParam =
+                                                                                        new Dictionary<string, string>
+                                                                                        {
+                                                                                            {"budgetId", budget.Budget.Id},
+                                                                                            {"allocationLineId", allocationLine.Id }
+                                                                                        };
+                                                                                }
+                                                                                <a asp-page="/Products/Index" asp-all-route-data="routeParam" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
                                                                                 <span class="ammount">@allocationLine.TotalAmount.AsMoney()</span>
                                                                             </h4>
                                                                             <div class="esfa-summary">
