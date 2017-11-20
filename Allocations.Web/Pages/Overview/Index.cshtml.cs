@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Allocations.Web.ApiClient;
+using Allocations.Web.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Allocations.Web.Pages.Allocations
+namespace Allocations.Web.Pages.Overview
 {
     public class IndexModel : PageModel
     {
