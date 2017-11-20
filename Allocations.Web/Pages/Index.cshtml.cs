@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Threading.Tasks;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
@@ -9,21 +15,9 @@ namespace Allocations.Web.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
-        public IList<BudgetSummary> Budgets;
-
-        public IndexModel(AllocationsApiClient apiClient)
+        public void OnGet()
         {
-            _apiClient = apiClient;
-        }
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            var results = await _apiClient.GetBudgetResults();
-
-            Budgets = results.Content;
-            return Page();
         }
     }
-
 }
