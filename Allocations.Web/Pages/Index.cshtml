@@ -36,33 +36,21 @@
                         <div class="panel-heading" tabindex="0">
                             <h2 class="panel-title stream-title">
                                 @budget.Budget.Name
-                                <span class="ammount">@budget.TotalAmount.AsMoney()</span>
+                                
                             </h2>
                             <div class="esfa-summary">
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-3">
                                         <div class="data">
-                                            <span class="data-item medium">@budget.TotalProviders</span>
-                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
-                                        </div>
+                                            Total <span class="ammount">@budget.TotalAmount.AsMoney()</span>                                        </div>
                                     </div>
-                                    <div class="col-xs-12 col-sm-3">
+                                    <div class="col-xs-12 col-sm-6">
                                         <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Passed </span>
-                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Failed</span>
-                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message"> tests failing</span></a>
+                                            <span class="data-item medium">@budget.TestSummary.Failed providers failing tests</span>
                                         </div>
                                     </div>
                                     <div class="col-xs-11 col-sm-2">
-                                        @Html.Partial("_TestChart", budget.TestSummary)
-                                        <div class="data">
-                                            <span class="data-item bold-xsmall">coverage</span>
-                                        </div>
+    
                                     </div>
                                 </div>
                             </div>
@@ -83,29 +71,17 @@
                                                             </h2>
                                                             <div class="esfa-summary">
                                                                 <div class="row">
-                                                                    <div class="col-xs-12 col-sm-3">
+                                                                    <div class="col-xs-12 col-sm-5">
                                                                         <div class="data">
-                                                                            <span class="data-item medium">@policy.TotalProviders</span>
-                                                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">@policy.TestSummary.Failed providers failing tests</span></a>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="col-xs-12 col-sm-3">
-                                                                        <div class="data">
-                                                                            <span class="data-item medium">@policy.TestSummary.Passed</span>
-                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-3">
-                                                                        <div class="data">
-                                                                            <span class="data-item medium">@policy.TestSummary.Failed</span>
-                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-11 col-sm-2">
+                                
+                                                                    <div class="col-xs-11 col-sm-3">
                                                                         @Html.Partial("_TestChart", policy.TestSummary)
 
                                                                         <div class="data">
-                                                                            <span class="data-item bold-xsmall">coverage</span>
+                                                                            <span class="data-item bold-xsmall">@policy.TestSummary.Covered/@policy.TotalProviders providers covered</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -123,28 +99,17 @@
                                                                             </h4>
                                                                             <div class="esfa-summary">
                                                                                 <div class="row">
-                                                                                    <div class="col-xs-12 col-sm-3">
+                                                                                    <div class="col-xs-12 col-sm-5">
                                                                                         <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TotalProviders</span>
-                                                                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">@allocationLine.TestSummary.Failed providers failing tests</span></a>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
+                                
+                                                                                    <div class="col-xs-11 col-sm-5">
+                                                                                        @Html.Partial("_TestChart", policy.TestSummary)
+
                                                                                         <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Passed</span>
-                                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Failed</span>
-                                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-11 col-sm-2">
-                                                                                        @Html.Partial("_TestChart", allocationLine.TestSummary)
-                                                                                        <div class="data">
-                                                                                            <span class="data-item bold-xsmall">coverage</span>
+                                                                                            <span class="data-item bold-xsmall">@allocationLine.TestSummary.Covered/@allocationLine.TotalProviders providers covered</span>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
