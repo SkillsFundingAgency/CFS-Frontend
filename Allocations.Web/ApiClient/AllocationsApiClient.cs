@@ -83,6 +83,11 @@ namespace Allocations.Web.ApiClient
             return await GetAsync<Product>($"{_specsPath}/products?budgetId={budgetId}&productId={productId}");
         }
 
+        public async Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId)
+        {
+            return await GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
+        }
+
 
         public async Task<ApiResponse<Budget[]>> GetBudgets()
         {

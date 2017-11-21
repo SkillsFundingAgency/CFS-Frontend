@@ -1,4 +1,7 @@
 ﻿@page
+@using System.Collections.Generic
+@using Allocations.Web
+@using Allocations.Web.ApiClient.Models.Results
 @using ApiClient.Models.Results
 @model Allocations.Web.Pages.Overview.IndexModel
 @{
@@ -6,7 +9,8 @@
 }
 <div class="row">
     <div class="col-xs-8">
-        <h1 class="heading-xlarge">Allocations overview</h1>
+        <h1 class="heading-xlarge">Funding overview</h1>
+        <p class="text-muted">Live summary of the status of quality assuring the provider allocations for [2017/2018]</p>
         <form class="year-form" method="get">
             <div class="form-group">
                 <label class="form-label" for="select-box">Select year:</label>
@@ -117,7 +121,15 @@
                                                                     {
                                                                         <li class="list-group-item sublist-item">
                                                                             <h4 class="heading-small">
-                                                                                <a asp-page="Products/Index" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
+                                                                                @{
+                                                                                    var routeParam =
+                                                                                        new Dictionary<string, string>
+                                                                                        {
+                                                                                            {"budgetId", budget.Budget.Id},
+                                                                                            {"allocationLineId", allocationLine.Id }
+                                                                                        };
+                                                                                }
+                                                                                <a asp-page="/Products/Index" asp-all-route-data="routeParam" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
                                                                                 <span class="ammount">@allocationLine.TotalAmount.AsMoney()</span>
                                                                             </h4>
                                                                             <div class="esfa-summary">

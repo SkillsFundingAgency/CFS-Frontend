@@ -11,14 +11,24 @@
 }
 <div class="row">
     <div class="col-xs-12 col-sm-8">
-        <h1 class="heading-xlarge">Pri005_PriBESubTotal Summary</h1>
-        <p>Full year ammount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
+        <h1 class="heading-xlarge">@Model.Product.Name Summary</h1>
+        <p>@Model.Product.Description</p>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12 col-sm-8">
+        @{
+            var routeEditCalulation =
+                new Dictionary<string, string>
+                {
+                    {"id", Model.Budget.Id},
+                    {"productId", Model.Product.Id }
+                };
+        }
+        <a class="button" asp-page="/Specifications/Product" asp-all-route-data="routeEditCalulation" role="button">Edit</a>
         <div class="editor read-only">
-            Dim t As DateTime = New DateTime(2018, 4, 1)
+            @Model.Product.Calculation.SourceCode
+            @*Dim t As DateTime = New DateTime(2018, 4, 1)
             Dim flag As Boolean = Me.APTProviderInformation.DateOpened > t
             Dim result As Decimal
             If flag Then
@@ -26,7 +36,7 @@
             Else
             result = Me.P004_PriRate() * Me.CensusNumberCounts.NORPrimary
             End If
-            Return result
+            Return result*@
         </div>
     </div>
 </div>
@@ -52,352 +62,374 @@
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
             <div class="funding-streams">
                 <button class="accordion-toggle">Open all</button>
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h2 class="heading-large panel-title">
-                               Primary school has a primary subtotal
-                        </h2>
-                    </div>
-                    <div class="panel-collapse collapse">
-                        <div class="panel-body">
+               
+                        @foreach (var scenario in @Model.Product.TestScenarios)
+                        { 
                             <div class="panel">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="gherkin-scenario">
-                                                    <p>
-                                                    <p>
-                                                        Given <span class="data-tag">'Phase'</span> in <span class="data-tag">'APT Provider Information'</span> is <span class="data-tag">'Primary'</span>
-                                                        <br />
-                                                        Then the result should be greater than <span class="data-tag">'0.00'</span>
-                                                    </p>
-                                                </div>
-                                                <div class="qa-failed-report">
-                                                    
-                                                        <h3 class="heading-medium list-title summary">7 Providers failing test</h3>
-                                                    
+                              <div class="panel-heading">
+                                  <h2 class="heading-large panel-title">
+                                      @scenario.Name
+                                  </h2>
+                        </div>
+                        <div class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="panel">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="gherkin-scenario">
+                                                        @if (scenario.GivenSteps != null)
+                                                        {
+                                                             foreach (var givenStep in scenario.GivenSteps)
+                                                             {
+                                                                 <p>
+                                                                     Given <span class="data-tag">@givenStep.Field</span> in <span class="data-tag">@givenStep.Dataset </span> is <span class="data-tag">@givenStep.Value</span>
+                                                                    
+                                                                 </p>
+                                                             }
+                                                        }
+                                                        @if (scenario.ThenSteps != null)
+                                                        {
+                                                             foreach (var thenStep in scenario.ThenSteps)
+                                                             {
+                                                                 <br/>
+                                                                 <p>Then <span class="data-tag">@thenStep.StepType</span> should be <span class="data-tag">@thenStep.Value</span>
+</p>
+                                                             }
+                                                            {
 
-                                                    <div class="details collapse panel panel-border-narrow">
-
+                                                            }
+                                                        }
                                                     </div>
-                                            </div>
-                                        </div>
+                                                    <div class="qa-failed-report">
 
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="qa-passed-report">
-                                                    
-                                                        <h3 class="heading-medium list-title summary">55 Providers passed the test</h3>
-                                                    
+                                                        <h3 class="heading-medium list-title summary"> Providers failing test</h3>
 
-                                                    <div class="details collapse panel panel-border-narrow">
 
+                                                        <div class="details collapse panel panel-border-narrow">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="qa-passed-report">
+
+                                                        <h3 class="heading-medium list-title summary"> Providers passed the test</h3>
+
+
+                                                        <div class="details collapse panel panel-border-narrow">
+
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- end of panel -->
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">
-                             Non primary schools don't have primary subtotals
-                        </h2>
-                    </div>
-                    <div class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="panel">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="gherkin-scenario">
-                                                    <p>
-                                                        Given <span class="data-tag">'Phase'</span> in <span class="data-tag">'APT Provider Information'</span> is not <span class="data-tag">'Primary'</span>
-                                                        <br />
-                                                        Then the result should be <span class="data-tag">'0.00'</span>
-                                                    </p>
-                                                </div>
-                                                <div class="qa-failed-report">
-                                                    <h3 class="heading-medium list-title summary">7 Providers failing test</h3>
-                                                    <div class="details collapse details collapse panel panel-border-narrow">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item sublist-item">
-                                                                <div class="provider-report">
-                                                                    <h4 class="heading-small list-title summary">
-                                                                        St. Ethelbert's Catholic Primary School
-                                                                    </h4>
-                                                                    <div class="details collapse provider-stats">
-                                                                        <ul class="list-inline">
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LA Name:</dt>
-                                                                                    <dd>Slough</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LAESTAB:</dt>
-                                                                                    <dd>8713363</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UPIN:</dt>
-                                                                                    <dd>134673</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UKPRN:</dt>
-                                                                                    <dd>10061983</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>URN:</dt>
-                                                                                    <dd>143802</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <table class="table">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th scope="col">Phase</th>
-                                                                                    <th class="numeric" scope="col">PrimaryNOR</th>
-                                                                                    <th class="numeric" scope="col">Rate</th>
-                                                                                    <th class="numeric" scope="col">P005_PriB E Subtotal</th>
+                        }
 
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th scope="row">Not applicable</th>
-                                                                                    <td class="numeric">401</td>
-                                                                                    <td class="numeric">3,156.24</td>
-                                                                                    <td class="numeric">&pound;1,265,653.93</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                            <li class="list-group-item sublist-item">
-                                                                <div class="provider-report">
-                                                                    <h4 class="heading-small list-title summary">
-                                                                        Denmead Junior High School
-                                                                    </h4>
-                                                                    <div class="provider-stats">
-                                                                        <ul class="list-inline">
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LA Name:</dt>
-                                                                                    <dd>Slough</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LAESTAB:</dt>
-                                                                                    <dd>8713363</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UPIN:</dt>
-                                                                                    <dd>134673</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UKPRN:</dt>
-                                                                                    <dd>10061983</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>URN:</dt>
-                                                                                    <dd>143802</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <table class="table">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th scope="col">Phase</th>
-                                                                                    <th class="numeric" scope="col">PrimaryNOR</th>
-                                                                                    <th class="numeric" scope="col">Rate</th>
-                                                                                    <th class="numeric" scope="col">P005_PriB E Subtotal</th>
+                        <!-- end of panel -->
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">
+                                    Non primary schools don't have primary subtotals
+                                </h2>
+                            </div>
+                            <div class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="panel">
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="gherkin-scenario">
+                                                            <p>
+                                                                Given <span class="data-tag">'Phase'</span> in <span class="data-tag">'APT Provider Information'</span> is not <span class="data-tag">'Primary'</span>
+                                                                <br />
+                                                                Then the result should be <span class="data-tag">'0.00'</span>
+                                                            </p>
+                                                        </div>
+                                                        <div class="qa-failed-report">
+                                                            <h3 class="heading-medium list-title summary">7 Providers failing test</h3>
+                                                            <div class="details collapse details collapse panel panel-border-narrow">
+                                                                <ul class="list-group">
+                                                                    <li class="list-group-item sublist-item">
+                                                                        <div class="provider-report">
+                                                                            <h4 class="heading-small list-title summary">
+                                                                                St. Ethelbert's Catholic Primary School
+                                                                            </h4>
+                                                                            <div class="details collapse provider-stats">
+                                                                                <ul class="list-inline">
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LA Name:</dt>
+                                                                                            <dd>Slough</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LAESTAB:</dt>
+                                                                                            <dd>8713363</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UPIN:</dt>
+                                                                                            <dd>134673</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UKPRN:</dt>
+                                                                                            <dd>10061983</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>URN:</dt>
+                                                                                            <dd>143802</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <table class="table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th scope="col">Phase</th>
+                                                                                            <th class="numeric" scope="col">PrimaryNOR</th>
+                                                                                            <th class="numeric" scope="col">Rate</th>
+                                                                                            <th class="numeric" scope="col">P005_PriB E Subtotal</th>
 
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th scope="row">Not applicable</th>
-                                                                                    <td class="numeric">401</td>
-                                                                                    <td class="numeric">3,156.24</td>
-                                                                                    <td class="numeric">&pound;1,265,653.93</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="qa-passed-report">                                                    
-                                                    <h3 class="heading-medium list-title summary">137 Providers passed the test</h3>
-                                                    <div class="details collapse panel panel-border-narrow">
-                                                        <ul>
-                                                            <li class="list-group-item sublist-item">
-                                                                <div class="provider-stats">
-                                                                    <div class="provider-report">
-                                                                        <h4 class="heading-small list-title summary">
-                                                                            Brune Park Community School
-                                                                        </h4>
-                                                                        <div class="provider-stats">
-                                                                            <ul class="list-inline">
-                                                                                <li>
-                                                                                    <dl>
-                                                                                        <dt>LA Name:</dt>
-                                                                                        <dd>Slough</dd>
-                                                                                    </dl>
-                                                                                </li>
-                                                                                <li>
-                                                                                    <dl>
-                                                                                        <dt>LAESTAB:</dt>
-                                                                                        <dd>8713363</dd>
-                                                                                    </dl>
-                                                                                </li>
-                                                                                <li>
-                                                                                    <dl>
-                                                                                        <dt>UPIN:</dt>
-                                                                                        <dd>134673</dd>
-                                                                                    </dl>
-                                                                                </li>
-                                                                                <li>
-                                                                                    <dl>
-                                                                                        <dt>UKPRN:</dt>
-                                                                                        <dd>10061983</dd>
-                                                                                    </dl>
-                                                                                </li>
-                                                                                <li>
-                                                                                    <dl>
-                                                                                        <dt>URN:</dt>
-                                                                                        <dd>143802</dd>
-                                                                                    </dl>
-                                                                                </li>
-                                                                            </ul>
-                                                                            <table class="table">
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                        <th scope="col">Phase</th>
-                                                                                        <th class="numeric" scope="col">PrimaryNOR</th>
-                                                                                        <th class="numeric" scope="col">Rate</th>
-                                                                                        <th class="numeric" scope="col">P005_PriB E Subtotal</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <th scope="row">Not applicable</th>
-                                                                                        <td class="numeric">401</td>
-                                                                                        <td class="numeric">3,156.24</td>
-                                                                                        <td class="numeric">&pound;1,265,653.93</td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <th scope="row">Not applicable</th>
+                                                                                            <td class="numeric">401</td>
+                                                                                            <td class="numeric">3,156.24</td>
+                                                                                            <td class="numeric">&pound;1,265,653.93</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>                                                                
-                                                            </li>
-                                                            <li class="list-group-item sublist-item">
-                                                                <div class="provider-report">
-                                                                    <h4 class="heading-small list-title summary">
-                                                                         Widcombe CE Junior School, Bath
-                                                                    </h4>
-                                                                    <div class="provider-stats">
-                                                                        <ul class="list-inline">
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LA Name:</dt>
-                                                                                    <dd>Slough</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>LAESTAB:</dt>
-                                                                                    <dd>8713363</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UPIN:</dt>
-                                                                                    <dd>134673</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>UKPRN:</dt>
-                                                                                    <dd>10061983</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                            <li>
-                                                                                <dl>
-                                                                                    <dt>URN:</dt>
-                                                                                    <dd>143802</dd>
-                                                                                </dl>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <table class="table">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th scope="col">Phase</th>
-                                                                                    <th class="numeric" scope="col">PrimaryNOR</th>
-                                                                                    <th class="numeric" scope="col">Rate</th>
-                                                                                    <th class="numeric" scope="col">P005_PriB E Subtotal</th>
+                                                                    </li>
+                                                                    <li class="list-group-item sublist-item">
+                                                                        <div class="provider-report">
+                                                                            <h4 class="heading-small list-title summary">
+                                                                                Denmead Junior High School
+                                                                            </h4>
+                                                                            <div class="provider-stats">
+                                                                                <ul class="list-inline">
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LA Name:</dt>
+                                                                                            <dd>Slough</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LAESTAB:</dt>
+                                                                                            <dd>8713363</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UPIN:</dt>
+                                                                                            <dd>134673</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UKPRN:</dt>
+                                                                                            <dd>10061983</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>URN:</dt>
+                                                                                            <dd>143802</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <table class="table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th scope="col">Phase</th>
+                                                                                            <th class="numeric" scope="col">PrimaryNOR</th>
+                                                                                            <th class="numeric" scope="col">Rate</th>
+                                                                                            <th class="numeric" scope="col">P005_PriB E Subtotal</th>
 
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th scope="row">Not applicable</th>
-                                                                                    <td class="numeric">401</td>
-                                                                                    <td class="numeric">3,156.24</td>
-                                                                                    <td class="numeric">&pound;1,265,653.93</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <th scope="row">Not applicable</th>
+                                                                                            <td class="numeric">401</td>
+                                                                                            <td class="numeric">3,156.24</td>
+                                                                                            <td class="numeric">&pound;1,265,653.93</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="qa-passed-report">
+                                                            <h3 class="heading-medium list-title summary">137 Providers passed the test</h3>
+                                                            <div class="details collapse panel panel-border-narrow">
+                                                                <ul>
+                                                                    <li class="list-group-item sublist-item">
+                                                                        <div class="provider-stats">
+                                                                            <div class="provider-report">
+                                                                                <h4 class="heading-small list-title summary">
+                                                                                    Brune Park Community School
+                                                                                </h4>
+                                                                                <div class="provider-stats">
+                                                                                    <ul class="list-inline">
+                                                                                        <li>
+                                                                                            <dl>
+                                                                                                <dt>LA Name:</dt>
+                                                                                                <dd>Slough</dd>
+                                                                                            </dl>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <dl>
+                                                                                                <dt>LAESTAB:</dt>
+                                                                                                <dd>8713363</dd>
+                                                                                            </dl>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <dl>
+                                                                                                <dt>UPIN:</dt>
+                                                                                                <dd>134673</dd>
+                                                                                            </dl>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <dl>
+                                                                                                <dt>UKPRN:</dt>
+                                                                                                <dd>10061983</dd>
+                                                                                            </dl>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <dl>
+                                                                                                <dt>URN:</dt>
+                                                                                                <dd>143802</dd>
+                                                                                            </dl>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                    <table class="table">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th scope="col">Phase</th>
+                                                                                                <th class="numeric" scope="col">PrimaryNOR</th>
+                                                                                                <th class="numeric" scope="col">Rate</th>
+                                                                                                <th class="numeric" scope="col">P005_PriB E Subtotal</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <th scope="row">Not applicable</th>
+                                                                                                <td class="numeric">401</td>
+                                                                                                <td class="numeric">3,156.24</td>
+                                                                                                <td class="numeric">&pound;1,265,653.93</td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                    </li>
+                                                                    <li class="list-group-item sublist-item">
+                                                                        <div class="provider-report">
+                                                                            <h4 class="heading-small list-title summary">
+                                                                                Widcombe CE Junior School, Bath
+                                                                            </h4>
+                                                                            <div class="provider-stats">
+                                                                                <ul class="list-inline">
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LA Name:</dt>
+                                                                                            <dd>Slough</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>LAESTAB:</dt>
+                                                                                            <dd>8713363</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UPIN:</dt>
+                                                                                            <dd>134673</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>UKPRN:</dt>
+                                                                                            <dd>10061983</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <dl>
+                                                                                            <dt>URN:</dt>
+                                                                                            <dd>143802</dd>
+                                                                                        </dl>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <table class="table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th scope="col">Phase</th>
+                                                                                            <th class="numeric" scope="col">PrimaryNOR</th>
+                                                                                            <th class="numeric" scope="col">Rate</th>
+                                                                                            <th class="numeric" scope="col">P005_PriB E Subtotal</th>
+
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <th scope="row">Not applicable</th>
+                                                                                            <td class="numeric">401</td>
+                                                                                            <td class="numeric">3,156.24</td>
+                                                                                            <td class="numeric">&pound;1,265,653.93</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <!-- end of panel -->
+                        <!-- end of panel -->
                     </div>
-                </div>
-                <!-- end of panel -->
-                <!-- end of panel -->
-            </div>
+
         </div>
         <!-- end of #esfa-collapse  -->
     </div>

@@ -3,7 +3,7 @@
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
-        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title:not(.stream-title)')),
+        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title').not('.stream-title').not('.scenario-title')),
         headingText = $('panel-title'),
         summary = $('.summary');
     //add the accordion functionality
