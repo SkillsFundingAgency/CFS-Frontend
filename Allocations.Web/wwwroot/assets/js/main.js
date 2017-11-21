@@ -123,7 +123,10 @@
         var JavaScriptMode = ace.require("ace/mode/vbscript").Mode;
         editor = ace.edit(this);
         editorSession = editor.getSession();
-        editorSession.setMode('ace/mode/vbscript');
+        editorSession.setMode({
+            path: 'ace/mode/vbscript',
+            v: Date.now() //small tweak here to update the mode constantly
+        });
         editorSession.setUseWrapMode(true);
         editor.resize()
         editor.setOptions({
