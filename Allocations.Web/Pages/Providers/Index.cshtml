@@ -1,4 +1,5 @@
 ﻿@page "{id}"
+@using System.Linq;
 @model Allocations.Web.Pages.Providers.IndexModel
 @{
     ViewData["Title"] = "Providers";
@@ -10,7 +11,7 @@
 }
 <div class="row">
     <div class="col-xs-8">
-        <h1 class="heading-xlarge">Pupil-led factor</h1>
+        <h1 class="heading-xlarge">Providers failing tests</h1>
     </div>
 </div>
 <div class="row">
@@ -30,19 +31,15 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Status</a>
+                                <a class="plain-link" href="javascript:void(0);">Local Authority</a>
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
                             <div class="panel-body">
                                 <fieldset>
                                     <div class="multiple-choice">
-                                        <input id="pass-test" name="esfa-filter-status" type="checkbox" value="passed">
-                                        <label for="pass-test">Pass</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="fail-test" name="esfa-filter-status" type="checkbox" value="failed" checked="checked">
-                                        <label for="fail-test">Failed</label>
+                                        <input id="pass-test" name="esfa-filter-status" type="checkbox" value="northumberland">
+                                        <label for="pass-test">Northumberland (@Model.Providers.Count))</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -52,48 +49,63 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Product Folder</a>
+                                <a class="plain-link" href="javascript:void(0);">Datasets</a>
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
                             <div class="panel-body scroll-body">
                                 <fieldset>
-                                    <div class="multiple-choice">
-                                        <input id="pupil-led-factors" name="esfa-filter-folder" type="checkbox" value="basic-entitlement" checked="checked">
-                                        <label for="pass-test">Basic Entitlement</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="other-factors" name="esfa-filter-folder" type="checkbox" value="fsm">
-                                        <label for="other-factors">FSM</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="idaci" name="esfa-filter-folder" type="checkbox" value="idaci">
-                                        <label for="exceptional-factors">IDACI</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="lac" name="esfa-filter-folder" type="checkbox" value="lac">
-                                        <label for="lac">LAC</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="prior-attainment" name="esfa-filter-folder" type="checkbox" value="prior-attainment">
-                                        <label for="prior-attainment">Prior Attainment</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="eal" name="esfa-filter-folder" type="checkbox" value="eal">
-                                        <label for="eal">EAL</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="mobility" name="esfa-filter-folder" type="checkbox" value="mobility">
-                                        <label for="mobility">Mobility</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="sparsity" name="esfa-filter-folder" type="checkbox" value="sparsity">
-                                        <label for="sparsity">Sparsity</label>
-                                    </div>
-                                    <div class="multiple-choice">
-                                        <input id="other-factors" name="esfa-filter-folder" type="checkbox" value="other-factors-folder">
-                                        <label for="other-factors">Other factors</label>
-                                    </div>
+                                    @foreach (var name in Model.DatasetNames.OrderByDescending(x => x.Value.Count()))
+                                    {
+                                        <div class="multiple-choice">
+                                            <input id="pass-test" name="esfa-filter-status" type="checkbox" value="@name.Key.Replace(' ', '-')">
+                                            <label for="pass-test">@name.Key (@name.Value.Count())</label>
+                                        </div>
+                                    }
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                <a class="plain-link" href="javascript:void(0);">Dataset fields</a>
+                            </h3>
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body scroll-body">
+                                <fieldset>
+                                    @foreach (var name in Model.DatasetFieldNames.OrderByDescending(x => x.Value.Count()))
+                                    {
+                                        <div class="multiple-choice">
+                                            <input id="pass-test" name="esfa-filter-status" type="checkbox" value="@name.Key.Replace(' ', '-')">
+                                            <label for="pass-test">@name.Key (@name.Value.Count())</label>
+                                        </div>
+                                    }
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                <a class="plain-link" href="javascript:void(0);">Dataset field values</a>
+                            </h3>
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body scroll-body">
+                                <fieldset>
+                                    @foreach (var name in Model.DatasetFieldValues.OrderByDescending(x => x.Value.Count()))
+                                    {
+                                        <div class="multiple-choice">
+                                            <input id="pass-test" name="esfa-filter-status" type="checkbox" value="@name.Key?.Replace(' ', '-')">
+                                            <label for="pass-test">@name.Key (@name.Value.Count())</label>
+                                        </div>
+                                    }
                                 </fieldset>
 
                             </div>
@@ -110,42 +122,74 @@
             <div class="panel-group wrap esfa-collapse filtr-container" id="esfa-list">
             <button class="accordion-toggle">Open all</button>
                 
-                @foreach (var provider in Model.Providers)
+                @foreach (var tr in Model.Providers)
                 {
-                    <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed basic-entitlement">
+                    var categories = new List<string>();
+                    var datasetRefs = tr.ScenarioResults.Where(x => x.DatasetReferences != null).SelectMany(x => x.DatasetReferences).Distinct().ToArray();
+                    categories.AddRange(datasetRefs.Select(x => x.DatasetName.Replace(' ', '-')));
+                    categories.AddRange(datasetRefs.Select(x => x.FieldName.Replace(' ', '-')));
+                    categories.AddRange(datasetRefs.Select(x => x.Value?.Replace(' ', '-')));
+                    <div class="panel filtr-item" data-id="P004_PriRate" data-category="northumberland @string.Join(' ', categories)">
                         <div class="panel-heading">
-                            <h2 class="heading-large panel-title">
+                            <h2 class="panel-title">
                                 <a href="javascript:void(0);">
-                                    @provider.Provider.Name
+                                    @tr.Provider.Name
                                 </a>
                             </h2>
-                            <div class="flex-row">
-                                <p class="item-detail"><span class="glyphicon glyphicon-folder-close"></span>Basic entitlement</p>
-                            </div>
                         </div>
-                        <div class="panel-collapse collapse in">
+                        <div class="panel-collapse collapse">
                             <div class="panel-body">
-                                <div class="panel">
-                                    <p>Full year amount of basic entitlement for academies that have primary pupils calculated by multiplying primary pupils by the LA-determined rate, except for in-year openers funded on census, where the LA-calculated allocation is picked up from the New ISB sheet of the APT Agregation</p>
+                                <div class="panel panel-border-narrow">
+                                    <div class="provider-stats">
+                                        <ul class="list-inline">
+                                            <li>
+                                                <dl>
+                                                    <dt>LA Name:</dt>
+                                                    <dd>Northumberland</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>LAESTAB:</dt>
+                                                    <dd>8713363</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>UPIN:</dt>
+                                                    <dd>134673</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>UKPRN:</dt>
+                                                    <dd>10061983</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>URN:</dt>
+                                                    <dd>143802</dd>
+                                                </dl>
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Scenario test results</th>
-                                                <th>For 152 Providers</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a class="test" asp-page="Results2">Only Primary providers should have Primary Rate</a></td>
-                                                <td><p class="item-detail font-xsmall"><a href="javascript:void(0);"><span class="error-message">7 Providers failed tests</span></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a class="test" asp-page="Results2">Non primary schools don't have primary subtotals</a></td>
-                                                <td><p class="text-success">All tests passed</p></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <ul class="list-group">
+                                        @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
+                                        {
+                                            <li class="list-group-item">
+                                                <h3 class="heading-medium list-title">
+                                                    @scenarioResult.Key
+                                                    <span class="product-value">@scenarioResult.First().ProductValue.ToString()</span>
+                                                </h3>
+                                                @foreach (var scenario in scenarioResult)
+                                                {
+                                                    <p>@scenario.Scenario?.Name @scenario.TestResult</p>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
                                 </div>
                             </div>
                         </div>
