@@ -180,7 +180,7 @@ a.button:hover {
             }
         }
 
-        a {
+        /*a {
             color: $link-colour;
             position: relative;
             font-weight: 700;
@@ -210,7 +210,7 @@ a.button:hover {
                     outline-offset: 0;
                 }
             }
-        }
+        }*/
 
         .amount {
             color: initial !important;
@@ -398,7 +398,9 @@ a.button:hover {
         color: $link-colour;
         padding: 5px;
         cursor: pointer;
-
+        &:empty {
+            content: "empty-variable"
+        }
         &:hover {
             /*background-color: $highlight-colour;*/
             color: $link-hover-colour;
@@ -599,5 +601,16 @@ table {
         &:hover {
             color: $red;
         }
+    }
+}
+
+#calculation-engine {
+    h3 {
+        margin: 0;
+        margin-top: 30px;
+        font-size: 24px;
+    }
+    table {
+        border: 1px solid $red;
     }
 }
