@@ -33,7 +33,7 @@
                         <div class="panel-heading no-collapse">
                             <fieldset>
                                 <label class="form-label" for="esfa-filter-search">Search</label>
-                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search">
+                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search" data-search>
                             </fieldset>
                         </div>
                     </div>
@@ -41,7 +41,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Status</a>
+                                Status
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -63,7 +63,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Product Folder</a>
+                                Product Folder
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -127,7 +127,7 @@
                 {
                     foreach (var product in productFolder.Products)
                     {
-                        <div class="panel filtr-item" data-id="P004_PriRate" data-category="failed @productFolder.Id">
+                        <div class="panel filtr-item" data-filter-item data-filter-name="@product.Name.ToLower()" data-id="P004_PriRate" data-category="failed @productFolder.Id">
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-6">

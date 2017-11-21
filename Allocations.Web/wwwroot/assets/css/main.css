@@ -1796,6 +1796,10 @@ a.button:hover {
       margin-bottom: 20px;
       font-weight: 700;
       margin-right: 10px; }
+      .esfa-collapse .panel .panel-heading .panel-title a {
+        color: #005ea5; }
+        .esfa-collapse .panel .panel-heading .panel-title a:hover {
+          color: #2b8cc4; }
   .esfa-collapse .panel .panel-collapse {
     display: none; }
     .esfa-collapse .panel .panel-collapse .panel-body {
@@ -1850,22 +1854,7 @@ a.button:hover {
     .esfa-collapse#esfa-filter .panel .panel-heading {
       border-top: none;
       background-color: #dee0e2;
-      padding: 10px;
-      /*&:before {
-                    content: "\e114";
-                    display: block;
-                    font-family: $glyph;
-                    position: absolute;
-                    color: $text-colour;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    right: 5px;
-                    font-size: 19px;
-                }
-
-                &.active:before {
-                    content: "\e113";
-                }*/ }
+      padding: 10px; }
       .esfa-collapse#esfa-filter .panel .panel-heading .panel-title {
         font-size: inherit;
         line-height: 1.25;
@@ -1876,10 +1865,8 @@ a.button:hover {
         width: 100%; }
         .esfa-collapse#esfa-filter .panel .panel-heading .form-control:focus {
           outline: 3px solid #ffbf47; }
-      .esfa-collapse#esfa-filter .panel .panel-heading:hover .plain-link {
-        color: #0b0c0c; }
     .esfa-collapse#esfa-filter .panel.search-panel .panel-heading:hover {
-      background-color: #dee0e2; }
+      background-color: #bfc1c3; }
     .esfa-collapse#esfa-filter .panel .panel-no-collapse {
       background-color: #dee0e2;
       padding: 0 5px 5px; }
@@ -1896,8 +1883,10 @@ a.button:hover {
             width: 18px;
             height: 10px; }
     .esfa-collapse#esfa-filter .panel:hover .panel-heading,
-    .esfa-collapse#esfa-filter .panel:hover .panel-collapse {
-      background-color: #bfc1c3; }
+    .esfa-collapse#esfa-filter .panel:hover .panel-collapse,
+    .esfa-collapse#esfa-filter .panel:hover .panel-no-collapse {
+      background-color: #bfc1c3;
+      border-color: #bfc1c3; }
 
 .product-details .summary {
   display: block; }

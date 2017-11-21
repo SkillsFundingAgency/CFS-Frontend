@@ -34,7 +34,7 @@
                         <div class="panel-heading no-collapse">
                             <fieldset>
                                 <label class="form-label" for="esfa-filter-search">Search</label>
-                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search">
+                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search" data-search>
                             </fieldset>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Local Authority</a>
+                                Local Authority
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -50,7 +50,7 @@
                                 <fieldset>
                                     <div class="multiple-choice">
                                         <input id="pass-test" name="esfa-filter-status" type="checkbox" value="northumberland">
-                                        <label for="pass-test">Northumberland (@Model.Providers.Count))</label>
+                                        <label for="pass-test">Northumberland (@Model.Providers.Count)</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -60,7 +60,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Datasets</a>
+                                Datasets
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -82,7 +82,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Dataset fields</a>
+                                Dataset fields
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -104,7 +104,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="heading-medium panel-title">
-                                <a class="plain-link" href="javascript:void(0);">Dataset field values</a>
+                                Dataset field values
                             </h3>
                         </div>
                         <div class="panel-no-collapse">
@@ -140,9 +140,9 @@
                     categories.AddRange(datasetRefs.Select(x => x.DatasetName.Replace(' ', '-')));
                     categories.AddRange(datasetRefs.Select(x => x.FieldName.Replace(' ', '-')));
                     categories.AddRange(datasetRefs.Select(x => x.Value?.Replace(' ', '-')));
-                    <div class="panel filtr-item" data-id="P004_PriRate" data-category="northumberland @string.Join(' ', categories)">
+                    <div class="panel filtr-item" data-id="P004_PriRate" data-filter-item data-filter-name="@tr.Provider.Name.ToLower()" data-category="northumberland @string.Join(' ', categories)">
                         <div class="panel-heading">
-                            <h2 class="panel-title">
+                            <h2 class="panel-title provider-title">
                                 <a href="/providers/details/@tr.Budget.Id?providerId=@tr.Provider.Id">
                                     @tr.Provider.Name
                                 </a>
