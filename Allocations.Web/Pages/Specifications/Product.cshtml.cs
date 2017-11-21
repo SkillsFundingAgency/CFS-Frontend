@@ -22,8 +22,8 @@ namespace Allocations.Web.Pages.Specifications
             Budget = (await _apiClient.GetBudget(id))?.Content;
 
             Product = Budget.FundingPolicies
-                .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
-                .Skip(1).FirstOrDefault();
+                .SelectMany(x => x.AllocationLines.SelectMany(y =>
+                    y.ProductFolders.SelectMany(z => z.Products).Where(p => p.Id == productId))).FirstOrDefault();
 
             var response = await _apiClient.PostPreview(new PreviewRequest
             {
