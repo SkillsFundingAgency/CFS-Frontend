@@ -6,6 +6,19 @@
     ViewData["Title"] = "Details";
     Layout = "~/Pages/_Layout.cshtml";
 }
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+                <li><a href="/Overview">Funding overview</a></li>
+                <li><a href="/Products/Pupil%20Led%20Factors?budgetId=@Model.Budget.Id&allocationLineId=pupil-led-factors">Pupil Led Factors</a></li>
+                <li><a href="/Products/Details?budgetId=@Model.Budget.Id&productId=@Model.Product.Id">@Model.Product.Name</a></li>
+            </ol>
+        </div>
+    </div>
+</div>
     <div class="row">
         <div class="col-xs-12 col-sm-8">
             <h1 class="heading-xlarge">@Model.Product.Name specifications</h1>
