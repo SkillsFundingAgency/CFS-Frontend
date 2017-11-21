@@ -1936,7 +1936,7 @@ a.button:hover {
   padding: 5px;
   cursor: pointer; }
   .gherkin-scenario span.data-tag:empty {
-    content: "empty-variable"; }
+    display: none; }
   .gherkin-scenario span.data-tag:hover {
     /*background-color: $highlight-colour;*/
     color: #2b8cc4; }

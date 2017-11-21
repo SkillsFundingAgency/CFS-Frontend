@@ -399,7 +399,7 @@ a.button:hover {
         padding: 5px;
         cursor: pointer;
         &:empty {
-            content: "empty-variable"
+            display: none;
         }
         &:hover {
             /*background-color: $highlight-colour;*/
