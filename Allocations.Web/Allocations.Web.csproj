@@ -14,5 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\assets\css\" />
+    <Folder Include="wwwroot\assets\libs\NewFolder\" />
   </ItemGroup>
 </Project>

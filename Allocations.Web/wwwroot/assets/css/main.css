@@ -1738,7 +1738,38 @@ a.button:hover {
   border-style: none;
   border-radius: 0;
   box-shadow: none;
-  position: static !important; }
+  position: static !important;
+  /*a {
+            color: $link-colour;
+            position: relative;
+            font-weight: 700;
+            padding: 5px;
+            padding-left: 0;
+
+            &:hover {
+                text-decoration: none !important;
+                color: $link-hover-colour;
+            }
+
+            &:focus {
+                text-decoration: none !important;
+                background-color: initial;
+                outline: 3px solid $focus-colour;
+                outline-offset: 2px;
+            }
+
+            &.plain-link {
+                color: $text-colour;
+
+                &:hover {
+                    color: $text-colour;
+                }
+
+                &:focus {
+                    outline-offset: 0;
+                }
+            }
+        }*/ }
   .esfa-collapse .panel.panel-border-narrow, .esfa-collapse .panel.panel-border-narrow {
     border-left-style: solid;
     padding: 15px; }
@@ -1787,26 +1818,6 @@ a.button:hover {
         margin: 0;
         margin-right: 10px;
         color: #6f777b; }
-  .esfa-collapse .panel a {
-    color: #005ea5;
-    position: relative;
-    font-weight: 700;
-    padding: 5px;
-    padding-left: 0; }
-    .esfa-collapse .panel a:hover {
-      text-decoration: none !important;
-      color: #2b8cc4; }
-    .esfa-collapse .panel a:focus {
-      text-decoration: none !important;
-      background-color: initial;
-      outline: 3px solid #ffbf47;
-      outline-offset: 2px; }
-    .esfa-collapse .panel a.plain-link {
-      color: #0b0c0c; }
-      .esfa-collapse .panel a.plain-link:hover {
-        color: #0b0c0c; }
-      .esfa-collapse .panel a.plain-link:focus {
-        outline-offset: 0; }
   .esfa-collapse .panel .amount {
     color: initial !important;
     font-weight: normal !important;
@@ -1924,6 +1935,8 @@ a.button:hover {
   color: #005ea5;
   padding: 5px;
   cursor: pointer; }
+  .gherkin-scenario span.data-tag:empty {
+    content: "empty-variable"; }
   .gherkin-scenario span.data-tag:hover {
     /*background-color: $highlight-colour;*/
     color: #2b8cc4; }
@@ -2045,3 +2058,11 @@ table {
   cursor: pointer; }
   .gherkin-scenario .remove-step:hover {
     color: #b10e1e; }
+
+#calculation-engine h3 {
+  margin: 0;
+  margin-top: 30px;
+  font-size: 24px; }
+
+#calculation-engine table {
+  border: 1px solid #b10e1e; }
