@@ -168,7 +168,15 @@
                                 }
                             }
                         }*@
-                    <a class="button" asp-page="TestScenario" asp-route-id="@Model.Budget.Id">Add scenario</a>
+            @{
+                var routeCreateScenario =
+                    new Dictionary<string, string>
+                    {
+                        {"budgetId", Model.Budget.Id},
+                        {"productId", @Model.Product.Id }
+                    };
+            }
+            <a class="button" asp-page="/Specifications/TestScenario" asp-all-route-data="routeCreateScenario" role="button">Add new scenario</a>
                 @*<div class="form-group">
                     <label for="description">Test Providers</label>
                     @if (Model.Product.TestProviders != null)
