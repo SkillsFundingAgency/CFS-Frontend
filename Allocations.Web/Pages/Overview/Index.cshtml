@@ -39,7 +39,7 @@
                         <div class="panel-heading" tabindex="0">
                             <h2 class="panel-title stream-title">
                                 @budget.Budget.Name
-                                <span class="ammount">@budget.TotalAmount.AsMoney()</span>
+                                <span class="amount">@budget.TotalAmount.AsMoney()</span>
                             </h2>
                             <div class="esfa-summary">
                                 <div class="row">
@@ -82,7 +82,7 @@
                                                         <div cass="inner-header ">
                                                             <h2 class="heading-medium list-title summary">
                                                                 @policy.Name
-                                                                <span class="ammount">@policy.TotalAmount.AsMoney()</span>
+                                                                <span class="amount">@policy.TotalAmount.AsMoney()</span>
                                                             </h2>
                                                             <div class="esfa-summary">
                                                                 <div class="row">
@@ -130,7 +130,7 @@
                                                                                         };
                                                                                 }
                                                                                 <a asp-page="/Products/Index" asp-all-route-data="routeParam" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
-                                                                                <span class="ammount">@allocationLine.TotalAmount.AsMoney()</span>
+                                                                                <span class="amount">@allocationLine.TotalAmount.AsMoney()</span>
                                                                             </h4>
                                                                             <div class="esfa-summary">
                                                                                 <div class="row">

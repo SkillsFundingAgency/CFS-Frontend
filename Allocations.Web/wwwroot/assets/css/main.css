@@ -1807,7 +1807,7 @@ a.button:hover {
         color: #0b0c0c; }
       .esfa-collapse .panel a.plain-link:focus {
         outline-offset: 0; }
-  .esfa-collapse .panel .ammount {
+  .esfa-collapse .panel .amount {
     color: initial !important;
     font-weight: normal !important;
     font-size: initial !important;
