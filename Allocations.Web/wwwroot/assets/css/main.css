@@ -1702,6 +1702,13 @@ a.button:hover {
   border-top: 10px solid #005ea5;
   padding-top: 5px; }
 
+.breadcrumbs li {
+  background-image: url("../images/separator.png");
+  background-position: 0% 50%;
+  background-repeat: no-repeat; }
+  .breadcrumbs li:first-child {
+    background-image: none; }
+
 .button-error {
   background-color: #df3034; }
   .button-error:hover {

@@ -48,8 +48,22 @@ a.button:hover {
     border-top: 10px solid #005ea5;
     padding-top: 5px;
 }
-///////////////////////////////////////
-/////             Buttons       //////
+  /////////////////////////////////////
+ /////         Breadcrumbs       /////
+/////////////////////////////////////
+.breadcrumbs {
+    li {
+        background-image: url('../images/separator.png');
+        background-position: 0% 50%;
+        background-repeat: no-repeat;
+
+        &:first-child {
+            background-image: none;
+        }
+    }
+}
+  /////////////////////////////////////
+ ////           Buttons         //////
 /////////////////////////////////////
 .button-error {
     background-color: $mellow-red;

@@ -142,7 +142,7 @@
                     categories.AddRange(datasetRefs.Select(x => x.Value?.Replace(' ', '-')));
                     <div class="panel filtr-item" data-id="P004_PriRate" data-filter-item data-filter-name="@tr.Provider.Name.ToLower()" data-category="northumberland @string.Join(' ', categories)">
                         <div class="panel-heading">
-                            <h2 class="panel-title provider-title">
+                            <h2 class="panel-title failing-provider-title">
                                 <a href="/providers/details/@tr.Budget.Id?providerId=@tr.Provider.Id">
                                     @tr.Provider.Name
                                 </a>
