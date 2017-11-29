@@ -48,8 +48,22 @@ a.button:hover {
     border-top: 10px solid #005ea5;
     padding-top: 5px;
 }
-///////////////////////////////////////
-/////             Buttons       //////
+  /////////////////////////////////////
+ /////         Breadcrumbs       /////
+/////////////////////////////////////
+.breadcrumbs {
+    li {
+        background-image: url('../images/separator.png');
+        background-position: 0% 50%;
+        background-repeat: no-repeat;
+
+        &:first-child {
+            background-image: none;
+        }
+    }
+}
+  /////////////////////////////////////
+ ////           Buttons         //////
 /////////////////////////////////////
 .button-error {
     background-color: $mellow-red;
@@ -138,6 +152,13 @@ a.button:hover {
                 margin-bottom: 20px;
                 font-weight: 700;
                 margin-right: 10px;
+                a {
+                    color: $link-colour;
+
+                    &:hover {
+                        color: $link-hover-colour;
+                    }
+                }
             }
         }
 
@@ -276,32 +297,12 @@ a.button:hover {
                         outline: 3px solid $focus-colour;
                     }
                 }
-                /*&:before {
-                    content: "\e114";
-                    display: block;
-                    font-family: $glyph;
-                    position: absolute;
-                    color: $text-colour;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    right: 5px;
-                    font-size: 19px;
-                }
-
-                &.active:before {
-                    content: "\e113";
-                }*/
-                &:hover {
-                    .plain-link {
-                        color: $text-colour;
-                    }
-                }
             }
 
             &.search-panel {
                 .panel-heading {
                     &:hover {
-                        background-color: $filter-bg;
+                        background-color: $filter-hover-bg;
                     }
                 }
             }
@@ -333,8 +334,10 @@ a.button:hover {
 
             &:hover {
                 .panel-heading,
-                .panel-collapse {
+                .panel-collapse,
+                .panel-no-collapse {
                     background-color: $filter-hover-bg;
+                    border-color: $filter-hover-bg;
                 }
             }
         }
