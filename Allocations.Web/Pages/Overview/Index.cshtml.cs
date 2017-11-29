@@ -19,6 +19,8 @@ namespace Allocations.Web.Pages.Overview
             _apiClient = apiClient;
         }
 
+       
+
         public async Task<IActionResult> OnGetAsync()
         {
             var results = await _apiClient.GetBudgetResults();
