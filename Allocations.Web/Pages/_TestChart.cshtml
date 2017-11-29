@@ -1,11 +1,19 @@
 ﻿@using Allocations.Web.ApiClient.Models
 @model ApiClient.Models.Results.TestSummary
-
+@{
+    var failed = string.Format("{0:0.00}", Model.FailedRate);
+}
+@{
+    var passed = string.Format("{0:0.00}", Model.PassedRate);
+}
 <div class="progress">
     <div class="progress-bar progress-bar-success" role="progressbar" style="width: @Model.PassedRate%">
-
+        @passed%
     </div>
     <div class="progress-bar progress-bar-error" role="progressbar" style="width: @Model.FailedRate%">
-
-    </div>    
+        @if (failed != "0.00")
+        {
+            <span>@failed%</span>
+        }
+    </div>
 </div>

@@ -50,12 +50,14 @@ namespace Allocations.Web.ApiClient
 
         public async Task<ApiResponse<BudgetSummary[]>> GetBudgetResults()
         {
-            return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
+            return await GetAsync<BudgetSummary[]>("/api/budgets");
+            //return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
         }
 
         public async Task<ApiResponse<Budget>> GetBudget(string id)
         {
-            return await GetAsync<Budget>($"{_specsPath}/budgets?budgetId={id}");
+            return await GetAsync<Budget>($"/api/budgets?budgetId={id}");
+            //return await GetAsync<Budget>($"{_specsPath}/budgets?budgetId={id}");
         }
 
         public async Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId)
@@ -85,7 +87,8 @@ namespace Allocations.Web.ApiClient
 
         public async Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId)
         {
-            return await GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
+            return await GetAsync<AllocationLine>($"/api/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
+            //return await GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
         }
 
 
