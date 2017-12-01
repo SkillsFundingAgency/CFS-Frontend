@@ -1,6 +1,7 @@
 using Allocations.Web.ApiClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +22,7 @@ namespace Allocations.Web
             services.AddMvc();
             services.Configure<AllocationApiOptions>(Configuration);
             services.AddTransient<AllocationsApiClient, AllocationsApiClient>();
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
