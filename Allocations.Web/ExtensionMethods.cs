@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Allocations.Web
+namespace CalculateFunding.Web
 {
     public static class ExtensionMethods
     {

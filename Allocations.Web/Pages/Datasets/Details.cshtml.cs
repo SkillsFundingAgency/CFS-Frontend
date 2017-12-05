@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Allocations.Web.ApiClient;
-using Allocations.Web.ApiClient.Models;
+using CalculateFunding.Web.ApiClient;
+using CalculateFunding.Web.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Allocations.Web.Pages.Datasets
+namespace CalculateFunding.Web.Pages.Datasets
 {
     public class DetailsModel : PageModel
     {

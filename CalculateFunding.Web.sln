@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27110.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Allocations.Web", "Allocations.Web\Allocations.Web.csproj", "{426D0C1C-C5B5-4438-98C8-D724B0DFFA5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculateFunding.Web", "Allocations.Web\CalculateFunding.Web.csproj", "{426D0C1C-C5B5-4438-98C8-D724B0DFFA5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

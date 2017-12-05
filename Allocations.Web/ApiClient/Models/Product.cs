@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using Allocations.Web.ApiClient.Models.Results;
-using Allocations.Web.Pages.Specifications;
+using CalculateFunding.Web.ApiClient.Models.Results;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
-namespace Allocations.Web.ApiClient.Models
+namespace CalculateFunding.Web.ApiClient.Models
 {
 
     public class Product : ResultSummary

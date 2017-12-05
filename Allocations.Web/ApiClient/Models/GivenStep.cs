@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace Allocations.Web.ApiClient.Models
+namespace CalculateFunding.Web.ApiClient.Models
 {
     public class GivenStep : TestStep, IValidatableObject
     {

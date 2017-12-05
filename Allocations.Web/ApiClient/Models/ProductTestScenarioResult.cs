@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Allocations.Web.ApiClient.Models
+namespace CalculateFunding.Web.ApiClient.Models
 {
     public class ProductTestScenarioResult
     {

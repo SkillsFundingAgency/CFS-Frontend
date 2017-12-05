@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Allocations.Web.ApiClient.Models
+namespace CalculateFunding.Web.ApiClient.Models
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Severity

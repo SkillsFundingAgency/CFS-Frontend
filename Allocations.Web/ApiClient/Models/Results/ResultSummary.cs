@@ -1,4 +1,4 @@
-namespace Allocations.Web.ApiClient.Models.Results
+namespace CalculateFunding.Web.ApiClient.Models.Results
 {
     public abstract class ResultSummary
     {

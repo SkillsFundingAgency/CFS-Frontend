@@ -1,11 +1,11 @@
-using Allocations.Web.ApiClient;
+using CalculateFunding.Web.ApiClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Allocations.Web
+namespace CalculateFunding.Web
 {
     public class Startup
     {

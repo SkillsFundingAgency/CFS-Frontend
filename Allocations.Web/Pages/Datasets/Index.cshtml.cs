@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Allocations.Web.ApiClient;
-using Allocations.Web.ApiClient.Models;
-using Allocations.Web.ApiClient.Models.Results;
+using CalculateFunding.Web.ApiClient;
+using CalculateFunding.Web.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
-namespace Allocations.Web.Pages.Datasets
+namespace CalculateFunding.Web.Pages.Datasets
 {
     public enum RowType
     {
@@ -58,7 +55,7 @@ namespace Allocations.Web.Pages.Datasets
             _apiClient = apiClient;
         }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public IActionResult OnGet(string id)
         {
             var y1718 = new Reference("1718", "2017-2018");
             Datasets = new List<Dataset>

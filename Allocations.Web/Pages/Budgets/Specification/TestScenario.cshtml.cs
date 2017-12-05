@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Allocations.Web.ApiClient;
-using Allocations.Web.ApiClient.Models;
+using CalculateFunding.Web.ApiClient;
+using CalculateFunding.Web.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Allocations.Web.Pages.Specifications
+namespace CalculateFunding.Web.Pages.Budgets.Specification
 {
     public class TestScenarioModel : PageModel
     {

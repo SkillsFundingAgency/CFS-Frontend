@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Allocations.Web.ApiClient
+namespace CalculateFunding.Web.ApiClient
 {
     public class ApiResponse<T>
     {

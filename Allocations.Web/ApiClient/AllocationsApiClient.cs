@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Allocations.Web.ApiClient.Models;
-using Allocations.Web.ApiClient.Models.Results;
-using Allocations.Web.Pages;
+using CalculateFunding.Web.ApiClient.Models;
+using CalculateFunding.Web.ApiClient.Models.Results;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Allocations.Web.ApiClient
+namespace CalculateFunding.Web.ApiClient
 {
     public class AllocationApiOptions
     {

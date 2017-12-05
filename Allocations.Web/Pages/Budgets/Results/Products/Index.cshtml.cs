@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Allocations.Web.ApiClient;
-using Allocations.Web.ApiClient.Models.Results;
+﻿using System.Threading.Tasks;
+using CalculateFunding.Web.ApiClient;
+using CalculateFunding.Web.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Allocations.Web.ApiClient.Models;
 
-namespace Allocations.Web.Pages.Products
+namespace CalculateFunding.Web.Pages.Budgets.Results.Products
 {
     public class IndexModel : PageModel
     {
