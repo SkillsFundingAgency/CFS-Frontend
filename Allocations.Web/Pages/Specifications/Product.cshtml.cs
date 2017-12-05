@@ -17,13 +17,13 @@ namespace Allocations.Web.Pages.Specifications
         {
             _apiClient = apiClient;
         }
-        public async Task OnGet(string id)
+        public async Task OnGet(string id, string productId)
         {
             Budget = (await _apiClient.GetBudget(id))?.Content;
 
             Product = Budget.FundingPolicies
-                .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
-                .Skip(1).FirstOrDefault();
+                .SelectMany(x => x.AllocationLines.SelectMany(y =>
+                    y.ProductFolders.SelectMany(z => z.Products).Where(p => p.Id == productId))).FirstOrDefault();
 
             var response = await _apiClient.PostPreview(new PreviewRequest
             {
@@ -53,7 +53,7 @@ namespace Allocations.Web.Pages.Specifications
 
             if (!string.IsNullOrEmpty(calculation))
             {
-                Product.Calculation = new ProductCalculation {SourceCode = calculation};
+                Product.Calculation = new ProductCalculation { SourceCode = calculation };
             }
 
             Preview = response.Content;

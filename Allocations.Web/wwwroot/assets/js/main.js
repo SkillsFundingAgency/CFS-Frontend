@@ -3,7 +3,7 @@
     var heading = $('.esfa-collapse .panel-heading').not('.item-detail'),
         panelCollapse = $('#esfa-list .panel-collapse'),
         expandLink = $('.accordion-toggle'),
-        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title:not(.stream-title)')),
+        headingSiblings = $('.esfa-summary .data-link').add($('.panel-title').not('.stream-title').not('.scenario-title').not('.provider-title')),
         headingText = $('panel-title'),
         summary = $('.summary');
     //add the accordion functionality
@@ -25,9 +25,12 @@
         }
         //stop this to cause a page scroll
         return false;
-    });    
+    });
     headingSiblings.click(function (e) {
         e.stopImmediatePropagation();
+    });
+    headingSiblings.siblings().click(function (e) {
+        e.stopPropagation();
     });
 
     // hook up the expand/collapse all
@@ -74,7 +77,7 @@
                 selectedFilters[this.name] = [];
             }
 
-            selectedFilters[this.name].push(this.value);            
+            selectedFilters[this.name].push(this.value);
         });
 
         // create a collection containing all of the filterable elements
@@ -109,7 +112,10 @@
         });
 
         $('.filtr-item').hide().filter($filteredResults).show();
+    });
 
+    $('#sidebar input:checkbox:checked').each(function () {
+        $(this).prop('checked', false);
     });
     //Embed Ace Editor
     var editor,
@@ -120,7 +126,10 @@
         var JavaScriptMode = ace.require("ace/mode/vbscript").Mode;
         editor = ace.edit(this);
         editorSession = editor.getSession();
-        editorSession.setMode('ace/mode/vbscript');
+        editorSession.setMode({
+            path: 'ace/mode/vbscript',
+            v: Date.now() //small tweak here to update the mode constantly
+        });
         editorSession.setUseWrapMode(true);
         editor.resize()
         editor.setOptions({
@@ -131,17 +140,73 @@
         editor.session.setMode(new JavaScriptMode());
         this.style.fontSize = '16px';
         $(this).hasClass('read-only') ? editor.setReadOnly(true) : editor.setReadOnly(false);
-        var input = $('#calculation-engine #calculation');        
+        var input = $('#calculation-engine #calculation');
         var valedit = editor.getValue();
         input.val(valedit);
         editor.getSession().on("change", function () {
             input.val(editor.getSession().getValue());;
         });
-    });    
+    });
     //Summary collapse
     summary.click(function () {
-        console.log('hello');
         $(this).siblings('.details').toggle();
         $(this).toggleClass('collapsed');
     });
+    //Search functionality
+    $('[data-search]').on('keyup', function () {
+        var searchVal = $(this).val();
+        var filterItems = $('[data-filter-item]');
+
+        if (searchVal != '') {
+            filterItems.addClass('hidden');
+            $('[data-filter-item][data-filter-name*="' + searchVal.toLowerCase() + '"]').removeClass('hidden');
+        } else {
+            filterItems.removeClass('hidden');
+        }
+    });
+    //Remove title margin if no siblings
+    var $panelTitle = $('.panel-title');
+    if ($panelTitle.siblings().size() === 0) {
+        $panelTitle.attr('style', 'margin-bottom: 0 !important')
+    }
 });
+
+$(document).on('click', '.step-btn', function (e) {
+    var $this = $(this);
+    var step = $this.text();
+    var stepLabel = '<label>' + step + '</label><span class="remove-step glyphicon glyphicon-remove-circle pull-right"></span>';
+    var $clone = $('.gherkin-step:last').clone();
+    $clone.find('.step-label').html(stepLabel);
+    $clone.addClass('generated');
+    $('.gherkin-scenario').append($clone);
+});
+$(document).on('click', '.remove-step', function () {
+    $(this).closest('.row').remove();
+});
+$(document).on('click', '.reset-btn', function () {
+    var $this = $(this);
+    if ($this.hasClass('remove')) {
+        $('.raw-display').html('');
+        $('.formatted-display').html('')
+        $this.removeClass('remove').text('Reset');
+        $('.generated').remove();
+    } else {
+        $this.addClass('remove').text('Are you sure?');
+        setTimeout(function () {
+            $this.removeClass('remove').text('Reset');
+        }, 2000)
+    }
+});
+//function initSortable() {
+//    $('.steps').sortable({
+//        placeholder: "ui-state-highlight",
+//        items: '> .row:not(.non-sortable)',
+//        helper: 'clone',
+//        connectWith: '.steps',
+//        activeClass: "ui-state-hover",
+//        hoverClass: "ui-state-active",
+//        update: function () {
+//            compile();
+//        }
+//    }).disableSelection();
+//}

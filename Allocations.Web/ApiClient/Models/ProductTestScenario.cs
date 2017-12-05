@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Allocations.Web.ApiClient.Models.Results;
 using Newtonsoft.Json;
 
 namespace Allocations.Web.ApiClient.Models
 {
-    public class ProductTestScenario : IValidatableObject
+    public class ProductTestScenario : ResultSummary,IValidatableObject
     {
         [JsonProperty("id")]
         public string Id { get; set; }

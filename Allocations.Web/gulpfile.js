@@ -77,7 +77,7 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/ext-language_tools.js',
             './node_modules/ace-builds/src-noconflict/snippets/csharp.js',
             './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
-            './node_modules/ace-builds/src-noconflict/snippets/vbscripts.js'
+            './node_modules/ace-builds/src-noconflict/snippets/vbscript.js'
 
         ],
         css: ['./node_modules/bootstrap/dist/css/bootstrap.css'],

@@ -34,7 +34,7 @@ namespace Allocations.Web
                 var output = $"£{(money / oneMillion):0.00}M";
                 return output.EndsWith(".00M") ? output.Replace(".00M", "M") : output;
             }
-            return money.ToString("C0");
+            return $"£{money:0.00}";
         }
     }
 }

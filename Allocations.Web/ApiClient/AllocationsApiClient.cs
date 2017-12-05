@@ -58,6 +58,16 @@ namespace Allocations.Web.ApiClient
             return await GetAsync<Budget>($"{_specsPath}/budgets?budgetId={id}");
         }
 
+        public async Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId)
+        {
+            return await GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}");
+        }
+
+        public async Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId)
+        {
+            return await GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}");
+        }
+
         public async Task<HttpStatusCode> PostBudget(Budget budget)
         {
             return await PostAsync($"{_specsPath}/budgets", budget);
@@ -71,6 +81,11 @@ namespace Allocations.Web.ApiClient
         public async Task<ApiResponse<Product>> GetProduct(string budgetId, string productId)
         {
             return await GetAsync<Product>($"{_specsPath}/products?budgetId={budgetId}&productId={productId}");
+        }
+
+        public async Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId)
+        {
+            return await GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
         }
 
 

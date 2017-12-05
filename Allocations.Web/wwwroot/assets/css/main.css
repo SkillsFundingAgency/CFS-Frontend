@@ -1687,10 +1687,44 @@ input[type=number] {
 @font-face {
   font-family: 'glyphicons-halflings-regular';
   src: url("../libs/fonts/glyphicons-halflings-regular.eot");
-  src: url("../libs//glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../libs/fonts/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
+  src: url("../libs/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../libs/fonts/glyphicons-halflings-regular.woff2") format("woff"), url("../libs/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
 
 a.button:hover {
   text-decoration: none; }
+
+.button-start {
+  background-repeat: no-repeat;
+  background-position: 100% 50%;
+  background-image: url(../images/icon-pointer.png); }
+
+.govuk-related-items {
+  margin-top: 30px;
+  border-top: 10px solid #005ea5;
+  padding-top: 5px; }
+
+.breadcrumbs li {
+  background-image: url("../images/separator.png");
+  background-position: 0% 50%;
+  background-repeat: no-repeat; }
+  .breadcrumbs li:first-child {
+    background-image: none; }
+
+.button-error {
+  background-color: #df3034; }
+  .button-error:hover {
+    background-color: #bf1d21; }
+  .button-error.remove {
+    background-color: #006435; }
+    .button-error.remove:hover {
+      background-color: #00311a; }
+
+/*.button-view {
+    background-color: $govuk-blue;
+}*/
+.button-edit {
+  background-color: #005ea5; }
+  .button-edit:hover {
+    background-color: #004172; }
 
 .esfa-collapse .accordion-toggle {
   color: #005ea5;
@@ -1711,7 +1745,38 @@ a.button:hover {
   border-style: none;
   border-radius: 0;
   box-shadow: none;
-  position: static !important; }
+  position: static !important;
+  /*a {
+            color: $link-colour;
+            position: relative;
+            font-weight: 700;
+            padding: 5px;
+            padding-left: 0;
+
+            &:hover {
+                text-decoration: none !important;
+                color: $link-hover-colour;
+            }
+
+            &:focus {
+                text-decoration: none !important;
+                background-color: initial;
+                outline: 3px solid $focus-colour;
+                outline-offset: 2px;
+            }
+
+            &.plain-link {
+                color: $text-colour;
+
+                &:hover {
+                    color: $text-colour;
+                }
+
+                &:focus {
+                    outline-offset: 0;
+                }
+            }
+        }*/ }
   .esfa-collapse .panel.panel-border-narrow, .esfa-collapse .panel.panel-border-narrow {
     border-left-style: solid;
     padding: 15px; }
@@ -1724,6 +1789,8 @@ a.button:hover {
     border-bottom: none;
     border-radius: 0;
     border-top: 1px solid #bfc1c3; }
+    .esfa-collapse .panel .panel-heading:focus {
+      outline: 3px solid #ffbf47; }
     .esfa-collapse .panel .panel-heading:hover {
       background-color: #f8f8f8; }
       .esfa-collapse .panel .panel-heading:hover a {
@@ -1733,7 +1800,13 @@ a.button:hover {
     .esfa-collapse .panel .panel-heading .panel-title {
       font-size: 24px;
       line-height: 1.25;
-      margin-bottom: 20px; }
+      margin-bottom: 20px;
+      font-weight: 700;
+      margin-right: 10px; }
+      .esfa-collapse .panel .panel-heading .panel-title a {
+        color: #005ea5; }
+        .esfa-collapse .panel .panel-heading .panel-title a:hover {
+          color: #2b8cc4; }
   .esfa-collapse .panel .panel-collapse {
     display: none; }
     .esfa-collapse .panel .panel-collapse .panel-body {
@@ -1756,30 +1829,11 @@ a.button:hover {
         margin: 0;
         margin-right: 10px;
         color: #6f777b; }
-  .esfa-collapse .panel a {
-    color: #005ea5;
-    position: relative;
-    font-weight: 700;
-    padding: 5px;
-    padding-left: 0; }
-    .esfa-collapse .panel a:hover {
-      text-decoration: none !important;
-      color: #2b8cc4; }
-    .esfa-collapse .panel a:focus {
-      text-decoration: none !important;
-      background-color: initial;
-      outline: 3px solid #ffbf47;
-      outline-offset: 2px; }
-    .esfa-collapse .panel a.plain-link {
-      color: #0b0c0c; }
-      .esfa-collapse .panel a.plain-link:hover {
-        color: #0b0c0c; }
-      .esfa-collapse .panel a.plain-link:focus {
-        outline-offset: 0; }
-  .esfa-collapse .panel .ammount {
+  .esfa-collapse .panel .amount {
     color: initial !important;
     font-weight: normal !important;
-    font-size: initial !important; }
+    font-size: initial !important;
+    margin-left: 10px; }
 
 .esfa-collapse#esfa-list .panel-heading:before {
   content: "";
@@ -1807,22 +1861,7 @@ a.button:hover {
     .esfa-collapse#esfa-filter .panel .panel-heading {
       border-top: none;
       background-color: #dee0e2;
-      padding: 10px;
-      /*&:before {
-                    content: "\e114";
-                    display: block;
-                    font-family: $glyph;
-                    position: absolute;
-                    color: $text-colour;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    right: 5px;
-                    font-size: 19px;
-                }
-
-                &.active:before {
-                    content: "\e113";
-                }*/ }
+      padding: 10px; }
       .esfa-collapse#esfa-filter .panel .panel-heading .panel-title {
         font-size: inherit;
         line-height: 1.25;
@@ -1833,10 +1872,8 @@ a.button:hover {
         width: 100%; }
         .esfa-collapse#esfa-filter .panel .panel-heading .form-control:focus {
           outline: 3px solid #ffbf47; }
-      .esfa-collapse#esfa-filter .panel .panel-heading:hover .plain-link {
-        color: #0b0c0c; }
     .esfa-collapse#esfa-filter .panel.search-panel .panel-heading:hover {
-      background-color: #dee0e2; }
+      background-color: #bfc1c3; }
     .esfa-collapse#esfa-filter .panel .panel-no-collapse {
       background-color: #dee0e2;
       padding: 0 5px 5px; }
@@ -1853,8 +1890,10 @@ a.button:hover {
             width: 18px;
             height: 10px; }
     .esfa-collapse#esfa-filter .panel:hover .panel-heading,
-    .esfa-collapse#esfa-filter .panel:hover .panel-collapse {
-      background-color: #bfc1c3; }
+    .esfa-collapse#esfa-filter .panel:hover .panel-collapse,
+    .esfa-collapse#esfa-filter .panel:hover .panel-no-collapse {
+      background-color: #bfc1c3;
+      border-color: #bfc1c3; }
 
 .product-details .summary {
   display: block; }
@@ -1892,6 +1931,8 @@ a.button:hover {
   color: #005ea5;
   padding: 5px;
   cursor: pointer; }
+  .gherkin-scenario span.data-tag:empty {
+    display: none; }
   .gherkin-scenario span.data-tag:hover {
     /*background-color: $highlight-colour;*/
     color: #2b8cc4; }
@@ -1915,20 +1956,15 @@ a.button:hover {
 .visible {
   display: block !important; }
 
-/*
- * off Canvas sidebar
- * --------------------------------------------------
- */
-table {
-  border: 1px solid gray; }
-  table p.error-message, table .esfa-collapse .panel .item-detail > span.error-message, .esfa-collapse .panel table .item-detail > span.error-message {
-    font-weight: normal; }
-
-th, tr, td, thead, tbody {
+th, tr, td, tbody {
   border: none !important; }
 
-a.test {
-  font-weight: normal !important; }
+table {
+  border: none; }
+  table p.error-message, table .esfa-collapse .panel .item-detail > span.error-message, .esfa-collapse .panel table .item-detail > span.error-message {
+    font-weight: normal; }
+  table thead {
+    border-bottom: 2px solid #bfc1c3 !important; }
 
 .error-message {
   font-weight: normal !important; }
@@ -1985,9 +2021,11 @@ a.test {
   display: block;
   width: 100%;
   max-width: 100px;
-  background-color: #df3034; }
+  background-color: #dee0e2; }
   .esfa-summary .progress .progress-bar-success {
     background-color: #006435; }
+  .esfa-summary .progress .progress-bar-error {
+    background-color: #df3034; }
 
 .editor {
   min-height: 250px;
@@ -1996,11 +2034,31 @@ a.test {
 
 .summary {
   cursor: pointer; }
-  .summary > a:before {
-    content: "\e250";
+  .summary:focus {
+    outline: 3px solid #ffbf47; }
+  .summary:before {
+    content: "\e258";
     font-family: "glyphicons-halflings-regular";
+    font-weight: normal;
+    font-size: 14px;
     margin-right: 5px;
-    margin-left: -12px;
     vertical-align: middle; }
-  .summary.collapsed > a:before {
-    content: "\e252"; }
+  .summary.collapsed:before {
+    content: "\e259"; }
+
+/*Gherkin scenario page*/
+.gherkin-scenario .form-control {
+  width: 100%; }
+
+.gherkin-scenario .remove-step {
+  cursor: pointer; }
+  .gherkin-scenario .remove-step:hover {
+    color: #b10e1e; }
+
+#calculation-engine h3 {
+  margin: 0;
+  margin-top: 30px;
+  font-size: 24px; }
+
+#calculation-engine table {
+  border: 1px solid #b10e1e; }

@@ -6,28 +6,28 @@ using Allocations.Web.ApiClient;
 using Allocations.Web.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Allocations.Web.ApiClient.Models;
 
-namespace Allocations.Web.Pages.Products
+namespace Allocations.Web.Pages.Overview
 {
     public class IndexModel : PageModel
     {
         private readonly AllocationsApiClient _apiClient;
-        public AllocationLine AllocationLine;
-        public string BudgetId;
+        public IList<BudgetSummary> Budgets;
 
         public IndexModel(AllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
         }
 
-        public async Task<IActionResult> OnGetAsync(string budgetId, string allocationLineId)
-        {
-            var results = await _apiClient.GetAllocationLine(budgetId, allocationLineId);
+       
 
-            AllocationLine = results.Content;
-            BudgetId = budgetId;
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var results = await _apiClient.GetBudgetResults();
+
+            Budgets = results.Content;
             return Page();
         }
     }
+
 }
