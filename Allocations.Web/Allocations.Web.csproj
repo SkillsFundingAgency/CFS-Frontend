@@ -15,4 +15,10 @@
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\Budgets\Product-Folders\" />
+    <Folder Include="Pages\Budgets\Test-Scenarios\" />
+    <Folder Include="Pages\Budgets\Products\" />
+    <Folder Include="Pages\Providers\" />
+  </ItemGroup>
 </Project>

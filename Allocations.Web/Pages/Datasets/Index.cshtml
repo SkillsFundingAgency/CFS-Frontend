@@ -1,0 +1,153 @@
+﻿@page
+@using System.Linq;
+@model Allocations.Web.Pages.Datasets.IndexModel
+@{
+    ViewData["Title"] = "Providers";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+            </ol>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-8">
+        <h1 class="heading-xlarge">Datasets</h1>
+        <p class="text-muted">Manage and import source datasets and specify calculated datasets</p>
+
+    </div>
+</div>
+<div class="row">
+    <div id="sidebar">
+        <div class="col-md-4">
+            <div class="panel-group wrap esfa-collapse" id="esfa-filter">
+                <form class="filter-form" method="get">
+                    <div class="panel search-panel">
+                        <div class="panel-heading no-collapse">
+                            <fieldset>
+                                <label class="form-label" for="esfa-filter-search">Search</label>
+                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search" data-search>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                Academic Year
+                            </h3>
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body">
+                                <fieldset>
+                                    <div class="multiple-choice">
+                                        @foreach (var year in Model.Datasets.GroupBy(x => x.AcademicYear))
+                                        {
+                                            <input name="esfa-filter-status" type="checkbox" value="@year.Key.Id">
+                                            <label>@year.Key.Name (@year.Count())</label>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="heading-medium panel-title">
+                                Datset types
+                            </h3>
+                        </div>
+                        <div class="panel-no-collapse">
+                            <div class="panel-body scroll-body">
+                                <fieldset>
+                                   
+                                    @foreach (var type in Model.Datasets.GroupBy(x => x.DatasetType))
+                                    {
+                                        <div class="multiple-choice">
+                                        <input name="esfa-filter-status" type="checkbox" value="@type.Key.Replace(" ", "").ToLowerInvariant()">
+                                    <label>@type.Key (@type.Count())</label>
+                                        </div>
+                                    }
+                                  
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end of panel -->
+                </form>
+            </div>
+            <!-- end of #esfa-collapse  -->
+        </div>
+    </div>
+    <div id="main">
+        <div class="col-md-8">
+            <div class="panel-group wrap esfa-collapse filtr-container" id="esfa-list">
+            <button class="accordion-toggle">Open all</button>
+                
+                @foreach (var tr in Model.Datasets)
+                {
+                    <div class="panel filtr-item" data-id="P004_PriRate" data-filter-item data-filter-name="@tr.DatasetType.ToLower()" data-category="@tr.AcademicYear.Id @tr.DatasetType.Replace(" ", "").ToLowerInvariant()">
+                        <div class="panel-heading">
+                            <h2 class="panel-title failing-provider-title">
+                                <a href="/datasets/details/@tr.Id">
+                                    @tr.DatasetType @tr.AcademicYear.Name
+                                </a>
+                            </h2>
+                        </div>
+                        <div class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="panel panel-border-narrow">
+                                    <div class="provider-stats">
+                                        <ul class="list-inline">
+                                            <li>
+                                                <dl>
+                                                    <dt>LA Name:</dt>
+                                                    <dd>Northumberland</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>LAESTAB:</dt>
+                                                    <dd>8713363</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>UPIN:</dt>
+                                                    <dd>134673</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>UKPRN:</dt>
+                                                    <dd>10061983</dd>
+                                                </dl>
+                                            </li>
+                                            <li>
+                                                <dl>
+                                                    <dt>URN:</dt>
+                                                    <dd>143802</dd>
+                                                </dl>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- end of panel -->
+                }
+            </div>
+            <!-- end of #esfa-collapse  -->
+        </div>
+    </div>
+</div><!-- end of .row -->
