@@ -1,4 +1,5 @@
-﻿@model ApiClient.Models.Budget
+﻿@using ApiClient.Models
+@model ApiClient.Models.Budget
 @{
 }
 <h2>
@@ -6,8 +7,7 @@
 </h2>
           
          <h3>Products</h3>
-         @foreach (var productFolder in Model.FundingPolicies
-             .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders)))
+         @foreach (var productFolder in Model.FundingPolicies.Where(x => x.AllocationLines != null) .SelectMany(x => x.AllocationLines.Where(y => y.ProductFolders != null).SelectMany(y => y.ProductFolders)))
          {
              <h4><span class="glyphicon glyphicon-folder-close"></span> @productFolder.Name</h4>
              foreach (var product in productFolder.Products)

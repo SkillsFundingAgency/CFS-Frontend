@@ -1,286 +1,44 @@
 ﻿@page
-@model IndexModel
+@model Allocations.Web.Pages.IndexModel
 @{
-ViewData["Title"] = "Allocations overview";
+    Layout = "~/Pages/_Layout.cshtml";
 }
-<div class="row">
-    <div class="col-xs-8">
-        <h1 class="heading-xlarge">Allocations overview</h1>
-        <form class="year-form" method="get">
-            <div class="form-group">
-                <label class="form-label" for="select-box">Select year:</label>
-                <select class="form-control" id="select-box" name="select-box">
-                    <option>2017/2018</option>
-                    <option>2016/2017</option>
-                    <option>2015/2016</option>
-                </select>
-            </div>
-        </form>
-        <div class="graph">
-            <img src="~/assets/images/graph.png" />
-        </div>
-    </div>
-    @*end of col-xs-8*@
-</div>
-@*end of row*@
+
 <div class="row">
     <div class="col-xs-12 col-md-8">
-        <div class="panel-group wrap esfa-collapse" id="esfa-list">
-            <div class="funding-streams">
-                <button class="accordion-toggle">Open all</button>
-                @foreach(var budget in Model.Rootobjects)
-                {
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h2 class="panel-title stream-title">
-                            <a href="#">
-                                @budget.Budget.Name - @budget.Budget.Id
-                            </a>
-                            <span class="ammount">&pound;45.5 billion</span>
-                            </h2>
-                            <div class="esfa-summary">
-                                <div class="row">
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">1000</span>
-                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Passed</span>
-                                            <a class="data-link success" asp-page="Products/Index" ><span class="data-item bold-xsmall text-success">covered</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Failed</span>
-                                            <a class="data-link failing" asp-page="Products/Index" ><span class="data-item bold-xsmall error-message"> tests failing</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-11 col-sm-2">
-                                        <div class="progress">
-                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-                                                 aria-valuemin="0" aria-valuemax="100" style="width:70%">
-                                                98% Complete (success)
-                                            </div>
-                                        </div>
-                                        <div class="data">
-                                            <span class="data-item bold-xsmall">coverage</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="panel">
-                                    <ul class="list-group">
-                                        @foreach (var policy in budget.FundingPolicies)
-                                        {
-                                            <li class="list-group-item">
-                                                <div class="row">
-                                                    <div class="col-xs-12">
-                                                        <details>
-                                                            <summary>
-                                                                <h3 class="heading-medium list-title summary">@policy.Name <span class="ammount">&pound;@policy.TotalAmount</span></h3>
-                                                                <div class="esfa-summary">
-                                                                    <div class="row">
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">1000</span>
-                                                                                <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">@policy.TestSummary.Passed</span>
-                                                                                <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-xs-12 col-sm-3">
-                                                                            <div class="data">
-                                                                                <span class="data-item medium">@policy.TestSummary.Failed</span>
-                                                                                <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-xs-11 col-sm-2">
-                                                                            <div class="progress">
-                                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-                                                                                     aria-valuemin="0" aria-valuemax="100" style="width:70%">
-                                                                                    70% Complete (success)
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="data">
-                                                                                <span class="data-item bold-xsmall">coverage</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </summary>
 
-                                                            <div class="panel panel-border-narrow">
-                                                                <ul class="list-group">
-                                                                    @foreach (var allocationLine in policy.AllocationLines)
-                                                                    {
-                                                                        <li class="list-group-item sublist-item">
-                                                                            <h4 class="heading-small">
-                                                                                <a asp-page="Products/Index" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
-                                                                                <span class="ammount">&pound;17 billion</span>
-                                                                            </h4>
-                                                                            <div class="esfa-summary">
-                                                                                <div class="row">
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">1000</span>
-                                                                                            <a class="data-link" asp-page="Products/Index"><span class="data-item bold-xsmall">total providers</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Passed</span>
-                                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Failed</span>
-                                                                                            <a class="data-link failing" asp-page="Products/Index"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-11 col-sm-2">
-                                                                                        <div class="progress">
-                                                                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-                                                                                                 aria-valuemin="0" aria-valuemax="100" style="width:70%">
-                                                                                                70% Complete (success)
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="data">
-                                                                                            <span class="data-item bold-xsmall">coverage</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </li>
-                                                                    }
-                                                                </ul>
-                                                            </div>
-                                                            @*end of panel.panel-border-narrow*@
-                                                        </details>
-                                                    </div>
-                                                    @*end of col-xs-12*@
-                                                </div>
-                                                @*end of row*@
-                                            </li>
-                                         }
-                                        @{
-                                        string[] allocationLinesMockups = { "Minimum Funding Guarantee", "ESG Protection", "Post Opening Grant", "Post 16 High Needs Funding" };
-                                        }
+        <h1 class="heading-xlarge">
+            Calculate funding
+        </h1>
 
-                                        @foreach (var allocationLine in allocationLinesMockups)
-                                        {
-                                        <li class="list-group-item">
-                                            <div class="row">
-                                                <div class="col-xs-12">
+        <p>Use this service to:</p>
+        
+        <ul class="list list-bullet">
+            <li>explore funding streams, policy areas and allocation lines</li>
+            <li>understand the quality assurance coverage and results for each funding stream and allocation line</li>
+            <li>understand the progress in resolving any providers failing quality assurance as the allocation deadline approaches</li>
+        </ul>
+        <p>
+            <a class="button button-start" href="/Overview" role="button">Start now</a>
+        </p>
 
-                                                    <details>
-                                                        <summary>
-                                                            <h3 class="heading-medium list-title summary">
-                                                                @allocationLine
-                                                                <span class="ammount">&pound;</span>
-                                                            </h3>
-                                                            <div>
-                                                                <p class="item-detail font-xsmall"><a asp-page="Providers/Index"><span class="error-message"># Providers failed tests</span></a></p>
-                                                                <p class="item-detail font-xsmall"><a asp-page="Products/Index"><span class="error-message"># Scenarios failing</span></a></p>
-                                                            </div>
-                                                        </summary>
-
-                                                        <div class="panel panel-border-narrow">
-                                                            <ul class="list-group allocation-lines-list">
-                                                                @for (var i = 1; i < 5; i++)
-                                                                {
-                                                                <li class="list-group-item sublist-item">
-                                                                    <h4 class="heading-small">
-                                                                        <a asp-page="Results">Allocation line @i</a>
-                                                                    </h4>
-                                                                    <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
-                                                                    <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># providers failed tests</span></a></p>
-                                                                </li>
-                                                                }
-                                                            </ul>
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                                @*end of .col-xs-12*@
-                                            </div>
-                                            @*end of row*@
-                                        </li>
-                                        }
-                                    </ul>
-                                </div>
-                                @*end of panel inside panel-body*@
-                            </div>
-                            @*end of panel-body*@
-                        </div>
-                        @*end of panel-collapse*@
-                    </div>
-                    @*end of panel*@
-                }
-                @*end of foreach*@
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">
-                            <a href="#">
-                                16-19 Funding
-                            </a>
-                        </h2>
-                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
-                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
-                    </div>
-                    <div class="panel-collapse collapse">
-                        <div class="panel-body">
-
-                        </div>
-                    </div>
-                </div>
-                @*end of panel*@ 
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">
-                            <a href="#">
-                                High Needs Funding
-                            </a>
-                        </h2>
-                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
-                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
-                    </div>
-                    <div id="three" class="panel-collapse collapse">
-                        <div class="panel-body">
-
-                        </div>
-                    </div>
-                </div>
-                 @*end of panel*@ 
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">
-                            <a href="#">
-                                Another funding stream
-                            </a>
-                        </h2>
-                        <p class="item-detail font-xsmall">Total <span class="ammount">&pound;</span></p>
-                        <p class="item-detail font-xsmall"><a href="#"><span class="error-message"># Providers failed tests</span></a></p>
-                    </div>
-                    <div id="four" class="panel-collapse collapse">
-                        <div class="panel-body">
-                        </div>
-                    </div>
-                </div>
-                @*end of panel*@
-            </div>
-        </div>
-         @*end of #esfa-collapse*@  
     </div>
-     @*end of .col-xs-12*@  
+    <div class="column-third">
+
+        <aside class="govuk-related-items" role="complementary">
+            <h2 class="heading-medium" id="subsection-title">Quality Assurance Pages</h2>
+            <nav role="navigation" aria-labelledby="subsection-title">
+                <ul class="font-xsmall">
+                    <li><a href="/Overview">Overview</a></li>
+                    <li><a href="/Products/Pupil%20Led%20Factors?budgetId=budget-gag1718&allocationLineId=pupil-led-factors">Products</a></li>
+                    <li><a href="/Products/Details?budgetId=budget-gag1718&productId=p004prirate&id=budget-gag1718">Product details</a></li>
+                    <li><a href="/Providers/budget-gag1718">Providers failing tests</a></li>
+                    <li><a href="/providers/details/budget-gag1718?providerId=140002">Provider details</a></li>
+                    <li><a href="/Specifications/Product?id=budget-gag1718&productId=p004prirate">Build calculation</a></li>
+                    <li><a href="/Specifications/TestScenario/budget-gag1718?productId=p004prirate">Create new scenario</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+    </div>
 </div>
- @*end of .row*@  

@@ -14,7 +14,7 @@ namespace Allocations.Web.ApiClient.Models
         [JsonProperty("product")]
         public Product Product { get; set; }
         [JsonProperty("scenarioName")]
-        public string ScenarioName { get; set; }
+        public Reference Scenario { get; set; }
         [JsonProperty("scenarioDescription")]
         public string ScenarioDescription { get; set; }
 

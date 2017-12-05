@@ -1,5 +1,4 @@
-﻿@using System.Reflection
-<!DOCTYPE html>
+﻿1<!DOCTYPE html>
 <html lang="en" data-ng-app="app" id="ng-app">
 <head>
     <meta charset="utf-8">
@@ -54,7 +53,7 @@
                 </div>
             </div>
             <!-- Breadcrumbs -->
-            <div class="row">
+            @*<div class="row">
                 <div class="col-xs-12">
                     <div class="breadcrumbs">
                         <ol>
@@ -62,7 +61,7 @@
                         </ol>
                     </div>
                 </div>
-            </div>
+            </div>*@
             @RenderBody()
 
         </div>
@@ -73,7 +72,7 @@
             <div class="footer-meta-inner">
                 <div class="open-government-licence">
                     <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence</a></p>
-                    <p>@Assembly.GetExecutingAssembly().GetName().Version All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
+                    <p>All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
                 </div>
             </div>
             <div class="copyright">
@@ -84,8 +83,16 @@
 </footer>
 
     @RenderSection("Scripts", required: false)
-    <script src="~/assets/libs/js/jquery.min.js"></script>
-    <script src="~/assets/libs/js/bootstrap.js"></script>    
-    <script src="~/assets/js/main.js"></script>
+    <script src="/assets/libs/js/jquery.min.js"></script>
+    <script src="/assets/libs/js/bootstrap.js"></script>    
+    <script src="/assets/libs/js/ace.js"></script>
+    <script src="/assets/libs/js/keybinding-vim.js"></script>
+    <script src="/assets/libs/js/keybinding-emacs.js"></script>
+    <script src="/assets/libs/js/ext-language_tools.js"></script>
+    <script src="/assets/libs/js/csharp.js"></script>
+    <script src="/assets/libs/js/mode-csharp.js"></script>
+    <script src="/assets/libs/js/mode-gherkin.js"></script>
+    <script src="/assets/libs/js/mode-vbscript.js"></script>
+    <script src="/assets/js/main.js"></script>
 </body>
 </html>

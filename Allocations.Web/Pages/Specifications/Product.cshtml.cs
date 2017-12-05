@@ -17,21 +17,20 @@ namespace Allocations.Web.Pages.Specifications
         {
             _apiClient = apiClient;
         }
-        public async Task OnGet(string id)
+        public async Task OnGet(string id, string productId)
         {
             Budget = (await _apiClient.GetBudget(id))?.Content;
 
             Product = Budget.FundingPolicies
-                .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
-                .Skip(1).FirstOrDefault();
+                .SelectMany(x => x.AllocationLines.SelectMany(y =>
+                    y.ProductFolders.SelectMany(z => z.Products).Where(p => p.Id == productId))).FirstOrDefault();
 
-            var response = (await _apiClient.PostAsync<PreviewResponse, PreviewRequest>("api/v1/engine/preview",
-                new PreviewRequest
-                {
-                    BudgetId = Budget.Id,
-                    ProductId = Product.Id,
-                    Calculation = Product.Calculation?.SourceCode
-                }));
+            var response = await _apiClient.PostPreview(new PreviewRequest
+            {
+                BudgetId = Budget.Id,
+                ProductId = Product.Id,
+                Calculation = Product.Calculation?.SourceCode
+            });
 
             Preview = response.Content;
         }
@@ -44,13 +43,18 @@ namespace Allocations.Web.Pages.Specifications
                 .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
                 .Skip(1).FirstOrDefault();
 
-            var response = (await _apiClient.PostAsync<PreviewResponse, PreviewRequest>("api/v1/engine/preview",
-                new PreviewRequest
-                {
-                    BudgetId = Budget.Id,
-                    ProductId = Product.Id,
-                    Calculation = calculation ?? Product.Calculation?.SourceCode
-                }));
+
+            var response = await _apiClient.PostPreview(new PreviewRequest
+            {
+                BudgetId = Budget.Id,
+                ProductId = Product.Id,
+                Calculation = calculation ?? Product.Calculation?.SourceCode
+            });
+
+            if (!string.IsNullOrEmpty(calculation))
+            {
+                Product.Calculation = new ProductCalculation { SourceCode = calculation };
+            }
 
             Preview = response.Content;
         }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Allocations.Web.ApiClient;
@@ -10,29 +10,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Allocations.Web.Pages.Specifications
 {
-    public class GivenStep
-    {
-        public string DatasetId { get; set; }
-        public string FieldId { get; set; }
-        public string Operator { get; set; }
-        public string Value { get; set; }
-    }
-
-    public class ThenStep
-    {
-        public string Operator { get; set; }
-        public string Value { get; set; }
-    }
-
-    public class TestScenarioViewModel
-    {
-
-        [Required]
-        public string Name { get; set; }
-
-        public List<GivenStep> GivenSteps { get; set;}
-        public List<ThenStep> ThenSteps { get; set; }
-    }
     public class TestScenarioModel : PageModel
     {
         private readonly AllocationsApiClient _apiClient;
@@ -40,39 +17,180 @@ namespace Allocations.Web.Pages.Specifications
         public TestScenarioModel(AllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
-            Operators = new List<string>
-            {
-                "is equal to",
-                "is not equal to",
-                "is greater than",
-                "is greater than or equal to",
-                "is less than",
-                "is less than or equal to"
-            };
+
+            Operators = Enum.GetValues(typeof(ComparisonOperator)).Cast<ComparisonOperator>().ToList();
         } 
 
-        public List<string> Operators { get; }
+        public List<ComparisonOperator> Operators { get; }
         public Budget Budget { get; private set; }
         public Product Product { get; private set; }
-        public TestScenarioViewModel TestScenarioViewModel { get; private set; }
 
-        public async Task OnGet(string id)
+        [BindProperty]
+        public ProductTestScenario TestScenario { get; set; }
+
+        public async Task OnGet(string budgetId, string productId)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _apiClient.GetBudget(budgetId))?.Content;
+            Product = (await _apiClient.GetProduct(budgetId, productId))?.Content;
 
-            Product = Budget.FundingPolicies
-                .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
-                .Skip(1).FirstOrDefault();
 
-            var response = (await _apiClient.PostAsync<PreviewResponse, PreviewRequest>("api/v1/engine/preview",
-                new PreviewRequest
+            TestScenario = new ProductTestScenario
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                GivenSteps = new List<GivenStep>
+                {
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                    new GivenStep(),
+                },
+                ThenSteps = new List<ThenStep>
+                {
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                    new ThenStep(),
+                }
+            };
+        }
+
+        public async Task OnPost(string budgetId, string productId)
+        {
+            Budget = (await _apiClient.GetBudget(budgetId))?.Content;
+            Product = (await _apiClient.GetProduct(budgetId, productId))?.Content;
+
+
+            var i = 0;
+            foreach (var givenStep in TestScenario.GivenSteps)
+            {
+                if (!string.IsNullOrWhiteSpace(givenStep.Field) && !string.IsNullOrWhiteSpace(givenStep.Value))
+                {
+                    var split = givenStep.Field.Split('|');
+                    var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
+                    var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
+                    if (field != null)
+                    {
+
+                        //givenStep.Field = field.Id;
+                        givenStep.Value = ValidateFieldType(field.Type, givenStep.Value, i);
+                    }
+                }
+                i++;
+            }
+
+            i = 0;
+            foreach (var thenStep in TestScenario.ThenSteps)
+            {
+                if (!string.IsNullOrWhiteSpace(thenStep.Value))
+                {
+                    thenStep.Value = ValidateFieldType(FieldType.Decimal, thenStep.Value, i);
+                }
+                i++;
+            }
+
+            if (ModelState.IsValid)
+            {
+
+                foreach (var givenStep in TestScenario.GivenSteps)
+                {
+                    if (!string.IsNullOrWhiteSpace(givenStep.Field) && !string.IsNullOrWhiteSpace(givenStep.Value))
+                    {
+                        var split = givenStep.Field.Split('|');
+                        var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
+                        var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
+                        if (field != null)
+                        {
+                            givenStep.Dataset = dataset.Id;
+                            givenStep.Field = field.Id;
+                        }
+                        givenStep.StepType = TestStepType.GivenSourceField;
+                    }
+                }
+
+                foreach (var thenStep in TestScenario.ThenSteps)
+                {
+                    thenStep.StepType = TestStepType.ThenProductValue;
+                }
+
+                var existing = Product.TestScenarios.FirstOrDefault(x => x.Id == TestScenario.Id);
+                if (existing != null)
+                {
+                    existing.Name = TestScenario.Name;
+                    existing.GivenSteps = TestScenario.GivenSteps.Where(x =>
+                        !string.IsNullOrEmpty(x.Field) &&
+                        !string.IsNullOrEmpty(x.Value)).ToList();
+                    existing.ThenSteps = TestScenario.ThenSteps.Where(x =>
+                        !string.IsNullOrEmpty(x.Value)).ToList();
+                }
+                else
+                {
+                    Product.TestScenarios.Add(TestScenario);
+                }
+
+                var response = await _apiClient.PostPreview(new PreviewRequest
                 {
                     BudgetId = Budget.Id,
                     ProductId = Product.Id,
-                    Calculation = Product.Calculation?.SourceCode
-                }));
+                    TestScenario = TestScenario
+                });
 
-            TestScenarioViewModel = new TestScenarioViewModel();
+                Preview = response.Content;
+                // to save: var result = await _apiClient.PostProduct(budgetId, Product);
+            }
+        }
+
+        public PreviewResponse Preview { get; set; }
+
+        private string ValidateFieldType(FieldType fieldType, string value, int i)
+        {
+            switch (fieldType)
+            {
+                case FieldType.DateTime:
+                    if (!DateTime.TryParse(value, new CultureInfo("en-GB"),
+                        DateTimeStyles.AssumeLocal, out var date))
+                    {
+                        ModelState.AddModelError($"TestScenario.GivenStep[{i}]", $"{value} is not a valid date");
+                    }
+                    else
+                    {
+                        return date.ToString("dd/MM/yyyy");
+                    }
+                    break;
+                case FieldType.Decimal:
+                    if (!Decimal.TryParse(value, NumberStyles.Any, new CultureInfo("en-GB"), out var dec))
+                    {
+                        ModelState.AddModelError($"TestScenario.GivenStep[{i}]", $"{value} is not a valid decimal");
+                    }
+                    else
+                    {
+                        return dec.ToString("0.00");
+                    }
+                    break;
+                case FieldType.Integer:
+                    if (!long.TryParse(value, NumberStyles.Any, new CultureInfo("en-GB"), out var lng))
+                    {
+                        ModelState.AddModelError($"TestScenario.GivenStep[{i}]", $"{value} is not a valid integer");
+                    }
+                    else
+                    {
+                        return lng.ToString("0.00");
+                    }
+                    break;
+            
+            }
+            return value;
         }
     }
 }
