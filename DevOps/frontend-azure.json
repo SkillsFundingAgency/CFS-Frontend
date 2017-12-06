@@ -34,20 +34,20 @@
     "apiKey": {
       "type": "string",
       "metadata": {
-        "description": "Allocations API Management Key"
+        "description": "Calculate Funding API Management Key"
       }
     },
     "apiEndpoint": {
       "type": "string",
       "metadata": {
-        "description": "Allocations API Management Endpoint"
+        "description": "Calculate Funding API Management Endpoint"
       }
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(resourceGroup().id, '-plan')]",
-    "webSiteName": "[concat(resourceGroup().id, '-web')]",
-    "applicationInsightsName": "[concat(resourceGroup().id, '-ai')]",
+    "hostingPlanName": "[concat(resourceGroup().name, '-plan')]",
+    "webSiteName": "[concat(resourceGroup().name, '-web')]",
+    "applicationInsightsName": "[concat(resourceGroup().name, '-ai')]",
     "databaseName": "sampledb"
   },
   "resources": [
