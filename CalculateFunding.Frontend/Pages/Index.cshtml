@@ -1,0 +1,49 @@
+﻿@page
+@using CalculateFunding.Frontend.Pages
+@model CalculateFunding.Frontend.Pages.IndexModel
+@{
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xs-12 col-md-8">
+
+        <h1 class="heading-xlarge">
+            Calculate funding
+        </h1>
+
+        <p>Use this service to:</p>
+        
+        <ul class="list list-bullet">
+            <li>explore funding streams, policy areas and allocation lines</li>
+            <li>understand the quality assurance coverage and results for each funding stream and allocation line</li>
+            <li>understand the progress in resolving any providers failing quality assurance as the allocation deadline approaches</li>
+        </ul>
+        <p>
+            <a class="button button-start" href="/Overview" role="button">Start now</a>
+        </p>
+
+    </div>
+    <div class="column-third">
+
+        <aside class="govuk-related-items" role="complementary">
+            <h2 class="heading-medium" id="subsection-title">Quality Assurance Pages</h2>
+            <nav role="navigation" aria-labelledby="subsection-title">
+                <ul class="font-xsmall">
+                    <li><a href="/datasets">Datasets</a></li>
+                    <li><a href="/providers">Providers</a></li>
+                    <li><a href="/audit">Audit</a></li>
+
+                    <li><a href="/budgets/results">Results overview</a></li>
+                    <li><a href="/budgets/results/Products/Pupil%20Led%20Factors?budgetId=budget-gag1718&allocationLineId=pupil-led-factors">Products</a></li>
+                    <li><a href="/budgets/results/Products/Details?budgetId=budget-gag1718&productId=p004prirate&id=budget-gag1718">Product details</a></li>
+                    <li><a href="/budgets/results/Providers/budget-gag1718">Providers failing tests</a></li>
+                    <li><a href="/budgets/results/providers/details/budget-gag1718?providerId=140002">Provider details</a></li>
+                    <li><a href="/budgets/Specifications/Product?id=budget-gag1718&productId=p004prirate">Build calculation</a></li>
+                    <li><a href="/budgets/Specifications/TestScenario/budget-gag1718?productId=p004prirate">Create new scenario</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+    </div>
+</div>

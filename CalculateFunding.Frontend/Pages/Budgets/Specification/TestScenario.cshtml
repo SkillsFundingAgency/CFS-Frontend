@@ -1,0 +1,161 @@
+﻿@page "{budgetId}"
+@using CalculateFunding.Frontend
+@using CalculateFunding.Frontend.ApiClient.Models
+@using CalculateFunding.Frontend.Pages.Budgets.Specification
+@model CalculateFunding.Frontend.Pages.Budgets.Specification.TestScenarioModel
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+                <li><a href="/Overview">Funding overview</a></li>
+                <li><a href="/Products/Pupil%20Led%20Factors?budgetId=@Model.Budget.Id&allocationLineId=pupil-led-factors">Pupil Led Factors</a></li>
+                <li><a href="/Products/Details?budgetId=@Model.Budget.Id&productId=@Model.Product.Id">@Model.Product.Name</a></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-8">
+        <h1 class="heading-xlarge">Create new scenario for @Model.Product.Name</h1>
+        <p class="text-muted">@Model.Product.Description</p>
+        <h2 class="heading-large">Create rules for your scenario</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <form method="post" class="form gherkin-scenario">
+            <div class="row gherkin-step">
+                <div class="col-xs-12 col-sm-8">
+                    <div class="form-group">
+                        <label for="scenario-name">
+                            Scenario name
+                        </label>
+                        <input asp-for="TestScenario.Id" type="hidden">
+                        <input asp-for="TestScenario.Name" class="form-control" id="scenario-name" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row spec-labels">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <div class="row">
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Dataset</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Field</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Operator</label></div>
+                        <div class="col-sm-3"><label class="form-label" for="select-box">Value</label></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gherkin-step">
+                <div class="col-xs-2">
+                    <div class="step-label">
+                        <label>Given</label>
+                    </div>
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        @*@for (var i = 0; i < Model.TestScenario.GivenSteps.Count; i++)
+                            {
+                                var step = Model.TestScenario.GivenSteps[i];*@
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" name="">
+                                    @foreach (var dataset in Model.Budget.DatasetDefinitions)
+                                    {
+                                        <optgroup label="@dataset.Name">
+                                            @foreach (var fieldDefinition in dataset.FieldDefinitions)
+                                            {
+                                                var compositeKey = string.Format("{0}|{1}", dataset.Id, fieldDefinition.Id);
+                                                <option selected="" value="@compositeKey">@fieldDefinition.Name</option>
+                                                //selected = @(compositeKey == step.Field)
+                                            }
+                                        </optgroup>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" id="select-box" name="select-box">
+                                    <option>GOV.UK elements option 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" name="">
+                                    @*TestScenario.GivenSteps[@i].Operator*@
+                                    <option></option>
+                                    @foreach (var op in Model.Operators)
+                                    {
+                                        <option selected="" value="@op">@op.GetDisplayText()</option>
+                                        //selected= @(op == step.Operator)
+
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <input class="form-control" name="" type="text" value="" />
+                                @*@step.Value*@
+                            </div>
+                        </div>
+                        @*}*@
+
+                    </div>
+                </div>
+            </div>
+        </form>
+        <button type="button" class="button step-btn">And</button>
+        <button type="button" class="button step-btn">Then</button>
+        <button class="button reset-btn">Reset</button>
+        <div asp-validation-summary="All"></div>
+        <p><button type="submit" class="button">Run Test</button></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @if (Model.Preview != null)
+        {
+
+
+            <h2>Results</h2>
+
+            @if (Model.Preview.CompilerOutput.Success)
+            {
+                <h3>Compilation succeeded</h3>
+            }
+            else
+            {
+                <h4>Compilation failed</h4>
+            }
+            <table class="table table-condensed">
+
+                @foreach (var diagostic in Model?.Preview?.CompilerOutput?.CompilerMessages.Where(x => x.Severity != Severity.Hidden))
+                {
+                    <tr>
+                        <td>@diagostic.Severity</td>
+                        <td>@diagostic.Message</td>
+                    </tr>
+                }
+
+            </table>
+            <h3>Test Results</h3>
+            @foreach (var tr in Model.Preview.TestResults)
+            {
+                <h4>@tr.Provider.Name</h4>
+                @foreach (var scenarioResult in tr.ScenarioResults.GroupBy(x => x.Product.Name))
+                {
+                    <h5>@scenarioResult.Key @scenarioResult.First().ProductValue.ToString()</h5>
+                    foreach (var scenario in scenarioResult)
+                    {
+                        <p>@scenario.Scenario?.Name @scenario.TestResult</p>
+                    }
+                }
+            }
+        }
+    </div>
+</div>
