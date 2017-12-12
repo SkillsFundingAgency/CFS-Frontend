@@ -18,6 +18,6 @@ namespace CalculateFunding.Frontend.Pages.Budgets.Specification
             Budgets = (await _apiClient.GetBudgets())?.Content;
         }
 
-        public Budget[] Budgets { get; set; }
+        public ApiClient.Models.Specification[] Budgets { get; set; }
     }
 }

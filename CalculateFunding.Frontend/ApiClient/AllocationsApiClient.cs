@@ -50,9 +50,9 @@ namespace CalculateFunding.Frontend.ApiClient
             return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
         }
 
-        public async Task<ApiResponse<Budget>> GetBudget(string id)
+        public async Task<ApiResponse<Specification>> GetBudget(string id)
         {
-            return await GetAsync<Budget>($"{_specsPath}/budgets?budgetId={id}");
+            return await GetAsync<Specification>($"{_specsPath}/budgets?budgetId={id}");
         }
 
         public async Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId)
@@ -65,7 +65,7 @@ namespace CalculateFunding.Frontend.ApiClient
             return await GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}");
         }
 
-        public async Task<HttpStatusCode> PostBudget(Budget budget)
+        public async Task<HttpStatusCode> PostBudget(Specification budget)
         {
             return await PostAsync($"{_specsPath}/budgets", budget);
         }
@@ -86,9 +86,9 @@ namespace CalculateFunding.Frontend.ApiClient
         }
 
 
-        public async Task<ApiResponse<Budget[]>> GetBudgets()
+        public async Task<ApiResponse<Specification[]>> GetBudgets()
         {
-            return await GetAsync<Budget[]>($"{_specsPath}/budgets");
+            return await GetAsync<Specification[]>($"{_specsPath}/budgets");
         }
 
         public async Task<ApiResponse<PreviewResponse>> PostPreview(PreviewRequest request)

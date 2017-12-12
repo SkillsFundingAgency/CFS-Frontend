@@ -66,6 +66,7 @@ gulp.task('copy-assets', function () {
     var assets = {
         js: [
             './node_modules/bootstrap/dist/js/bootstrap.js',
+            './node_modules/summernote/dist/summernote.min.js',
             './node_modules/jquery/dist/jquery.min.js',
             './node_modules/ace-builds/src-noconflict/ace.js',
             './node_modules/ace-builds/src-noconflict/mode-csharp.js',
@@ -80,8 +81,16 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/snippets/vbscript.js'
 
         ],
-        css: ['./node_modules/bootstrap/dist/css/bootstrap.css'],
-        fonts: ['./node_modules/bootstrap/dist/fonts/*.*'],
+        css: [
+            './node_modules/bootstrap/dist/css/bootstrap.css',
+            './node_modules/summernote/dist/summernote.css',
+            './node_modules/summernote/dist/**/*.woff',
+            './node_modules/summernote/dist/**/*.eot',
+            './node_modules/summernote/dist/**/*.ttf',
+        ],
+        fonts: [
+            './node_modules/bootstrap/dist/fonts/*.*'
+        ]
     };
     lodash(assets).forEach(function (assets, type) {
         gulp.src(assets).pipe(gulp.dest('./wwwroot/assets/libs/' + type));

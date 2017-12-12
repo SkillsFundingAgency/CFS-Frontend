@@ -14,6 +14,9 @@ namespace CalculateFunding.Frontend.ApiClient.Models
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        [JsonProperty("allocationLine")]
+        public Reference AllocationLine { get; set; }
+
         [JsonProperty("calculation")]
         public ProductCalculation Calculation { get; set; }
         [JsonProperty("testScenarios")]

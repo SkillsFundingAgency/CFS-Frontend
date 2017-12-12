@@ -22,7 +22,7 @@ namespace CalculateFunding.Frontend.Pages.Budgets.Specification
         } 
 
         public List<ComparisonOperator> Operators { get; }
-        public Budget Budget { get; private set; }
+        public ApiClient.Models.Specification Budget { get; private set; }
         public Product Product { get; private set; }
 
         [BindProperty]
@@ -78,14 +78,14 @@ namespace CalculateFunding.Frontend.Pages.Budgets.Specification
                 if (!string.IsNullOrWhiteSpace(givenStep.Field) && !string.IsNullOrWhiteSpace(givenStep.Value))
                 {
                     var split = givenStep.Field.Split('|');
-                    var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
-                    var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
-                    if (field != null)
-                    {
+                   /// var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
+                   // var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
+                   // if (field != null)
+                   // {
 
-                        //givenStep.Field = field.Id;
-                        givenStep.Value = ValidateFieldType(field.Type, givenStep.Value, i);
-                    }
+                   //     //givenStep.Field = field.Id;
+                   //     givenStep.Value = ValidateFieldType(field.Type, givenStep.Value, i);
+                   // }
                 }
                 i++;
             }
@@ -108,13 +108,13 @@ namespace CalculateFunding.Frontend.Pages.Budgets.Specification
                     if (!string.IsNullOrWhiteSpace(givenStep.Field) && !string.IsNullOrWhiteSpace(givenStep.Value))
                     {
                         var split = givenStep.Field.Split('|');
-                        var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
-                        var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
-                        if (field != null)
-                        {
-                            givenStep.Dataset = dataset.Id;
-                            givenStep.Field = field.Id;
-                        }
+                        //var dataset = Budget?.DatasetDefinitions.FirstOrDefault(x => x.Id == split[0]);
+                        //var field = dataset?.FieldDefinitions.FirstOrDefault(x => x.Id == split[1]);
+                        //if (field != null)
+                        //{
+                        //    givenStep.Dataset = dataset.Id;
+                        //    givenStep.Field = field.Id;
+                        //}
                         givenStep.StepType = TestStepType.GivenSourceField;
                     }
                 }
