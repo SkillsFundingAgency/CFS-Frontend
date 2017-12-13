@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
+using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,7 +11,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
     public class IndexModel : PageModel
     {
         private readonly AllocationsApiClient _apiClient;
-        public IList<BudgetSummary> Budgets;
+        public IList<Specification> Specifications;
 
         public IndexModel(AllocationsApiClient apiClient)
         {
@@ -21,9 +22,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var results = await _apiClient.GetBudgetResults();
+            var results = await _apiClient.GetSpecifications();
 
-            Budgets = results.Content;
+            Specifications = results.Content;
             return Page();
         }
     }

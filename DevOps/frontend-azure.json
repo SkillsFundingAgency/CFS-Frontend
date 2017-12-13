@@ -100,11 +100,11 @@
           "AlwaysOn": true,
           "appSettings": [
             {
-              "name": "AllocationsApiKey",
+              "name": "ApiKey",
               "value": "[parameters('apiKey')]"
             },
             {
-              "name": "AllocationsApiEndpoint",
+              "name": "ApiEndpoint",
               "value": "[parameters('apiEndpoint')]"
             },
             {

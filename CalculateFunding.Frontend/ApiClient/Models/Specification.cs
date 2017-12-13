@@ -1,51 +1,23 @@
-﻿using CalculateFunding.Frontend.ApiClient.Models;
+﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.ApiClient.Models;
 using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.ApiClient.Models
 {
-    public class Policy
+    public class PolicySpecification : Reference
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
         [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("calculations")]
+        public List<CalculationSpecification> Calculations { get; set; }
+
+        [JsonProperty("subPolicies")]
+        public List<PolicySpecification> SubPolicies { get; set; }
     }
 
-    public class SpecificationSnapshot
+    public class Specification : Reference
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("specification")]
-        public Specification Specification { get; set; }
-
-
-        //[JsonProperty("fundingPolicies")]
-        //public FundingPolicy[] FundingPolicies { get; set; }
-
-        //[JsonProperty("datasetDefinitions")]
-        //public DatasetDefinition[] DatasetDefinitions { get; set; }
-
-    }
-
-
-public class Specification
-    {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("currentSnapshotId")]
-        public string CurrentSnaphotId { get; set; }
-
-    [JsonProperty("name")]
-        public string Name { get; set; }
 
         [JsonProperty("academicYear")]
         public Reference AcademicYear { get; set; }
@@ -56,13 +28,15 @@ public class Specification
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        [JsonProperty("policies")]
+        public List<PolicySpecification> Policies { get; set; }
 
-        //[JsonProperty("fundingPolicies")]
-        //public FundingPolicy[] FundingPolicies { get; set; }
+    }
 
-        //[JsonProperty("datasetDefinitions")]
-        //public DatasetDefinition[] DatasetDefinitions { get; set; }
-
+    public class CalculationSpecification : Reference
+    {
+        [JsonProperty("description")]
+        public string Description { get; set; }
     }
 }
 

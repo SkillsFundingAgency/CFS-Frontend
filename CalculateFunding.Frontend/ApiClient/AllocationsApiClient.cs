@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,8 +15,8 @@ namespace CalculateFunding.Frontend.ApiClient
 {
     public class AllocationApiOptions
     {
-        public string AllocationsApiKey { get; set; }
-        public string AllocationsApiEndpoint { get; set; }
+        public string ApiKey { get; set; }
+        public string ApiEndpoint { get; set; }
         public string ResultsPath { get; set; }
         public string SpecsPath { get; set; }
     }
@@ -25,13 +26,13 @@ namespace CalculateFunding.Frontend.ApiClient
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings{Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()};
         private readonly string _resultsPath;
         private string _specsPath;
-
+        
         public AllocationsApiClient(IOptions<AllocationApiOptions> options)
         {
-            _httpClient = new HttpClient(){BaseAddress = new Uri(options.Value.AllocationsApiEndpoint)};
-            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.AllocationsApiKey);
-            _resultsPath = options.Value.ResultsPath ?? "/api/v1/results";
-            _specsPath = options.Value.SpecsPath ?? "/api/v1/specs";
+            _httpClient = new HttpClient(){BaseAddress = new Uri(options.Value.ApiEndpoint)};
+            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
+            _resultsPath = options.Value.ResultsPath ?? "/api/results";
+            _specsPath = options.Value.SpecsPath ?? "/api/specs";
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -48,6 +49,11 @@ namespace CalculateFunding.Frontend.ApiClient
         public async Task<ApiResponse<BudgetSummary[]>> GetBudgetResults()
         {
             return await GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
+        }
+
+        public async Task<ApiResponse<List<Specification>>> GetSpecifications()
+        {
+            return await GetAsync<List<Specification>>($"{_specsPath}/specifications");
         }
 
         public async Task<ApiResponse<Specification>> GetBudget(string id)

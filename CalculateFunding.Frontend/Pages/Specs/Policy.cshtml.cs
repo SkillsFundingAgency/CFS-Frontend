@@ -7,11 +7,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
     public class PolicyModel : PageModel
     {
 
-        public Policy Policy { get; set; }
+        public PolicySpecification Policy { get; set; }
     
         public void OnGet()
         {
-            Policy = new Policy();
+            Policy = new PolicySpecification();
         }
     }
 
