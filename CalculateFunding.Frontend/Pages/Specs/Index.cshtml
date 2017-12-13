@@ -50,7 +50,6 @@
                                 @budget.Budget.Name
                             </h2>
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</p>
-
                         </div>
                         <div class="panel-collapse collapse">
                             <div class="panel-body">
@@ -69,31 +68,36 @@
 
                                                             <div class="details collapse panel">
                                                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</p>
-
+                                                                <p>                
+                                                                   <a href="/specs/product" class="button">Add product</a>
+                                                                    <a href="/specs/policy" class="button">Add sub policy</a>
+                                                                </p>
                                                                 @foreach (var allocationLine in policy.AllocationLines ?? new List<AllocationLineSummary>())
-    {
-                                                            <h3 class="heading-small">
-                                                                @{
-        var routeParam =
-            new Dictionary<string, string>
-            {
-                                                                        {"budgetId", budget.Budget.Id},
-                                                                        {"allocationLineId", allocationLine.Id}
-            };
+                                                                {
+                                                                    <h3 class="heading-small">
+                                                                        @{
+                                                                            var routeParam =
+                                                                                new Dictionary<string, string>
+                                                                                {
+                                                                                    {"budgetId", budget.Budget.Id},
+                                                                                    {"allocationLineId", allocationLine.Id}
+                                                                                };
+                                                                        }
+                                                                        @allocationLine.Name
+                                                                    </h3>
+                                                                    <dl class="dl-horizontal">
+                                                                        <dt>Product 1</dt>
+                                                                        <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</dd>
+
+                                                                        <dt>Product 2</dt>
+                                                                        <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</dd>
+                                                                    </dl>
+
+
                                                                 }
-                                                                @allocationLine.Name
-                                                            </h3>
-        <dl class="dl-horizontal">
-            <dt>Product 1</dt>
-            <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</dd>
-            
-            <dt>Product 2</dt>
-            <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</dd>
-        </dl>
+                                                              
+                                                                
 
-
-}
-                                                                <p>                <a href="/specs/product" class="button">Add product</a></p>
                                                             </div>
                                                             @*end of panel.panel-border-narrow*@
                                                         </div>
@@ -105,6 +109,9 @@
                                         }
 
                                     </ul>
+                                    <p>               
+                                        <a href="/specs/policy" class="button">Add funding policy</a>
+                                    </p>
                                 </div>
                                 @*end of panel inside panel-body*@
                             </div>
