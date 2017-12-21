@@ -5,7 +5,7 @@ using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CalculateFunding.Frontend.Pages.Budgets.Results.Products
+namespace CalculateFunding.Frontend.Pages.Results.Products
 {
     public class DetailsModel : PageModel
     {

@@ -5,7 +5,7 @@ using CalculateFunding.Frontend.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CalculateFunding.Frontend.Pages.Budgets.Results
+namespace CalculateFunding.Frontend.Pages.Results
 {
     public class IndexModel : PageModel
     {

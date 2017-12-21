@@ -8,7 +8,7 @@ using CalculateFunding.Frontend.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CalculateFunding.Frontend.Pages.Budgets.Specification
+namespace CalculateFunding.Frontend.Pages.Tests
 {
     public class TestScenarioModel : PageModel
     {

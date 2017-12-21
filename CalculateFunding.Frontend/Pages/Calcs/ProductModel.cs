@@ -1,10 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CalculateFunding.Frontend.Pages.Budgets.Specification
+namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class ProductModel : PageModel
     {
