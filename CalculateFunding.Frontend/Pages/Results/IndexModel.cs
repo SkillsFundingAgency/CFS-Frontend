@@ -23,7 +23,8 @@ namespace CalculateFunding.Frontend.Pages.Results
         {
             var results = await _apiClient.GetBudgetResultsAsync(HttpContext.RequestAborted).ConfigureAwait(false);
 
-            Budgets = results.Content;
+            //Ignore this just testing stuff without a valid url
+            Budgets = results.Content != null ? results.Content : new List<BudgetSummary>();
 
             return Page();
         }

@@ -24,6 +24,7 @@ namespace CalculateFunding.Frontend.ApiClient
         public AbstractApiClient(IOptionsSnapshot<AllocationApiOptions> options, IHttpClient httpClient, ILoggingService logs)
         {
             _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
             _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
             _resultsPath = options.Value.ResultsPath ?? "/api/results";
             _specsPath = options.Value.SpecsPath ?? "/api/specs";
@@ -35,12 +36,22 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             _logs.Trace($"Beginning to fetch data from: {url}");
 
-            var response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = null;
+            //Ignore some of this, just testing with a valid url
+            try
             {
-                return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
+                response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
+                }
+                return new ApiResponse<T>(response.StatusCode);
             }
-            return new ApiResponse<T>(response.StatusCode);
+            catch (Exception ex)
+            {
+                _logs.Exception("foobarred", ex);
+                return new ApiResponse<T>(response != null ? response.StatusCode : HttpStatusCode.InternalServerError);
+            }
         }
 
         async public Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))

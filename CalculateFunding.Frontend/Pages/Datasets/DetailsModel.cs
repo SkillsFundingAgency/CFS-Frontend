@@ -18,7 +18,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
         public async Task<IActionResult> OnGetAsync(string id, string providerId)
         {
-            var result = await _apiClient.GetProviderResult(id, providerId);
+            var result = await _apiClient.GetProviderResult(id, providerId).ConfigureAwait(false);
 
             Provider = result.Content;
 
