@@ -1,10 +1,15 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using CalculateFunding.Frontend.ApiClient;
+using CalculateFunding.Frontend.Core.Middleware;
+using CalculateFunding.Frontend.Modules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace CalculateFunding.Frontend
 {
@@ -17,13 +22,28 @@ namespace CalculateFunding.Frontend
 
         public IConfiguration Configuration { get; }
 
+        public IContainer ApplicationContainer { get; private set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.Configure<AllocationApiOptions>(Configuration);
-            services.AddTransient<AllocationsApiClient, AllocationsApiClient>();
+            services.AddModule<ApiModule>(Configuration);
+            services.AddModule<ProxiesModule>(Configuration);
+            services.AddModule<LoggingModule>(Configuration);
+
+            services
+                .AddScoped<CorrelationIdMiddleware>();
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            var builder = new ContainerBuilder();
+
+            builder.Populate(services);
+
+            ApplicationContainer = builder.Build();
+
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +67,8 @@ namespace CalculateFunding.Frontend
                 }
             });
 
+            app.UseMiddleware<CorrelationIdMiddleware>();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -54,5 +76,7 @@ namespace CalculateFunding.Frontend
                     template: "{controller}/{action=Index}/{id?}");
             });
         }
+
+        
     }
 }
