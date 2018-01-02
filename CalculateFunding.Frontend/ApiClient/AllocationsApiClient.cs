@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
+using CalculateFunding.Frontend.Interfaces.Core;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -15,14 +16,15 @@ namespace CalculateFunding.Frontend.ApiClient
 {
     public class AllocationsApiClient
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClient _httpClient;
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings{Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()};
         private readonly string _resultsPath;
         private string _specsPath;
         
-        public AllocationsApiClient(IOptions<AllocationApiOptions> options)
+        public AllocationsApiClient(IOptions<AllocationApiOptions> options, IHttpClient httpClient)
         {
-            _httpClient = new HttpClient(){BaseAddress = new Uri(options.Value.ApiEndpoint)};
+            _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
             _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
             _resultsPath = options.Value.ResultsPath ?? "/api/results";
             _specsPath = options.Value.SpecsPath ?? "/api/specs";
