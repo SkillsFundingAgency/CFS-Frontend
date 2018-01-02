@@ -56,7 +56,7 @@
                             <div class="panel-body">
                                 <div class="panel">
                                     <ul class="list-group">
-                                        @foreach (var policy in specification.Policies)
+                                        @foreach (var policy in specification.Policies ?? new List<PolicySpecification>())
                                         {
                                             <li class="list-group-item">
                                                 <div class="row">
