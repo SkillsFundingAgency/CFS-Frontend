@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,10 +9,10 @@ namespace CalculateFunding.Frontend.Pages.Results.Providers
 {
     public class DetailsModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IAllocationsApiClient _apiClient;
         public ProviderTestResult Provider { get; set; }
 
-        public DetailsModel(AllocationsApiClient apiClient)
+        public DetailsModel(IAllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,9 +13,9 @@ namespace CalculateFunding.Frontend.Pages.Tests
 {
     public class TestScenarioModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IAllocationsApiClient _apiClient;
 
-        public TestScenarioModel(AllocationsApiClient apiClient)
+        public TestScenarioModel(IAllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
 

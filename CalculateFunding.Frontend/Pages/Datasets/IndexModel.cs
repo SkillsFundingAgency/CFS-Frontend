@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,10 +10,10 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 {
     public class IndexModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IAllocationsApiClient _apiClient;
         public IList<Dataset> Datasets { get; set; }
 
-        public IndexModel(AllocationsApiClient apiClient)
+        public IndexModel(IAllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
         }

@@ -1,15 +1,16 @@
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class ProductModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IAllocationsApiClient _apiClient;
 
-        public ProductModel(AllocationsApiClient apiClient)
+        public ProductModel(IAllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
         }

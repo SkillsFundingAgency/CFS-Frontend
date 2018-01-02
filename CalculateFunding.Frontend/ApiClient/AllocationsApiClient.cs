@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace CalculateFunding.Frontend.ApiClient
 {
-    public class AllocationsApiClient
+    public class AllocationsApiClient : IAllocationsApiClient
     {
         private readonly IHttpClient _httpClient;
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings{Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()};

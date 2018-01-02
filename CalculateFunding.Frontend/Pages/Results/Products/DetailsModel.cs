@@ -3,15 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CalculateFunding.Frontend.Pages.Results.Products
 {
     public class DetailsModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IAllocationsApiClient _apiClient;
 
-        public DetailsModel(AllocationsApiClient apiClient)
+        public DetailsModel(IAllocationsApiClient apiClient)
         {
             _apiClient = apiClient;
         }
