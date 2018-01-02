@@ -16,7 +16,7 @@ namespace CalculateFunding.FrontEnd
             int j = i++;
 
             //Assert
-            i.Should().Be(2);
+            j.Should().Be(2);
         }
     }
 }
