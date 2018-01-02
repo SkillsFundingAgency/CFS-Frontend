@@ -1,0 +1,619 @@
+﻿// Settings (variables)
+@import "colours"; // Colour variables
+@import "font_stack"; // Font family variables
+@import "measurements"; // Widths and gutter variables
+
+// Mixins
+@import "conditionals"; // Media query mixin
+@import "device-pixels"; // Retina image mixin
+@import "grid_layout"; // Basic grid layout mixin
+@import "typography"; // Core bold and heading mixins
+@import "shims"; // Inline block mixin, clearfix placeholder
+
+// Mixins to generate components (chunks of UI)
+@import "design-patterns/alpha-beta"; // Only required if using _phase-banner.scss
+@import "design-patterns/buttons"; // Only required if using _buttons.scss
+@import "govuk-elements";
+
+// Functions
+@import "url-helpers"; // Function to output image-url, or prefixed path (Rails and Compass only)
+$path: "wwwroot/assets/images";
+
+//colors
+
+$filter-bg: #dee0e2;
+$filter-hover-bg: #bfc1c3;
+//fonts
+@font-face {
+    font-family: 'glyphicons-halflings-regular';
+    src: url("../libs/fonts/glyphicons-halflings-regular.eot");
+    src: url('../libs/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../libs/fonts/glyphicons-halflings-regular.woff2') format('woff'), url('../libs/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+$glyph: 'glyphicons-halflings-regular';
+
+a.button:hover {
+    text-decoration: none;
+}
+///////////////////////////////////////
+//             Start Page           //
+/////////////////////////////////////
+.button-start {
+    background-repeat: no-repeat;
+    background-position: 100% 50%;
+    background-image: url(../images/icon-pointer.png);
+}
+.govuk-related-items {
+    margin-top: 30px;
+    border-top: 1px solid $border-colour;
+    padding-top: 5px;
+}
+  /////////////////////////////////////
+ /////         Breadcrumbs       /////
+/////////////////////////////////////
+.breadcrumbs {
+    li {
+        background-image: url('../images/separator.png');
+        background-position: 0% 50%;
+        background-repeat: no-repeat;
+
+        &:first-child {
+            background-image: none;
+        }
+    }
+}
+  /////////////////////////////////////
+ ////           Buttons         //////
+/////////////////////////////////////
+.button-error {
+    background-color: $mellow-red;
+    &:hover {
+        background-color: darken($mellow-red, 10%);       
+    }
+    &.remove {
+        background-color: $green;
+        &:hover {
+            background-color: darken($green, 10%);
+        }       
+    }
+}
+/*.button-view {
+    background-color: $govuk-blue;
+}*/
+.button-edit {
+    background-color: $govuk-blue;
+
+    &:hover {
+        background-color: darken($govuk-blue, 10%);
+    }
+}
+///////////////////////////////////////
+//    Accordion list and sublist    //
+/////////////////////////////////////
+
+.esfa-collapse {
+    .accordion-toggle {
+        color: #005ea5;
+        cursor: pointer;
+        background: none;
+        border: 0;
+        font-size: 16px;
+        line-height: 1.25;
+        font-weight: 400;
+        text-transform: none;
+        float: right;
+        position: relative;
+        z-index: 1;
+        padding: 0.5em 0;
+    }
+
+    .panel {
+        padding: 0;
+        border-style: none;
+        border-radius: 0;
+        box-shadow: none;
+        position: static !important;
+
+        &.panel-border-narrow,
+        &.panel-border-narrow {
+            border-left-style: solid;
+            padding: 15px;
+        }
+
+        .panel-heading {
+            position: relative;
+            background-color: #fff;
+            cursor: pointer;
+            padding: 15px 0;
+            padding-right: 25px;
+            border-bottom: none;
+            border-radius: 0;
+            border-top: 1px solid $border-colour;
+
+            &:focus {
+                outline: 3px solid $focus-colour;
+            }
+
+            &:hover {
+                background-color: $canvas-colour;
+
+                a {
+                    color: $link-hover-colour;
+                }
+            }
+
+            &.no-collapse:before {
+                display: none !important;
+            }
+
+            .panel-title {
+                font-size: 24px;
+                line-height: 1.25;
+                margin-bottom: 20px;
+                font-weight: 700;
+                margin-right: 10px;
+                a {
+                    color: $link-colour;
+
+                    &:hover {
+                        color: $link-hover-colour;
+                    }
+                }
+            }
+        }
+
+        .panel-collapse {
+            display: none;
+
+            .panel-body {
+                border-top: none !important;
+
+                .list-title:not(.heading-medium) {
+                    display: inline-block;
+                    font-weight: normal;
+                    text-decoration: none;
+                }
+
+                .heading-medium {
+                    text-decoration: none !important;
+                }
+            }
+        }
+
+        .item-detail {
+            display: inline-block;
+            margin-right: 10px;
+
+            &:last-of-type {
+                margin-right: 0;
+            }
+
+            > span {
+                @extend p;
+                font-size: 19px;
+
+                &.glyphicon {
+                    font-family: glyphicons-halflings-regular;
+                    margin: 0;
+                    margin-right: 10px;
+                    color: $secondary-text-colour;
+                }
+            }
+        }
+
+        /*a {
+            color: $link-colour;
+            position: relative;
+            font-weight: 700;
+            padding: 5px;
+            padding-left: 0;
+
+            &:hover {
+                text-decoration: none !important;
+                color: $link-hover-colour;
+            }
+
+            &:focus {
+                text-decoration: none !important;
+                background-color: initial;
+                outline: 3px solid $focus-colour;
+                outline-offset: 2px;
+            }
+
+            &.plain-link {
+                color: $text-colour;
+
+                &:hover {
+                    color: $text-colour;
+                }
+
+                &:focus {
+                    outline-offset: 0;
+                }
+            }
+        }*/
+
+        .amount {
+            color: initial !important;
+            font-weight: normal !important;
+            font-size: initial !important;
+            margin-left: 10px;
+        }
+    }
+
+    &#esfa-list {
+        .panel-heading {
+
+            &:before {
+                content: "";
+                display: block;
+                width: 16px;
+                height: 16px;
+                position: absolute;
+                background-image: url('../images/icon-plus.png');
+                color: $text-colour;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 5px;
+                font-size: 24px;
+            }
+
+            &.active {
+                background-color: $canvas-colour;
+
+                &:before {
+                    content: "";
+                    background-image: url('../images/icon-minus.png');
+                }
+            }
+        }
+    }
+
+    &#esfa-filter {
+        margin-top: 36px;
+
+        .panel {
+            margin-bottom: 30px;
+
+            .panel-heading {
+                border-top: none;
+                background-color: $filter-bg;
+                padding: 10px;
+
+                .panel-title {
+                    font-size: inherit;
+                    line-height: 1.25;
+                    padding-left: 5px;
+                }
+
+                label {
+                    font-weight: 700;
+                }
+
+                .form-control {
+                    width: 100%;
+
+                    &:focus {
+                        outline: 3px solid $focus-colour;
+                    }
+                }
+            }
+
+            &.search-panel {
+                .panel-heading {
+                    &:hover {
+                        background-color: $filter-hover-bg;
+                    }
+                }
+            }
+
+            .panel-no-collapse {
+                background-color: $filter-bg;
+                padding: 0 5px 5px;
+
+                .panel-body {
+                    background-color: #fff;
+                    padding: 10px;
+
+                    &.scroll-body {
+                        max-height: 244px; //add or remove 49px to add/remove elements shown
+                        overflow: hidden;
+                        overflow-y: scroll;
+                    }
+
+                    label {
+                        font-weight: normal;
+
+                        &:after {
+                            width: 18px;
+                            height: 10px;
+                        }
+                    }
+                }
+            }
+
+            &:hover {
+                .panel-heading,
+                .panel-collapse,
+                .panel-no-collapse {
+                    background-color: $filter-hover-bg;
+                    border-color: $filter-hover-bg;
+                }
+            }
+        }
+    }
+}
+
+.product-details {
+    .summary {
+        display: block;
+
+        > div:first-of-type {
+            display: inline-block;
+            vertical-align: middle;
+            /*Standard*/
+            width: calc(100% - 25px);
+            /*Firefox*/
+            width: -moz-calc(100% - 25px);
+            /*Webkit*/
+            width: -webkit-calc(100% - 25px);
+            /*Opera*/
+            width: -o-calc(100% - 25px);
+
+            .list-title {
+                float: left;
+                margin: 0;
+            }
+
+            .folder {
+                float: right;
+                display: inline-block;
+                margin: 0;
+
+                > span {
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+}
+
+.provider-stats {
+    ul {
+        > li {
+            dt, dd {
+                display: inline-block;
+                font-size: 19px;
+            }
+        }
+    }
+}
+
+.gherkin-scenario {
+
+    p {
+        margin-bottom: 20px !important;
+        line-height: 2.5;
+    }
+
+    span.data-tag {
+        background-color: $panel-colour;
+        color: $link-colour;
+        padding: 5px;
+        cursor: pointer;
+        &:empty {
+            display: none;
+        }
+        &:hover {
+            /*background-color: $highlight-colour;*/
+            color: $link-hover-colour;
+        }
+    }
+}
+
+.qa-passed-report {
+    summary {
+        color: $green;
+
+        &:hover {
+            color: $green;
+        }
+    }
+
+    .panel {
+        &.panel-border-narrow {
+            border-color: $green !important;
+        }
+    }
+}
+
+.qa-failed-report {
+    summary {
+        color: $red;
+
+        &:hover {
+            color: $red;
+        }
+    }
+
+    .panel {
+        &.panel-border-narrow {
+            border-color: $red !important;
+        }
+    }
+}
+
+.visible {
+    display: block !important;
+}
+///////////////////////////////////////
+//          Sidebar pages           //
+/////////////////////////////////////
+th, tr, td, tbody {
+    border: none !important;
+}
+table {
+    border: none;
+
+    p.error-message {
+        font-weight: normal;
+    }
+    thead {
+        border-bottom: 2px solid $border-colour !important;
+    } 
+}
+.error-message {
+    font-weight: normal !important;
+
+    a {
+        color: $red !important;
+
+        &:hover {
+            color: $red !important;
+        }
+    }
+}
+
+.text-success {
+    font-weight: normal;
+}
+
+.item-detail {
+    > a {
+        display: inline-block;
+        text-decoration: underline;
+        text-decoration-color: inherit;
+    }
+}
+
+.progress {
+    display: inline-block;
+    width: 20%;
+}
+
+.year-form {
+    .form-control {
+        width: 25% !important;
+
+        &:focus {
+            outline: 3px solid $focus-colour !important;
+            border-color: initial !important;
+            box-shadow: none !important;
+        }
+    }
+}
+
+.graph {
+    width: 100%;
+    margin-bottom: 30px;
+
+    img {
+        width: 100%;
+    }
+}
+
+.esfa-summary {
+
+    .data {
+        margin-top: 0;
+        display: inline-block;
+
+        .data-link {
+            padding: 0 !important;
+            text-decoration: underline;
+
+            &.success {
+                text-decoration-color: $green;
+            }
+
+            &.failing {
+                text-decoration-color: $error-colour;
+            }
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        .data-item {
+            padding: 0;
+            font-size: inherit;
+            font-weight: normal;
+            line-height: 1;
+        }
+    }
+
+    .progress {
+        margin-bottom: 0;
+        display: block;
+        width: 100%;
+        max-width: 100px;
+        background-color: $panel-colour;
+
+        .progress-bar-success {
+            background-color: $green;
+        }
+
+        .progress-bar-error {
+            background-color: $mellow-red;
+        }
+    }
+}
+
+.editor {
+    min-height: 250px;
+    border: 1px solid $border-colour;
+    width: 100%;
+}
+
+.summary {
+    cursor: pointer;
+
+    &:focus {
+        outline: 3px solid $focus-colour;
+    }
+
+    &:before {
+        content: "\e258";
+        font-family: $glyph;
+        font-weight: normal;
+        font-size: 14px;
+        margin-right: 5px;
+        //display: inline-block;
+        vertical-align: middle;
+    }
+
+    &.collapsed:before {
+        content: "\e259";
+    }
+}
+
+/*Gherkin scenario page*/
+
+.gherkin-scenario {
+    #scenario-name {
+    }
+
+    .form-control {
+        width: 100%;
+    }
+
+    .remove-step {
+        cursor: pointer;
+
+        &:hover {
+            color: $red;
+        }
+    }
+}
+
+#calculation-engine {
+    h3 {
+        margin: 0;
+        margin-top: 30px;
+        font-size: 24px;
+    }
+    table {
+        border: 1px solid $red;
+    }
+}

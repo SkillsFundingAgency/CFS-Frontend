@@ -1,0 +1,59 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Specs.PolicyModel
+@{
+    ViewData["Title"] = "Create policy";
+}
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+                <li><a href="/specs">Specifications</a></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="heading-xlarge">Create policy</h1>
+        <p class="text-muted">Lorem ipsum</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <form method="post" class="form">
+
+            <div class="form-group">
+                <label asp-for="Policy.Name">Name</label>
+                <input asp-for="Policy.Id" type="hidden">
+                <input asp-for="Policy.Name" class="form-control" type="text">
+            </div>
+            <div class="form-group">
+                <label asp-for="Policy.Description">Description</label>
+                <textarea asp-for="Policy.Description" class="summernote" id="contents" title="Contents"></textarea>
+            </div>
+
+            <p><button type="submit" class="button">Save</button></p>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            $('.summernote').summernote({
+                height: 200
+            });
+
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+                alert($('.summernote').summernote('code'));
+                alert($('.summernote').val());
+            });
+        });
+    </script>
+}
