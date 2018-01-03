@@ -27,7 +27,7 @@
                     <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
                     <nav id="proposition-menu">
 
-                        <a href="/" id="proposition-name">Calculate funding</a>
+                        <a href="/" id="proposition-name">Calculate Funding</a>
 
                         @*<ul id="proposition-links">
                             <li><a href="layout.html">Layout</a></li>
@@ -40,10 +40,26 @@
             </div>
         </div>
     </header>
-    <div id="global-header-bar"></div>
-    <main role="main">
+    <section class="banner-container">
         <div class="container">
             <div class="row">
+                <div class="col-xs-9">
+                    @RenderSection("BannerLeft", false)
+                </div>
+                <div class="col-xs-3">
+                    <div class="banner-container-right">
+                        <a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.
+                        @RenderSection("BannerRight", false)
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main role="main">
+        <div class="container">
+            @*<div class="row">
                 <div class="col-xs-12">
                     <div class="phase-banner-alpha">
                         <p>
@@ -52,7 +68,7 @@
                         </p>
                     </div>
                 </div>
-            </div>
+            </div>*@
             <!-- Breadcrumbs -->
             @*<div class="row">
                 <div class="col-xs-12">

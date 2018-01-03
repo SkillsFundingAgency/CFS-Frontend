@@ -43,13 +43,14 @@ a.button:hover {
     background-position: 100% 50%;
     background-image: url(../images/icon-pointer.png);
 }
+
 .govuk-related-items {
     margin-top: 30px;
     border-top: 1px solid $border-colour;
     padding-top: 5px;
 }
-  /////////////////////////////////////
- /////         Breadcrumbs       /////
+/////////////////////////////////////
+/////         Breadcrumbs       /////
 /////////////////////////////////////
 .breadcrumbs {
     li {
@@ -62,19 +63,22 @@ a.button:hover {
         }
     }
 }
-  /////////////////////////////////////
- ////           Buttons         //////
+/////////////////////////////////////
+////           Buttons         //////
 /////////////////////////////////////
 .button-error {
     background-color: $mellow-red;
+
     &:hover {
-        background-color: darken($mellow-red, 10%);       
+        background-color: darken($mellow-red, 10%);
     }
+
     &.remove {
         background-color: $green;
+
         &:hover {
             background-color: darken($green, 10%);
-        }       
+        }
     }
 }
 /*.button-view {
@@ -152,6 +156,7 @@ a.button:hover {
                 margin-bottom: 20px;
                 font-weight: 700;
                 margin-right: 10px;
+
                 a {
                     color: $link-colour;
 
@@ -200,7 +205,6 @@ a.button:hover {
                 }
             }
         }
-
         /*a {
             color: $link-colour;
             position: relative;
@@ -232,7 +236,6 @@ a.button:hover {
                 }
             }
         }*/
-
         .amount {
             color: initial !important;
             font-weight: normal !important;
@@ -401,9 +404,11 @@ a.button:hover {
         color: $link-colour;
         padding: 5px;
         cursor: pointer;
+
         &:empty {
             display: none;
         }
+
         &:hover {
             /*background-color: $highlight-colour;*/
             color: $link-hover-colour;
@@ -452,16 +457,19 @@ a.button:hover {
 th, tr, td, tbody {
     border: none !important;
 }
+
 table {
     border: none;
 
     p.error-message {
         font-weight: normal;
     }
+
     thead {
         border-bottom: 2px solid $border-colour !important;
-    } 
+    }
 }
+
 .error-message {
     font-weight: normal !important;
 
@@ -613,7 +621,32 @@ table {
         margin-top: 30px;
         font-size: 24px;
     }
+
     table {
         border: 1px solid $red;
     }
+}
+
+.banner-container {
+    background-color: $govuk-blue;
+    color: $page-colour;
+    padding-bottom: 60px;
+
+    a,
+    a:visited,
+    a:link {
+        color: $page-colour;
+        text-decoration: underline;
+    }
+
+    .banner-container-right{
+        padding-top: 50px;
+    }
+}
+
+.homepage-section-container{
+    padding: 15px 0;
+}
+.homepage-section-title{
+    padding: 30px 0 15px 0;
 }
