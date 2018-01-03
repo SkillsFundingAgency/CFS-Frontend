@@ -25,10 +25,10 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
-            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
+            _httpClient.DefaultRequestHeaders?.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
             _resultsPath = options.Value.ResultsPath ?? "/api/results";
             _specsPath = options.Value.SpecsPath ?? "/api/specs";
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _logs = logs;
         }
 
