@@ -23,8 +23,8 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
-            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders?.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
+            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _logs = logs;
         }
 
@@ -33,7 +33,6 @@ namespace CalculateFunding.Frontend.ApiClient
             _logs.Trace($"Beginning to fetch data from: {url}");
 
             HttpResponseMessage response = null;
-            //Ignore some of this, just testing with a valid url
             try
             {
                 response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
@@ -41,11 +40,15 @@ namespace CalculateFunding.Frontend.ApiClient
                 {
                     return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
                 }
+
+                _logs.Trace($"No successful response from {url} with status code: {response.StatusCode} and reason: {response.ReasonPhrase}");
+                
                 return new ApiResponse<T>(response.StatusCode);
             }
             catch (Exception ex)
             {
-                _logs.Exception("foobarred", ex);
+                _logs.Exception($"Failed to fetch data from {url}", ex);
+
                 return new ApiResponse<T>(response != null ? response.StatusCode : HttpStatusCode.InternalServerError);
             }
         }
