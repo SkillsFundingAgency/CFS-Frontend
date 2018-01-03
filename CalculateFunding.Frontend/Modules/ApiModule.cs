@@ -12,10 +12,6 @@ namespace CalculateFunding.Frontend.Modules
             AddSettingAsOptions<ApiOptions>(services);
 
             services
-                .AddScoped<IBudgetApiClient, BudgetApiClient>();
-
-
-            services
                 .AddScoped<ISpecsApiClient, SpecsApiClient>();
 
             services

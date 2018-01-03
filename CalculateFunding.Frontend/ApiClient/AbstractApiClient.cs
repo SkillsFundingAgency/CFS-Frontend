@@ -17,18 +17,14 @@ namespace CalculateFunding.Frontend.ApiClient
     {
         readonly IHttpClient _httpClient;
         readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
-        readonly protected string _resultsPath;
-        readonly protected string _specsPath;
         readonly protected ILoggingService _logs;
 
         public AbstractApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs)
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
-            _httpClient.DefaultRequestHeaders?.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
-            _resultsPath = options.Value.ResultsPath ?? "/api/results";
-            _specsPath = options.Value.SpecsPath ?? "/api/specs";
-            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _logs = logs;
         }
 
