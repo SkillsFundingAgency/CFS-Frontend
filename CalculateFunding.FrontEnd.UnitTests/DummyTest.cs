@@ -13,10 +13,10 @@ namespace CalculateFunding.FrontEnd
             int i = 1;
 
             //Act
-            int j = i++;
+            i++;
 
             //Assert
-            j.Should().Be(2);
+            i.Should().Be(2);
         }
     }
 }

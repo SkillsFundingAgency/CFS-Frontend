@@ -10,9 +10,10 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private readonly ICalculationsApiClient _calculationsClient;
         private readonly ISpecsApiClient _specsClient;
 
-        public ProductModel(ICalculationsApiClient apiClient)
+        public ProductModel(ICalculationsApiClient calculationsClient, ISpecsApiClient specsClient)
         {
-            _calculationsClient = apiClient;
+            _calculationsClient = calculationsClient;
+            _specsClient = specsClient;
         }
         public async Task OnGet(string id, string productId)
         {
@@ -52,6 +53,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         public PreviewResponse Preview { get; set; }
 
         public Specification Budget { get; set; }
+
         public Product Product { get; set; }
     }
 }
