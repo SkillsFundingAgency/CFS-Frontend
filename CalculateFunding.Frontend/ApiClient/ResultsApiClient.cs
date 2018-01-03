@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -19,24 +20,24 @@ namespace CalculateFunding.Frontend.ApiClient
 
         }
 
-        public Task<ApiResponse<BudgetSummary[]>> GetBudgetResults()
+        public Task<ApiResponse<BudgetSummary[]>> GetBudgetResults(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets");
+            return GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets", cancellationToken);
         }
 
-        public Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId)
+        public Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}");
+            return GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}", cancellationToken);
         }
 
-        public Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId)
+        public Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}");
+            return GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}", cancellationToken);
         }
 
-        public Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId)
+        public Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}");
+            return GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}", cancellationToken);
         }
     }
 }

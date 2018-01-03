@@ -5,6 +5,7 @@ using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -80,7 +81,15 @@ namespace CalculateFunding.FrontEnd.ApiClients
         public async Task GetSpecifications_GivenResponseIsASuccess_ReturnsData()
         {
             //Arrange
+            IEnumerable<Specification> specs = new List<Specification>
+            {
+                new Specification(),
+                new Specification()
+            };
+
             HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            response
+                .Content = new StringContent(JsonConvert.SerializeObject(specs));
 
             IHttpClient httpClient = CreateHttpClient();
             httpClient
@@ -98,11 +107,13 @@ namespace CalculateFunding.FrontEnd.ApiClients
             results
                 .StatusCode
                 .Should()
-                .Be(HttpStatusCode.BadRequest);
+                .Be(HttpStatusCode.OK);
 
-            logs
-                .Received()
-                .Trace("No successful response from specs/specifications with status code: BadRequest and reason: Bad Request");
+            results
+                .Content
+                .Count
+                .Should()
+                .Be(2);
         }
 
 
