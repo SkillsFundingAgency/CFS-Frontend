@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ApiClient
 {
-    public class AllocationApiOptions
+    public class ApiOptions
     {
         public string ApiKey { get; set; }
         public string ApiEndpoint { get; set; }

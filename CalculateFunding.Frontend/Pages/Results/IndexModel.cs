@@ -21,7 +21,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var results = await _apiClient.GetBudgetResultsAsync(HttpContext.RequestAborted).ConfigureAwait(false);
+            var results = await _apiClient.GetBudgetResults(HttpContext.RequestAborted).ConfigureAwait(false);
 
             //Ignore this just testing stuff without a valid url
             Budgets = results.Content != null ? results.Content : new List<BudgetSummary>();

@@ -9,13 +9,19 @@ namespace CalculateFunding.Frontend.Modules
     {
         override public void Configure(IServiceCollection services)
         {
-            AddSettingAsOptions<AllocationApiOptions>(services);
+            AddSettingAsOptions<ApiOptions>(services);
 
             services
                 .AddScoped<IBudgetApiClient, BudgetApiClient>();
 
             services
-                .AddScoped<IAllocationsApiClient, AllocationsApiClient>();
+                .AddScoped<ISpecsApiClient, SpecsApiClient>();
+
+            services
+                .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
+
+            services
+                .AddScoped<IResultsApiClient, ResultsApiClient>();
         }
     }
 }

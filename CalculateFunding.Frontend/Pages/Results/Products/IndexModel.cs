@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc;
@@ -9,18 +8,18 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
 {
     public class IndexModel : PageModel
     {
-        private readonly IAllocationsApiClient _apiClient;
+        private readonly IResultsApiClient _resultsClient;
         public AllocationLine AllocationLine;
         public string BudgetId;
 
-        public IndexModel(IAllocationsApiClient apiClient)
+        public IndexModel(IResultsApiClient resultsApiClient)
         {
-            _apiClient = apiClient;
+            _resultsClient = resultsApiClient;
         }
 
         public async Task<IActionResult> OnGetAsync(string budgetId, string allocationLineId)
         {
-            var results = await _apiClient.GetAllocationLine(budgetId, allocationLineId);
+            var results = await _resultsClient.GetAllocationLine(budgetId, allocationLineId);
 
             AllocationLine = results.Content;
             BudgetId = budgetId;

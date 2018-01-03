@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.Interfaces.APiClient;
 using Microsoft.AspNetCore.Mvc;
@@ -9,23 +8,21 @@ namespace CalculateFunding.Frontend.Pages.Results.Providers
 {
     public class DetailsModel : PageModel
     {
-        private readonly IAllocationsApiClient _apiClient;
+        private readonly IResultsApiClient _resultsClient;
         public ProviderTestResult Provider { get; set; }
 
-        public DetailsModel(IAllocationsApiClient apiClient)
+        public DetailsModel(IResultsApiClient resultsClient)
         {
-            _apiClient = apiClient;
+            _resultsClient = resultsClient;
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string providerId)
         {
-            var result = await _apiClient.GetProviderResult(id, providerId);
+            var result = await _resultsClient.GetProviderResult(id, providerId);
 
             Provider = result.Content;
 
             return Page();
         }
-
-
     }
-    }
+}

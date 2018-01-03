@@ -9,10 +9,10 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 {
     public class DetailsModel : PageModel
     {
-        private readonly IAllocationsApiClient _apiClient;
+        private readonly IResultsApiClient _apiClient;
         public ProviderTestResult Provider { get; set; }
 
-        public DetailsModel(IAllocationsApiClient apiClient)
+        public DetailsModel(IResultsApiClient apiClient)
         {
             _apiClient = apiClient;
         }
