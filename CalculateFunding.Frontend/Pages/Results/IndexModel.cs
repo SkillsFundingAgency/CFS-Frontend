@@ -4,17 +4,17 @@ using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
     public class IndexModel : PageModel
     {
-        readonly IBudgetApiClient _apiClient;
+        readonly IResultsApiClient _apiClient;
 
         public IEnumerable<BudgetSummary> Budgets;
 
-        public IndexModel(IBudgetApiClient apiClient)
+        public IndexModel(IResultsApiClient apiClient)
         {
             _apiClient = apiClient;
         }
@@ -24,7 +24,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             var results = await _apiClient.GetBudgetResults(HttpContext.RequestAborted).ConfigureAwait(false);
 
             //Ignore this just testing stuff without a valid url
-            Budgets = results.Content != null ? results.Content : new List<BudgetSummary>();
+            Budgets = results.Content ?? new List<BudgetSummary>().ToArray();
 
             return Page();
         }
