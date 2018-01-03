@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.ApiClient
         readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
         readonly protected string _resultsPath;
         readonly protected string _specsPath;
-       readonly ILoggingService _logs;
+        readonly protected ILoggingService _logs;
 
         public AbstractApiClient(IOptionsSnapshot<AllocationApiOptions> options, IHttpClient httpClient, ILoggingService logs)
         {
