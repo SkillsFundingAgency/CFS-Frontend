@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.Results;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
@@ -27,16 +28,24 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+
             return GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}", cancellationToken);
         }
 
         public Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
             return GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}", cancellationToken);
         }
 
         public Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(allocationLineId, nameof(allocationLineId));
+
             return GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}", cancellationToken);
         }
     }

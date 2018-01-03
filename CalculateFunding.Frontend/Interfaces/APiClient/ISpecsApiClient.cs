@@ -8,7 +8,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     public interface ISpecsApiClient
     {
-        Task<ApiResponse<Specification>> GetBudget(string id);
+        Task<ApiResponse<Specification>> GetBudget(string budgetId);
         Task<ApiResponse<Product>> GetProduct(string budgetId, string productId);
         Task<ApiResponse<List<Specification>>> GetSpecifications();
         Task<HttpStatusCode> PostBudget(Specification budget);

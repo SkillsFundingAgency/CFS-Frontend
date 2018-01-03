@@ -36,87 +36,96 @@
 @*end of row*@
 <div class="row">
     <div class="col-xs-12 col-md-12">
-        <p>                
+        <p>
             <a href="/specs/specification" class="button">Add specification</a>
         </p>
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
             <div class="funding-streams">
 
                 <button class="accordion-toggle">Open all</button>
-                @foreach (var specification in Model.Specifications)
+                @if (Model.Specifications != null)
                 {
-                    <div class="panel">
-                        <div class="panel-heading" tabindex="0">
-                            <h2 class="panel-title stream-title">
-                                @specification.Name
-                            </h2>
-                            <p>@specification.Description</p>
-                         </div>
-                        <div class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="panel">
-                                    <ul class="list-group">
-                                        @foreach (var policy in specification.Policies)
-                                        {
-                                            <li class="list-group-item">
-                                                <div class="row">
-                                                    <div class="col-xs-12">
-                                                        <div cass="inner-header ">
-                                                            <h2 class="heading-medium list-title summary">
-                                                                @policy.Name
-                                                            </h2>
-                                                            <p>@policy.Description</p>
-
-                                                            <div class="details collapse panel">
-                                                                @foreach (var subPolicy in policy.SubPolicies ?? new List<PolicySpecification>())
-                                                                {
-                                                                    <h3 class="heading-small">
-                                                                        @subPolicy.Name
-                                                                    </h3>
-                                                                    <p>@subPolicy.Description</p>
-                                                                    <table class="table  table-condensed">
-                                                                        @foreach (var calculationSpecification in subPolicy.Calculations)
-                                                                        {
-                                                                            <tr>
-                                                                                <th scope="row">@calculationSpecification.Name</th>
-                                                                                <td>@calculationSpecification.Description</td>   
-                                                                            </tr>
-
-                                                                        }
-                                                                    </table>
-                                                                    <p>                
-                                                                        <a href="/specs/product" class="button">Add calculation</a>
-                                                                        <a href="/specs/policy" class="button">Add sub policy</a>
-                                                                    </p>
-
-                                                                }
-                                                              
-                                                                
-
-                                                            </div>
-                                                            @*end of panel.panel-border-narrow*@
-                                                        </div>
-                                                    </div>
-                                                    @*end of col-xs-12*@
-                                                </div>
-                                                @*end of row*@
-                                            </li>
-                                        }
-
-                                    </ul>
-
-                                    <p>               
-                                        <a href="/specs/policy" class="button">Add funding policy</a>
-                                    </p>
-                                </div>
-                                @*end of panel inside panel-body*@
+                    foreach (var specification in Model.Specifications)
+                    {
+                        <div class="panel">
+                            <div class="panel-heading" tabindex="0">
+                                <h2 class="panel-title stream-title">
+                                    @specification.Name
+                                </h2>
+                                <p>@specification.Description</p>
                             </div>
-                            @*end of panel-body*@
+                            <div class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="panel">
+                                        <ul class="list-group">
+                                            @foreach (var policy in specification.Policies)
+                                            {
+                                                <li class="list-group-item">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <div cass="inner-header ">
+                                                                <h2 class="heading-medium list-title summary">
+                                                                    @policy.Name
+                                                                </h2>
+                                                                <p>@policy.Description</p>
+
+                                                                <div class="details collapse panel">
+                                                                    @foreach (var subPolicy in policy.SubPolicies ?? new List<PolicySpecification>())
+                                                                    {
+                                                                        <h3 class="heading-small">
+                                                                            @subPolicy.Name
+                                                                        </h3>
+                                                                        <p>@subPolicy.Description</p>
+                                                                        <table class="table  table-condensed">
+                                                                            @foreach (var calculationSpecification in subPolicy.Calculations)
+                                                                            {
+                                                                                <tr>
+                                                                                    <th scope="row">@calculationSpecification.Name</th>
+                                                                                    <td>@calculationSpecification.Description</td>
+                                                                                </tr>
+
+                                                                            }
+                                                                        </table>
+                                                                        <p>
+                                                                            <a href="/specs/product" class="button">Add calculation</a>
+                                                                            <a href="/specs/policy" class="button">Add sub policy</a>
+                                                                        </p>
+
+                                                                    }
+
+
+
+                                                                </div>
+                                                                @*end of panel.panel-border-narrow*@
+                                                            </div>
+                                                        </div>
+                                                        @*end of col-xs-12*@
+                                                    </div>
+                                                    @*end of row*@
+                                                </li>
+                                            }
+
+                                        </ul>
+
+                                        <p>
+                                            <a href="/specs/policy" class="button">Add funding policy</a>
+                                        </p>
+                                    </div>
+                                    @*end of panel inside panel-body*@
+                                </div>
+                                @*end of panel-body*@
+                            </div>
+                            @*end of panel-collapse*@
                         </div>
-                        @*end of panel-collapse*@
-                    </div>
-                    @*end of panel*@
+                        @*end of panel*@
+                    }
                 }
+                else
+                {
+                    <div>No specifications found</div>
+
+                }
+
                 @*end of foreach*@
             </div>
         </div>

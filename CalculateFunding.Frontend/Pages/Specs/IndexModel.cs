@@ -20,8 +20,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
         public async Task<IActionResult> OnGetAsync()
         {
             var results = await _specsClient.GetSpecifications();
-
             Specifications = results.Content;
+
             return Page();
         }
     }

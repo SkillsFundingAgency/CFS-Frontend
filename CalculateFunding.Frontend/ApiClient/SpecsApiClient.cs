@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
@@ -24,23 +25,33 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<List<Specification>>($"{_specsPath}/specifications");
         }
 
-        public Task<ApiResponse<Specification>> GetBudget(string id)
+        public Task<ApiResponse<Specification>> GetBudget(string budgetId)
         {
-            return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={id}");
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+
+            return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={budgetId}");
         }
 
         public Task<HttpStatusCode> PostBudget(Specification budget)
         {
+            Guard.ArgumentNotNull(budget, nameof(budget));
+
             return PostAsync($"{_specsPath}/budgets", budget);
         }
 
         public Task<HttpStatusCode> PostProduct(string budgetId, Product product)
         {
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.ArgumentNotNull(product, nameof(product));
+
             return PostAsync($"{_specsPath}/products?budgetId={budgetId}", product);
         }
 
         public Task<ApiResponse<Product>> GetProduct(string budgetId, string productId)
         {
+            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(productId, nameof(productId));
+
             return GetAsync<Product>($"{_specsPath}/products?budgetId={budgetId}&productId={productId}");
         }
 
