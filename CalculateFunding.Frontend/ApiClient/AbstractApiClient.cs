@@ -17,6 +17,7 @@ namespace CalculateFunding.Frontend.ApiClient
     public abstract class AbstractApiClient
     {
         const string sfaCorellationId = "sfa-correlationId";
+        const string ocpApimSubscriptionKey = "Ocp-Apim-Subscription-Key";
 
         readonly IHttpClient _httpClient;
         readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
@@ -31,7 +32,7 @@ namespace CalculateFunding.Frontend.ApiClient
             _logs = logs;
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
-            _httpClient.DefaultRequestHeaders?.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
+            _httpClient.DefaultRequestHeaders?.Add(ocpApimSubscriptionKey, options.Value.ApiKey);
             _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _logs.CorrelationId);
             _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); 
         }

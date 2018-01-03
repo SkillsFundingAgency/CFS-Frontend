@@ -25,34 +25,34 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<List<Specification>>($"{_specsPath}/specifications");
         }
 
-        public Task<ApiResponse<Specification>> GetBudget(string budgetId)
+        public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
         {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={budgetId}");
+            return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={specificationId}");
         }
 
-        public Task<HttpStatusCode> PostBudget(Specification budget)
+        public Task<HttpStatusCode> PostSpecification(Specification specification)
         {
-            Guard.ArgumentNotNull(budget, nameof(budget));
+            Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/budgets", budget);
+            return PostAsync($"{_specsPath}/budgets", specification);
         }
 
-        public Task<HttpStatusCode> PostProduct(string budgetId, Product product)
+        public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
         {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(product, nameof(product));
 
-            return PostAsync($"{_specsPath}/products?budgetId={budgetId}", product);
+            return PostAsync($"{_specsPath}/products?budgetId={specificationId}", product);
         }
 
-        public Task<ApiResponse<Product>> GetProduct(string budgetId, string productId)
+        public Task<ApiResponse<Product>> GetProduct(string specificationId, string productId)
         {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(productId, nameof(productId));
 
-            return GetAsync<Product>($"{_specsPath}/products?budgetId={budgetId}&productId={productId}");
+            return GetAsync<Product>($"{_specsPath}/products?budgetId={specificationId}&productId={productId}");
         }
 
         public Task<ApiResponse<Specification[]>> GetBudgets()

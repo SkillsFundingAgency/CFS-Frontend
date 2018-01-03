@@ -17,7 +17,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         }
         public async Task OnGet(string id, string productId)
         {
-            Budget = (await _specsClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
             var response = await _calculationsClient.PostPreview(new PreviewRequest
@@ -32,7 +32,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public async Task OnPost(string id, string calculation)
         {
-            Budget = (await _specsClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
             var response = await _calculationsClient.PostPreview(new PreviewRequest
