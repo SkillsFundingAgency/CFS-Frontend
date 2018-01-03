@@ -11,7 +11,7 @@ using System.Text;
 namespace CalculateFunding.FrontEnd.ApiClients
 {
     [TestClass]
-    public class BudgetApiClientTests
+    public class SpecsApiClientTests
     {
 
         static IOptionsSnapshot<ApiOptions> CreateOptions()
@@ -37,9 +37,9 @@ namespace CalculateFunding.FrontEnd.ApiClients
             return Substitute.For<ILoggingService>();
         }
 
-        static BudgetApiClient CreateBudgetApiClient(IOptionsSnapshot<ApiOptions> options = null, IHttpClient httpClient = null, ILoggingService logs = null)
+        static SpecsApiClient CreateBudgetApiClient(IOptionsSnapshot<ApiOptions> options = null, IHttpClient httpClient = null, ILoggingService logs = null)
         {
-            return new BudgetApiClient(options ?? CreateOptions(), httpClient ?? CreateHttpClient(), logs ?? CreateLoggingService());
+            return new SpecsApiClient(options ?? CreateOptions(), httpClient ?? CreateHttpClient(), logs ?? CreateLoggingService());
         }
     }
 }
