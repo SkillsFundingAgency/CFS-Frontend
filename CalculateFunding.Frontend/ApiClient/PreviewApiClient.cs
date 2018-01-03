@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.ApiClient.Models.Results;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Microsoft.Extensions.Options;

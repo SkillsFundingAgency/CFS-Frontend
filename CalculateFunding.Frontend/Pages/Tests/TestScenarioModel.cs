@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -13,13 +12,11 @@ namespace CalculateFunding.Frontend.Pages.Tests
 {
     public class TestScenarioModel : PageModel
     {
-        private readonly IBudgetApiClient _budgetClient;
         private readonly ISpecsApiClient _specsClient;
         private readonly ICalculationsApiClient _resultsClient;
 
-        public TestScenarioModel(IBudgetApiClient budgetClient, ISpecsApiClient specsClient, ICalculationsApiClient calculationsClient)
+        public TestScenarioModel(ISpecsApiClient specsClient, ICalculationsApiClient calculationsClient)
         {
-            _budgetClient = budgetClient;
             _specsClient = specsClient;
             _resultsClient = calculationsClient;
 
@@ -35,7 +32,7 @@ namespace CalculateFunding.Frontend.Pages.Tests
 
         public async Task OnGet(string budgetId, string productId)
         {
-            Budget = (await _budgetClient.GetBudget(budgetId))?.Content;
+            Budget = (await _specsClient.GetBudget(budgetId))?.Content;
             Product = (await _specsClient.GetProduct(budgetId, productId))?.Content;
 
 
@@ -73,7 +70,7 @@ namespace CalculateFunding.Frontend.Pages.Tests
 
         public async Task OnPost(string budgetId, string productId)
         {
-            Budget = (await _budgetClient.GetBudget(budgetId))?.Content;
+            Budget = (await _specsClient.GetBudget(budgetId))?.Content;
             Product = (await _specsClient.GetProduct(budgetId, productId))?.Content;
 
 

@@ -1,6 +1,6 @@
 ﻿using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.Core.Ioc;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CalculateFunding.Frontend.Modules
@@ -12,13 +12,16 @@ namespace CalculateFunding.Frontend.Modules
             AddSettingAsOptions<ApiOptions>(services);
 
             services
-                .AddScoped<ISpecsApiClient, SpecsApiClient>();
+               .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
 
             services
-                .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
+                    .AddScoped<IPreviewApiClient, PreviewApiClient>();
 
             services
                 .AddScoped<IResultsApiClient, ResultsApiClient>();
+
+            services
+               .AddScoped<ISpecsApiClient, SpecsApiClient>();
         }
     }
 }

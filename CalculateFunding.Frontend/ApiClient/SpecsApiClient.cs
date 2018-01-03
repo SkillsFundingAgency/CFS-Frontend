@@ -2,12 +2,10 @@
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace CalculateFunding.Frontend.ApiClient
 {

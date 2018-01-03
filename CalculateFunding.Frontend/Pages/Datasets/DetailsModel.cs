@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
