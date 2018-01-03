@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.ApiClient.Models.Results;
 
-namespace CalculateFunding.Frontend.Interfaces.APiClient
+namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     public interface ICalculationsApiClient
     {

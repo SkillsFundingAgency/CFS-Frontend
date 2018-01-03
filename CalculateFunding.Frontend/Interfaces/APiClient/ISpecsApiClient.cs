@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 
-namespace CalculateFunding.Frontend.Interfaces.APiClient
+namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     public interface ISpecsApiClient
     {
