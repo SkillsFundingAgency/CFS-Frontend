@@ -3,6 +3,7 @@ using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +22,8 @@ namespace CalculateFunding.FrontEnd.ApiClients
     [TestClass]
     public class SpecsApiClientTests
     {
+        string CorrelationId = Guid.NewGuid().ToString();
+
         [TestMethod]
         public void GetSpecifications_GivenHttpClientThrowsException_LogsReturnsInternalServerError()
         {
