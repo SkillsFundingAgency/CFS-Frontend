@@ -9,14 +9,16 @@ namespace CalculateFunding.Frontend.Pages.Calcs
     public class ProductModel : PageModel
     {
         private readonly IAllocationsApiClient _apiClient;
+        private readonly IBudgetApiClient _budgetApiClient;
 
-        public ProductModel(IAllocationsApiClient apiClient)
+        public ProductModel(IAllocationsApiClient apiClient, IBudgetApiClient budgetApiClient)
         {
             _apiClient = apiClient;
+            _budgetApiClient = budgetApiClient;
         }
         public async Task OnGet(string id, string productId)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _budgetApiClient.GetBudgetAsync(id))?.Content;
 
 
             var response = await _apiClient.PostPreview(new PreviewRequest
@@ -51,7 +53,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public PreviewResponse Preview { get; set; }
 
-        public ApiClient.Models.Specification Budget { get; set; }
+        public Specification Budget { get; set; }
+
         public Product Product { get; set; }
     }
 }

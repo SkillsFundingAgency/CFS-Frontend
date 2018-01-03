@@ -15,6 +15,9 @@ namespace CalculateFunding.Frontend.Modules
                 .AddScoped<IBudgetApiClient, BudgetApiClient>();
 
             services
+                .AddScoped<IPreviewApiClient, PreviewApiClient>();
+
+            services
                 .AddScoped<IAllocationsApiClient, AllocationsApiClient>();
         }
     }
