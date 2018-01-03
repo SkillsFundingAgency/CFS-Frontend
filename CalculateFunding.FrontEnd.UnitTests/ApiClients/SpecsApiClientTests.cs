@@ -117,11 +117,6 @@ namespace CalculateFunding.FrontEnd.ApiClients
         }
 
 
-
-
-
-
-
         static IOptionsSnapshot<ApiOptions> CreateOptions()
         {
             ApiOptions options = new ApiOptions

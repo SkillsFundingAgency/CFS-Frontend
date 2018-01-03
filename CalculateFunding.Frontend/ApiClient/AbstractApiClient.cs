@@ -15,17 +15,20 @@ namespace CalculateFunding.Frontend.ApiClient
 {
     public abstract class AbstractApiClient
     {
+        const string sfaCorellationId = "sfa-correlationId";
+
         readonly IHttpClient _httpClient;
         readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
         readonly protected ILoggingService _logs;
 
         public AbstractApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs)
         {
+            _logs = logs;
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
             _httpClient.DefaultRequestHeaders?.Add("Ocp-Apim-Subscription-Key", options.Value.ApiKey);
-            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _logs = logs;
+            _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _logs.CorrelationId);
+            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); 
         }
 
         async public Task<ApiResponse<T>> GetAsync<T>(string url, CancellationToken cancellationToken = default(CancellationToken))
