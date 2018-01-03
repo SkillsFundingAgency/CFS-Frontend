@@ -20,7 +20,7 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
         }
         public async Task OnGet(string id, string productId)
         {
-            Budget = (await _specsClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
             //Product = Budget.FundingPolicies
             //    .SelectMany(x => x.AllocationLines.SelectMany(y =>
@@ -41,7 +41,7 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
 
         public async Task OnPost(string id, string calculation)
         {
-            Budget = (await _specsClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
             //Product = Budget.FundingPolicies
             //    .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))

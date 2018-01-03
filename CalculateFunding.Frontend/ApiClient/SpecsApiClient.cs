@@ -24,12 +24,12 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<List<Specification>>($"{_specsPath}/specifications");
         }
 
-        public Task<ApiResponse<Specification>> GetBudget(string id)
+        public Task<ApiResponse<Specification>> GetSpecification(string id)
         {
             return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={id}");
         }
 
-        public Task<HttpStatusCode> PostBudget(Specification budget)
+        public Task<HttpStatusCode> PostSpecification(Specification budget)
         {
             return PostAsync($"{_specsPath}/budgets", budget);
         }
