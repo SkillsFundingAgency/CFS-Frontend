@@ -36,7 +36,12 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications()
         {
-            var specs = new List<Specification> {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
+        {
+            var specs = new [] {
                 new Specification{
                     AcademicYear = new Reference("1617", "2016-2017"),
                     FundingStream = new Reference(),
@@ -66,7 +71,7 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
                 }
             };
 
-            var response = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specs);
+            var response = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specs.Where(m => m.AcademicYear.Id == academicYearId).ToList());
 
             return Task.FromResult(response);
         }

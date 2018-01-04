@@ -30,6 +30,11 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<List<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
+        public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
+        {
+            return GetAsync<List<Specification>>($"{_specsPath}/specifications/{academicYearId}", _cancellationToken);
+        }
+
         public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));

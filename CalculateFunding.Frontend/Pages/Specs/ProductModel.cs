@@ -20,7 +20,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             };
 
-            Product = new ProductSpecification();;
+            Product = new ProductSpecification();
         }
     }
 

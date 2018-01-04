@@ -22,15 +22,21 @@ namespace CalculateFunding.Frontend.Pages.Specs
             _specsClient = specsClient;
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string academicYearId = null)
         {
-            var specstask = _specsClient.GetSpecifications();
-            var yearsTask = _specsClient.GetAcademicYears();
+            var yearsResponse = await _specsClient.GetAcademicYears();
+            var years = yearsResponse.Content;
 
-            await TaskHelper.WhenAllAndThrow(specstask, yearsTask);
+            if (string.IsNullOrWhiteSpace(academicYearId))
+                academicYearId = years.FirstOrDefault().Id;
 
-            Specifications = specstask.Result.Content;
-            Years = yearsTask.Result.Content.Select(m => new SelectListItem
+            var specstask = _specsClient.GetSpecifications(academicYearId);
+
+            //await TaskHelper.WhenAllAndThrow(specstask, yearsTask);
+
+            Specifications = specstask.Result == null ? new List<Specification>() : specstask.Result.Content;
+
+            Years = years.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name
