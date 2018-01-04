@@ -75,9 +75,9 @@ namespace CalculateFunding.Frontend.ApiClient
             //To change and get from 
             var years = new[]
             {
-                new Reference("1617", "2016-2017"),
-                new Reference("1718", "2017-2018"),
-                new Reference("1819", "2018-2019")
+                new Reference("1819", "2018/19"),
+                new Reference("1718", "2017/18"),
+                new Reference("1617", "2016/17")
             };
 
             var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);

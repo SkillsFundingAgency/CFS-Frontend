@@ -201,6 +201,10 @@ $("#select-spec-year").change(function () {
     var selectedSpecYear = $(this).val();
 
 });
+$("#btn-select-year").hide();
+$("#select-spec-year").change(function () {
+    $("#btn-select-year").click();
+});
 //function initSortable() {
 //    $('.steps').sortable({
 //        placeholder: "ui-state-highlight",

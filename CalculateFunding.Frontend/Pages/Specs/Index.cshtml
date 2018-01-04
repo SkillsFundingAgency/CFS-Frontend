@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{academicYearId?}"
 @using CalculateFunding.Frontend
 @using CalculateFunding.Frontend.ApiClient.Models
 @using CalculateFunding.Frontend.ApiClient.Models.Results
@@ -8,12 +8,12 @@
 }
 @section BreadCrumb{
 
-            <div class="breadcrumbs">
-                <ol>
-                    <li><a href="/">Calculate Funding</a></li>
-                    <li>Manage Specification</li>
-                </ol>
-            </div>
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li>Manage Specification</li>
+        </ol>
+    </div>
 }
 @section BannerLeft{
     <!-- Breadcrumbs -->
@@ -28,11 +28,11 @@
 
 <div class="row">
     <div class="col-xs-9">
-        <form class="year-form" method="get">
+        <form class="form-inline" method="get" role="form">
             <div class="form-group">
                 <label class="form-label" for="select-box">Select year:</label>
-                <select asp-items="@(Model.Years)" class="form-control" id="select-spec-year" name="select-spec-year"></select>
-                <a href="/specs" class="button">Go</a>
+                <select asp-items="@(Model.Years)" class="form-control" id="select-spec-year" name="academicYearId"></select>
+                <input id="btn-select-year" type="submit" class="button button-in-line" value="Go" />
             </div>
         </form>
         <hr />
@@ -46,7 +46,7 @@
 
 @*end of row*@
 <div class="row">
-    <div class="col-xs-12 col-md-12">
+    <div class="col-xs-9 col-md-9">
         <p>
             <a href="/specs/specification" class="button">Create Specification</a>
         </p>

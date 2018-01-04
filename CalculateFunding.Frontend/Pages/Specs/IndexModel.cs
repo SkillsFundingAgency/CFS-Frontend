@@ -39,7 +39,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
             Years = years.Select(m => new SelectListItem
             {
                 Value = m.Id,
-                Text = m.Name
+                Text = m.Name,
+                Selected = (m.Id == academicYearId)
             }).ToList();
 
             return Page();

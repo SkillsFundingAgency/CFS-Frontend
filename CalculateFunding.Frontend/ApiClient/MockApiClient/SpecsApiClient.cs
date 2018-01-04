@@ -14,9 +14,9 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
         {
             var years = new[]
             {
-                new Reference("1617", "2016-2017"),
-                new Reference("1718", "2017-2018"),
-                new Reference("1819", "2018-2019")
+                new Reference("1819", "2018/19"),
+                new Reference("1718", "2017/18"),
+                new Reference("1617", "2016/17")
             };
 
             var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
@@ -41,23 +41,29 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
-            var specs = new [] {
+            var specs = new[] {
                 new Specification{
+                    Name = "Test Spec 1",
+                    Id = Guid.NewGuid().ToString(),
                     AcademicYear = new Reference("1617", "2016-2017"),
                     FundingStream = new Reference(),
-                    Description = "test",
+                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                     Policies = new List<PolicySpecification>()
                 },
                 new Specification{
+                    Name = "Test Spec 2",
+                    Id = Guid.NewGuid().ToString(),
                     AcademicYear = new Reference("1718", "2017-2018"),
                     FundingStream = new Reference(),
-                    Description = "test",
+                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                     Policies = new List<PolicySpecification>()
                 },
                 new Specification{
+                    Name = "Test Spec 3",
+                    Id = Guid.NewGuid().ToString(),
                     AcademicYear = new Reference("1819", "2018-2019"),
                     FundingStream = new Reference(),
-                    Description = "test",
+                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                     Policies = new List<PolicySpecification>{
                         new PolicySpecification
                         {
