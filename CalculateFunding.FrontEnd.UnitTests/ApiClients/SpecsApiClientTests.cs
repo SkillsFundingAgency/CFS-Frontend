@@ -151,9 +151,16 @@ namespace CalculateFunding.FrontEnd.ApiClients
             return Substitute.For<ILoggingService>();
         }
 
-        static SpecsApiClient CreateSpecsApiClient(IOptionsSnapshot<ApiOptions> options = null, IHttpClient httpClient = null, ILoggingService logs = null)
+        static IHttpContextAccessor CreateContextAccessor()
         {
-            return new SpecsApiClient(options ?? CreateOptions(), httpClient ?? CreateHttpClient(), logs ?? CreateLoggingService());
+            return Substitute.For<IHttpContextAccessor>();
+        }
+
+        static SpecsApiClient CreateSpecsApiClient(IOptionsSnapshot<ApiOptions> options = null, 
+            IHttpClient httpClient = null, ILoggingService logs = null, IHttpContextAccessor contextAccessor = null)
+        {
+            return new SpecsApiClient(options ?? CreateOptions(), 
+                httpClient ?? CreateHttpClient(), logs ?? CreateLoggingService(), contextAccessor ?? CreateContextAccessor());
         }
     }
 }

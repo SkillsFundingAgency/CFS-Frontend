@@ -4,40 +4,51 @@
 @using CalculateFunding.Frontend.ApiClient.Models.Results
 @model CalculateFunding.Frontend.Pages.Specs.IndexModel
 @{
-    ViewData["Title"] = "Create a specification";
+    ViewData["Title"] = "Manage specification";
 }
-<!-- Breadcrumbs -->
+@section BreadCrumb{
+
+            <div class="breadcrumbs">
+                <ol>
+                    <li><a href="/">Calculate Funding</a></li>
+                    <li>Manage Specification</li>
+                </ol>
+            </div>
+}
+@section BannerLeft{
+    <!-- Breadcrumbs -->
+    <h1 class="heading-large">Manage specification</h1>
+    <p>Use this service to:</p>
+    <ul class="banner-container-list">
+        <li>Explore funding streams, policy areas and allocation lines</li>
+        <li>Create product specification</li>
+        <li>Create policy</li>
+    </ul>
+}
+
 <div class="row">
-    <div class="col-xs-12">
-        <div class="breadcrumbs">
-            <ol>
-                <li><a href="/">Home</a></li>
-            </ol>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-8">
-        <h1 class="heading-xlarge">Specifications</h1>
-        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc feugiat orci et felis cursus tincidunt. Aenean cursus lobortis iaculis. Donec sed sollicitudin lorem, eget sodales orci. Nunc quis maximus mi. Mauris nec mauris laoreet augue luctus vestibulum. Morbi rhoncus tempus libero in lobortis. Integer a erat nec ante venenatis euismod sit amet sit amet lorem.</p>
+    <div class="col-xs-9">
         <form class="year-form" method="get">
             <div class="form-group">
                 <label class="form-label" for="select-box">Select year:</label>
-                <select class="form-control" id="select-box" name="select-box">
-                    <option>2017/2018</option>
-                    <option>2016/2017</option>
-                    <option>2015/2016</option>
-                </select>
+                <select asp-items="@(Model.Years)" class="form-control" id="select-spec-year" name="select-spec-year"></select>
+                <a href="/specs" class="button">Go</a>
             </div>
         </form>
+        <hr />
+
+        <p>Create specification or select one from the list below</p>
+
+
     </div>
-    @*end of col-xs-8*@
+    @*end of col-xs-9*@
 </div>
+
 @*end of row*@
 <div class="row">
     <div class="col-xs-12 col-md-12">
         <p>
-            <a href="/specs/specification" class="button">Add specification</a>
+            <a href="/specs/specification" class="button">Create Specification</a>
         </p>
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
             <div class="funding-streams">

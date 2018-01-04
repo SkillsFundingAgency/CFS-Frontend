@@ -197,6 +197,10 @@ $(document).on('click', '.reset-btn', function () {
         }, 2000)
     }
 });
+$("#select-spec-year").change(function () {
+    var selectedSpecYear = $(this).val();
+
+});
 //function initSortable() {
 //    $('.steps').sortable({
 //        placeholder: "ui-state-highlight",

@@ -631,6 +631,7 @@ table {
     background-color: $govuk-blue;
     color: $page-colour;
     padding-bottom: 60px;
+    margin-bottom: 50px;
 
     a,
     a:visited,
@@ -639,8 +640,20 @@ table {
         text-decoration: underline;
     }
 
-    .banner-container-right{
+    .banner-container-right {
         padding-top: 50px;
+    }
+
+    .heading-large {
+        margin-top: 0;
+    }
+
+    .banner-container-list {
+        padding-left: 15px;
+
+        li {
+            list-style: disc;
+        }
     }
 }
 
@@ -649,4 +662,10 @@ table {
 }
 .homepage-section-title{
     padding: 30px 0 15px 0;
+}
+.form-control {
+    border-radius:0;
+}
+.button{
+    box-shadow:none;
 }

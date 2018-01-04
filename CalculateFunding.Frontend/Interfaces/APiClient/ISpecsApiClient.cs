@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
@@ -13,5 +14,6 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<ApiResponse<List<Specification>>> GetSpecifications();
         Task<HttpStatusCode> PostSpecification(Specification specification);
         Task<HttpStatusCode> PostProduct(string specificationId, Product product);
+        Task<ApiResponse<string[]>> GetSpecYears();
     }
 }
