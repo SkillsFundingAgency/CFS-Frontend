@@ -3,27 +3,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CalculateFunding.Frontend.Pages.Results.Products
 {
     public class DetailsModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly ISpecsApiClient _specsClient;
+        private readonly ICalculationsApiClient _calculationsClient;
 
-        public DetailsModel(AllocationsApiClient apiClient)
+        public DetailsModel(ISpecsApiClient apiClient, ICalculationsApiClient calculationsClient)
         {
-            _apiClient = apiClient;
+            _specsClient = apiClient;
+            _calculationsClient = calculationsClient;
         }
         public async Task OnGet(string id, string productId)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
             //Product = Budget.FundingPolicies
             //    .SelectMany(x => x.AllocationLines.SelectMany(y =>
             //        y.ProductFolders.SelectMany(z => z.Products).Where(p => p.Id == productId))).FirstOrDefault();
 
-            var response = await _apiClient.PostPreview(new PreviewRequest
+            var response = await _calculationsClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
@@ -38,14 +41,14 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
 
         public async Task OnPost(string id, string calculation)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
             //Product = Budget.FundingPolicies
             //    .SelectMany(x => x.AllocationLines.SelectMany(y => y.ProductFolders.SelectMany(z => z.Products)))
             //    .Skip(1).FirstOrDefault();
 
 
-            var response = await _apiClient.PostPreview(new PreviewRequest
+            var response = await _calculationsClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,

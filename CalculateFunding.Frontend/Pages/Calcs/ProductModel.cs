@@ -1,24 +1,26 @@
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class ProductModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly ICalculationsApiClient _calculationsClient;
+        private readonly ISpecsApiClient _specsClient;
 
-        public ProductModel(AllocationsApiClient apiClient)
+        public ProductModel(ICalculationsApiClient calculationsClient, ISpecsApiClient specsClient)
         {
-            _apiClient = apiClient;
+            _calculationsClient = calculationsClient;
+            _specsClient = specsClient;
         }
         public async Task OnGet(string id, string productId)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
-            var response = await _apiClient.PostPreview(new PreviewRequest
+            var response = await _calculationsClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
@@ -30,10 +32,10 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public async Task OnPost(string id, string calculation)
         {
-            Budget = (await _apiClient.GetBudget(id))?.Content;
+            Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
-            var response = await _apiClient.PostPreview(new PreviewRequest
+            var response = await _calculationsClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
@@ -50,7 +52,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public PreviewResponse Preview { get; set; }
 
-        public ApiClient.Models.Specification Budget { get; set; }
+        public Specification Budget { get; set; }
+
         public Product Product { get; set; }
     }
 }

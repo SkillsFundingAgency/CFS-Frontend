@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,11 +12,13 @@ namespace CalculateFunding.Frontend.Pages.Tests
 {
     public class TestScenarioModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly ISpecsApiClient _specsClient;
+        private readonly ICalculationsApiClient _resultsClient;
 
-        public TestScenarioModel(AllocationsApiClient apiClient)
+        public TestScenarioModel(ISpecsApiClient specsClient, ICalculationsApiClient calculationsClient)
         {
-            _apiClient = apiClient;
+            _specsClient = specsClient;
+            _resultsClient = calculationsClient;
 
             Operators = Enum.GetValues(typeof(ComparisonOperator)).Cast<ComparisonOperator>().ToList();
         } 
@@ -30,8 +32,8 @@ namespace CalculateFunding.Frontend.Pages.Tests
 
         public async Task OnGet(string budgetId, string productId)
         {
-            Budget = (await _apiClient.GetBudget(budgetId))?.Content;
-            Product = (await _apiClient.GetProduct(budgetId, productId))?.Content;
+            Budget = (await _specsClient.GetSpecification(budgetId))?.Content;
+            Product = (await _specsClient.GetProduct(budgetId, productId))?.Content;
 
 
             TestScenario = new ProductTestScenario
@@ -68,8 +70,8 @@ namespace CalculateFunding.Frontend.Pages.Tests
 
         public async Task OnPost(string budgetId, string productId)
         {
-            Budget = (await _apiClient.GetBudget(budgetId))?.Content;
-            Product = (await _apiClient.GetProduct(budgetId, productId))?.Content;
+            Budget = (await _specsClient.GetSpecification(budgetId))?.Content;
+            Product = (await _specsClient.GetProduct(budgetId, productId))?.Content;
 
 
             var i = 0;
@@ -139,7 +141,7 @@ namespace CalculateFunding.Frontend.Pages.Tests
                     Product.TestScenarios.Add(TestScenario);
                 }
 
-                var response = await _apiClient.PostPreview(new PreviewRequest
+                var response = await _resultsClient.PostPreview(new PreviewRequest
                 {
                     BudgetId = Budget.Id,
                     ProductId = Product.Id,

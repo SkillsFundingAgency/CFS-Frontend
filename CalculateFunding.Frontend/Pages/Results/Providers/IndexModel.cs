@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,17 +10,17 @@ namespace CalculateFunding.Frontend.Pages.Results.Providers
 {
     public class IndexModel : PageModel
     {
-        private readonly AllocationsApiClient _apiClient;
+        private readonly IResultsApiClient _resultsClient;
         public IList<ProviderTestResult> Providers { get; set; }
 
-        public IndexModel(AllocationsApiClient apiClient)
+        public IndexModel(IResultsApiClient resultsClient)
         {
-            _apiClient = apiClient;
+            _resultsClient = resultsClient;
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            var results = await _apiClient.GetProviderResults(id);
+            var results = await _resultsClient.GetProviderResults(id);
 
             Providers = results?.Content?.Where(x => x.ScenarioResults.Any(sr => sr.TestResult == TestResult.Failed)).ToList();
 
