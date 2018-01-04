@@ -28,8 +28,4 @@
     <ProjectReference Include="..\CalculateFunding.Frontend\CalculateFunding.Frontend.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="PageModels\" />
-  </ItemGroup>
-
 </Project>

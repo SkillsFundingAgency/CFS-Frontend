@@ -65,12 +65,17 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<Specification[]>($"{_specsPath}/budgets");
         }
 
-        public Task<ApiResponse<string[]>> GetSpecYears()
+        public Task<ApiResponse<Reference[]>> GetAcademicYears()
         {
             //To change and get from 
-            var years = new[] { "2018/2019", "2017/2018", "2016/2017" };
+            var years = new[]
+            {
+                new Reference("1617", "2016-2017"),
+                new Reference("1718", "2017-2018"),
+                new Reference("1819", "2018-2019")
+            };
 
-            var response = new ApiResponse<string[]>(HttpStatusCode.OK, years);
+            var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
 
             return Task.FromResult(response);
         }

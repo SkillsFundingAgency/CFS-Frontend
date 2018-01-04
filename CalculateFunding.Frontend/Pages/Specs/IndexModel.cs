@@ -25,15 +25,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
         public async Task<IActionResult> OnGetAsync()
         {
             var specstask = _specsClient.GetSpecifications();
-            var yearsTask = _specsClient.GetSpecYears();
+            var yearsTask = _specsClient.GetAcademicYears();
 
             await TaskHelper.WhenAllAndThrow(specstask, yearsTask);
 
             Specifications = specstask.Result.Content;
             Years = yearsTask.Result.Content.Select(m => new SelectListItem
             {
-                Value = m,
-                Text = m
+                Value = m.Id,
+                Text = m.Name
             }).ToList();
 
             return Page();
