@@ -1,0 +1,21 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Results.ViewModel
+@{
+    ViewData["Title"] = "View the Results";
+    Layout = "~/Pages/_Layout.cshtml";
+
+    // The implementation of this page should be in index, but created to satisfy story #35383 for landing page
+}
+
+@section BannerLeft{
+    <h1 class="heading-large">View the Results</h1>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li>View the Results</li>
+        </ol>
+    </div>
+}
