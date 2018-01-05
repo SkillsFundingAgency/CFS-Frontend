@@ -1,5 +1,6 @@
 ﻿@page "{academicYearId}"
 @model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 
 @{
     ViewData["Title"] = "Create specification";
@@ -24,22 +25,39 @@
 <div class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CreateSpecificationViewModel.Name">Name of the specification</label>
-                <input asp-for="AcademicYear.Id" type="hidden" />
-                <input asp-for="AcademicYear.Name" type="hidden" />
-                <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
+            <div asp-validation-summary="All">
+                @if (!Model.ModelState.IsValid)
+                {
+                    <span class="heading-medium">There is a problem</span>
+                    <p><strong>Check that you have answered the questions correctly</strong></p>
+                }
             </div>
-            <div class="form-group">
-                <label asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
-                <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control"></select>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label asp-for="CreateSpecificationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the specification</label>
+                        <input asp-for="AcademicYear.Id" type="hidden" />
+                        <input asp-for="AcademicYear.Name" type="hidden" />
+                        <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="CreateSpecificationViewModel.Description">Description</label>
-                <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control"></select>
+                    </div>
+                </div>
             </div>
-
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.Description">Description</label>
+                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+             </div>
             <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId">Cancel</a></p>
 
         </form>

@@ -40,6 +40,9 @@ a:visited {
     text-decoration: underline;
     color: $govuk-blue;
 }
+b, strong {
+    font-weight: 600;
+}
 
 ///////////////////////////////////////
 //             Start Page           //
@@ -721,20 +724,54 @@ table {
 .form-submit-container{
     display:flex;
     align-items:flex-end;
-
+    margin-top:30px;
     a{
         margin-left:15px;
     }
 }
 
-@media (min-width: 641px){
-    .form-control 
-    {
-       width: 100%;
+@media (min-width: 641px) {
+    .form-control {
+        width: 100%;
     }
-}
 
-.description-text {
-    color: $grey-2
-}
+    .form-group {
+        margin-bottom: 0px;
+        padding-bottom: 15px;
+    }
 
+    .description-text {
+        color: $grey-2
+    }
+
+    .validation-failed-block {
+        border-left: 5px solid $error-colour;
+        padding-left: 10px;
+    }
+
+    .validation-failed-label {
+        color: $error-colour;
+    }
+
+    /*.validation-passed-block {
+        border-left: 5px solid $page-colour;
+        padding-left: 10px;
+    }*/
+
+    .validation-summary-errors {
+        border: 1px $error-colour solid;
+        padding: 10px;
+        margin-bottom: 15px;
+
+        ul {
+            color: $error-colour;
+            font-size: smaller;
+        }
+
+        p {
+            font-size: small;
+            font-weight: 300;
+        }
+    }
+
+}
