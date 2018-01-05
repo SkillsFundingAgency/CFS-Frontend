@@ -9,7 +9,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public PolicySpecification Policy { get; set; }
     
-        public void OnGet()
+        public void OnGet(string specificationId)
         {
             Policy = new PolicySpecification();
         }

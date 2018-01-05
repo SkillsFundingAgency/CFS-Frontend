@@ -197,10 +197,7 @@ $(document).on('click', '.reset-btn', function () {
         }, 2000)
     }
 });
-$("#select-spec-year").change(function () {
-    var selectedSpecYear = $(this).val();
 
-});
 $("#btn-select-year").hide();
 $("#select-spec-year").change(function () {
     $("#btn-select-year").click();

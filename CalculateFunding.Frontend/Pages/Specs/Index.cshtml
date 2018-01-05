@@ -31,7 +31,7 @@
         <form class="form-inline" method="get" role="form">
             <div class="form-group">
                 <label class="form-label" for="select-box">Select year:</label>
-                <select asp-items="@(Model.Years)" class="form-control" id="select-spec-year" name="academicYearId"></select>
+                <select asp-items="@(Model.Years)" class="form-control spec-mgr-control" id="select-spec-year" name="academicYearId"></select>
                 <input id="btn-select-year" type="submit" class="button button-in-line" value="Go" />
             </div>
         </form>
@@ -48,84 +48,24 @@
 <div class="row">
     <div class="col-xs-9 col-md-9">
         <p>
-            <a href="/specs/specification" class="button">Create Specification</a>
+            <a href="/specs/specification" class="button spec-mgr-control">Create Specification</a>
         </p>
+        <hr/>
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
             <div class="funding-streams">
 
-                <button class="accordion-toggle">Open all</button>
-                @if (Model.Specifications != null)
+                @if (!Model.Specifications.IsNullOrEmpty())
                 {
                     foreach (var specification in Model.Specifications)
                     {
                         <div class="panel">
                             <div class="panel-heading" tabindex="0">
                                 <h2 class="panel-title stream-title">
-                                    @specification.Name
+                                    <a href="/specs/policy/@specification.Id"> @specification.Name</a>
                                 </h2>
                                 <p>@specification.Description</p>
                             </div>
-                            <div class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <div class="panel">
-                                        <ul class="list-group">
-                                            @foreach (var policy in specification.Policies)
-                                            {
-                                                <li class="list-group-item">
-                                                    <div class="row">
-                                                        <div class="col-xs-12">
-                                                            <div cass="inner-header ">
-                                                                <h2 class="heading-medium list-title summary">
-                                                                    @policy.Name
-                                                                </h2>
-                                                                <p>@policy.Description</p>
 
-                                                                <div class="details collapse panel">
-                                                                    @foreach (var subPolicy in policy.SubPolicies ?? new List<PolicySpecification>())
-                                                                    {
-                                                                        <h3 class="heading-small">
-                                                                            @subPolicy.Name
-                                                                        </h3>
-                                                                        <p>@subPolicy.Description</p>
-                                                                        <table class="table  table-condensed">
-                                                                            @foreach (var calculationSpecification in subPolicy.Calculations)
-                                                                            {
-                                                                                <tr>
-                                                                                    <th scope="row">@calculationSpecification.Name</th>
-                                                                                    <td>@calculationSpecification.Description</td>
-                                                                                </tr>
-
-                                                                            }
-                                                                        </table>
-                                                                        <p>
-                                                                            <a href="/specs/product" class="button">Add calculation</a>
-                                                                            <a href="/specs/policy" class="button">Add sub policy</a>
-                                                                        </p>
-
-                                                                    }
-
-
-
-                                                                </div>
-                                                                @*end of panel.panel-border-narrow*@
-                                                            </div>
-                                                        </div>
-                                                        @*end of col-xs-12*@
-                                                    </div>
-                                                    @*end of row*@
-                                                </li>
-                                            }
-
-                                        </ul>
-
-                                        <p>
-                                            <a href="/specs/policy" class="button">Add funding policy</a>
-                                        </p>
-                                    </div>
-                                    @*end of panel inside panel-body*@
-                                </div>
-                                @*end of panel-body*@
-                            </div>
                             @*end of panel-collapse*@
                         </div>
                         @*end of panel*@
@@ -133,7 +73,9 @@
                 }
                 else
                 {
-                    <div>No specifications found</div>
+                    <p>
+                        <a href="/specs/specification">No specification exists, create a specfication</a>
+                    </p>
 
                 }
 
