@@ -15,13 +15,13 @@ namespace CalculateFunding.Frontend.Modules
                .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
 
             services
-                    .AddScoped<IPreviewApiClient, PreviewApiClient>();
+               .AddScoped<IPreviewApiClient, PreviewApiClient>();
 
             services
                 .AddScoped<IResultsApiClient, ResultsApiClient>();
 
             services
-               .AddScoped<ISpecsApiClient, SpecsApiClient>();
+               .AddScoped<ISpecsApiClient, ApiClient.MockApiClient.SpecsApiClient>();
         }
     }
 }

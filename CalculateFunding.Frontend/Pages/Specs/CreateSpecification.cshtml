@@ -1,0 +1,82 @@
+﻿@page "{academicYearId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+
+@{
+    ViewData["Title"] = "Create specification";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <h1 class="heading-large">Create Specification for @Model.AcademicYear.Name</h1>
+    <p class="description-text">This specification describes how a funding stream will be used for an academic year.</p>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYearId">Specifications</a></li>
+            <li>Create Specification</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div asp-validation-summary="All">
+                @if (!Model.ModelState.IsValid)
+                {
+                    <span class="heading-medium">There is a problem</span>
+                    <p><strong>Check that you have answered the questions correctly</strong></p>
+                }
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label asp-for="CreateSpecificationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the specification</label>
+                        <input asp-for="AcademicYear.Id" type="hidden" />
+                        <input asp-for="AcademicYear.Name" type="hidden" />
+                        <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.Description">Description</label>
+                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+             </div>
+            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId">Cancel</a></p>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts
+    {
+    @*<script type="text/javascript">
+        $(function () {
+            $('.summernote').summernote({
+                height: 200
+            });
+
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+                alert($('.summernote').summernote('code'));
+                alert($('.summernote').val());
+            });
+        });
+    </script>*@
+}

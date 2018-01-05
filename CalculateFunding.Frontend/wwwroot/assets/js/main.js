@@ -197,6 +197,11 @@ $(document).on('click', '.reset-btn', function () {
         }, 2000)
     }
 });
+
+$("#btn-select-year").hide();
+$("#select-spec-year").change(function () {
+    $("#btn-select-year").click();
+});
 //function initSortable() {
 //    $('.steps').sortable({
 //        placeholder: "ui-state-highlight",
