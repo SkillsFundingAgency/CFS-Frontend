@@ -40,62 +40,105 @@
             </div>
         </div>
     </header>
-    @*<section class="thin-top-banner">
-    </section>*@
-    <section class="banner-container">
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-9">
-                    @RenderSection("BreadCrumb", false)
-                    @RenderSection("BannerLeft", false)
-                </div>
-                <div class="col-xs-3">
-                    <div class="banner-container-right">
-                        <a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.
-                        @*@RenderSection("BannerRight", false)*@
-                    </div>
+    @if (IsSectionDefined("BannerLeft"))
+    {
+        <section class="banner-container">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-9">
+                        @RenderSection("BreadCrumb", false)
 
+                        @RenderSection("BannerLeft", false)
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="banner-container-right">
+                            <a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.
+                            @RenderSection("BannerRight", false)
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else if (IsSectionDefined("FormBannerLeft"))
+    {
+        <section class="form-banner-container">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <div class="form-banner-container-left">
+                            @RenderSection("BreadCrumb", false)
+                            @RenderSection("FormBannerLeft", false)
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="form-banner-container-right">
+                            <a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.
+                            @RenderSection("FormBannerRight", false)
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <main role="main">
+        <div class="container">
+            @*<div class="row">
+                    <div class="col-xs-12">
+                        <div class="phase-banner-alpha">
+                            <p>
+                                <strong class="phase-tag">ALPHA</strong>
+                                <span>This is a new service – your <a href="https://designpatterns.hackpad.com/GOV.UK-elements-feedback-sKrDyQxcfA2">feedback</a> will help us to improve it.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>*@
+            <!-- Breadcrumbs -->
+            @*<div class="row">
+                    <div class="col-xs-12">
+                        <div class="breadcrumbs">
+                            <ol>
+                                <li><a href="index.html">GOV.UK Bootstrap</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>*@
+            @RenderBody()
+
+        </div>
+    </main>
+    <footer class="group js-footer" id="footer" role="contentinfo">
+        <div class="footer-wrapper">
+            <div class="footer-meta">
+                <div class="footer-meta-inner">
+                    <div class="open-government-licence">
+                        <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence</a></p>
+                        <p>All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <a href="http://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/">© Crown copyright</a>
                 </div>
             </div>
         </div>
-    </section>
+    </footer>
 
-        <main role="main">
-            <div class="container">
-             
-                @RenderBody()
+    <script src="/assets/libs/js/jquery.min.js"></script>
+    <script src="/assets/libs/js/bootstrap.js"></script>
+    <script src="/assets/libs/js/ace.js"></script>
+    <script src="/assets/libs/js/keybinding-vim.js"></script>
+    <script src="/assets/libs/js/keybinding-emacs.js"></script>
+    <script src="/assets/libs/js/ext-language_tools.js"></script>
+    <script src="/assets/libs/js/csharp.js"></script>
+    <script src="/assets/libs/js/mode-csharp.js"></script>
+    <script src="/assets/libs/js/mode-gherkin.js"></script>
+    <script src="/assets/libs/js/mode-vbscript.js"></script>
+    <script src="/assets/libs/js/summernote.min.js"></script>
+    <script src="/assets/js/main.js"></script>
 
-            </div>
-        </main>
-        <footer class="group js-footer" id="footer" role="contentinfo">
-            <div class="footer-wrapper">
-                <div class="footer-meta">
-                    <div class="footer-meta-inner">
-                        <div class="open-government-licence">
-                            <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence</a></p>
-                            <p>All content is available under the <a href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' rel='license'>Open Government Licence v3.0</a>, except where otherwise stated</p>
-                        </div>
-                    </div>
-                    <div class="copyright">
-                        <a href="http://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/">© Crown copyright</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-
-        <script src="/assets/libs/js/jquery.min.js"></script>
-        <script src="/assets/libs/js/bootstrap.js"></script>
-        <script src="/assets/libs/js/ace.js"></script>
-        <script src="/assets/libs/js/keybinding-vim.js"></script>
-        <script src="/assets/libs/js/keybinding-emacs.js"></script>
-        <script src="/assets/libs/js/ext-language_tools.js"></script>
-        <script src="/assets/libs/js/csharp.js"></script>
-        <script src="/assets/libs/js/mode-csharp.js"></script>
-        <script src="/assets/libs/js/mode-gherkin.js"></script>
-        <script src="/assets/libs/js/mode-vbscript.js"></script>
-        <script src="/assets/libs/js/summernote.min.js"></script>
-        <script src="/assets/js/main.js"></script>
-
-        @RenderSection("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
