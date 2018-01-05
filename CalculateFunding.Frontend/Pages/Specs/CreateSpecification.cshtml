@@ -1,28 +1,28 @@
-﻿@page
-@model CalculateFunding.Frontend.Pages.Specs.SpecificationModel
+﻿@page "{academicYearId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationModel
+
 @{
     ViewData["Title"] = "Create specification";
+    Layout = "~/Pages/_Layout.cshtml";
 }
-<!-- Breadcrumbs -->
-<div class="row">
-    <div class="col-xs-12">
-        <div class="breadcrumbs">
-            <ol>
-                <li><a href="/">Home</a></li>
-                <li><a href="/specs">Specifications</a></li>
-            </ol>
-        </div>
+
+@section FormBannerLeft{
+    <h1 class="heading-large">Create Specification for @Model.Specification.AcademicYear.Name</h1>
+    <p>This specification describes how a funding stream will be used for an academic year.</p>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYearId">Specifications</a></li>
+            <li>Create Specification</li>
+        </ol>
     </div>
-</div>
+}
 
 <div class="row">
-    <div class="col-md-12">
-        <h1 class="heading-xlarge">Create specification</h1>
-        <p class="text-muted">Lorem ipsum</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
+    <div class="col-sm-9">
         <form method="post" class="form">
 
             <div class="form-group">
@@ -30,15 +30,7 @@
                 <input asp-for="Specification.Id" type="hidden">
                 <input asp-for="Specification.Name" class="form-control" type="text">
             </div>
-            <div class="form-group">
-                <label asp-for="Specification.AcademicYear.Id">Academic year</label>
-                <select asp-for="Specification.AcademicYear.Id" class="form-control" name="">
-                    @foreach (var year in Model.AcademicYears)
-                    {
-                        <option selected="@Model.Specification.AcademicYear?.Id" value="@year.Id">@year.Name</option>
-                    }
-                </select>
-            </div>
+          
             <div class="form-group">
                 <label asp-for="Specification.FundingStream.Id">Funding stream</label>
                 <select asp-for="Specification.FundingStream.Id" class="form-control" name="">
@@ -50,19 +42,19 @@
             </div>
             <div class="form-group">
                 <label asp-for="Specification.Description">Description</label>
-                <textarea asp-for="Specification.Description" class="summernote" id="contents" title="Contents"></textarea>
+                <textarea asp-for="Specification.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
             </div>
 
-            <p><button type="submit" class="button">Save</button></p>
+            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId">Cancel</a></p>
 
         </form>
 
     </div>
 </div>
 @section Scripts
-{
-    <script type="text/javascript">
-        $(function() {
+    {
+    @*<script type="text/javascript">
+        $(function () {
             $('.summernote').summernote({
                 height: 200
             });
@@ -73,5 +65,5 @@
                 alert($('.summernote').val());
             });
         });
-    </script>
+    </script>*@
 }

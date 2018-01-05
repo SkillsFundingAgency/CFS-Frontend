@@ -6,11 +6,14 @@ namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class PolicyModel : PageModel
     {
-
         public PolicySpecification Policy { get; set; }
-    
+        
+        public Specification Specification { get; set; }
+
         public void OnGet(string specificationId)
         {
+            //get the spec for id
+
             Policy = new PolicySpecification();
         }
     }

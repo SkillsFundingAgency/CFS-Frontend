@@ -48,7 +48,7 @@
 <div class="row">
     <div class="col-xs-9 col-md-9">
         <p>
-            <a href="/specs/specification" class="button spec-mgr-control">Create Specification</a>
+            <a href="/specs/createSpecification/@Model.AcademicYearId" class="button spec-mgr-control">Create Specification</a>
         </p>
         <hr/>
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
@@ -59,9 +59,9 @@
                     foreach (var specification in Model.Specifications)
                     {
                         <div class="panel">
-                            <div class="panel-heading" tabindex="0">
+                            <div>
                                 <h2 class="panel-title stream-title">
-                                    <a href="/specs/policy/@specification.Id"> @specification.Name</a>
+                                    <a href="/specs/specification/@specification.Id"> @specification.Name</a>
                                 </h2>
                                 <p>@specification.Description</p>
                             </div>

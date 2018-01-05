@@ -35,6 +35,12 @@ $glyph: 'glyphicons-halflings-regular';
 a.button:hover {
     text-decoration: none;
 }
+a,
+a:visited {
+    text-decoration: underline;
+    color: $govuk-blue;
+}
+
 ///////////////////////////////////////
 //             Start Page           //
 /////////////////////////////////////
@@ -657,6 +663,40 @@ table {
     }
 }
 
+.form-banner-container {
+    border-top: 10px solid $govuk-blue;
+    margin-bottom: 15px;
+
+    a,
+    a:visited,
+    a:link {
+        text-decoration: underline;
+    }
+
+    .form-banner-container-right {
+        padding-top: 50px;
+    }
+
+    .heading-large {
+        margin-top: 0;
+    }
+
+    .form-banner-container-list {
+        padding-left: 15px;
+
+        li {
+            list-style: disc;
+        }
+    }
+    .breadcrumbs{
+        a,
+        a:visited{
+            color: #000
+        }
+
+    }
+}
+
 .homepage-section-container{
     padding: 15px 0;
 }
@@ -677,3 +717,13 @@ table {
 .spec-mgr-control{
     width:200px !important;
 }
+
+.form-submit-container{
+    display:flex;
+    align-items:flex-end;
+
+    a{
+        margin-left:15px;
+    }
+}
+

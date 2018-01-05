@@ -17,6 +17,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
         public IList<Specification> Specifications;
         public IList<SelectListItem> Years;
 
+        public string AcademicYearId { get; set; }
+
         public IndexModel(ISpecsApiClient specsClient)
         {
             _specsClient = specsClient;
@@ -42,6 +44,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 Text = m.Name,
                 Selected = (m.Id == academicYearId)
             }).ToList();
+
+            AcademicYearId = academicYearId;
 
             return Page();
         }
