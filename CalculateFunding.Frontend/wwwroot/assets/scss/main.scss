@@ -727,3 +727,14 @@ table {
     }
 }
 
+@media (min-width: 641px){
+    .form-control 
+    {
+       width: 100%;
+    }
+}
+
+.description-text {
+    color: $grey-2
+}
+

@@ -7,8 +7,8 @@
 }
 
 @section FormBannerLeft{
-    <h1 class="heading-large">Create Specification for @Model.Specification.AcademicYear.Name</h1>
-    <p>This specification describes how a funding stream will be used for an academic year.</p>
+    <h1 class="heading-large">Create Specification for @Model.AcademicYear.Name</h1>
+    <p class="description-text">This specification describes how a funding stream will be used for an academic year.</p>
 }
 
 @section BreadCrumb{
@@ -22,27 +22,22 @@
 }
 
 <div class="row">
-    <div class="col-sm-9">
+    <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
-
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Specification.Name">Name</label>
-                <input asp-for="Specification.Id" type="hidden">
-                <input asp-for="Specification.Name" class="form-control" type="text">
-            </div>
-          
-            <div class="form-group">
-                <label asp-for="Specification.FundingStream.Id">Funding stream</label>
-                <select asp-for="Specification.FundingStream.Id" class="form-control" name="">
-                    @foreach (var stream in Model.FundingStreams)
-                    {
-                        <option selected="@Model.Specification.FundingStream?.Id" value="@stream.Id">@stream.Name</option>
-                    }
-                </select>
+                <label asp-for="CreateSpecificationViewModel.Name">Name of the specification</label>
+                <input asp-for="AcademicYear.Id" type="hidden" />
+                <input asp-for="AcademicYear.Name" type="hidden" />
+                <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
             </div>
             <div class="form-group">
-                <label asp-for="Specification.Description">Description</label>
-                <textarea asp-for="Specification.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                <label asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
+                <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreateSpecificationViewModel.Description">Description</label>
+                <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
             </div>
 
             <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId">Cancel</a></p>

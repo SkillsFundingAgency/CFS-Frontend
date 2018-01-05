@@ -31,6 +31,7 @@ namespace CalculateFunding.Frontend
             services.AddModule<ApiModule>(Configuration);
             services.AddModule<ProxiesModule>(Configuration);
             services.AddModule<LoggingModule>(Configuration);
+            services.AddModule<MappingModule>(Configuration);
 
             services
                 .AddScoped<CorrelationIdMiddleware>();
