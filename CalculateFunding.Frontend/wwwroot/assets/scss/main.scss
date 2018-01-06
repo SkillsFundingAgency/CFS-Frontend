@@ -730,6 +730,23 @@ table {
     }
 }
 
+.description-text-link {
+    font-size: 24px;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    font-weight: 700;
+    margin-right: 10px;
+
+    a {
+        color: $link-colour;
+        text-decoration: none;
+
+        &:hover {
+            color: $link-hover-colour;
+        }
+    }
+}
+
 @media (min-width: 641px) {
     .form-control {
         width: 100%;
