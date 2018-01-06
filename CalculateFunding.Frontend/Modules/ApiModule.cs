@@ -21,7 +21,7 @@ namespace CalculateFunding.Frontend.Modules
                 .AddScoped<IResultsApiClient, ResultsApiClient>();
 
             services
-               .AddScoped<ISpecsApiClient, ApiClient.MockApiClient.SpecsApiClient>();
+               .AddScoped<ISpecsApiClient, SpecsApiClient>();
         }
     }
 }

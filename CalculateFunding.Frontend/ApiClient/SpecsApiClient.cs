@@ -32,7 +32,7 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
-            return GetAsync<List<Specification>>($"{_specsPath}/specifications/{academicYearId}", _cancellationToken);
+            return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
