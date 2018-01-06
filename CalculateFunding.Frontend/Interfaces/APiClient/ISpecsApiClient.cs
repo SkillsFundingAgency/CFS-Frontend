@@ -16,5 +16,6 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<HttpStatusCode> PostSpecification(Specification specification);
         Task<HttpStatusCode> PostProduct(string specificationId, Product product);
         Task<ApiResponse<Reference[]>> GetAcademicYears();
+        Task<ApiResponse<Reference[]>> GetFundingStreams();
     }
 }

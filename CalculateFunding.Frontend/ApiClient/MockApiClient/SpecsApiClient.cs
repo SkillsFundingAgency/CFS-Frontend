@@ -91,5 +91,10 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
         {
             throw new NotImplementedException();
         }
+
+        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

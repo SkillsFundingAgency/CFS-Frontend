@@ -72,7 +72,6 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<Reference[]>> GetAcademicYears()
         {
-            //To change and get from 
             var years = new[]
             {
                 new Reference("1819", "2018/19"),
@@ -83,6 +82,12 @@ namespace CalculateFunding.Frontend.ApiClient
             var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
 
             return Task.FromResult(response);
+            //return GetAsync<Reference[]>($"{_specsPath}/academic-years");
+        }
+
+        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        {
+            return GetAsync<Reference[]>($"{_specsPath}/funding-streams");
         }
     }
 }

@@ -40,17 +40,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             AcademicYear = years.FirstOrDefault(m => m.Id == academicYearId);
 
-            var fundingStreams = new List<Reference>
-            {
-                new Reference("gag", "General Annual Grant"),
-                new Reference("test", "General Annual Test")
-            };
-
-            FundingStreams = fundingStreams.Select(m => new SelectListItem
-            {
-                Value = m.Id,
-                Text = m.Name
-            }).ToList();
+            await PopulateFundingStreams();
 
             AcademicYearId = academicYearId;
 
@@ -63,17 +53,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
-                var fundingStreams = new List<Reference>
-                {
-                    new Reference("gag", "General Annual Grant"),
-                    new Reference("test", "General Annual Test")
-                };
-
-                FundingStreams = fundingStreams.Select(m => new SelectListItem
-                {
-                    Value = m.Id,
-                    Text = m.Name
-                }).ToList();
+                await PopulateFundingStreams();
 
                 return Page();
             }
@@ -81,6 +61,18 @@ namespace CalculateFunding.Frontend.Pages.Specs
             Specification specification = _mapper.Map<Specification>(CreateSpecificationViewModel);
             specification.AcademicYear = AcademicYear;
             return Redirect($"/specs?academicYearId={specification.AcademicYear.Id}");
+        }
+
+        async Task PopulateFundingStreams()
+        {
+            var fundingStreamsResponse = await _specsClient.GetFundingStreams();
+            var fundingStreams = fundingStreamsResponse.Content;
+
+            FundingStreams = fundingStreams.Select(m => new SelectListItem
+            {
+                Value = m.Id,
+                Text = m.Name
+            }).ToList();
         }
     }
 
