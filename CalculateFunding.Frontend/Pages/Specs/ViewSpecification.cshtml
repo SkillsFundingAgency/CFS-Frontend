@@ -1,88 +1,34 @@
-﻿@page "{academicYearId?}"
+﻿@page "{specificationId?}"
 @using CalculateFunding.Frontend
 @using CalculateFunding.Frontend.ApiClient.Models
 @using CalculateFunding.Frontend.ApiClient.Models.Results
-@model CalculateFunding.Frontend.Pages.Specs.IndexModel
+@model CalculateFunding.Frontend.Pages.Specs.ViewSpecificationModel
 @{
-    ViewData["Title"] = "Manage specification";
+    ViewData["Title"] = "View specification";
 }
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/specs?academicYearId=@Model.AcademicYearId">Specifications</a></li>
-            <li>View Specification</li>
+            <li><a href="/specs?academicYearId=@Model.ViewSpecificationViewModel.AcademicYear.Id">Specifications</a></li>
+            <li>@Model.ViewSpecificationViewModel.Name</li>
         </ol>
     </div>
 }
 @section BannerLeft{
     <!-- Breadcrumbs -->
-    <h1 class="heading-large">Manage specification</h1>
-    <p>Use this service to:</p>
-    <ul class="banner-container-list">
-        <li>Explore funding streams, policy areas and allocation lines</li>
-        <li>Create product specification</li>
-        <li>Create policy</li>
-    </ul>
+    <h1 class="heading-large">@Model.ViewSpecificationViewModel.Name</h1>
+    <p>@Model.ViewSpecificationViewModel.Description</p>
+  
 }
 
 <div class="row">
-    <div class="col-xs-9">
-        <form class="form-inline" method="get" role="form">
-            <div class="form-group">
-                <label class="form-label" for="select-box">Select year:</label>
-                <select asp-items="@(Model.Years)" class="form-control spec-mgr-control" id="select-spec-year" name="academicYearId"></select>
-                <input id="btn-select-year" type="submit" class="button button-in-line" value="Go" />
-            </div>
-        </form>
-        <hr />
-
-        <p>Create specification or select one from the list below</p>
-
-
-    </div>
-    @*end of col-xs-9*@
-</div>
-
-@*end of row*@
-<div class="row">
     <div class="col-xs-9 col-md-9">
         <p>
-            <a href="/specs/createSpecification/@Model.AcademicYearId" class="button spec-mgr-control">Create Specification</a>
+            <a href="/specs/policy/@Model.ViewSpecificationViewModel.Id" class="button spec-mgr-control">Create Policy/a>
         </p>
         <hr />
-        <div class="panel-group wrap esfa-collapse" id="esfa-list">
-            <div class="funding-streams">
-
-                @if (!Model.Specifications.IsNullOrEmpty())
-                {
-                    foreach (var specification in Model.Specifications)
-                    {
-                        <div>
-                            <div>
-                                <h2 class="description-text-link stream-title">
-                                    <a href="/specs/specification/@specification.Id"> @specification.Name</a>
-                                </h2>
-                                <p>@specification.Description</p>
-                            </div>
-
-                            @*end of panel-collapse*@
-                        </div>
-                        @*end of panel*@
-                    }
-                }
-                else
-                {
-                    <p>
-                        <a href="/specs/createSpecification/@Model.AcademicYearId">No specification exists, create a specfication</a>
-                    </p>
-
-                }
-
-                @*end of foreach*@
-            </div>
-        </div>
-        @*end of #esfa-collapse*@
+       
     </div>
     @*end of .col-xs-12*@
 </div>

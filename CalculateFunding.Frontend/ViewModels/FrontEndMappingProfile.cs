@@ -13,6 +13,7 @@ namespace CalculateFunding.Frontend.ViewModels
         public FrontEndMappingProfile()
         {
             CreateMap<CreateSpecificationViewModel, Specification>();
+            CreateMap<Specification, ViewSpecificationViewModel>();
         }
     }
 }
