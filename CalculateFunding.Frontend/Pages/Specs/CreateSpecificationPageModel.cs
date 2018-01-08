@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {
-    public class CreateSpecificationModel : PageModel
+    public class CreateSpecificationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
 
@@ -27,7 +28,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string AcademicYearId { get; set; }
 
-        public CreateSpecificationModel(ISpecsApiClient specsClient, IMapper mapper)
+        public CreateSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
             _specsClient = specsClient;
             _mapper = mapper;
@@ -47,7 +48,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string academicYearId)
         {
             await Task.Delay(20);
 
@@ -58,9 +59,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 return Page();
             }
 
-            Specification specification = _mapper.Map<Specification>(CreateSpecificationViewModel);
-            specification.AcademicYear = AcademicYear;
-            return Redirect($"/specs?academicYearId={specification.AcademicYear.Id}");
+            CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
+            specification.AcademicYearId = academicYearId;
+
+            await _specsClient.PostSpecification(specification);
+
+            return Redirect($"/specs?academicYearId={specification.AcademicYearId}");
         }
 
         async Task PopulateFundingStreams()
@@ -75,6 +79,4 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }).ToList();
         }
     }
-
-
 }

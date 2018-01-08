@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
@@ -42,11 +43,11 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={specificationId}");
         }
 
-        public Task<HttpStatusCode> PostSpecification(Specification specification)
+        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/budgets", specification);
+            return PostAsync($"{_specsPath}/specifications", specification);
         }
 
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
