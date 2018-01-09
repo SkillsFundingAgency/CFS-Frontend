@@ -22,7 +22,7 @@ namespace CalculateFunding.Frontend.ApiClient
         public SpecsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs, IHttpContextAccessor context)
             : base(options, httpClient, logs)
         {
-            _specsPath = options.Value.SpecsPath ?? "/api/specs";
+            _specsPath = options.Value.SpecsPath ?? "specs";
             _cancellationToken = context.HttpContext.RequestAborted;
         }
 

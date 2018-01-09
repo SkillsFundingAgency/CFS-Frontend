@@ -108,6 +108,14 @@
               "value": "[parameters('apiEndpoint')]"
             },
             {
+              "name": "ApiOptions:ApiKey",
+              "value": "[parameters('apiKey')]"
+            },
+            {
+              "name": "ApiOptions:ApiEndpoint",
+              "value": "[parameters('apiEndpoint')]"
+            },
+            {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
             },
