@@ -50,8 +50,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnPostAsync(string academicYearId)
         {
-            await Task.Delay(20);
-
             if (!ModelState.IsValid)
             {
                 await PopulateFundingStreams();
