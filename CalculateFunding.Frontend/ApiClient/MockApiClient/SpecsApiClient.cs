@@ -1,4 +1,5 @@
 ﻿using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using System;
 using System.Collections.Generic;
@@ -88,6 +89,16 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
         }
 
         public Task<HttpStatusCode> PostSpecification(Specification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
         {
             throw new NotImplementedException();
         }

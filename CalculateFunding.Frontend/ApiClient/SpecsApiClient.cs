@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
@@ -32,7 +33,7 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
-            return GetAsync<List<Specification>>($"{_specsPath}/specifications/{academicYearId}", _cancellationToken);
+            return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
@@ -42,11 +43,11 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={specificationId}");
         }
 
-        public Task<HttpStatusCode> PostSpecification(Specification specification)
+        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/budgets", specification);
+            return PostAsync($"{_specsPath}/specifications", specification);
         }
 
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
@@ -72,7 +73,6 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<Reference[]>> GetAcademicYears()
         {
-            //To change and get from 
             var years = new[]
             {
                 new Reference("1819", "2018/19"),
@@ -83,6 +83,12 @@ namespace CalculateFunding.Frontend.ApiClient
             var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
 
             return Task.FromResult(response);
+            //return GetAsync<Reference[]>($"{_specsPath}/academic-years");
+        }
+
+        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        {
+            return GetAsync<Reference[]>($"{_specsPath}/funding-streams");
         }
     }
 }

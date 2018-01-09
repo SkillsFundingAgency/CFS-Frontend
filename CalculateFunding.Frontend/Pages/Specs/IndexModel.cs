@@ -34,8 +34,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             var specstask = _specsClient.GetSpecifications(academicYearId);
 
-            //await TaskHelper.WhenAllAndThrow(specstask, yearsTask);
-
             Specifications = specstask.Result == null ? new List<Specification>() : specstask.Result.Content;
 
             Years = years.Select(m => new SelectListItem
