@@ -47,14 +47,14 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<Specification>($"{_specsPath}/budgets?budgetId={specificationId}");
+            return GetAsync<Specification>($"{_specsPath}/specification?specificationId={specificationId}");
         }
 
         public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/specifications", specification);
+            return PostAsync($"{_specsPath}/specifications-create", specification);
         }
 
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
