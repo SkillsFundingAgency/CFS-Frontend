@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/specifications-create", specification);
+            return PostAsync($"{_specsPath}/specifications", specification);
         }
 
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
