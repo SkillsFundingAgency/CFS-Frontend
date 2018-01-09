@@ -31,15 +31,20 @@ namespace CalculateFunding.Frontend.ApiClient
 
             _logs = logs;
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri(options.Value.ApiEndpoint);
+            string baseAddress = options.Value.ApiEndpoint;
+            if (!baseAddress.EndsWith("/"))
+            {
+                baseAddress = $"{baseAddress}/";
+            }
+            _httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
             _httpClient.DefaultRequestHeaders?.Add(ocpApimSubscriptionKey, options.Value.ApiKey);
             _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _logs.CorrelationId);
-            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); 
+            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         async public Task<ApiResponse<T>> GetAsync<T>(string url, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if(url == null)
+            if (url == null)
             {
                 throw new ArgumentNullException(nameof(url));
             }
@@ -56,7 +61,7 @@ namespace CalculateFunding.Frontend.ApiClient
                 }
 
                 _logs.Trace($"No successful response from {url} with status code: {response.StatusCode} and reason: {response.ReasonPhrase}");
-                
+
                 return new ApiResponse<T>(response.StatusCode);
             }
             catch (Exception ex)

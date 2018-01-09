@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -83,13 +84,21 @@ namespace CalculateFunding.Frontend.Pages.Specs
         async Task PopulateFundingStreams()
         {
             var fundingStreamsResponse = await _specsClient.GetFundingStreams();
-            var fundingStreams = fundingStreamsResponse.Content;
-
-            FundingStreams = fundingStreams.Select(m => new SelectListItem
+            if(fundingStreamsResponse.StatusCode == HttpStatusCode.OK)
             {
-                Value = m.Id,
-                Text = m.Name
-            }).ToList();
+                var fundingStreams = fundingStreamsResponse.Content;
+
+                FundingStreams = fundingStreams.Select(m => new SelectListItem
+                {
+                    Value = m.Id,
+                    Text = m.Name
+                }).ToList();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingStreamsResponse.StatusCode}");
+            }
+            
         }
 
         private async Task PopulateAcademicYears(string academicYearId)
