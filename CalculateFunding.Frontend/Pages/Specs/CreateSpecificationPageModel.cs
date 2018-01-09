@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
-        [BindProperty]
         public Reference AcademicYear { get; set; }
 
         [BindProperty]
@@ -30,12 +30,17 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public CreateSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+
             _specsClient = specsClient;
             _mapper = mapper;
         }
 
         public async Task<IActionResult> OnGetAsync(string academicYearId)
         {
+            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
+
             var yearsResponse = await _specsClient.GetAcademicYears();
             var years = yearsResponse.Content;
 
@@ -50,6 +55,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnPostAsync(string academicYearId)
         {
+            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
+
             if (!ModelState.IsValid)
             {
                 await PopulateFundingStreams();
@@ -62,7 +69,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             await _specsClient.PostSpecification(specification);
 
-            return Redirect($"/specs?academicYearId={specification.AcademicYearId}");
+            return Redirect($"/specs?academicYearId={academicYearId}");
         }
 
         async Task PopulateFundingStreams()
