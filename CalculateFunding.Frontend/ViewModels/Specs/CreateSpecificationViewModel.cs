@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.Properties;
 
 namespace CalculateFunding.Frontend.ViewModels.Specs
 {
     public class CreateSpecificationViewModel
     {
-        [Required(ErrorMessage = "You must give a unique specification name")]
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationNameRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "You must select at least one funding stream")]
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingStreamRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string FundingStreamId { get; set; }
 
-        [Required(ErrorMessage = "You must give a description for the specification")]
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationDescriptionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Description { get; set; }
     }
 }

@@ -11,20 +11,6 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
 {
     public class SpecsApiClient : ISpecsApiClient
     {
-        public Task<ApiResponse<Reference[]>> GetAcademicYears()
-        {
-            var years = new[]
-            {
-                new Reference("1819", "2018/19"),
-                new Reference("1718", "2017/18"),
-                new Reference("1617", "2016/17")
-            };
-
-            var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
-
-            return Task.FromResult(response);
-        }
-
         public Task<ApiResponse<Product>> GetProduct(string specificationId, string productId)
         {
             throw new NotImplementedException();
@@ -93,12 +79,31 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
         {
             throw new NotImplementedException();
         }
 
-        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
+        public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<IEnumerable<Reference>>> ISpecsApiClient.GetAcademicYears()
+        {
+            var years = new[]
+                        {
+                new Reference("1819", "2018/19"),
+                new Reference("1718", "2017/18"),
+                new Reference("1617", "2016/17")
+            };
+
+            var response = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, years);
+
+            return Task.FromResult(response);
+        }
+
+        Task<ApiResponse<IEnumerable<Reference>>> ISpecsApiClient.GetFundingStreams()
         {
             throw new NotImplementedException();
         }

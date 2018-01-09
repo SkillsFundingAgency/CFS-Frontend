@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -41,12 +45,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
 
-            var yearsResponse = await _specsClient.GetAcademicYears();
-            var years = yearsResponse.Content;
-
-            AcademicYear = years.FirstOrDefault(m => m.Id == academicYearId);
-
-            await PopulateFundingStreams();
+            await TaskHelper.WhenAllAndThrow(PopulateAcademicYears(academicYearId), PopulateFundingStreams());
 
             AcademicYearId = academicYearId;
 
@@ -57,9 +56,18 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
 
+            if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
+            {
+                ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(CreateSpecificationViewModel.Name);
+                if(existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
+                {
+                    this.ModelState.AddModelError($"{nameof(CreateSpecificationViewModel)}.{nameof(CreateSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
+                }
+            }
+
             if (!ModelState.IsValid)
             {
-                await PopulateFundingStreams();
+                await TaskHelper.WhenAllAndThrow(PopulateAcademicYears(academicYearId), PopulateFundingStreams());
 
                 return Page();
             }
@@ -82,6 +90,14 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 Value = m.Id,
                 Text = m.Name
             }).ToList();
+        }
+
+        private async Task PopulateAcademicYears(string academicYearId)
+        {
+            var yearsResponse = await _specsClient.GetAcademicYears();
+            var years = yearsResponse.Content;
+
+            AcademicYear = years.FirstOrDefault(m => m.Id == academicYearId);
         }
     }
 }

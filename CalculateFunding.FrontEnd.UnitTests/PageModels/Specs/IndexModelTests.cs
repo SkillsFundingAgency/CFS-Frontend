@@ -29,7 +29,7 @@ namespace CalculateFunding.FrontEnd.PageModels.Specs
 
             IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<Reference[]> yearsResponse = new ApiResponse<Reference[]>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
@@ -74,7 +74,7 @@ namespace CalculateFunding.FrontEnd.PageModels.Specs
 
             IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<Reference[]> yearsResponse = new ApiResponse<Reference[]>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
@@ -119,7 +119,7 @@ namespace CalculateFunding.FrontEnd.PageModels.Specs
 
             IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<Reference[]> yearsResponse = new ApiResponse<Reference[]>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
@@ -164,7 +164,7 @@ namespace CalculateFunding.FrontEnd.PageModels.Specs
 
             IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<Reference[]> yearsResponse = new ApiResponse<Reference[]>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 

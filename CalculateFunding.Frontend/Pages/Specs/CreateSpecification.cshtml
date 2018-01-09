@@ -46,7 +46,9 @@
                 <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
                         <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control"></select>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control">
+                            <option></option>
+                        </select>
                     </div>
                 </div>
             </div>

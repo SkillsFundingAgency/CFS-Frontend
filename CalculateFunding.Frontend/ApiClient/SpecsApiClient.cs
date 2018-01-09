@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -34,6 +34,13 @@ namespace CalculateFunding.Frontend.ApiClient
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
             return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
+        }
+
+        public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
+        {
+            Guard.IsNullOrWhiteSpace(specificationName, nameof(specificationName));
+
+            return GetAsync<Specification>($"{_specsPath}/specification-by-name?specificationName={specificationName}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
@@ -71,7 +78,7 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<Specification[]>($"{_specsPath}/budgets");
         }
 
-        public Task<ApiResponse<Reference[]>> GetAcademicYears()
+        public Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears()
         {
             var years = new[]
             {
@@ -80,15 +87,15 @@ namespace CalculateFunding.Frontend.ApiClient
                 new Reference("1617", "2016/17")
             };
 
-            var response = new ApiResponse<Reference[]>(HttpStatusCode.OK, years);
+            var response = new ApiResponse<IEnumerable<Reference>> (HttpStatusCode.OK, years.AsEnumerable());
 
             return Task.FromResult(response);
             //return GetAsync<Reference[]>($"{_specsPath}/academic-years");
         }
 
-        public Task<ApiResponse<Reference[]>> GetFundingStreams()
+        public Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams()
         {
-            return GetAsync<Reference[]>($"{_specsPath}/funding-streams");
+            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/funding-streams");
         }
     }
 }
