@@ -1,0 +1,63 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Specs.PoliciesModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Policies";
+}
+
+@section BreadCrumb{
+
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?academicYearId=@Model.Specification.AcademicYear.Id#spec-@Model.Specification.Id">@Model.Specification.AcademicYear.Name</a></li>
+            <li>@BreadcrumbText.ManagePolicies</li>
+        </ol>
+    </div>
+}
+@section BannerLeft{
+    <!-- Breadcrumbs -->
+    <h1 class="heading-large">@PageText.ManagePolicies</h1>
+    <p>For @Model.Specification.Name</p>
+    <p>Year: @Model.Specification.AcademicYear.Name</p>
+    <p>@PageText.ManagePoliciesHeadingText</p>
+
+}
+
+<div class="row">
+    <div class="col-xs-9 col-md-9">
+        <p><strong>Create a policy for @Model.Specification.Name:</strong></p>
+        <p>What is @Model.Specification.Name?</p>
+        <p>@Model.Specification.Description</p>
+        <p><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
+        <hr />
+        <div class="panel-group wrap esfa-collapse" id="esfa-list">
+            <div class="funding-streams">
+
+                @if (!Model.Specification.Policies.IsNullOrEmpty())
+                {
+                    foreach (var policy in Model.Specification.Policies)
+                    {
+                        <div>
+                            <div>
+                                <h2 class="description-text-link stream-title">
+                                    <a name="policy-@policy.Id"></a>
+                                    <a href="/specs/policies/@policy.Id"> @policy.Name</a>
+                                </h2>
+                                <p>@policy.Description</p>
+                            </div>
+                            <hr />
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>
+                        <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
+                    </p>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
