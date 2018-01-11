@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {
-    public class PolicyModel : PageModel
+    public class CreatePolicyPageModel : PageModel
     {
         public PolicySpecification Policy { get; set; }
         

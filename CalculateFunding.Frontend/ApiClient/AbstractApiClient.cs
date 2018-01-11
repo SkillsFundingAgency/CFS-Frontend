@@ -40,6 +40,8 @@ namespace CalculateFunding.Frontend.ApiClient
             _httpClient.DefaultRequestHeaders?.Add(ocpApimSubscriptionKey, options.Value.ApiKey);
             _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _logs.CorrelationId);
             _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         }
 
         async public Task<ApiResponse<T>> GetAsync<T>(string url, CancellationToken cancellationToken = default(CancellationToken))
@@ -52,24 +54,24 @@ namespace CalculateFunding.Frontend.ApiClient
             _logs.Trace($"Beginning to fetch data from: {url}");
 
             HttpResponseMessage response = null;
-            try
+
+            response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            if (response == null)
             {
-                response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
-                if (response.IsSuccessStatusCode)
-                {
-                    return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
-                }
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
 
-                _logs.Trace($"No successful response from {url} with status code: {response.StatusCode} and reason: {response.ReasonPhrase}");
-
-                return new ApiResponse<T>(response.StatusCode);
             }
-            catch (Exception ex)
+
+            if (response.IsSuccessStatusCode)
             {
-                _logs.Exception($"Failed to fetch data from {url}", ex);
-
-                return new ApiResponse<T>(response != null ? response.StatusCode : HttpStatusCode.InternalServerError);
+                return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
             }
+
+            _logs.Trace($"No successful response from {url} with status code: {response.StatusCode} and reason: {response.ReasonPhrase}");
+
+            return new ApiResponse<T>(response.StatusCode);
+
+
         }
 
         async public Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
