@@ -21,6 +21,9 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
                 .ForMember(m => m.AcademicYearId, opt => opt.Ignore());
+
+            CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
+                .ForMember(m => m.SpecificationId , opt => opt.Ignore());
         }
     }
 }

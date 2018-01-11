@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
+using CalculateFunding.Frontend.ApiClient.Models.GetModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
@@ -57,6 +58,13 @@ namespace CalculateFunding.Frontend.ApiClient
             return PostAsync($"{_specsPath}/specifications", specification);
         }
 
+        public Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy)
+        {
+            Guard.ArgumentNotNull(policy, nameof(policy));
+
+            return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
+        }
+
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -97,6 +105,18 @@ namespace CalculateFunding.Frontend.ApiClient
         {
             return GetAsync<IEnumerable<Reference>>($"{_specsPath}/funding-streams");
         }
+
+        public Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(policyName, nameof(policyName));
+
+            PolicyGetModel model = new PolicyGetModel { SpecificationId = specificationId, Name = policyName };
+
+            return PostAsync<Policy, PolicyGetModel>($"{_specsPath}/policy-by-name", model, _cancellationToken);
+        }
+
+
     }
 }
 
