@@ -25,34 +25,6 @@ namespace CalculateFunding.FrontEnd.ApiClients
         string CorrelationId = Guid.NewGuid().ToString();
 
         [TestMethod]
-        public void GetSpecifications_GivenHttpClientThrowsException_LogsReturnsInternalServerError()
-        {
-            //Arrange
-            IHttpClient httpClient = CreateHttpClient();
-            httpClient
-                .When(x => x.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()))
-                .Do(x => { throw new Exception(); });
-
-            ILoggingService logs = CreateLoggingService();
-
-            SpecsApiClient apiClient = CreateSpecsApiClient(httpClient: httpClient, logs: logs);
-
-            //Act
-            Func<Task> test = async () => await apiClient.GetSpecifications();
-
-            //Assert
-            test();
-
-            logs
-                .Received()
-                .Trace(Arg.Is("Beginning to fetch data from: specs/specifications"));
-
-            logs
-                .Received()
-                .Exception(Arg.Any<string>(), Arg.Any<Exception>());
-        }
-
-        [TestMethod]
         public async Task GetSpecifications_GivenResponseIsNotASuccess_LogsReturnsStatusCode()
         {
             //Arrange
