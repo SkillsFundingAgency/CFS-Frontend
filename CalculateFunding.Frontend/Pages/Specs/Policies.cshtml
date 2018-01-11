@@ -16,48 +16,99 @@
     </div>
 }
 @section BannerLeft{
-    <!-- Breadcrumbs -->
-    <h1 class="heading-large">@PageText.ManagePolicies</h1>
-    <p>For @Model.Specification.Name</p>
-    <p>Year: @Model.Specification.AcademicYear.Name</p>
-    <p>@PageText.ManagePoliciesHeadingText</p>
-
+    <h1 class="hero-title">@PageText.ManagePolicies</h1>
+    <p class="hero-description">For @Model.Specification.Name</p>
+    <p class="hero-description">Year: @Model.Specification.AcademicYear.Name</p>
+    <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
 }
 
+
+
 <div class="row">
-    <div class="col-xs-9 col-md-9">
+    <div class="col-xs-9 col-md-9 manage-policy">
         <p><strong>Create a policy for @Model.Specification.Name:</strong></p>
         <p>What is @Model.Specification.Name?</p>
         <p>@Model.Specification.Description</p>
         <p><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
-        <hr />
-        <div class="panel-group wrap esfa-collapse" id="esfa-list">
-            <div class="funding-streams">
-
-                @if (!Model.Specification.Policies.IsNullOrEmpty())
+        <p class="text-right">
+            <a href="#" class="policy-list-openall withjs-show">Open All</a>
+        </p>
+        <div class="policy-list">
+            @if (!Model.Specification.Policies.IsNullOrEmpty())
+            {
+                @foreach (var policy in Model.Specification.Policies)
                 {
-                    foreach (var policy in Model.Specification.Policies)
-                    {
-                        <div>
-                            <div>
-                                <h2 class="description-text-link stream-title">
-                                    <a name="policy-@policy.Id"></a>
-                                    <a href="/specs/policies/@policy.Id"> @policy.Name</a>
-                                </h2>
-                                <p>@policy.Description</p>
-                            </div>
-                            <hr />
+                    <div class="jscollapse-container policy-list-item">
+                        <div class="policy-list-header jscollapse-header">
+                            <a href="#" class="policy-list-edit-link">Edit</a>
+                            <h2 class="policy-list-title-container collapse-title jscollapse-active">
+                                <a name="policy-@policy.Id"></a>
+                                <a href="/calculations/@policy.Id">@policy.Name</a>
+                            </h2>
                         </div>
-                    }
+                        <div class="jscollapse-body">
+                            <p class="policy-description">
+                                @policy.Description
+                            </p>
+                        </div>
+                    </div>
                 }
-                else
-                {
-                    <p>
-                        <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
-                    </p>
+            }
+            else
+            {
+                <p>
+                    <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
+                </p>
 
-                }
-            </div>
+            }
         </div>
     </div>
 </div>
+
+
+@section scripts{
+
+    <script type="text/javascript">
+        $(".withjs-show").removeClass("withjs-show");
+
+
+        $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
+
+        $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
+        $(".jscollapse-active").addClass("jscollapse-jsenabled-active");
+
+        $(".policy-list-openall").on("click", function (e) { 
+            $(".jscollapse-container").find(".jscollapse-body").removeClass("hidden");
+            $(".jscollapse-container").find(".jscollapse-header").children(".collapse-title").addClass("jscollapse-jsenabled-active");
+
+            e.preventDefault();
+        });
+
+        
+        $(".collapse-title").on("click", function (e, selector, data) {
+
+            var $this = $(e.target);
+            var setActive = !$this.hasClass("jscollapse-jsenabled-active");
+            if (!setActive) {
+                $this.removeClass("jscollapse-jsenabled-active");
+            }
+            else {
+                $this.addClass("jscollapse-jsenabled-active");
+            }
+
+            var headerElement = $this.parent();
+            if (headerElement.hasClass("jscollapse-header")) {
+
+                var containerElement = headerElement.parent();
+                if (containerElement.hasClass("jscollapse-container")) {
+                    if (setActive) {
+                        containerElement.find(".jscollapse-body").removeClass("hidden");
+                    }
+                    else {
+                        containerElement.find(".jscollapse-body").addClass("hidden");
+                    }
+                }
+            }
+        });
+    </script>
+}

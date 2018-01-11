@@ -1,7 +1,4 @@
 ﻿@page "{academicYearId?}"
-@using CalculateFunding.Frontend
-@using CalculateFunding.Frontend.ApiClient.Models
-@using CalculateFunding.Frontend.ApiClient.Models.Results
 @model CalculateFunding.Frontend.Pages.Specs.IndexModel
 @{
     ViewData["Title"] = "Manage specification";
@@ -17,8 +14,8 @@
 }
 @section BannerLeft{
     <!-- Breadcrumbs -->
-    <h1 class="heading-large">Manage specification</h1>
-    <p>Use this service to:</p>
+    <h1 class="hero-title">Manage specification</h1>
+    <p class="hero-description">Use this service to:</p>
     <ul class="banner-container-list">
         <li>Explore funding streams, policy areas and allocation lines</li>
         <li>Create product specification</li>
