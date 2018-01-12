@@ -1,6 +1,7 @@
 ﻿@page "{specificationId}"
 @model CalculateFunding.Frontend.Pages.Specs.CreatePolicyPageModel
 @using Microsoft.AspNetCore.Mvc.ModelBinding
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Create policy";
@@ -16,10 +17,10 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs?academicYearId=@Model.AcademicYearId#spec-@Model.SpecificationId">@Model.AcademicYearName</a></li>
             <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
-            <li>Create Policy</li>
+            <li>@BreadcrumbText.CreatePolicy</li>
         </ol>
     </div>
 }
@@ -37,7 +38,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
-                        <label asp-for="CreatePolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the specification</label>
+                        <label asp-for="CreatePolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the policy</label>
                         <input asp-for="AcademicYearName" type="hidden" />
                         <input asp-for="AcademicYearId" type="hidden" />
                         <input asp-for="SpecificationId" type="hidden" />
@@ -46,7 +47,7 @@
                     </div>
                 </div>
             </div>
-           
+
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">

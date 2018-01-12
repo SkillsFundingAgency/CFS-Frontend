@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
@@ -8,11 +11,8 @@ using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {
@@ -26,22 +26,47 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string SpecificationId { get; set; }
 
+        public string SpecificationName { get; set; }
+
+        public string AcademicYearId { get; set; }
+
+        public string AcademicYearName { get; set; }
+
+        public string ParentPolicyId { get; set; }
+
+        public IEnumerable<SelectListItem> Policies { get; set; }
+
         public CreateSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
             _specsClient = specsClient;
             _mapper = mapper;
         }
 
-        public IActionResult OnGet(string specificationId)
+        public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             SpecificationId = specificationId;
 
+            Specification specification = await GetSpecification(specificationId);
+
+            if (specification != null)
+            {
+                AcademicYearName = specification.AcademicYear.Name;
+
+                AcademicYearId = specification.AcademicYear.Id;
+
+                SpecificationName = specification.Name;
+
+                PopulatePolicies(specification);
+            }
+
+            //if null then should redirect somewhere else, error or not found page
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId)
+        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -51,12 +76,18 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 if (existingPolicyResponse.StatusCode != HttpStatusCode.NotFound)
                 {
-                    this.ModelState.AddModelError($"{nameof(CreatePolicyViewModel)}.{nameof(CreatePolicyViewModel.Name)}", ValidationMessages.PolicyNameAlreadyExists);
+                    this.ModelState.AddModelError($"{nameof(CreateSubPolicyViewModel)}.{nameof(CreateSubPolicyViewModel.Name)}", ValidationMessages.PolicyNameAlreadyExists);
                 }
             }
 
             if (!ModelState.IsValid)
             {
+                SpecificationName = specificationName;
+
+                Specification specification = await GetSpecification(specificationId);
+
+                PopulatePolicies(specification);
+
                 return Page();
             }
 
@@ -64,9 +95,37 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             policy.SpecificationId = specificationId;
 
-            await _specsClient.PostPolicy(policy);
+            ApiResponse<Policy> newPolicyResponse = await _specsClient.PostPolicy(policy);
 
-            return Redirect($"/specs/policies?specificationId={specificationId}");
+            Policy newPolicy = newPolicyResponse.Content;
+
+            return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
+        }
+
+        void PopulatePolicies(Specification specification)
+        {
+            Guard.ArgumentNotNull(specification, nameof(specification));
+
+            Policies = specification.Policies.Select(m => new SelectListItem
+            {
+                Value = m.Id,
+                Text = m.Name,
+                Selected = (m.Id == ParentPolicyId)
+            }).ToList();
+        }
+
+        async Task<Specification> GetSpecification(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+
+            if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return specificationResponse.Content;
+            }
+
+            return null;
         }
     }
 }
