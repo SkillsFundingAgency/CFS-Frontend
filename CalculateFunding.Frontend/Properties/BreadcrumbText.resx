@@ -120,6 +120,9 @@
   <data name="CalculateFunding" xml:space="preserve">
     <value>Calculate Funding</value>
   </data>
+  <data name="CreateCalculation" xml:space="preserve">
+    <value>Create calculation specification</value>
+  </data>
   <data name="CreatePolicy" xml:space="preserve">
     <value>Create Policy</value>
   </data>

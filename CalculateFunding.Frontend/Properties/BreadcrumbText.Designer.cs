@@ -70,6 +70,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create calculation specification.
+        /// </summary>
+        public static string CreateCalculation {
+            get {
+                return ResourceManager.GetString("CreateCalculation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Policy.
         /// </summary>
         public static string CreatePolicy {

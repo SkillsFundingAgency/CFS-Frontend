@@ -28,6 +28,8 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
+            CreateMap<CreateCalculationViewModel, CreateCalculationModel>()
+               .ForMember(m => m.SpecificationId, opt => opt.Ignore());
         }
     }
 }

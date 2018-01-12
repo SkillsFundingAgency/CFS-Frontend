@@ -1,0 +1,95 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateCalculationPageModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Create calculation specification for policy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Year: @Model.AcademicYearName</p>
+    <h1 class="hero-title">Create calculation specification for policy</h1>
+    <p class="hero-text">Creating calculation specification for @Model.SpecificationName</p>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYearId#spec-@Model.SpecificationId">@Model.AcademicYearName</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.CreateCalculation</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div asp-validation-summary="All">
+                @if (!Model.ModelState.IsValid)
+        {
+            <span class="heading-medium">There is a problem</span>
+            <p><strong>Check that you have answered the questions correctly</strong></p>
+}
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label asp-for="CreateCalculationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Name") == true ? "validation-failed-label" : "" )">Name</label>
+                        <input asp-for="CreateCalculationViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.PolicyId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.PolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.PolicyId">Select policy or subpolicy</label>
+                        <select asp-items="@(Model.Policies)" asp-for="CreateCalculationViewModel.PolicyId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.AllocationLineId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.AllocationLineId") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
+                        <select asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.Description">Description</label>
+                        <textarea asp-for="CreateCalculationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts
+    {
+    @*<script type="text/javascript">
+            $(function () {
+                $('.summernote').summernote({
+                    height: 200
+                });
+
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+                    alert($('.summernote').summernote('code'));
+                    alert($('.summernote').val());
+                });
+            });
+        </script>*@
+}
