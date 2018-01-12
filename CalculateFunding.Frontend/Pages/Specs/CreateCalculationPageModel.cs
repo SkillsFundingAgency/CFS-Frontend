@@ -126,13 +126,17 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if(specification.Policies != null)
             {
-                foreach(Policy policy in specification.Policies)
+                var policiesGroup = new SelectListGroup { Name = "Policies" };
+                var subPoliciesGroup = new SelectListGroup { Name = "Sub Policies" };
+
+                foreach (Policy policy in specification.Policies)
                 {
                     Policies.Add(new SelectListItem
                     {
                         Value = policy.Id,
                         Text = policy.Name,
-                        Selected = (policy.Id == PolicyId)
+                        Selected = (policy.Id == PolicyId),
+                        Group = policiesGroup
                     });
 
                     if(policy.SubPolicies != null)
@@ -142,8 +146,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
                             Policies.Add(new SelectListItem
                             {
                                 Value = subPolicy.Id,
-                                Text = $"---{subPolicy.Name}",
-                                Selected = (subPolicy.Id == PolicyId)
+                                Text = subPolicy.Name,
+                                Selected = (subPolicy.Id == PolicyId),
+                                Group = subPoliciesGroup
                             });
                         }
                     }
