@@ -9,8 +9,8 @@
 }
 
 @section FormBannerLeft{
-    <p class="description-text">Year: @Model.AcademicYearName</p>
-    <h1 class="heading-large">Create subpolicy</h1>
+    <p class="hero-text">Year: @Model.AcademicYearName</p>
+    <h1 class="hero-title">Create subpolicy</h1>
 }
 
 @section BreadCrumb{
@@ -37,7 +37,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
-                        <label asp-for="CreateSubPolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the sub policy</label>
+                        <label asp-for="CreateSubPolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the subpolicy</label>
                         <input asp-for="AcademicYearName" type="hidden" />
                         <input asp-for="AcademicYearId" type="hidden" />
                         <input asp-for="SpecificationId" type="hidden" />
@@ -49,7 +49,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
-                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.ParentPolicyId">Selct policy</label>
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.ParentPolicyId">Select policy</label>
                         <select asp-items="@(Model.Policies)" asp-for="CreateSubPolicyViewModel.ParentPolicyId" class="form-control">
                             <option></option>
                         </select>

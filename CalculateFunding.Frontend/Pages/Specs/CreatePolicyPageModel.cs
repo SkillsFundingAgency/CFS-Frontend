@@ -60,9 +60,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName)
+        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName, string academicYearId, string academicYearName)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationName, nameof(specificationName));
+            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
+            Guard.IsNullOrWhiteSpace(academicYearName, nameof(academicYearName));
 
             if (!string.IsNullOrWhiteSpace(CreatePolicyViewModel.Name))
             {
@@ -77,6 +80,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (!ModelState.IsValid)
             {
                 SpecificationName = specificationName;
+
+                SpecificationId = specificationId;
+
+                AcademicYearId = academicYearId;
+
+                AcademicYearName = academicYearName;
 
                 return Page();
             }

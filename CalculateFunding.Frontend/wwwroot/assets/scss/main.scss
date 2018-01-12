@@ -44,6 +44,14 @@ b, strong {
     font-weight: 600;
 }
 
+.form-control:focus {
+    outline: 3px solid $focus-colour;
+    border-color: #000;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    outline-offset: 0;
+}
+
 ///////////////////////////////////////
 //             Start Page           //
 /////////////////////////////////////
@@ -100,6 +108,22 @@ b, strong {
         background-color: darken($govuk-blue, 10%);
     }
 }
+
+.hero-title {
+    font-size: 48px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.hero-description {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.hero-text {
+    font-size: 19px;
+}
+
 ///////////////////////////////////////
 //    Accordion list and sublist    //
 /////////////////////////////////////
@@ -691,12 +715,20 @@ table {
             list-style: disc;
         }
     }
-    .breadcrumbs{
+
+    .breadcrumbs {
         a,
-        a:visited{
+        a:visited {
             color: #000
         }
+    }
 
+    .hero-text {
+        color: $grey-2;
+    }
+
+    .hero-description {
+        color: $grey-2;
     }
 }
 

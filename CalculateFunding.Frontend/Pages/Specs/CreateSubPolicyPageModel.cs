@@ -66,7 +66,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName)
+        public async Task<IActionResult> OnPostAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -82,9 +82,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
-                SpecificationName = specificationName;
-
                 Specification specification = await GetSpecification(specificationId);
+
+                SpecificationName = specification.Name;
+
+                SpecificationId = specificationId;
+
+                AcademicYearName = specification.AcademicYear.Name;
+
+                AcademicYearId = specification.AcademicYear.Id;
 
                 PopulatePolicies(specification);
 
@@ -106,12 +112,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            Policies = specification.Policies.Select(m => new SelectListItem
+            Policies = specification.Policies != null ? specification.Policies?.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
                 Selected = (m.Id == ParentPolicyId)
-            }).ToList();
+            }).ToList() : new List<SelectListItem>();
+
         }
 
         async Task<Specification> GetSpecification(string specificationId)
