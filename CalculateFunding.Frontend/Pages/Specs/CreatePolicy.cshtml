@@ -1,46 +1,61 @@
 ﻿@page "{specificationId}"
 @model CalculateFunding.Frontend.Pages.Specs.CreatePolicyPageModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+
 @{
     ViewData["Title"] = "Create policy";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
-@section BannerLeft{
-    <h1 class="heading-large">Manage the Data</h1>
+@section FormBannerLeft{
+    <p class="description-text">Year: @Model.AcademicYearName</p>
+    <h1 class="heading-large">Create policy</h1>
+    <p class="description-text"> Create policy for @Model.SpecificationName</p>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/specs/@Model.Specification.AcademicYear.Id">Specifications</a></li>
-            <li><a href="/specs/specification/@Model.Specification.Id">@Model.Specification.Name</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYearId#spec-@Model.SpecificationId">@Model.AcademicYearName</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
             <li>Create Policy</li>
         </ol>
     </div>
 }
 
 <div class="row">
-    <div class="col-md-12">
-        <h1 class="heading-xlarge">Create policy</h1>
-        <p class="text-muted">Lorem ipsum</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
+    <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
-
-            <div class="form-group">
-                <label asp-for="Policy.Name">Name</label>
-                <input asp-for="Policy.Id" type="hidden">
-                <input asp-for="Policy.Name" class="form-control" type="text">
+            <div asp-validation-summary="All">
+                @if (!Model.ModelState.IsValid)
+                {
+                    <span class="heading-medium">There is a problem</span>
+                    <p><strong>Check that you have answered the questions correctly</strong></p>
+                }
             </div>
-            <div class="form-group">
-                <label asp-for="Policy.Description">Description</label>
-                <textarea asp-for="Policy.Description" class="summernote" id="contents" title="Contents"></textarea>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label asp-for="CreatePolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the specification</label>
+                        <input asp-for="AcademicYearName" type="hidden" />
+                        <input asp-for="AcademicYearId" type="hidden" />
+                        <input asp-for="SpecificationId" type="hidden" />
+                        <input asp-for="SpecificationName" type="hidden" />
+                        <input asp-for="CreatePolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
             </div>
-
-            <p><button type="submit" class="button">Save</button></p>
+           
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreatePolicyViewModel.Description">Description</label>
+                        <textarea asp-for="CreatePolicyViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
 
         </form>
 
@@ -48,17 +63,17 @@
 </div>
 @section Scripts
     {
-    <script type="text/javascript">
-        $(function () {
-            $('.summernote').summernote({
-                height: 200
-            });
+    @*<script type="text/javascript">
+            $(function () {
+                $('.summernote').summernote({
+                    height: 200
+                });
 
-            $('form').on('submit', function (e) {
-                e.preventDefault();
-                alert($('.summernote').summernote('code'));
-                alert($('.summernote').val());
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+                    alert($('.summernote').summernote('code'));
+                    alert($('.summernote').val());
+                });
             });
-        });
-    </script>
+        </script>*@
 }

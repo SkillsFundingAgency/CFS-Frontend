@@ -24,22 +24,43 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string SpecificationId { get; set; }
 
+        public string SpecificationName { get; set; }
+
+        public string AcademicYearId { get; set; }
+
+        public string AcademicYearName { get; set; }
+
         public CreatePolicyPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
             _specsClient = specsClient;
             _mapper = mapper;
         }
 
-        public IActionResult OnGet(string specificationId)
+        public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             SpecificationId = specificationId;
 
+            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+
+            if(specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                Specification specification = specificationResponse.Content;
+
+                AcademicYearName = specification.AcademicYear.Name;
+
+                AcademicYearId = specification.AcademicYear.Id;
+
+                SpecificationName = specification.Name;
+            }
+            
+            //if null then should redirect somewhere else, error or not found page
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId)
+        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -55,6 +76,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
+                SpecificationName = specificationName;
+
                 return Page();
             }
 
@@ -62,9 +85,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             policy.SpecificationId = specificationId;
 
-            await _specsClient.PostPolicy(policy);
+            ApiResponse<Policy> newPolicyResponse = await _specsClient.PostPolicy(policy);
 
-            return Redirect($"/specs/policies?specificationId={specificationId}");
+            Policy newPolicy = newPolicyResponse.Content;
+
+            return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
         }
     }
 }

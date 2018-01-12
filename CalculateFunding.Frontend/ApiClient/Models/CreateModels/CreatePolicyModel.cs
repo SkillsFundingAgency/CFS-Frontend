@@ -10,7 +10,7 @@ namespace CalculateFunding.Frontend.ApiClient.Models.CreateModels
         [JsonProperty("description")]
         public string Description { get; set; }
 
-        [JsonProperty("namw")]
+        [JsonProperty("name")]
         public string Name { get; set; }
     }
 }

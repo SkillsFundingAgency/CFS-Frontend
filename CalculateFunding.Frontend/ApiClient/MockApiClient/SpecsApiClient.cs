@@ -89,7 +89,7 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
             throw new NotImplementedException();
         }
 
-        Task<ApiResponse<IEnumerable<Reference>>> ISpecsApiClient.GetAcademicYears()
+        Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears()
         {
             var years = new[]
                         {
@@ -103,7 +103,7 @@ namespace CalculateFunding.Frontend.ApiClient.MockApiClient
             return Task.FromResult(response);
         }
 
-        Task<ApiResponse<IEnumerable<Reference>>> ISpecsApiClient.GetFundingStreams()
+        Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams()
         {
             throw new NotImplementedException();
         }

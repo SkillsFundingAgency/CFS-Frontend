@@ -81,7 +81,7 @@ namespace CalculateFunding.Frontend.ApiClient
                 throw new ArgumentNullException(nameof(url));
             }
 
-            var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            var json = JsonConvert.SerializeObject(request);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
