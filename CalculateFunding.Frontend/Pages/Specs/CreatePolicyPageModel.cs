@@ -44,29 +44,23 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 
-            if(specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                Specification specification = specificationResponse.Content;
+            Specification specification = await GetSpecification(specificationId);
 
-                AcademicYearName = specification.AcademicYear.Name;
+            SpecificationName = specification.Name;
 
-                AcademicYearId = specification.AcademicYear.Id;
+            AcademicYearName = specification.AcademicYear.Name;
 
-                SpecificationName = specification.Name;
-            }
-            
-            //if null then should redirect somewhere else, error or not found page
+            AcademicYearId = specification.AcademicYear.Id;
 
             return Page();
+
+            //if null then should redirect somewhere else, error or not found page
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId, string specificationName, string academicYearId, string academicYearName)
+        public async Task<IActionResult> OnPostAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(specificationName, nameof(specificationName));
-            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
-            Guard.IsNullOrWhiteSpace(academicYearName, nameof(academicYearName));
-
+           
             if (!string.IsNullOrWhiteSpace(CreatePolicyViewModel.Name))
             {
                 ApiResponse<Policy> existingPolicyResponse = await _specsClient.GetPolicyBySpecificationIdAndPolicyName(specificationId, CreatePolicyViewModel.Name);
@@ -79,13 +73,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
-                SpecificationName = specificationName;
+                Specification specification = await GetSpecification(specificationId);
+
+                SpecificationName = specification.Name;
 
                 SpecificationId = specificationId;
 
-                AcademicYearId = academicYearId;
+                AcademicYearName = specification.AcademicYear.Name;
 
-                AcademicYearName = academicYearName;
+                AcademicYearId = specification.AcademicYear.Id;
 
                 return Page();
             }
@@ -99,6 +95,20 @@ namespace CalculateFunding.Frontend.Pages.Specs
             Policy newPolicy = newPolicyResponse.Content;
 
             return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
+        }
+
+        async Task<Specification> GetSpecification(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+
+            if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return specificationResponse.Content;
+            }
+
+            return null;
         }
     }
 }

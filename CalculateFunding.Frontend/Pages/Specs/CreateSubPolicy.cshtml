@@ -38,10 +38,7 @@
                 <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
                         <label asp-for="CreateSubPolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the subpolicy</label>
-                        <input asp-for="AcademicYearName" type="hidden" />
-                        <input asp-for="AcademicYearId" type="hidden" />
                         <input asp-for="SpecificationId" type="hidden" />
-                        <input asp-for="SpecificationName" type="hidden" />
                         <input asp-for="CreateSubPolicyViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
