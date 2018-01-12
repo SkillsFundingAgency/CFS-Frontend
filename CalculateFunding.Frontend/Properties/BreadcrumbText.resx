@@ -124,7 +124,7 @@
     <value>Create Policy</value>
   </data>
   <data name="CreateSubPolicy" xml:space="preserve">
-    <value>Create Sub Policy</value>
+    <value>Create subpolicy</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage Policies</value>

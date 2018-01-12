@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create Sub Policy.
+        ///   Looks up a localized string similar to Create subpolicy.
         /// </summary>
         public static string CreateSubPolicy {
             get {
