@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="PolicyDescriptionRequired" xml:space="preserve">
+    <value>You must give a description for the policy</value>
+  </data>
+  <data name="PolicyNameAlreadyExists" xml:space="preserve">
+    <value>You must give a unique policy name</value>
+  </data>
+  <data name="PolicyNameRequired" xml:space="preserve">
+    <value>You must give a unique policy name</value>
+  </data>
+  <data name="PolicyParentIdRequired" xml:space="preserve">
+    <value>You must select a policy</value>
+  </data>
   <data name="SpecificationAlreadyExists" xml:space="preserve">
     <value>You must give a unique specification name</value>
   </data>
@@ -128,5 +140,8 @@
   </data>
   <data name="SpecificationNameRequired" xml:space="preserve">
     <value>You must give a unique specification name</value>
+  </data>
+  <data name="SubPolicyDescriptionRequired" xml:space="preserve">
+    <value>You must give a description for the subpolicy</value>
   </data>
 </root>

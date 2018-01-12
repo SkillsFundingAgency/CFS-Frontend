@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.ApiClient.Models
 {
-    public class PolicySpecification : Reference
+    public class Policy : Reference
     {
         [JsonProperty("description")]
         public string Description { get; set; }
@@ -12,6 +12,6 @@ namespace CalculateFunding.Frontend.ApiClient.Models
         public List<CalculationSpecification> Calculations { get; set; }
 
         [JsonProperty("subPolicies")]
-        public List<PolicySpecification> SubPolicies { get; set; }
+        public List<Policy> SubPolicies { get; set; }
     }
 }

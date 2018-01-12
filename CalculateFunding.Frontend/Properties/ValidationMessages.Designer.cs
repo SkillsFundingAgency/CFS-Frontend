@@ -61,6 +61,42 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must give a description for the policy.
+        /// </summary>
+        internal static string PolicyDescriptionRequired {
+            get {
+                return ResourceManager.GetString("PolicyDescriptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a unique policy name.
+        /// </summary>
+        internal static string PolicyNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("PolicyNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a unique policy name.
+        /// </summary>
+        internal static string PolicyNameRequired {
+            get {
+                return ResourceManager.GetString("PolicyNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must select a policy.
+        /// </summary>
+        internal static string PolicyParentIdRequired {
+            get {
+                return ResourceManager.GetString("PolicyParentIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must give a unique specification name.
         /// </summary>
         internal static string SpecificationAlreadyExists {
@@ -93,6 +129,15 @@ namespace CalculateFunding.Frontend.Properties {
         internal static string SpecificationNameRequired {
             get {
                 return ResourceManager.GetString("SpecificationNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a description for the subpolicy.
+        /// </summary>
+        internal static string SubPolicyDescriptionRequired {
+            get {
+                return ResourceManager.GetString("SubPolicyDescriptionRequired", resourceCulture);
             }
         }
     }
