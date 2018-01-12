@@ -24,44 +24,118 @@
 
 
 
-<div class="row">
-    <div class="col-xs-9 col-md-9 manage-policy">
-        <p><strong>Create a policy for @Model.Specification.Name:</strong></p>
-        <p>What is @Model.Specification.Name?</p>
-        <p>@Model.Specification.Description</p>
+<div class="row manage-policy">
+    <div class="col-xs-12 col-sm-9">
+        <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
+        <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
+        <p class="policy-spec-what withjs-show">
+            <a href="#" id="toggleSpecificationDescription">What is @Model.Specification.Name?</a>
+        </p>
+
+        <p class="policy-spec-description withjs-hide" id="specificationDescription">@Model.Specification.Description</p>
         <p><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
         <p class="text-right">
             <a href="#" class="policy-list-openall withjs-show">Open All</a>
         </p>
         <div class="policy-list">
             @if (!Model.Specification.Policies.IsNullOrEmpty())
-            {
-                @foreach (var policy in Model.Specification.Policies)
+        {
+            @foreach (var policy in Model.Specification.Policies)
+        {
+            <div class="jscollapse-container policy-list-item">
+                <div class="policy-list-header jscollapse-header">
+                    <a href="/specs/editPolicy/@policy.Id" class="policy-list-edit-link">Edit</a>
+                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
+                        <a name="policy-@policy.Id"></a>
+                        <a class="policy-title" href="/calculations/@policy.Id">@policy.Name</a>
+                    </h2>
+                </div>
+                <div class="jscollapse-body">
+                    <p class="policy-description">
+                        @policy.Description
+                    </p>
+
+                    @if (policy.Calculations != null && policy.Calculations.Any())
                 {
-                    <div class="jscollapse-container policy-list-item">
-                        <div class="policy-list-header jscollapse-header">
-                            <a href="#" class="policy-list-edit-link">Edit</a>
+                    <div class="calculation-container">
+                        <table class="calculation-table table table-bordered table-condensed">
+                            @foreach (var calculation in policy.Calculations)
+                        {
+                            <tr>
+                                <td class="calculation-name"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
+                            </tr>
+                    }
+                        </table>
+                    </div>
+            }
+
+                    @if (policy.SubPolicies != null && policy.SubPolicies.Any())
+                {
+                    @foreach (var subPolicy in policy.SubPolicies)
+                {
+                    <div class="subpolicy-container jscollapse-container">
+                        <div class="subpolicy-list-header jscollapse-header">
+
+                            <a href="/specs/editPolicy/@subPolicy.Id" class="policy-list-edit-link">Edit</a>
                             <h2 class="policy-list-title-container collapse-title jscollapse-active">
-                                <a name="policy-@policy.Id"></a>
-                                <a href="/calculations/@policy.Id">@policy.Name</a>
+                                <a name="policy-@subPolicy.Id"></a>
+                                <a class="policy-title" href="/calculations/@subPolicy.Id">@subPolicy.Name</a>
                             </h2>
+
                         </div>
                         <div class="jscollapse-body">
-                            <p class="policy-description">
+
+
+                            <p class="subpolicy-description">
                                 @policy.Description
                             </p>
+
+                            @if (policy.Calculations != null && policy.Calculations.Any())
+                        {
+                            <div class="calculation-container">
+                                <table class="calculation-table table table-bordered table-condensed">
+                                    @foreach (var calculation in policy.Calculations)
+                                {
+                                    <tr>
+                                        <td class="calculation-name"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
+                                    </tr>
+                            }
+                                </table>
+                            </div>
+                    }
                         </div>
                     </div>
-                }
             }
-            else
-            {
-                <p>
-                    <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
-                </p>
+            }
+                </div>
+            </div>
+    }
+    }
+    else
+    {
+        <p>
+            <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
+        </p>
 
-            }
+}
         </div>
+    </div>
+    <div class="col-xs-12 col-sm-3">
+        @if(Model.Specification.Policies != null && Model.Specification.Policies.Any())
+        {
+
+        <div class="rightcolumn-container">
+            <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
+            <div>
+                <a href="/specs/createSubPolicy/@Model.Specification.Id">Create sub policy</a>
+            </div>
+            <div>
+                <a href="/calculationSpecification/@Model.Specification.Id">Create calculation specification</a>
+            </div>
+        </div>
+        }
     </div>
 </div>
 
@@ -70,6 +144,8 @@
 
     <script type="text/javascript">
         $(".withjs-show").removeClass("withjs-show");
+        $(".withjs-hide").addClass("withjs-hide-hidden");
+
 
 
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
@@ -77,14 +153,29 @@
         $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
         $(".jscollapse-active").addClass("jscollapse-jsenabled-active");
 
-        $(".policy-list-openall").on("click", function (e) { 
+        $(".policy-list-openall").on("click", function (e) {
             $(".jscollapse-container").find(".jscollapse-body").removeClass("hidden");
             $(".jscollapse-container").find(".jscollapse-header").children(".collapse-title").addClass("jscollapse-jsenabled-active");
 
             e.preventDefault();
         });
 
-        
+        $("#toggleSpecificationDescription").on("click", function (e) { 
+            var descriptionElement = $("#specificationDescription");
+            if (descriptionElement) {
+                if (descriptionElement.hasClass("withjs-hide-hidden")) {
+                    descriptionElement.removeClass("withjs-hide-hidden");
+                }
+                else {
+                    descriptionElement.addClass("withjs-hide-hidden");
+                }
+
+                e.preventDefault();
+            }
+
+        });
+
+
         $(".collapse-title").on("click", function (e, selector, data) {
 
             var $this = $(e.target);
@@ -101,11 +192,15 @@
 
                 var containerElement = headerElement.parent();
                 if (containerElement.hasClass("jscollapse-container")) {
-                    if (setActive) {
-                        containerElement.find(".jscollapse-body").removeClass("hidden");
-                    }
-                    else {
-                        containerElement.find(".jscollapse-body").addClass("hidden");
+                    var bodyElement = containerElement.children(".jscollapse-body");
+                    if (bodyElement) {
+                        if (setActive) {
+                            bodyElement.removeClass("hidden");
+                        }
+                        else {
+                            bodyElement.addClass("hidden");
+                        }
+
                     }
                 }
             }
