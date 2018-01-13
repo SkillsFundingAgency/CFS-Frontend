@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines()
         {
-            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/alloction-lines");
+            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/allocation-lines");
         }
 
         public Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName)

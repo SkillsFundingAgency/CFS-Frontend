@@ -36,7 +36,7 @@
 }
             </div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
                         <label asp-for="CreateCalculationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Name") == true ? "validation-failed-label" : "" )">Name</label>
                         <input asp-for="CreateCalculationViewModel.Name" class="form-control" type="text">
