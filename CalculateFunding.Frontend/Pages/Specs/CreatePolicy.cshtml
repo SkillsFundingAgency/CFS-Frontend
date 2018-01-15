@@ -28,16 +28,11 @@
 <div class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
-            <div asp-validation-summary="All">
-                @if (!Model.ModelState.IsValid)
-                {
-                    <span class="heading-medium">There is a problem</span>
-                    <p><strong>Check that you have answered the questions correctly</strong></p>
-                }
-            </div>
+            <div gds-validation-summary="All"></div>
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreatePolicyViewModel.Name"></a>
                         <label asp-for="CreatePolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the policy</label>
                         <input asp-for="CreatePolicyViewModel.Name" class="form-control" type="text">
                     </div>
@@ -47,6 +42,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreatePolicyViewModel.Description"></a>
                         <label class="@(ModelState.IsPropertyInvalid("CreatePolicyViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreatePolicyViewModel.Description">Description</label>
                         <textarea asp-for="CreatePolicyViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
                     </div>

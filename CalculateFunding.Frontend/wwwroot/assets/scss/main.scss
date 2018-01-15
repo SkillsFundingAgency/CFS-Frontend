@@ -987,18 +987,34 @@ table {
     }*/
 
     .validation-summary-errors {
-        border: 1px $error-colour solid;
-        padding: 10px;
+        border: 5px $error-colour solid;
+        padding: 20px 15px 15px;
         margin-bottom: 15px;
 
         ul {
             color: $error-colour;
             font-size: smaller;
+
+            li{
+                margin-bottom: 5px;
+            }
         }
 
         p {
             font-size: small;
             font-weight: 300;
+        }
+
+        a,
+        a:visited,
+        a:link{
+            color: $error-colour;
+            font-weight: bold;
+        }
+
+        .heading-large{
+            margin-bottom: 15px;
+            margin-top: 0;
         }
     }
 }

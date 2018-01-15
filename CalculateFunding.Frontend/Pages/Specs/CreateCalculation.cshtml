@@ -28,16 +28,11 @@
 <div class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
-            <div asp-validation-summary="All">
-                @if (!Model.ModelState.IsValid)
-        {
-            <span class="heading-medium">There is a problem</span>
-            <p><strong>Check that you have answered the questions correctly</strong></p>
-}
-            </div>
+            <div gds-validation-summary="All"></div>
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreateCalculationViewModel.Name"></a>
                         <label asp-for="CreateCalculationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Name") == true ? "validation-failed-label" : "" )">Name</label>
                         <input asp-for="CreateCalculationViewModel.Name" class="form-control" type="text">
                     </div>
@@ -46,6 +41,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.PolicyId") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreateCalculationViewModel.PolicyId"></a>
                         <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.PolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.PolicyId">Select policy or subpolicy</label>
                         <select asp-items="@(Model.Policies)" asp-for="CreateCalculationViewModel.PolicyId" class="form-control">
                             <option></option>
@@ -56,6 +52,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.AllocationLineId") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreateCalculationViewModel.AllocationLineId"></a>
                         <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.AllocationLineId") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
                         <select asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
                             <option></option>
@@ -66,6 +63,7 @@
             <div>
                 <div class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
                     <div class="form-group">
+                        <a validationanchor-for="CreateCalculationViewModel.Description"></a>
                         <label class="@(ModelState.IsPropertyInvalid("CreateCalculationViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateCalculationViewModel.Description">Description</label>
                         <textarea asp-for="CreateCalculationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
                     </div>
