@@ -2,7 +2,7 @@
 
 namespace CalculateFunding.Frontend.ApiClient.Models
 {
-    public class CalculationSpecification : Reference
+    public class Calculation : Reference
     {
         [JsonProperty("description")]
         public string Description { get; set; }

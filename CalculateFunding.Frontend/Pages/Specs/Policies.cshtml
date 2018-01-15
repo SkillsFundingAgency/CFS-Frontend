@@ -62,7 +62,7 @@
                             @foreach (var calculation in policy.Calculations)
                         {
                             <tr>
-                                <td class="calculation-name"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
                                 <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
                             </tr>
                     }
@@ -98,7 +98,7 @@
                                     @foreach (var calculation in policy.Calculations)
                                 {
                                     <tr>
-                                        <td class="calculation-name"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                        <td class="calculation-name"><a name="calculation-@calculation.Id"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
                                         <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
                                     </tr>
                             }
@@ -132,7 +132,7 @@
                 <a href="/specs/createSubPolicy/@Model.Specification.Id">Create sub policy</a>
             </div>
             <div>
-                <a href="/calculationSpecification/@Model.Specification.Id">Create calculation specification</a>
+                <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
             </div>
         </div>
         }

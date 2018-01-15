@@ -65,6 +65,13 @@ namespace CalculateFunding.Frontend.ApiClient
             return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
         }
 
+        public Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation)
+        {
+            Guard.ArgumentNotNull(calculation, nameof(calculation));
+
+            return PostAsync<Calculation, CreateCalculationModel>($"{_specsPath}/calculations", calculation);
+        }
+
         public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -106,6 +113,11 @@ namespace CalculateFunding.Frontend.ApiClient
             return GetAsync<IEnumerable<Reference>>($"{_specsPath}/funding-streams");
         }
 
+        public Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines()
+        {
+            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/allocation-lines");
+        }
+
         public Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -116,7 +128,15 @@ namespace CalculateFunding.Frontend.ApiClient
             return PostAsync<Policy, PolicyGetModel>($"{_specsPath}/policy-by-name", model, _cancellationToken);
         }
 
+        public Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(calculationName, nameof(calculationName));
 
+            CalculationGetModel model = new CalculationGetModel { SpecificationId = specificationId, Name = calculationName };
+
+            return PostAsync<Calculation, CalculationGetModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
+        }
     }
 }
 

@@ -9,7 +9,7 @@ namespace CalculateFunding.Frontend.ApiClient.Models
         public string Description { get; set; }
 
         [JsonProperty("calculations")]
-        public List<CalculationSpecification> Calculations { get; set; }
+        public List<Calculation> Calculations { get; set; }
 
         [JsonProperty("subPolicies")]
         public List<Policy> SubPolicies { get; set; }

@@ -61,6 +61,51 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must select an allocation line.
+        /// </summary>
+        internal static string CalculationAllocationLineRequired {
+            get {
+                return ResourceManager.GetString("CalculationAllocationLineRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a description for the calculation.
+        /// </summary>
+        internal static string CalculationDescriptionRequired {
+            get {
+                return ResourceManager.GetString("CalculationDescriptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a unique calculation name.
+        /// </summary>
+        internal static string CalculationNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("CalculationNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a unique calculation name.
+        /// </summary>
+        internal static string CalculationNameRequired {
+            get {
+                return ResourceManager.GetString("CalculationNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must select a policy or subpolicy.
+        /// </summary>
+        internal static string CalculationPolicyIdRequired {
+            get {
+                return ResourceManager.GetString("CalculationPolicyIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must give a description for the policy.
         /// </summary>
         internal static string PolicyDescriptionRequired {

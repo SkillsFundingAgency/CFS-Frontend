@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CalculationAllocationLineRequired" xml:space="preserve">
+    <value>You must select an allocation line</value>
+  </data>
+  <data name="CalculationDescriptionRequired" xml:space="preserve">
+    <value>You must give a description for the calculation</value>
+  </data>
+  <data name="CalculationNameAlreadyExists" xml:space="preserve">
+    <value>You must give a unique calculation name</value>
+  </data>
+  <data name="CalculationNameRequired" xml:space="preserve">
+    <value>You must give a unique calculation name</value>
+  </data>
+  <data name="CalculationPolicyIdRequired" xml:space="preserve">
+    <value>You must select a policy or subpolicy</value>
+  </data>
   <data name="PolicyDescriptionRequired" xml:space="preserve">
     <value>You must give a description for the policy</value>
   </data>
