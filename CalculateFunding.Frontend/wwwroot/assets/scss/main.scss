@@ -35,11 +35,13 @@ $glyph: 'glyphicons-halflings-regular';
 a.button:hover {
     text-decoration: none;
 }
+
 a,
 a:visited {
     text-decoration: underline;
     color: $govuk-blue;
 }
+
 b, strong {
     font-weight: 600;
 }
@@ -124,10 +126,183 @@ b, strong {
     font-size: 19px;
 }
 
+
+.jscollapse-container {
+    .jscollapse-header {
+    }
+
+    .jscollapse-jsenabled-header {
+        .collapse-title {
+
+
+            &:before {
+                content: "";
+                display: block;
+                width: 16px;
+                height: 16px;
+                position: absolute;
+                background-image: url('../images/icon-plus.png');
+                color: $text-colour;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 5px;
+                font-size: 24px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+
+            &.jscollapse-jsenabled-active {
+                &:before {
+                    content: "";
+                    background-image: url('../images/icon-minus.png');
+                }
+            }
+        }
+    }
+}
+
+.rightcolumn-container {
+    border-top: 5px solid $govuk-blue;
+    padding-top: 5px;
+    font-size: 16px;
+
+    .rightcolumn-heading {
+        font-size: 19px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+}
+
+
+.manage-policy {
+    .policy-spec-description {
+        font-size: 16px;
+    }
+
+
+    .policy-description, .subpolicy-description {
+        color: $secondary-text-colour;
+        font-size: 16px;
+        margin-left: 15px;
+    }
+
+    .policy-list .policy-list-item:last-child {
+        border-bottom: 1px solid #bfc1c3;
+    }
+
+    .policy-list-title-container {
+        font-size: 24px;
+        line-height: 1.25;
+        margin-bottom: 0;
+        font-weight: 700;
+        margin-right: 10px;
+        pointer-events: none;
+    }
+
+    .policy-list-title,
+    .subpolicy-title-container {
+
+        a.policy-title,
+        a.policy-title:visited,
+        a.subpolicy-title,
+        a.subpolicy-title:visited {
+            color: $link-colour;
+            pointer-events: all;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+
+            &:hover {
+                color: $link-hover-colour;
+            }
+        }
+    }
+
+    .policy-list-header {
+        position: relative;
+        background-color: #fff;
+        padding: 15px 0;
+        padding-right: 25px;
+        border-bottom: none;
+        border-radius: 0;
+        border-top: 1px solid $border-colour;
+        line-height: 30px;
+
+        a,
+        a:visited {
+            text-decoration: none;
+        }
+    }
+
+
+    .subpolicy-list-header {
+        position: relative;
+        background-color: #fff;
+        padding: 15px 0;
+        padding-right: 25px;
+        border-bottom: none;
+        border-radius: 0;
+        line-height: 30px;
+
+        a,
+        a:visited {
+            text-decoration: none;
+        }
+    }
+
+    a.policy-list-openall,
+    a.policy-list-openall:visited {
+        text-decoration: none;
+    }
+
+    .policy-list-edit-link {
+        margin-right: 5px;
+        float: right;
+        font-size: 19px;
+    }
+
+    .subpolicy-container {
+        border-left: 5px solid $secondary-text-colour;
+        margin-left: 15px;
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+
+    .calculation-container {
+        border-left: 5px solid $secondary-text-colour;
+        margin-left: 15px;
+    }
+
+    .calculation-table {
+        margin-left: 15px;
+
+
+        td {
+            border: 1px solid #ddd !important;
+            font-size: 16px;
+        }
+
+        a,
+        a:visited {
+            text-decoration: none;
+        }
+    }
+}
+
+.withjs-show {
+    display: none;
+}
+
+.withjs-hide{
+
+}
+
+.withjs-hide-hidden {
+    display: none;
+}
 ///////////////////////////////////////
 //    Accordion list and sublist    //
 /////////////////////////////////////
-
 .esfa-collapse {
     .accordion-toggle {
         color: #005ea5;
@@ -663,8 +838,8 @@ table {
 .banner-container {
     background-color: $govuk-blue;
     color: $page-colour;
-    padding-bottom: 60px;
-    margin-bottom: 50px;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
 
     a,
     a:visited,
@@ -732,33 +907,37 @@ table {
     }
 }
 
-.homepage-section-container{
+.homepage-section-container {
     padding: 15px 0;
 }
-.homepage-section-title{
+
+.homepage-section-title {
     padding: 30px 0 15px 0;
 }
+
 .form-control {
-    border-radius:0;
+    border-radius: 0;
 }
-.button-in-line{
-    line-height:1.00
+
+.button-in-line {
+    line-height: 1.00
 }
 
 .button {
     box-shadow: none;
 }
 
-.spec-mgr-control{
-    width:200px !important;
+.spec-mgr-control {
+    width: 200px !important;
 }
 
-.form-submit-container{
-    display:flex;
-    align-items:flex-end;
-    margin-top:30px;
-    a{
-        margin-left:15px;
+.form-submit-container {
+    display: flex;
+    align-items: flex-end;
+    margin-top: 30px;
+
+    a {
+        margin-left: 15px;
     }
 }
 
@@ -822,5 +1001,4 @@ table {
             font-weight: 300;
         }
     }
-
 }
