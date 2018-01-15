@@ -14,19 +14,19 @@ namespace CalculateFunding.FrontEnd.TestData
                     AcademicYear = new Reference(),
                     FundingStream = new Reference(),
                     Description = "test",
-                    Policies = new List<PolicySpecification>()
+                    Policies = new List<Policy>()
                 },
                 new Specification{
                     AcademicYear = new Reference(),
                     FundingStream = new Reference(),
                     Description = "test",
-                    Policies = new List<PolicySpecification>()
+                    Policies = new List<Policy>()
                 },
                 new Specification{
                     AcademicYear = new Reference(),
                     FundingStream = new Reference(),
                     Description = "test",
-                    Policies = new List<PolicySpecification>()
+                    Policies = new List<Policy>()
                 }
             };
         }

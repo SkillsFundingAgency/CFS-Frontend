@@ -1,0 +1,85 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateSubPolicyPageModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Create subpolicy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Year: @Model.AcademicYearName</p>
+    <h1 class="hero-title">Create subpolicy</h1>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYearId#spec-@Model.SpecificationId">@Model.AcademicYearName</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.CreateSubPolicy</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div asp-validation-summary="All">
+                @if (!Model.ModelState.IsValid)
+        {
+            <span class="heading-medium">There is a problem</span>
+            <p><strong>Check that you have answered the questions correctly</strong></p>
+}
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label asp-for="CreateSubPolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the subpolicy</label>
+                        <input asp-for="SpecificationId" type="hidden" />
+                        <input asp-for="CreateSubPolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.ParentPolicyId">Select policy</label>
+                        <select asp-items="@(Model.Policies)" asp-for="CreateSubPolicyViewModel.ParentPolicyId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                    <div class="form-group">
+                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.Description">Description</label>
+                        <textarea asp-for="CreateSubPolicyViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts
+    {
+    @*<script type="text/javascript">
+            $(function () {
+                $('.summernote').summernote({
+                    height: 200
+                });
+
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+                    alert($('.summernote').summernote('code'));
+                    alert($('.summernote').val());
+                });
+            });
+        </script>*@
+}

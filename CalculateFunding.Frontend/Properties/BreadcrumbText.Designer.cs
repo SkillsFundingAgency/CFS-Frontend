@@ -70,6 +70,24 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create Policy.
+        /// </summary>
+        public static string CreatePolicy {
+            get {
+                return ResourceManager.GetString("CreatePolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create subpolicy.
+        /// </summary>
+        public static string CreateSubPolicy {
+            get {
+                return ResourceManager.GetString("CreateSubPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Policies.
         /// </summary>
         public static string ManagePolicies {

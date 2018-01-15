@@ -98,7 +98,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
             {
                 throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingStreamsResponse.StatusCode}");
             }
-            
         }
 
         private async Task PopulateAcademicYears(string academicYearId)

@@ -26,5 +26,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<HttpStatusCode> PostProduct(string specificationId, Product product);
         Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears();
         Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams();
+        Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
+        Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy);
     }
 }
