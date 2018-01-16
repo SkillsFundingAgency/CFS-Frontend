@@ -958,6 +958,10 @@ table {
     }
 }
 
+.input-validation-error{
+    border: 4px solid $error-colour;
+}
+
 @media (min-width: 641px) {
     .form-control {
         width: 100%;

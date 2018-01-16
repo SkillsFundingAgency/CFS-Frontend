@@ -28,12 +28,10 @@
             <div gds-validation-summary="All">
             </div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSpecificationViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="CreateSpecificationViewModel.Name"></a>
-                        <label asp-for="CreateSpecificationViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the specification</label>
-                        <input asp-for="AcademicYear.Id" type="hidden" />
-                        <input asp-for="AcademicYear.Name" type="hidden" />
+                        <label asp-for="CreateSpecificationViewModel.Name">Name of the specification</label>
                         <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -41,10 +39,10 @@
             <div>
                 <a validationanchor-for="CreateSpecificationViewModel.FundingStreamId"></a>
 
-                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamId">
                     <div class="form-group">
 
-                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.FundingStreamId") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
+                        <label asp-for="CreateSpecificationViewModel.FundingStreamId">Funding stream</label>
                         <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" class="form-control">
                             <option></option>
                         </select>
@@ -52,10 +50,10 @@
                 </div>
             </div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSpecificationViewModel.Description">
                     <div class="form-group">
                         <a validationanchor-for="CreateSpecificationViewModel.Description"></a>
-                        <label class="@(ModelState.IsPropertyInvalid("CreateSpecificationViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateSpecificationViewModel.Description">Description</label>
+                        <label asp-for="CreateSpecificationViewModel.Description">Description</label>
                         <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
                     </div>
                 </div>

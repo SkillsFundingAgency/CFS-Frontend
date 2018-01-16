@@ -1,6 +1,5 @@
 ﻿@page "{specificationId}"
 @model CalculateFunding.Frontend.Pages.Specs.CreateSubPolicyPageModel
-@using Microsoft.AspNetCore.Mvc.ModelBinding
 @using CalculateFunding.Frontend.Properties
 
 @{
@@ -29,20 +28,19 @@
         <form method="post" class="form">
             <div gds-validation-summary="All"></div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSubPolicyViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="CreateSubPolicyViewModel.Name"></a>
-                        <label asp-for="CreateSubPolicyViewModel.Name" class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Name") == true ? "validation-failed-label" : "" )">Name of the subpolicy</label>
-                        <input asp-for="SpecificationId" type="hidden" />
+                        <label asp-for="CreateSubPolicyViewModel.Name">Name of the subpolicy</label>
                         <input asp-for="CreateSubPolicyViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
             </div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSubPolicyViewModel.ParentPolicyId">
                     <div class="form-group">
                         <a validationanchor-for="CreateSubPolicyViewModel.ParentPolicyId"></a>
-                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.ParentPolicyId") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.ParentPolicyId">Select policy</label>
+                        <label asp-for="CreateSubPolicyViewModel.ParentPolicyId">Select policy</label>
                         <select asp-items="@(Model.Policies)" asp-for="CreateSubPolicyViewModel.ParentPolicyId" class="form-control">
                             <option></option>
                         </select>
@@ -50,10 +48,10 @@
                 </div>
             </div>
             <div>
-                <div class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Description") == true ? "validation-failed-block" : "validation-passed-block" )">
+                <div gds-validationblock-for="CreateSubPolicyViewModel.Description">
                     <div class="form-group">
                         <a validationanchor-for="CreateSubPolicyViewModel.Description"></a>
-                        <label class="@(ModelState.IsPropertyInvalid("CreateSubPolicyViewModel.Description") == true ? "validation-failed-label" : "" )" asp-for="CreateSubPolicyViewModel.Description">Description</label>
+                        <label asp-for="CreateSubPolicyViewModel.Description">Description</label>
                         <textarea asp-for="CreateSubPolicyViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
                     </div>
                 </div>
