@@ -9,8 +9,9 @@ using System.Text;
 using Newtonsoft.Json.Serialization;
 using System.Threading;
 using CalculateFunding.Frontend.Interfaces.Core;
-using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using CalculateFunding.Frontend.Helpers;
+using Serilog;
+using CalculateFunding.Frontend.Interfaces.Core.Logging;
 
 namespace CalculateFunding.Frontend.ApiClient
 {
@@ -21,27 +22,32 @@ namespace CalculateFunding.Frontend.ApiClient
 
         readonly IHttpClient _httpClient;
         readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
-        readonly protected ILoggingService _logs;
+        readonly protected ILogger _logger;
+        readonly ICorrelationIdProvider _correlationIdProvider;
 
-        public AbstractApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs)
+        public AbstractApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
         {
             Guard.ArgumentNotNull(options, nameof(options));
             Guard.ArgumentNotNull(httpClient, nameof(httpClient));
-            Guard.ArgumentNotNull(logs, nameof(logs));
+            Guard.ArgumentNotNull(httpClient, nameof(logger));
+            Guard.ArgumentNotNull(httpClient, nameof(correlationIdProvider));
 
-            _logs = logs;
+            _correlationIdProvider = correlationIdProvider;
+
             _httpClient = httpClient;
             string baseAddress = options.Value.ApiEndpoint;
-            if (!baseAddress.EndsWith("/"))
+            if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
             {
                 baseAddress = $"{baseAddress}/";
             }
             _httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
             _httpClient.DefaultRequestHeaders?.Add(ocpApimSubscriptionKey, options.Value.ApiKey);
-            _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _logs.CorrelationId);
+            _httpClient.DefaultRequestHeaders?.Add(sfaCorellationId, _correlationIdProvider.GetCorrelationId());
             _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
             _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            _logger = logger;
+           
         }
 
         async public Task<ApiResponse<T>> GetAsync<T>(string url, CancellationToken cancellationToken = default(CancellationToken))
@@ -50,8 +56,6 @@ namespace CalculateFunding.Frontend.ApiClient
             {
                 throw new ArgumentNullException(nameof(url));
             }
-
-            _logs.Trace($"Beginning to fetch data from: {url}");
 
             HttpResponseMessage response = null;
 
@@ -67,11 +71,7 @@ namespace CalculateFunding.Frontend.ApiClient
                 return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
             }
 
-            _logs.Trace($"No successful response from {url} with status code: {response.StatusCode} and reason: {response.ReasonPhrase}");
-
             return new ApiResponse<T>(response.StatusCode);
-
-
         }
 
         async public Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))

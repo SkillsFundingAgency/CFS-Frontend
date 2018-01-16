@@ -12,6 +12,7 @@ using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace CalculateFunding.Frontend.ApiClient
 {
@@ -20,8 +21,8 @@ namespace CalculateFunding.Frontend.ApiClient
         private string _specsPath;
         private readonly CancellationToken _cancellationToken;
 
-        public SpecsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs, IHttpContextAccessor context)
-            : base(options, httpClient, logs)
+        public SpecsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, IHttpContextAccessor context, ILogger logger, ICorrelationIdProvider correlationIdProvider)
+            : base(options, httpClient, logger, correlationIdProvider)
         {
             _specsPath = options.Value.SpecsPath ?? "specs";
             _cancellationToken = context.HttpContext.RequestAborted;
@@ -34,6 +35,7 @@ namespace CalculateFunding.Frontend.ApiClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
+            _logger.Information("This is from the FE");
             return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 

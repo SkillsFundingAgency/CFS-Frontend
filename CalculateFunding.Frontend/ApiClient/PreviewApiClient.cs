@@ -7,6 +7,7 @@ using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Serilog;
 
 namespace CalculateFunding.Frontend.ApiClient
 {
@@ -14,8 +15,8 @@ namespace CalculateFunding.Frontend.ApiClient
     {
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
-        public PreviewApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILoggingService logs)
-             : base(options, httpClient, logs)
+        public PreviewApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
+            : base(options, httpClient, logger, correlationIdProvider)
         { }
 
 

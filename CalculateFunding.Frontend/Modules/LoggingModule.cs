@@ -2,7 +2,13 @@
 using CalculateFunding.Frontend.Core.Logging;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using CalculateFunding.Frontend.Options;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using System;
 
 namespace CalculateFunding.Frontend.Modules
 {
@@ -10,10 +16,44 @@ namespace CalculateFunding.Frontend.Modules
     {
         override public void Configure(IServiceCollection services)
         {
-            AddSettingAsOptions<ApplicationInsightsOptions>(services);
+            ApplicationInsightsOptions appInsightsOptions = new ApplicationInsightsOptions();
 
-            services
-                .AddScoped<ILoggingService, ApplicationInsightsService>();
+            Configuration.Bind("ApplicationInsightsOptions", appInsightsOptions);
+
+            services.AddSingleton<ApplicationInsightsOptions>(appInsightsOptions);
+
+            services.AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
+
+            services.AddScoped<ILogger>(c => GetLoggerConfiguration(c.GetService<ICorrelationIdProvider>(), appInsightsOptions).CreateLogger());
+        }
+
+        public static LoggerConfiguration GetLoggerConfiguration(ICorrelationIdProvider correlationIdProvider, ApplicationInsightsOptions options, string serviceName = "CalculateFunding.Frontend")
+        {
+            if (correlationIdProvider == null)
+            {
+                throw new ArgumentNullException(nameof(correlationIdProvider));
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+            string appInsightsKey = options.InstrumentationKey;
+
+            if (string.IsNullOrWhiteSpace(appInsightsKey))
+            {
+                throw new InvalidOperationException("Unable to lookup Application Insights Configuration key from Configuration Provider. The value returned was empty string");
+            }
+            return new LoggerConfiguration().Enrich.With(new ILogEventEnricher[]
+            {
+                new CorrelationIdLogEnricher(correlationIdProvider)
+            }).Enrich.With(new ILogEventEnricher[]
+            {
+                new ServiceNameLogEnricher(serviceName)
+            }).WriteTo.ApplicationInsightsTraces(new TelemetryConfiguration
+            {
+                InstrumentationKey = appInsightsKey,
+
+            }, LogEventLevel.Verbose, null, null);
         }
     }
 }

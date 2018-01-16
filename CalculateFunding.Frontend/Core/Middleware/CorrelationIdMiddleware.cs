@@ -21,8 +21,8 @@ namespace CalculateFunding.Frontend.Core.Middleware
 
         public Task Invoke(HttpContext context)
         {
-            var loggingService = context.RequestServices.GetService<ILoggingService>();
-            var correlationId = loggingService.CorrelationId;
+            var correlationIdProvider = context.RequestServices.GetService<ICorrelationIdProvider>();
+            var correlationId = correlationIdProvider.GetCorrelationId();
 
             if (!context.Response.Headers.ContainsKey(sfaCorellationId))
                 context.Response.Headers.Add(sfaCorellationId, correlationId.ToLower());
