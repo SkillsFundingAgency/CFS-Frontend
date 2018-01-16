@@ -22,18 +22,31 @@
     <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
 }
 
+    <div class="row">
+        <div class="col-xs-12">
 
+            
+            
+        </div>
+    </div>
 
 <div class="row manage-policy">
     <div class="col-xs-12 col-sm-9">
         <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
         <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
-        <p class="policy-spec-what withjs-show">
-            <a href="#" id="toggleSpecificationDescription">What is @Model.Specification.Name?</a>
-        </p>
 
-        <p class="policy-spec-description withjs-hide" id="specificationDescription">@Model.Specification.Description</p>
-        <p><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
+        <div class="inline-collapse-container">
+            <div class="inline-collapse-heading withjs-show">
+                <i class="inline-collapse-arrow"></i>
+                <span>What is @Model.Specification.Name?</span>
+            </div>
+            <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                @Model.Specification.Description
+            </div>
+        </div>
+
+
+        <p  class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
         <p class="text-right">
             <a href="#" class="policy-list-openall withjs-show">Open All</a>
         </p>
@@ -91,11 +104,11 @@
                                 @policy.Description
                             </p>
 
-                            @if (policy.Calculations != null && policy.Calculations.Any())
+                            @if (subPolicy.Calculations != null && subPolicy.Calculations.Any())
                         {
                             <div class="calculation-container">
                                 <table class="calculation-table table table-bordered table-condensed">
-                                    @foreach (var calculation in policy.Calculations)
+                                    @foreach (var calculation in subPolicy.Calculations)
                                 {
                                     <tr>
                                         <td class="calculation-name"><a name="calculation-@calculation.Id"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
@@ -146,8 +159,6 @@
         $(".withjs-show").removeClass("withjs-show");
         $(".withjs-hide").addClass("withjs-hide-hidden");
 
-
-
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
 
         $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
@@ -159,22 +170,6 @@
 
             e.preventDefault();
         });
-
-        $("#toggleSpecificationDescription").on("click", function (e) { 
-            var descriptionElement = $("#specificationDescription");
-            if (descriptionElement) {
-                if (descriptionElement.hasClass("withjs-hide-hidden")) {
-                    descriptionElement.removeClass("withjs-hide-hidden");
-                }
-                else {
-                    descriptionElement.addClass("withjs-hide-hidden");
-                }
-
-                e.preventDefault();
-            }
-
-        });
-
 
         $(".collapse-title").on("click", function (e, selector, data) {
 
@@ -204,6 +199,26 @@
                     }
                 }
             }
+        });
+
+        $(".inline-collapse-heading").on("click", function (e) { 
+            var headerElement = $(this);
+            var containerElement = headerElement.parent();
+            var bodyElement = containerElement.children(".inline-collapse-contents");
+            
+            if (headerElement.hasClass("active")) {
+
+                headerElement.removeClass("active");
+                bodyElement.addClass("withjs-hide-hidden");
+            }
+            else {
+                headerElement.addClass("active");
+                bodyElement.removeClass("withjs-hide-hidden");
+
+            }
+
+            return e.preventDefault();
+
         });
     </script>
 }

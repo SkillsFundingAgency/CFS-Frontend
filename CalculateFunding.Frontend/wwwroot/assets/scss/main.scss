@@ -186,6 +186,10 @@ b, strong {
         margin-left: 15px;
     }
 
+    .create-policy-button-container{
+        margin: 15px 0;
+    }
+
     .policy-list .policy-list-item:last-child {
         border-bottom: 1px solid #bfc1c3;
     }
@@ -293,13 +297,45 @@ b, strong {
     display: none;
 }
 
-.withjs-hide{
-
+.withjs-hide {
 }
 
 .withjs-hide-hidden {
     display: none;
 }
+
+.inline-collapse-container {
+    .inline-collapse-heading {
+        color: $govuk-blue;
+
+        span {
+            cursor: pointer;
+            font-size: 19px;
+            line-height: 25px;
+        }
+
+        &.active {
+            .inline-collapse-arrow {
+                -webkit-transform: rotate(90deg);
+                transform: rotate(0.25turn);
+                transition: transform ease-in-out 0.3s;
+            }
+        }
+    }
+
+    .inline-collapse-arrow {
+        font-style: normal;
+        display: inline-block;
+        float: left;
+        margin-right: 5px;
+        transition: transform ease-in-out 0.3s;
+
+        &::after {
+            content: "▸";
+        }
+    }
+}
+
 ///////////////////////////////////////
 //    Accordion list and sublist    //
 /////////////////////////////////////
@@ -958,7 +994,7 @@ table {
     }
 }
 
-.input-validation-error{
+.input-validation-error {
     border: 4px solid $error-colour;
 }
 
@@ -999,7 +1035,7 @@ table {
             color: $error-colour;
             font-size: smaller;
 
-            li{
+            li {
                 margin-bottom: 5px;
             }
         }
@@ -1011,12 +1047,12 @@ table {
 
         a,
         a:visited,
-        a:link{
+        a:link {
             color: $error-colour;
             font-weight: bold;
         }
 
-        .heading-large{
+        .heading-large {
             margin-bottom: 15px;
             margin-top: 0;
         }
