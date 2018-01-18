@@ -1,9 +1,6 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Core.Logging
 {
@@ -19,7 +16,7 @@ namespace CalculateFunding.Frontend.Core.Logging
         /// <summary>
         /// Enrich LogEvent message with provided CorrelationId or generate a new one for this HTTP request.
         /// </summary>
-        /// <param name="logEvent">&gt;Log Event</param>
+        /// <param name="logEvent">Log Event</param>
         /// <param name="propertyFactory">Serilog Property Factory</param>
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
@@ -38,7 +35,7 @@ namespace CalculateFunding.Frontend.Core.Logging
                     _serviceName = "N/A";
                 }
             }
-            LogEventProperty property = propertyFactory.CreateProperty("Service", _serviceName, false);
+            LogEventProperty property = propertyFactory.CreateProperty(LoggingConstants.ServiceNamePropertiesName, _serviceName, false);
             logEvent.AddOrUpdateProperty(property);
         }
     }

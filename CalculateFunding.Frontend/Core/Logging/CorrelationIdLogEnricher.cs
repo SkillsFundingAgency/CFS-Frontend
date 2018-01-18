@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Frontend.Interfaces.Core.Logging;
+﻿using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using System;
@@ -11,10 +12,8 @@ namespace CalculateFunding.Frontend.Core.Logging
 
         public CorrelationIdLogEnricher(ICorrelationIdProvider correlationIdProvider)
         {
-            if (correlationIdProvider == null)
-            {
-                throw new ArgumentNullException(nameof(correlationIdProvider));
-            }
+            Guard.ArgumentNotNull(correlationIdProvider, nameof(correlationIdProvider));
+
             _correlationIdProvider = correlationIdProvider;
         }
 
@@ -32,7 +31,7 @@ namespace CalculateFunding.Frontend.Core.Logging
 
             if (!string.IsNullOrWhiteSpace(value))
             {
-                LogEventProperty property = propertyFactory.CreateProperty("CorrelationId", value, false);
+                LogEventProperty property = propertyFactory.CreateProperty(LoggingConstants.CorrelationIdPropertyName, value, false);
                 logEvent.AddOrUpdateProperty(property);
             }
         }

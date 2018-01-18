@@ -1,5 +1,7 @@
 ﻿using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Core.Logging;
+using CalculateFunding.Frontend.Core.Middleware;
+using CalculateFunding.Frontend.Core.Telemetry;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using CalculateFunding.Frontend.Options;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -22,12 +24,23 @@ namespace CalculateFunding.Frontend.Modules
 
             services.AddSingleton<ApplicationInsightsOptions>(appInsightsOptions);
 
-            services.AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
+            services.AddScoped<ICorrelationIdProvider, HttpContextCorrelationIdProvider>();
 
-            services.AddScoped<ILogger>(c => GetLoggerConfiguration(c.GetService<ICorrelationIdProvider>(), appInsightsOptions).CreateLogger());
+            string serviceName = "CalculateFunding.Frontend";
+
+            services.AddScoped<ILogger>(c => GetLoggerConfiguration(c.GetService<ICorrelationIdProvider>(), appInsightsOptions, serviceName).CreateLogger());
+
+
+            services.AddScoped<CorrelationIdMiddleware>();
+
+            services.AddScoped<ITelemetryInitializer, CorrelationIdTelemetryInitializer>();
+
+            ServiceNameTelemetryInitializer serviceNameEnricher = new ServiceNameTelemetryInitializer(serviceName);
+
+            services.AddSingleton<ITelemetryInitializer>(serviceNameEnricher);
         }
 
-        public static LoggerConfiguration GetLoggerConfiguration(ICorrelationIdProvider correlationIdProvider, ApplicationInsightsOptions options, string serviceName = "CalculateFunding.Frontend")
+        public static LoggerConfiguration GetLoggerConfiguration(ICorrelationIdProvider correlationIdProvider, ApplicationInsightsOptions options, string serviceName)
         {
             if (correlationIdProvider == null)
             {

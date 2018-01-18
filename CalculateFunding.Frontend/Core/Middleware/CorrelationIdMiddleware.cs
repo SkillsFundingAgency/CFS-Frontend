@@ -1,16 +1,13 @@
 ﻿using CalculateFunding.Frontend.Interfaces.Core.Logging;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using CalculateFunding.Frontend.Core.Logging;
 
 namespace CalculateFunding.Frontend.Core.Middleware
 {
     public class CorrelationIdMiddleware
     {
-        const string sfaCorellationId = "sfa-correlationId";
 
         readonly RequestDelegate _next;
 
@@ -24,8 +21,8 @@ namespace CalculateFunding.Frontend.Core.Middleware
             var correlationIdProvider = context.RequestServices.GetService<ICorrelationIdProvider>();
             var correlationId = correlationIdProvider.GetCorrelationId();
 
-            if (!context.Response.Headers.ContainsKey(sfaCorellationId))
-                context.Response.Headers.Add(sfaCorellationId, correlationId.ToLower());
+            if (!context.Response.Headers.ContainsKey(LoggingConstants.CorrelationIdHttpHeaderName))
+                context.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId.ToLower());
 
             return _next(context);
         }
