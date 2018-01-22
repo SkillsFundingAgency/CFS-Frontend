@@ -186,7 +186,7 @@ b, strong {
         margin-left: 15px;
     }
 
-    .create-policy-button-container{
+    .create-policy-button-container {
         margin: 15px 0;
     }
 
@@ -290,6 +290,61 @@ b, strong {
         a:visited {
             text-decoration: none;
         }
+    }
+}
+
+.manage-calculations {
+    .manage-calculations-filter-container {
+        background-color: $panel-colour;
+    }
+
+    .paging-container {
+        margin-bottom: 15px;
+    }
+
+    .calculations-table {
+
+        thead {
+            border-bottom: 2px solid #000 !important;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc !important;
+        }
+
+        td {
+            padding: 30px 0;
+        }
+    }
+}
+
+.paging-link {
+    padding: 0 5px;
+}
+
+.draft-saved-panel {
+    background-color: rgb(248, 188,155);
+    border-left: 5px solid $orange;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-decoration: underline;
+
+    a {
+        text-decoration: none;
+        color: #000;
+    }
+}
+
+.publish-notification-panel {
+    background-color: rgb(146, 207, 202);
+    border-left: 5px solid $green;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-decoration: underline;
+
+    a {
+        text-decoration: none;
+        color: #000;
     }
 }
 

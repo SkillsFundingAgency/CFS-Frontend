@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{pageNumber?}"
 @model CalculateFunding.Frontend.Pages.Calcs.IndexModel
 @{
     ViewData["Title"] = "Manage the Calculations";
@@ -6,7 +6,8 @@
 }
 
 @section BannerLeft{
-    <h1 class="heading-large">Manage the Calculations</h1>
+    <h1 class="hero-title">Manage the Calculations</h1>
+    <div class="hero-text">Specify the calculation specifications that will distribute ESFA funding for an academic year</div>
 }
 
 @section BreadCrumb{
@@ -17,3 +18,76 @@
         </ol>
     </div>
 }
+
+<div class="row manage-calculations">
+    <div class="col-xs-3 manage-calculations-filter-container">
+
+    </div>
+    <div class="col-xs-9">
+
+        @if (Model.DraftSavedCalculation != null)
+        {
+            <div class="draft-saved-panel">
+                <a href="/calcs?pageNumber=@Model.PagerState.CurrentPage" class="pull-right">Dismiss</a>
+                @Model.DraftSavedCalculation.Name saved in DRAFT successfully.
+            </div>
+        }
+
+        @if (Model.PublishedCalculation != null)
+        {
+            <div class="publish-notification-panel">
+                <a href="/calc?pageNumber=@Model.PagerState.CurrentPage" class="pull-right">Dismiss</a>
+                @Model.PublishedCalculation.Name published successfully.
+            </div>
+        }
+
+        <div>
+            <div class="pull-right paging-container">
+                @if (Model.PagerState.PreviousPage.HasValue)
+                {
+                    <a href="/calcs?pageNumber=@Model.PagerState.PreviousPage.Value" class="paging-link">Previous</a>
+
+                }
+
+                @foreach (int pageNumber in Model.PagerState.Pages)
+                {
+                    <a href="/calcs?pageNumber=@pageNumber" class="paging-link">@pageNumber</a>
+
+                }
+
+                @if (Model.PagerState.NextPage.HasValue)
+                {
+                    <a href="/calcs?pageNumber=@Model.PagerState.NextPage.Value" class="paging-link">Next</a>
+
+                }
+            </div>
+            Showing @Model.StartItemNumber-@Model.EndItemNumber of <strong>@Model.TotalResults</strong> calculations
+
+        </div>
+
+        <table class="calculations-table">
+            <thead>
+                <tr>
+                    <th>Calculation Name</th>
+                    <th>Status</th>
+                    <th>Spec name</th>
+                    <th>Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var calculation in Model.Calculations)
+                {
+                    <tr>
+                        <td><a href="/spec/@calculation.Specification.Id">@calculation.Name</a></td>
+                        <td>Unknown</td>
+                        <td>@calculation.Specification.Name</td>
+                        <td>@calculation.Period.Name</td>
+                    </tr>
+
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

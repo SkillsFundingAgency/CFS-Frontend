@@ -4,7 +4,10 @@ namespace CalculateFunding.Frontend.ApiClient.Models
 {
     public class Calculation : Reference
     {
-        [JsonProperty("description")]
         public string Description { get; set; }
+
+        public Reference Specification { get; set; }
+
+        public Reference Period { get; set; }
     }
 }
