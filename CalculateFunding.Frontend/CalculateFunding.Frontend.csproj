@@ -36,6 +36,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>BreadcrumbText.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\ErrorMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ErrorMessages.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\PageText.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -52,6 +57,10 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>BreadcrumbText.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Properties\ErrorMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErrorMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\PageText.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>PageText.Designer.cs</LastGenOutput>
@@ -60,5 +69,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Clients\Models\Results\" />
   </ItemGroup>
 </Project>

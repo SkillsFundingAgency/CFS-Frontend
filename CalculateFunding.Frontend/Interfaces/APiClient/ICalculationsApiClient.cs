@@ -1,14 +1,24 @@
 ﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     public interface ICalculationsApiClient
     {
-        Task<ApiResponse<PreviewResponse>> PostPreview(PreviewRequest request);
+        /// <summary>
+        /// Gets a paged list of calculations, given the paged query options
+        /// </summary>
+        /// <param name="queryOptions">Query Options</param>
+        /// <returns>List of Calculations</returns>
+        Task<PagedResult<CalculationSearchResult>> FindCalculations(PagedQueryOptions queryOptions);
 
-        Task<PagedResult<Calculation>> GetCalculations(PagedQueryOptions queryOptions);
-        Task<Calculation> GetCalculationById(string draftSavedId);
+        /// <summary>
+        /// Gets an individual calculation
+        /// </summary>
+        /// <param name="calculationId">Calculation ID</param>
+        /// <returns>Calculation object, otherwise null if not found</returns>
+        Task<Calculation> GetCalculationById(string calculationId);
     }
 }

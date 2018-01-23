@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,18 +13,18 @@ namespace CalculateFunding.Frontend.Pages.Tests
     public class TestScenarioModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
-        private readonly ICalculationsApiClient _resultsClient;
+        private readonly IPreviewApiClient _previewClient;
 
-        public TestScenarioModel(ISpecsApiClient specsClient, ICalculationsApiClient calculationsClient)
+        public TestScenarioModel(ISpecsApiClient specsClient, IPreviewApiClient previewClient)
         {
             _specsClient = specsClient;
-            _resultsClient = calculationsClient;
+            _previewClient = previewClient;
 
             Operators = Enum.GetValues(typeof(ComparisonOperator)).Cast<ComparisonOperator>().ToList();
         } 
 
         public List<ComparisonOperator> Operators { get; }
-        public ApiClient.Models.Specification Budget { get; private set; }
+        public Specification Budget { get; private set; }
         public Product Product { get; private set; }
 
         [BindProperty]
@@ -141,11 +141,11 @@ namespace CalculateFunding.Frontend.Pages.Tests
                     Product.TestScenarios.Add(TestScenario);
                 }
 
-                var response = await _resultsClient.PostPreview(new PreviewRequest
+                var response = await _previewClient.PostPreview(new Clients.PreviewClient.Models.PreviewRequest
                 {
                     BudgetId = Budget.Id,
                     ProductId = Product.Id,
-                    TestScenario = TestScenario
+                    //TestScenario = TestScenario
                 });
 
                 Preview = response.Content;
@@ -153,7 +153,7 @@ namespace CalculateFunding.Frontend.Pages.Tests
             }
         }
 
-        public PreviewResponse Preview { get; set; }
+        public Clients.PreviewClient.Models.PreviewResponse Preview { get; set; }
 
         private string ValidateFieldType(FieldType fieldType, string value, int i)
         {

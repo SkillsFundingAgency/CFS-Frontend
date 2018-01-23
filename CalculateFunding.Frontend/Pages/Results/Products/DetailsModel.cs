@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
-using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.PreviewClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -11,12 +11,12 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
     public class DetailsModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
-        private readonly ICalculationsApiClient _calculationsClient;
+        private readonly IPreviewApiClient _previewClient;
 
-        public DetailsModel(ISpecsApiClient apiClient, ICalculationsApiClient calculationsClient)
+        public DetailsModel(ISpecsApiClient apiClient, IPreviewApiClient previewClient)
         {
             _specsClient = apiClient;
-            _calculationsClient = calculationsClient;
+            _previewClient = previewClient;
         }
         public async Task OnGet(string id, string productId)
         {
@@ -26,7 +26,7 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
             //    .SelectMany(x => x.AllocationLines.SelectMany(y =>
             //        y.ProductFolders.SelectMany(z => z.Products).Where(p => p.Id == productId))).FirstOrDefault();
 
-            var response = await _calculationsClient.PostPreview(new PreviewRequest
+            var response = await _previewClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
@@ -48,7 +48,7 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
             //    .Skip(1).FirstOrDefault();
 
 
-            var response = await _calculationsClient.PostPreview(new PreviewRequest
+            var response = await _previewClient.PostPreview(new PreviewRequest
             {
                 BudgetId = Budget.Id,
                 ProductId = Product.Id,
@@ -57,7 +57,7 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
 
             if (!string.IsNullOrEmpty(calculation))
             {
-                Product.Calculation = new ProductCalculation { SourceCode = calculation };
+                Product.Calculation = new Clients.PreviewClient.Models.ProductCalculation { SourceCode = calculation };
             }
 
             Preview = response.Content;
@@ -65,8 +65,8 @@ namespace CalculateFunding.Frontend.Pages.Results.Products
 
         public PreviewResponse Preview { get; set; }
 
-        public ApiClient.Models.Specification Budget { get; set; }
-        public Product Product { get; set; }
+        public Specification Budget { get; set; }
+        public Clients.PreviewClient.Models.Product Product { get; set; }
         public List<ProviderTestResult> TestResults { get; set; }
     }
 }

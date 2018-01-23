@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Paging;
@@ -24,7 +26,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public int EndItemNumber { get; set; }
 
-        public IEnumerable<Calculation> Calculations { get; set; }
+        public IEnumerable<CalculationSearchResult> Calculations { get; set; }
 
         public PagerState PagerState { get; set; }
 
@@ -52,7 +54,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 pagedQueryOptions.Page = pageNumber.Value;
             }
 
-            PagedResult<Calculation> calculationsResult = await _calculationsApiClient.GetCalculations(pagedQueryOptions);
+            PagedResult<CalculationSearchResult> calculationsResult = await _calculationsApiClient.FindCalculations(pagedQueryOptions);
             TotalResults = calculationsResult.TotalItems;
             CurrentPage = calculationsResult.PageNumber;
             Calculations = calculationsResult.Items;

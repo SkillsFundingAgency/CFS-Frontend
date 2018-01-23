@@ -2,9 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Frontend.ApiClient;
-using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.ApiClient.Models.CreateModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Properties;
@@ -13,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.Models;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {

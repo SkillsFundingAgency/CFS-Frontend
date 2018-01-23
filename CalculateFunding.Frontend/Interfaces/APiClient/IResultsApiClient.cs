@@ -1,8 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
-using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.ApiClient.Models.Results;
+using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {

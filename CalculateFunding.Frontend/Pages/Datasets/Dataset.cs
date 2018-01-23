@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.Models;
 using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Pages.Datasets

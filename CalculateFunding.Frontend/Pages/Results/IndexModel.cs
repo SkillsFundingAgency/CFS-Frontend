@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
-using CalculateFunding.Frontend.ApiClient.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {

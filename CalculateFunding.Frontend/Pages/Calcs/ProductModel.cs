@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.PreviewClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -20,40 +22,40 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
-            var response = await _calculationsClient.PostPreview(new PreviewRequest
-            {
-                BudgetId = Budget.Id,
-                ProductId = Product.Id,
-                Calculation = Product.Calculation?.SourceCode
-            });
+            //var response = await _calculationsClient.PostPreview(new PreviewRequest
+            //{
+            //    BudgetId = Budget.Id,
+            //    ProductId = Product.Id,
+            //    Calculation = Product.Calculation?.SourceCode
+            //});
 
-            Preview = response.Content;
+           // Preview = response.Content;
         }
 
-        public async Task OnPost(string id, string calculation)
+        public void OnPost(string id, string calculation)
         {
-            Budget = (await _specsClient.GetSpecification(id))?.Content;
+            //Budget = (await _specsClient.GetSpecification(id))?.Content;
 
 
-            var response = await _calculationsClient.PostPreview(new PreviewRequest
-            {
-                BudgetId = Budget.Id,
-                ProductId = Product.Id,
-                Calculation = calculation ?? Product.Calculation?.SourceCode
-            });
+            //var response = await _calculationsClient.PostPreview(new PreviewRequest
+            //{
+            //    BudgetId = Budget.Id,
+            //    ProductId = Product.Id,
+            //    Calculation = calculation ?? Product.Calculation?.SourceCode
+            //});
 
-            if (!string.IsNullOrEmpty(calculation))
-            {
-                Product.Calculation = new ProductCalculation { SourceCode = calculation };
-            }
+            //if (!string.IsNullOrEmpty(calculation))
+            //{
+            //    Product.Calculation = new ProductCalculation { SourceCode = calculation };
+            //}
 
-            Preview = response.Content;
+            //Preview = response.Content;
         }
 
         public PreviewResponse Preview { get; set; }
 
         public Specification Budget { get; set; }
 
-        public Product Product { get; set; }
+        public Clients.PreviewClient.Models.Product Product { get; set; }
     }
 }

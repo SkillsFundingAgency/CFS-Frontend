@@ -97,6 +97,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage Calculations.
+        /// </summary>
+        public static string ManageCalculations {
+            get {
+                return ResourceManager.GetString("ManageCalculations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Policies.
         /// </summary>
         public static string ManagePolicies {

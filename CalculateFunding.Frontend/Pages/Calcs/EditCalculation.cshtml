@@ -1,0 +1,22 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.EditCalculationPageModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Edit Calculation";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">@Model.SpecsCalculation.Name</p>
+    
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+            <li>@Model.SpecsCalculation.Name</li>
+        </ol>
+    </div>
+}

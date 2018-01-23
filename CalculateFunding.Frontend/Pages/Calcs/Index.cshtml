@@ -78,10 +78,10 @@
                 @foreach (var calculation in Model.Calculations)
                 {
                     <tr>
-                        <td><a href="/spec/@calculation.Specification.Id">@calculation.Name</a></td>
+                        <td><a href="/spec/@calculation.SpecificationId">@calculation.Name</a></td>
                         <td>Unknown</td>
-                        <td>@calculation.Specification.Name</td>
-                        <td>@calculation.Period.Name</td>
+                        <td>@calculation.SpecificationName</td>
+                        <td>@calculation.PeriodName</td>
                     </tr>
 
                 }

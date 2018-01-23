@@ -1,18 +1,17 @@
 ﻿using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Pages.Specs;
-using CalculateFunding.Frontend.ApiClient.Models;
 using System.Linq;
 using CalculateFunding.FrontEnd.TestData;
 using NSubstitute;
-using CalculateFunding.Frontend.ApiClient;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.Models;
 
 namespace CalculateFunding.FrontEnd.PageModels.Specs
 {
