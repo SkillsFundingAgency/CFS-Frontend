@@ -51,7 +51,14 @@
 
                 @foreach (int pageNumber in Model.PagerState.Pages)
                 {
-                    <a href="/calcs?pageNumber=@pageNumber" class="paging-link">@pageNumber</a>
+                    if (pageNumber == Model.PagerState.CurrentPage)
+                    {
+                        <span class="paging-active-page">@pageNumber</span>
+                    }
+                    else
+                    {
+                        <a href="/calcs?pageNumber=@pageNumber" class="paging-link">@pageNumber</a>
+                    }
 
                 }
 
@@ -65,7 +72,7 @@
 
         </div>
 
-        <table class="calculations-table">
+        <table class="calculations-table table-striped">
             <thead>
                 <tr>
                     <th>Calculation Name</th>
@@ -78,8 +85,8 @@
                 @foreach (var calculation in Model.Calculations)
                 {
                     <tr>
-                        <td><a href="/spec/@calculation.SpecificationId">@calculation.Name</a></td>
-                        <td>Unknown</td>
+                        <td><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
+                        <td>@calculation.Status</td>
                         <td>@calculation.SpecificationName</td>
                         <td>@calculation.PeriodName</td>
                     </tr>

@@ -104,7 +104,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
                 new Reference("1617", "2016/17")
             };
 
-            var response = new ApiResponse<IEnumerable<Reference>> (HttpStatusCode.OK, years.AsEnumerable());
+            var response = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, years.AsEnumerable());
 
             return Task.FromResult(response);
             //return GetAsync<Reference[]>($"{_specsPath}/academic-years");
@@ -138,6 +138,24 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             CalculationGetModel model = new CalculationGetModel { SpecificationId = specificationId, Name = calculationName };
 
             return PostAsync<Calculation, CalculationGetModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
+        }
+
+        public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+
+            Calculation calc = new Calculation()
+            {
+                Id = calculationId,
+                Description = "Mocked",
+                Name = "Auto generated in specs",
+            };
+
+            ApiResponse<Calculation> response = new ApiResponse<Calculation>(HttpStatusCode.OK, calc);
+
+            return Task.FromResult(response);
+
+            // return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
     }
 }

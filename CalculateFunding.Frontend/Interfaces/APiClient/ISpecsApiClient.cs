@@ -29,6 +29,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
         Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy);
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
+        Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calclationId);
         Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation);
         Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines();
     }

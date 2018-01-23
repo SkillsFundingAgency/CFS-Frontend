@@ -7,8 +7,16 @@
 }
 
 @section FormBannerLeft{
-    <p class="hero-text">@Model.SpecsCalculation.Name</p>
-    
+    <p class="hero-title">@Model.Calculation.Name for @Model.Calculation.PeriodName</p>
+}
+
+@section FormBannerRight{ 
+    <div class="bannerpublish-container">
+        <div class="bannerpublish-title">Status</div>
+        <div class="bannerpublish-status"><strong>Status:</strong> @Model.Calculation.Status</div>
+        <div class="bannerpublish-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedBy</div>
+        <div class="bannerpublish-lastmodified">Last saved by: @Model.Calculation.LastModified</div>
+    </div>
 }
 
 @section BreadCrumb{
@@ -16,7 +24,49 @@
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
-            <li>@Model.SpecsCalculation.Name</li>
+            <li>@Model.Calculation.Name</li>
         </ol>
     </div>
 }
+
+<blockquote><p>
+    Testing
+</p>
+    </blockquote>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p class="policy-spec-what withjs-hide">What is @Model.Calculation.Name?</p>
+
+            <div class="inline-collapse-container">
+                <div class="inline-collapse-heading withjs-show">
+                    <i class="inline-collapse-arrow"></i>
+                    <span>What is @Model.Calculation.Name?</span>
+                </div>
+                <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                    @Model.Calculation.Description
+                </div>
+            </div>
+        </div>
+    </div>
+
+<strong>Calculation script:</strong>
+<div id="monacoeditor" class="monaco-editor-container"></div>
+
+
+
+
+<script src="~/assets/libs/js/monaco/vs/loader.js"></script>
+<script>
+    require.config({ paths: { 'vs': '/assets/libs/js/monaco/vs' }});
+	require(['vs/editor/editor.main'], function() {
+        var editor = monaco.editor.create(document.getElementById('monacoeditor'), {
+			value: [
+				//'function x() {',
+				//'\tconsole.log("Hello world!");',
+				//'}'
+			].join('\n'),
+			language: 'vb'
+		});
+	});
+</script>

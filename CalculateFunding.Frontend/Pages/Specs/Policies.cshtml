@@ -22,14 +22,6 @@
     <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
 }
 
-    <div class="row">
-        <div class="col-xs-12">
-
-            
-            
-        </div>
-    </div>
-
 <div class="row manage-policy">
     <div class="col-xs-12 col-sm-9">
         <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
@@ -156,8 +148,7 @@
 @section scripts{
 
     <script type="text/javascript">
-        $(".withjs-show").removeClass("withjs-show");
-        $(".withjs-hide").addClass("withjs-hide-hidden");
+       
 
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
 
@@ -199,26 +190,6 @@
                     }
                 }
             }
-        });
-
-        $(".inline-collapse-heading").on("click", function (e) { 
-            var headerElement = $(this);
-            var containerElement = headerElement.parent();
-            var bodyElement = containerElement.children(".inline-collapse-contents");
-            
-            if (headerElement.hasClass("active")) {
-
-                headerElement.removeClass("active");
-                bodyElement.addClass("withjs-hide-hidden");
-            }
-            else {
-                headerElement.addClass("active");
-                bodyElement.removeClass("withjs-hide-hidden");
-
-            }
-
-            return e.preventDefault();
-
         });
     </script>
 }

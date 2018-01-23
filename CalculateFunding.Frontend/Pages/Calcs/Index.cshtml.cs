@@ -26,7 +26,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public int EndItemNumber { get; set; }
 
-        public IEnumerable<CalculationSearchResult> Calculations { get; set; }
+        public IEnumerable<CalculationSearchResultItem> Calculations { get; set; }
 
         public PagerState PagerState { get; set; }
 
@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 pagedQueryOptions.Page = pageNumber.Value;
             }
 
-            PagedResult<CalculationSearchResult> calculationsResult = await _calculationsApiClient.FindCalculations(pagedQueryOptions);
+            PagedResult<CalculationSearchResultItem> calculationsResult = await _calculationsApiClient.FindCalculations(pagedQueryOptions);
             TotalResults = calculationsResult.TotalItems;
             CurrentPage = calculationsResult.PageNumber;
             Calculations = calculationsResult.Items;

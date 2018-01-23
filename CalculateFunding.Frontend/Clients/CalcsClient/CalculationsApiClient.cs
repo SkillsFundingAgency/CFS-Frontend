@@ -13,47 +13,34 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
 {
     public class CalculationsApiClient : AbstractApiClient, ICalculationsApiClient
     {
-        private List<CalculationSearchResult> _calculations;
+        private List<Calculation> _calculations;
 
         public CalculationsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
             : base(options, httpClient, logger, correlationIdProvider)
         {
-            _calculations = new List<CalculationSearchResult>();
+            _calculations = new List<Calculation>();
             for (int i = 0; i < 605; i++)
             {
-                _calculations.Add(new CalculationSearchResult()
+                _calculations.Add(new Calculation()
                 {
                     Id = $"{i}",
                     Description = $"This is calculation #{i + 1}",
                     Name = $"Calculation {i + 1}",
-                    SpecificationName = "Test spec 1",
-                    SpecificationId = "1",
-                    PeriodName = "2018/2019",
+                    Specification = new Reference("1", "Test spec 1"),
+                    Period = new Reference("1819", "2018/2019"),
+                    CalculationSpecification = new Reference($"{i}", $"Calculation {i + 1}"),
                 });
             }
         }
 
         public Task<Calculation> GetCalculationById(string calculationId)
         {
-            CalculationSearchResult csr = _calculations.FirstOrDefault(c => c.Id == calculationId);
-            Calculation result = null;
-            if (csr != null)
-            {
-                result = new Calculation()
-                {
-                    Description = csr.Description,
-                    Id = csr.Id,
-                    Name = csr.Name,
-                    Period = new Reference("1", csr.PeriodName),
-                    Specification = new Reference(csr.SpecificationId, csr.SpecificationName),
-                };
-            }
-            return Task.FromResult(result);
+            return Task.FromResult(_calculations.FirstOrDefault(c => c.Id == calculationId));
         }
 
-        public Task<PagedResult<CalculationSearchResult>> FindCalculations(PagedQueryOptions queryOptions)
+        public Task<PagedResult<CalculationSearchResultItem>> FindCalculations(PagedQueryOptions queryOptions)
         {
-            PagedResult<CalculationSearchResult> result = new PagedResult<CalculationSearchResult>()
+            PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>()
             {
                 PageNumber = queryOptions.Page,
                 PageSize = queryOptions.PageSize,
@@ -62,7 +49,14 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
 
             };
 
-            result.Items = _calculations.Skip((queryOptions.Page - 1) * queryOptions.PageSize).Take(queryOptions.PageSize);
+            result.Items = _calculations.Skip((queryOptions.Page - 1) * queryOptions.PageSize).Take(queryOptions.PageSize).Select(c => new CalculationSearchResultItem()
+            {
+                Id = c.Id,
+                Name = c.Name,
+                PeriodName = c.Period.Name,
+                SpecificationName = c.Specification.Name,
+                Status = "Unknown"
+            });
 
             return Task.FromResult(result);
         }

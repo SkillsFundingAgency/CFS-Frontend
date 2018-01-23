@@ -120,7 +120,10 @@
   <data name="CalculationIdNullOrEmpty" xml:space="preserve">
     <value>The provided calculation ID was null or empty string</value>
   </data>
-  <data name="CalculationNotFound" xml:space="preserve">
-    <value>Calculation not found</value>
+  <data name="CalculationNotFoundInCalcsService" xml:space="preserve">
+    <value>Calculation not found in Calcs Service</value>
+  </data>
+  <data name="CalculationNotFoundInSpecsService" xml:space="preserve">
+    <value>Calculation was not found in Specs Service</value>
   </data>
 </root>

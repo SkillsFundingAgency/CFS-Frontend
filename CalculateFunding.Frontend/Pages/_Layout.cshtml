@@ -74,7 +74,11 @@
                     </div>
                     <div class="col-xs-3">
                         <div class="form-banner-container-right">
-                            <a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.
+                            @if (!IsSectionDefined("FormBannerRight"))
+                            {
+                                <text><a href="#">Contact the Calculate Funding Service Team</a> with any comments or questions.</text>
+                            }
+
                             @RenderSection("FormBannerRight", false)
                         </div>
 

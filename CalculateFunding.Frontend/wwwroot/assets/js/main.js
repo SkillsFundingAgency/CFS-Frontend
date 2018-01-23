@@ -215,3 +215,26 @@ $("#select-spec-year").change(function () {
 //        }
 //    }).disableSelection();
 //}
+
+$(".withjs-show").removeClass("withjs-show");
+$(".withjs-hide").addClass("withjs-hide-hidden");
+
+$(".inline-collapse-heading").on("click", function (e) {
+    var headerElement = $(this);
+    var containerElement = headerElement.parent();
+    var bodyElement = containerElement.children(".inline-collapse-contents");
+
+    if (headerElement.hasClass("active")) {
+
+        headerElement.removeClass("active");
+        bodyElement.addClass("withjs-hide-hidden");
+    }
+    else {
+        headerElement.addClass("active");
+        bodyElement.removeClass("withjs-hide-hidden");
+
+    }
+
+    return e.preventDefault();
+
+});

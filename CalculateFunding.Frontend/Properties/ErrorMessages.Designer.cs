@@ -70,11 +70,20 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculation not found.
+        ///   Looks up a localized string similar to Calculation not found in Calcs Service.
         /// </summary>
-        internal static string CalculationNotFound {
+        internal static string CalculationNotFoundInCalcsService {
             get {
-                return ResourceManager.GetString("CalculationNotFound", resourceCulture);
+                return ResourceManager.GetString("CalculationNotFoundInCalcsService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calculation was not found in Specs Service.
+        /// </summary>
+        internal static string CalculationNotFoundInSpecsService {
+            get {
+                return ResourceManager.GetString("CalculationNotFoundInSpecsService", resourceCulture);
             }
         }
     }
