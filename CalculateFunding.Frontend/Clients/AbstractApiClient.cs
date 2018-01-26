@@ -68,7 +68,7 @@ namespace CalculateFunding.Frontend.Clients
 
             HttpResponseMessage response = null;
 
-            response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            response = await _httpClient.GetAsync(url, cancellationToken);
             if (response == null)
             {
                 throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
@@ -77,7 +77,8 @@ namespace CalculateFunding.Frontend.Clients
 
             if (response.IsSuccessStatusCode)
             {
-                return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
+                string bodyContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(bodyContent, _serializerSettings));
             }
 
             return new ApiResponse<T>(response.StatusCode);
@@ -91,10 +92,16 @@ namespace CalculateFunding.Frontend.Clients
             }
 
             var json = JsonConvert.SerializeObject(request, _serializerSettings);
-            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+
+            }
+
             if (response.IsSuccessStatusCode)
             {
-                return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), _serializerSettings));
+                return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
             }
             return new ApiResponse<TResponse>(response.StatusCode);
         }
@@ -107,7 +114,12 @@ namespace CalculateFunding.Frontend.Clients
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+
+            }
             return response.StatusCode;
         }
     }

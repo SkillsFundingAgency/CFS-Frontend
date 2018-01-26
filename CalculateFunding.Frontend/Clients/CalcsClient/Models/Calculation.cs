@@ -6,11 +6,9 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
     public class Calculation : Reference
     {
-        public string Description { get; set; }
+        public string SpecificationId { get; set; }
 
-        public Reference Specification { get; set; }
-
-        public Reference Period { get; set; }
+        public string PeriodName { get; set; }
 
         public Reference CalculationSpecification { get; set; }
 
@@ -22,6 +20,6 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
         public DateTime LastModified { get; set; }
 
         [JsonProperty("author")]
-        public string LastModifiedBy { get; set; }
+        public Reference LastModifiedBy { get; set; }
     }
 }

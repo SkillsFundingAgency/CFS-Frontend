@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -28,7 +30,12 @@ namespace CalculateFunding.Frontend.ViewModels
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<Clients.CalcsClient.Models.Calculation, CalculationEditViewModel>();
-            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationViewModel>();
+            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationViewModel>()
+                .ForMember(m => m.Description, opt => opt.Ignore());
+
+            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
+
+            CreateMap<Reference, ReferenceViewModel>();
         }
     }
 }

@@ -147,7 +147,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Calculation calc = new Calculation()
             {
                 Id = calculationId,
-                Description = "Mocked",
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dapibus metus lacus, vitae rhoncus augue dapibus sed. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus vitae vulputate nunc. Aliquam cursus tellus sodales, ullamcorper nunc non, rutrum sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis enim et volutpat ornare. Vivamus ornare nunc nec odio aliquam sagittis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus non nibh enim. Duis id quam at ligula vehicula facilisis. Nulla ligula mauris, pulvinar nec orci et, viverra varius sapien.",
                 Name = "Auto generated in specs",
             };
 

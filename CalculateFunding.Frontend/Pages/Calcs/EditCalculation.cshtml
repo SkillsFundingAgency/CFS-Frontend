@@ -8,14 +8,28 @@
 
 @section FormBannerLeft{
     <p class="hero-title">@Model.Calculation.Name for @Model.Calculation.PeriodName</p>
+    <div>
+        <p class="policy-spec-what withjs-hide">What is @Model.Calculation.Name?</p>
+
+        <div class="inline-collapse-container">
+            <div class="inline-collapse-heading withjs-show">
+                <i class="inline-collapse-arrow"></i>
+                <span>What is @Model.Calculation.Name?</span>
+            </div>
+            <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                @Model.Calculation.Description
+            </div>
+        </div>
+    </div>
 }
 
-@section FormBannerRight{ 
+@section FormBannerRight{
     <div class="bannerpublish-container">
         <div class="bannerpublish-title">Status</div>
         <div class="bannerpublish-status"><strong>Status:</strong> @Model.Calculation.Status</div>
-        <div class="bannerpublish-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedBy</div>
-        <div class="bannerpublish-lastmodified">Last saved by: @Model.Calculation.LastModified</div>
+        <div class="bannerpublish-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
+        <div class="bannerpublish-lastmodified">@Model.Calculation.LastModified</div>
+        <div class="bannerpublish-button-container"><input type="button" value="Publish" class="button button-publish" disabled /></div>
     </div>
 }
 
@@ -28,45 +42,69 @@
         </ol>
     </div>
 }
+<div class="row">
+    <div class="col-xs-12 edit-calculation" id="edit-calculation">
+        <strong>Calculation script:</strong>
+        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode"></div>
 
-<blockquote><p>
-    Testing
-</p>
-    </blockquote>
+        <div>
+            <a href="/calcs/compare/@Model.Calculation.Id">View previous versions</a>
+        </div>
 
-    <div class="row">
-        <div class="col-xs-12">
-            <p class="policy-spec-what withjs-hide">What is @Model.Calculation.Name?</p>
+        <div class="spacing-30">
+            <input type="button" class="button" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" />
+        </div>
 
-            <div class="inline-collapse-container">
-                <div class="inline-collapse-heading withjs-show">
-                    <i class="inline-collapse-arrow"></i>
-                    <span>What is @Model.Calculation.Name?</span>
-                </div>
-                <div class="inline-collapse-contents withjs-hide policy-spec-description">
-                    @Model.Calculation.Description
+        <strong>Build output:</strong>
+
+        <div class="build-output">
+            <div data-bind="text: buildOutput"></div>
+            <div data-bind="with: compilerResponse">
+                Code compiled sucessfully: <span data-bind="text: compilerOutput.success"></span>
+
+                <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                    <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
                 </div>
             </div>
         </div>
+
+        <div class="spacing-30" data-bind="visible: !calculationBuilt()">Please build calculation before saving the calculation:</div>
+        <div class="spacing-15">
+            <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" />
+        </div>
+
+        <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult">
+
+        </div>
+
+        <div>
+            <a href="/calcs">Back</a>
+        </div>
     </div>
-
-<strong>Calculation script:</strong>
-<div id="monacoeditor" class="monaco-editor-container"></div>
+</div>
 
 
 
 
-<script src="~/assets/libs/js/monaco/vs/loader.js"></script>
-<script>
-    require.config({ paths: { 'vs': '/assets/libs/js/monaco/vs' }});
-	require(['vs/editor/editor.main'], function() {
-        var editor = monaco.editor.create(document.getElementById('monacoeditor'), {
-			value: [
-				//'function x() {',
-				//'\tconsole.log("Hello world!");',
-				//'}'
-			].join('\n'),
-			language: 'vb'
-		});
-	});
-</script>
+
+
+@section scripts{
+    <script type="text/javascript" src="~/assets/libs/js/knockout-latest.debug.js"></script>
+    <script type="text/javascript" src="~/assets/libs/js/monaco/vs/loader.js"></script>
+
+    <script type="text/javascript" src="~/js/bindingHandler.monacoEditor.js"></script>
+    <script type="text/javascript" src="~/js/editcalculation.js"></script>
+    <script type="text/javascript">
+        var editCalculationElement = document.getElementById("edit-calculation");
+        if (editCalculationElement) {
+            var editViewModelOptions = {
+                calculationId: "@Model.Calculation.Id",
+                specificationId: "@Model.SpecificationId"
+            };
+            var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
+            viewModel.sourceCode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))");
+            ko.applyBindings(viewModel, editCalculationElement);
+        }
+
+    </script>
+}

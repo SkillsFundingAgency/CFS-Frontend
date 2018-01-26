@@ -29,7 +29,14 @@ namespace CalculateFunding.Frontend.Core.Telemetry
             else
             {
                 correlationId = Guid.NewGuid().ToString();
-                _httpContextAccessor.HttpContext.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId);
+                if (!_httpContextAccessor.HttpContext.Response.HasStarted)
+                {
+                    _httpContextAccessor.HttpContext.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId);
+                }
+                else
+                {
+                    return;
+                }
             }
 
             if (!telemetry.Context.Properties.ContainsKey(LoggingConstants.CorrelationIdPropertyName))

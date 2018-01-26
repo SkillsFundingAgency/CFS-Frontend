@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27110.0
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculateFunding.Frontend", "CalculateFunding.Frontend\CalculateFunding.Frontend.csproj", "{A36B0D39-5883-4EE0-9458-A0654BEA7646}"
 EndProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D048BD50-CFBB-42BF-8B43-301401018421}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculateFunding.FrontEnd.UnitTests", "CalculateFunding.FrontEnd.UnitTests\CalculateFunding.FrontEnd.UnitTests.csproj", "{F307EC05-2CD4-4755-9680-87E98A705EB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculateFunding.Frontend.UnitTests", "CalculateFunding.FrontEnd.UnitTests\CalculateFunding.Frontend.UnitTests.csproj", "{F307EC05-2CD4-4755-9680-87E98A705EB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

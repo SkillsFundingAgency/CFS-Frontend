@@ -16,9 +16,11 @@
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
 
-       public CalculationViewModel Calculation { get; set; }
+        public CalculationViewModel Calculation { get; set; }
 
         public CalculationEditViewModel EditModel { get; set; }
+
+        public string SpecificationId { get; set; }
 
         public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
         {
@@ -38,23 +40,25 @@
                 return new BadRequestObjectResult(ErrorMessages.CalculationIdNullOrEmpty);
             }
 
-            Clients.CalcsClient.Models.Calculation calculation = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Clients.CalcsClient.Models.Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
 
 
-            if (calculation == null)
+            if (calculation == null || calculation.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.Specification.Id, calculation.CalculationSpecification.Id);
-            if(specCalculation == null || specCalculation.StatusCode == System.Net.HttpStatusCode.NotFound)
+            ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
+            if (specCalculation == null || specCalculation.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
             }
 
+            Calculation = _mapper.Map<CalculationViewModel>(calculation.Content);
+            Calculation.Description = specCalculation.Content.Description;
+            SpecificationId = calculation.Content.SpecificationId;
 
-            Calculation = _mapper.Map<CalculationViewModel>(calculation);
-            EditModel = _mapper.Map<CalculationEditViewModel>(calculation);
+            EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
 
             return Page();
         }

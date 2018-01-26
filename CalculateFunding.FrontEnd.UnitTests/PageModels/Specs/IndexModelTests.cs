@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Pages.Specs;
 using System.Linq;
-using CalculateFunding.FrontEnd.TestData;
+using CalculateFunding.Frontend.TestData;
 using NSubstitute;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,7 @@ using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.Models;
 
-namespace CalculateFunding.FrontEnd.PageModels.Specs
+namespace CalculateFunding.Frontend.PageModels.Specs
 {
     [TestClass]
     public class IndexModelTests

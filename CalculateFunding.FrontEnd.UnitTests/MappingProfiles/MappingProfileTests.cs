@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CalculateFunding.FrontEnd.MappingProfiles
+namespace CalculateFunding.Frontend.MappingProfiles
 {
     [TestClass]
     public class MappingProfileTests
     {
         [TestMethod]
-        public void FrontEndMappingConfigurationIsValid()
+        public void FrontendMappingConfigurationIsValid()
         {
             // Arrange
             MapperConfiguration config = new MapperConfiguration(c => c.AddProfile<FrontEndMappingProfile>());

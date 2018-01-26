@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CalculateFunding.FrontEnd.ApiClients
+namespace CalculateFunding.Frontend.ApiClients
 {
     [TestClass]
     public class SpecsApiClientTests

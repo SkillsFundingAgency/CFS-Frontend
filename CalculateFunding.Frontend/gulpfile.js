@@ -1,4 +1,4 @@
-﻿/// <binding BeforeBuild='copy-assets, sass' ProjectOpened='watch-sass' />
+﻿/// <binding BeforeBuild='copy-assets, sass' ProjectOpened='watch-sass, ts:watch' />
 
 "use strict";
 
@@ -10,6 +10,12 @@ var lodash = require("lodash"),
     sass = require("gulp-sass"),
     uglify = require("gulp-uglify");
 
+var ts = require("gulp-typescript");
+var tsProject = ts.createProject("tsconfig.json");
+var sourcemaps = require('gulp-sourcemaps');
+var uglify = require('gulp-uglify');
+var merge = require('merge2');
+
 var paths = {
     webroot: "./wwwroot/"
 };
@@ -20,6 +26,7 @@ paths.css = paths.webroot + "assets/css/**/*.css";
 paths.minCss = paths.webroot + "assets/css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "assetsjs/main.min.js";
 paths.concatCssDest = paths.webroot + "assets/css/main.min.css";
+paths.tsSource = "Scripts/*.ts"
 
 gulp.task("clean:js", function (cb) {
     rimraf(paths.concatJsDest, cb);
@@ -78,7 +85,10 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/ext-language_tools.js',
             './node_modules/ace-builds/src-noconflict/snippets/csharp.js',
             './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
-            './node_modules/ace-builds/src-noconflict/snippets/vbscript.js'
+            './node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
+            './node_modules/knockout/build/output/knockout-latest.js',
+            './node_modules/knockout/build/output/knockout-latest.debug.js'
+
 
         ],
         css: [
@@ -95,4 +105,55 @@ gulp.task('copy-assets', function () {
     lodash(assets).forEach(function (assets, type) {
         gulp.src(assets).pipe(gulp.dest('./wwwroot/assets/libs/' + type));
     });
+
+    var monacoSource = "./node_modules/monaco-editor/min/vs";
+    var monacoSourceFiles = [
+        "loader.js",
+        "base/worker/workerMain.js",
+        "basic-languages/src/vb.js",
+        "editor/editor.main.js",
+        "editor/editor.main.css",
+        "editor/editor.main.nls.js",
+        "editor/standalone/browser/quickOpen/symbol-sprite.svg"
+    ];
+
+    monacoSourceFiles.forEach(function (value) {
+        var filePath = monacoSource + "/" + value;
+        var relativePathIndex = value.lastIndexOf("/");
+        var relativePath = "";
+        if (relativePathIndex > 0) {
+            relativePath = "/" + value.substring(0, relativePathIndex);
+        }
+
+        var destinationPath = "./wwwroot/assets/libs/js/monaco/vs" + relativePath;
+
+        console.log(destinationPath);
+
+        gulp.src(filePath).pipe(gulp.dest(destinationPath));
+    });
+});
+
+gulp.task('ts:watch', function () {
+    gulp.watch(paths.tsSource, ['ts:builddev']);
+});
+
+gulp.task("ts:builddev", function () {
+
+    var tsResult = tsProject.src()
+        .pipe(sourcemaps.init()) // This means sourcemaps will be generated
+        .pipe(tsProject());
+
+    return tsResult
+        .pipe(sourcemaps.write()) // Now the sourcemaps are added to the .js file
+        .pipe(gulp.dest('wwwroot/js'));
+});
+
+gulp.task("ts:release", function () {
+
+    var tsResult = tsProject.src()
+        .pipe(tsProject())
+        .pipe(uglify());
+
+    return tsResult
+        .pipe(gulp.dest('wwwroot/js'));
 });

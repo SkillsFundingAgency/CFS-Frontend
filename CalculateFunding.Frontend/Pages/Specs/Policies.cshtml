@@ -103,7 +103,7 @@
                                     @foreach (var calculation in subPolicy.Calculations)
                                 {
                                     <tr>
-                                        <td class="calculation-name"><a name="calculation-@calculation.Id"><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
                                         <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
                                     </tr>
                             }

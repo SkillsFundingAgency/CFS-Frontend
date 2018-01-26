@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient;
-using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -11,12 +7,14 @@ using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
-    public class IndexModel : PageModel
+    public class IndexPageModel : PageModel
     {
         private ICalculationsApiClient _calculationsApiClient;
+        private ILogger _logger;
 
         public int TotalResults { get; set; }
 
@@ -35,10 +33,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         public Calculation PublishedCalculation { get; set; }
 
 
-        public IndexModel(ICalculationsApiClient calculationsApiClient)
+        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ILogger logger)
         {
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
             _calculationsApiClient = calculationsApiClient;
+            _logger = logger;
         }
 
         public async Task<IActionResult> OnGet(int? pageNumber, string draftSavedId, string publishedId)
@@ -55,6 +56,12 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             }
 
             PagedResult<CalculationSearchResultItem> calculationsResult = await _calculationsApiClient.FindCalculations(pagedQueryOptions);
+            if (calculationsResult == null)
+            {
+                _logger.Error("Find calculations HTTP request failed");
+                return new StatusCodeResult(500);
+            }
+
             TotalResults = calculationsResult.TotalItems;
             CurrentPage = calculationsResult.PageNumber;
             Calculations = calculationsResult.Items;
@@ -69,12 +76,12 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             if (!string.IsNullOrWhiteSpace(draftSavedId))
             {
-                DraftSavedCalculation = await this._calculationsApiClient.GetCalculationById(draftSavedId);
+                DraftSavedCalculation = (await this._calculationsApiClient.GetCalculationById(draftSavedId)).Content;
             }
 
             if (!string.IsNullOrWhiteSpace(publishedId))
             {
-                PublishedCalculation = await this._calculationsApiClient.GetCalculationById(publishedId);
+                PublishedCalculation = (await this._calculationsApiClient.GetCalculationById(publishedId)).Content;
             }
 
             return Page();

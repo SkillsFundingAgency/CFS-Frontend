@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
+    <TypeScriptToolsVersion>2.6</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -11,6 +12,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
+    <None Remove="Scripts\editcalculation.ts" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
@@ -72,6 +77,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Clients\Models\Results\" />
+    <Folder Include="ViewModels\Preview\" />
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
   </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
+    <TypeScriptCompile Include="Scripts\editcalculation.ts" />
+  </ItemGroup>
+
+  <PropertyGroup>
+
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+
+  </PropertyGroup>
 </Project>

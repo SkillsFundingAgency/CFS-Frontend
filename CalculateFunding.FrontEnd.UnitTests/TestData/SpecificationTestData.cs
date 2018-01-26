@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CalculateFunding.FrontEnd.TestData
+namespace CalculateFunding.Frontend.TestData
 {
     public static class SpecificationTestData
     {

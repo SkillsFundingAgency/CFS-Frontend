@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CalculateFunding.FrontEnd.Paging
+namespace CalculateFunding.Frontend.Paging
 {
     [TestClass]
     public class PagingUnitTests
