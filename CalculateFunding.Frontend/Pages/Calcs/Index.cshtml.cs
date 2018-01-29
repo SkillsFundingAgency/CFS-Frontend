@@ -4,6 +4,8 @@ using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,66 +16,29 @@ namespace CalculateFunding.Frontend.Pages.Calcs
     public class IndexPageModel : PageModel
     {
         private ICalculationsApiClient _calculationsApiClient;
-        private ILogger _logger;
+        private ICalculationSearchService _searchService;
 
-        public int TotalResults { get; set; }
-
-        public int CurrentPage { get; set; }
-
-        public int StartItemNumber { get; set; }
-
-        public int EndItemNumber { get; set; }
-
-        public IEnumerable<CalculationSearchResultItem> Calculations { get; set; }
-
-        public PagerState PagerState { get; set; }
+        public CalculationSearchResultViewModel SearchResults { get; set; }
 
         public Calculation DraftSavedCalculation { get; set; }
 
         public Calculation PublishedCalculation { get; set; }
 
+        [BindProperty]
+        public string SearchTerm { get; set; }
 
-        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ILogger logger)
+
+        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService)
         {
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
-            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(searchService, nameof(searchService));
 
             _calculationsApiClient = calculationsApiClient;
-            _logger = logger;
+            _searchService = searchService;
         }
 
         public async Task<IActionResult> OnGet(int? pageNumber, string draftSavedId, string publishedId)
         {
-            PagedQueryOptions pagedQueryOptions = new PagedQueryOptions()
-            {
-                Page = 1,
-                PageSize = 50
-            };
-
-            if (pageNumber.HasValue && pageNumber.Value > 0)
-            {
-                pagedQueryOptions.Page = pageNumber.Value;
-            }
-
-            PagedResult<CalculationSearchResultItem> calculationsResult = await _calculationsApiClient.FindCalculations(pagedQueryOptions);
-            if (calculationsResult == null)
-            {
-                _logger.Error("Find calculations HTTP request failed");
-                return new StatusCodeResult(500);
-            }
-
-            TotalResults = calculationsResult.TotalItems;
-            CurrentPage = calculationsResult.PageNumber;
-            Calculations = calculationsResult.Items;
-            StartItemNumber = ((pagedQueryOptions.Page - 1) * pagedQueryOptions.PageSize) + 1;
-            EndItemNumber = StartItemNumber + pagedQueryOptions.PageSize - 1;
-            if (EndItemNumber > calculationsResult.TotalItems)
-            {
-                EndItemNumber = calculationsResult.TotalItems;
-            }
-
-            PagerState = new PagerState(pagedQueryOptions.Page, calculationsResult.TotalPages, 4);
-
             if (!string.IsNullOrWhiteSpace(draftSavedId))
             {
                 DraftSavedCalculation = (await this._calculationsApiClient.GetCalculationById(draftSavedId)).Content;
@@ -82,6 +47,36 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             if (!string.IsNullOrWhiteSpace(publishedId))
             {
                 PublishedCalculation = (await this._calculationsApiClient.GetCalculationById(publishedId)).Content;
+            }
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                PageNumber = pageNumber,
+            };
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPost(int? pageNumber)
+        {
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                PageNumber = pageNumber,
+                SearchTerm = SearchTerm,
+            };
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new StatusCodeResult(500);
             }
 
             return Page();

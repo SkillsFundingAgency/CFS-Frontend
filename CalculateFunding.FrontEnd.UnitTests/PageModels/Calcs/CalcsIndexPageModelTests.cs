@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Calcs;
+using CalculateFunding.Frontend.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,6 +27,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             PagedResult<CalculationSearchResultItem> zeroItemResult = new PagedResult<CalculationSearchResultItem>()
             {
@@ -34,18 +39,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 TotalPages = 0,
             };
 
-            calcsClient.FindCalculations(Arg.Any<PagedQueryOptions>())
+            calcsClient.FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
                 .Returns(zeroItemResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
             // Act
             IActionResult result = await pageModel.OnGet(null, null, null);
 
             // Assert
             result.Should().NotBeNull();
-            pageModel.CurrentPage.Should().Be(1);
-            pageModel.Calculations.Should().BeEmpty();
-            pageModel.PagerState.CurrentPage.Should().Be(1);
+            pageModel.SearchResults.CurrentPage.Should().Be(1);
+            pageModel.SearchResults.Calculations.Should().BeEmpty();
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(1);
         }
 
         [TestMethod]
@@ -54,13 +59,15 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
 
             calcsClient
-                .When(a => a.FindCalculations(Arg.Any<PagedQueryOptions>()))
+                .When(a => a.FindCalculations(Arg.Any<CalculationSearchFilterRequest>()))
                 .Do(x => { throw new HttpRequestException(); });
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
             Action pageAction = new Action(() =>
@@ -78,14 +85,16 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             PagedResult<CalculationSearchResultItem> nullServiceResult = null;
 
             calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
+                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
                 .Returns(nullServiceResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
             IActionResult result = await pageModel.OnGet(null, null, null);
@@ -97,86 +106,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             typedResult.StatusCode.Should().Be(500);
         }
 
-        [TestMethod]
-        public async Task OnGet_StartAndEndItemsNumbersDisplayedCorrectlyOnSinglePageOfItems()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-
-            int numberOfItems = 25;
-
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-
-            calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
-                .Returns(itemResult);
-
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
-
-            // Act
-            IActionResult result = await pageModel.OnGet(null, null, null);
-
-            // Assert
-            pageModel.StartItemNumber.Should().Be(1);
-            pageModel.EndItemNumber.Should().Be(numberOfItems);
-        }
-
-        [TestMethod]
-        public async Task OnGet_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithLessThanPageSize()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-
-            int numberOfItems = 25;
-
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 75;
-
-            calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
-                .Returns(itemResult);
-
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
-
-            // Act
-            IActionResult result = await pageModel.OnGet(2, null, null);
-
-            // Assert
-            pageModel.StartItemNumber.Should().Be(51);
-            pageModel.EndItemNumber.Should().Be(75);
-        }
-
-        [TestMethod]
-        public async Task OnGet_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithMorePagesAvailable()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-
-            int numberOfItems = 50;
-
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 175;
-
-            calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
-                .Returns(itemResult);
-
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
-
-            // Act
-            IActionResult result = await pageModel.OnGet(2, null, null);
-
-            // Assert
-            pageModel.StartItemNumber.Should().Be(51);
-            pageModel.EndItemNumber.Should().Be(100);
-        }
+        
 
         [TestMethod]
         public async Task OnGet_WhenDraftSavedRequested_ThenSuccessfullyShown()
@@ -184,6 +114,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
 
@@ -198,14 +130,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedDraftCalculation);
             
             calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
+                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
                 .Returns(itemResult);
 
             calcsClient
                 .GetCalculationById(expectedDraftCalculation.Id)
                 .Returns(calculationResponse);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
             IActionResult result = await pageModel.OnGet(null, draftCalculationId, null);
@@ -221,6 +153,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
 
@@ -235,14 +169,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedPublishedCalculation);
 
             calcsClient
-                .FindCalculations(Arg.Any<PagedQueryOptions>())
+                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
                 .Returns(itemResult);
 
             calcsClient
                 .GetCalculationById(expectedPublishedCalculation.Id)
                 .Returns(calculationResponse);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, logger);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
             IActionResult result = await pageModel.OnGet(null, null, publishedCalculationId);

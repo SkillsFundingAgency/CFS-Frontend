@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
+    <None Remove="Scripts\calcuations.ts" />
     <None Remove="Scripts\editcalculation.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
+    <TypeScriptCompile Include="Scripts\calcuations.ts" />
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />
   </ItemGroup>
 

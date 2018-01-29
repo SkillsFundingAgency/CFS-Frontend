@@ -11,7 +11,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// </summary>
         /// <param name="queryOptions">Query Options</param>
         /// <returns>List of Calculations</returns>
-        Task<PagedResult<CalculationSearchResultItem>> FindCalculations(PagedQueryOptions queryOptions);
+        Task<PagedResult<CalculationSearchResultItem>> FindCalculations(CalculationSearchFilterRequest queryOptions);
 
         /// <summary>
         /// Gets an individual calculation

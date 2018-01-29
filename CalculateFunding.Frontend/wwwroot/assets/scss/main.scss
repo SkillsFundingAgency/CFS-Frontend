@@ -117,7 +117,7 @@ blockquote {
     }
 }
 
-.button-publish{
+.button-publish {
     width: 100%;
 }
 
@@ -136,7 +136,7 @@ blockquote {
     font-size: 19px;
 }
 
-.spacing-15{
+.spacing-15 {
     margin-top: 15px;
     margin-bottom: 15px;
 }
@@ -379,8 +379,8 @@ blockquote {
     border: 4px solid #000000;
 }
 
-.edit-calculation{
-    .build-output{
+.edit-calculation {
+    .build-output {
         background-color: rgb(222,224,226);
         border: 4px solid #000000;
         min-height: 150px;
@@ -406,7 +406,7 @@ blockquote {
         color: $grey-2;
     }
 
-    .bannerpublish-lastmodified{
+    .bannerpublish-lastmodified {
         margin-bottom: 5px;
     }
 }
@@ -1060,8 +1060,27 @@ table {
         color: $grey-2;
     }
 
-    .hero-title{
+    .hero-title {
         margin-bottom: 0;
+    }
+}
+
+.filter-container {
+    .form-control {
+        border: none;
+        height: 100%;
+        padding: 10px;
+    }
+
+    .form-control:focus,
+    input:focus {
+        outline: none;
+    }
+
+    .input-group-addon {
+        background-color: rgb(11,12,12);
+        border: none;
+        border-radius: 0;
     }
 }
 

@@ -36,6 +36,8 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
 
             CreateMap<Reference, ReferenceViewModel>();
+
+            CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
         }
     }
 }

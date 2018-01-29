@@ -36,6 +36,7 @@ namespace CalculateFunding.Frontend
             services.AddModule<ProxiesModule>(Configuration);
             services.AddModule<LoggingModule>(Configuration);
             services.AddModule<MappingModule>(Configuration);
+            services.AddModule<ServicesModule>(Configuration);
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 

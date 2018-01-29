@@ -25,12 +25,13 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             return GetAsync<Calculation>($"{_calcsPath}/calculation-current-version?calculationId={calculationId}");
         }
 
-        public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(PagedQueryOptions queryOptions)
+        public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(CalculationSearchFilterRequest filterOptions)
         {
             CalculationSearchRequest request = new CalculationSearchRequest()
             {
-                PageNumber = queryOptions.Page,
-                Top = queryOptions.PageSize,
+                PageNumber = filterOptions.Page,
+                Top = filterOptions.PageSize,
+                SearchTerm = filterOptions.SearchTerm,
             };
 
             ApiResponse<CalculationSearchResults> results = await PostAsync<CalculationSearchResults, CalculationSearchRequest>($"{_calcsPath}/calculations-search", request);
@@ -39,8 +40,8 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                 PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>()
                 {
                     Items = results.Content.Results,
-                    PageNumber = queryOptions.Page,
-                    PageSize = queryOptions.PageSize,
+                    PageNumber = filterOptions.Page,
+                    PageSize = filterOptions.PageSize,
                     TotalItems = results.Content.TotalCount,
                 };
 
@@ -50,7 +51,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                 }
                 else
                 {
-                    result.TotalPages = (int)Math.Ceiling((decimal)results.Content.TotalCount / queryOptions.PageSize);
+                    result.TotalPages = (int)Math.Ceiling((decimal)results.Content.TotalCount / filterOptions.PageSize);
                 }
                 return result;
             }
