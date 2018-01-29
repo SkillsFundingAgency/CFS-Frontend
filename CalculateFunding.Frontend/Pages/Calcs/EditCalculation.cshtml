@@ -99,10 +99,10 @@
         if (editCalculationElement) {
             var editViewModelOptions = {
                 calculationId: "@Model.Calculation.Id",
-                specificationId: "@Model.SpecificationId"
+                specificationId: "@Model.SpecificationId",
+                existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))"
             };
             var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
-            viewModel.sourceCode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))");
             ko.applyBindings(viewModel, editCalculationElement);
         }
 

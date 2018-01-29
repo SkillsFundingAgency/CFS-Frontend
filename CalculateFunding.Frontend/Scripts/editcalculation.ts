@@ -7,7 +7,7 @@
 
         public canBuildCalculation: KnockoutComputed<boolean>;
 
-        public canSaveCalculation: KnockoutObservable<boolean> = ko.observable(false);
+        public canSaveCalculation: KnockoutComputed<boolean>;
 
         public calculationBuilt: KnockoutObservable<boolean> = ko.observable(false);
 
@@ -19,6 +19,10 @@
 
         private options: IEditCalculationViewModelOptions;
 
+        private successfulCompileSourceCode: KnockoutObservable<string> = ko.observable(null);
+
+        private initialCodeContents: string;
+
         constructor(options: IEditCalculationViewModelOptions) {
             if (!options.calculationId) {
                 throw new Error("calculationId not provided in options");
@@ -29,6 +33,9 @@
             }
 
             this.options = options;
+
+            this.initialCodeContents = options.existingSourceCode;
+            this.sourceCode(options.existingSourceCode);
 
             let self = this;
 
@@ -42,6 +49,21 @@
                 } else {
                     return false;
                 }
+            });
+
+            this.canSaveCalculation = ko.computed(() => {
+                // Has the user entered source code
+                if (!self.successfulCompileSourceCode()) {
+                    return false;
+                }
+
+                // Disable save if content is the same as existing verion
+                if (self.sourceCode() == self.initialCodeContents) {
+                    return false;
+                }
+
+                // Is the source code different to last successful compile
+                return self.successfulCompileSourceCode() === self.sourceCode();
             });
         }
 
@@ -80,8 +102,8 @@
                         let compilerResponse: IPreviewCompileResultReponse = response;
                         self.compilerResponse(compilerResponse);
                         if (compilerResponse.compilerOutput.success) {
-                            self.canSaveCalculation(true);
                             self.calculationBuilt(true);
+                            self.successfulCompileSourceCode(self.sourceCode());
                         }
                     }
 
@@ -127,6 +149,7 @@
     interface IEditCalculationViewModelOptions {
         calculationId: string,
         specificationId: string,
+        existingSourceCode: string,
     }
 
     interface IPreviewCompileResultReponse {
