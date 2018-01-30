@@ -1,6 +1,7 @@
 ﻿@page "{calculationId}"
 @model CalculateFunding.Frontend.Pages.Calcs.DiffCalculationModel
 @using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
 @{
     ViewData["Title"] = "Calculation comparision";
     Layout = "~/Pages/_Layout.cshtml";
@@ -50,13 +51,13 @@
                 <div class="diff-left diff-details-panel">
                     <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     <span>@Model.LeftCalcualationDiffModel.Author?.Name</span>
-                    <span>@Model.LeftCalcualationDiffModel.Date</span>
+                    <span>@Model.LeftCalcualationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString)</span>
                     <span class="diff-left-status">@Model.LeftCalcualationDiffModel.Status</span>
                 </div>
                 <div class="diff-right diff-details-panel">
                     <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
                     <span>@Model.RightCalculationDiffModel.Author?.Name</span>
-                    <span>@Model.RightCalculationDiffModel.Date </span>
+                    <span>@Model.RightCalculationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString) </span>
                     <span class="diff-right-status"> @Model.RightCalculationDiffModel.Status</span>
                 </div>
             </div>

@@ -11,7 +11,8 @@ ko.bindingHandlers.monacoEditor = {
             let editor = monaco.editor.create(element, {
                 value: valueUnwrapped,
                 language: 'vb',
-                minimap: { enabled: false }
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
             });
 
             

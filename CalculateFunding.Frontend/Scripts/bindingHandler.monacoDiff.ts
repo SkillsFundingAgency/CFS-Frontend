@@ -34,14 +34,14 @@ ko.bindingHandlers.monacoDiff = {
         require(['vs/editor/editor.main'], function () {
             let editor = monaco.editor.createDiffEditor(element, {
                 minimap: { enabled: false },
-                
+
                 // You can optionally disable the resizing
                 enableSplitViewResizing: !displayAsInline,
 
                 // Render the diff inline
                 renderSideBySide: !displayAsInline,
 
-                 scrollBeyondLastLine: false,
+                scrollBeyondLastLine: false,
             });
 
             var originalModel = monaco.editor.createModel(originalText, "text/plain");

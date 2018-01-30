@@ -1,6 +1,7 @@
 ﻿@page "{calculationId}"
 @model CalculateFunding.Frontend.Pages.Calcs.ComparePageModel
 @using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
 @{
     ViewData["Title"] = "Compare calculations";
     Layout = "~/Pages/_Layout.cshtml";
@@ -44,12 +45,12 @@
     Select two versions to compare:
 </blockquote>
 
-<div class="row">
+<div class="row compare-container">
     <div class="col-md-12">
         <form method="get" class="form" action="/calcs/diffcalculation/@Model.Calculation.Id">
             @if (Model.Calculations != null && Model.Calculations.Any())
             {
-                <table class="calculations-table table table-condensed" id="calculationVersions">
+                <table class="compare-table table table-condensed" id="calculationVersions">
                     <thead>
                         <tr>
                             <th> </th>
@@ -63,10 +64,15 @@
                         @foreach (var calculation in Model.Calculations)
                         {
                             <tr>
-                                <td><input type="checkbox" class="" name="Versions" value="@calculation.Version" /></td>
+                                <td class="calculation-select">
+                                    <div class="multiple-choice">
+                                        <input type="checkbox" class="" name="Versions" value="@calculation.Version" />
+                                        <label></label>
+                                    </div>
+                                </td>
                                 <td class="calculation-status"><span class="calculation-status">@calculation.Status</span></td>
                                 <td class="calculation-version"><span class="calculation-version">@calculation.Version</span></td>
-                                <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date</span></td>
+                                <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
                                 <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>
                             </tr>
                         }

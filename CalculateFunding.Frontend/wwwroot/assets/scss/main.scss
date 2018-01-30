@@ -317,6 +317,22 @@ blockquote {
     }
 }
 
+.compare-container{
+    .compare-table{
+
+    }
+
+    .calculation-select{
+        padding-bottom: 30px;
+        width: 45px;
+
+        label{
+            width: 0;
+            padding: 0;
+        }
+    }
+}
+
 .manage-calculations {
     .manage-calculations-filter-container {
         background-color: $panel-colour;

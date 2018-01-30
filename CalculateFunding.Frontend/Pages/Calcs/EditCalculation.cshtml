@@ -1,6 +1,7 @@
 ﻿@page "{calculationId}"
 @model CalculateFunding.Frontend.Pages.Calcs.EditCalculationPageModel
 @using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
 @{
     ViewData["Title"] = "Edit Calculation";
     Layout = "~/Pages/_Layout.cshtml";
@@ -28,7 +29,7 @@
         <div class="bannerpublish-title">Status</div>
         <div class="bannerpublish-status"><strong>Status:</strong> @Model.Calculation.Status</div>
         <div class="bannerpublish-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
-        <div class="bannerpublish-lastmodified">@Model.Calculation.LastModified</div>
+        <div class="bannerpublish-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
         <div class="bannerpublish-button-container"><input type="button" value="Publish" class="button button-publish" disabled /></div>
     </div>
 }

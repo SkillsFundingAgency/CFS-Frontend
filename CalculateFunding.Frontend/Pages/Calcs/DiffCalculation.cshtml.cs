@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                         throw new InvalidOperationException($"There are less than two previous versions available. Calculation version count ={ calculationVersions.Count() }");
                     }
 
-                    List<CalculationVersion> calculationVersionsList = calculationVersions.ToList();
+                    List<CalculationVersion> calculationVersionsList = calculationVersions.OrderBy(c => c.Version).ToList();
 
                     LeftCalcualationDiffModel = _mapper.Map<CalculationVersionViewModel>(calculationVersionsList[0]);
                     RightCalculationDiffModel = _mapper.Map<CalculationVersionViewModel>(calculationVersionsList[1]);
