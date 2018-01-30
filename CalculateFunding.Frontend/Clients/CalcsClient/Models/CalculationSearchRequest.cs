@@ -7,5 +7,7 @@
         public int Top { get; set; }
 
         public string SearchTerm { get; set; }
+
+        public bool IncludeFacets { get; set; }
     }
 }

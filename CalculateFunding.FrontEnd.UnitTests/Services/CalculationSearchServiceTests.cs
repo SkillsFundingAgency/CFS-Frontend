@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -101,6 +102,108 @@ namespace CalculateFunding.Frontend.Services
             first.Status.Should().Be("Unknown");
             first.PeriodName.Should().Be("Test Period");
             first.Name.Should().Be("Calculation 1");
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_FirstSearchResultWithFacets_ReturnedCorrectly()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+
+            int numberOfItems = 25;
+
+            IEnumerable<SearchFacet> facets = new[]
+            {
+                new SearchFacet(), new SearchFacet()
+            };
+
+            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+
+            calcsClient
+                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .Returns(itemResult);
+
+            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+
+            // Act
+            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+
+            // Assert
+            CalculationSearchResultItemViewModel first = results.Calculations.First();
+            first.Should().NotBeNull();
+            first.Id.Should().Be("10");
+            first.SpecificationName.Should().Be("Spec Name");
+            first.Status.Should().Be("Unknown");
+            first.PeriodName.Should().Be("Test Period");
+            first.Name.Should().Be("Calculation 1");
+
+            results.Facets.Count().Should().Be(2);
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_FirstSearchResultWithFacets_EnsuresFacetsLoadedCorrectly()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+
+            int numberOfItems = 25;
+
+            IEnumerable<SearchFacet> facets = new[]
+            {
+                new SearchFacet{
+                    Name = "facet 1",
+                    FacetValues = new[]
+                    {
+                        new SearchFacetValue{ Name = "f1", Count = 5}
+                    }
+                },
+                new SearchFacet{
+                    Name = "facet 2",
+                    FacetValues = new[]
+                    {
+                        new SearchFacetValue{ Name = "f2", Count = 11},
+                        new SearchFacetValue{ Name = "f3", Count = 1}
+                    }
+                }
+            };
+
+            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+
+            calcsClient
+                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .Returns(itemResult);
+
+            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+
+            // Act
+            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+
+            // Assert
+            CalculationSearchResultItemViewModel first = results.Calculations.First();
+            first.Should().NotBeNull();
+            first.Id.Should().Be("10");
+            first.SpecificationName.Should().Be("Spec Name");
+            first.Status.Should().Be("Unknown");
+            first.PeriodName.Should().Be("Test Period");
+            first.Name.Should().Be("Calculation 1");
+
+            results.Facets.Count().Should().Be(2);
+            results.Facets.First().Name.Should().Be("facet 1");
+            results.Facets.First().FacetValues.Count().Should().Be(1);
+            results.Facets.First().FacetValues.First().Name.Should().Be("f1");
+            results.Facets.First().FacetValues.First().Count.Should().Be(5);
+            results.Facets.Last().Name.Should().Be("facet 2");
+            results.Facets.Last().FacetValues.Count().Should().Be(2);
+            results.Facets.Last().FacetValues.First().Name.Should().Be("f2");
+            results.Facets.Last().FacetValues.First().Count.Should().Be(11);
+            results.Facets.Last().FacetValues.Last().Name.Should().Be("f3");
+            results.Facets.Last().FacetValues.Last().Count.Should().Be(1);
         }
 
         [TestMethod]
@@ -223,7 +326,7 @@ namespace CalculateFunding.Frontend.Services
             results.EndItemNumber.Should().Be(100);
         }
 
-        private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems)
+        private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
             PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>();
             List<CalculationSearchResultItem> items = new List<CalculationSearchResultItem>();
@@ -244,6 +347,7 @@ namespace CalculateFunding.Frontend.Services
             result.PageSize = 50;
             result.TotalItems = numberOfItems;
             result.TotalPages = 1;
+            result.Facets = facets;
 
             return result;
         }

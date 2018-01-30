@@ -8,5 +8,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
     public class CalculationSearchFilterRequest : PagedQueryOptions
     {
         public string SearchTerm { get; set; }
+
+        public bool IncludeFacets { get; set; }
     }
 }

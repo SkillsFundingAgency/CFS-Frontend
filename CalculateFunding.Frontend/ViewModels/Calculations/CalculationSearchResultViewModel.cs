@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.Clients.Models;
 using CalculateFunding.Frontend.ViewModels.Paging;
 
 namespace CalculateFunding.Frontend.ViewModels.Calculations
@@ -16,5 +17,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
         public IEnumerable<CalculationSearchResultItemViewModel> Calculations { get; set; }
 
         public PagerState PagerState { get; set; }
+
+        public IEnumerable<SearchFacet> Facets { get; set; }
     }
 }

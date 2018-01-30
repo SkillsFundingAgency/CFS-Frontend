@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CalculateFunding.Frontend.Clients.Models;
+using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.Clients
 {
@@ -13,5 +14,7 @@ namespace CalculateFunding.Frontend.Clients
         public int TotalItems { get; set; }
 
         public IEnumerable<T> Items { get; set; }
+
+        public IEnumerable<SearchFacet> Facets { get; set; }
     }
 }

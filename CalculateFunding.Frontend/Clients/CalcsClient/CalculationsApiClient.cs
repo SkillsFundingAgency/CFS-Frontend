@@ -14,7 +14,8 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
     {
         private string _calcsPath = "calcs";
 
-        public CalculationsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
+        public CalculationsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, 
+            ILogger logger, ICorrelationIdProvider correlationIdProvider)
             : base(options, httpClient, logger, correlationIdProvider)
         {
             _calcsPath = options.Value.CalcsPath ?? "calcs";
@@ -32,6 +33,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                 PageNumber = filterOptions.Page,
                 Top = filterOptions.PageSize,
                 SearchTerm = filterOptions.SearchTerm,
+                IncludeFacets = filterOptions.IncludeFacets
             };
 
             ApiResponse<CalculationSearchResults> results = await PostAsync<CalculationSearchResults, CalculationSearchRequest>($"{_calcsPath}/calculations-search", request);
@@ -42,7 +44,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                     Items = results.Content.Results,
                     PageNumber = filterOptions.Page,
                     PageSize = filterOptions.PageSize,
-                    TotalItems = results.Content.TotalCount,
+                    TotalItems = results.Content.TotalCount
                 };
 
                 if (results.Content.TotalCount == 0)
@@ -53,6 +55,9 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                 {
                     result.TotalPages = (int)Math.Ceiling((decimal)results.Content.TotalCount / filterOptions.PageSize);
                 }
+
+                result.Facets = results.Content.Facets;
+
                 return result;
             }
             else

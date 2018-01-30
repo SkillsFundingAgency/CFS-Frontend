@@ -36,6 +36,7 @@ namespace CalculateFunding.Frontend.Services
                 Page = 1,
                 PageSize = 50,
                 SearchTerm = request.SearchTerm,
+                IncludeFacets = request.IncludeFacets
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
@@ -54,6 +55,7 @@ namespace CalculateFunding.Frontend.Services
 
             result.TotalResults = calculationsResult.TotalItems;
             result.CurrentPage = calculationsResult.PageNumber;
+            result.Facets = calculationsResult.Facets;
 
             List<CalculationSearchResultItemViewModel> itemResults = new List<CalculationSearchResultItemViewModel>();
 
