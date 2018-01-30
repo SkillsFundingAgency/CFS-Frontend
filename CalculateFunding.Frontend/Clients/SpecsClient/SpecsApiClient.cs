@@ -141,20 +141,10 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 
         public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            Calculation calc = new Calculation()
-            {
-                Id = calculationId,
-                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dapibus metus lacus, vitae rhoncus augue dapibus sed. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus vitae vulputate nunc. Aliquam cursus tellus sodales, ullamcorper nunc non, rutrum sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis enim et volutpat ornare. Vivamus ornare nunc nec odio aliquam sagittis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus non nibh enim. Duis id quam at ligula vehicula facilisis. Nulla ligula mauris, pulvinar nec orci et, viverra varius sapien.",
-                Name = "Auto generated in specs",
-            };
-
-            ApiResponse<Calculation> response = new ApiResponse<Calculation>(HttpStatusCode.OK, calc);
-
-            return Task.FromResult(response);
-
-            // return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
+            return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
     }
 }
