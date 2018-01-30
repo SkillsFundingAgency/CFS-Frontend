@@ -35,7 +35,7 @@
                 <select asp-for="Product.AllocationLine.Id" class="form-control" name="">
                     @foreach (var year in Model.AllocationLines)
                     {
-                        <option selected="@Model.Product.AllocationLine?.Id" value="@year.Id">@year.Name</option>
+                        <option selected="@Model.Product.AllocationLine.Id" value="@year.Id">@year.Name</option>
                     }
                 </select>
             </div>

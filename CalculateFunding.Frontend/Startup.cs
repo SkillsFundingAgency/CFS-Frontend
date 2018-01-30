@@ -1,6 +1,5 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using CalculateFunding.Frontend.ApiClient;
 using CalculateFunding.Frontend.Core.Middleware;
 using CalculateFunding.Frontend.Core.Telemetry;
 using CalculateFunding.Frontend.Modules;

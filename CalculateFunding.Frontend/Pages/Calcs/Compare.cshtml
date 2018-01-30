@@ -1,0 +1,107 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.ComparePageModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Compare calculations";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section breadcrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+            <li><a href="/calcs/editCalculation/@Model.Calculation.Id">@BreadcrumbText.EditCalculation</a></li>
+            <li>@BreadcrumbText.CompareCalcuationVersions</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <h1 class="hero-title">@Model.Calculation.Name for @Model.Calculation.PeriodName</h1>
+}
+
+@section FormBannerRight{
+
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <p class="what-is-title-nojs withjs-hide">What is @Model.Calculation.Name?</p>
+        <div class="inline-collapse-container">
+            <div class="inline-collapse-heading withjs-show">
+                <i class="inline-collapse-arrow"></i>
+                <span>What is @Model.Calculation.Name?</span>
+            </div>
+            <div class="inline-collapse-contents withjs-hide what-is-description">
+                @Model.Calculation.Description
+            </div>
+        </div>
+    </div>
+</div>
+
+<blockquote class="spacing-30">
+    Select two versions to compare:
+</blockquote>
+
+<div class="row">
+    <div class="col-md-12">
+        <form method="get" class="form" action="/calcs/diffcalculation/@Model.Calculation.Id">
+            @if (Model.Calculations != null && Model.Calculations.Any())
+            {
+                <table class="calculations-table table table-condensed" id="calculationVersions">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th>Status</th>
+                            <th>Version</th>
+                            <th>Updated</th>
+                            <th>Author</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var calculation in Model.Calculations)
+                        {
+                            <tr>
+                                <td><input type="checkbox" class="" name="Versions" value="@calculation.Version" /></td>
+                                <td class="calculation-status"><span class="calculation-status">@calculation.Status</span></td>
+                                <td class="calculation-version"><span class="calculation-version">@calculation.Version</span></td>
+                                <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date</span></td>
+                                <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="warning"> There are no previous versions for this calculation!</div>
+
+            }
+            <p class="form-submit-container"><button type="submit" class="button" id="compare-button">Compare the calculations</button> </p>
+            <p><a href="/calcs/editCalculation/@Model.Calculation.Id"> Back </a></p>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $('#compare-button').prop('disabled', true);
+
+        $('#calculationVersions').on('change', function (e) {
+            var checkboxes = $("#calculationVersions input[type='checkbox']");
+            var checkedItems = 0;
+            checkboxes.each(function (i, checkbox) {
+                if (checkbox.checked) {
+                    checkedItems++;
+                }
+            });
+            if (checkedItems == 2) {
+                $('#compare-button').prop('disabled', null);
+            }
+            else {
+                $('#compare-button').prop('disabled', true);
+            }
+        });
+    </script>
+}

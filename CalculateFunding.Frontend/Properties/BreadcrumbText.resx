@@ -120,6 +120,12 @@
   <data name="CalculateFunding" xml:space="preserve">
     <value>Calculate Funding</value>
   </data>
+  <data name="CompareCalcuationVersions" xml:space="preserve">
+    <value>Compare Calculation Versions</value>
+  </data>
+  <data name="CompareVersions" xml:space="preserve">
+    <value>Compare versions</value>
+  </data>
   <data name="CreateCalculation" xml:space="preserve">
     <value>Create calculation specification</value>
   </data>
@@ -129,10 +135,16 @@
   <data name="CreateSubPolicy" xml:space="preserve">
     <value>Create subpolicy</value>
   </data>
+  <data name="EditCalculation" xml:space="preserve">
+    <value>Edit Calculation</value>
+  </data>
   <data name="ManageCalculations" xml:space="preserve">
     <value>Manage Calculations</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage Policies</value>
+  </data>
+  <data name="ViewCalculationVersions" xml:space="preserve">
+    <value>View calculation versions</value>
   </data>
 </root>

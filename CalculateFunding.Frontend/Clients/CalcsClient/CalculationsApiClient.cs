@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -78,6 +80,34 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
         {
             return PostAsync<PreviewCompileResult, PreviewCompileRequest>($"{_calcsPath}/compile-preview", request);
         }
+
+        public Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId)
+        {
+            return Task.FromResult(Enumerable.Empty<Calculation>());
+        }
+
+        public Task<ApiResponse<IEnumerable<CalculationVersion>>> GetAllVersionsByCalculationId(string calculationId)
+        {
+            return GetAsync<IEnumerable<CalculationVersion>>($"{_calcsPath}/calculation-version-history?calculationId={calculationId}");
+        }
+
+
+        public Task<ApiResponse<IEnumerable<CalculationVersion>>> GetMultipleVersionsByCalculationId(IEnumerable<int> versionIds, string calculationId)
+        {
+            Guard.ArgumentNotNull(versionIds, nameof(versionIds));
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+
+            CalculationVersionsRequestModel calcsVersGetModel = new CalculationVersionsRequestModel()
+            {
+                Versions = versionIds,
+                CalculationId = calculationId,
+            };
+
+            return PostAsync<IEnumerable<CalculationVersion>, CalculationVersionsRequestModel>($"{_calcsPath}/calculation-versions", calcsVersGetModel);
+        }
     }
+
 }
+         
+
 

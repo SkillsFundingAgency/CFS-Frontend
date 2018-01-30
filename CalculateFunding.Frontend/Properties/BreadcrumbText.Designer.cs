@@ -70,6 +70,24 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compare Calculation Versions.
+        /// </summary>
+        public static string CompareCalcuationVersions {
+            get {
+                return ResourceManager.GetString("CompareCalcuationVersions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compare versions.
+        /// </summary>
+        public static string CompareVersions {
+            get {
+                return ResourceManager.GetString("CompareVersions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create calculation specification.
         /// </summary>
         public static string CreateCalculation {
@@ -97,6 +115,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit Calculation.
+        /// </summary>
+        public static string EditCalculation {
+            get {
+                return ResourceManager.GetString("EditCalculation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Calculations.
         /// </summary>
         public static string ManageCalculations {
@@ -111,6 +138,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string ManagePolicies {
             get {
                 return ResourceManager.GetString("ManagePolicies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View calculation versions.
+        /// </summary>
+        public static string ViewCalculationVersions {
+            get {
+                return ResourceManager.GetString("ViewCalculationVersions", resourceCulture);
             }
         }
     }

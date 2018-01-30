@@ -1,6 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ApiClient.Models.GetModels
+﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
-    public class CalculationGetModel
+    internal class PolicyByNameRequestModel
     {
         public string SpecificationId { get; set; }
 

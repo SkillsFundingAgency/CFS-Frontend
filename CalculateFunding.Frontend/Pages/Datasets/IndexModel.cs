@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CalculateFunding.Frontend.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

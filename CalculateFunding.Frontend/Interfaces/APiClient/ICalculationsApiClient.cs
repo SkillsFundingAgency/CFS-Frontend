@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 
@@ -14,6 +15,16 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<PagedResult<CalculationSearchResultItem>> FindCalculations(CalculationSearchFilterRequest filterOptions);
 
         /// <summary>
+        /// Gets all versions of a calculation
+        /// </summary>
+        /// <param name="calculationId"></param>
+        /// <returns>Calculation object, otherwise null if not found</returns>
+        Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId);
+
+        Task<ApiResponse<IEnumerable<CalculationVersion>>> GetMultipleVersionsByCalculationId(IEnumerable<int> versionIds, string calculationId);
+                                        
+        Task<ApiResponse<IEnumerable<CalculationVersion>>> GetAllVersionsByCalculationId(string calculationID);
+
         /// Gets an individual calculation
         /// </summary>
         /// <param name="calculationId">Calculation ID</param>

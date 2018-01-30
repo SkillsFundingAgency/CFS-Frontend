@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
-    <TypeScriptToolsVersion>2.6</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -13,8 +13,11 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\calcuations.ts" />
+    <None Remove="Scripts\compare.ts" />
+    <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -77,14 +80,16 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Clients\Models\Results\" />
     <Folder Include="ViewModels\Preview\" />
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
+    <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
     <TypeScriptCompile Include="Scripts\calcuations.ts" />
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />
+    <TypeScriptCompile Include="Scripts\compare.ts" />
   </ItemGroup>
 
   <PropertyGroup>

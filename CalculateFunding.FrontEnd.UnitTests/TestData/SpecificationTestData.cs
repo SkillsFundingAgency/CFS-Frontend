@@ -1,5 +1,4 @@
-﻿using CalculateFunding.Frontend.ApiClient.Models;
-using CalculateFunding.Frontend.Clients.Models;
+﻿using CalculateFunding.Frontend.Clients.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using System;
 using System.Collections.Generic;

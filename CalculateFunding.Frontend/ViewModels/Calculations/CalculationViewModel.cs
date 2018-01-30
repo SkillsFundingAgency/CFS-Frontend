@@ -19,6 +19,8 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public DateTime LastModified { get; set; }
 
+        public int Version { get; set; }
+
         public string LastModifiedByName { get; set; }
 
         public string SourceCode { get; set; }

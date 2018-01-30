@@ -9,14 +9,14 @@
 @section FormBannerLeft{
     <p class="hero-title">@Model.Calculation.Name for @Model.Calculation.PeriodName</p>
     <div>
-        <p class="policy-spec-what withjs-hide">What is @Model.Calculation.Name?</p>
+        <p class="what-is-title-nojs withjs-hide">What is @Model.Calculation.Name?</p>
 
         <div class="inline-collapse-container">
             <div class="inline-collapse-heading withjs-show">
                 <i class="inline-collapse-arrow"></i>
                 <span>What is @Model.Calculation.Name?</span>
             </div>
-            <div class="inline-collapse-contents withjs-hide policy-spec-description">
+            <div class="inline-collapse-contents withjs-hide what-is-description">
                 @Model.Calculation.Description
             </div>
         </div>
@@ -48,7 +48,7 @@
         <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode"></div>
 
         <div>
-            <a href="/calcs/compare/@Model.Calculation.Id">View previous versions</a>
+            <a href="/calcs/compare/@Model.Calculation.Id">View previous versions</a>   <!-- api/calcs/calculation-version-history -->
         </div>
 
         <div class="spacing-30">

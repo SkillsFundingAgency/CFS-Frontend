@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.ApiClient.Models.GetModels;
 using CalculateFunding.Frontend.Clients.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -125,9 +124,9 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(policyName, nameof(policyName));
 
-            PolicyGetModel model = new PolicyGetModel { SpecificationId = specificationId, Name = policyName };
+            PolicyByNameRequestModel model = new PolicyByNameRequestModel { SpecificationId = specificationId, Name = policyName };
 
-            return PostAsync<Policy, PolicyGetModel>($"{_specsPath}/policy-by-name", model, _cancellationToken);
+            return PostAsync<Policy, PolicyByNameRequestModel>($"{_specsPath}/policy-by-name", model, _cancellationToken);
         }
 
         public Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
@@ -135,9 +134,9 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationName, nameof(calculationName));
 
-            CalculationGetModel model = new CalculationGetModel { SpecificationId = specificationId, Name = calculationName };
+            CalculationByNameRequestModel model = new CalculationByNameRequestModel { SpecificationId = specificationId, Name = calculationName };
 
-            return PostAsync<Calculation, CalculationGetModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
+            return PostAsync<Calculation, CalculationByNameRequestModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
         }
 
         public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
