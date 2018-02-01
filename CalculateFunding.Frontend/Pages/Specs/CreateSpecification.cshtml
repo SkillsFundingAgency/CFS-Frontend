@@ -54,29 +54,13 @@
                     <div class="form-group">
                         <a validationanchor-for="CreateSpecificationViewModel.Description"></a>
                         <label asp-for="CreateSpecificationViewModel.Description">Description</label>
-                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/specs?academicYearId=@Model.AcademicYearId" id="cancel-link">Cancel</a></p>
 
         </form>
 
     </div>
 </div>
-@section Scripts
-    {
-    @*<script type="text/javascript">
-            $(function () {
-                $('.summernote').summernote({
-                    height: 200
-                });
-
-                $('form').on('submit', function (e) {
-                    e.preventDefault();
-                    alert($('.summernote').summernote('code'));
-                    alert($('.summernote').val());
-                });
-            });
-        </script>*@
-}

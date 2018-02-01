@@ -45,7 +45,7 @@
 <div class="row">
     <div class="col-xs-9 col-md-9">
         <p>
-            <a href="/specs/createSpecification/@Model.AcademicYearId" class="button spec-mgr-control">Create Specification</a>
+            <a href="/specs/createSpecification/@Model.AcademicYearId" class="button spec-mgr-control" id="create-specification-button">Create Specification</a>
         </p>
         <hr />
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
@@ -59,7 +59,7 @@
                             <div>
                                 <h2 class="description-text-link stream-title">
                                     <a name="spec-@specification.Id"></a>
-                                    <a href="/specs/policies/@specification.Id"> @specification.Name</a>
+                                    <a href="/specs/policies/@specification.Id" id="specification-link-@specification.Id"> @specification.Name</a>
                                 </h2>
                                 <p>@specification.Description</p>
                             </div>
@@ -72,7 +72,7 @@
                 else
                 {
                     <p>
-                        <a href="/specs/createSpecification/@Model.AcademicYearId">No specification exists, create a specfication</a>
+                        <a href="/specs/createSpecification/@Model.AcademicYearId" id="create-specification-button-noneexists">No specification exists, create a specfication</a>
                     </p>
 
                 }

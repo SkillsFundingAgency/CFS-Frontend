@@ -152,6 +152,8 @@ namespace CalculateFunding.Frontend.TagHelpers
                         anchorTag.AddCssClass("validation-summary-link");
 
                         anchorTag.Attributes.Add("href", $"#{TagHelperConstants.ValidationAnchorPrefix}-{fieldNameSanitisedId}");
+                        anchorTag.Attributes.Add("id", $"validation-link-for-{fieldNameSanitisedId}");
+
 
                         listItem.InnerHtml.AppendLine(anchorTag);
                         htmlSummary.InnerHtml.AppendLine(listItem);
