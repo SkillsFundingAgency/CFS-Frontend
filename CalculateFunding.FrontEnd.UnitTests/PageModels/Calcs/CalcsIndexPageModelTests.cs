@@ -10,6 +10,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Calcs;
 using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Calculations;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -84,15 +85,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
-
-            PagedResult<CalculationSearchResultItem> nullServiceResult = null;
-
-            calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
-                .Returns(nullServiceResult);
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+           
+            calculationSearchService
+                .PerformSearch(Arg.Any<CalculationSearchRequestViewModel>())
+                .Returns((CalculationSearchResultViewModel)null);
 
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
