@@ -167,8 +167,10 @@ $(document).ready(function () {
     });
     //Remove title margin if no siblings
     var $panelTitle = $('.panel-title');
-    if ($panelTitle.siblings().size() === 0) {
-        $panelTitle.attr('style', 'margin-bottom: 0 !important')
+    if ($panelTitle) {
+        if ($panelTitle.siblings().length === 0) {
+            $panelTitle.attr('style', 'margin-bottom: 0 !important')
+        }
     }
 });
 

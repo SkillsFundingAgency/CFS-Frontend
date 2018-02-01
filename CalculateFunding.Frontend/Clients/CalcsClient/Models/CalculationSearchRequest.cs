@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
+﻿using System.Collections.Generic;
+
+namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
     internal class CalculationSearchRequest
     {
@@ -9,5 +11,7 @@
         public string SearchTerm { get; set; }
 
         public bool IncludeFacets { get; set; }
+
+        public IDictionary<string, string[]> Filters { get; set; }
     }
 }

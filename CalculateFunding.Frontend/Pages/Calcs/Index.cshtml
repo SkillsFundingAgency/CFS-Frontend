@@ -8,14 +8,46 @@
 @section BannerLeft{
     <h1 class="hero-title">Manage the Calculations</h1>
     <div class="hero-text">Specify the calculation specifications that will distribute ESFA funding for an academic year</div>
-    <form method="post" class="filter-container spacing-15">
+}
+
+@section BannerMiddle{
+    <form method="post" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">Search calculations</div>
+            <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
+        </div>
         <div class="row">
             <div class="col-xs-9">
                 <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" />
-                    <div class="input-group-addon"><input type="image" src="~/assets/images/icon-search.png" /></div>
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
+            <div class="withjs-show col-xs-3">
+                <select data-bind="options: allocationLines, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select Allocation Line', selectedOptions: selectedAllocationLines, enable: state() === 'idle'" class="form-control"></select>
+            </div>
+        </div>
+        <div class="row spacing-15-top withjs-show">
+            <div class="col-xs-3 filter-field-heading">Year</div>
+            <div class="col-xs-3 filter-field-heading">Funding Stream</div>
+            <div class="col-xs-3 filter-field-heading">Spec name</div>
+            <div class="col-xs-3 filter-field-heading">Calculation status</div>
+
+        </div>
+        <div class="row withjs-show">
+            <div class="col-xs-3">
+                <select data-bind="options: periods, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select year', selectedOptions: selectedPeriods, enable: canSelectFilters" class="form-control"></select>
+            </div>
+            <div class="col-xs-3">
+                <select data-bind="options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select funding stream', selectedOptions: selectedFundingStreams, enable: canSelectFilters" class="form-control"></select>
+            </div>
+            <div class="col-xs-3">
+                <select data-bind="options: specifications, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select specification name', selectedOptions: selectedSpecifications, enable: canSelectFilters" class="form-control"></select>
+            </div>
+            <div class="col-xs-3">
+                <select data-bind="options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Show all status', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" class="form-control"></select>
+            </div>
+
         </div>
     </form>
 }
@@ -29,7 +61,15 @@
     </div>
 }
 
-<div class="row manage-calculations">
+<div class="row manage-calculations" id="manage-calculations-container">
+    <div class="col-xs-12 withjs-show">
+        <div class="filter-selected-container" data-bind="foreach: selectedSearchFacets">
+            <div class="filter-selected-item">
+                <span data-bind="click: function(){$root.removeFilter($data)}" class="filter-selected-item-remove-button"><i class="material-icons">close</i></span>
+                <span data-bind="text: displayName"></span>
+            </div>
+        </div>
+    </div>
     <div class="col-xs-12">
 
         @if (Model.DraftSavedCalculation != null)
@@ -48,7 +88,7 @@
             </div>
         }
 
-        <div>
+        <div data-bind="visible: !searchPerformed()">
             <div class="pull-right paging-container">
                 @if (Model.SearchResults.PagerState.PreviousPage.HasValue)
                 {
@@ -79,6 +119,22 @@
 
         </div>
 
+        <div class="withjs-show" data-bind="visible: searchPerformed">
+            <div class="pull-right paging-container" data-bind="with: pagerState">
+
+                <a data-bind="if: previousPage, click: function(){ $root.loadPage(previousPage)}" class="paging-link">Previous</a>
+
+                <span data-bind="foreach: pages">
+                    <span class="paging-active-page" data-bind="visible: $data === $parent.currentPage, text: $data"></span>
+                    <a href="#" data-bind="visible: $data !== $parent.currentPage, click: function(){$root.loadPage($data)}" class="paging-link"><span data-bind="text: $data"></span></a>
+
+                </span>
+                <a data-bind="if: nextPage, click: function(){ $root.loadPage(nextPage)}" class="paging-link">Next</a>
+
+            </div>
+
+            Showing <span data-bind="text: startItemNumber"></span>-<span data-bind="text: endItemNumber"></span> of <strong data-bind="text: totalResults"></strong> calculations
+        </div>
         <table class="calculations-table table-striped">
             <thead>
                 <tr>
@@ -88,7 +144,15 @@
                     <th>Year</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody data-bind="foreach: calculations" class="withjs-show">
+                <tr>
+                    <td><a data-bind="attr: {href: '/calcs/editCalculation/' + id }, text: name"></a></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: specificationName"></td>
+                    <td data-bind="text: periodName"></td>
+                </tr>
+            </tbody>
+            <tbody data-bind="visible: !searchPerformed()">
                 @foreach (var calculation in Model.SearchResults.Calculations)
                 {
                     <tr>
@@ -99,9 +163,28 @@
                     </tr>
 
                 }
+
             </tbody>
 
         </table>
 
     </div>
 </div>
+
+@section scripts{
+    <script src="~/assets/libs/js/knockout-latest.js" type="text/javascript"></script>
+    <script src="~/js/calcuations.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageCalculations.CalculationSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-calculations-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+        vm.performSearch();
+    </script>
+}

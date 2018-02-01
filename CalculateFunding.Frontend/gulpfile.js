@@ -99,6 +99,10 @@ gulp.task('copy-assets', function () {
             './node_modules/summernote/dist/**/*.ttf',
         ],
         fonts: [
+            './node_modules/material-design-icons/iconfont/*.woff2',
+            './node_modules/material-design-icons/iconfont/*.woff',
+            './node_modules/material-design-icons/iconfont/*.eot',
+            './node_modules/material-design-icons/iconfont/*.ttf',
             './node_modules/bootstrap/dist/fonts/*.*'
         ]
     };
@@ -126,9 +130,6 @@ gulp.task('copy-assets', function () {
         }
 
         var destinationPath = "./wwwroot/assets/libs/js/monaco/vs" + relativePath;
-
-        console.log(destinationPath);
-
         gulp.src(filePath).pipe(gulp.dest(destinationPath));
     });
 });

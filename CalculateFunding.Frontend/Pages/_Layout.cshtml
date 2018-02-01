@@ -39,9 +39,26 @@
                 </div>
             </div>
         </div>
+
     </header>
+
     @if (IsSectionDefined("BannerLeft"))
     {
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 spacing-15">
+                    <div class="govuk-beta-label">
+
+                        <strong class="phase-tag">Beta</strong>
+                        <span>
+                            Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer" href="#">help us improve our content</a>.
+
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <section class="banner-container">
             <div class="container">
                 <div class="row">
@@ -58,11 +75,36 @@
 
                     </div>
                 </div>
+                @if (IsSectionDefined("BannerMiddle"))
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @RenderSection("BannerMiddle", false)
+                        </div>
+                    </div>
+
+                }
             </div>
         </section>
     }
     else if (IsSectionDefined("FormBannerLeft"))
     {
+        <div class="container form-banner-container-beta">
+            <div class="row">
+                <div class="col-xs-12 form-banner-container-beta-col">
+                    <div class="govuk-beta-label">
+
+                        <strong class="phase-tag">Beta</strong>
+                        <span>
+                            Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer" href="#">help us improve our content</a>.
+
+                        </span>
+                    </div>
+                    <hr class="spacing-15" />
+                </div>
+            </div>
+        </div>
+
         <section class="form-banner-container">
             <div class="container">
                 <div class="row">

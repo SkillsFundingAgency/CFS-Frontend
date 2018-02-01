@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿using System.Collections.Generic;
+
+namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
     public class CalculationSearchRequestViewModel
     {
@@ -7,5 +9,7 @@
         public string SearchTerm { get; set; }
 
         public bool IncludeFacets { get; set; }
+
+        public IDictionary<string, string[]> Filters { get; set; }
     }
 }

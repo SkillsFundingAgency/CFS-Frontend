@@ -35,7 +35,8 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
                 PageNumber = filterOptions.Page,
                 Top = filterOptions.PageSize,
                 SearchTerm = filterOptions.SearchTerm,
-                IncludeFacets = filterOptions.IncludeFacets
+                IncludeFacets = filterOptions.IncludeFacets,
+                Filters = filterOptions.Filters,
             };
 
             ApiResponse<CalculationSearchResults> results = await PostAsync<CalculationSearchResults, CalculationSearchRequest>($"{_calcsPath}/calculations-search", request);

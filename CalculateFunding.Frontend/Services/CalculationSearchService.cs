@@ -36,7 +36,8 @@ namespace CalculateFunding.Frontend.Services
                 Page = 1,
                 PageSize = 50,
                 SearchTerm = request.SearchTerm,
-                IncludeFacets = request.IncludeFacets
+                IncludeFacets = request.IncludeFacets,
+                Filters = request.Filters,
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
@@ -65,7 +66,7 @@ namespace CalculateFunding.Frontend.Services
             }
 
             result.Calculations = itemResults.AsEnumerable();
-            if(result.TotalResults == 0)
+            if (result.TotalResults == 0)
             {
                 result.StartItemNumber = 0;
                 result.EndItemNumber = 0;

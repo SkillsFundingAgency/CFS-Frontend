@@ -52,7 +52,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
             {
                 PageNumber = pageNumber,
-                IncludeFacets = true
+                IncludeFacets = false
             };
 
             SearchResults = await _searchService.PerformSearch(searchRequest);
@@ -71,7 +71,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 PageNumber = pageNumber,
                 SearchTerm = SearchTerm,
-                IncludeFacets = true
+                IncludeFacets = false
             };
 
             SearchResults = await _searchService.PerformSearch(searchRequest);

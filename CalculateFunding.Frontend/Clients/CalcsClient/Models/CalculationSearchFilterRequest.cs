@@ -10,5 +10,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
         public string SearchTerm { get; set; }
 
         public bool IncludeFacets { get; set; }
+
+        public IDictionary<string, string[]> Filters { get; set; }
     }
 }
