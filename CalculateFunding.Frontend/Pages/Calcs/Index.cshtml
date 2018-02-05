@@ -1,4 +1,5 @@
 ﻿@page "{pageNumber?}"
+@using System.Web
 @model CalculateFunding.Frontend.Pages.Calcs.IndexPageModel
 @{
     ViewData["Title"] = "Manage the Calculations";
@@ -11,7 +12,7 @@
 }
 
 @section BannerMiddle{
-    <form method="post" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch">
+    <form method="post" action="/calcs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
         <div class="row">
             <div class="col-xs-9 filter-field-heading">Search calculations</div>
             <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
@@ -20,11 +21,11 @@
             <div class="col-xs-9">
                 <div class="input-group">
                     <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
             <div class="withjs-show col-xs-3">
-                <select data-bind="options: allocationLines, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select Allocation Line', selectedOptions: selectedAllocationLines, enable: state() === 'idle'" class="form-control"></select>
+                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select Allocation Line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
             </div>
         </div>
         <div class="row spacing-15-top withjs-show">
@@ -36,16 +37,16 @@
         </div>
         <div class="row withjs-show">
             <div class="col-xs-3">
-                <select data-bind="options: periods, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select year', selectedOptions: selectedPeriods, enable: canSelectFilters" class="form-control"></select>
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select year', buttonWidth: '100%', disableIfEmpty: true}, options: periods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedPeriods, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select data-bind="options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select funding stream', selectedOptions: selectedFundingStreams, enable: canSelectFilters" class="form-control"></select>
+                <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select data-bind="options: specifications, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Select specification name', selectedOptions: selectedSpecifications, enable: canSelectFilters" class="form-control"></select>
+                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select data-bind="options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', optionsCaption: 'Show all status', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" class="form-control"></select>
+                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all status', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
             </div>
 
         </div>
@@ -63,7 +64,7 @@
 
 <div class="row manage-calculations" id="manage-calculations-container">
     <div class="col-xs-12 withjs-show">
-        <div class="filter-selected-container" data-bind="foreach: selectedSearchFacets">
+        <div class="filter-selected-container" data-bind="foreach: selectedSearchFacets" id="filter-selected-container">
             <div class="filter-selected-item">
                 <span data-bind="click: function(){$root.removeFilter($data)}" class="filter-selected-item-remove-button"><i class="material-icons">close</i></span>
                 <span data-bind="text: displayName"></span>
@@ -74,25 +75,25 @@
 
         @if (Model.DraftSavedCalculation != null)
         {
-            <div class="draft-saved-panel">
-                <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right">Dismiss</a>
+            <div class="draft-saved-panel" id="draft-saved-panel">
+                <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right" id="dismiss-draft-link">Dismiss</a>
                 @Model.DraftSavedCalculation.Name saved in DRAFT successfully.
             </div>
         }
 
         @if (Model.PublishedCalculation != null)
         {
-            <div class="publish-notification-panel">
-                <a href="/calc?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right">Dismiss</a>
+            <div class="publish-notification-panel" id="publish-notification-panel">
+                <a href="/calc?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right" id="dismiss-published-link">Dismiss</a>
                 @Model.PublishedCalculation.Name published successfully.
             </div>
         }
 
-        <div data-bind="visible: !searchPerformed()">
-            <div class="pull-right paging-container">
+        <div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
+            <div class="pull-right paging-container" id="static-paging-container">
                 @if (Model.SearchResults.PagerState.PreviousPage.HasValue)
                 {
-                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.PreviousPage.Value" class="paging-link">Previous</a>
+                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.PreviousPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Previous</a>
 
                 }
 
@@ -104,14 +105,14 @@
                     }
                     else
                     {
-                        <a href="/calcs?pageNumber=@pageNumber" class="paging-link">@pageNumber</a>
+                        <a href="/calcs?pageNumber=@pageNumber&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">@pageNumber</a>
                     }
 
                 }
 
                 @if (Model.SearchResults.PagerState.NextPage.HasValue)
                 {
-                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.NextPage.Value" class="paging-link">Next</a>
+                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.NextPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Next</a>
 
                 }
             </div>
@@ -119,8 +120,8 @@
 
         </div>
 
-        <div class="withjs-show" data-bind="visible: searchPerformed">
-            <div class="pull-right paging-container" data-bind="with: pagerState">
+        <div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rownavigation-container">
+            <div class="pull-right paging-container" data-bind="with: pagerState" id="dynamic-paging-container">
 
                 <a data-bind="if: previousPage, click: function(){ $root.loadPage(previousPage)}" class="paging-link">Previous</a>
 
@@ -135,7 +136,7 @@
 
             Showing <span data-bind="text: startItemNumber"></span>-<span data-bind="text: endItemNumber"></span> of <strong data-bind="text: totalResults"></strong> calculations
         </div>
-        <table class="calculations-table table-striped">
+        <table class="calculations-table table-striped" id="calculation-results-table">
             <thead>
                 <tr>
                     <th>Calculation Name</th>
@@ -144,7 +145,7 @@
                     <th>Year</th>
                 </tr>
             </thead>
-            <tbody data-bind="foreach: calculations" class="withjs-show">
+            <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
                 <tr>
                     <td><a data-bind="attr: {href: '/calcs/editCalculation/' + id }, text: name"></a></td>
                     <td data-bind="text: status"></td>
@@ -152,28 +153,31 @@
                     <td data-bind="text: periodName"></td>
                 </tr>
             </tbody>
-            <tbody data-bind="visible: !searchPerformed()">
+            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                @{ 
+                    int rowId = 0;
+                }
                 @foreach (var calculation in Model.SearchResults.Calculations)
                 {
                     <tr>
-                        <td><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
-                        <td>@calculation.Status</td>
-                        <td>@calculation.SpecificationName</td>
-                        <td>@calculation.PeriodName</td>
+                        <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
+                        <td id="static-results-status-@rowId">@calculation.Status</td>
+                        <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                        <td id="static-results-periodName-@rowId">@calculation.PeriodName</td>
                     </tr>
-
+                    rowId++;
                 }
-
             </tbody>
-
         </table>
 
     </div>
 </div>
 
 @section scripts{
-    <script src="~/assets/libs/js/knockout-latest.js" type="text/javascript"></script>
-    <script src="~/js/calcuations.js" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/calcuations.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
         var vm = new calculateFunding.manageCalculations.CalculationSearchViewModel();
         var filterElement = document.getElementById("filter-container");
@@ -187,4 +191,8 @@
         }
         vm.performSearch();
     </script>
+}
+
+@section styles{ 
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
 }

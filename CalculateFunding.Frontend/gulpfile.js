@@ -8,12 +8,12 @@ var lodash = require("lodash"),
     concat = require("gulp-concat"),
     cssmin = require("gulp-cssmin"),
     sass = require("gulp-sass"),
-    uglify = require("gulp-uglify");
+    uglify = require("gulp-uglify"),
+    rev = require('gulp-rev');
 
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
 var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
 var merge = require('merge2');
 
 var paths = {
@@ -22,35 +22,59 @@ var paths = {
 
 paths.js = paths.webroot + "assets/js/**/*.js";
 paths.minJs = paths.webroot + "assets/js/**/*.min.js";
+paths.minJsFolder = paths.webroot + "assetsjs";
 paths.css = paths.webroot + "assets/css/**/*.css";
 paths.minCss = paths.webroot + "assets/css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "assetsjs/main.min.js";
 paths.concatCssDest = paths.webroot + "assets/css/main.min.css";
-paths.tsSource = "Scripts/*.ts"
+paths.minCssFolder = paths.webroot + "assetscss";
+paths.tsSource = "Scripts/*.ts";
+paths.jsSource = "Scripts/*.js";
 
 gulp.task("clean:js", function (cb) {
-    rimraf(paths.concatJsDest, cb);
+    rimraf(paths.minJsFolder, cb);
+
 });
 
 gulp.task("clean:css", function (cb) {
-    rimraf(paths.concatCssDest, cb);
+    rimraf(paths.minCssFolder, cb);
 });
 
 gulp.task("clean", ["clean:js", "clean:css"]);
 
 gulp.task("min:js", function () {
-    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
-        .pipe(concat(paths.concatJsDest))
+
+    return gulp.src(paths.js)
         .pipe(uglify())
+        .pipe(rev())
+        .pipe(gulp.dest(paths.minJsFolder));
+});
+
+gulp.task("min:css", ["min:maincss", "min:librarycss"]);
+
+
+gulp.task("min:maincss", function () {
+    return gulp.src(paths.webroot + "assets/css/main.css")
+        .pipe(concat(paths.minCssFolder + "/main.min.css"))
+        .pipe(cssmin())
+        .pipe(rev())
         .pipe(gulp.dest("."));
 });
 
-gulp.task("min:css", function () {
-    return gulp.src([paths.css, "!" + paths.minCss])
-        .pipe(concat(paths.concatCssDest))
+gulp.task("min:librarycss", function () {
+
+    var libraryPaths = [
+        "./wwwroot/assets/libs/css/bootstrap.css",
+        "./wwwroot/libs/govuk_bootstrap/govuk_bootstrap.css",
+    ];
+
+    return gulp.src(libraryPaths)
+        .pipe(concat(paths.minCssFolder + "/libraries.min.css"))
         .pipe(cssmin())
+        .pipe(rev())
         .pipe(gulp.dest("."));
 });
+
 
 gulp.task("min", ["min:js", "min:css"]);
 
@@ -87,9 +111,7 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
             './node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
-            './node_modules/knockout/build/output/knockout-latest.debug.js'
-
-
+            './node_modules/knockout/build/output/knockout-latest.debug.js',
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
@@ -97,6 +119,7 @@ gulp.task('copy-assets', function () {
             './node_modules/summernote/dist/**/*.woff',
             './node_modules/summernote/dist/**/*.eot',
             './node_modules/summernote/dist/**/*.ttf',
+            './node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
         ],
         fonts: [
             './node_modules/material-design-icons/iconfont/*.woff2',

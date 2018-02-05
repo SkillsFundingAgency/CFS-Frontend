@@ -22,32 +22,34 @@ namespace CalculateFunding.Frontend.Core.Telemetry
         public void Initialize(ITelemetry telemetry)
         {
             string correlationId;
-            if (_httpContextAccessor.HttpContext.Response.Headers.ContainsKey(LoggingConstants.CorrelationIdHttpHeaderName))
+            if (_httpContextAccessor.HttpContext != null)
             {
-                correlationId = _httpContextAccessor.HttpContext.Response.Headers[LoggingConstants.CorrelationIdHttpHeaderName];
-            }
-            else
-            {
-                correlationId = Guid.NewGuid().ToString();
-                if (!_httpContextAccessor.HttpContext.Response.HasStarted)
+                if (_httpContextAccessor.HttpContext.Response.Headers.ContainsKey(LoggingConstants.CorrelationIdHttpHeaderName))
                 {
-                    _httpContextAccessor.HttpContext.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId);
+                    correlationId = _httpContextAccessor.HttpContext.Response.Headers[LoggingConstants.CorrelationIdHttpHeaderName];
                 }
                 else
                 {
-                    return;
+                    correlationId = Guid.NewGuid().ToString();
+                    if (!_httpContextAccessor.HttpContext.Response.HasStarted)
+                    {
+                        _httpContextAccessor.HttpContext.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
+                if (!telemetry.Context.Properties.ContainsKey(LoggingConstants.CorrelationIdPropertyName))
+                {
+                    telemetry.Context.Properties.Add(LoggingConstants.CorrelationIdPropertyName, correlationId);
+                }
+                else if (correlationId != telemetry.Context.Properties[LoggingConstants.CorrelationIdPropertyName])
+                {
+                    throw new InvalidOperationException("Correlation ID Conflict");
                 }
             }
-
-            if (!telemetry.Context.Properties.ContainsKey(LoggingConstants.CorrelationIdPropertyName))
-            {
-                telemetry.Context.Properties.Add(LoggingConstants.CorrelationIdPropertyName, correlationId);
-            }
-            else if(correlationId != telemetry.Context.Properties[LoggingConstants.CorrelationIdPropertyName])
-            {
-                throw new InvalidOperationException("Correlation ID Conflict");
-            }
-
         }
     }
 }

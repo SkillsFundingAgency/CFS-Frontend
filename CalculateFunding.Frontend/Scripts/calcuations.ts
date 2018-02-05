@@ -205,7 +205,6 @@
             if (compareResult.length > 0) {
                 console.log("Updating " + filterName, compareResult);
                 facetObservableArray(facets);
-
             }
         }
 

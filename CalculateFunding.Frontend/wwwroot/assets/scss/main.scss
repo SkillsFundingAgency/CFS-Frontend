@@ -26,8 +26,8 @@ $filter-hover-bg: #bfc1c3;
 //fonts
 @font-face {
     font-family: 'glyphicons-halflings-regular';
-    src: url("../libs/fonts/glyphicons-halflings-regular.eot");
-    src: url('../libs/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../libs/fonts/glyphicons-halflings-regular.woff2') format('woff'), url('../libs/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+    src: url("/assets/libs/fonts/glyphicons-halflings-regular.eot");
+    src: url('/assets/libs/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('/assets/libs/fonts/glyphicons-halflings-regular.woff2') format('woff'), url('/assets/libs/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('/assets/libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
 $glyph: 'glyphicons-halflings-regular';
@@ -36,8 +36,8 @@ $glyph: 'glyphicons-halflings-regular';
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url(../libs/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
-    src: local('Material Icons'), local('MaterialIcons-Regular'), url(../libs/fonts/MaterialIcons-Regular.woff2) format('woff2'), url(../libs/fonts/MaterialIcons-Regular.woff) format('woff'), url(../libs/fonts/MaterialIcons-Regular.ttf) format('truetype');
+    src: url('/assets/libs/fonts/MaterialIcons-Regular.eot'); /* For IE6-8 */
+    src: local('Material Icons'), local('MaterialIcons-Regular'), url('/assets/libs/fonts/MaterialIcons-Regular.woff2') format('woff2'), url('/assets/libs/fonts/MaterialIcons-Regular.woff') format('woff'), url('/asssets/libs/fonts/MaterialIcons-Regular.ttf') format('truetype');
 }
 
 .material-icons {
@@ -97,7 +97,7 @@ blockquote {
 .button-start {
     background-repeat: no-repeat;
     background-position: 100% 50%;
-    background-image: url(../images/icon-pointer.png);
+    background-image: url('/assets/images/icon-pointer.png');
 }
 
 .govuk-related-items {
@@ -110,7 +110,7 @@ blockquote {
 /////////////////////////////////////
 .breadcrumbs {
     li {
-        background-image: url('../images/separator.png');
+        background-image: url('/assets/images/separator.png');
         background-position: 0% 50%;
         background-repeat: no-repeat;
 
@@ -205,7 +205,7 @@ blockquote {
                 width: 16px;
                 height: 16px;
                 position: absolute;
-                background-image: url('../images/icon-plus.png');
+                background-image: url('/assets/images/icon-plus.png');
                 color: $text-colour;
                 top: 50%;
                 transform: translateY(-50%);
@@ -218,7 +218,7 @@ blockquote {
             &.jscollapse-jsenabled-active {
                 &:before {
                     content: "";
-                    background-image: url('../images/icon-minus.png');
+                    background-image: url('/assets/images/icon-minus.png');
                 }
             }
         }
@@ -723,7 +723,7 @@ blockquote {
                 width: 16px;
                 height: 16px;
                 position: absolute;
-                background-image: url('../images/icon-plus.png');
+                background-image: url('/assets/images/icon-plus.png');
                 color: $text-colour;
                 top: 50%;
                 transform: translateY(-50%);
@@ -736,7 +736,7 @@ blockquote {
 
                 &:before {
                     content: "";
-                    background-image: url('../images/icon-minus.png');
+                    background-image: url('/assets/images/icon-minus.png');
                 }
             }
         }
@@ -1200,37 +1200,72 @@ table {
     }
 
     input[type='image']:disabled {
-        cursor:not-allowed;
+        cursor: not-allowed;
     }
 
-    .filter-field-heading{
+    .filter-field-heading {
         font-size: 19px;
+    }
+
+    .multiselect-container > li > a {
+        text-decoration: none;
+    }
+
+    .multiselect-container > li > a > label {
+        padding: 5px 30px 5px 45px;
+    }
+}
+
+.multiselect.btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 0;
+    border: none;
+    font-size: 19px;
+    text-align: left;
+    color: #555555;
+
+    .multiselect-selected-text {
+        height: 28px;
+    }
+}
+
+
+
+
+.multiselect-container {
+    border-radius: 0;
+    font-size: 16px;
+
+    label {
+        padding: 5px;
     }
 }
 
 .filter-selected-container {
     display: flex;
-    flex-wrap:wrap;
+    flex-wrap: wrap;
 
 
     .filter-selected-item {
-        padding: 15px 15px;
+        padding: 15px 15px 10px 15px;
         background-color: rgb(248,248,248);
         border: 1px solid $secondary-text-colour;
         margin-right: 15px;
         margin-bottom: 30px;
-        white-space:nowrap;
+        white-space: nowrap;
     }
 
     .filter-selected-item:last-child {
         margin-right: 0;
     }
 
-    .filter-selected-item-remove-button{
+    .filter-selected-item-remove-button {
         padding-left: 15px;
         color: #000;
         cursor: pointer;
         float: right;
+        line-height: 19px;
     }
 }
 
@@ -1349,4 +1384,18 @@ table {
             margin-top: 0;
         }
     }
+}
+
+
+/*image path overrides*/
+#global-header #logo {
+    background-image: url('/libs/govuk_bootstrap/images/gov.uk_logotype_crown.png?version=0.17.1');
+}
+
+#footer .footer-meta .copyright a {
+    background-image: url('/libs/govuk_bootstrap/images/govuk-crest.png?0.17.1');
+}
+
+#footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
+    background-image: url('/libs/govuk_bootstrap/images/open-government-licence.png?0.17.1');
 }

@@ -15,6 +15,8 @@
   <ItemGroup>
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
+    <None Remove="Scripts\bindingHandler.multiselect.ts" />
+    <None Remove="Scripts\bootstrap-multiselect.d.ts" />
     <None Remove="Scripts\calcuations.ts" />
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
@@ -84,8 +86,13 @@
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
+  </ItemGroup>
+  <ItemGroup>
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
+    <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
+    <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
     <TypeScriptCompile Include="Scripts\calcuations.ts" />
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />

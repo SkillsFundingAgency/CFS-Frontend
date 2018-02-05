@@ -90,11 +90,10 @@
 
 
 @section scripts{
-    <script type="text/javascript" src="~/assets/libs/js/knockout-latest.debug.js"></script>
-    <script type="text/javascript" src="~/assets/libs/js/monaco/vs/loader.js"></script>
-
-    <script type="text/javascript" src="~/js/bindingHandler.monacoEditor.js"></script>
-    <script type="text/javascript" src="~/js/editcalculation.js"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/editcalculation.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var editCalculationElement = document.getElementById("edit-calculation");
         if (editCalculationElement) {

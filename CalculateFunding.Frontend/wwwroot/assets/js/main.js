@@ -119,35 +119,35 @@ $(document).ready(function () {
         $(this).prop('checked', false);
     });
     //Embed Ace Editor
-    var editor,
-        editorSession,
-        JavaScriptMode;
-    ace.require("ace/ext/language_tools");
-    $('.editor').each(function () {
-        var JavaScriptMode = ace.require("ace/mode/vbscript").Mode;
-        editor = ace.edit(this);
-        editorSession = editor.getSession();
-        editorSession.setMode({
-            path: 'ace/mode/vbscript',
-            v: Date.now() //small tweak here to update the mode constantly
-        });
-        editorSession.setUseWrapMode(true);
-        editor.resize()
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: false
-        });
-        editor.session.setMode(new JavaScriptMode());
-        this.style.fontSize = '16px';
-        $(this).hasClass('read-only') ? editor.setReadOnly(true) : editor.setReadOnly(false);
-        var input = $('#calculation-engine #calculation');
-        var valedit = editor.getValue();
-        input.val(valedit);
-        editor.getSession().on("change", function () {
-            input.val(editor.getSession().getValue());;
-        });
-    });
+    //var editor,
+    //    editorSession,
+    //    JavaScriptMode;
+    //ace.require("ace/ext/language_tools");
+    //$('.editor').each(function () {
+    //    var JavaScriptMode = ace.require("ace/mode/vbscript").Mode;
+    //    editor = ace.edit(this);
+    //    editorSession = editor.getSession();
+    //    editorSession.setMode({
+    //        path: 'ace/mode/vbscript',
+    //        v: Date.now() //small tweak here to update the mode constantly
+    //    });
+    //    editorSession.setUseWrapMode(true);
+    //    editor.resize()
+    //    editor.setOptions({
+    //        enableBasicAutocompletion: true,
+    //        enableSnippets: true,
+    //        enableLiveAutocompletion: false
+    //    });
+    //    editor.session.setMode(new JavaScriptMode());
+    //    this.style.fontSize = '16px';
+    //    $(this).hasClass('read-only') ? editor.setReadOnly(true) : editor.setReadOnly(false);
+    //    var input = $('#calculation-engine #calculation');
+    //    var valedit = editor.getValue();
+    //    input.val(valedit);
+    //    editor.getSession().on("change", function () {
+    //        input.val(editor.getSession().getValue());;
+    //    });
+    //});
     //Summary collapse
     summary.click(function () {
         $(this).siblings('.details').toggle();

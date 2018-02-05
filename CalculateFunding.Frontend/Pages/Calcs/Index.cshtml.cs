@@ -1,15 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients;
+﻿using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.ViewModels.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Serilog;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
@@ -37,7 +33,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             _searchService = searchService;
         }
 
-        public async Task<IActionResult> OnGet(int? pageNumber, string draftSavedId, string publishedId)
+        public async Task<IActionResult> OnGetAsync(int? pageNumber, string draftSavedId, string publishedId, string searchTerm)
         {
             if (!string.IsNullOrWhiteSpace(draftSavedId))
             {
@@ -52,8 +48,11 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
             {
                 PageNumber = pageNumber,
-                IncludeFacets = false
+                IncludeFacets = false,
+                SearchTerm = searchTerm,
             };
+
+            SearchTerm = searchTerm;
 
             SearchResults = await _searchService.PerformSearch(searchRequest);
 
@@ -65,13 +64,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             return Page();
         }
 
-        public async Task<IActionResult> OnPost(int? pageNumber)
+        public async Task<IActionResult> OnPostAsync(int? pageNumber)
         {
             CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
             {
                 PageNumber = pageNumber,
                 SearchTerm = SearchTerm,
-                IncludeFacets = false
+                IncludeFacets = false,
             };
 
             SearchResults = await _searchService.PerformSearch(searchRequest);

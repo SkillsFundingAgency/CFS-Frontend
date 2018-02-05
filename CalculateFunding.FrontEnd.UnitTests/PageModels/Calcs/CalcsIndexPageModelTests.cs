@@ -13,6 +13,7 @@ using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
@@ -22,6 +23,282 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     [TestClass]
     public class CalcsIndexPageModelTests
     {
+        [TestMethod]
+        public async Task OnGet_WhenFirstPageRequestedWithNoFilters_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 10;
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = null,
+                PageNumber = null,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchRequest.SearchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(1);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenSecondPageRequestedWithNoFilters_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 50;
+            int requestedPage = 2;
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = null,
+                PageNumber = requestedPage,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+            expectedCalculationResult.StartItemNumber = 51;
+            expectedCalculationResult.EndItemNumber = 100;
+            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(requestedPage, null, null, null);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchRequest.SearchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(2);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_WhenFirstPageRequestedWithNoFilters_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 10;
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = null,
+                PageNumber = null,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(null);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchRequest.SearchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(1);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_WhenSecondPageRequestedWithNoFilters_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 50;
+            int requestedPage = 2;
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = null,
+                PageNumber = requestedPage,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+            expectedCalculationResult.StartItemNumber = 51;
+            expectedCalculationResult.EndItemNumber = 100;
+            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(requestedPage, null, null, null);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchRequest.SearchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(2);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_WhenFirstPageRequestedWithSearchTerm_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 10;
+            string searchTerm = "test search";
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = searchTerm,
+                PageNumber = null,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            pageModel.SearchTerm = searchTerm;
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(null);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchRequest.SearchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(1);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_WhenSecondPageRequestedWithSearchTerm_ThenSuccessfullyShown()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            int generatedNumberOfItems = 50;
+            int requestedPage = 2;
+            string searchTerm = "test search";
+
+            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            {
+                SearchTerm = searchTerm,
+                PageNumber = requestedPage,
+                IncludeFacets = false,
+                Filters = null,
+            };
+
+            CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
+            expectedCalculationResult.StartItemNumber = 51;
+            expectedCalculationResult.EndItemNumber = 100;
+            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+
+            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+                    m => m.PageNumber == searchRequest.PageNumber &&
+                    m.SearchTerm == searchRequest.SearchTerm &&
+                    m.IncludeFacets == searchRequest.IncludeFacets &&
+                    m.Filters == searchRequest.Filters))
+                .Returns(expectedCalculationResult);
+
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
+            pageModel.SearchTerm = searchTerm;
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(requestedPage);
+
+            // Assert
+            result.Should().BeOfType<PageResult>();
+            pageModel.SearchResults.Should().NotBeNull();
+            pageModel.SearchResults.Calculations.Should().HaveCount(generatedNumberOfItems, "The number of items returned in the calculations list should equal the expected results");
+            pageModel.SearchResults.PagerState.Should().NotBeNull("Pager State should not be null");
+            pageModel.SearchTerm.Should().Be(searchTerm);
+            pageModel.SearchResults.PagerState.CurrentPage.Should().Be(2);
+            pageModel.SearchResults.PagerState.DisplayNumberOfPages.Should().Be(4);
+            pageModel.SearchResults.PagerState.NextPage.Should().BeNull("Next Page should be null");
+            pageModel.SearchResults.PagerState.PreviousPage.Should().BeNull("Preview Page should be null");
+        }
+
         [TestMethod]
         public async Task OnGet_WhenNoCalculationsExist()
         {
@@ -45,7 +322,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
             // Act
-            IActionResult result = await pageModel.OnGet(null, null, null);
+            IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
 
             // Assert
             result.Should().NotBeNull();
@@ -73,7 +350,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Act
             Action pageAction = new Action(() =>
             {
-                IActionResult result = pageModel.OnGet(null, null, null).Result;
+                IActionResult result = pageModel.OnGetAsync(null, null, null, null).Result;
             });
 
             // Assert
@@ -86,7 +363,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
-           
+
             calculationSearchService
                 .PerformSearch(Arg.Any<CalculationSearchRequestViewModel>())
                 .Returns((CalculationSearchResultViewModel)null);
@@ -94,7 +371,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
-            IActionResult result = await pageModel.OnGet(null, null, null);
+            IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
 
 
             // Assert
@@ -103,7 +380,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             typedResult.StatusCode.Should().Be(500);
         }
 
-        
+
 
         [TestMethod]
         public async Task OnGet_WhenDraftSavedRequested_ThenSuccessfullyShown()
@@ -120,12 +397,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Calculation expectedDraftCalculation = new Calculation()
             {
-                 Id = draftCalculationId,
-                  Name = "Draft Calculation 5"
+                Id = draftCalculationId,
+                Name = "Draft Calculation 5"
             };
 
             ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedDraftCalculation);
-            
+
             calcsClient
                 .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
                 .Returns(itemResult);
@@ -137,7 +414,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
-            IActionResult result = await pageModel.OnGet(null, draftCalculationId, null);
+            IActionResult result = await pageModel.OnGetAsync(null, draftCalculationId, null, null);
 
             // Assert
             pageModel.DraftSavedCalculation.Should().NotBeNull();
@@ -176,7 +453,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
 
             // Act
-            IActionResult result = await pageModel.OnGet(null, null, publishedCalculationId);
+            IActionResult result = await pageModel.OnGetAsync(null, null, publishedCalculationId, null);
 
             // Assert
             pageModel.PublishedCalculation.Should().NotBeNull();
@@ -204,6 +481,37 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             result.PageSize = 50;
             result.TotalItems = numberOfItems;
             result.TotalPages = 1;
+
+            return result;
+        }
+
+        private CalculationSearchResultViewModel GenerateSearchResult(int numberOfItems)
+        {
+            CalculationSearchResultViewModel result = new CalculationSearchResultViewModel()
+            {
+                CurrentPage = 1,
+                EndItemNumber = numberOfItems,
+                Facets = null,
+                PagerState = new ViewModels.Paging.PagerState(1, 1),
+                StartItemNumber = 1,
+                TotalResults = numberOfItems,
+            };
+
+            List<CalculationSearchResultItemViewModel> items = new List<CalculationSearchResultItemViewModel>();
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                items.Add(new CalculationSearchResultItemViewModel()
+                {
+                    Id = $"{i}",
+                    Name = $"Calculation {i}",
+                    PeriodName = "Test Period",
+                    SpecificationName = "Spec Name",
+                    Status = "Unknown",
+                });
+            }
+
+            result.Calculations = items.AsEnumerable();
+
 
             return result;
         }

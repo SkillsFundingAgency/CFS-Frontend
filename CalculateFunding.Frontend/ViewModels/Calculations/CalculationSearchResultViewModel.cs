@@ -10,8 +10,14 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public int CurrentPage { get; set; }
 
+        /// <summary>
+        /// The human readable position in the dataset the first item in the table is
+        /// </summary>
         public int StartItemNumber { get; set; }
 
+        /// <summary>
+        /// The human readable position in the dataset where the last item in the table is
+        /// </summary>
         public int EndItemNumber { get; set; }
 
         public IEnumerable<CalculationSearchResultItemViewModel> Calculations { get; set; }
