@@ -1,6 +1,8 @@
 ﻿@page "{pageNumber?}"
 @using System.Web
 @model CalculateFunding.Frontend.Pages.Calcs.IndexPageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.AspNetCore.Hosting
 @{
     ViewData["Title"] = "Manage the Calculations";
     Layout = "~/Pages/_Layout.cshtml";
@@ -154,7 +156,7 @@
                 </tr>
             </tbody>
             <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
-                @{ 
+                @{
                     int rowId = 0;
                 }
                 @foreach (var calculation in Model.SearchResults.Calculations)
@@ -175,7 +177,14 @@
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
-    <script asp-src-include="~/assets/libs/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/calcuations.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
@@ -193,6 +202,6 @@
     </script>
 }
 
-@section styles{ 
+@section styles{
     <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
 }
