@@ -1,18 +1,22 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
+﻿// <copyright file="CalculationControllerTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.Controllers
 {
+    using System;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+
     [TestClass]
     public class CalculationControllerTests
     {
@@ -100,7 +104,6 @@ namespace CalculateFunding.Frontend.Controllers
                 .UpdateCalculation(calculationId, Arg.Any<CalculationUpdateModel>())
                 .Returns(Task.FromResult(new ApiResponse<Calculation>(System.Net.HttpStatusCode.ServiceUnavailable, null)));
 
-
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
                 SourceCode = "Source code",
@@ -113,9 +116,8 @@ namespace CalculateFunding.Frontend.Controllers
             });
 
             // Assert
-            a.ShouldThrow<InvalidOperationException>();
+            a.Should().Throw<InvalidOperationException>();
         }
-
 
         [TestMethod]
         public async Task CompilePreview_OnSuccessfulSaveRequest_ThenResponseSentToClient()
@@ -207,7 +209,6 @@ namespace CalculateFunding.Frontend.Controllers
                 .PreviewCompile(Arg.Any<PreviewCompileRequest>())
                 .Returns(Task.FromResult(new ApiResponse<PreviewCompileResult>(System.Net.HttpStatusCode.ServiceUnavailable, null)));
 
-
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
                 SourceCode = "Source code",
@@ -220,7 +221,7 @@ namespace CalculateFunding.Frontend.Controllers
             });
 
             // Assert
-            a.ShouldThrow<InvalidOperationException>();
+            a.Should().Throw<InvalidOperationException>();
         }
     }
 }

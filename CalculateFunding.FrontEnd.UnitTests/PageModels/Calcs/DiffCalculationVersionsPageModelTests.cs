@@ -1,25 +1,25 @@
-﻿using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Controllers;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using System.Linq;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using Microsoft.AspNetCore.Mvc;
-using CalculateFunding.Frontend.Pages.Calcs;
-using FluentAssertions;
-using CalculateFunding.Frontend.Clients.Models;
+﻿// <copyright file="DiffCalculationVersionsPageModelTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Pages.Calcs;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+
     [TestClass]
     public class DiffCalculationVersionsPageModelTests
     {
@@ -38,7 +38,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IEnumerable<int> versions = Enumerable.Empty<int>();
             calcsClient
               .GetCalculationById(Arg.Any<string>())
-              .Returns(new ApiResponse<Clients.CalcsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, expectedCalculation));
+              .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.NotFound, expectedCalculation));
 
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
@@ -48,7 +48,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<BadRequestObjectResult>();
-            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
@@ -69,22 +68,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
               .GetCalculationById(Arg.Any<string>())
-              .Returns(new ApiResponse<Clients.CalcsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, expectedCalculation));
+              .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.NotFound, expectedCalculation));
 
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
-
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
 
             // Assert
-
             result.Should().NotBeNull();
 
-            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
-
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
-
 
         [TestMethod]
 
@@ -129,29 +124,25 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
              .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, specCalculation));
+             .Returns(new ApiResponse<Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, specCalculation));
 
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
-
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
 
             // Assert
-
             result.Should().NotBeNull();
             result.Should().BeOfType<NotFoundObjectResult>();
-            NotFoundObjectResult typeResult = result as NotFoundObjectResult;
-            typeResult.Value.Should().Be( "Calculation was not found in Specs Service");
-            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
 
+            NotFoundObjectResult typeResult = result as NotFoundObjectResult;
+            typeResult.Value.Should().Be("Calculation was not found in Specs Service");
         }
 
         [TestMethod]
         public async Task OnGet_WhenNotAllCalculationVersionsDoesntExistThenNotFoundReturned()
         {
             // Arrange
-
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
@@ -171,7 +162,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Version = 4
             };
 
-            IEnumerable<int> versions = new List<int> { 1 };  //Not passing two versionIDs in the versions array
+            IEnumerable<int> versions = new List<int> { 1 };  // Not passing two versionIDs in the versions array
             string calculationId = "1";
 
             Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
@@ -192,33 +183,27 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
-
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
 
             // Assert
-
-            result.Should().NotBeNull();           
+            result.Should().NotBeNull();
             result.Should().BeOfType<BadRequestObjectResult>();
 
             BadRequestObjectResult typeResult = result as BadRequestObjectResult;
             typeResult.Value.Should().Be("Two versions not requested");
-            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
-
         }
-
 
         [TestMethod]
         public async Task OnGet_WhencalculationVersionsListReturned()
         {
             // Arrange
-
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             ILogger logger = Substitute.For<ILogger>();
 
-            Calculation expectedCalculation = new Calculation()   // calculation in CalculateFunding.Frontend.Clients.CalcsClient.Models
+            Calculation expectedCalculation = new Calculation()
             {
                 CalculationSpecification = new Reference("1", "Calc spec"),
                 Id = "2",
@@ -231,20 +216,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Version = 4
             };
 
-            IEnumerable<int> versions = new List<int> { 1 , 2 };   
+            IEnumerable<int> versions = new List<int> { 1, 2 };
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()   // Calculation in namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
             {
                 Id = "1",
                 Name = "Test spec",
                 Description = "Test description",
                 AllocationLine = new Reference("1", "Test Allocation")
-
             };
 
-            //build two versions for feeding the left and right panel
-
+            // build two versions for feeding the left and right panel
             CalculationVersion calver1 = new CalculationVersion()
             {
                 DecimalPlaces = 2,
@@ -274,7 +257,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
              .GetCalculationById("1", calculationId)
-             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));  //CalculateFunding.Frontend.Clients.SpecsClient.Models
+             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));  // CalculateFunding.Frontend.Clients.SpecsClient.Models
 
             calcsClient
              .GetMultipleVersionsByCalculationId(versions, calculationId)
@@ -283,18 +266,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             DiffCalculationModel diffCalcPageModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
-
             IActionResult result = await diffCalcPageModel.OnGet(versions, calculationId);
 
             // Assert
-
             result.Should().NotBeNull();
 
             diffCalcPageModel.RightCalculationDiffModel.Version.Should().Be(calver2.Version);
             diffCalcPageModel.LeftCalcualationDiffModel.Version.Should().Be(calver1.Version);
-
         }
-
-
     }
 }

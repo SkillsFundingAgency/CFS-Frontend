@@ -12,6 +12,7 @@ using CalculateFunding.Frontend.Interfaces.Core;
 using CalculateFunding.Frontend.Helpers;
 using Serilog;
 using CalculateFunding.Frontend.Interfaces.Core.Logging;
+using CalculateFunding.Frontend.Clients.CommonModels;
 
 namespace CalculateFunding.Frontend.Clients
 {

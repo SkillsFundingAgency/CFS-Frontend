@@ -1,26 +1,25 @@
-﻿using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Pages.Calcs;
-using CalculateFunding.Frontend.Services;
+﻿// <copyright file="CalcsVersionPageModelTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Serilog;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.Clients.Models;
-using System.Linq;
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Pages.Calcs;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+    using Serilog;
+
     [TestClass]
     public class CalcsVersionPageModelTests
     {
@@ -28,7 +27,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         public async Task OnGet_WhenCalculationDoesNotExistThenNotFoundReturned()
         {
             // Arrange
-
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
@@ -52,35 +50,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             result.Should().BeOfType<NotFoundObjectResult>();
         }
 
-        //public async Task OnGet_WhenSpecCalculationDoesNotExistThenNotFoundReturned()
-        //{
-        //    // Arrange
-        //    ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-        //    ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-        //    IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-        //    ILogger logger = Substitute.For<ILogger>();
-
-        //    string calculationId = "£$%";
-
-        //    calcsClient.GetCalculationById(calculationId).Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, new Calculation()
-        //    {
-        //        Id = calculationId,
-        //        CalculationSpecification = new Frontend.Clients.Models.Reference("1", "Test Calculation Specification"),
-        //        SpecificationId = "54",
-        //    }));
-
-
-        //    ComparePageModel pageModel = new ComparePageModel(specsClient, calcsClient, mapper);
-        //    // Act
-        //    IActionResult result = await pageModel.OnGet(calculationId);
-
-        //    // Assert
-        //    result.Should().NotBeNull();
-        //    result.Should().BeOfType<NotFoundObjectResult>();
-        //}
-
-
         [TestMethod]
         public async Task OnGet_WhenGetAllVersionsbyCalculationIdReturnsNull_ThenServerErrorResponseIsReturned()
         {
@@ -100,7 +69,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ComparePageModel compPageModel = new ComparePageModel(specsClient, calcsClient, mapper);
 
             // Act
-
             IActionResult result = await compPageModel.OnGet(calculationID);
 
             // Assert
@@ -109,11 +77,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             typedResult.StatusCode.Should().Be(500);
         }
 
-
         [TestMethod]
         public async Task OnGet_WhenCalculationIDIsNullGetAllVersionsbyCalculationIdReturns_ThenServerErrorResponseIsReturned()
         {
-
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
@@ -183,8 +149,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
         }
 
-
-
         [TestMethod]
         public async Task OnGet_WhenCalculationExistsThenCalculationReturned()
         {
@@ -214,7 +178,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedCalculation));
 
-
             Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
             {
                 Id = "1",
@@ -225,11 +188,10 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
            .GetCalculationById(expectedCalculation.SpecificationId, calculationId)
-           .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));
+           .Returns(new ApiResponse<Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));
 
             CalculationVersion calcsVersion1 = new CalculationVersion()
             {
-
                 Status = "Draft",
                 Version = "1",
                 DecimalPlaces = 4,
@@ -250,7 +212,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             CalculationVersion calcsVersion3 = new CalculationVersion()
             {
-
                 Status = "Draft",
                 Version = "3",
                 DecimalPlaces = 4,
@@ -265,7 +226,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 calcsVersion2,
                 calcsVersion3
             };
-
 
             calcsClient
                .GetAllVersionsByCalculationId(calculationId)
@@ -292,13 +252,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             var firstCalculation = comparePageModel.Calculations.First();
 
             firstCalculation.Version.Should().Be(calcsVersion3.Version);
-
-
         }
-
     }
-
-
-
-
 }

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace CalculateFunding.Frontend.Clients
+namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     public class ApiResponse<T>
     {

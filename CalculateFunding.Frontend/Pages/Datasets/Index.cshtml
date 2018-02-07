@@ -1,154 +1,220 @@
-﻿@page
-@using System.Linq;
-@using CalculateFunding.Frontend.Pages.Datasets
-@model CalculateFunding.Frontend.Pages.Datasets.IndexModel
+﻿@page "{pageNumber?}"
+@model CalculateFunding.Frontend.Pages.Datasets.DatasetsIndexPageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.Helpers
+@using Microsoft.AspNetCore.Hosting
+@using System.Web
 @{
-    ViewData["Title"] = "Providers";
+    ViewData["Title"] = "Manage Datasets";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
-<!-- Breadcrumbs -->
-<div class="row">
-    <div class="col-xs-12">
-        <div class="breadcrumbs">
-            <ol>
-                <li><a href="/">Home</a></li>
-            </ol>
+@section BannerLeft{
+    <h1 class="hero-title">Manage Datasets</h1>
+}
+
+@section BannerMiddle{
+    <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">Search calculations</div>
+            <div class="col-xs-3 filter-field-heading withjs-show">Add new datasets</div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-8">
-        <h1 class="heading-xlarge">Datasets</h1>
-        <p class="text-muted">Manage and import source datasets and specify calculated datasets</p>
-
-    </div>
-</div>
-<div class="row">
-    <div id="sidebar">
-        <div class="col-md-4">
-            <div class="panel-group wrap esfa-collapse" id="esfa-filter">
-                <form class="filter-form" method="get">
-                    <div class="panel search-panel">
-                        <div class="panel-heading no-collapse">
-                            <fieldset>
-                                <label class="form-label" for="esfa-filter-search">Search</label>
-                                <input class="form-control" id="esfa-filter-search" type="text" name="esfa-filter-search" data-search>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <!-- end of panel -->
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h3 class="heading-medium panel-title">
-                                Academic Year
-                            </h3>
-                        </div>
-                        <div class="panel-no-collapse">
-                            <div class="panel-body">
-                                <fieldset>
-                                    <div class="multiple-choice">
-                                        @foreach (var year in Model.Datasets.GroupBy(x => x.AcademicYear))
-                                        {
-                                            <input name="esfa-filter-status" type="checkbox" value="@year.Key.Id">
-                                            <label>@year.Key.Name (@year.Count())</label>
-                                        }
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end of panel -->
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h3 class="heading-medium panel-title">
-                                Datset types
-                            </h3>
-                        </div>
-                        <div class="panel-no-collapse">
-                            <div class="panel-body scroll-body">
-                                <fieldset>
-                                   
-                                    @foreach (var type in Model.Datasets.GroupBy(x => x.DatasetType))
-                                    {
-                                        <div class="multiple-choice">
-                                        <input name="esfa-filter-status" type="checkbox" value="@type.Key.Replace(" ", "").ToLowerInvariant()">
-                                    <label>@type.Key (@type.Count())</label>
-                                        </div>
-                                    }
-                                  
-                                </fieldset>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end of panel -->
-                </form>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
             </div>
-            <!-- end of #esfa-collapse  -->
+            <div class="col-xs-3">
+                <a href="#" class="btn btn-filter-link-button">Load new datasets</a>
+            </div>
+        </div>
+        <div class="row withjs-show">
+            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter datasets</div>
+        </div>
+        <div class="row withjs-show">
+            <div class="col-xs-5 filter-field-heading">Data Schema</div>
+            <div class="col-xs-3 filter-field-heading">Specification</div>
+            <div class="col-xs-2 filter-field-heading">Year</div>
+            <div class="col-xs-2 filter-field-heading">Status</div>
+
+        </div>
+        <div class="row withjs-show">
+            <div class="col-xs-5">
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-2">
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select year', buttonWidth: '100%', disableIfEmpty: true}, options: periods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedPeriods, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-2">
+                <select id="status" data-bind="multiselect2: {nonSelectedText: 'All', buttonWidth: '100%', disableIfEmpty: true}, options: status, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatus, enable: canSelectFilters" multiple></select>
+            </div>
+
+        </div>
+    </form>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">Calculate Funding</a></li>
+            <li>Manage Datasets</li>
+        </ol>
+    </div>
+}
+
+<div class="row manage-datasets" id="manage-datasets-container">
+    <div class="col-xs-12 withjs-show">
+        <div class="filter-selected-container" data-bind="foreach: selectedSearchFacets" id="filter-selected-container">
+            <div class="filter-selected-item">
+                <span data-bind="click: function(){$root.removeFilter($data)}" class="filter-selected-item-remove-button"><i class="material-icons">close</i></span>
+                <span data-bind="text: displayName"></span>
+            </div>
         </div>
     </div>
-    <div id="main">
-        <div class="col-md-8">
-            <div class="panel-group wrap esfa-collapse filtr-container" id="esfa-list">
-            <button class="accordion-toggle">Open all</button>
-                
-                @foreach (var tr in Model.Datasets)
+    <div class="col-xs-12">
+        <div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
+            <div class="pull-right paging-container" id="static-paging-container">
+                @if (Model.SearchResults.PagerState.PreviousPage.HasValue)
                 {
-                    <div class="panel filtr-item" data-id="P004_PriRate" data-filter-item data-filter-name="@tr.DatasetType.ToLower()" data-category="@tr.AcademicYear.Id @tr.DatasetType.Replace(" ", "").ToLowerInvariant()">
-                        <div class="panel-heading">
-                            <h2 class="panel-title failing-provider-title">
-                                <a href="/datasets/details/@tr.Id">
-                                    @tr.DatasetType @tr.AcademicYear.Name
-                                </a>
-                            </h2>
-                        </div>
-                        <div class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="panel panel-border-narrow">
-                                    <div class="provider-stats">
-                                        <ul class="list-inline">
-                                            <li>
-                                                <dl>
-                                                    <dt>LA Name:</dt>
-                                                    <dd>Northumberland</dd>
-                                                </dl>
-                                            </li>
-                                            <li>
-                                                <dl>
-                                                    <dt>LAESTAB:</dt>
-                                                    <dd>8713363</dd>
-                                                </dl>
-                                            </li>
-                                            <li>
-                                                <dl>
-                                                    <dt>UPIN:</dt>
-                                                    <dd>134673</dd>
-                                                </dl>
-                                            </li>
-                                            <li>
-                                                <dl>
-                                                    <dt>UKPRN:</dt>
-                                                    <dd>10061983</dd>
-                                                </dl>
-                                            </li>
-                                            <li>
-                                                <dl>
-                                                    <dt>URN:</dt>
-                                                    <dd>143802</dd>
-                                                </dl>
-                                            </li>
-                                        </ul>
-                                    </div>
+                    <a href="/datasets?pageNumber=@Model.SearchResults.PagerState.PreviousPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Previous</a>
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <!-- end of panel -->
+                }
+
+                @foreach (int pageNumber in Model.SearchResults.PagerState.Pages)
+                {
+                    if (pageNumber == Model.SearchResults.PagerState.CurrentPage)
+                    {
+                        <span class="paging-active-page">@pageNumber</span>
+                    }
+                    else
+                    {
+                        <a href="/datasets?pageNumber=@pageNumber&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">@pageNumber</a>
+                    }
+
+                }
+
+                @if (Model.SearchResults.PagerState.NextPage.HasValue)
+                {
+                    <a href="/datasets?pageNumber=@Model.SearchResults.PagerState.NextPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Next</a>
+
                 }
             </div>
-            <!-- end of #esfa-collapse  -->
+            Showing @Model.SearchResults.StartItemNumber-@Model.SearchResults.EndItemNumber of <strong>@Model.SearchResults.TotalResults</strong> datasets
+
         </div>
+
+        <div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rownavigation-container">
+            <div class="pull-right paging-container" data-bind="with: pagerState" id="dynamic-paging-container">
+
+                <a data-bind="if: previousPage, click: function(){ $root.loadPage(previousPage)}" class="paging-link">Previous</a>
+
+                <span data-bind="foreach: pages">
+                    <span class="paging-active-page" data-bind="visible: $data === $parent.currentPage, text: $data"></span>
+                    <a href="#" data-bind="visible: $data !== $parent.currentPage, click: function(){$root.loadPage($data)}" class="paging-link"><span data-bind="text: $data"></span></a>
+
+                </span>
+                <a data-bind="if: nextPage, click: function(){ $root.loadPage(nextPage)}" class="paging-link">Next</a>
+
+            </div>
+
+            Showing <span data-bind="text: startItemNumber"></span>-<span data-bind="text: endItemNumber"></span> of <strong data-bind="text: totalResults"></strong> datasets
+        </div>
+        <div class="dataset-searchresult-container spacing-30">
+            @{
+                int datasetRow = 0;
+            }
+            @foreach (var dataset in Model.SearchResults.Datasets)
+            {
+
+                <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
+                    <div class="dataset-item-header">@dataset.Name</div>
+                    <div>
+                        <span class="dataset-item-property">
+                            <strong>Status:</strong>
+                            <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong>Update on:</strong>
+                            <span id="dataset-item-lastupdated-@datasetRow">
+                                @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                datasetRow++;
+            }
+        </div>
+
+        @*<table class="calculations-table table-striped" id="calculation-results-table">
+                <thead>
+                    <tr>
+                        <th>Calculation Name</th>
+                        <th>Status</th>
+                        <th>Spec name</th>
+                        <th>Year</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
+                    <tr>
+                        <td><a data-bind="attr: {href: '/calcs/editCalculation/' + id }, text: name"></a></td>
+                        <td data-bind="text: status"></td>
+                        <td data-bind="text: specificationName"></td>
+                        <td data-bind="text: periodName"></td>
+                    </tr>
+                </tbody>
+                <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                    @{
+                        int rowId = 0;
+                    }
+                    @foreach (var calculation in Model.SearchResults.Datasets)
+                    {
+                        <tr>
+                            <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
+                            <td id="static-results-status-@rowId">@calculation.Status</td>
+                            <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                            <td id="static-results-periodName-@rowId">@calculation.PeriodName</td>
+                        </tr>
+                        rowId++;
+                    }
+                </tbody>
+            </table>*@
+
     </div>
-</div><!-- end of .row -->
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/datasets.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageDatasets.DatasetSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-datasets-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+        vm.performSearch();
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

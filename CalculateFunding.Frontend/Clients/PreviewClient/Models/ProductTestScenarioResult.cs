@@ -1,5 +1,5 @@
 ﻿using System;
-using CalculateFunding.Frontend.Clients.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Clients.PreviewClient.Models

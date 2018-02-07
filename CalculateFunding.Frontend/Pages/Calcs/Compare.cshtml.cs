@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -8,9 +7,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.Clients;
 using AutoMapper;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.Clients.CommonModels;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
@@ -43,13 +42,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new BadRequestObjectResult(ErrorMessages.CalculationIdNullOrEmpty);
             }
 
-            ApiResponse<Clients.CalcsClient.Models.Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
             if (calculationResponse == null)
             {
                 return new StatusCodeResult(500);
             }
 
-            Clients.CalcsClient.Models.Calculation calculation = calculationResponse.Content;
+            Calculation calculation = calculationResponse.Content;
 
             if (calculation == null)
             {

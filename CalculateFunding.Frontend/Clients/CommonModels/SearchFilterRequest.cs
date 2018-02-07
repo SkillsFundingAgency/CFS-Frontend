@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace CalculateFunding.Frontend.ViewModels.Calculations
+namespace CalculateFunding.Frontend.Clients.CommonModels
 {
-    public class CalculationSearchRequestViewModel
+    public class SearchFilterRequest : PagedQueryOptions
     {
-        public int? PageNumber { get; set; }
-
         public string SearchTerm { get; set; }
 
         public bool IncludeFacets { get; set; }

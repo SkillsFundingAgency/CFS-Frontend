@@ -1,4 +1,4 @@
-﻿namespace CalculateFunding.Frontend.ViewModels
+﻿namespace CalculateFunding.Frontend.ViewModels.Common
 {
     public class ReferenceViewModel
     {

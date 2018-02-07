@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient

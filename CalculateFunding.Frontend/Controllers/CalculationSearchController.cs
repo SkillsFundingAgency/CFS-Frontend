@@ -2,6 +2,7 @@
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -18,7 +19,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/calculations/search")]
-        public async Task<IActionResult> SearchCalculations([FromBody] CalculationSearchRequestViewModel request)
+        public async Task<IActionResult> SearchCalculations([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 

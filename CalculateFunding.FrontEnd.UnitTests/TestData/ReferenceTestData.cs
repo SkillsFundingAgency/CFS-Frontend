@@ -1,10 +1,12 @@
-﻿using CalculateFunding.Frontend.Clients.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// <copyright file="ReferenceTestData.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.TestData
 {
+    using System.Collections.Generic;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+
     public static class ReferenceTestData
     {
         public static IEnumerable<Reference> AcademicYears()

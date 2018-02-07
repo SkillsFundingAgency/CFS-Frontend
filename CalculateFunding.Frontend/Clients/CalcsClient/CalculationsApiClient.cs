@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Core;
@@ -28,7 +29,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             return GetAsync<Calculation>($"{_calcsPath}/calculation-current-version?calculationId={calculationId}");
         }
 
-        public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(CalculationSearchFilterRequest filterOptions)
+        public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions)
         {
             CalculationSearchRequest request = new CalculationSearchRequest()
             {

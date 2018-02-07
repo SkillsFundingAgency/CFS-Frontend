@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
 using CalculateFunding.Frontend.ViewModels.Specs;
 
 namespace CalculateFunding.Frontend.ViewModels
@@ -35,9 +38,17 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
 
-            CreateMap<Reference, ReferenceViewModel>();
-
             CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
+            CreateMap<DatasetSearchResultItem, DatasetSearchResultItemViewModel>();
+
+            this.MapCommon();
+        }
+
+        private void MapCommon()
+        {
+            CreateMap<SearchFacet, SearchFacetViewModel>();
+            CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
+            CreateMap<Reference, ReferenceViewModel>();
         }
     }
 }

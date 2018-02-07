@@ -1,5 +1,5 @@
 ﻿using System;
-using CalculateFunding.Frontend.Clients.Models;
+using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
@@ -13,7 +13,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public DateTime Date { get; set; }
 
-        public Reference Author { get; set; }
+        public ReferenceViewModel Author { get; set; }
 
         public string Status { get; set; }
     }

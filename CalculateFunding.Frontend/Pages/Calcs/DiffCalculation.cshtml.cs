@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Properties;
@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new BadRequestObjectResult("Two versions not requested");
             }
 
-            ApiResponse<Clients.CalcsClient.Models.Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
             if (calculationResponse == null || calculationResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);

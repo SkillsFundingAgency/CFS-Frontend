@@ -9,6 +9,7 @@ namespace CalculateFunding.Frontend.Modules
         public override void Configure(IServiceCollection services)
         {
             services.AddScoped<ICalculationSearchService, CalculationSearchService>();
+            services.AddScoped<IDatasetSearchService, DatasetSearchService>();
         }
     }
 }

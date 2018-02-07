@@ -4,6 +4,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -45,7 +46,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 PublishedCalculation = (await this._calculationsApiClient.GetCalculationById(publishedId)).Content;
             }
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 PageNumber = pageNumber,
                 IncludeFacets = false,
@@ -66,7 +67,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public async Task<IActionResult> OnPostAsync(int? pageNumber)
         {
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 PageNumber = pageNumber,
                 SearchTerm = SearchTerm,

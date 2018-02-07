@@ -1,4 +1,4 @@
-﻿namespace CalculateFunding.Frontend.Clients.Models
+﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     public class SearchFacetValue
     {

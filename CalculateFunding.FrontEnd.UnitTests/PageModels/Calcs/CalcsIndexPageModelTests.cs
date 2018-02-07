@@ -1,25 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Pages.Calcs;
-using CalculateFunding.Frontend.Services;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Serilog;
+﻿// <copyright file="CalcsIndexPageModelTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Pages.Calcs;
+    using CalculateFunding.Frontend.Services;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+    using Serilog;
+
     [TestClass]
     public class CalcsIndexPageModelTests
     {
@@ -32,7 +37,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             int generatedNumberOfItems = 10;
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = null,
                 PageNumber = null,
@@ -42,7 +47,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -76,7 +81,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             int generatedNumberOfItems = 50;
             int requestedPage = 2;
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = null,
                 PageNumber = requestedPage,
@@ -87,9 +92,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
             expectedCalculationResult.StartItemNumber = 51;
             expectedCalculationResult.EndItemNumber = 100;
-            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+            expectedCalculationResult.PagerState = new ViewModels.Common.PagerState(2, 2);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -122,7 +127,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             int generatedNumberOfItems = 10;
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = null,
                 PageNumber = null,
@@ -132,7 +137,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -166,7 +171,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             int generatedNumberOfItems = 50;
             int requestedPage = 2;
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = null,
                 PageNumber = requestedPage,
@@ -177,9 +182,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
             expectedCalculationResult.StartItemNumber = 51;
             expectedCalculationResult.EndItemNumber = 100;
-            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+            expectedCalculationResult.PagerState = new ViewModels.Common.PagerState(2, 2);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -213,7 +218,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             int generatedNumberOfItems = 10;
             string searchTerm = "test search";
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = searchTerm,
                 PageNumber = null,
@@ -223,7 +228,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -260,7 +265,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             int requestedPage = 2;
             string searchTerm = "test search";
 
-            CalculationSearchRequestViewModel searchRequest = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 SearchTerm = searchTerm,
                 PageNumber = requestedPage,
@@ -271,9 +276,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             CalculationSearchResultViewModel expectedCalculationResult = GenerateSearchResult(generatedNumberOfItems);
             expectedCalculationResult.StartItemNumber = 51;
             expectedCalculationResult.EndItemNumber = 100;
-            expectedCalculationResult.PagerState = new ViewModels.Paging.PagerState(2, 2);
+            expectedCalculationResult.PagerState = new ViewModels.Common.PagerState(2, 2);
 
-            calculationSearchService.PerformSearch(Arg.Is<CalculationSearchRequestViewModel>(
+            calculationSearchService.PerformSearch(Arg.Is<SearchRequestViewModel>(
                     m => m.PageNumber == searchRequest.PageNumber &&
                     m.SearchTerm == searchRequest.SearchTerm &&
                     m.IncludeFacets == searchRequest.IncludeFacets &&
@@ -317,10 +322,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 TotalPages = 0,
             };
 
-            calcsClient.FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+            calcsClient.FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(zeroItemResult);
 
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
 
@@ -340,9 +346,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
-
             calcsClient
-                .When(a => a.FindCalculations(Arg.Any<CalculationSearchFilterRequest>()))
+                .When(a => a.FindCalculations(Arg.Any<SearchFilterRequest>()))
                 .Do(x => { throw new HttpRequestException(); });
 
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
@@ -354,7 +359,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             });
 
             // Assert
-            pageAction.ShouldThrow<HttpRequestException>();
+            pageAction.Should().Throw<HttpRequestException>();
         }
 
         [TestMethod]
@@ -365,7 +370,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
             calculationSearchService
-                .PerformSearch(Arg.Any<CalculationSearchRequestViewModel>())
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns((CalculationSearchResultViewModel)null);
 
             IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
@@ -373,14 +378,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
 
-
             // Assert
             result.Should().BeOfType<StatusCodeResult>();
             StatusCodeResult typedResult = result as StatusCodeResult;
             typedResult.StatusCode.Should().Be(500);
         }
-
-
 
         [TestMethod]
         public async Task OnGet_WhenDraftSavedRequested_ThenSuccessfullyShown()
@@ -404,7 +406,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedDraftCalculation);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             calcsClient
@@ -443,7 +445,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedPublishedCalculation);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             calcsClient
@@ -492,7 +494,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 CurrentPage = 1,
                 EndItemNumber = numberOfItems,
                 Facets = null,
-                PagerState = new ViewModels.Paging.PagerState(1, 1),
+                PagerState = new ViewModels.Common.PagerState(1, 1),
                 StartItemNumber = 1,
                 TotalResults = numberOfItems,
             };
@@ -511,7 +513,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             }
 
             result.Calculations = items.AsEnumerable();
-
 
             return result;
         }

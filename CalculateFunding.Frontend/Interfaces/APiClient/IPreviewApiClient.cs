@@ -1,4 +1,4 @@
-﻿using CalculateFunding.Frontend.Clients;
+﻿using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.PreviewClient.Models;
 using System.Threading.Tasks;
 

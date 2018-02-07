@@ -1,9 +1,13 @@
-﻿using CalculateFunding.Frontend.ViewModels.Paging;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// <copyright file="PagingUnitTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.Paging
 {
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class PagingUnitTests
     {
@@ -150,7 +154,7 @@ namespace CalculateFunding.Frontend.Paging
             PagerState state = new PagerState(2, 8);
 
             // Act / Assert
-            state.Pages.Should().ContainInOrder(1,2,3,4);
+            state.Pages.Should().ContainInOrder(1, 2, 3, 4);
 
             state.CurrentPage.Should().Be(2);
             state.NextPage.Should().Be(5);

@@ -3,7 +3,6 @@ using CalculateFunding.Frontend.Helpers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
-using CalculateFunding.Frontend.Core.Middleware;
 using CalculateFunding.Frontend.Core.Logging;
 
 namespace CalculateFunding.Frontend.Core.Telemetry

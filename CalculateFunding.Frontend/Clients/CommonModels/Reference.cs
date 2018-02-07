@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace CalculateFunding.Frontend.Clients.Models
+namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     public class Reference
     {

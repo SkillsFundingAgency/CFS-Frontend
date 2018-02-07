@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CalculateFunding.Frontend.ViewModels.Paging
+namespace CalculateFunding.Frontend.ViewModels.Common
 {
     public class PagerState
     {

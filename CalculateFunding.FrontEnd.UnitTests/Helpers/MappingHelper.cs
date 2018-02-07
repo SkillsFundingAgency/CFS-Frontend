@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoMapper;
-using CalculateFunding.Frontend.ViewModels;
+﻿// <copyright file="MappingHelper.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.Helpers
 {
+    using AutoMapper;
+    using CalculateFunding.Frontend.ViewModels;
+
     internal class MappingHelper
     {
         internal static IMapper CreateFrontEndMapper()

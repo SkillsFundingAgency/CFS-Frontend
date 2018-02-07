@@ -1,39 +1,42 @@
-﻿using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Pages.Specs;
-using System.Linq;
-using CalculateFunding.Frontend.TestData;
-using NSubstitute;
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using FluentAssertions;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.Models;
+﻿// <copyright file="IndexModelTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.PageModels.Specs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Pages.Specs;
+    using CalculateFunding.Frontend.TestData;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+
     [TestClass]
     public class IndexModelTests
     {
         [TestMethod]
         public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResults_ReturnsPageResult()
         {
-            //Arrange
-            IEnumerable<Specification> Specifications = Enumerable.Empty<Specification>();
+            // Arrange
+            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, Specifications.ToList());
+            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(AcademicYears.First().Id))
+                .GetSpecifications(Arg.Is(academicYears.First().Id))
                 .Returns(specsResponse);
 
             apiClient
@@ -42,10 +45,10 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             IndexModel indexModel = new IndexModel(apiClient);
 
-            //Act
+            // Act
             IActionResult result = await indexModel.OnGetAsync();
 
-            //Assert
+            // Assert
             result
                 .Should()
                 .NotBeNull();
@@ -66,19 +69,19 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         [TestMethod]
         public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResultsAndParameterSupplied_ReturnsPageResult()
         {
-            //Arrange
-            IEnumerable<Specification> Specifications = Enumerable.Empty<Specification>();
+            // Arrange
+            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, Specifications.ToList());
+            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(AcademicYears.First().Id))
+                .GetSpecifications(Arg.Is(academicYears.First().Id))
                 .Returns(specsResponse);
 
             apiClient
@@ -87,10 +90,10 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             IndexModel indexModel = new IndexModel(apiClient);
 
-            //Act
-            IActionResult result = await indexModel.OnGetAsync(Arg.Is(AcademicYears.First().Id));
+            // Act
+            IActionResult result = await indexModel.OnGetAsync(Arg.Is(academicYears.First().Id));
 
-            //Assert
+            // Assert
             result
                 .Should()
                 .NotBeNull();
@@ -111,19 +114,19 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         [TestMethod]
         public async Task OnGetAsync_GivenInvalidParameterSupplied_ReturnsPageResult()
         {
-            //Arrange
-            IEnumerable<Specification> Specifications = Enumerable.Empty<Specification>();
+            // Arrange
+            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, Specifications.ToList());
+            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(AcademicYears.First().Id))
+                .GetSpecifications(Arg.Is(academicYears.First().Id))
                 .Returns(specsResponse);
 
             apiClient
@@ -132,10 +135,10 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             IndexModel indexModel = new IndexModel(apiClient);
 
-            //Act
+            // Act
             IActionResult result = await indexModel.OnGetAsync("an-id");
 
-            //Assert
+            // Assert
             result
                 .Should()
                 .NotBeNull();
@@ -156,19 +159,19 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         [TestMethod]
         public async Task OnGetAsync_GivenGetSpecificationsReturnsResults_ReturnsPageResult()
         {
-            //Arrange
-            IEnumerable<Specification> Specifications = SpecificationTestData.Data();
+            // Arrange
+            IEnumerable<Specification> specifications = SpecificationTestData.Data();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, Specifications.ToList());
+            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> AcademicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, AcademicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(AcademicYears.First().Id))
+                .GetSpecifications(Arg.Is(academicYears.First().Id))
                 .Returns(specsResponse);
 
             apiClient
@@ -177,10 +180,10 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             IndexModel indexModel = new IndexModel(apiClient);
 
-            //Act
+            // Act
             IActionResult result = await indexModel.OnGetAsync();
 
-            //Assert
+            // Assert
             result
                 .Should()
                 .NotBeNull();
@@ -198,12 +201,12 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Be(3);
         }
 
-        static ISpecsApiClient CreateApiClient()
+        private static ISpecsApiClient CreateApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
         }
 
-        static IndexModel CreateIndexModel(ISpecsApiClient apiClient = null)
+        private static IndexModel CreateIndexModel(ISpecsApiClient apiClient = null)
         {
             return new IndexModel(apiClient ?? CreateApiClient());
         }

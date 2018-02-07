@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.CommonModels;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {

@@ -1,11 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CalculateFunding.Frontend.Core.Middleware;
-using CalculateFunding.Frontend.Core.Telemetry;
 using CalculateFunding.Frontend.Modules;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

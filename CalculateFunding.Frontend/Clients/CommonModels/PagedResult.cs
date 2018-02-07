@@ -1,7 +1,6 @@
-﻿using CalculateFunding.Frontend.Clients.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CalculateFunding.Frontend.Clients
+namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     public class PagedResult<T>
     {

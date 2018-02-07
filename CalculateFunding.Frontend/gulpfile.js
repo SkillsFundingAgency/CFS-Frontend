@@ -65,7 +65,7 @@ gulp.task("min:librarycss", function () {
 
     var libraryPaths = [
         "./wwwroot/assets/libs/css/bootstrap.css",
-        "./wwwroot/libs/govuk_bootstrap/govuk_bootstrap.css",
+        "./wwwroot/libs/govuk_bootstrap/govuk_bootstrap.css"
     ];
 
     return gulp.src(libraryPaths)
@@ -111,7 +111,7 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
             './node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
-            './node_modules/knockout/build/output/knockout-latest.debug.js',
+            './node_modules/knockout/build/output/knockout-latest.debug.js'
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',

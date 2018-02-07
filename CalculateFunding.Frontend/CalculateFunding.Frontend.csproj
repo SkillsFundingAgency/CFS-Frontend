@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
-    <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.7</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -18,9 +18,12 @@
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
     <None Remove="Scripts\bootstrap-multiselect.d.ts" />
     <None Remove="Scripts\calcuations.ts" />
+    <None Remove="Scripts\common.d.ts" />
     <None Remove="Scripts\compare.ts" />
+    <None Remove="Scripts\datasets.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\search.ts" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
@@ -29,10 +32,10 @@
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.4.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.22" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.2" PrivateAssets="All" />
     <PackageReference Include="Serilog" Version="2.6.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="2.4.0" />
@@ -93,10 +96,13 @@
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
+    <TypeScriptCompile Include="Scripts\datasets.ts" />
     <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
     <TypeScriptCompile Include="Scripts\calcuations.ts" />
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />
     <TypeScriptCompile Include="Scripts\compare.ts" />
+    <TypeScriptCompile Include="Scripts\common.d.ts" />
+    <TypeScriptCompile Include="Scripts\search.ts" />
   </ItemGroup>
 
   <PropertyGroup>

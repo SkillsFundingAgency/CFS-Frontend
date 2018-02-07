@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.ViewModels.Paging;
+using CalculateFunding.Frontend.ViewModels.Common;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Services
@@ -29,9 +29,9 @@ namespace CalculateFunding.Frontend.Services
             _logger = logger;
         }
 
-        public async Task<CalculationSearchResultViewModel> PerformSearch(CalculationSearchRequestViewModel request)
+        public async Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
-            CalculationSearchFilterRequest requestOptions = new CalculationSearchFilterRequest()
+            SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = 1,
                 PageSize = 50,
@@ -56,7 +56,16 @@ namespace CalculateFunding.Frontend.Services
 
             result.TotalResults = calculationsResult.TotalItems;
             result.CurrentPage = calculationsResult.PageNumber;
-            result.Facets = calculationsResult.Facets;
+            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
+            if (calculationsResult.Facets != null)
+            {
+                foreach (SearchFacet facet in calculationsResult.Facets)
+                {
+                    searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
+                }
+            }
+
+            result.Facets = searchFacets.AsEnumerable();
 
             List<CalculationSearchResultItemViewModel> itemResults = new List<CalculationSearchResultItemViewModel>();
 

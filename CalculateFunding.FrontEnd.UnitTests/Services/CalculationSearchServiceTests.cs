@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Serilog;
+﻿// <copyright file="CalculationSearchServiceTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+    using Serilog;
+
     [TestClass]
     public class CalculationSearchServiceTests
     {
@@ -29,13 +33,11 @@ namespace CalculateFunding.Frontend.Services
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
-
             calcsClient
-                .When(a => a.FindCalculations(Arg.Any<CalculationSearchFilterRequest>()))
+                .When(a => a.FindCalculations(Arg.Any<SearchFilterRequest>()))
                 .Do(x => { throw new HttpRequestException(); });
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
-
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             Action pageAction = new Action(() =>
@@ -44,7 +46,7 @@ namespace CalculateFunding.Frontend.Services
             });
 
             // Assert
-            pageAction.ShouldThrow<HttpRequestException>();
+            pageAction.Should().Throw<HttpRequestException>();
         }
 
         [TestMethod]
@@ -59,11 +61,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> expectedServiceResult = null;
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(expectedServiceResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
-
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel result = await calculationSearchService.PerformSearch(request);
@@ -86,10 +87,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
@@ -123,10 +124,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
@@ -156,19 +157,21 @@ namespace CalculateFunding.Frontend.Services
 
             IEnumerable<SearchFacet> facets = new[]
             {
-                new SearchFacet{
+                new SearchFacet
+                {
                     Name = "facet 1",
                     FacetValues = new[]
                     {
-                        new SearchFacetValue{ Name = "f1", Count = 5}
+                        new SearchFacetValue { Name = "f1", Count = 5 }
                     }
                 },
-                new SearchFacet{
+                new SearchFacet
+                {
                     Name = "facet 2",
                     FacetValues = new[]
                     {
-                        new SearchFacetValue{ Name = "f2", Count = 11},
-                        new SearchFacetValue{ Name = "f3", Count = 1}
+                        new SearchFacetValue { Name = "f2", Count = 11 },
+                        new SearchFacetValue { Name = "f3", Count = 1 }
                     }
                 }
             };
@@ -176,10 +179,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
@@ -220,10 +223,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
@@ -247,10 +250,10 @@ namespace CalculateFunding.Frontend.Services
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel();
+            SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
@@ -277,10 +280,10 @@ namespace CalculateFunding.Frontend.Services
             itemResult.TotalItems = 75;
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel request = new SearchRequestViewModel()
             {
                 PageNumber = 2,
             };
@@ -310,10 +313,10 @@ namespace CalculateFunding.Frontend.Services
             itemResult.TotalItems = 175;
 
             calcsClient
-                .FindCalculations(Arg.Any<CalculationSearchFilterRequest>())
+                .FindCalculations(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
-            CalculationSearchRequestViewModel request = new CalculationSearchRequestViewModel()
+            SearchRequestViewModel request = new SearchRequestViewModel()
             {
                 PageNumber = 2,
             };

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;

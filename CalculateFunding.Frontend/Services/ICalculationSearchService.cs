@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.Services
 {
     public interface ICalculationSearchService
     {
-        Task<CalculationSearchResultViewModel> PerformSearch(CalculationSearchRequestViewModel request);
+        Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
     }
 }

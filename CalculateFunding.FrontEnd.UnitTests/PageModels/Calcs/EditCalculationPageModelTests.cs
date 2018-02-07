@@ -1,21 +1,23 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Pages.Calcs;
-using CalculateFunding.Frontend.ViewModels;
-using Castle.Core.Logging;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
+﻿// <copyright file="EditCalculationPageModelTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Pages.Calcs;
+    using Castle.Core.Logging;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NSubstitute;
+
     [TestClass]
     public class EditCalculationPageModelTests
     {
@@ -32,6 +34,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             string calculationId = "5";
 
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
+
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
 
@@ -55,12 +58,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             calcsClient.GetCalculationById(calculationId).Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Frontend.Clients.Models.Reference("1", "Test Calculation Specification"),
+                CalculationSpecification = new Reference("1", "Test Calculation Specification"),
                 SpecificationId = "54",
             }));
 
-
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
+
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
 
@@ -84,7 +87,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Frontend.Clients.Models.Reference(calculationId, "Test Calculation Specification"),
+                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
                 SpecificationId = "54",
                 SourceCode = "Test Source Code",
             };
@@ -98,14 +101,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation ));
+                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
                 .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specsCalculation));
 
-
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
+
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
 
@@ -133,6 +136,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             string calculationId = null;
 
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
+
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
 
@@ -141,8 +145,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             result.Should().BeOfType<BadRequestObjectResult>();
 
             BadRequestObjectResult typedResult = result as BadRequestObjectResult;
+            typedResult.Value.Should().Be("The provided calculation ID was null or empty string");
         }
-
-        
     }
 }

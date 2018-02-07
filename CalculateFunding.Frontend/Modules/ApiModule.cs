@@ -1,5 +1,6 @@
 ﻿using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient;
+using CalculateFunding.Frontend.Clients.DatasetsClient;
 using CalculateFunding.Frontend.Clients.PreviewClient;
 using CalculateFunding.Frontend.Clients.ResultsClient;
 using CalculateFunding.Frontend.Clients.SpecsClient;
@@ -26,6 +27,9 @@ namespace CalculateFunding.Frontend.Modules
 
             services
                .AddScoped<ISpecsApiClient, SpecsApiClient>();
+
+            services
+               .AddScoped<IDatasetsApiClient, DatasetsApiClient>();
         }
     }
 }

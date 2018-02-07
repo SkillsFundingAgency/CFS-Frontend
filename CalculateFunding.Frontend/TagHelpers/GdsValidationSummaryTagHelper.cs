@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

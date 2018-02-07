@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.Models;
+﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.Clients.CommonModels;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {

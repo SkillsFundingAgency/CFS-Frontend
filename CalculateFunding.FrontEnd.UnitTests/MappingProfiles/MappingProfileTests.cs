@@ -1,13 +1,15 @@
-﻿using AutoMapper;
-using CalculateFunding.Frontend.ViewModels;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// <copyright file="MappingProfileTests.cs" company="Department for Education">
+// Copyright (c) Department for Education. All rights reserved.
+// </copyright>
 
 namespace CalculateFunding.Frontend.MappingProfiles
 {
+    using System;
+    using AutoMapper;
+    using CalculateFunding.Frontend.ViewModels;
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class MappingProfileTests
     {
@@ -16,12 +18,13 @@ namespace CalculateFunding.Frontend.MappingProfiles
         {
             // Arrange
             MapperConfiguration config = new MapperConfiguration(c => c.AddProfile<FrontEndMappingProfile>());
-            Action a = new Action(() => {
+            Action a = new Action(() =>
+            {
                 config.AssertConfigurationIsValid();
             });
 
             // Act / Assert
-            a.ShouldNotThrow("Mapping configuration should be valid");
+            a.Should().NotThrow("Mapping configuration should be valid");
         }
     }
 }

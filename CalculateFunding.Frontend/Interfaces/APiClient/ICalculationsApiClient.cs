@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
@@ -12,7 +12,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// </summary>
         /// <param name="filterOptions">Filter Options</param>
         /// <returns>List of Calculations</returns>
-        Task<PagedResult<CalculationSearchResultItem>> FindCalculations(CalculationSearchFilterRequest filterOptions);
+        Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions);
 
         /// <summary>
         /// Gets all versions of a calculation
