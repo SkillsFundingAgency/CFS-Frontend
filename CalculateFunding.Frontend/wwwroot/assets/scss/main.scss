@@ -1268,6 +1268,15 @@ table {
     }
 }
 
+.search-loading-container {
+    text-align: center;
+    margin-bottom: 30px;
+
+    p{
+        margin-top: 15px;
+    }
+}
+
 .multiselect.btn {
     width: 100%;
     padding: 10px;

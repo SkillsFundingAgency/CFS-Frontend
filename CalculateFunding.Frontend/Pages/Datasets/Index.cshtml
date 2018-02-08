@@ -72,7 +72,9 @@
     @Html.Partial("_SearchFilterPartial")
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
-        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "datasets", Model.SearchTerm))
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "datasets", Model.SearchTerm))
+        </div>
 
         <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
             @{
@@ -99,20 +101,26 @@
                 datasetRow++;
             }
         </div>
-        <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
-            <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
-                <div class="dataset-item-header" data-bind="text: name"></div>
-                <div>
-                    <span class="dataset-item-property">
-                        <strong>Status:</strong>
-                        <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
-                    </span>
-                    <span class="dataset-item-property">
-                        <strong>Update on:</strong>
-                        <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
-                    </span>
+        <div data-bind="visible: isResultsVisible">
+            <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
+                <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
+                    <div class="dataset-item-header" data-bind="text: name"></div>
+                    <div>
+                        <span class="dataset-item-property">
+                            <strong>Status:</strong>
+                            <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong>Update on:</strong>
+                            <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
+                        </span>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Datasets Results</p>
         </div>
     </div>
 </div>

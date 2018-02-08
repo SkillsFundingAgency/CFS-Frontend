@@ -1,5 +1,5 @@
 ﻿declare module calculateFunding.common {
-    export interface ICalculationSearchRequest {
+    export interface ISearchRequest {
         pageNumber: number;
         searchTerm: string;
         includeFacets: boolean;
@@ -8,6 +8,15 @@
 
     export interface ISearchFilterRequest {
         [fieldName: string]: Array<string>
+    }
+
+    export interface ISearchResultResponse {
+        currentPage: number;
+        endItemNumber: 50;
+        facets: Array<ISearchFacetResponse>;
+        pagerState: IPagerStateResponse;
+        startItemNumber: number;
+        totalResults: number;
     }
 
     export interface IPagerStateResponse {

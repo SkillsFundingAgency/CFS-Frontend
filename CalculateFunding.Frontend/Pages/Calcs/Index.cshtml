@@ -84,10 +84,11 @@
                 @Model.PublishedCalculation.Name published successfully.
             </div>
         }
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm))
+        </div>
 
-        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm))
-
-        <table class="calculations-table table-striped" id="calculation-results-table">
+        <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
             <thead>
                 <tr>
                     <th>Calculation Name</th>
@@ -96,6 +97,7 @@
                     <th>Year</th>
                 </tr>
             </thead>
+
             <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
                 <tr>
                     <td><a data-bind="attr: {href: '/calcs/editCalculation/' + id }, text: name"></a></td>
@@ -120,7 +122,10 @@
                 }
             </tbody>
         </table>
-
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Calculations Results</p>
+        </div>
     </div>
 </div>
 
