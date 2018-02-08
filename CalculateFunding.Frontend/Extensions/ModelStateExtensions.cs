@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-
-namespace Microsoft.AspNetCore.Mvc.ModelBinding
+﻿namespace Microsoft.AspNetCore.Mvc.ModelBinding
 {
+    using System;
+    using System.Linq;
+
     public static class ModelStateExtensions
     {
         public static bool IsPropertyInvalid(this ModelStateDictionary modelState, string propertyName)

@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace CalculateFunding.Frontend.Pages.Tests
+﻿namespace CalculateFunding.Frontend.Pages.Tests
 {
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class ManageModel : PageModel
     {
         public void OnGet()
         {
-
         }
     }
 }

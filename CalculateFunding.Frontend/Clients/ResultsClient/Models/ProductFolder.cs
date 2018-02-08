@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
+    using Newtonsoft.Json;
+
     public class ProductFolder
     {
         [JsonProperty("id")]

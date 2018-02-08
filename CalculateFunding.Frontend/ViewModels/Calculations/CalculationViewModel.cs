@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
+    using System;
+
     public class CalculationViewModel
     {
         public string Id { get; set; }

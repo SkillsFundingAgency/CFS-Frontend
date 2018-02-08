@@ -1,15 +1,16 @@
-﻿using AutoMapper;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.ViewModels.Common;
-using CalculateFunding.Frontend.ViewModels.Datasets;
-using CalculateFunding.Frontend.ViewModels.Specs;
-
-namespace CalculateFunding.Frontend.ViewModels
+﻿namespace CalculateFunding.Frontend.ViewModels
 {
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Datasets;
+    using CalculateFunding.Frontend.ViewModels.Specs;
+
     public class FrontEndMappingProfile : Profile
     {
         public FrontEndMappingProfile()
@@ -24,7 +25,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.AcademicYearId, opt => opt.Ignore());
 
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
-                .ForMember(m => m.SpecificationId , opt => opt.Ignore());
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
@@ -39,7 +40,12 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
 
             CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
-            CreateMap<DatasetSearchResultItem, DatasetSearchResultItemViewModel>();
+            CreateMap<DatasetSearchResultItem, DatasetSearchResultItemViewModel>()
+                .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
+                .AfterMap((DatasetSearchResultItem source, DatasetSearchResultItemViewModel destination) =>
+                {
+                    destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
+                });
 
             this.MapCommon();
         }

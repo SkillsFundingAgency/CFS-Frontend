@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 {
+    using Newtonsoft.Json;
+
     public abstract class TestStep
     {
         [JsonProperty("stepType")]

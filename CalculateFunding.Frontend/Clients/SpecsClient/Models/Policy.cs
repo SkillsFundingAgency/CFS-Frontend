@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
+    using System.Collections.Generic;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class Policy : Reference
     {
         [JsonProperty("description")]

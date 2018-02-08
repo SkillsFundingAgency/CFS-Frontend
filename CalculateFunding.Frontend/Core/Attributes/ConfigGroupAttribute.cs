@@ -1,9 +1,9 @@
-﻿using System;
-
-namespace CalculateFunding.Frontend.Core.Attributes
+﻿namespace CalculateFunding.Frontend.Core.Attributes
 {
+    using System;
+
     [AttributeUsage(AttributeTargets.Class)]
-    sealed public class ConfigGroupAttribute : Attribute
+    public sealed class ConfigGroupAttribute : Attribute
     {
         public ConfigGroupAttribute(string name)
         {

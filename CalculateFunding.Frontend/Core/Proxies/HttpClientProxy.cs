@@ -1,25 +1,28 @@
-﻿using CalculateFunding.Frontend.Interfaces.Core;
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace CalculateFunding.Frontend.Core.Proxies
+﻿namespace CalculateFunding.Frontend.Core.Proxies
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Interfaces.Core;
+
     public class HttpClientProxy : IHttpClient
     {
-        HttpClient _httpClient;
-        readonly HttpMessageHandler _handler;
-        readonly bool _disposeHandler;
+        private readonly HttpMessageHandler _handler;
+        private readonly bool _disposeHandler;
+
+        private HttpClient _httpClient;
 
         public HttpClientProxy()
-            : this(new HttpClientHandler()
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            }, true)
+            : this(
+                new HttpClientHandler()
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                },
+                true)
         {
         }
 
@@ -34,9 +37,13 @@ namespace CalculateFunding.Frontend.Core.Proxies
             _disposeHandler = disposeHandler;
 
             if (handler == null)
+            {
                 _httpClient = new HttpClient();
+            }
             else
+            {
                 _httpClient = new HttpClient(handler, disposeHandler);
+            }
         }
 
         public HttpRequestHeaders DefaultRequestHeaders => _httpClient.DefaultRequestHeaders;
@@ -68,14 +75,6 @@ namespace CalculateFunding.Frontend.Core.Proxies
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        virtual protected void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _httpClient.Dispose();
-            }
         }
 
         public Task<HttpResponseMessage> DeleteAsync(string requestUri, CancellationToken cancellationToken = default(CancellationToken))
@@ -166,6 +165,14 @@ namespace CalculateFunding.Frontend.Core.Proxies
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationToken cancellationToken = default(CancellationToken))
         {
             return RetryAgent.DoRequestAsync(() => _httpClient.SendAsync(request, completionOption, cancellationToken));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _httpClient.Dispose();
+            }
         }
     }
 }

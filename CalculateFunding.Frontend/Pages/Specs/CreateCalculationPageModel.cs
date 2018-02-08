@@ -1,24 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.ViewModels.Specs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
-
-namespace CalculateFunding.Frontend.Pages.Specs
+﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Properties;
+    using CalculateFunding.Frontend.ViewModels.Specs;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+
     public class CreateCalculationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+
+        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        {
+            _specsClient = specsClient;
+            _mapper = mapper;
+        }
 
         [BindProperty]
         public CreateCalculationViewModel CreateCalculationViewModel { get; set; }
@@ -41,12 +47,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public IEnumerable<SelectListItem> AllocationLines { get; set; }
 
-        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper)
-        {
-            _specsClient = specsClient;
-            _mapper = mapper;
-        }
-
         public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -67,8 +67,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 await PopulateAllocationLines();
             }
-
-            //if null then should redirect somewhere else, error or not found page
 
             return Page();
         }
@@ -117,13 +115,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Redirect($"/specs/policies/{specificationId}#calculation-{newCalculation.Id}");
         }
 
-        void PopulatePolicies(Specification specification)
+        private void PopulatePolicies(Specification specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
             Policies = new List<SelectListItem>();
 
-            if(specification.Policies != null)
+            if (specification.Policies != null)
             {
                 var policiesGroup = new SelectListGroup { Name = "Policies" };
                 var subPoliciesGroup = new SelectListGroup { Name = "Sub Policies" };
@@ -134,11 +132,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
                     {
                         Value = policy.Id,
                         Text = policy.Name,
-                        Selected = (policy.Id == PolicyId),
+                        Selected = policy.Id == PolicyId,
                         Group = policiesGroup
                     });
 
-                    if(policy.SubPolicies != null)
+                    if (policy.SubPolicies != null)
                     {
                         foreach (Policy subPolicy in policy.SubPolicies)
                         {
@@ -146,17 +144,16 @@ namespace CalculateFunding.Frontend.Pages.Specs
                             {
                                 Value = subPolicy.Id,
                                 Text = subPolicy.Name,
-                                Selected = (subPolicy.Id == PolicyId),
+                                Selected = subPolicy.Id == PolicyId,
                                 Group = subPoliciesGroup
                             });
                         }
                     }
                 }
             }
-
         }
 
-        async Task PopulateAllocationLines()
+        private async Task PopulateAllocationLines()
         {
             ApiResponse<IEnumerable<Reference>> allocationLinesResponse = await _specsClient.GetAllocationLines();
 
@@ -166,12 +163,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 {
                     Value = m.Id,
                     Text = m.Name,
-                    Selected = (m.Id == AllocationLineId)
+                    Selected = m.Id == AllocationLineId
                 }).ToList();
             }
         }
 
-        async Task<Specification> GetSpecification(string specificationId)
+        private async Task<Specification> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 

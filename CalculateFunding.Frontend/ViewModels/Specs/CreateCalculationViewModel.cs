@@ -1,8 +1,8 @@
-﻿using CalculateFunding.Frontend.Properties;
-using System.ComponentModel.DataAnnotations;
-
-namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
+    using System.ComponentModel.DataAnnotations;
+    using CalculateFunding.Frontend.Properties;
+
     public class CreateCalculationViewModel
     {
         public string SpecificationId { get; set; }

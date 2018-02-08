@@ -1,13 +1,13 @@
-﻿using System;
-using CalculateFunding.Frontend.ViewModels.Common;
-
-namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
+    using System;
+    using CalculateFunding.Frontend.ViewModels.Common;
+
     public class CalculationVersionViewModel
     {
-        public int DecimalPlaces { set; get; }
+        public int DecimalPlaces { get; set; }
 
-        public string SourceCode { set; get; }
+        public string SourceCode { get; set; }
 
         public string Version { get; set; }
 

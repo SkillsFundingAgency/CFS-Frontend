@@ -16,12 +16,6 @@
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
 
-        public CalculationViewModel Calculation { get; set; }
-
-        public CalculationEditViewModel EditModel { get; set; }
-
-        public string SpecificationId { get; set; }
-
         public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
@@ -33,6 +27,12 @@
             _mapper = mapper;
         }
 
+        public CalculationViewModel Calculation { get; set; }
+
+        public CalculationEditViewModel EditModel { get; set; }
+
+        public string SpecificationId { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
@@ -41,7 +41,6 @@
             }
 
             ApiResponse<Clients.CalcsClient.Models.Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
-
 
             if (calculation == null || calculation.StatusCode != System.Net.HttpStatusCode.OK)
             {

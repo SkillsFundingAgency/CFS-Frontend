@@ -1,7 +1,7 @@
-﻿using System.Net;
-
-namespace CalculateFunding.Frontend.Clients.CommonModels
+﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
+    using System.Net;
+
     public class ApiResponse<T>
     {
         public ApiResponse(HttpStatusCode statusCode, T content = default(T))
@@ -11,6 +11,7 @@ namespace CalculateFunding.Frontend.Clients.CommonModels
         }
 
         public HttpStatusCode StatusCode { get; private set; }
+
         public T Content { get; private set; }
     }
 }

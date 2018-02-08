@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-
-namespace CalculateFunding.Frontend.Interfaces.ApiClient
+﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+
     public interface IDatasetsApiClient
     {
         /// <summary>

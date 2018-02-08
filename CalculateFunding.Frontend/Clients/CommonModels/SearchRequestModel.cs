@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace CalculateFunding.Frontend.Clients.CommonModels
+﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
+    using System.Collections.Generic;
+
     public class SearchRequestModel
     {
         public int? PageNumber { get; set; }

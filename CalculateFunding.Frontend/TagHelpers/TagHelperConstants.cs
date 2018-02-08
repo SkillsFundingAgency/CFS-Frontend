@@ -11,6 +11,5 @@
         /// Validation Anchor ID Separator for characters with invalid values
         /// </summary>
         public const string ValidationAnchorSeparator = "-";
-
     }
 }

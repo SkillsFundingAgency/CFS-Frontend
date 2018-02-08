@@ -1,9 +1,9 @@
-﻿using Serilog.Core;
-using Serilog.Events;
-using System;
-
-namespace CalculateFunding.Frontend.Core.Logging
+﻿namespace CalculateFunding.Frontend.Core.Logging
 {
+    using System;
+    using Serilog.Core;
+    using Serilog.Events;
+
     public class ServiceNameLogEnricher : ILogEventEnricher
     {
         private string _serviceName;
@@ -24,10 +24,12 @@ namespace CalculateFunding.Frontend.Core.Logging
             {
                 throw new ArgumentNullException(nameof(logEvent));
             }
+
             if (propertyFactory == null)
             {
                 throw new ArgumentNullException(nameof(propertyFactory));
             }
+
             if (string.IsNullOrWhiteSpace(_serviceName))
             {
                 if (string.IsNullOrWhiteSpace(_serviceName))
@@ -35,6 +37,7 @@ namespace CalculateFunding.Frontend.Core.Logging
                     _serviceName = "N/A";
                 }
             }
+
             LogEventProperty property = propertyFactory.CreateProperty(LoggingConstants.ServiceNamePropertiesName, _serviceName, false);
             logEvent.AddOrUpdateProperty(property);
         }

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
-    public class ProductTestScenario : ResultSummary,IValidatableObject
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.Linq;
+    using Newtonsoft.Json;
+
+    public class ProductTestScenario : ResultSummary, IValidatableObject
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -16,6 +16,7 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 
         [JsonProperty("givenSteps")]
         public List<GivenStep> GivenSteps { get; set; }
+
         [JsonProperty("thenSteps")]
         public List<ThenStep> ThenSteps { get; set; }
 

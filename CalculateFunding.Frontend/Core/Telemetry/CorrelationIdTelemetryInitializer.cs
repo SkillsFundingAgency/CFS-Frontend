@@ -1,12 +1,12 @@
-﻿using System;
-using CalculateFunding.Frontend.Helpers;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Http;
-using CalculateFunding.Frontend.Core.Logging;
-
-namespace CalculateFunding.Frontend.Core.Telemetry
+﻿namespace CalculateFunding.Frontend.Core.Telemetry
 {
+    using System;
+    using CalculateFunding.Frontend.Core.Logging;
+    using CalculateFunding.Frontend.Helpers;
+    using Microsoft.ApplicationInsights.Channel;
+    using Microsoft.ApplicationInsights.Extensibility;
+    using Microsoft.AspNetCore.Http;
+
     public class CorrelationIdTelemetryInitializer : ITelemetryInitializer
     {
         private IHttpContextAccessor _httpContextAccessor;
@@ -15,7 +15,6 @@ namespace CalculateFunding.Frontend.Core.Telemetry
         {
             Guard.ArgumentNotNull(httpContextAccessor, nameof(httpContextAccessor));
             _httpContextAccessor = httpContextAccessor;
-
         }
 
         public void Initialize(ITelemetry telemetry)

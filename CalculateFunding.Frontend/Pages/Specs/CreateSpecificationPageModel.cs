@@ -1,36 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.ViewModels.Specs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace CalculateFunding.Frontend.Pages.Specs
+﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Properties;
+    using CalculateFunding.Frontend.ViewModels.Specs;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+
     public class CreateSpecificationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
 
         private readonly IMapper _mapper;
-
-        public IEnumerable<SelectListItem> FundingStreams { get; set; }
-
-        public Reference AcademicYear { get; set; }
-
-        [BindProperty]
-        public CreateSpecificationViewModel CreateSpecificationViewModel {get;set;}
-
-        public string AcademicYearId { get; set; }
 
         public CreateSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
@@ -40,6 +31,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
             _specsClient = specsClient;
             _mapper = mapper;
         }
+
+        public IEnumerable<SelectListItem> FundingStreams { get; set; }
+
+        public Reference AcademicYear { get; set; }
+
+        [BindProperty]
+        public CreateSpecificationViewModel CreateSpecificationViewModel { get; set; }
+
+        public string AcademicYearId { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string academicYearId)
         {
@@ -59,7 +59,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
             {
                 ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(CreateSpecificationViewModel.Name);
-                if(existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
+                if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
                 {
                     this.ModelState.AddModelError($"{nameof(CreateSpecificationViewModel)}.{nameof(CreateSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
                 }
@@ -80,10 +80,10 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Redirect($"/specs?academicYearId={academicYearId}");
         }
 
-        async Task PopulateFundingStreams()
+        private async Task PopulateFundingStreams()
         {
             var fundingStreamsResponse = await _specsClient.GetFundingStreams();
-            if(fundingStreamsResponse.StatusCode == HttpStatusCode.OK)
+            if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK)
             {
                 var fundingStreams = fundingStreamsResponse.Content;
 

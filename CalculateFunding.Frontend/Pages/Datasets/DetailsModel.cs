@@ -1,20 +1,21 @@
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace CalculateFunding.Frontend.Pages.Datasets
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class DetailsModel : PageModel
     {
         private readonly IResultsApiClient _apiClient;
-        public ProviderTestResult Provider { get; set; }
 
         public DetailsModel(IResultsApiClient apiClient)
         {
             _apiClient = apiClient;
         }
+
+        public ProviderTestResult Provider { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string id, string providerId)
         {
@@ -24,7 +25,5 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
             return Page();
         }
-
-
     }
 }

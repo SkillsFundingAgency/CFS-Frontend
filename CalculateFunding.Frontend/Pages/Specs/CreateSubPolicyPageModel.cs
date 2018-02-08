@@ -1,24 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.ViewModels.Specs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
-
-namespace CalculateFunding.Frontend.Pages.Specs
+﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Properties;
+    using CalculateFunding.Frontend.ViewModels.Specs;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+
     public class CreateSubPolicyPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+
+        public CreateSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        {
+            _specsClient = specsClient;
+            _mapper = mapper;
+        }
 
         [BindProperty]
         public CreateSubPolicyViewModel CreateSubPolicyViewModel { get; set; }
@@ -34,12 +40,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
         public string ParentPolicyId { get; set; }
 
         public IEnumerable<SelectListItem> Policies { get; set; }
-
-        public CreateSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper)
-        {
-            _specsClient = specsClient;
-            _mapper = mapper;
-        }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
         {
@@ -59,8 +59,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 PopulatePolicies(specification);
             }
-
-            //if null then should redirect somewhere else, error or not found page
 
             return Page();
         }
@@ -107,7 +105,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
         }
 
-        void PopulatePolicies(Specification specification)
+        private void PopulatePolicies(Specification specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
@@ -115,12 +113,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
             {
                 Value = m.Id,
                 Text = m.Name,
-                Selected = (m.Id == ParentPolicyId)
+                Selected = m.Id == ParentPolicyId
             }).ToList() : new List<SelectListItem>();
-
         }
 
-        async Task<Specification> GetSpecification(string specificationId)
+        private async Task<Specification> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 

@@ -1,15 +1,14 @@
-﻿using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using CalculateFunding.Frontend.Core.Logging;
-
-namespace CalculateFunding.Frontend.Core.Middleware
+﻿namespace CalculateFunding.Frontend.Core.Middleware
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Core.Logging;
+    using CalculateFunding.Frontend.Interfaces.Core.Logging;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+
     public class CorrelationIdMiddleware
     {
-
-        readonly RequestDelegate _next;
+        private readonly RequestDelegate _next;
 
         public CorrelationIdMiddleware(RequestDelegate next)
         {
@@ -22,7 +21,9 @@ namespace CalculateFunding.Frontend.Core.Middleware
             var correlationId = correlationIdProvider.GetCorrelationId();
 
             if (!context.Response.Headers.ContainsKey(LoggingConstants.CorrelationIdHttpHeaderName))
+            {
                 context.Response.Headers.Add(LoggingConstants.CorrelationIdHttpHeaderName, correlationId.ToLower());
+            }
 
             return _next(context);
         }

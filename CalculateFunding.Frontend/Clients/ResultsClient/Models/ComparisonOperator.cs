@@ -1,9 +1,9 @@
-﻿using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
+    using System.Runtime.Serialization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ComparisonOperator
     {

@@ -9,7 +9,7 @@
 
         public searchTerm: KnockoutObservable<string> = ko.observable("");
 
-        public calculations: KnockoutObservableArray<IDatasetResponse> = ko.observableArray([]);
+        public datasets: KnockoutObservableArray<IDatasetResponse> = ko.observableArray([]);
 
         public startItemNumber: KnockoutObservable<number> = ko.observable();
         public endItemNumber: KnockoutObservable<number> = ko.observable();
@@ -37,6 +37,8 @@
 
         public canSelectFilters: KnockoutComputed<boolean>;
 
+        public errorMessage: KnockoutObservable<string> = ko.observable();
+
         constructor() {
             let self = this;
 
@@ -53,7 +55,7 @@
                 self.buildSelectedSearchFacets(facets, self.selectedStatus(), self.status());
 
                 return facets;
-            });
+            }).extend({ throttle: 5 });
 
             this.selectedSearchFacetsString = ko.pureComputed(() => {
                 let result: Array<Object> = [];
@@ -68,7 +70,7 @@
                 });
 
                 return JSON.stringify(result);
-            });
+            }).extend({ throttle: 5 });
 
             self.selectedSearchFacetsString.subscribe((newValue) => {
                 self.performSearch();
@@ -84,6 +86,7 @@
         public performSearch(pageNumber: number = null) {
             if (this.state() === "idle") {
                 this.state("searching");
+                this.errorMessage(null);
 
                 let queryPageNumber = 1;
                 if ($.isNumeric(pageNumber) && pageNumber > 0) {
@@ -119,11 +122,10 @@
                 let self = this;
                 console.log("Starting search request");
                 request.done((resultUntyped) => {
-                    self.state("idle");
                     console.log("Search request completed");
 
                     let result: IDatasetSearchResultResponse = resultUntyped;
-                    self.calculations(result.datasets);
+                    self.datasets(result.datasets);
                     self.startItemNumber(result.startItemNumber);
                     self.endItemNumber(result.endItemNumber);
                     self.totalResults(result.totalResults);
@@ -137,10 +139,11 @@
                     self.populateFacets("status", result.facets, self.status);
 
                     this.searchPerformed(true);
+                    self.state("idle");
                 });
 
-                request.fail((errorStatus) => {
-                    alert("Request to search datasets failed.");
+                request.fail((xhrDetails : JQuery.jqXHR<any>, errorStatus : JQuery.Ajax.ErrorTextStatus) => {
+                    self.errorMessage("Request to search datasets failed. " + xhrDetails.statusText + ". Error code=" + xhrDetails.status);
                     self.state("idle");
                 });
             }
@@ -233,6 +236,7 @@
         id: string;
         name: string;
         lastUpdated: Date;
+        lastUpdatedDisplay: string;
         status: string;
     }
 }

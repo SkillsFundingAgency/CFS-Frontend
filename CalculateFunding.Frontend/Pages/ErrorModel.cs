@@ -1,8 +1,8 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace CalculateFunding.Frontend.Pages
 {
+    using System.Diagnostics;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class ErrorModel : PageModel
     {
         public string RequestId { get; set; }

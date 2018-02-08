@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace CalculateFunding.Frontend.Clients.CommonModels
+﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
+    using System.Collections.Generic;
+
     public class PagedResult<T>
     {
         public int PageSize { get; set; }

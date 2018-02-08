@@ -1,29 +1,30 @@
-﻿using System;
-using CalculateFunding.Frontend.Helpers;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-
-namespace CalculateFunding.Frontend.TagHelpers
+﻿namespace CalculateFunding.Frontend.TagHelpers
 {
+    using System;
+    using CalculateFunding.Frontend.Helpers;
+    using Microsoft.AspNetCore.Html;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.AspNetCore.Mvc.TagHelpers;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+    using Microsoft.AspNetCore.Razor.TagHelpers;
+
     [HtmlTargetElement("div", Attributes = ValidationSummaryAttributeName)]
     public class GdsValidationSummaryTagHelper : ValidationSummaryTagHelper
     {
-        private const string ValidationSummaryAttributeName = "gds-validation-summary";
-        private ValidationSummary _validationSummary;
         private const string HiddenListItem = @"<li style=""display:none""></li>";
 
-        public GdsValidationSummaryTagHelper(IHtmlGenerator generator) :
-            base(generator)
+        private const string ValidationSummaryAttributeName = "gds-validation-summary";
+        private ValidationSummary _validationSummary;
+
+        public GdsValidationSummaryTagHelper(IHtmlGenerator generator)
+           : base(generator)
         {
         }
 
         /// <summary>
-        /// If <see cref="ValidationSummary.All"/> or <see cref="ValidationSummary.ModelOnly"/>, appends a validation
+        /// Gets or sets If <see cref="ValidationSummary.All"/> or <see cref="ValidationSummary.ModelOnly"/>, appends a validation
         /// summary. Otherwise (<see cref="ValidationSummary.None"/>, the default), this tag helper does nothing.
         /// </summary>
         /// <exception cref="ArgumentException">
@@ -134,7 +135,7 @@ namespace CalculateFunding.Frontend.TagHelpers
             {
                 ModelStateEntry modelState = modelStateValuePair.Value;
 
-                string fieldNameSanitisedId = modelState.Errors.Count > 0 ? NameAndIdProvider.CreateSanitizedId(viewContext, modelStateValuePair.Key, TagHelperConstants.ValidationAnchorSeparator) : "";
+                string fieldNameSanitisedId = modelState.Errors.Count > 0 ? NameAndIdProvider.CreateSanitizedId(viewContext, modelStateValuePair.Key, TagHelperConstants.ValidationAnchorSeparator) : string.Empty;
 
                 // Perf: Avoid allocations
                 for (var i = 0; i < modelState.Errors.Count; i++)
@@ -152,7 +153,6 @@ namespace CalculateFunding.Frontend.TagHelpers
 
                         anchorTag.Attributes.Add("href", $"#{TagHelperConstants.ValidationAnchorPrefix}-{fieldNameSanitisedId}");
                         anchorTag.Attributes.Add("id", $"validation-link-for-{fieldNameSanitisedId}");
-
 
                         listItem.InnerHtml.AppendLine(anchorTag);
                         htmlSummary.InnerHtml.AppendLine(listItem);

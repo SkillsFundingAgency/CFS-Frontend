@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using CalculateFunding.Frontend.Properties;
-
-namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
+    using System.ComponentModel.DataAnnotations;
+    using CalculateFunding.Frontend.Properties;
+
     public class CreateSpecificationViewModel
     {
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationNameRequired), ErrorMessageResourceType = typeof(ValidationMessages))]

@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 {
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using Newtonsoft.Json;
+
     public class GivenStep : TestStep, IValidatableObject
     {
         public GivenStep()
         {
-
         }
+
         public GivenStep(string dataset, string field, ComparisonOperator @operator, string value)
         {
             StepType = TestStepType.GivenSourceField;
@@ -18,12 +18,16 @@ namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
             Operator = @operator;
             Value = value;
         }
+
         [JsonProperty("dataset")]
         public string Dataset { get; set; }
+
         [JsonProperty("field")]
         public string Field { get; set; }
+
         [JsonProperty("operator")]
         public ComparisonOperator Operator { get; set; }
+
         [JsonProperty("value")]
         public string Value { get; set; }
 
@@ -34,10 +38,22 @@ namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
                 case TestStepType.GivenSourceField:
                     if (Operator != ComparisonOperator.None || !string.IsNullOrEmpty(Field) || !string.IsNullOrEmpty(Value))
                     {
-                        if (string.IsNullOrEmpty(Dataset)) yield return new ValidationResult("Dataset must be specified");
-                        if(Operator == ComparisonOperator.None) yield return new ValidationResult("Operator must be specified");
-                        if (string.IsNullOrEmpty(Value)) yield return new ValidationResult("Value must be specified");
+                        if (string.IsNullOrEmpty(Dataset))
+                        {
+                            yield return new ValidationResult("Dataset must be specified");
+                        }
+
+                        if (Operator == ComparisonOperator.None)
+                        {
+                            yield return new ValidationResult("Operator must be specified");
+                        }
+
+                        if (string.IsNullOrEmpty(Value))
+                        {
+                            yield return new ValidationResult("Value must be specified");
+                        }
                     }
+
                     break;
             }
         }

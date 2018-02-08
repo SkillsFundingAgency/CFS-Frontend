@@ -1,8 +1,8 @@
 ﻿@page "{pageNumber?}"
-@using System.Web
 @model CalculateFunding.Frontend.Pages.Calcs.IndexPageModel
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.ViewModels.Common
 @{
     ViewData["Title"] = "Manage the Calculations";
     Layout = "~/Pages/_Layout.cshtml";
@@ -65,14 +65,8 @@
 }
 
 <div class="row manage-calculations" id="manage-calculations-container">
-    <div class="col-xs-12 withjs-show">
-        <div class="filter-selected-container" data-bind="foreach: selectedSearchFacets" id="filter-selected-container">
-            <div class="filter-selected-item">
-                <span data-bind="click: function(){$root.removeFilter($data)}" class="filter-selected-item-remove-button"><i class="material-icons">close</i></span>
-                <span data-bind="text: displayName"></span>
-            </div>
-        </div>
-    </div>
+    @Html.Partial("_SearchFilterPartial")
+    @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
 
         @if (Model.DraftSavedCalculation != null)
@@ -91,53 +85,8 @@
             </div>
         }
 
-        <div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
-            <div class="pull-right paging-container" id="static-paging-container">
-                @if (Model.SearchResults.PagerState.PreviousPage.HasValue)
-                {
-                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.PreviousPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Previous</a>
+        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm))
 
-                }
-
-                @foreach (int pageNumber in Model.SearchResults.PagerState.Pages)
-                {
-                    if (pageNumber == Model.SearchResults.PagerState.CurrentPage)
-                    {
-                        <span class="paging-active-page">@pageNumber</span>
-                    }
-                    else
-                    {
-                        <a href="/calcs?pageNumber=@pageNumber&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">@pageNumber</a>
-                    }
-
-                }
-
-                @if (Model.SearchResults.PagerState.NextPage.HasValue)
-                {
-                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.NextPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Next</a>
-
-                }
-            </div>
-            Showing @Model.SearchResults.StartItemNumber-@Model.SearchResults.EndItemNumber of <strong>@Model.SearchResults.TotalResults</strong> calculations
-
-        </div>
-
-        <div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rownavigation-container">
-            <div class="pull-right paging-container" data-bind="with: pagerState" id="dynamic-paging-container">
-
-                <a data-bind="if: previousPage, click: function(){ $root.loadPage(previousPage)}" class="paging-link">Previous</a>
-
-                <span data-bind="foreach: pages">
-                    <span class="paging-active-page" data-bind="visible: $data === $parent.currentPage, text: $data"></span>
-                    <a href="#" data-bind="visible: $data !== $parent.currentPage, click: function(){$root.loadPage($data)}" class="paging-link"><span data-bind="text: $data"></span></a>
-
-                </span>
-                <a data-bind="if: nextPage, click: function(){ $root.loadPage(nextPage)}" class="paging-link">Next</a>
-
-            </div>
-
-            Showing <span data-bind="text: startItemNumber"></span>-<span data-bind="text: endItemNumber"></span> of <strong data-bind="text: totalResults"></strong> calculations
-        </div>
         <table class="calculations-table table-striped" id="calculation-results-table">
             <thead>
                 <tr>

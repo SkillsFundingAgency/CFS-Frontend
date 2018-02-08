@@ -1,9 +1,9 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.PreviewClient.Models;
-using System.Threading.Tasks;
-
-namespace CalculateFunding.Frontend.Interfaces.ApiClient
+﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.PreviewClient.Models;
+
     public interface IPreviewApiClient
     {
         Task<ApiResponse<PreviewResponse>> PostPreview(PreviewRequest request);

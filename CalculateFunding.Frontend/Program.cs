@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-
-namespace CalculateFunding.Frontend
+﻿namespace CalculateFunding.Frontend
 {
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+
     public static class Program
     {
         public static void Main(string[] args)

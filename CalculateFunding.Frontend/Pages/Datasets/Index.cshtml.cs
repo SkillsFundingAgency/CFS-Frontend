@@ -1,21 +1,16 @@
-﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Services;
-using CalculateFunding.Frontend.ViewModels.Common;
-using CalculateFunding.Frontend.ViewModels.Datasets;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace CalculateFunding.Frontend.Pages.Datasets
+﻿namespace CalculateFunding.Frontend.Pages.Datasets
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Services;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Datasets;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class DatasetsIndexPageModel : PageModel
     {
         private IDatasetSearchService _searchService;
-
-        [BindProperty]
-        public string SearchTerm { get; set; }
-
-        public DatasetSearchResultViewModel SearchResults { get; set; }
 
         public DatasetsIndexPageModel(IDatasetSearchService searchService)
         {
@@ -23,6 +18,11 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
             _searchService = searchService;
         }
+
+        [BindProperty]
+        public string SearchTerm { get; set; }
+
+        public DatasetSearchResultViewModel SearchResults { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm)
         {
@@ -63,6 +63,5 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
             return Page();
         }
-
     }
 }

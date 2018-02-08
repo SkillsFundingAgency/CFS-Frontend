@@ -1,29 +1,19 @@
-﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Services;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.ViewModels.Common;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace CalculateFunding.Frontend.Pages.Calcs
+﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Services;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class IndexPageModel : PageModel
     {
         private ICalculationsApiClient _calculationsApiClient;
         private ICalculationSearchService _searchService;
-
-        public CalculationSearchResultViewModel SearchResults { get; set; }
-
-        public Calculation DraftSavedCalculation { get; set; }
-
-        public Calculation PublishedCalculation { get; set; }
-
-        [BindProperty]
-        public string SearchTerm { get; set; }
-
 
         public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService)
         {
@@ -33,6 +23,15 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             _calculationsApiClient = calculationsApiClient;
             _searchService = searchService;
         }
+
+        public CalculationSearchResultViewModel SearchResults { get; set; }
+
+        public Calculation DraftSavedCalculation { get; set; }
+
+        public Calculation PublishedCalculation { get; set; }
+
+        [BindProperty]
+        public string SearchTerm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? pageNumber, string draftSavedId, string publishedId, string searchTerm)
         {

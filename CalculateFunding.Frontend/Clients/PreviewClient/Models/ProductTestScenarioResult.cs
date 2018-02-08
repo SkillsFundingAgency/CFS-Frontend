@@ -1,21 +1,26 @@
-﻿using System;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 {
+    using System;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class ProductTestScenarioResult
     {
         [JsonProperty("fundingPolicy")]
         public Reference FundingPolicy { get; set; }
+
         [JsonProperty("allocationLine")]
         public Reference AllocationLine { get; set; }
+
         [JsonProperty("productFolder")]
         public Reference ProductFolder { get; set; }
+
         [JsonProperty("product")]
         public Product Product { get; set; }
+
         [JsonProperty("scenarioName")]
         public Reference Scenario { get; set; }
+
         [JsonProperty("scenarioDescription")]
         public string ScenarioDescription { get; set; }
 
@@ -30,12 +35,16 @@ namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 
         [JsonProperty("tags")]
         public string[] Tags { get; set; }
+
         [JsonProperty("stepsExecuted")]
         public int StepExected { get; set; }
+
         [JsonProperty("totalSteps")]
         public int TotalSteps { get; set; }
+
         [JsonProperty("datasetReferences")]
         public DatasetReference[] DatasetReferences { get; set; }
+
         [JsonProperty("productValue")]
         public decimal? ProductValue { get; set; }
     }

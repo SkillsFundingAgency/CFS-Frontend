@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace CalculateFunding.Frontend.ViewModels.Common
+﻿namespace CalculateFunding.Frontend.ViewModels.Common
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class PagerState
     {
         private int _currentPage;
@@ -10,6 +10,15 @@ namespace CalculateFunding.Frontend.ViewModels.Common
         private int? _nextPage;
         private int? _previousPage;
         private int _displayNumberOfPages;
+
+        public PagerState(int currentPage, int totalPages, int displayNumberOfPages = 4)
+        {
+            _currentPage = currentPage;
+            _totalPages = totalPages;
+            _displayNumberOfPages = displayNumberOfPages;
+
+            CalculatePages();
+        }
 
         public int DisplayNumberOfPages
         {
@@ -19,13 +28,30 @@ namespace CalculateFunding.Frontend.ViewModels.Common
             }
         }
 
-        public PagerState(int currentPage, int totalPages, int displayNumberOfPages = 4)
+        public int? PreviousPage
         {
-            _currentPage = currentPage;
-            _totalPages = totalPages;
-            _displayNumberOfPages = displayNumberOfPages;
+            get
+            {
+                return _previousPage;
+            }
+        }
 
-            CalculatePages();
+        public int? NextPage
+        {
+            get
+            {
+                return _nextPage;
+            }
+        }
+
+        public IEnumerable<int> Pages { get; set; }
+
+        public int CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
         }
 
         private void CalculatePages()
@@ -38,7 +64,6 @@ namespace CalculateFunding.Frontend.ViewModels.Common
             {
                 availableDisplayPages = availableDisplayPages = _totalPages;
             }
-            
 
             if (numberOfAdditionalPages > _displayNumberOfPages)
             {
@@ -46,13 +71,13 @@ namespace CalculateFunding.Frontend.ViewModels.Common
             }
 
             int previousPages = availableDisplayPages - 1 - numberOfAdditionalPages;
-            if(previousPages < 0)
+            if (previousPages < 0)
             {
-                if(_currentPage == 1)
+                if (_currentPage == 1)
                 {
                     previousPages = 0;
                 }
-                else if(previousPages == -1)
+                else if (previousPages == -1)
                 {
                     previousPages = 1;
                 }
@@ -101,50 +126,23 @@ namespace CalculateFunding.Frontend.ViewModels.Common
 
             if (numberOfAdditionalPages + _currentPage <= _totalPages)
             {
-                int nextPageValue = pages.Last() + 1; ;
+                int nextPageValue = pages.Last() + 1;
                 if (nextPageValue <= _totalPages)
                 {
                     _nextPage = nextPageValue;
-
                 }
             }
 
             if (previousPages > 0)
             {
                 int previousPageValue = _currentPage - previousPages - 1;
-                if(previousPageValue > 0)
+                if (previousPageValue > 0)
                 {
                     _previousPage = previousPageValue;
                 }
             }
 
             this.Pages = pages.AsEnumerable();
-        }
-
-        public int? PreviousPage
-        {
-            get
-            {
-                return _previousPage;
-            }
-        }
-
-        public int? NextPage
-        {
-            get
-            {
-                return _nextPage;
-            }
-        }
-
-        public IEnumerable<int> Pages { get; set; }
-
-        public int CurrentPage
-        {
-            get
-            {
-                return _currentPage;
-            }
         }
     }
 }

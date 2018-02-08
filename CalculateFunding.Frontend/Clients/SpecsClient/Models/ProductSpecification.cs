@@ -1,8 +1,8 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class ProductSpecification
     {
         [JsonProperty("id")]

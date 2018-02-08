@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class PreviewCompileRequestViewModel
     {
         [Required]

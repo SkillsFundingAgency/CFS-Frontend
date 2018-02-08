@@ -1,10 +1,10 @@
-﻿using CalculateFunding.Frontend.Core.Logging;
-using CalculateFunding.Frontend.Helpers;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-
-namespace CalculateFunding.Frontend.Core.Telemetry
+﻿namespace CalculateFunding.Frontend.Core.Telemetry
 {
+    using CalculateFunding.Frontend.Core.Logging;
+    using CalculateFunding.Frontend.Helpers;
+    using Microsoft.ApplicationInsights.Channel;
+    using Microsoft.ApplicationInsights.Extensibility;
+
     public class ServiceNameTelemetryInitializer : ITelemetryInitializer
     {
         private string _serviceName;

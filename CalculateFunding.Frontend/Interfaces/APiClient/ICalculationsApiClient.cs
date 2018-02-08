@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
-
-namespace CalculateFunding.Frontend.Interfaces.ApiClient
+﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+
     public interface ICalculationsApiClient
     {
         /// <summary>
@@ -17,14 +17,15 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// <summary>
         /// Gets all versions of a calculation
         /// </summary>
-        /// <param name="calculationId"></param>
+        /// <param name="calculationId">Calculation ID</param>
         /// <returns>Calculation object, otherwise null if not found</returns>
         Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId);
 
         Task<ApiResponse<IEnumerable<CalculationVersion>>> GetMultipleVersionsByCalculationId(IEnumerable<int> versionIds, string calculationId);
-                                        
+
         Task<ApiResponse<IEnumerable<CalculationVersion>>> GetAllVersionsByCalculationId(string calculationID);
 
+        /// <summary>
         /// Gets an individual calculation
         /// </summary>
         /// <param name="calculationId">Calculation ID</param>
@@ -35,7 +36,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// Update a Calculation
         /// </summary>
         /// <param name="calculationId">Calcuation Id</param>
-        /// <param name="calculation">Updated Calculation</param>
+        /// <param name="calculation">Calculation details to update</param>
         /// <returns>Updated Calculation</returns>
         Task<ApiResponse<Calculation>> UpdateCalculation(string calculationId, CalculationUpdateModel calculation);
 

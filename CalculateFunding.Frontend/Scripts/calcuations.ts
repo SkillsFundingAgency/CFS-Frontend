@@ -41,6 +41,8 @@
 
         public canSelectFilters: KnockoutComputed<boolean>;
 
+        public errorMessage: KnockoutObservable<string> = ko.observable();
+
         constructor() {
             let self = this;
 
@@ -58,10 +60,10 @@
                 self.buildSelectedSearchFacets(facets, self.selectedCalculationStatus(), self.calculationStatus());
 
                 return facets;
-            });
+            }).extend({ throttle: 5 });
 
             this.selectedSearchFacetsString = ko.pureComputed(() => {
-                let result : Array<Object> = [];
+                let result: Array<Object> = [];
 
                 ko.utils.arrayForEach(self.selectedSearchFacets(), (facet: calculateFunding.search.SearchFacet, i: number) => {
                     let item = {
@@ -73,7 +75,7 @@
                 });
 
                 return JSON.stringify(result);
-            });
+            }).extend({ throttle: 5 });
 
             self.selectedSearchFacetsString.subscribe((newValue) => {
                 self.performSearch();
@@ -128,7 +130,7 @@
                 let self = this;
                 console.log("Starting search request");
                 request.done((resultUntyped) => {
-                    self.state("idle");
+                    self.errorMessage(null);
                     console.log("Search request completed");
 
                     let result: ICalculationSearchResultResponse = resultUntyped;
@@ -147,10 +149,11 @@
                     self.populateFacets("status", result.facets, self.calculationStatus);
 
                     this.searchPerformed(true);
+                    self.state("idle");
                 });
 
-                request.fail((errorStatus) => {
-                    alert("Request to search calculations failed.");
+                request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
+                    self.errorMessage("Request to search calculations failed. " + xhrDetails.statusText + ". Error code=" + xhrDetails.status);
                     self.state("idle");
                 });
             }

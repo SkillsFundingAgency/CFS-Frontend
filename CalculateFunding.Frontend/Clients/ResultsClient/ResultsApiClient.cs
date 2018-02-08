@@ -1,16 +1,16 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Interfaces.Core;
-using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.Extensions.Options;
-using Serilog;
-
-namespace CalculateFunding.Frontend.Clients.ResultsClient
+﻿namespace CalculateFunding.Frontend.Clients.ResultsClient
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Interfaces.Core;
+    using CalculateFunding.Frontend.Interfaces.Core.Logging;
+    using Microsoft.Extensions.Options;
+    using Serilog;
+
     public class ResultsApiClient : AbstractApiClient, IResultsApiClient
     {
         private readonly string _resultsPath;
@@ -19,7 +19,6 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient
             : base(options, httpClient, logger, correlationIdProvider)
         {
             _resultsPath = options.Value.ResultsPath ?? "/api/results";
-
         }
 
         public Task<ApiResponse<BudgetSummary[]>> GetBudgetResults(CancellationToken cancellationToken = default(CancellationToken))
@@ -51,4 +50,3 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient
         }
     }
 }
-

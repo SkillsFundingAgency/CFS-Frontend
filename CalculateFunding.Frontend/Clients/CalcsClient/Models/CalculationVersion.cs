@@ -1,14 +1,14 @@
-﻿using System;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
+    using System;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class CalculationVersion
     {
-        public int DecimalPlaces { set; get; }
+        public int DecimalPlaces { get; set; }
 
-        public string SourceCode { set; get; }
+        public string SourceCode { get; set; }
 
         public string Version { get; set; }
 
@@ -18,6 +18,5 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 
         [JsonProperty("publishStatus")]
         public string Status { get; set; }
-
     }
 }

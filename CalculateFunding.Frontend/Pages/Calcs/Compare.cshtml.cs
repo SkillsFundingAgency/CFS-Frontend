@@ -1,27 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Properties;
-using AutoMapper;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.Clients.CommonModels;
-
-namespace CalculateFunding.Frontend.Pages.Calcs
+﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Properties;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class ComparePageModel : PageModel
     {
         private ISpecsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
-
-        public CalculationViewModel Calculation { get; set; }
-
-        public IEnumerable<CalculationVersionViewModel> Calculations { get; set; }
 
         public ComparePageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
         {
@@ -33,7 +29,10 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             _calcClient = calcClient;
             _mapper = mapper;
         }
-  
+
+        public CalculationViewModel Calculation { get; set; }
+
+        public IEnumerable<CalculationVersionViewModel> Calculations { get; set; }
 
         public async Task<IActionResult> OnGet(string calculationId)
         {
@@ -69,7 +68,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             }
 
             List<CalculationVersionViewModel> calculationVersions = new List<CalculationVersionViewModel>();
-            foreach (CalculationVersion calculationVersion in calculationAllVersionsResponse.Content.OrderByDescending(c=>c.Version))
+            foreach (CalculationVersion calculationVersion in calculationAllVersionsResponse.Content.OrderByDescending(c => c.Version))
             {
                 calculationVersions.Add(_mapper.Map<CalculationVersionViewModel>(calculationVersion));
             }
@@ -80,9 +79,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             Calculation.Description = specCalculation.Content.Description;
 
             return Page();
-
         }
-
-
     }
 }

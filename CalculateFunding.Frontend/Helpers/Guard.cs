@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CalculateFunding.Frontend.Helpers
+﻿namespace CalculateFunding.Frontend.Helpers
 {
+    using System;
+
     /// <summary>
     /// Method Guard Helpers
     /// </summary>

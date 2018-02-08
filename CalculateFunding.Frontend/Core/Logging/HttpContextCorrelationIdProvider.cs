@@ -1,10 +1,10 @@
-﻿using System;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.AspNetCore.Http;
-
-namespace CalculateFunding.Frontend.Core.Logging
+﻿namespace CalculateFunding.Frontend.Core.Logging
 {
+    using System;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.Core.Logging;
+    using Microsoft.AspNetCore.Http;
+
     public class HttpContextCorrelationIdProvider : ICorrelationIdProvider
     {
         private IHttpContextAccessor _httpContextAccessor;

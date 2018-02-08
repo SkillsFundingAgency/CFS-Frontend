@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 {
+    using System.Collections.Generic;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
 
     public class Product : ResultSummary
     {
         [JsonProperty("id")]
         public string Id { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
+
         [JsonProperty("description")]
         public string Description { get; set; }
 
@@ -19,11 +20,11 @@ namespace CalculateFunding.Frontend.Clients.PreviewClient.Models
 
         [JsonProperty("calculation")]
         public ProductCalculation Calculation { get; set; }
+
         [JsonProperty("testScenarios")]
         public List<ProductTestScenario> TestScenarios { get; set; }
+
         [JsonProperty("testProviders")]
         public Reference[] TestProviders { get; set; }
     }
-
-
 }

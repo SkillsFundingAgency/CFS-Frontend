@@ -1,15 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.ViewModels.Calculations;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CalculateFunding.Frontend.Controllers
+﻿namespace CalculateFunding.Frontend.Controllers
 {
+    using System;
+    using System.Threading.Tasks;
+    using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.ViewModels.Calculations;
+    using Microsoft.AspNetCore.Mvc;
+
     public class CalculationController : Controller
     {
         private ICalculationsApiClient _calcClient;
@@ -51,7 +51,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [Route("api/preview/compile")]
-        [HttpPost()]
+        [HttpPost]
         public async Task<IActionResult> CompilePreview([FromBody]PreviewCompileRequestViewModel vm)
         {
             if (!ModelState.IsValid)

@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Interfaces.Core;
-using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Serilog;
-
-namespace CalculateFunding.Frontend.Clients.SpecsClient
+﻿namespace CalculateFunding.Frontend.Clients.SpecsClient
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Interfaces.Core;
+    using CalculateFunding.Frontend.Interfaces.Core.Logging;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Options;
+    using Serilog;
+
     public class SpecsApiClient : AbstractApiClient, ISpecsApiClient
     {
-        private string _specsPath;
         private readonly CancellationToken _cancellationToken;
+        private string _specsPath;
 
         public SpecsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, IHttpContextAccessor context, ILogger logger, ICorrelationIdProvider correlationIdProvider)
             : base(options, httpClient, logger, correlationIdProvider)
@@ -34,7 +34,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
-            _logger.Information("This is from the FE");
+            Logger.Information("This is from the FE");
             return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             var response = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, years.AsEnumerable());
 
             return Task.FromResult(response);
-            //return GetAsync<Reference[]>($"{_specsPath}/academic-years");
+            ////return GetAsync<Reference[]>($"{_specsPath}/academic-years");
         }
 
         public Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams()
@@ -148,4 +148,3 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
         }
     }
 }
-

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class Specification : Reference
     {
         public Specification()
@@ -23,7 +23,5 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 
         [JsonProperty("policies")]
         public IEnumerable<Policy> Policies { get; set; }
-
     }
 }
-

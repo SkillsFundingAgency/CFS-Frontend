@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Services;
-using CalculateFunding.Frontend.ViewModels.Common;
-using CalculateFunding.Frontend.ViewModels.Datasets;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CalculateFunding.Frontend.Controllers
+﻿namespace CalculateFunding.Frontend.Controllers
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Services;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Datasets;
+    using Microsoft.AspNetCore.Mvc;
+
     public class DatasetSearchController : Controller
     {
         private IDatasetSearchService _calculationSearchService;
@@ -24,7 +24,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(request, nameof(request));
 
             DatasetSearchResultViewModel result = await _calculationSearchService.PerformSearch(request);
-            if(result != null)
+            if (result != null)
             {
                 return Ok(result);
             }

@@ -1,9 +1,9 @@
-﻿using System;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
+﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
+    using System;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
+
     public class Calculation : Reference
     {
         public string SpecificationId { get; set; }
@@ -23,6 +23,5 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
         public Reference LastModifiedBy { get; set; }
 
         public int Version { get; set; }
-     
     }
 }

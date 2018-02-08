@@ -1,17 +1,17 @@
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using CalculateFunding.Frontend.Core.Middleware;
-using CalculateFunding.Frontend.Modules;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-
-namespace CalculateFunding.Frontend
+﻿namespace CalculateFunding.Frontend
 {
+    using System;
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
+    using CalculateFunding.Frontend.Core.Middleware;
+    using CalculateFunding.Frontend.Modules;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -74,7 +74,5 @@ namespace CalculateFunding.Frontend
                     template: "{controller}/{action=Index}/{id?}");
             });
         }
-
-        
     }
 }

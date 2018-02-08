@@ -1,22 +1,29 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace CalculateFunding.Frontend.Pages.Results.Providers
+﻿namespace CalculateFunding.Frontend.Pages.Results.Providers
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+
     public class IndexModel : PageModel
     {
         private readonly IResultsApiClient _resultsClient;
-        public IList<ProviderTestResult> Providers { get; set; }
 
         public IndexModel(IResultsApiClient resultsClient)
         {
             _resultsClient = resultsClient;
         }
+
+        public IList<ProviderTestResult> Providers { get; set; }
+
+        public Dictionary<string, IGrouping<string, string>> DatasetFieldValues { get; set; }
+
+        public Dictionary<string, IGrouping<string, string>> DatasetFieldNames { get; set; }
+
+        public Dictionary<string, IGrouping<string, string>> DatasetNames { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
@@ -37,8 +44,6 @@ namespace CalculateFunding.Frontend.Pages.Results.Providers
                 datasetNames.AddRange(datasetReferences.Select(x => x.DatasetName).Distinct());
                 fieldNames.AddRange(datasetReferences.Select(x => x.FieldName).Distinct());
                 fieldValues.AddRange(datasetReferences.Select(x => x.Value).Distinct());
-
-
             }
 
             DatasetNames = datasetNames.GroupBy(x => x).ToDictionary(x => x.Key);
@@ -46,11 +51,5 @@ namespace CalculateFunding.Frontend.Pages.Results.Providers
             DatasetFieldValues = fieldValues.GroupBy(x => x).ToDictionary(x => x.Key);
             return Page();
         }
-
-        public Dictionary<string, IGrouping<string, string>> DatasetFieldValues { get; set; }
-
-        public Dictionary<string, IGrouping<string, string>> DatasetFieldNames { get; set; }
-
-        public Dictionary<string, IGrouping<string, string>> DatasetNames { get; set; }
     }
 }
