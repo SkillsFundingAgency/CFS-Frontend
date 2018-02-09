@@ -60,7 +60,7 @@
 
                 self.populateFacets("periodName", result.facets, self.periods);
                 self.populateFacets("specification", result.facets, self.specifications);
-                self.populateFacets("dataSchema", result.facets, self.dataSchemas);
+                self.populateFacets("definitionName", result.facets, self.dataSchemas);
                 self.populateFacets("status", result.facets, self.status);
             });
         }
@@ -73,7 +73,7 @@
                     selectedArray = this.selectedPeriods;
                 } else if (fieldName === "specification") {
                     selectedArray = this.selectedSpecifications;
-                } else if (fieldName === "dataSchema") {
+                } else if (fieldName === "definitionName") {
                     selectedArray = this.selectedDataSchemas;
                 } else if (fieldName === "status") {
                     selectedArray = this.selectedStatus;

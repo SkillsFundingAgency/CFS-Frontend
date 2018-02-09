@@ -28,20 +28,20 @@
                 </div>
             </div>
             <div class="col-xs-3">
-                <a href="#" class="btn btn-filter-link-button">Load new datasets</a>
+                <a href="/datasets/createdataset" class="btn btn-filter-link-button">Load new datasets</a>
             </div>
         </div>
-        <div class="row withjs-show">
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter datasets</div>
         </div>
-        <div class="row withjs-show">
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-5 filter-field-heading">Data Schema</div>
             <div class="col-xs-3 filter-field-heading">Specification</div>
             <div class="col-xs-2 filter-field-heading">Year</div>
             <div class="col-xs-2 filter-field-heading">Status</div>
 
         </div>
-        <div class="row withjs-show">
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-5">
                 <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
             </div>

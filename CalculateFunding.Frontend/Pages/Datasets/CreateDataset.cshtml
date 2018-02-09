@@ -1,0 +1,112 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Datasets.CreateDatasetPageModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Create Dataset";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li>@BreadcrumbText.LoadDataset</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <h1 class="hero-title">Load new datasets</h1>
+    <p class="hero-text"> Upload new data to the definitions provided, so that the data is available to be used in calculations and tests.</p>
+}
+
+
+
+<div class="row" id="dataset-form-controls">
+    <div data-bind="visible: isFormVisible" class="col-sm-9 col-md-6">
+        <form method="post" id="dataset-form" class="form">
+            <div class="validation-summary-errors" style="display:none;" data-valmsg-summary="true" data-bind="visible: isValidationSummaryVisible, attr:{'display': 'block'}">
+                <h3 class="heading-large">There is a problem</h3>
+                <p><strong>Check that you have answered the questions correctly</strong></p>
+                <ul data-bind="foreach: validationLinks">
+                    <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div data-bind="css: { 'validation-failed-block': !isDefinitionIdValid() }">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateDatasetViewModel.DataDefinitionId"></a>
+                        <label asp-for="CreateDatasetViewModel.DataDefinitionId">Select dataset schema:</label>
+                        <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" asp-items="@(Model.DatasetDefinitions)" asp-for="CreateDatasetViewModel.DataDefinitionId">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateDatasetViewModel.Name"></a>
+                        <label asp-for="CreateDatasetViewModel.Name">Name the dataset:</label>
+                        <h4 class="faded-text">Data set name has to be unique.</h4>
+                        <input data-bind="value: name, css: { 'input-validation-error': !isNameValid() }" asp-for="CreateDatasetViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateDatasetViewModel.Description"></a>
+                        <label asp-for="CreateDatasetViewModel.Description">Add description for the dataset:</label>
+                        <textarea data-bind="value: description, css: { 'input-validation-error': !isDescriptionValid() }" id="description" asp-for="CreateDatasetViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
+                    <a validationanchor-for="CreateDatasetViewModel.Filename"></a>
+                    <label asp-for="CreateDatasetViewModel.Filename">Upload dataset file</label>
+                    <h4 class="faded-text">We support the following file formats xls, xlsx, csv</h4>
+                    <div class="input-group">
+                        <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
+                        <span class="input-group-btn">
+                            <label class="btn btn-file file-button">
+                                Browse <input asp-for="CreateDatasetViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;">
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Upload</button> <a href="/datasets">Cancel</a></p>
+
+        <div>
+            <a href="/datasets">Back</a>
+        </div>
+    </div>
+
+    <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">
+        <p class="h4-heading"><strong>Dataset upload is progressing</strong></p>
+        <p>This may take a minute or so, please bare with us.</p>
+        <p data-bind="text: loadingMessage"></p>
+        <img src="~/assets/images/loader.gif" />
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/createnewdataset.js" type="text/javascript" asp-append-version="true"></script>
+    <script type="text/javascript">
+        var createDatasetElement = document.getElementById("dataset-form-controls");
+        if (createDatasetElement) {
+
+            var viewModel = new calculateFunding.createNewDataset.CreateNewDatasetViewModel();
+            ko.applyBindings(viewModel, createDatasetElement);
+        }
+
+    </script>
+}
+

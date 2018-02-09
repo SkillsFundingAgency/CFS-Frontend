@@ -12,6 +12,7 @@
 <Rule Id="SA1633" Action="None" />
 <Rule Id="SA1649" Action="None" />
 <Rule Id="SA1412" Action="None" />
+<Rule Id="SA1206" Action="None" />
   </Rules>
 <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
     <Rule Id="UseConfigureAwait" Action="Warning" />

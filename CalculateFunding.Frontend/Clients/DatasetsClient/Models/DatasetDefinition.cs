@@ -1,6 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
-    public class DatasetDefinition
+    using CalculateFunding.Frontend.Clients.CommonModels;
+
+    public class DatasetDefinition : Reference
     {
     }
 }

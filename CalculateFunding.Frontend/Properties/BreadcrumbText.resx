@@ -138,8 +138,14 @@
   <data name="EditCalculation" xml:space="preserve">
     <value>Edit Calculation</value>
   </data>
+  <data name="LoadDataset" xml:space="preserve">
+    <value>Load dataset</value>
+  </data>
   <data name="ManageCalculations" xml:space="preserve">
     <value>Manage Calculations</value>
+  </data>
+  <data name="ManageDatasets" xml:space="preserve">
+    <value>Manage data</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage Policies</value>

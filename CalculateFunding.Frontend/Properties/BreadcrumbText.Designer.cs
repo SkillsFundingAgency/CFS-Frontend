@@ -124,11 +124,29 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load dataset.
+        /// </summary>
+        public static string LoadDataset {
+            get {
+                return ResourceManager.GetString("LoadDataset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Calculations.
         /// </summary>
         public static string ManageCalculations {
             get {
                 return ResourceManager.GetString("ManageCalculations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage data.
+        /// </summary>
+        public static string ManageDatasets {
+            get {
+                return ResourceManager.GetString("ManageDatasets", resourceCulture);
             }
         }
         

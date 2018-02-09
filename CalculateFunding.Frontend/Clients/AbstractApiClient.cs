@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -112,6 +113,35 @@
             }
 
             return new ApiResponse<TResponse>(response.StatusCode);
+        }
+
+        public async Task<ValidatedApiResponse<TResponse>> ValidatedPostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ValidatedApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
+            }
+
+            ValidatedApiResponse<TResponse> apiResponse = new ValidatedApiResponse<TResponse>(response.StatusCode);
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, object>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
+            }
+
+            return apiResponse;
         }
 
         public async Task<HttpStatusCode> PostAsync<TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))

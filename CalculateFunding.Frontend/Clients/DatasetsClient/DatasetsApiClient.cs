@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient
 {
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -137,7 +138,33 @@
 
         public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetListOfDatasetSchemaDefinitions()
         {
-            return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/");
+            return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/data-definitions");
+        }
+
+        public Task<ApiResponse<Reference[]>> GetDefinitions()
+        {
+            var definitions = new[]
+            {
+                new Reference("9183", "14/15")
+            };
+
+            ApiResponse<Reference[]> response = new ApiResponse<Reference[]>(HttpStatusCode.OK, definitions);
+
+            return Task.FromResult(response);
+        }
+
+        public Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset)
+        {
+            Guard.ArgumentNotNull(dataset, nameof(dataset));
+
+            return ValidatedPostAsync<CreateNewDatasetResponseModel, CreateNewDatasetModel>($"{_datasetsPath}/create-new-dataset", dataset);
+        }
+
+        public Task<HttpStatusCode> ValidateDataset(ValidateDatasetModel model)
+        {
+            Guard.ArgumentNotNull(model, nameof(model));
+
+            return PostAsync($"{_datasetsPath}/validate-dataset", model);
         }
     }
 }

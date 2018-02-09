@@ -25,6 +25,7 @@
     <None Remove="Scripts\common.d.ts" />
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\datasets.ts" />
+    <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\search.ts" />

@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
+    using System.Collections.Generic;
     using System.Net;
 
     public class ApiResponse<T>

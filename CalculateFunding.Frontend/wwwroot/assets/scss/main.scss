@@ -1451,6 +1451,21 @@ table {
     }
 }
 
+.file-button {
+    background: grey;
+    margin-left: 5px !important;
+    border-radius: 0;
+    font-weight: 600;
+}
+
+.disabled-input {
+    background-color: #fff !important;
+}
+
+.faded-text {
+    color: #bfc1c3;
+}
+
 
 /*image path overrides*/
 #global-header #logo {
