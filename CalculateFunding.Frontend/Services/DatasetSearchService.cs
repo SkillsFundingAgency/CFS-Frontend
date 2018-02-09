@@ -45,21 +45,23 @@
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<DatasetSearchResultItem> calculationsResult = await _datasetsClient.FindDatasets(requestOptions);
-            if (calculationsResult == null)
+            PagedResult<DatasetSearchResultItem> searchRequestResult = await _datasetsClient.FindDatasets(requestOptions);
+            if (searchRequestResult == null)
             {
                 _logger.Error("Find datasets HTTP request failed");
                 return null;
             }
 
-            DatasetSearchResultViewModel result = new DatasetSearchResultViewModel();
-
-            result.TotalResults = calculationsResult.TotalItems;
-            result.CurrentPage = calculationsResult.PageNumber;
-            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-            if (calculationsResult.Facets != null)
+            DatasetSearchResultViewModel result = new DatasetSearchResultViewModel
             {
-                foreach (SearchFacet facet in calculationsResult.Facets)
+                TotalResults = searchRequestResult.TotalItems,
+                CurrentPage = searchRequestResult.PageNumber,
+            };
+
+            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
+            if (searchRequestResult.Facets != null)
+            {
+                foreach (SearchFacet facet in searchRequestResult.Facets)
                 {
                     searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
                 }
@@ -69,7 +71,7 @@
 
             List<DatasetSearchResultItemViewModel> itemResults = new List<DatasetSearchResultItemViewModel>();
 
-            foreach (DatasetSearchResultItem searchResult in calculationsResult.Items)
+            foreach (DatasetSearchResultItem searchResult in searchRequestResult.Items)
             {
                 itemResults.Add(_mapper.Map<DatasetSearchResultItemViewModel>(searchResult));
             }
@@ -86,12 +88,12 @@
                 result.EndItemNumber = result.StartItemNumber + requestOptions.PageSize - 1;
             }
 
-            if (result.EndItemNumber > calculationsResult.TotalItems)
+            if (result.EndItemNumber > searchRequestResult.TotalItems)
             {
-                result.EndItemNumber = calculationsResult.TotalItems;
+                result.EndItemNumber = searchRequestResult.TotalItems;
             }
 
-            result.PagerState = new PagerState(requestOptions.Page, calculationsResult.TotalPages, 4);
+            result.PagerState = new PagerState(requestOptions.Page, searchRequestResult.TotalPages, 4);
 
             return result;
         }

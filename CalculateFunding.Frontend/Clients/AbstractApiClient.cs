@@ -107,7 +107,8 @@
 
             if (response.IsSuccessStatusCode)
             {
-                return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(responseBody, _serializerSettings));
             }
 
             return new ApiResponse<TResponse>(response.StatusCode);

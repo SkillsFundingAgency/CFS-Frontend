@@ -15,6 +15,6 @@
 
         public string CalcsPath { get; set; }
 
-        public string DatasetPath { get; set; }
+        public string DatasetsPath { get; set; }
     }
 }

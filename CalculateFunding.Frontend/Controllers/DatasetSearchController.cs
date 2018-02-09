@@ -9,12 +9,13 @@
 
     public class DatasetSearchController : Controller
     {
-        private IDatasetSearchService _calculationSearchService;
+        private IDatasetSearchService _datasetSearchService;
 
-        public DatasetSearchController(IDatasetSearchService calculationSearchService)
+        public DatasetSearchController(IDatasetSearchService datasetSearchService)
         {
-            Guard.ArgumentNotNull(calculationSearchService, nameof(calculationSearchService));
-            _calculationSearchService = calculationSearchService;
+            Guard.ArgumentNotNull(datasetSearchService, nameof(datasetSearchService));
+
+            _datasetSearchService = datasetSearchService;
         }
 
         [HttpPost]
@@ -23,7 +24,7 @@
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            DatasetSearchResultViewModel result = await _calculationSearchService.PerformSearch(request);
+            DatasetSearchResultViewModel result = await _datasetSearchService.PerformSearch(request);
             if (result != null)
             {
                 return Ok(result);
