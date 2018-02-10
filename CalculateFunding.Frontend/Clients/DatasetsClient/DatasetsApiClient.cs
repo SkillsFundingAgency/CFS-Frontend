@@ -138,7 +138,7 @@
 
         public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetListOfDatasetSchemaDefinitions()
         {
-            return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/data-definitions");
+            return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/get-data-definitions");
         }
 
         public Task<ApiResponse<Reference[]>> GetDefinitions()
