@@ -65,11 +65,11 @@
     </div>
 
     <div class="monaco-editor-diff-container">
-        <div data-bind="monacoDiff: {original: original, modified: modified, displayAsInline: displayAsInline}" class="monaco-editor-diff-editor"></div>
+        <div data-bind="monacoDiff: {original: original, modified: modified, displayAsInline: displayAsInline}" class="monaco-editor-diff-editor" id="calculation-diff-viewer"></div>
     </div>
 
     <p><input type="checkbox" name="inLineCodeEditor" data-bind="checked: displayAsInline" value="true" id="inLineCodeEditor" /> <label for="inLineCodeEditor">Inline Code Editor</label></p>
-    <p><a href="/calcs/compare/@Model.CalculationId"> Back </a></p>
+    <p><a href="/calcs/compare/@Model.CalculationId" id="back-link">Back</a></p>
 
 </form>
 
