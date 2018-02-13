@@ -35,7 +35,7 @@
 
         async private Task PopulateDefinitions()
         {
-            var definitionsResponse = await _datasetApiClient.GetListOfDatasetSchemaDefinitions();
+            var definitionsResponse = await _datasetApiClient.GetDataDefinitions();
             if (definitionsResponse.StatusCode == HttpStatusCode.OK)
             {
                 var defintions = definitionsResponse.Content;

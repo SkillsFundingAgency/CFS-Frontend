@@ -46,6 +46,9 @@
                 {
                     destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
                 });
+            CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+            CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
             this.MapCommon();
         }

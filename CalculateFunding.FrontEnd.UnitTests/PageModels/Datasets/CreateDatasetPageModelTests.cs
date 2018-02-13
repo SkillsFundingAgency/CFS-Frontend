@@ -7,7 +7,6 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Text;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -31,7 +30,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetListOfDatasetSchemaDefinitions()
+                .GetDataDefinitions()
                 .Returns(response);
 
             CreateDatasetPageModel pageModel = CreatePageModel(apiClient);
@@ -63,7 +62,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetListOfDatasetSchemaDefinitions()
+                .GetDataDefinitions()
                 .Returns(response);
 
             CreateDatasetPageModel pageModel = CreatePageModel(apiClient);

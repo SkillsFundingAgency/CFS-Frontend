@@ -1,12 +1,11 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
-    using System.Collections.Generic;
     using CalculateFunding.Frontend.Clients.CommonModels;
+    using Newtonsoft.Json;
 
-    public class DatasetDefinition : Reference
+    public class DatasetSchemaListItem : Reference
     {
+        [JsonProperty("description")]
         public string Description { get; set; }
-
-        public IEnumerable<TableDefinition> TableDefinitions { get; set; }
     }
 }

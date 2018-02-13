@@ -8,10 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CalculateFunding.Frontend.Properties {
+namespace CalculateFunding.Frontend.Properties
+{
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,58 +23,82 @@ namespace CalculateFunding.Frontend.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class PageText {
-        
+    public class PageText
+    {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal PageText() {
+        internal PageText()
+        {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
+        public static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CalculateFunding.Frontend.Properties.PageText", typeof(PageText).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
-            get {
+        public static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Assign dataset schema for calculation specfication.
+        /// </summary>
+        public static string AssignDatasetSchemaText
+        {
+            get
+            {
+                return ResourceManager.GetString("AssignDatasetSchemaText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Manage Policies.
         /// </summary>
-        public static string ManagePolicies {
-            get {
+        public static string ManagePolicies
+        {
+            get
+            {
                 return ResourceManager.GetString("ManagePolicies", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Policies help design funding calculations to achieve specific outcomes.
         /// </summary>
-        public static string ManagePoliciesHeadingText {
-            get {
+        public static string ManagePoliciesHeadingText
+        {
+            get
+            {
+
                 return ResourceManager.GetString("ManagePoliciesHeadingText", resourceCulture);
             }
         }

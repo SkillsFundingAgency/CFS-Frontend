@@ -132,6 +132,12 @@
   <data name="CalculationPolicyIdRequired" xml:space="preserve">
     <value>You must select a policy or subpolicy</value>
   </data>
+  <data name="DatasetSchemaRelationshipNameRequired" xml:space="preserve">
+    <value>You must give a unique name for this dataset schema relationship</value>
+  </data>
+  <data name="DatasetSchemaRequiredForSpecification" xml:space="preserve">
+    <value>You must assign a dataset for the specification</value>
+  </data>
   <data name="PolicyDescriptionRequired" xml:space="preserve">
     <value>You must give a description for the policy</value>
   </data>

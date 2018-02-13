@@ -126,4 +126,10 @@
   <data name="CalculationNotFoundInSpecsService" xml:space="preserve">
     <value>Calculation was not found in Specs Service</value>
   </data>
+  <data name="DatasetDefinitionNotFoundInDatasetService" xml:space="preserve">
+    <value>Dataset definition not found in Datasets Service</value>
+  </data>
+  <data name="DatasetSchemaRequired" xml:space="preserve">
+    <value>Dataset Schema is mandatory for specification</value>
+  </data>
 </root>

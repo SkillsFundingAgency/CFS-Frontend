@@ -9,6 +9,14 @@
     public interface IDatasetsApiClient
     {
         /// <summary>
+        /// Gets a list of all Dataset schema in the system
+        /// </summary>
+        /// <returns>List of dataset schema</returns>
+        Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions();
+
+        Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema);
+
+        /// <summary>
         /// Gets a paged list of datasets, given the paged query options and search options
         /// </summary>
         /// <param name="filterOptions">Filter Options</param>
@@ -18,8 +26,6 @@
         Task<ApiResponse<Reference[]>> GetDefinitions();
 
         Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset);
-
-        Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetListOfDatasetSchemaDefinitions();
 
         Task<HttpStatusCode> ValidateDataset(ValidateDatasetModel model);
     }

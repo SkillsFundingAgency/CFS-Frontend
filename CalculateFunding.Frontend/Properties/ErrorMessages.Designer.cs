@@ -86,5 +86,23 @@ namespace CalculateFunding.Frontend.Properties {
                 return ResourceManager.GetString("CalculationNotFoundInSpecsService", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dataset definition not found in Datasets Service.
+        /// </summary>
+        internal static string DatasetDefinitionNotFoundInDatasetService {
+            get {
+                return ResourceManager.GetString("DatasetDefinitionNotFoundInDatasetService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dataset Schema is mandatory for specification.
+        /// </summary>
+        internal static string DatasetSchemaRequired {
+            get {
+                return ResourceManager.GetString("DatasetSchemaRequired", resourceCulture);
+            }
+        }
     }
 }

@@ -8,10 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CalculateFunding.Frontend.Properties {
-    using System;
-    
-    
+namespace CalculateFunding.Frontend.Properties
+{
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -102,6 +100,24 @@ namespace CalculateFunding.Frontend.Properties {
         internal static string CalculationPolicyIdRequired {
             get {
                 return ResourceManager.GetString("CalculationPolicyIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must give a unique name for this dataset schema relationship.
+        /// </summary>
+        internal static string DatasetSchemaRelationshipNameRequired {
+            get {
+                return ResourceManager.GetString("DatasetSchemaRelationshipNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must assign a dataset for the specification.
+        /// </summary>
+        internal static string DatasetSchemaRequiredForSpecification {
+            get {
+                return ResourceManager.GetString("DatasetSchemaRequiredForSpecification", resourceCulture);
             }
         }
         

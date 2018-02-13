@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Helpers;
@@ -136,7 +137,7 @@
             ////return Task.FromResult(result);
         }
 
-        public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetListOfDatasetSchemaDefinitions()
+        public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
         {
             return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/get-data-definitions");
         }
@@ -165,6 +166,13 @@
             Guard.ArgumentNotNull(model, nameof(model));
 
             return PostAsync($"{_datasetsPath}/validate-dataset", model);
+        }
+
+        public Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)
+        {
+            Guard.ArgumentNotNull(datasetSchema, nameof(datasetSchema));
+
+            return PostAsync($"{_datasetsPath}/create-definitionspecification-relationship", datasetSchema);
         }
     }
 }
