@@ -162,10 +162,6 @@
 
                         return Page();
                     }
-                    else
-                    {
-                        return new StatusCodeResult(500);
-                    }
                 }
                 else
                 {
@@ -181,7 +177,7 @@
 
             if (newAssignDatasetResponse.Equals(HttpStatusCode.OK))
             {
-                return Redirect($"/specs/policies/{specificationId}");
+                return Redirect($"/datasets/ListDatasetSchemas/{specificationId}");
             }
             else
             {

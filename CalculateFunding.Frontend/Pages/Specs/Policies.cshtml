@@ -23,132 +23,152 @@
 }
 
 <div class="row manage-policy">
+
     <div class="col-xs-12 col-sm-9">
-        <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
-        <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
+        <div class="row view-policy">
 
-        <div class="inline-collapse-container">
-            <div class="inline-collapse-heading withjs-show">
-                <i class="inline-collapse-arrow"></i>
-                <span>What is @Model.Specification.Name?</span>
-            </div>
-            <div class="inline-collapse-contents withjs-hide policy-spec-description">
-                @Model.Specification.Description
-            </div>
-        </div>
+            <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
+                <li class="nav-item active">
+                    <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View Policies</a>
+                </li>
+                <li class="nav-item">
+                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">Data types</a>
+                </li>
+            </ul>
+            <div>
+                <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
+                <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
 
-
-        <p  class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
-        <p class="text-right">
-            <a href="#" class="policy-list-openall withjs-show">Open All</a>
-        </p>
-        <div class="policy-list">
-            @if (!Model.Specification.Policies.IsNullOrEmpty())
-        {
-            @foreach (var policy in Model.Specification.Policies)
-        {
-            <div class="jscollapse-container policy-list-item">
-                <div class="policy-list-header jscollapse-header">
-                    @*<a href="/specs/editPolicy/@policy.Id" class="policy-list-edit-link">Edit</a>*@
-                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
-                        <a name="policy-@policy.Id"></a>
-                        <a class="policy-title" href="/calculations/@policy.Id">@policy.Name</a>
-                    </h2>
-                </div>
-                <div class="jscollapse-body">
-                    <p class="policy-description">
-                        @policy.Description
-                    </p>
-
-                    @if (policy.Calculations != null && policy.Calculations.Any())
-                {
-                    <div class="calculation-container">
-                        <table class="calculation-table table table-bordered table-condensed">
-                            @foreach (var calculation in policy.Calculations)
-                        {
-                            <tr>
-                                <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
-                                <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
-                            </tr>
-                    }
-                        </table>
+                <div class="inline-collapse-container">
+                    <div class="inline-collapse-heading withjs-show">
+                        <i class="inline-collapse-arrow"></i>
+                        <span>What is @Model.Specification.Name?</span>
                     </div>
-            }
+                    <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                        @Model.Specification.Description
+                    </div>
+                </div>
 
-                    @if (policy.SubPolicies != null && policy.SubPolicies.Any())
-                {
-                    @foreach (var subPolicy in policy.SubPolicies)
-                {
-                    <div class="subpolicy-container jscollapse-container">
-                        <div class="subpolicy-list-header jscollapse-header">
-
-                            <a href="/specs/editPolicy/@subPolicy.Id" class="policy-list-edit-link">Edit</a>
-                            <h2 class="policy-list-title-container collapse-title jscollapse-active">
-                                <a name="policy-@subPolicy.Id"></a>
-                                <a class="policy-title" href="/calculations/@subPolicy.Id">@subPolicy.Name</a>
-                            </h2>
-
-                        </div>
-                        <div class="jscollapse-body">
-
-
-                            <p class="subpolicy-description">
-                                @subPolicy.Description
-                            </p>
-
-                            @if (subPolicy.Calculations != null && subPolicy.Calculations.Any())
+                <p class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
+                <p class="text-right">
+                    <a href="#" class="policy-list-openall withjs-show">Open All</a>
+                </p>
+                <div class="policy-list">
+                    @if (!Model.Specification.Policies.IsNullOrEmpty())
+                    {
+                        @foreach (var policy in Model.Specification.Policies)
                         {
-                            <div class="calculation-container">
-                                <table class="calculation-table table table-bordered table-condensed">
-                                    @foreach (var calculation in subPolicy.Calculations)
-                                {
-                                    <tr>
-                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
-                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
-                                    </tr>
-                            }
-                                </table>
+                            <div class="jscollapse-container policy-list-item">
+                                <div class="policy-list-header jscollapse-header">
+                                    @*<a href="/specs/editPolicy/@policy.Id" class="policy-list-edit-link">Edit</a>*@
+                                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
+                                        <a name="policy-@policy.Id"></a>
+                                        <a class="policy-title" href="/calculations/@policy.Id">@policy.Name</a>
+                                    </h2>
+                                </div>
+                                <div class="jscollapse-body">
+                                    <p class="policy-description">
+                                        @policy.Description
+                                    </p>
+
+                                    @if (policy.Calculations != null && policy.Calculations.Any())
+                                    {
+                                        <div class="calculation-container">
+                                            <table class="calculation-table table table-bordered table-condensed">
+                                                @foreach (var calculation in policy.Calculations)
+                                                {
+                                                    <tr>
+                                                        <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </div>
+                                    }
+
+                                    @if (policy.SubPolicies != null && policy.SubPolicies.Any())
+                                    {
+                                        @foreach (var subPolicy in policy.SubPolicies)
+                                        {
+                                            <div class="subpolicy-container jscollapse-container">
+                                                <div class="subpolicy-list-header jscollapse-header">
+
+                                                    <a href="/specs/editPolicy/@subPolicy.Id" class="policy-list-edit-link">Edit</a>
+                                                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
+                                                        <a name="policy-@subPolicy.Id"></a>
+                                                        <a class="policy-title" href="/calculations/@subPolicy.Id">@subPolicy.Name</a>
+                                                    </h2>
+
+                                                </div>
+                                                <div class="jscollapse-body">
+
+
+                                                    <p class="subpolicy-description">
+                                                        @subPolicy.Description
+                                                    </p>
+
+                                                    @if (subPolicy.Calculations != null && subPolicy.Calculations.Any())
+                                                    {
+                                                        <div class="calculation-container">
+                                                            <table class="calculation-table table table-bordered table-condensed">
+                                                                @foreach (var calculation in subPolicy.Calculations)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
                             </div>
+                        }
                     }
-                        </div>
-                    </div>
-            }
-            }
-                </div>
-            </div>
-    }
-    }
-    else
-    {
-        <p>
-            <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
-        </p>
+                    else
+                    {
+                        <p>
+                            <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
+                        </p>
 
-}
+                    }
+                </div>
+
+            </div>
+
         </div>
     </div>
-    <div class="col-xs-12 col-sm-3">
-        @if(Model.Specification.Policies != null && Model.Specification.Policies.Any())
-        {
 
+    <div class="col-xs-12 col-sm-3">
         <div class="rightcolumn-container">
             <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
+            @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())
+            {
+                <div>
+                    <a href="/specs/createSubPolicy/@Model.Specification.Id">Create sub policy</a>
+                </div>
+                <div>
+                    <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
+                </div>
+            }
             <div>
-                <a href="/specs/createSubPolicy/@Model.Specification.Id">Create sub policy</a>
-            </div>
-            <div>
-                <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
+                <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Choose data type relationship</a>
             </div>
         </div>
-        }
+
     </div>
+
 </div>
 
 
 @section scripts{
 
     <script type="text/javascript">
-       
+
 
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
 
@@ -190,6 +210,13 @@
                     }
                 }
             }
+
+
         });
+            //$('#managePolicies a').on('click', function (e) {
+            //    e.preventDefault()
+            //    $(this).tab('show')
+            //});
+
     </script>
 }

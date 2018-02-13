@@ -599,6 +599,27 @@ blockquote {
     }
 }
 
+.nav-tabs-pagenavigation {
+    a,
+    a:visited {
+        text-decoration: none;
+    }
+
+    &.nav-tabs > li > a {
+        border-radius: 0;
+    }
+
+    &.nav > li > a:hover,
+    &.nav > li > a:focus,
+    &.nav > li.active > a {
+        background-color: #fff;
+    }
+
+    &.nav > li > a,
+    &.nav > li > a {
+        background-color: #eee;
+    }
+}
 ///////////////////////////////////////
 //    Accordion list and sublist    //
 /////////////////////////////////////
@@ -1276,7 +1297,7 @@ table {
     text-align: center;
     margin-bottom: 30px;
 
-    p{
+    p {
         margin-top: 15px;
     }
 }

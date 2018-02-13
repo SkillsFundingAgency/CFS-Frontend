@@ -16,9 +16,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using CalculateFunding.Frontend.Pages.Calcs;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
+    using Serilog;
 
     [TestClass]
     public class DiffCalculationVersionsPageModelTests

@@ -27,7 +27,18 @@
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddModule<ApiModule>(Configuration);
+
+            bool useEmulator = this.Configuration.GetValue<bool>("UseEmulator");
+
+            if (useEmulator)
+            {
+                services.AddModule<EmulatedApiModule>(Configuration);
+            }
+            else
+            {
+                services.AddModule<ApiModule>(Configuration);
+            }
+
             services.AddModule<ProxiesModule>(Configuration);
             services.AddModule<LoggingModule>(Configuration);
             services.AddModule<MappingModule>(Configuration);

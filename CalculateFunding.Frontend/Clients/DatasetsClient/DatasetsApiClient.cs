@@ -50,91 +50,6 @@
             {
                 return null;
             }
-
-            ////PagedResult<DatasetSearchResultItem> result = new PagedResult<DatasetSearchResultItem>()
-            ////{
-            ////    TotalPages = 1,
-            ////    TotalItems = 3,
-            ////    PageSize = 50,
-            ////    PageNumber = 1,
-            ////};
-
-            ////List<DatasetSearchResultItem> items = new List<DatasetSearchResultItem>
-            ////{
-            ////    new DatasetSearchResultItem()
-            ////    {
-            ////        Id = "1",
-            ////        LastUpdated = DateTime.Now.AddHours(-1),
-            ////        Name = "APT Adjusted Factors Test",
-            ////        Status = "Draft",
-            ////    },
-
-            ////    new DatasetSearchResultItem()
-            ////    {
-            ////        Id = "2",
-            ////        LastUpdated = DateTime.Now.AddHours(-2),
-            ////        Name = "APT Adjusted Factors Test Asif",
-            ////        Status = "Published",
-            ////    },
-
-            ////    new DatasetSearchResultItem()
-            ////    {
-            ////        Id = "3",
-            ////        LastUpdated = DateTime.Now.AddHours(-3),
-            ////        Name = "AP Adjusted Factors New Data",
-            ////        Status = "Updated",
-            ////    }
-            ////};
-
-            ////result.Items = items;
-            ////List<SearchFacet> facets = new List<SearchFacet>
-            ////{
-            ////    new SearchFacet()
-            ////    {
-            ////        Name = "dataSchema",
-            ////        FacetValues = new List<SearchFacetValue>()
-            ////    {
-            ////        new SearchFacetValue() { Name = "Schema 1", Count = 5 },
-            ////        new SearchFacetValue() { Name = "Schema two", Count = 2 }
-            ////    }
-            ////    },
-
-            ////    new SearchFacet()
-            ////    {
-            ////        Name = "specification",
-            ////        FacetValues = new List<SearchFacetValue>()
-            ////    {
-            ////        new SearchFacetValue() { Name = "Spec 1", Count = 50 },
-            ////        new SearchFacetValue() { Name = "Spec 52", Count = 25 }
-            ////    }
-            ////    },
-
-            ////    new SearchFacet()
-            ////    {
-            ////        Name = "periodName",
-            ////        FacetValues = new List<SearchFacetValue>()
-            ////    {
-            ////        new SearchFacetValue() { Name = "2017/18", Count = 2 },
-            ////        new SearchFacetValue() { Name = "2018/2019", Count = 1 }
-            ////    }
-            ////    },
-
-            ////    new SearchFacet()
-            ////    {
-            ////        Name = "status",
-            ////        FacetValues = new List<SearchFacetValue>()
-            ////    {
-            ////        new SearchFacetValue()
-            ////        { Name = "Draft", Count = 1 },
-            ////        new SearchFacetValue() { Name = "Published", Count = 1 },
-            ////        new SearchFacetValue() { Name = "Updated", Count = 1 }
-            ////    }
-            ////    }
-            ////};
-
-            ////result.Facets = facets;
-
-            ////return Task.FromResult(result);
         }
 
         public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
@@ -173,6 +88,13 @@
             Guard.ArgumentNotNull(datasetSchema, nameof(datasetSchema));
 
             return PostAsync($"{_datasetsPath}/create-definitionspecification-relationship", datasetSchema);
+        }
+
+        public Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            return GetAsync<IEnumerable<DatasetSchemasAssigned>>($"{_datasetsPath}/get-definitions-relationships?specificationId={specificationId}");
         }
     }
 }

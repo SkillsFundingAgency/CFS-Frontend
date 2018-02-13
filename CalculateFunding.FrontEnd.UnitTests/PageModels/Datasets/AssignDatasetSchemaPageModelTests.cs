@@ -18,9 +18,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.Extensions.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
+    using Serilog;
 
     [TestClass]
     public class AssignDatasetSchemaPageModelTests
