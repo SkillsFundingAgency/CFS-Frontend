@@ -9,7 +9,9 @@ var lodash = require("lodash"),
     cssmin = require("gulp-cssmin"),
     sass = require("gulp-sass"),
     uglify = require("gulp-uglify"),
-    rev = require('gulp-rev');
+    rev = require('gulp-rev'),
+    runSequence = require('run-sequence');
+
 
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
@@ -64,7 +66,7 @@ gulp.task("min:maincss", function () {
 gulp.task("min:librarycss", function () {
 
     var libraryPaths = [
-        "./wwwroot/assets/libs/css/bootstrap.css",
+        "./node_modules/bootstrap/dist/css/bootstrap.css",
         "./wwwroot/libs/govuk_bootstrap/govuk_bootstrap.css"
     ];
 
@@ -112,7 +114,7 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
             './node_modules/knockout/build/output/knockout-latest.debug.js',
-            './node_modules/select2/dist/js/select2.min.js',
+            './node_modules/select2/dist/js/select2.min.js'
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
@@ -182,4 +184,8 @@ gulp.task("ts:release", function () {
 
     return tsResult
         .pipe(gulp.dest('wwwroot/js'));
+});
+
+gulp.task("release", function (callback) {
+    runSequence("clean", "sass", "copy-assets", "ts:release", "min", callback);
 });

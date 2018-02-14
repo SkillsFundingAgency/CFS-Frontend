@@ -281,9 +281,6 @@ __pycache__/
 # Telerik's JustMock configuration file
 *.jmconfig
 
-# NPM Lock File
-**/package-lock.json
-
 # BizTalk build output
 *.btp.cs
 *.btm.cs

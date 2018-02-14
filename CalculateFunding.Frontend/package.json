@@ -33,6 +33,7 @@
     "gulp-typescript": "^3.2.4",
     "gulp-uglify": "^3.0.0",
     "merge2": "^1.2.1",
+    "run-sequence": "^2.2.1",
     "typescript": "^2.7.1"
   },
   "scripts": {
