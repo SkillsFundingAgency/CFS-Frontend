@@ -254,6 +254,45 @@ blockquote {
     color: $secondary-text-colour;
 }
 
+.gds-select {
+    & ~ .select2-container .select2-selection--single {
+        min-height: 50px;
+        border-radius: 0;
+        border: 2px solid #000;
+        padding-right: 5px;
+    }
+
+    & ~ .select2-container .select2-selection__rendered {
+        margin-top: 10px;
+    }
+
+    & ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 10px;
+    }
+}
+
+.gds-select-description {
+    font-size: 16px;
+    color: $border-colour;
+    line-height: 16px;
+}
+
+.gds-select-title{
+    font-weight: 800;
+    line-height: 19px;
+    font-size: 17px;
+}
+
+.gds-select-description-dropdown {
+    font-size: 16px;
+    line-height: 16px;
+}
+
+.gds-select-title-dropdown {
+    font-weight: bold;
+    line-height: 19px;
+}
+
 .manage-policy {
     .policy-description, .subpolicy-description {
         color: $secondary-text-colour;

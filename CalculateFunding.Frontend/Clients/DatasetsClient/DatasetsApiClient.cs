@@ -36,7 +36,7 @@
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
             ApiResponse<SearchResults<DatasetSearchResultItem>> results = await PostAsync<SearchResults<DatasetSearchResultItem>, SearchQueryRequest>($"{_datasetsPath}/datasets-search", request);
-            if (results.StatusCode == System.Net.HttpStatusCode.OK)
+            if (results.StatusCode == HttpStatusCode.OK)
             {
                 PagedResult<DatasetSearchResultItem> result = new SearchPagedResult<DatasetSearchResultItem>(filterOptions, results.Content.TotalCount)
                 {

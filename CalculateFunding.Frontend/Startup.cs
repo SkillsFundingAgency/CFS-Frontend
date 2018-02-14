@@ -4,6 +4,7 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Frontend.Core.Middleware;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Modules;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -14,9 +15,15 @@
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IHostingEnvironment _hostingEnvironment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
+            Guard.ArgumentNotNull(configuration, nameof(configuration));
+            Guard.ArgumentNotNull(hostingEnvironment, nameof(hostingEnvironment));
+
             Configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
@@ -40,7 +47,16 @@
             }
 
             services.AddModule<ProxiesModule>(Configuration);
-            services.AddModule<LoggingModule>(Configuration);
+
+            if (!_hostingEnvironment.IsDevelopment())
+            {
+                services.AddModule<LoggingModule>(Configuration);
+            }
+            else
+            {
+                services.AddModule<LocalDevelopmentLoggingModule>(Configuration);
+            }
+
             services.AddModule<MappingModule>(Configuration);
             services.AddModule<ServicesModule>(Configuration);
 

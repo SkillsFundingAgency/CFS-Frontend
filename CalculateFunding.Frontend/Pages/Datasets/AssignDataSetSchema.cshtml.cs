@@ -13,6 +13,7 @@
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -44,7 +45,7 @@
 
         public string SpecificationDescription { get; set; }
 
-        public IEnumerable<SelectListItem> Datasets { get; set; }
+        public IEnumerable<GdsSelectListItem> Datasets { get; set; }
 
         [BindProperty]
         public AssignDatasetSchemaModel AssignDatasetViewModel { get; set; }
@@ -189,11 +190,12 @@
         {
             Guard.ArgumentNotNull(datsetDefn, nameof(datsetDefn));
 
-            Datasets = datsetDefn != null ? datsetDefn.Select(m => new SelectListItem
+            Datasets = datsetDefn != null ? datsetDefn.Select(m => new GdsSelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
-            }).ToList() : Enumerable.Empty<SelectListItem>();
+                Description = m.Description,
+            }).ToList() : Enumerable.Empty<GdsSelectListItem>();
         }
     }
 }

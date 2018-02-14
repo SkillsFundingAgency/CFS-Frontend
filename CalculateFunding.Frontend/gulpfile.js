@@ -111,7 +111,8 @@ gulp.task('copy-assets', function () {
             './node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
             './node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
-            './node_modules/knockout/build/output/knockout-latest.debug.js'
+            './node_modules/knockout/build/output/knockout-latest.debug.js',
+            './node_modules/select2/dist/js/select2.min.js',
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
@@ -119,7 +120,8 @@ gulp.task('copy-assets', function () {
             './node_modules/summernote/dist/**/*.woff',
             './node_modules/summernote/dist/**/*.eot',
             './node_modules/summernote/dist/**/*.ttf',
-            './node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css'
+            './node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css',
+            './node_modules/select2/dist/css/select2.min.css'
         ],
         fonts: [
             './node_modules/material-design-icons/iconfont/*.woff2',

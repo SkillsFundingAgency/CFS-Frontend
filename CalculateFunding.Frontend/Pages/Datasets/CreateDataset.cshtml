@@ -1,6 +1,5 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Datasets.CreateDatasetPageModel
-@using Microsoft.AspNetCore.Mvc.ModelBinding
 @using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "Create Dataset";
@@ -40,7 +39,7 @@
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.DataDefinitionId"></a>
                         <label asp-for="CreateDatasetViewModel.DataDefinitionId">Select dataset schema:</label>
-                        <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" asp-items="@(Model.DatasetDefinitions)" asp-for="CreateDatasetViewModel.DataDefinitionId">
+                        <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" gds-items="@(Model.DatasetDefinitions)" gds-for="CreateDatasetViewModel.DataDefinitionId">
                             <option></option>
                         </select>
                     </div>
@@ -98,6 +97,7 @@
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/createnewdataset.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var createDatasetElement = document.getElementById("dataset-form-controls");
@@ -106,7 +106,9 @@
             var viewModel = new calculateFunding.createNewDataset.CreateNewDatasetViewModel();
             ko.applyBindings(viewModel, createDatasetElement);
         }
-
     </script>
 }
 
+@section styles{ 
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/select2.min.css" />
+}

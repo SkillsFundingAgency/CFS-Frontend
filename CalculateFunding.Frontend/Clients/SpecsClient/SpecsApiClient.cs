@@ -34,7 +34,6 @@
 
         public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
         {
-            Logger.Information("This is from the FE");
             return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 

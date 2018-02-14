@@ -241,3 +241,40 @@ $(".inline-collapse-heading").on("click", function (e) {
     return e.preventDefault();
 
 });
+
+// Gds Select List Tag Helper counterpart
+$(function () {
+
+    var dataDefinitionDropdown = $("select.gds-select").each(function (i, item) {
+        var $item = $(item);
+        $item.select2({
+            templateResult: function (option) {
+                if (typeof option.element != "undefined") {
+
+                    var $optionElement = $(option.element);
+
+                    var $option = $(
+                        '<div class="gds-select-title-dropdown">' + option.text + '</div><div class="gds-select-description-dropdown">' + $optionElement.data("description") + '</div>'
+                    );
+                    return $option;
+                }
+                return option.text;
+            },
+            placeholder: "",
+            templateSelection: function (option) {
+                if (typeof option.element != "undefined") {
+
+                    var $optionElement = $(option.element);
+
+                    var $option = $(
+                        '<div class="gds-select-title">' + option.text + '</div><div class="gds-select-description">' + $optionElement.data("description") + '</div>'
+                    );
+                    return $option;
+                }
+                return option.text;
+            },
+            placeholder: ""
+        }
+        );
+    });
+});

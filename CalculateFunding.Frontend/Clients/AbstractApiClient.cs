@@ -58,6 +58,8 @@
             _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
 
             _logger = logger;
+
+            _logger.Debug("AbstractApiClient created with Base URL: {baseAddress}", baseAddress);
         }
 
         protected ILogger Logger
@@ -76,6 +78,7 @@
             }
 
             HttpResponseMessage response = null;
+            _logger.Debug("ApiClient GET: {url}", url);
 
             response = await _httpClient.GetAsync(url, cancellationToken);
             if (response == null)
@@ -100,6 +103,7 @@
             }
 
             var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            _logger.Debug($"ApiClient POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -123,6 +127,7 @@
             }
 
             var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -152,6 +157,7 @@
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
+            _logger.Debug($"ApiClient POST: {{url}} ({typeof(TRequest).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {

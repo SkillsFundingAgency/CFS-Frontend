@@ -6,11 +6,12 @@
     using System.Net;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
 
     public class CreateDatasetPageModel : PageModel
     {
@@ -18,13 +19,15 @@
 
         public CreateDatasetPageModel(IDatasetsApiClient datasetApiClient)
         {
+            Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
+
             _datasetApiClient = datasetApiClient;
         }
 
         [BindProperty]
         public CreateDatasetViewModel CreateDatasetViewModel { get; set; }
 
-        public IEnumerable<SelectListItem> DatasetDefinitions { get; set; }
+        public IEnumerable<GdsSelectListItem> DatasetDefinitions { get; set; }
 
         async public Task<IActionResult> OnGetAsync()
         {
@@ -40,10 +43,11 @@
             {
                 var defintions = definitionsResponse.Content;
 
-                DatasetDefinitions = defintions.Select(m => new SelectListItem
+                DatasetDefinitions = defintions.Select(m => new GdsSelectListItem
                 {
                     Value = m.Id,
-                    Text = m.Name
+                    Text = m.Name,
+                    Description = m.Description
                 }).ToList();
             }
             else
