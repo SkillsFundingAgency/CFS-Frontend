@@ -7,7 +7,11 @@
     using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.Core;
+    using Microsoft.Extensions.Options;
+    using Serilog;
 
     public class HttpClientProxy : IHttpClient
     {
@@ -16,35 +20,70 @@
 
         private HttpClient _httpClient;
 
-        public HttpClientProxy()
-            : this(
-                new HttpClientHandler()
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                },
-                true)
+        public HttpClientProxy(IOptionsSnapshot<ApiOptions> options, ILogger logger)
         {
-        }
+            Guard.ArgumentNotNull(logger, nameof(logger));
 
-        public HttpClientProxy(HttpMessageHandler handler)
-            : this(handler, true)
-        {
-        }
+            ApiProxyOptions proxyOptions = options.Value;
 
-        public HttpClientProxy(HttpMessageHandler handler, bool disposeHandler)
-        {
-            _handler = handler;
-            _disposeHandler = disposeHandler;
-
-            if (handler == null)
+            HttpClientHandler handler = new HttpClientHandler()
             {
-                _httpClient = new HttpClient();
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            };
+
+            if (proxyOptions != null && proxyOptions.UseProxyServer)
+            {
+                WebProxy proxy = new WebProxy();
+                if (string.IsNullOrWhiteSpace(proxyOptions.ProxyAddress))
+                {
+                    logger.Error("UseProxyServer is true, but not proxy server address specified");
+
+                    throw new InvalidOperationException("UseProxyServer is true, but not proxy server address specified");
+                }
+
+                proxy.Address = new Uri(proxyOptions.ProxyAddress);
+                if (!string.IsNullOrWhiteSpace(proxyOptions.ProxyUsername) && !string.IsNullOrWhiteSpace(proxyOptions.ProxyPassword))
+                {
+                    proxy.Credentials = new NetworkCredential(proxyOptions.ProxyUsername, proxyOptions.ProxyPassword);
+                    logger.Information("Proxy server configured with address {proxyAddress} and username {proxyUsername}", proxyOptions.ProxyAddress, proxyOptions.ProxyUsername);
+                }
+                else
+                {
+                    logger.Warning("Proxy server configured with address {proxyAddress}, but not username", proxyOptions.ProxyAddress);
+                }
+
+                handler.UseProxy = true;
+                handler.Proxy = proxy;
             }
             else
             {
-                _httpClient = new HttpClient(handler, disposeHandler);
+                logger.Verbose("Configured ApiClient without proxy server");
             }
+
+            _disposeHandler = true;
+            _handler = handler;
+            _httpClient = new HttpClient(_handler, true);
         }
+
+        ////public HttpClientProxy(HttpMessageHandler handler)
+        ////    : this(handler, true)
+        ////{
+        ////}
+
+        ////public HttpClientProxy(HttpMessageHandler handler, bool disposeHandler)
+        ////{
+        ////    _handler = handler;
+        ////    _disposeHandler = disposeHandler;
+
+        ////    if (handler == null)
+        ////    {
+        ////        _httpClient = new HttpClient();
+        ////    }
+        ////    else
+        ////    {
+        ////        _httpClient = new HttpClient(handler, disposeHandler);
+        ////    }
+        ////}
 
         public HttpRequestHeaders DefaultRequestHeaders => _httpClient.DefaultRequestHeaders;
 
