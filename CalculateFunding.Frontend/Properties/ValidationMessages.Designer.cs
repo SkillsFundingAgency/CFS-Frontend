@@ -8,8 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CalculateFunding.Frontend.Properties
-{
+namespace CalculateFunding.Frontend.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -154,6 +156,15 @@ namespace CalculateFunding.Frontend.Properties
         internal static string PolicyParentIdRequired {
             get {
                 return ResourceManager.GetString("PolicyParentIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Given relationship name is not unique, please provide different relationship name .
+        /// </summary>
+        internal static string RelationshipNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("RelationshipNameAlreadyExists", resourceCulture);
             }
         }
         

@@ -10,6 +10,7 @@
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -33,14 +34,15 @@
 
         public Specification Specification { get; set; }
 
-        ////public DatasetDefinition DataDefinitions { get; set; }
-
-        ////public IEnumerable<DatasetSchemaListForSpecification> DataTypeListForSpecification { get; set; }
-
         public IEnumerable<AssignedDataDefinitionToSpecificationViewModel> DatasetDefinitions { get; set; }
 
         public async Task<IActionResult> OnGet(string specificationId)
         {
+            if (string.IsNullOrWhiteSpace(specificationId))
+            {
+                return new BadRequestObjectResult(ErrorMessages.SpecificationIdNullOrEmpty);
+            }
+
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 
             if (specificationResponse.StatusCode == HttpStatusCode.NotFound)

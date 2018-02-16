@@ -104,5 +104,14 @@ namespace CalculateFunding.Frontend.Properties {
                 return ResourceManager.GetString("DatasetSchemaRequired", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided specification ID was null or empty string.
+        /// </summary>
+        internal static string SpecificationIdNullOrEmpty {
+            get {
+                return ResourceManager.GetString("SpecificationIdNullOrEmpty", resourceCulture);
+            }
+        }
     }
 }

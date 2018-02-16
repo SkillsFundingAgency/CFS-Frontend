@@ -132,4 +132,7 @@
   <data name="DatasetSchemaRequired" xml:space="preserve">
     <value>Dataset Schema is mandatory for specification</value>
   </data>
+  <data name="SpecificationIdNullOrEmpty" xml:space="preserve">
+    <value>The provided specification ID was null or empty string</value>
+  </data>
 </root>

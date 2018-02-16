@@ -150,6 +150,9 @@
   <data name="PolicyParentIdRequired" xml:space="preserve">
     <value>You must select a policy</value>
   </data>
+  <data name="RelationshipNameAlreadyExists" xml:space="preserve">
+    <value>Given relationship name is not unique, please provide different relationship name </value>
+  </data>
   <data name="SpecificationAlreadyExists" xml:space="preserve">
     <value>You must give a unique specification name</value>
   </data>

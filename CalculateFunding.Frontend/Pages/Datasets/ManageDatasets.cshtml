@@ -1,0 +1,159 @@
+﻿@page "{pageNumber?}"
+@model CalculateFunding.Frontend.Pages.Datasets.ManageDatasetsPageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.Helpers
+@using CalculateFunding.Frontend.ViewModels.Common
+@using Microsoft.AspNetCore.Hosting
+
+@{
+    ViewData["Title"] = "Manage Datasets";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Manage Datasets</h1>
+}
+
+@section BannerMiddle{
+    <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">Search calculations</div>
+            <div class="col-xs-3 filter-field-heading withjs-show">Add new datasets</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <a href="/datasets/createdataset" class="btn btn-filter-link-button">Load new datasets</a>
+            </div>
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter datasets</div>
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-5 filter-field-heading">Data Schema</div>
+            <div class="col-xs-3 filter-field-heading">Specification</div>
+            <div class="col-xs-2 filter-field-heading">Year</div>
+            <div class="col-xs-2 filter-field-heading">Status</div>
+
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-5">
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-2">
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select year', buttonWidth: '100%', disableIfEmpty: true}, options: periods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedPeriods, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-2">
+                <select id="status" data-bind="multiselect2: {nonSelectedText: 'All', buttonWidth: '100%', disableIfEmpty: true}, options: status, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatus, enable: canSelectFilters" multiple></select>
+            </div>
+
+        </div>
+    </form>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">Calculate Funding</a></li>
+            <li><a href="~/datasets">Manage Data</a></li>
+            <li>Manage Datasets</li>
+        </ol>
+    </div>
+}
+
+<div class="row manage-datasets" id="manage-datasets-container">
+    @Html.Partial("_SearchFilterPartial")
+    @Html.Partial("_SearchErrorPartial")
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "datasets", Model.SearchTerm))
+        </div>
+
+        <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+            @{
+                int datasetRow = 0;
+            }
+            @foreach (var dataset in Model.SearchResults.Datasets)
+            {
+
+                <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
+                    <div class="dataset-item-header">@dataset.Name</div>
+                    <div>
+                        <span class="dataset-item-property">
+                            <strong>Status:</strong>
+                            <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong>Update on:</strong>
+                            <span id="dataset-item-lastupdated-@datasetRow">
+                                @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                datasetRow++;
+            }
+        </div>
+        <div data-bind="visible: isResultsVisible">
+            <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
+                <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
+                    <div class="dataset-item-header" data-bind="text: name"></div>
+                    <div>
+                        <span class="dataset-item-property">
+                            <strong>Status:</strong>
+                            <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong>Update on:</strong>
+                            <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Datasets Results</p>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/datasets.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageDatasets.DatasetSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-datasets-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+        vm.performSearch();
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

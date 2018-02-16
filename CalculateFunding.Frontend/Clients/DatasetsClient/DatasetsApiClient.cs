@@ -96,5 +96,12 @@
 
             return GetAsync<IEnumerable<DatasetSchemasAssigned>>($"{_datasetsPath}/get-definitions-relationships?specificationId={specificationId}");
         }
+
+        public Task<ApiResponse<DatasetSchemasAssigned>> GetAssignedDatasetSchemasForSpecificationAndRelationshipName(string specificationId, string relationshipName)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            return GetAsync<DatasetSchemasAssigned>($"{_datasetsPath}/get-definition-relationship-by-specificationid-name?specificationId={specificationId}&name={relationshipName}");
+        }
     }
 }

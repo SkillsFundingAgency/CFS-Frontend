@@ -26,7 +26,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     public class AssignDatasetSchemaPageModelTests
     {
         [TestMethod]
-        public async Task OnGet_WhenSpecificationIdDoesNotExistThenNotFoundReturned()
+        public async Task OnGet_WhenSpecificationIdDoesNotExistThenBadRequestReturned()
         {
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
@@ -52,7 +52,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeOfType<NotFoundObjectResult>().Which.Value.Should().Be("Unable to get specification response. Specification Id value = ");
+            result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be("The provided specification ID was null or empty string");
         }
 
         [TestMethod]

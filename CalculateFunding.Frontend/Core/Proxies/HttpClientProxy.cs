@@ -16,7 +16,6 @@
     public class HttpClientProxy : IHttpClient
     {
         private readonly HttpMessageHandler _handler;
-        private readonly bool _disposeHandler;
 
         private HttpClient _httpClient;
 
@@ -60,7 +59,6 @@
                 logger.Verbose("Configured ApiClient without proxy server");
             }
 
-            _disposeHandler = true;
             _handler = handler;
             _httpClient = new HttpClient(_handler, true);
         }

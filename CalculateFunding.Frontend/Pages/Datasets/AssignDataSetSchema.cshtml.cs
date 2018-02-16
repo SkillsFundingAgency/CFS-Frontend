@@ -16,7 +16,6 @@
     using CalculateFunding.Frontend.ViewModels.Common;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
 
     public class AssignDatasetSchemaPageModel : PageModel
     {
@@ -52,6 +51,11 @@
 
         public async Task<IActionResult> OnGet(string specificationId)
         {
+            if (string.IsNullOrWhiteSpace(specificationId))
+            {
+                return new BadRequestObjectResult(ErrorMessages.SpecificationIdNullOrEmpty);
+            }
+
             SpecificationId = specificationId;
 
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
@@ -116,6 +120,16 @@
         public async Task<IActionResult> OnPostAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            if (!string.IsNullOrWhiteSpace(AssignDatasetViewModel.Name))
+            {
+                ApiResponse<DatasetSchemasAssigned> existingRelationshipResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecificationAndRelationshipName(specificationId, AssignDatasetViewModel.Name);
+
+                if (existingRelationshipResponse.StatusCode != HttpStatusCode.NotFound)
+                {
+                    this.ModelState.AddModelError($"{nameof(AssignDatasetViewModel)}.{nameof(AssignDatasetViewModel.Name)}", ValidationMessages.RelationshipNameAlreadyExists);
+                }
+            }
 
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 

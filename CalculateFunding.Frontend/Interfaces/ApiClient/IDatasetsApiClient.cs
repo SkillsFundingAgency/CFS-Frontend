@@ -30,5 +30,7 @@
         Task<HttpStatusCode> ValidateDataset(ValidateDatasetModel model);
 
         Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId);
+
+        Task<ApiResponse<DatasetSchemasAssigned>> GetAssignedDatasetSchemasForSpecificationAndRelationshipName(string specificationId, string relationshipName);
     }
 }
