@@ -11,6 +11,11 @@
 
     public class SpecsEmulator : ISpecsApiClient
     {
+        public Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears()
         {
             IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
@@ -23,7 +28,7 @@
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calclationId)
+        public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
         {
             throw new NotImplementedException();
         }

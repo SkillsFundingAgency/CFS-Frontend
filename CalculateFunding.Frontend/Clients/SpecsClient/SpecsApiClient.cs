@@ -145,5 +145,27 @@
 
             return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
+
+        public async Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions)
+        {
+            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
+
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-search", request);
+            if (results.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

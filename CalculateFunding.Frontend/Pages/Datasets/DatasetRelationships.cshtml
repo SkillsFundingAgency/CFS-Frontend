@@ -1,0 +1,115 @@
+﻿@page "{pageNumber?}"
+@model CalculateFunding.Frontend.Pages.Datasets.DatasetRelationshipsPageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.ViewModels.Common
+
+
+@{
+    ViewData["Title"] = "Choose data sources for specifications";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BannerLeft{
+    <h1 class="hero-title no-margin">Choose data sources for specifications</h1>
+    <div class="hero-text">Create relationships between specifications and source data.</div>
+}
+
+@section BannerMiddle{
+    <form method="post" action="/datasets/datasetrelationships" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 spacing-30-top filter-field-heading">Filter by year</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <select data-bind="event: { change: periodChanged }, value: selectedPeriod" asp-items="@(Model.Periods)" class="form-control spec-mgr-control" id="select-spec-period" name="periodId"></select>
+            </div>
+        </div>
+    </form>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">Calculate Funding</a></li>
+            <li>Choose data sources for specifications</li>
+        </ol>
+    </div>
+}
+
+<div class="row manage-spec-relationships" id="manage-spec-relationships-container">
+    @Html.Partial("_SearchErrorPartial")
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial_SpecRelationships", new PagerPartialViewModel(Model.SearchResults, "specs", Model.SearchTerm))
+        </div>
+        <hr />
+        @*end of row*@
+        <div class="row">
+            <div class="specs-relationship-searchresult-container spacing-30 col-xs-9 col-md-9" data-bind="visible: isResultsVisible">
+                <div>
+                    <div data-bind="visible: !searchPerformed()" id="static-results-container">
+
+                        @foreach (var specification in Model.SearchResults.SpecRelationships)
+                        {
+                            <div>
+                                <h2 class="description-text-link stream-title">
+                                    <a href="/datasets/wherever/@specification.SpecificationId" id="specification-link-@specification.SpecificationId"> @specification.SpecificationName</a>
+                                </h2>
+                                <p>@specification.CountPhrase</p>
+                            </div>
+
+                            <hr />
+                        }
+
+                    </div>
+                    <div data-bind="foreach: specRelationships" class="withjs-show" id="dynamic-results-container">
+
+                        <div>
+                            <h2 class="description-text-link stream-title">
+                                <a data-bind="attr: {href: '/datasets/wherever/' + specificationId }, text: specificationName"></a>
+                            </h2>
+                            <p data-bind="text: countPhrase"></p>
+                        </div>
+                        <hr />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Specification Results</p>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/dataset-relationships.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageDatasetRelationships.DatasetRelationshipsSearchViewModel();
+
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var datasetsRelationshipsContainer = document.getElementById("manage-spec-relationships-container");
+        if (datasetsRelationshipsContainer) {
+            ko.applyBindings(vm, datasetsRelationshipsContainer);
+        }
+        vm.performSearch();
+    </script>
+}
+

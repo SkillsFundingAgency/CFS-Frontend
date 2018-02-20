@@ -37,6 +37,13 @@
         }
     }
 
+    export class SearchFilter {
+
+        public name: KnockoutObservable<string> = ko.observable();
+
+        public term: KnockoutObservable<string> = ko.observable();
+    }
+
     export abstract class SearchViewModel {
 
         public state: KnockoutObservable<string> = ko.observable(IdleStateKey);
@@ -65,6 +72,8 @@
         public canSelectFilters: KnockoutComputed<boolean>;
 
         public errorMessage: KnockoutObservable<string> = ko.observable();
+
+        public selectedSearchFilters: KnockoutComputed<Array<calculateFunding.search.SearchFilter>>;
 
         constructor() {
             var self = this;
@@ -110,16 +119,33 @@
                     queryPageNumber = pageNumber;
                 }
 
-                let filters: calculateFunding.common.ISearchFilterRequest = {};
-                ko.utils.arrayForEach(this.selectedSearchFacets(), (facet: calculateFunding.search.SearchFacet, i: number) => {
-                    if (facet) {
-                        if (!filters[facet.fieldName()]) {
-                            filters[facet.fieldName()] = [];
-                        }
+                var filters: calculateFunding.common.ISearchFilterRequest = {};
 
-                        filters[facet.fieldName()].push(facet.name());
-                    }
-                });
+                if (this.selectedSearchFacets){
+                    ko.utils.arrayForEach(this.selectedSearchFacets(), (facet: calculateFunding.search.SearchFacet, i: number) => {
+                        if (facet) {
+                            if (!filters[facet.fieldName()]) {
+                                filters[facet.fieldName()] = [];
+                            }
+
+                            filters[facet.fieldName()].push(facet.name());
+                        }
+                    });
+                }
+
+                if (this.selectedSearchFilters) {
+                    ko.utils.arrayForEach(this.selectedSearchFilters(), (searchFilter: calculateFunding.search.SearchFilter, i: number) => {
+                        if (searchFilter) {
+                            if (!filters[searchFilter.name()]) {
+                                filters[searchFilter.name()] = [];
+                            }
+
+                            filters[searchFilter.name()].push(searchFilter.term());
+                        }
+                    });
+                }
+
+                //cant bind to the search term box for some reason, needs looking at
 
                 let data: calculateFunding.common.ISearchRequest = {
                     pageNumber: queryPageNumber,

@@ -19,7 +19,7 @@
         }
 
         [HttpPost]
-        [Route("api/datasets/search")]
+        [Route("api/specs/searchrelationships")]
         public async Task<IActionResult> SearchDatasets([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));

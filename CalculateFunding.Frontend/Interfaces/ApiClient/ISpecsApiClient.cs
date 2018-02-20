@@ -37,10 +37,12 @@
 
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
 
-        Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calclationId);
+        Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId);
 
         Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation);
 
         Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines();
+
+        Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
     }
 }

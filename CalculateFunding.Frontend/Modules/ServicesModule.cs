@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Modules
 {
     using CalculateFunding.Frontend.Core.Ioc;
+    using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Services;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,7 @@
         {
             services.AddScoped<ICalculationSearchService, CalculationSearchService>();
             services.AddScoped<IDatasetSearchService, DatasetSearchService>();
+            services.AddScoped<IDatasetRelationshipsSearchService, DatasetRelationshipsSearchService>();
         }
     }
 }
