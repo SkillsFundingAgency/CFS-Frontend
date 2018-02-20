@@ -106,6 +106,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must provide a description for this new relationship.
+        /// </summary>
+        internal static string DatasetSchemaDescriptionRequired {
+            get {
+                return ResourceManager.GetString("DatasetSchemaDescriptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must give a unique name for this dataset schema relationship.
         /// </summary>
         internal static string DatasetSchemaRelationshipNameRequired {

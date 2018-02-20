@@ -28,13 +28,13 @@
         <form method="post" class="form">
             <div gds-validation-summary="All"></div>
             <div>
-                <a validationanchor-for="AssignDatasetViewModel.DatasetDefinitionId"></a>
+                <a validationanchor-for="AssignDatasetSchemaViewModel.DatasetDefinitionId"></a>
 
-                <div gds-validationblock-for="AssignDatasetViewModel.DatasetDefinitionId">
+                <div gds-validationblock-for="AssignDatasetSchemaViewModel.DatasetDefinitionId">
                     <div class="form-group">
-                        <a validationanchor-for="AssignDatasetViewModel.DatasetDefinitionId"></a>
-                        <label asp-for="AssignDatasetViewModel.DatasetDefinitionId">Select dataset schema:</label>
-                        <select gds-items="@(Model.Datasets)" gds-for="AssignDatasetViewModel.DatasetDefinitionId" class="form-control">
+                        <a validationanchor-for="AssignDatasetSchemaViewModel.DatasetDefinitionId"></a>
+                        <label asp-for="AssignDatasetSchemaViewModel.DatasetDefinitionId">Select dataset schema:</label>
+                        <select gds-items="@(Model.Datasets)" gds-for="AssignDatasetSchemaViewModel.DatasetDefinitionId" class="form-control">
                             <option></option>
                         </select>
                     </div>
@@ -42,31 +42,26 @@
             </div>
 
             <div>
-                <div gds-validationblock-for="AssignDatasetViewModel.Name">
+                <div gds-validationblock-for="AssignDatasetSchemaViewModel.Name">
                     <div class="form-group">
-                        <a validationanchor-for="AssignDatasetViewModel.Name"></a>
-                        <label asp-for="AssignDatasetViewModel.Name">Name the dataset schema relationship:</label>
-                        <input asp-for="AssignDatasetViewModel.Name" class="form-control" type="text" placeholder="Provide unique name for the relationship." id="datasetSchemaName">
+                        <a validationanchor-for="AssignDatasetSchemaViewModel.Name"></a>
+                        <label asp-for="AssignDatasetSchemaViewModel.Name">Name the dataset schema relationship:</label>
+                        <input asp-for="AssignDatasetSchemaViewModel.Name" class="form-control" type="text" placeholder="Provide unique name for the relationship." id="datasetSchemaName">
                     </div>
                 </div>
             </div>
 
 
             <div>
-                <div gds-validationblock-for="AssignDatasetViewModel.Description">
+                <div gds-validationblock-for="AssignDatasetSchemaViewModel.Description">
                     <div class="form-group">
-                        <a validationanchor-for="AssignDatasetViewModel.Description"></a>
-                        <label asp-for="AssignDatasetViewModel.Description">Description:</label>
-                        <textarea asp-for="AssignDatasetViewModel.Description" rows="10" placeholder="Please enter the description." class="form-control" id="contents" title="Contents"></textarea>
+                        <a validationanchor-for="AssignDatasetSchemaViewModel.Description"></a>
+                        <label asp-for="AssignDatasetSchemaViewModel.Description">Description:</label>
+                        <textarea asp-for="AssignDatasetSchemaViewModel.Description" rows="10" placeholder="Please enter the description." class="form-control" id="contents" title="Contents"></textarea>
                     </div>
                 </div>
             </div>
-
-
             <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
-
-
-
         </form>
     </div>
 </div>

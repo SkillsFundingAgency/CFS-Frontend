@@ -14,6 +14,7 @@
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -47,7 +48,7 @@
         public IEnumerable<GdsSelectListItem> Datasets { get; set; }
 
         [BindProperty]
-        public AssignDatasetSchemaModel AssignDatasetViewModel { get; set; }
+        public AssignDatasetSchemaViewModel AssignDatasetSchemaViewModel { get; set; }
 
         public async Task<IActionResult> OnGet(string specificationId)
         {
@@ -121,50 +122,50 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            if (!string.IsNullOrWhiteSpace(AssignDatasetViewModel.Name))
+            if (!string.IsNullOrWhiteSpace(AssignDatasetSchemaViewModel.Name))
             {
-                ApiResponse<DatasetSchemasAssigned> existingRelationshipResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecificationAndRelationshipName(specificationId, AssignDatasetViewModel.Name);
+                ApiResponse<DatasetSchemasAssigned> existingRelationshipResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecificationAndRelationshipName(specificationId, AssignDatasetSchemaViewModel.Name);
 
                 if (existingRelationshipResponse.StatusCode != HttpStatusCode.NotFound)
                 {
-                    this.ModelState.AddModelError($"{nameof(AssignDatasetViewModel)}.{nameof(AssignDatasetViewModel.Name)}", ValidationMessages.RelationshipNameAlreadyExists);
+                    this.ModelState.AddModelError($"{nameof(AssignDatasetSchemaViewModel)}.{nameof(AssignDatasetSchemaViewModel.Name)}", ValidationMessages.RelationshipNameAlreadyExists);
                 }
             }
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
-
-            if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
+            if (!ModelState.IsValid)
             {
-                return new NotFoundObjectResult($"Unable to get specification response. Specification Id value = {SpecificationId}");
-            }
+                ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 
-            if (specificationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                Specification specContent = specificationResponse.Content;
-
-                if (specContent == null)
+                if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
                 {
-                    throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
+                    return new NotFoundObjectResult($"Unable to get specification response. Specification Id value = {SpecificationId}");
                 }
 
-                ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
-
-                if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
+                if (specificationResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
-                }
+                    Specification specContent = specificationResponse.Content;
 
-                if (datasetResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
-
-                    if (datasetDefinitionList == null)
+                    if (specContent == null)
                     {
-                        throw new InvalidOperationException($"Unable to retrieve Dataset definition from the response. Specification Id value = {SpecificationId}");
+                        throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
                     }
 
-                    if (!ModelState.IsValid)
+                    ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
+
+                    if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
                     {
+                        return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
+                    }
+
+                    if (datasetResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
+
+                        if (datasetDefinitionList == null)
+                        {
+                            throw new InvalidOperationException($"Unable to retrieve Dataset definition from the response. Specification Id value = {SpecificationId}");
+                        }
+
                         SpecificationName = specContent.Name;
 
                         SpecificationDescription = specContent.Description;
@@ -177,14 +178,14 @@
 
                         return Page();
                     }
-                }
-                else
-                {
-                    return new StatusCodeResult(500);
+                    else
+                    {
+                        return new StatusCodeResult(500);
+                    }
                 }
             }
 
-            AssignDatasetSchemaModel datasetSchema = _mapper.Map<AssignDatasetSchemaModel>(AssignDatasetViewModel);
+            AssignDatasetSchemaModel datasetSchema = _mapper.Map<AssignDatasetSchemaModel>(AssignDatasetSchemaViewModel);
 
             datasetSchema.SpecificationId = specificationId;
 
