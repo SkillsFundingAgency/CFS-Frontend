@@ -63,26 +63,6 @@
             _httpClient = new HttpClient(_handler, true);
         }
 
-        ////public HttpClientProxy(HttpMessageHandler handler)
-        ////    : this(handler, true)
-        ////{
-        ////}
-
-        ////public HttpClientProxy(HttpMessageHandler handler, bool disposeHandler)
-        ////{
-        ////    _handler = handler;
-        ////    _disposeHandler = disposeHandler;
-
-        ////    if (handler == null)
-        ////    {
-        ////        _httpClient = new HttpClient();
-        ////    }
-        ////    else
-        ////    {
-        ////        _httpClient = new HttpClient(handler, disposeHandler);
-        ////    }
-        ////}
-
         public HttpRequestHeaders DefaultRequestHeaders => _httpClient.DefaultRequestHeaders;
 
         public Uri BaseAddress

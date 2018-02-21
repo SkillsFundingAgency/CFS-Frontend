@@ -12,7 +12,7 @@
 
     export interface ISearchResultResponse {
         currentPage: number;
-        endItemNumber: 50;
+        endItemNumber: number;
         facets: Array<ISearchFacetResponse>;
         pagerState: IPagerStateResponse;
         startItemNumber: number;

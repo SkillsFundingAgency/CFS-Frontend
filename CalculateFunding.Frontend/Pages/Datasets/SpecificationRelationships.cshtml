@@ -1,0 +1,66 @@
+﻿@page "{specificationId?}"
+@model CalculateFunding.Frontend.Pages.Datasets.SpecificationRelationshipsPageModel
+@{
+    ViewData["Title"] = "Specification Relationships";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">Calculate Funding</a></li>
+            <li><a href="~/datasets">Manage Data</a></li>
+            <li><a href="~/datasets/datasetrelationships">Choose data sources for specifications</a></li>
+            <li>@Model.ViewModel.Specification.Name</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <p class="hero-title">For @Model.ViewModel.Specification.Name</p>
+    <p class="hero-text">Choose data sources for specifications and create relationships between specifications and source data.</p>
+}
+
+<div class="row spacing-15">
+    <div class="col-xs-12">
+
+        @if (Model.ShowSuccessMessage)
+        {
+            <div class="success-message">
+                <span>The new dataset added succesfully</span> <a id="dismiss-link" class="float-right" href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">Dismiss</a>
+            </div>
+        }
+
+        <p>@Model.ViewModel.GetCountPhrase()</p>
+
+        @{
+            int counter = 0;
+        }
+
+        @foreach (var item in Model.ViewModel.Items)
+        {
+            <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back")">
+                <h2 class="heading-medium heading-24 no-margin">@item.RelationName</h2>
+                <h4 class="heading-small no-margin">@item.DefinitionName</h4>
+                <p class="faded-text small no-margin">@item.DefinitionDescription</p>
+                <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectdatasource?specificationId=@Model.ViewModel.Specification.Id&defintionId=@item.DefinitionId">@item.LinkPhrase</a></p>
+            </div>
+
+            counter++;
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+       
+        $('#dismiss-link').on('click', function (e) {
+            e.preventDefault();
+
+            $('.success-message').hide();
+        });
+    </script>
+}
+
+
+

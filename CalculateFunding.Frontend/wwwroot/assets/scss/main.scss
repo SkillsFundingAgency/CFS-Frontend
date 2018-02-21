@@ -1530,7 +1530,35 @@ table {
     margin : 0px;
 }
 
-/*image path overrides*/
+.success-message {
+    width: 100%;
+    background-color: #92cfca;
+    border-left: 15px solid #006435;
+    padding: 15px;
+    margin-bottom: 20px;
+    a, link {
+        text-decoration: none;
+        color: #333333;
+    }
+}
+
+.float-right{
+    float:right
+}
+
+.spec-rel-grey-back {
+    background-color: #dee0e2;
+    padding: 10px;
+    padding-bottom: 1px;
+    margin-bottom: 15px;
+}
+
+.spec-rel-white-back {
+    padding: 10px;
+    padding-bottom: 1px;
+    margin-bottom:15px;
+}
+    /*image path overrides*/
 #global-header #logo {
     background-image: url('/libs/govuk_bootstrap/images/gov.uk_logotype_crown.png?version=0.17.1');
 }

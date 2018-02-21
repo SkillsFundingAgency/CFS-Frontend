@@ -103,5 +103,26 @@
 
             return GetAsync<DatasetSchemasAssigned>($"{_datasetsPath}/get-definition-relationship-by-specificationid-name?specificationId={specificationId}&name={relationshipName}");
         }
+
+        public Task<ApiResponse<DefinitionSpecificationRelationship>> GetDefinitionSpecificationRelationshipById(string relationshipId)
+        {
+            DefinitionSpecificationRelationship result = new DefinitionSpecificationRelationship()
+            {
+                DatasetDefinition = new Reference("1", "Dataset definition name"),
+                Description = "Description of the relationship",
+                Id = "1",
+                Name = "Test mocked relationship",
+                Specification = new Reference("SpecificationID", "SpecificationName"),
+            };
+
+            return Task.FromResult(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK, result));
+        }
+
+        public Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>> GetDatasetSpecificationRelationshipsBySpecificationId(string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            return GetAsync<IEnumerable<DatasetSpecificationRelationshipModel>>($"{_datasetsPath}/get-relationships-by-specificationId?specificationId={specificationId}");
+        }
     }
 }

@@ -1,0 +1,25 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Datasets.SelectSourceDatasetPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Select source dataset";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?academicYearId=@Model.AcademicYear">@BreadcrumbText.ManageSpecifications</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.ChooseYourData</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">@Model.SpecificationName</p>
+    <h1 class="hero-title">@Model.DatasetDefinitionName</h1>
+}
+

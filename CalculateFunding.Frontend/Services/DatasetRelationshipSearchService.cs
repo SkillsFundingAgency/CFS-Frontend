@@ -13,7 +13,7 @@
 
     public class DatasetRelationshipsSearchService : IDatasetRelationshipsSearchService
     {
-        private const int PageSize = 3;
+        private const int PageSize = 20;
 
         private readonly ISpecsApiClient _specsClient;
         private readonly ILogger _logger;
