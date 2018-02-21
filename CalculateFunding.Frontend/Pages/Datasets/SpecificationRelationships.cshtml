@@ -17,7 +17,7 @@
 }
 
 @section BannerLeft{
-    <p class="hero-title">For @Model.ViewModel.Specification.Name</p>
+    <p class="hero-title">@Model.ViewModel.Specification.Name</p>
     <p class="hero-text">Choose data sources for specifications and create relationships between specifications and source data.</p>
 }
 
@@ -37,23 +37,36 @@
             int counter = 0;
         }
 
-        @foreach (var item in Model.ViewModel.Items)
+        @if (Model.ViewModel.Items.IsNullOrEmpty())
         {
-            <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back")">
-                <h2 class="heading-medium heading-24 no-margin">@item.RelationName</h2>
-                <h4 class="heading-small no-margin">@item.DefinitionName</h4>
-                <p class="faded-text small no-margin">@item.DefinitionDescription</p>
-                <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectdatasource?specificationId=@Model.ViewModel.Specification.Id&defintionId=@item.DefinitionId">@item.LinkPhrase</a></p>
-            </div>
-
-            counter++;
+            <p>No data sources relationship exists for @Model.ViewModel.Specification.Name</p>
+            <p><h4 class="heading-small no-margin">To create relationship between specifications and source data, you must</h4></p>
+            <p>
+                1. Add data type relationship within manage specification and <br />
+                2. Ensure you have a dataset to link to, this cam be done within manage dataset
+            </p>
         }
+        else
+        {
+            @foreach (var item in Model.ViewModel.Items)
+            {
+                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back")">
+                    <h2 class="heading-medium heading-24 no-margin">@item.RelationName</h2>
+                    <h4 class="heading-small no-margin">@item.DefinitionName</h4>
+                    <p class="faded-text small no-margin">@item.DefinitionDescription</p>
+                    <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectdatasource?specificationId=@Model.ViewModel.Specification.Id&defintionId=@item.DefinitionId">@item.LinkPhrase</a></p>
+                </div>
+
+                counter++;
+            }
+        }
+
     </div>
 </div>
 
 @section Scripts{
     <script type="text/javascript">
-       
+
         $('#dismiss-link').on('click', function (e) {
             e.preventDefault();
 

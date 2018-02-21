@@ -21,6 +21,9 @@
         {
             int totalCount = Items.Count();
 
+            if (totalCount == 0)
+                return string.Empty;
+
             int selectedCount = Items.Count(m => !string.IsNullOrWhiteSpace(m.DatasetId));
 
             return $"{selectedCount} of {totalCount} data sources selected for {Specification.Name}";
