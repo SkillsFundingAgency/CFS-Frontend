@@ -1,201 +1,223 @@
 ﻿@page
-@using CalculateFunding.Frontend
-@using CalculateFunding.Frontend.Clients.ResultsClient.Models
-@model CalculateFunding.Frontend.Pages.Results.IndexModel
+@*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
+@model CalculateFunding.Frontend.Pages.Results.IndexPageModel
+@using CalculateFunding.Frontend.ViewModels.Common
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.AspNetCore.Hosting
+
 @{
-    ViewData["Title"] = "Allocations overview";
+    ViewData["Title"] = "View provider results";
+    Layout = "~/Pages/_Layout.cshtml";
 }
-<!-- Breadcrumbs -->
-<div class="row">
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li>View results</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">View provider results</h1>
+    <p class="hero-text">Review and validate the results of calculations and the tests for each provider</p>
+}
+@section BannerMiddle{
+    <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">You can search by provider name, UPIN, UKPRN, URN or establishment number</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search provider" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-4 filter-field-heading">Provider type</div>
+            <div class="col-xs-4 filter-field-heading">Provider subtype</div>
+            <div class="col-xs-4 filter-field-heading">Local authority</div>
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-4">
+                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+            </div>
+
+        </div>
+    </form>
+}
+
+<div class="row providers-search" id="providers-search-container">
+    @Html.Partial("_SearchFilterPartial")
+    @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
-        <div class="breadcrumbs">
-            <ol>
-                <li><a href="/">Home</a></li>
-            </ol>
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial_ProviderResults", new PagerPartialViewModel(Model.ProviderResults, "providers", Model.SearchTerm))
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-8">
-        <h1 class="heading-xlarge">Funding overview</h1>
-        <p class="text-muted">Live summary of the status of quality assuring the provider allocations for [2017/2018]</p>
-        <form class="year-form" method="get">
-            <div class="form-group">
-                <label class="form-label" for="select-box">Select year:</label>
-                <select class="form-control" id="select-box" name="select-box">
-                    <option>2017/2018</option>
-                    <option>2016/2017</option>
-                    <option>2015/2016</option>
-                </select>
-            </div>
-        </form>
-        <div class="graph">
-            <img src="~/assets/images/graph.png" />
-        </div>
-    </div>
-    @*end of col-xs-8*@
-</div>
-@*end of row*@
-<div class="row">
-    <div class="col-xs-12 col-md-8">
-        <div class="panel-group wrap esfa-collapse" id="esfa-list">
-            <div class="funding-streams">
-                <button class="accordion-toggle">Open all</button>
-                @foreach (var budget in Model.Budgets)
-                {
-                    <div class="panel">
-                        <div class="panel-heading" tabindex="0">
-                            <h2 class="panel-title stream-title">
-                                @budget.Budget.Name
-                                <span class="amount">@budget.TotalAmount.AsMoney()</span>
-                            </h2>
-                            <div class="esfa-summary">
-                                <div class="row">
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TotalProviders</span>
-                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Passed </span>
-                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-3">
-                                        <div class="data">
-                                            <span class="data-item medium">@budget.TestSummary.Failed</span>
-                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message"> tests failing</span></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-11 col-sm-2">
-                                        @Html.Partial("_TestChart", budget.TestSummary)
-                                        <div class="data">
-                                            <span class="data-item bold-xsmall">coverage</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="panel">
-                                    <ul class="list-group">
-                                        @foreach (var policy in budget.FundingPolicies)
-                                        {
-                                            <li class="list-group-item">
-                                                <div class="row">
-                                                    <div class="col-xs-12">
-                                                        <div cass="inner-header ">
-                                                            <h2 class="heading-medium list-title summary">
-                                                                @policy.Name
-                                                                <span class="amount">@policy.TotalAmount.AsMoney()</span>
-                                                            </h2>
-                                                            <div class="esfa-summary">
-                                                                <div class="row">
-                                                                    <div class="col-xs-12 col-sm-3">
-                                                                        <div class="data">
-                                                                            <span class="data-item medium">@policy.TotalProviders</span>
-                                                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-3">
-                                                                        <div class="data">
-                                                                            <span class="data-item medium">@policy.TestSummary.Passed</span>
-                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-12 col-sm-3">
-                                                                        <div class="data">
-                                                                            <span class="data-item medium">@policy.TestSummary.Failed</span>
-                                                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-xs-11 col-sm-2">
-                                                                        @Html.Partial("_TestChart", policy.TestSummary)
+        <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+            @{
+                int providerRow = 0;
+            }
 
-                                                                        <div class="data">
-                                                                            <span class="data-item bold-xsmall">coverage</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-
-                                                            <div class="details collapse panel panel-border-narrow">
-                                                                <ul class="list-group">
-                                                                    @foreach (var allocationLine in policy.AllocationLines ?? new List<AllocationLineSummary>())
-                                                                    {
-                                                                        <li class="list-group-item sublist-item">
-                                                                            <h4 class="heading-small">
-                                                                                @{
-                                                                                    var routeParam =
-                                                                                        new Dictionary<string, string>
-                                                                                        {
-                                                                                            {"budgetId", budget.Budget.Id},
-                                                                                            {"allocationLineId", allocationLine.Id }
-                                                                                        };
-                                                                                }
-                                                                                <a asp-page="/Products/Index" asp-all-route-data="routeParam" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
-                                                                                <span class="amount">@allocationLine.TotalAmount.AsMoney()</span>
-                                                                            </h4>
-                                                                            <div class="esfa-summary">
-                                                                                <div class="row">
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TotalProviders</span>
-                                                                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Passed</span>
-                                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-12 col-sm-3">
-                                                                                        <div class="data">
-                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Failed</span>
-                                                                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message">test failing</span></a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-xs-11 col-sm-2">
-                                                                                        @Html.Partial("_TestChart", allocationLine.TestSummary)
-                                                                                        <div class="data">
-                                                                                            <span class="data-item bold-xsmall">coverage</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </li>
-                                                                    }
-                                                                </ul>
-                                                            </div>
-                                                            @*end of panel.panel-border-narrow*@
-                                                        </div>
-                                                    </div>
-                                                    @*end of col-xs-12*@
-                                                </div>
-                                                @*end of row*@
-                                            </li>
-                                        }
-
-                                    </ul>
-                                </div>
-                                @*end of panel inside panel-body*@
-                            </div>
-                            @*end of panel-body*@
-                        </div>
-                        @*end of panel-collapse*@
+            @foreach (var provider in Model.ProviderResults.Providers)
+            {
+                <div class="provider-item-container" id="provider-item-result-@providerRow">
+                    <div class="provider-item-header">
+                        <h4 class="heading-small"><a href="/results/providerallocationline/@provider.Ukprn">@provider.Name</a></h4>
                     </div>
-                        @*end of panel*@
-                }
-                @*end of foreach*@
+                    <div>
+                        <span class="provider-item-property">
+                            UPIN:&nbsp;
+                            <strong>
+                                <span id="provider-item-upin-@providerRow">@provider.Upin</span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;UKPRN:&nbsp;
+                            <strong>
+                                <span id="provider-item-ukprn-@providerRow">
+                                    @provider.Ukprn
+                                </span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;URN:&nbsp;
+                            <strong>
+                                <span id="provider-item-urn-@providerRow">
+                                    @provider.Urn
+                                </span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Establishment number:&nbsp;
+                            <strong>
+                                <span id="provider-item-establishmentnumber-@providerRow">
+                                    @provider.EstablishmentNumber
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="provider-item-property">
+                            Provider type:&nbsp;
+                            <strong>
+                                <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Provider subtype:&nbsp;
+                            <strong>
+                                <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Local authority:&nbsp;
+                            <strong>
+                                <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Date Opened:&nbsp;
+                            <strong>
+                                <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+                providerRow++;
+            }
+        </div>
+        <div data-bind="visible: isResultsVisible">
+            <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
+                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index">
+                    <div class="provider-item-header">
+                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/providerallocationline/' + ukprn }, text: name"></a></h4>
+                    </div>
+                    <p>
+                        <span class="provider-item-property">
+                            UPIN:&nbsp; <strong> <span data-bind="text: upin, attr:{  'id' : 'provider-item-upin-'+$index }"></span> </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;UKPRN:&nbsp;<strong> <span data-bind="text: ukprn, attr:{ 'id' : 'provider-item-ukprn-' +$index}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;URN:&nbsp;<strong><span data-bind="text: urn, attr: {'id' : 'provider-item-urn-' +$index}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Establishment number:&nbsp;<strong><span data-bind="text: establishmentNumber, attr: {'id' : 'provider-item-establishmentnumber-' +$index}"></span></strong>
+                        </span>
+                    </p>
+                    <div>
+                        <span class="provider-item-property">
+                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: {'id' : 'provider-item-providertype-'+$index}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{'id' : 'provider-item-providersubtype-' +$index}"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Local authority:&nbsp;<strong><span data-bind="text: authority, attr: {'id' : 'provider-item-localauthority-'+$index}"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index}"> </span></strong>
+                        </span>
+                        </div>
+                </div>
             </div>
         </div>
-        @*end of #esfa-collapse*@
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Provider Results</p>
+        </div>
     </div>
-    @*end of .col-xs-12*@
 </div>
-@*end of .row*@  
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/list-providerresults.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.results.listProviderResults.ProviderSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+        var providerResultsContainer = document.getElementById("providers-search-container");
+        if (providerResultsContainer) {
+            ko.applyBindings(vm, providerResultsContainer);
+        }
+        vm.performSearch();
+
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

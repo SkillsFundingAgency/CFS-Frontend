@@ -1,0 +1,201 @@
+﻿@page
+@using CalculateFunding.Frontend
+@using CalculateFunding.Frontend.Clients.ResultsClient.Models
+@model CalculateFunding.Frontend.Pages.Results.AllocationOverview
+@{
+    ViewData["Title"] = "Allocations overview";
+}
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+            </ol>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-8">
+        <h1 class="heading-xlarge">Funding overview</h1>
+        <p class="text-muted">Live summary of the status of quality assuring the provider allocations for [2017/2018]</p>
+        <form class="year-form" method="get">
+            <div class="form-group">
+                <label class="form-label" for="select-box">Select year:</label>
+                <select class="form-control" id="select-box" name="select-box">
+                    <option>2017/2018</option>
+                    <option>2016/2017</option>
+                    <option>2015/2016</option>
+                </select>
+            </div>
+        </form>
+        <div class="graph">
+            <img src="~/assets/images/graph.png" />
+        </div>
+    </div>
+    @*end of col-xs-8*@
+</div>
+@*end of row*@
+<div class="row">
+    <div class="col-xs-12 col-md-8">
+        <div class="panel-group wrap esfa-collapse" id="esfa-list">
+            <div class="funding-streams">
+                <button class="accordion-toggle">Open all</button>
+                @foreach (var budget in Model.Budgets)
+                {
+                    <div class="panel">
+                        <div class="panel-heading" tabindex="0">
+                            <h2 class="panel-title stream-title">
+                                @budget.Budget.Name
+                                <span class="amount">@budget.TotalAmount.AsMoney()</span>
+                            </h2>
+                            <div class="esfa-summary">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3">
+                                        <div class="data">
+                                            <span class="data-item medium">@budget.TotalProviders</span>
+                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-3">
+                                        <div class="data">
+                                            <span class="data-item medium">@budget.TestSummary.Passed </span>
+                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-3">
+                                        <div class="data">
+                                            <span class="data-item medium">@budget.TestSummary.Failed</span>
+                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message"> tests failing</span></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-11 col-sm-2">
+                                        @Html.Partial("_TestChart", budget.TestSummary)
+                                        <div class="data">
+                                            <span class="data-item bold-xsmall">coverage</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="panel">
+                                    <ul class="list-group">
+                                        @foreach (var policy in budget.FundingPolicies)
+                                        {
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div cass="inner-header ">
+                                                            <h2 class="heading-medium list-title summary">
+                                                                @policy.Name
+                                                                <span class="amount">@policy.TotalAmount.AsMoney()</span>
+                                                            </h2>
+                                                            <div class="esfa-summary">
+                                                                <div class="row">
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TotalProviders</span>
+                                                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TestSummary.Passed</span>
+                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-3">
+                                                                        <div class="data">
+                                                                            <span class="data-item medium">@policy.TestSummary.Failed</span>
+                                                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message">test failing</span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-11 col-sm-2">
+                                                                        @Html.Partial("_TestChart", policy.TestSummary)
+
+                                                                        <div class="data">
+                                                                            <span class="data-item bold-xsmall">coverage</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="details collapse panel panel-border-narrow">
+                                                                <ul class="list-group">
+                                                                    @foreach (var allocationLine in policy.AllocationLines ?? new List<AllocationLineSummary>())
+                                                                    {
+                                                                        <li class="list-group-item sublist-item">
+                                                                            <h4 class="heading-small">
+                                                                                @{
+                                                                                    var routeParam =
+                                                                                        new Dictionary<string, string>
+                                                                                        {
+                                                                                            {"budgetId", budget.Budget.Id},
+                                                                                            {"allocationLineId", allocationLine.Id }
+                                                                                        };
+                                                                                }
+                                                                                <a asp-page="/Products/Index" asp-all-route-data="routeParam" asp-route-id="@allocationLine.Name">@allocationLine.Name</a>
+                                                                                <span class="amount">@allocationLine.TotalAmount.AsMoney()</span>
+                                                                            </h4>
+                                                                            <div class="esfa-summary">
+                                                                                <div class="row">
+                                                                                    <div class="col-xs-12 col-sm-3">
+                                                                                        <div class="data">
+                                                                                            <span class="data-item medium">@allocationLine.TotalProviders</span>
+                                                                                            <a class="data-link" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall">total providers</span></a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-xs-12 col-sm-3">
+                                                                                        <div class="data">
+                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Passed</span>
+                                                                                            <a class="data-link success" asp-page="Products/Index"><span class="data-item bold-xsmall text-success">covered</span></a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-xs-12 col-sm-3">
+                                                                                        <div class="data">
+                                                                                            <span class="data-item medium">@allocationLine.TestSummary.Failed</span>
+                                                                                            <a class="data-link failing" href="/providers/@budget.Budget.Id"><span class="data-item bold-xsmall error-message">test failing</span></a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-xs-11 col-sm-2">
+                                                                                        @Html.Partial("_TestChart", allocationLine.TestSummary)
+                                                                                        <div class="data">
+                                                                                            <span class="data-item bold-xsmall">coverage</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                            @*end of panel.panel-border-narrow*@
+                                                        </div>
+                                                    </div>
+                                                    @*end of col-xs-12*@
+                                                </div>
+                                                @*end of row*@
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </div>
+                                @*end of panel inside panel-body*@
+                            </div>
+                            @*end of panel-body*@
+                        </div>
+                        @*end of panel-collapse*@
+                    </div>
+                        @*end of panel*@
+                }
+                @*end of foreach*@
+            </div>
+        </div>
+        @*end of #esfa-collapse*@
+    </div>
+    @*end of .col-xs-12*@
+</div>
+@*end of .row*@  

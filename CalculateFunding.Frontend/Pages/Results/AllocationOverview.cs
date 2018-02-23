@@ -7,11 +7,11 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
 
-    public class IndexModel : PageModel
+    public class AllocationOverview : PageModel
     {
         private readonly IResultsApiClient _apiClient;
 
-        public IndexModel(IResultsApiClient apiClient)
+        public AllocationOverview(IResultsApiClient apiClient)
         {
             _apiClient = apiClient;
         }

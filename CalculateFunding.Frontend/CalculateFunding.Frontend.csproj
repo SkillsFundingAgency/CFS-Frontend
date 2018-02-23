@@ -29,6 +29,7 @@
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\list-providerresults.ts" />
     <None Remove="Scripts\search.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +114,7 @@
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />
     <TypeScriptCompile Include="Scripts\compare.ts" />
     <TypeScriptCompile Include="Scripts\common.d.ts" />
+    <TypeScriptCompile Include="Scripts\list-providerresults.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
   </ItemGroup>
 

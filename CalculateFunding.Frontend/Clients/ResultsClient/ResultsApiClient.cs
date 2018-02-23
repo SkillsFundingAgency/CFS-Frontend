@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ResultsClient
 {
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -47,6 +48,30 @@
             Guard.IsNullOrWhiteSpace(allocationLineId, nameof(allocationLineId));
 
             return GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}", cancellationToken);
+        }
+
+        public async Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions)
+        {
+            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
+
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<ProviderSearchResultItem>> results = await PostAsync<SearchResults<ProviderSearchResultItem>, SearchQueryRequest>($"{_resultsPath}/providers-search", request);
+
+            if (results.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<ProviderSearchResultItem> result = new SearchPagedResult<ProviderSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results,
+                    Facets = results.Content.Facets,
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

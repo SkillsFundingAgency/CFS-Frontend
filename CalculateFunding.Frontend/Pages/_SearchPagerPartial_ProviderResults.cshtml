@@ -1,0 +1,44 @@
+﻿@using System.Web
+@model CalculateFunding.Frontend.ViewModels.Common.PagerPartialViewModel
+<div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
+    <div class="pull-right paging-container" id="static-paging-container">
+        @if (Model.PagerState.PreviousPage.HasValue)
+        {
+            <a href="/results/whatever?pageNumber=@Model.PagerState.PreviousPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Previous</a>
+        }
+        @foreach (int pageNumber in Model.PagerState.Pages)
+        {
+            if (pageNumber == Model.PagerState.CurrentPage)
+            {
+                <span class="paging-active-page">@pageNumber</span>
+            }
+            else
+            {
+                <a href="/results/whatever?pageNumber=@pageNumber&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">@pageNumber</a>
+            }
+
+        }
+
+        @if (Model.PagerState.NextPage.HasValue)
+        {
+            <a href="/results/whatever?pageNumber=@Model.PagerState.NextPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Next</a>
+        }
+    </div>
+    Showing @Model.StartItemNumber-@Model.EndItemNumber of <strong>@Model.TotalResults</strong> @Model.EntityName
+</div>
+<div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rownavigation-container">
+    <div class="pull-right paging-container" data-bind="with: pagerState" id="dynamic-paging-container">
+
+        <a data-bind="if: previousPage, click: function(){ $root.loadPage(previousPage)}" class="paging-link">Previous</a>
+
+        <span data-bind="foreach: pages">
+            <span class="paging-active-page" data-bind="visible: $data === $parent.currentPage, text: $data"></span>
+            <a href="#" data-bind="visible: $data !== $parent.currentPage, click: function(){$root.loadPage($data)}" class="paging-link"><span data-bind="text: $data"></span></a>
+
+        </span>
+        <a data-bind="if: nextPage, click: function(){ $root.loadPage(nextPage)}" class="paging-link">Next</a>
+
+    </div>
+
+    Showing <span data-bind="text: startItemNumber"></span>-<span data-bind="text: endItemNumber"></span> of <strong data-bind="text: totalResults"></strong> @Model.EntityName
+</div>

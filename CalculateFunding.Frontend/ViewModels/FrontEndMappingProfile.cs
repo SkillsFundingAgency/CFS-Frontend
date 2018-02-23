@@ -4,11 +4,13 @@
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
+    using CalculateFunding.Frontend.ViewModels.Results;
     using CalculateFunding.Frontend.ViewModels.Specs;
 
     public class FrontEndMappingProfile : Profile
@@ -49,6 +51,12 @@
             CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
+
+            CreateMap<ProviderSearchResultItem, ProviderSearchResultItemViewModel>()
+             .ForMember(m => m.ConvertDate, opt => opt.Ignore())
+             .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
+             .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
+             .ForMember(m => m.DateClosed, opt => opt.Ignore());
 
             this.MapCommon();
         }
