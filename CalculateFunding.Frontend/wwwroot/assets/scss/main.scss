@@ -1558,7 +1558,114 @@ table {
     padding-bottom: 1px;
     margin-bottom:15px;
 }
-    /*image path overrides*/
+
+
+
+.ds-container {
+
+    .block-label input, .block-label--stacked input, .vertically-aligned-input {
+        display: block;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        left: 15px;
+        cursor: pointer;
+    }
+
+    .block-label, .block-label--stacked {
+        display: block;
+        float: left;
+        clear: left;
+        position: relative;
+        background: #dee0e2;
+        border: 1px solid #dee0e2;
+        padding: 18px 30px 15px 45px;
+        margin: 10px 10px 10px 0;
+        cursor: pointer;
+    }
+
+    .block-label input, .block-label--stacked input {
+        position: absolute;
+        width: auto;
+        margin: 0;
+    }
+
+    label {
+        font-family: "nta", Arial, sans-serif;
+        font-weight: 400;
+        text-transform: none;
+        line-height: 1.25;
+        display: block;
+        min-width: 300px;
+    }
+
+    .add-focus {
+        background-color: #fff;
+        border: 1px solid #000;
+        outline: 3px solid #ffbf47
+    }
+
+}
+
+.ds-versions-container {
+   
+    padding-top:10px;
+    h4{
+        margin-top:0px !important;
+    },
+    label{
+        font-weight:400;
+        display:block;
+    },
+    input{
+         margin-right:10px
+     }
+}
+
+.grey-left-border {
+    border-left: solid 5px #dee0e2;
+    padding: 10px;
+}
+
+.red-left-border {
+    border-left: 5px #b10e1e solid;
+    padding-left: 10px;
+}
+
+.red-3p-border {
+    border: 3px #b10e1e solid !important;
+}
+
+.alert--success {
+    background-color: #e9f5f4;
+    border-left-color: #28a197;
+}
+
+.alert {
+    clear: both;
+    border-left-width: 5px;
+    border-left-style: solid;
+    margin: 0 0 1.05263em;
+    padding: 0.89474em 0.78947em;
+
+    a, link {
+        text-decoration: none;
+        color: #333333;
+    }
+}
+
+.specs-relationship-searchresult-container .specs-relationship-searchresult-container-item {
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+}
+
+.specs-relationship-searchresult-container .specs-relationship-searchresult-container-item:last-child{
+    border-bottom: 1px solid #ccc;
+}
+
+
+/*image path overrides*/
 #global-header #logo {
     background-image: url('/libs/govuk_bootstrap/images/gov.uk_logotype_crown.png?version=0.17.1');
 }

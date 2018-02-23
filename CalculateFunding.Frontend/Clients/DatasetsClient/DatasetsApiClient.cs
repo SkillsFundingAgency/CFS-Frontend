@@ -118,6 +118,20 @@
             return Task.FromResult(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK, result));
         }
 
+        public Task<ApiResponse<SelectDataSourceModel>> GetDatasourcesByRelationshipId(string relationshipId)
+        {
+            Guard.ArgumentNotNull(relationshipId, nameof(relationshipId));
+
+            return GetAsync<SelectDataSourceModel>($"{_datasetsPath}/get-datasources-by-relationshipid?relationshipId={relationshipId}");
+        }
+
+        public Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion)
+        {
+            Guard.ArgumentNotNull(datasetVersion, nameof(datasetVersion));
+
+            return PostAsync($"{_datasetsPath}/assign-datasource-to-relationship", datasetVersion);
+        }
+
         public Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>> GetDatasetSpecificationRelationshipsBySpecificationId(string specificationId)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));

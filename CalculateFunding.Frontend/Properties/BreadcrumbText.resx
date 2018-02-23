@@ -159,6 +159,9 @@
   <data name="ManageSpecifications" xml:space="preserve">
     <value>Manage Specification</value>
   </data>
+  <data name="SelectSourceDataset" xml:space="preserve">
+    <value>Select source dataset</value>
+  </data>
   <data name="ViewCalculationVersions" xml:space="preserve">
     <value>View calculation versions</value>
   </data>

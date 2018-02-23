@@ -51,7 +51,6 @@
         <div data-bind="visible: isResultsVisible">
             @Html.Partial("_SearchPagerPartial_SpecRelationships", new PagerPartialViewModel(Model.SearchResults, "specs", Model.SearchTerm))
         </div>
-        <hr />
         @*end of row*@
         <div class="row">
             <div class="specs-relationship-searchresult-container spacing-30 col-xs-12 col-md-12" data-bind="visible: isResultsVisible">
@@ -60,26 +59,23 @@
 
                         @foreach (var specification in Model.SearchResults.SpecRelationships)
                         {
-                            <div>
+                            <div class="specs-relationship-searchresult-container-item">
                                 <h2 class="description-text-link stream-title">
                                     <a href="/datasets/specificationrelationships/@specification.SpecificationId" id="specification-link-@specification.SpecificationId"> @specification.SpecificationName</a>
                                 </h2>
                                 <p>@specification.CountPhrase</p>
                             </div>
-
-                            <hr />
                         }
 
                     </div>
                     <div data-bind="foreach: specRelationships" class="withjs-show" id="dynamic-results-container">
 
-                        <div>
+                        <div class="specs-relationship-searchresult-container-item">
                             <h2 class="description-text-link stream-title">
                                 <a data-bind="attr: {href: '/datasets/specificationrelationships/' + specificationId }, text: specificationName"></a>
                             </h2>
                             <p data-bind="text: countPhrase"></p>
                         </div>
-                        <hr />
                     </div>
                 </div>
             </div>

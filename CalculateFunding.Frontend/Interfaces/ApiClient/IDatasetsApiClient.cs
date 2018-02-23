@@ -36,5 +36,9 @@
         Task<ApiResponse<DefinitionSpecificationRelationship>> GetDefinitionSpecificationRelationshipById(string relationshipId);
 
         Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>> GetDatasetSpecificationRelationshipsBySpecificationId(string specificationId);
+
+        Task<ApiResponse<SelectDataSourceModel>> GetDatasourcesByRelationshipId(string relationshipId);
+
+        Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion);
     }
 }

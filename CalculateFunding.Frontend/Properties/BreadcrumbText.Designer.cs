@@ -187,6 +187,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select source dataset.
+        /// </summary>
+        public static string SelectSourceDataset {
+            get {
+                return ResourceManager.GetString("SelectSourceDataset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View calculation versions.
         /// </summary>
         public static string ViewCalculationVersions {
