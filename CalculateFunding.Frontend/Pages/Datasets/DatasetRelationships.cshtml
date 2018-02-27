@@ -61,7 +61,7 @@
                         {
                             <div class="specs-relationship-searchresult-container-item">
                                 <h2 class="description-text-link stream-title">
-                                    <a href="/datasets/specificationrelationships/@specification.SpecificationId" id="specification-link-@specification.SpecificationId"> @specification.SpecificationName</a>
+                                    <a href="/datasets/specificationrelationships?specificationId=@specification.SpecificationId" id="specification-link-@specification.SpecificationId"> @specification.SpecificationName</a>
                                 </h2>
                                 <p>@specification.CountPhrase</p>
                             </div>
@@ -72,7 +72,7 @@
 
                         <div class="specs-relationship-searchresult-container-item">
                             <h2 class="description-text-link stream-title">
-                                <a data-bind="attr: {href: '/datasets/specificationrelationships/' + specificationId }, text: specificationName"></a>
+                                <a data-bind="attr: {href: '/datasets/specificationrelationships?specificationId=' + specificationId }, text: specificationName"></a>
                             </h2>
                             <p data-bind="text: countPhrase"></p>
                         </div>
