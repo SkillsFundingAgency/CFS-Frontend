@@ -11,31 +11,32 @@
 }
 
 @section BannerLeft{
-    <h1 class="hero-title">Manage Datasets</h1>
+    <h1 class="hero-title">Manage data sources</h1>
+    <h2 class="hero-description"> View and update existing data sources or create a new one.</h2>
 }
 
 @section BannerMiddle{
     <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-9 filter-field-heading">Search calculations</div>
-            <div class="col-xs-3 filter-field-heading withjs-show">Add new datasets</div>
+            <div class="col-xs-9 filter-field-heading"></div>
+            <div class="col-xs-3 filter-field-heading withjs-show"></div>
         </div>
         <div class="row">
             <div class="col-xs-9">
                 <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search datasets" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data sources" data-bind="textInput: searchTerm, enable: canSelectFilters" />
                     <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
             <div class="col-xs-3">
-                <a href="/datasets/createdataset" class="btn btn-filter-link-button">Load new datasets</a>
+                <a href="/datasets/createdataset" class="btn btn-filter-link-button">Load new data source</a>
             </div>
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter datasets</div>
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-5 filter-field-heading">Data Schema</div>
+            <div class="col-xs-5 filter-field-heading">Data schema</div>
             <div class="col-xs-3 filter-field-heading">Specification</div>
             <div class="col-xs-2 filter-field-heading">Year</div>
             <div class="col-xs-2 filter-field-heading">Status</div>

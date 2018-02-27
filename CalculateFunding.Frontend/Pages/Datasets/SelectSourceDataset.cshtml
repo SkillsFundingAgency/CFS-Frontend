@@ -37,7 +37,7 @@
             </div>
             <input name="specificationId" id="specificationId" type="hidden" value="@Model.ViewModel.SpecificationId" />
             <a name="data-sources-anchor" class="form-anchor"></a>
-            <h4 class="heading-small">Select the source dataset</h4>
+            <h4 class="heading-small">Select data source</h4>
 
             <div class="ds-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "")">
 
@@ -54,7 +54,7 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="ds-versions-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "grey-left-border")" id="@dataset.VersionContainerId">
-                                <h4 class="heading-small">Select the dataset version</h4>
+                                <h4 class="heading-small">Select data source version</h4>
                                 @foreach (var version in dataset.Versions)
                                 {
                                     <label><input type="radio" @(version.IsSelected ? "checked='checked'" : string.Empty) name="datasetVersion" value="@version.UniqueName">@version.ToString()</label>

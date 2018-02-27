@@ -16,8 +16,8 @@
     </div>
 }
 @section BannerLeft{
-    <h1 class="hero-title">@PageText.ManagePolicies</h1>
-    <p class="hero-description">For @Model.Specification.Name</p>
+    <h1 class="hero-title"> @Model.Specification.Name </h1>
+    <p class="hero-description ">@PageText.ManagePolicies</p>
     <p class="hero-description">Year: @Model.Specification.AcademicYear.Name</p>
     <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
 }
@@ -26,30 +26,32 @@
 
     <div class="col-xs-12 col-sm-9">
         <div class="row view-policy">
+            <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
+            <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
 
+            <div class="inline-collapse-container">
+                <div class="inline-collapse-heading withjs-show">
+                    <i class="inline-collapse-arrow"></i>
+                    <span>What is @Model.Specification.Name?</span>
+                </div>
+                <br />
+                <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                    @Model.Specification.Description
+                </div>
+            </div>
             <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
                 <li class="nav-item active">
-                    <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View Policies</a>
+                    <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View policies</a>
                 </li>
                 <li class="nav-item">
-                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">Data types</a>
+                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">Datasets</a>
                 </li>
             </ul>
+            <br />
             <div>
-                <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
-                <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
 
-                <div class="inline-collapse-container">
-                    <div class="inline-collapse-heading withjs-show">
-                        <i class="inline-collapse-arrow"></i>
-                        <span>What is @Model.Specification.Name?</span>
-                    </div>
-                    <div class="inline-collapse-contents withjs-hide policy-spec-description">
-                        @Model.Specification.Description
-                    </div>
-                </div>
 
-                <p class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create Policy</a></p>
+                <p class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create policy</a></p>
                 <p class="text-right">
                     <a href="#" class="policy-list-openall withjs-show">Open All</a>
                 </p>
@@ -156,7 +158,7 @@
                 </div>
             }
             <div>
-                <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Choose data type relationship</a>
+                <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Create dataset</a>
             </div>
         </div>
 
@@ -213,10 +215,10 @@
 
 
         });
-            //$('#managePolicies a').on('click', function (e) {
-            //    e.preventDefault()
-            //    $(this).tab('show')
-            //});
+                //$('#managePolicies a').on('click', function (e) {
+                //    e.preventDefault()
+                //    $(this).tab('show')
+                //});
 
     </script>
 }

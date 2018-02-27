@@ -18,7 +18,7 @@
 
 @section BannerLeft{
     <p class="hero-title">@Model.ViewModel.Specification.Name</p>
-    <p class="hero-text">Choose data sources for specifications and create relationships between specifications and source data.</p>
+    <p class="hero-text">Map specification between data sources and datasets.</p>
 }
 
 <div class="row spacing-15">
@@ -27,7 +27,7 @@
         @if (Model.ShowSuccessMessage)
         {
             <div class="alert alert--success">
-                <span>The new dataset added succesfully</span> <a id="dismiss-link" class="float-right" href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">Dismiss</a>
+                <span>You mapped the new data source successfully</span> <a id="dismiss-link" class="float-right" href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">Dismiss</a>
             </div>
         }
 
@@ -39,11 +39,11 @@
 
         @if (Model.ViewModel.Items.IsNullOrEmpty())
         {
-            <p>No data sources relationship exists for @Model.ViewModel.Specification.Name</p>
-            <p><h4 class="heading-small no-margin">To create relationship between specifications and source data, you must</h4></p>
+            <p>No data sources have been mapped to @Model.ViewModel.Specification.Name</p>
+            <p><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
             <p>
-                1. Add data type relationship within manage specification and <br />
-                2. Ensure you have a dataset to link to, this cam be done within manage dataset
+                1. Go to the Specification and create a dataset. <br />
+                2. Return here and add a data source to a dataset.
             </p>
         }
         else

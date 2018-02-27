@@ -121,7 +121,7 @@
     <value>Assign dataset schema for calculation specfication</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
-    <value>Manage Policies</value>
+    <value>Manage the specification, policies and map datasets.</value>
   </data>
   <data name="ManagePoliciesHeadingText" xml:space="preserve">
     <value>Policies help design funding calculations to achieve specific outcomes</value>

@@ -17,8 +17,8 @@
 }
 
 @section FormBannerLeft{
-    <h1 class="hero-title">Load new datasets</h1>
-    <p class="hero-text"> Upload new data to the definitions provided, so that the data is available to be used in calculations and tests.</p>
+    <h1 class="hero-title">Load new data source</h1>
+    <p class="hero-text"> Upload a data source so that you can use it in calculations and tests.</p>
 }
 
 
@@ -38,7 +38,7 @@
                 <div data-bind="css: { 'validation-failed-block': !isDefinitionIdValid() }">
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.DataDefinitionId"></a>
-                        <label asp-for="CreateDatasetViewModel.DataDefinitionId">Select dataset schema:</label>
+                        <label asp-for="CreateDatasetViewModel.DataDefinitionId">Select data schema</label>
                         <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" gds-items="@(Model.DatasetDefinitions)" gds-for="CreateDatasetViewModel.DataDefinitionId">
                             <option></option>
                         </select>
@@ -49,8 +49,8 @@
                 <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.Name"></a>
-                        <label asp-for="CreateDatasetViewModel.Name">Name the dataset:</label>
-                        <h4 class="faded-text">Data set name has to be unique.</h4>
+                        <label asp-for="CreateDatasetViewModel.Name">Data source name</label>
+                        <h4 class="faded-text">You must give a unique name</h4>
                         <input data-bind="value: name, css: { 'input-validation-error': !isNameValid() }" asp-for="CreateDatasetViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                 <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.Description"></a>
-                        <label asp-for="CreateDatasetViewModel.Description">Add description for the dataset:</label>
+                        <label asp-for="CreateDatasetViewModel.Description">Description </label>
                         <textarea data-bind="value: description, css: { 'input-validation-error': !isDescriptionValid() }" id="description" asp-for="CreateDatasetViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>
@@ -67,8 +67,8 @@
             <div>
                 <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
                     <a validationanchor-for="CreateDatasetViewModel.Filename"></a>
-                    <label asp-for="CreateDatasetViewModel.Filename">Upload dataset file</label>
-                    <h4 class="faded-text">We support the following file formats xls, xlsx, csv</h4>
+                    <label asp-for="CreateDatasetViewModel.Filename">Select data source file</label>
+                    <h4 class="faded-text">Upload a csv, xls or xlsx file</h4>
                     <div class="input-group">
                         <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
                         <span class="input-group-btn">
