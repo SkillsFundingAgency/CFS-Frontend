@@ -72,7 +72,7 @@
             {
                 <div class="provider-item-container" id="provider-item-result-@providerRow">
                     <div class="provider-item-header">
-                        <h4 class="heading-small"><a href="/results/providerallocationline/@provider.Ukprn">@provider.Name</a></h4>
+                        <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn">@provider.Name</a></h4>
                     </div>
                     <div>
                         <span class="provider-item-property">
@@ -145,7 +145,7 @@
             <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
                 <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index">
                     <div class="provider-item-header">
-                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/providerallocationline/' + ukprn }, text: name"></a></h4>
+                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/providerallocationline?providerId=' + ukprn }, text: name"></a></h4>
                     </div>
                     <p>
                         <span class="provider-item-property">
@@ -178,7 +178,7 @@
                         <span class="provider-item-property">
                             Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index}"> </span></strong>
                         </span>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>

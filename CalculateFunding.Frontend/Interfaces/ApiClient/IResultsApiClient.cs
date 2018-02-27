@@ -1,9 +1,11 @@
 ﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
 
     public interface IResultsApiClient
     {
@@ -21,5 +23,11 @@
         /// <param name="filterOptions">Filter Options</param>
         /// <returns>List of Providers</returns>
         Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions);
+
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string providerId);
+
+        Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId);
     }
 }

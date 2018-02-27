@@ -1,0 +1,118 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Results.ProviderCalcsResultsPageModel
+
+@{
+    ViewData["Title"] = "View provider allocations";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="~/results/index">View results</a></li>
+            <li>@Model.ViewModel.ProviderName</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title no-margin">@Model.ViewModel.ProviderName</h1>
+    <p class="hero-text no-margin">
+        <span>UPIN:&nbsp;<strong>@Model.ViewModel.Upin</strong>&nbsp;</span>
+        <span>UKPRN:&nbsp;<strong>@Model.ViewModel.Ukprn</strong>&nbsp;</span>
+        <span>URN:&nbsp;<strong>@Model.ViewModel.Urn</strong>&nbsp;</span>
+    </p>
+    <p class="hero-text">
+        <div>
+            <span>Local authority:&nbsp;<strong>@Model.ViewModel.LocalAuthority</strong></span>
+        </div>
+        <div>
+            <span>Provider type:&nbsp;<strong>@Model.ViewModel.ProviderType</strong></span>&nbsp;
+            <span>Provider subtype:&nbsp;<strong>@Model.ViewModel.ProviderSubtype</strong></span>
+        </div>
+        <div>
+            <span>Date opened:&nbsp;<strong>@Model.ViewModel.DateOpened</strong>&nbsp;</span>
+        </div>
+    </p>
+
+}
+
+@section BannerMiddle{
+    <form method="post" class="filter-container spacing-15" id="filter-container" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-3 filter-field-heading">Select a year</div>
+            <div class="col-xs-4 filter-field-heading">Select a specification</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <select asp-items="@(Model.Periods)" asp-for="@Model.PeriodId" class="form-control filter">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-4">
+                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-1">
+                <button type="submit" class="button" id="search-button">Search</button>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="row provider-funding">
+    <div class="col-xs-12">
+        <div class="row view-policy">
+            <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="AllocationLineTabs" role="tablist">
+                <li class="nav-item">
+                    <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true">Allocation line</a>
+                </li>
+                <li class="nav-item active">
+                    <a id="nav-calculations-tab" href="#" role="tab" aria-selected="false">Calculation results</a>
+                </li>
+            </ul>
+            <br />
+            @if (!@Model.ViewModel.CalculationItems.IsNullOrEmpty())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width:85%" scope="col">Calculation Name</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+         
+                    <tbody>
+                        @foreach (var result in Model.ViewModel.CalculationItems)
+                        {
+                            <tr>
+                                <th scope="row">@result.Calculation</th>
+                                <td>@result.TotalFormatted</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p><strong>Select a specification to view results</strong></p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $("#search-button").hide();
+
+        $('select').change(function () {
+            if ($(this).attr('id') == "PeriodId") {
+                $("#SpecificationId").val('');
+
+            }
+            $("#search-button").click();
+        });
+    </script>
+}

@@ -1,10 +1,12 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ResultsClient
 {
+    using System.Collections.Generic;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Core;
@@ -32,6 +34,14 @@
             Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
 
             return GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}", cancellationToken);
+        }
+
+        public Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return GetAsync<ProviderResults>($"{_resultsPath}/get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
         }
 
         public Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId, CancellationToken cancellationToken = default(CancellationToken))
@@ -72,6 +82,16 @@
             {
                 return null;
             }
+        }
+
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string providerId)
+        {
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_resultsPath}/get-provider-specs?providerId={providerId}");
+        }
+
+        public Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId)
+        {
+            return GetAsync<Provider>($"{_resultsPath}/get-provider?providerId={providerId}");
         }
     }
 }
