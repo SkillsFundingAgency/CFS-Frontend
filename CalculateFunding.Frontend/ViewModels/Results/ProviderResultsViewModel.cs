@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
@@ -47,42 +48,12 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         {
             get
             {
-                return Total.ToString("C");
+                return Total.ToString("C", new CultureInfo("en-GB"));
             }
         }
 
         public IEnumerable<AllocationLineResult> AllocationLineItems { get; set; }
 
         public IEnumerable<CalculationItemResult> CalculationItems { get; set; }
-    }
-
-    public class AllocationLineResult
-    {
-        public string AllocationLine { get; set; }
-
-        public double SubTotal { get; set; }
-
-        public string TotalFormatted
-        {
-            get
-            {
-                return SubTotal.ToString("C");
-            }
-        }
-    }
-
-    public class CalculationItemResult
-    {
-        public string Calculation { get; set; }
-
-        public double SubTotal { get; set; }
-
-        public string TotalFormatted
-        {
-            get
-            {
-                return SubTotal.ToString("C");
-            }
-        }
     }
 }
