@@ -7,21 +7,20 @@
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Results;
-    using Serilog;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
+    using Serilog;
     using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
 
     [TestClass]
-    public class ProviderFundingCalculationTests
+  public class ProviderFundingAllocationTests
     {
-
         [TestMethod]
         public void OnGetAsync_GivenNullProviderReturnsArgumentNullExceptionThrown()
         {
@@ -34,15 +33,15 @@
 
             ILogger logger = Substitute.For<ILogger>();
 
-            ProviderCalcsResultsPageModel providerCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             // Act - Assert
-            Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerCalcPageModel.OnGetAsync(null, string.Empty, string.Empty));
+            Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerAllocPageModel.OnGetAsync(null, string.Empty, string.Empty));
 
         }
 
         [TestMethod]
-        public void onGetAsync_ReturnsErrorWhenAcademicYearResponseIsNull()
+        public void OnGetAsync_ReturnsErrorWhenAcademicYearResponseIsNull()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -53,7 +52,7 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             Provider provider = CreateProvider();
 
@@ -83,9 +82,10 @@
             resultsApiClient.GetSpecifications("2")
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
+
             // Act
 
-            Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            Func<Task> test = async () => await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             test
@@ -105,7 +105,7 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             Provider provider = CreateProvider();
 
@@ -132,24 +132,23 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
-
             resultsApiClient.GetSpecifications("2")
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
             // Act
-            IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             PageResult pageResult = result as PageResult;
 
             pageResult.Should().NotBeNull();
 
-            provideCalcPageModel.Periods.Should().NotBeNull();
+            providerAllocPageModel.Periods.Should().NotBeNull();
 
         }
 
         [TestMethod]
-        public void onGetAsync_WhenGettingProviderResponseIsNotSuccess_ThrowsException()
+        public async Task OnGetAsync_WhenGettingProviderResponseIsSuccess_PopulatesProviderDetails()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -160,7 +159,61 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+
+            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+
+            Provider provider = CreateProvider();
+
+            IList<SpecificationSummary> specSummary = GetSpecSummary();
+
+            IList<CalculationResultItem> calResult = GetCalcResults();
+
+            IList<AllocationLineResultItem> allocResult = GetAllocationResults();
+
+            ProviderResults providerResults = new ProviderResults()
+            {
+                AllocationResults = allocResult,
+                CalculationResults = calResult
+            };
+
+            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
+                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+
+            var academicyears = specsClient.GetAcademicYears()
+                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+
+            resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
+                .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
+
+            resultsApiClient.GetSpecifications("2")
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+
+            // Act
+            IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");
+
+            // Assert
+            providerAllocPageModel.ViewModel.Should().NotBeNull();
+            providerAllocPageModel.ViewModel.Upin.Should().Be(234234);
+            providerAllocPageModel.ViewModel.Ukprn.Should().Be(345345);
+            providerAllocPageModel.ViewModel.Urn.Should().Be(2234);
+            providerAllocPageModel.ViewModel.ProviderType.Should().Be("Academy");
+        }
+
+
+        [TestMethod]
+        public void OnGetAsync_WhenGettingProviderResponseIsNotSuccess_ThrowsException()
+        {
+            // Arrange
+            IResultsApiClient resultsApiClient = CreateApiClient();
+
+            ISpecsApiClient specsClient = CreateSpecsApiClient();
+
+            IMapper mapper = CreateMapper();
+
+            ILogger logger = CreateLogger();
+
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -191,7 +244,7 @@
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
             // Act
-            Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            Func<Task> test = async () => await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             test
@@ -201,7 +254,7 @@
         }
 
         [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResponseIsSuccess_PopulatesProviderDetails()
+        public async Task OnGetAsync_WhenGettingProviderResultsIsSuccess_AllocationDetails_Populated()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -212,60 +265,7 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
-
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
-
-            Provider provider = CreateProvider();
-
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
-
-            IList<CalculationResultItem> calResult = GetCalcResults();
-
-            IList<AllocationLineResultItem> allocResult = GetAllocationResults();
-
-            ProviderResults providerResults = new ProviderResults()
-            {
-                AllocationResults = allocResult,
-                CalculationResults = calResult
-            };
-
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
-
-            var academicyears = specsClient.GetAcademicYears()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
-
-            resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
-                .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
-
-            resultsApiClient.GetSpecifications("2")
-            .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
-
-            // Act
-            IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
-
-            // Assert
-            provideCalcPageModel.ViewModel.Should().NotBeNull();
-            provideCalcPageModel.ViewModel.Upin.Should().Be(234234);
-            provideCalcPageModel.ViewModel.Ukprn.Should().Be(345345);
-            provideCalcPageModel.ViewModel.Urn.Should().Be(2234);
-            provideCalcPageModel.ViewModel.ProviderType.Should().Be("Academy");
-        }
-
-        [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResultsIsSuccess_CalculationDetails_Populated()
-        {
-            // Arrange
-            IResultsApiClient resultsApiClient = CreateApiClient();
-
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
-
-            IMapper mapper = CreateMapper();
-
-            ILogger logger = CreateLogger();
-
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -296,15 +296,15 @@
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
             // Act
-            IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
-            provideCalcPageModel.ViewModel.CalculationItems.Should().HaveSameCount(calResult);
+            providerAllocPageModel.ViewModel.AllocationLineItems.Should().HaveSameCount(allocResult);
 
         }
 
         [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResultsIsNotSuccess_CalculationDetails_NotPopulated()
+        public async Task OnGetAsync_WhenGettingProviderResultsIsNotSuccess_AllocationDetails_NotPopulated()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -315,7 +315,7 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -342,15 +342,14 @@
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
             // Act
-            IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             PageResult pageResult = result as PageResult;
             pageResult.Should().NotBeNull();
-            provideCalcPageModel.ViewModel.AllocationLineItems.Should().HaveCount(0);
-            provideCalcPageModel.ViewModel.CalculationItems.Should().HaveCount(0);
+            providerAllocPageModel.ViewModel.AllocationLineItems.Should().HaveCount(0);
+            providerAllocPageModel.ViewModel.CalculationItems.Should().HaveCount(0);
         }
-
 
         [TestMethod]
         public void onGetAsync_WhenGettingSpecificationSummaryIsNotSuccess_ThrowsError()
@@ -364,7 +363,7 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
 
             IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -390,16 +389,15 @@
             resultsApiClient.GetSpecifications("2")
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
-           
+
             // Act
-            Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
+            Func<Task> test = async () => await providerAllocPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             test
             .Should()
-            .ThrowExactly<System.ArgumentNullException>();        
+            .ThrowExactly<System.ArgumentNullException>();         
         }
-
         private Provider CreateProvider()
         {
             return new Provider()
@@ -503,9 +501,10 @@
         {
             return MappingHelper.CreateFrontEndMapper();
         }
-        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
+
+        private static ProviderAllocationLinePageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
         {
-            return new ProviderCalcsResultsPageModel(resultsApiClient, specsApiClient, mapper, logger);
+            return new ProviderAllocationLinePageModel(resultsApiClient,  mapper, specsApiClient, logger);
         }
 
         private static ILogger CreateLogger()
@@ -514,5 +513,4 @@
         }
 
     }
-
 }
