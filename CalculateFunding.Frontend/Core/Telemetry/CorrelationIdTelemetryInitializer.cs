@@ -45,7 +45,8 @@
                 }
                 else if (correlationId != telemetry.Context.Properties[LoggingConstants.CorrelationIdPropertyName])
                 {
-                    throw new InvalidOperationException("Correlation ID Conflict");
+                     telemetry.Context.Properties[LoggingConstants.CorrelationIdPropertyName] = correlationId;
+                    //throw new InvalidOperationException("Correlation ID Conflict");
                 }
             }
         }
