@@ -77,7 +77,7 @@
                 let fieldName = searchFacet.fieldName();
                 if (fieldName === "providerType") {
                     selectedArray = this.selectedProviderTypes;
-                } else if (fieldName === "subProviderType") {
+                } else if (fieldName === "providerSubType") {
                     selectedArray = this.selectedProviderSubTypes;
                 } else if (fieldName === "authority") {
                     selectedArray = this.selectedLocalAuthorities;
