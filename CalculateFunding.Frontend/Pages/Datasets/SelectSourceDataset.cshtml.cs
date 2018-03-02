@@ -105,7 +105,8 @@
                 SpecificationName = selectDatasourceModel.SpecificationName,
                 RelationshipId = selectDatasourceModel.RelationshipId,
                 DefinitionId = selectDatasourceModel.DefinitionId,
-                DefinitionName = selectDatasourceModel.DefinitionName
+                DefinitionName = selectDatasourceModel.DefinitionName,
+                RelationshipName = selectDatasourceModel.RelationshipName
             };
 
             List<DatasetVersionsViewModel> datasets = new List<DatasetVersionsViewModel>();
