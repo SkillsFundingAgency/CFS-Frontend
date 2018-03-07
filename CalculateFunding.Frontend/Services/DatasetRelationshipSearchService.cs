@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Services
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -67,7 +68,9 @@
                 });
             }
 
-            viewModel.SpecRelationships = itemResults;
+            IEnumerable<SpecificationDatasourceRelationshipSearchResultItemViewModel> sortedResults = itemResults.OrderBy(f => f.SpecificationName);
+
+            viewModel.SpecRelationships = sortedResults.ToList();
 
             if (viewModel.TotalResults == 0)
             {

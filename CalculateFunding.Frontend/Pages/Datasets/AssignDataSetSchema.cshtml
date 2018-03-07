@@ -51,7 +51,6 @@
                 </div>
             </div>
 
-
             <div>
                 <div gds-validationblock-for="AssignDatasetSchemaViewModel.Description">
                     <div class="form-group">
@@ -61,7 +60,27 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
+            <br/>
+            <div>
+                <div class="multiple-choice">
+                    <input asp-for="AssignDatasetSchemaViewModel.UsedInDataAggregations" type="checkbox" id="UsedInDataAggregation" value="true" title="UsedInDataAggregation" />
+                    <label asp-for="AssignDatasetSchemaViewModel.UsedInDataAggregations">
+                        Use as a list of values in calculations - the data source mapped to this dataset will have more than one record per provider
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <div class="multiple-choice">
+                    <input asp-for="AssignDatasetSchemaViewModel.IsSetAsProviderData" type="checkbox" id="IsProviderData" value="true" title="IsProviderData" />
+                    <label asp-for="AssignDatasetSchemaViewModel.IsSetAsProviderData">Set as provider data</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <p  class="form-submit-container"><button type="submit" class="button" id="create-button">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId" id="back-link">Cancel</a></p>
+                </div>
+            </div>
         </form>
     </div>
 </div>

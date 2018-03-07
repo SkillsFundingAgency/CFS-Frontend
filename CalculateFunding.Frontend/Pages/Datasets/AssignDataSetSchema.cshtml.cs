@@ -83,6 +83,7 @@
                     AcademicYear = specContent.AcademicYear.Id;
 
                     AcademicYearName = specContent.AcademicYear.Name;
+               
                 }
 
                 ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
