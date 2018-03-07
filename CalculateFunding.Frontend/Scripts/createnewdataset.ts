@@ -95,7 +95,7 @@
             let data = {
                 name: this.name(),
                 description: this.description(),
-                dataDefinitionId: this.dataDefinitionId(),
+                definitionId: this.dataDefinitionId(),
                 filename: this.fileName()
             };
 
@@ -127,11 +127,9 @@
         private handleValidateFormSuccess(response: ICreateNewDatasetResponseModel) {
             let self = this;
             
-            let formData = new FormData();
-            formData.append("files", self.datasetFile);
             let blobRequest = $.ajax({
                 url: response.blobUrl,
-                data: formData,
+                data: self.datasetFile,
                 processData: false,
                 contentType: false,
                 method: "PUT",
@@ -159,7 +157,7 @@
             blobRequest.done((blobResponse, msg, xhr) => {
                 if (xhr.status === 201) {
                     
-                    self.handleBlobUploadSuccess(response.datasetId, response.filename);
+                    self.handleBlobUploadSuccess(response.datasetId, response.filename, response.definitionId);
                 }
             });
 
@@ -218,7 +216,7 @@
             }
         }
 
-        private handleBlobUploadSuccess(datasetId: string, filename: string) {
+        private handleBlobUploadSuccess(datasetId: string, filename: string, definitionId: string) {
             let self = this;
 
             self.loadingMessage("Validating dataset..");
@@ -226,7 +224,8 @@
             let data = {
                 DatasetId: datasetId,
                 Filename: filename,
-                Version: 1
+                Version: 1,
+                DataDefinitionId: definitionId
             };
 
             let validationRequest = $.ajax({
@@ -298,9 +297,9 @@
     }
 
     export interface ICreateNewDatasetModelState {
-        Name: string[];
-        Filename: string[];
-        Description: string[];
-        DefinitionId: string[];
+        Name: string;
+        Filename: string;
+        Description: string;
+        DefinitionId: string;
     }
 }
