@@ -39,7 +39,7 @@
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.DataDefinitionId"></a>
                         <label asp-for="CreateDatasetViewModel.DataDefinitionId">Select data schema</label>
-                        <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" gds-items="@(Model.DatasetDefinitions)" gds-for="CreateDatasetViewModel.DataDefinitionId">
+                        <select data-bind="value: dataDefinitionId, css: { 'input-validation-error': !isDefinitionIdValid() }" class="form-control" gds-items="@(Model.DatasetDefinitions)" gds-for="CreateDatasetViewModel.DataDefinitionId" id="selectSchema">
                             <option></option>
                         </select>
                     </div>
@@ -73,17 +73,17 @@
                         <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
                         <span class="input-group-btn">
                             <label class="btn btn-file file-button">
-                                Browse <input asp-for="CreateDatasetViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;">
+                                Browse <input asp-for="CreateDatasetViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;" id="browseButton">
                             </label>
                         </span>
                     </div>
                 </div>
             </div>
         </form>
-        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Upload</button> <a href="/datasets">Cancel</a></p>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Upload</button> <a href="/datasets" id="cancelLink">Cancel</a></p>
 
         <div>
-            <a href="/datasets">Back</a>
+            <a href="/datasets" id="backLink">Back</a>
         </div>
     </div>
 

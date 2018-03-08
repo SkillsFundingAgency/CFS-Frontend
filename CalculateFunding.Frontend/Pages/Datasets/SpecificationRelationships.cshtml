@@ -31,7 +31,7 @@
             </div>
         }
 
-        <p>@Model.ViewModel.GetCountPhrase()</p>
+        <p id="datasourceCount">@Model.ViewModel.GetCountPhrase()</p>
 
         @{
             int counter = 0;
@@ -39,9 +39,9 @@
 
         @if (Model.ViewModel.Items.IsNullOrEmpty())
         {
-            <p>No data sources have been mapped to @Model.ViewModel.Specification.Name</p>
-            <p><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
-            <p>
+            <p id="noDatasourceMappedMessage">No data sources have been mapped to @Model.ViewModel.Specification.Name</p>
+            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
+            <p id="noDatasourceMappedHowToSteps">
                 1. Go to the Specification and create a dataset. <br />
                 2. Return here and add a data source to a dataset.
             </p>
@@ -50,10 +50,10 @@
         {
             @foreach (var item in Model.ViewModel.Items)
             {
-                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back")">
-                    <h2 class="heading-medium heading-24 no-margin">@item.RelationName</h2>
-                    <h4 class="heading-small no-margin">@item.DefinitionName</h4>
-                    <p class="faded-text small no-margin">@item.DefinitionDescription</p>
+                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container" >
+                    <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.RelationName</h2>
+                    <h4 class="heading-small no-margin specification-relationship-definition-name">@item.DefinitionName</h4>
+                    <p  class="faded-text small no-margin specification-relationship-description">@item.DefinitionDescription</p>
                     <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectsourcedataset?relationshipId=@item.RelationshipId">@item.LinkPhrase</a></p>
                 </div>
 
