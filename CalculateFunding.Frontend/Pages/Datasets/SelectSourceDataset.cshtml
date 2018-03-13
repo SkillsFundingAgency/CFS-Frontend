@@ -43,21 +43,19 @@
 
                 @foreach (var dataset in Model.ViewModel.Datasets)
                 {
-                    <div class="row">
+                    <div class="row selectdataset-item-container">
                         <div class="col-xs-12">
                             <label class="block-label @(Model.ModelState.ErrorCount > 0 ? "red-3p-border" : "")">
-                                @dataset.Name
-                                <input name="datasets" @(dataset.IsSelected ? "checked='checked'" : string.Empty) id="@dataset.Id" type="radio" value="@dataset.Id">
+                                <span class="selectdataset-item-name">@dataset.Name</span>
+                                <input name="datasets" @(dataset.IsSelected ? "checked" : string.Empty) id="@dataset.Id" type="radio" value="@dataset.Id" class="selectdataset-item-dataset">
                             </label>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-xs-12">
                             <div class="ds-versions-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "grey-left-border")" id="@dataset.VersionContainerId">
                                 <h4 class="heading-small">Select data source version</h4>
                                 @foreach (var version in dataset.Versions)
                                 {
-                                    <label><input type="radio" @(version.IsSelected ? "checked='checked'" : string.Empty) name="datasetVersion" value="@version.UniqueName">@version.ToString()</label>
+                                    <label><input type="radio" @(version.IsSelected ? "checked" : string.Empty) name="datasetVersion" value="@version.UniqueName" class="selectdataset-item-datasetversion">@version.ToString()</label>
                                 }
                             </div>
 
