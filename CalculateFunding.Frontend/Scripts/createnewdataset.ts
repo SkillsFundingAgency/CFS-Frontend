@@ -1,5 +1,5 @@
-﻿namespace calculateFunding.createNewDataset{
-    
+﻿namespace calculateFunding.createNewDataset {
+
     export class CreateNewDatasetViewModel {
 
         public name: KnockoutObservable<string> = ko.observable("");
@@ -95,7 +95,7 @@
             let data = {
                 name: this.name(),
                 description: this.description(),
-                definitionId: this.dataDefinitionId(),
+                dataDefinitionId: this.dataDefinitionId(),
                 filename: this.fileName()
             };
 
@@ -113,7 +113,7 @@
 
             request.fail((response) => {
                 self.state("idle");
-                
+
                 self.handleValidateFormFailed(response.responseJSON);
             });
 
@@ -126,7 +126,7 @@
 
         private handleValidateFormSuccess(response: ICreateNewDatasetResponseModel) {
             let self = this;
-            
+
             let blobRequest = $.ajax({
                 url: response.blobUrl,
                 data: self.datasetFile,
@@ -156,8 +156,8 @@
 
             blobRequest.done((blobResponse, msg, xhr) => {
                 if (xhr.status === 201) {
-                    
-                    self.handleBlobUploadSuccess(response.datasetId, response.filename, response.definitionId);
+
+                    self.handleBlobUploadSuccess(response.datasetId, response.filename);
                 }
             });
 
@@ -180,7 +180,7 @@
                     href: "#field-CreateDatasetViewModel-Name",
                     message: modelState.Name[0],
                     id: "validation-link-for-CreateDatasetViewModel-Name"
-                    
+
                 }
                 this.validationLinks.push(link);
             }
@@ -189,7 +189,7 @@
                 this.isDescriptionValid(false);
                 let link = {
                     href: "#field-CreateDatasetViewModel-Description",
-                    message: modelState.Description[0] ,
+                    message: modelState.Description[0],
                     id: "validation-link-for-CreateDatasetViewModel-Description"
                 }
                 this.validationLinks.push(link);
@@ -206,7 +206,7 @@
             }
 
             if (modelState.Filename && modelState.Filename.length > 0) {
-                this.isFileNameValid(false); 
+                this.isFileNameValid(false);
                 let link = {
                     href: "#field-CreateDatasetViewModel-Filename",
                     message: modelState.Filename[0],
@@ -216,7 +216,7 @@
             }
         }
 
-        private handleBlobUploadSuccess(datasetId: string, filename: string, definitionId: string) {
+        private handleBlobUploadSuccess(datasetId: string, filename: string) {
             let self = this;
 
             self.loadingMessage("Validating dataset..");
@@ -224,8 +224,7 @@
             let data = {
                 DatasetId: datasetId,
                 Filename: filename,
-                Version: 1,
-                DataDefinitionId: definitionId
+                Version: 1
             };
 
             let validationRequest = $.ajax({
@@ -239,6 +238,10 @@
             validationRequest.always((res: any, msg: string, xhr: JQueryXHR) => {
                 if (xhr.status === 204) {
                     self.handleDatasetValidationSuccess();
+                }
+                else if (xhr.status === 200 && res.message.length > 0) {
+                    self.state("idle");
+                    self.handleValidationRequestFailed(res);
                 }
                 else {
                     self.state("idle");
@@ -261,18 +264,32 @@
             this.validationLinks.push(link);
         }
 
+        private handleValidationRequestFailed(response: IValidateDatasetResponse) {
+            this.resetValidation();
+
+            this.validationLinks([]);
+
+            this.isFileNameValid(false);
+            let link = {
+                href: response.fileUrl,
+                message: response.message,
+                id: "validation-link-for-CreateDatasetViewModel-Filename"
+            }
+            this.validationLinks.push(link);
+        }
+
         private handleBlobUploadFailed() {
             this.invalidateUpload();
         }
 
         private handleDatasetValidationSuccess() {
-            window.location.href = "/datasets";
+            window.location.href = "/datasets/managedatasets";
         }
 
         private handleDatasetValidationFailed() {
             this.invalidateUpload();
         }
-        
+
     }
 
     export interface ICreateNewDatasetResponseModel {
@@ -297,9 +314,14 @@
     }
 
     export interface ICreateNewDatasetModelState {
-        Name: string;
-        Filename: string;
-        Description: string;
-        DefinitionId: string;
+        Name: string[];
+        Filename: string[];
+        Description: string[];
+        DefinitionId: string[];
+    }
+
+    export interface IValidateDatasetResponse {
+        message: string;
+        fileUrl: string;
     }
 }

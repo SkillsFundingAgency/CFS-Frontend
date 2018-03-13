@@ -27,7 +27,7 @@
 
         Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset);
 
-        Task<HttpStatusCode> ValidateDataset(ValidateDatasetModel model);
+        Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model);
 
         Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId);
 

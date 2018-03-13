@@ -171,10 +171,12 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
+            ApiResponse<ValidateDatasetResponseModel> response = new ApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
                 .ValidateDataset(Arg.Is(viewModel))
-                .Returns(HttpStatusCode.BadRequest);
+                .Returns(response);
 
             ILogger logger = CreateLogger();
 
@@ -206,10 +208,12 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
+            ApiResponse<ValidateDatasetResponseModel> response = new ApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.NoContent);
+
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
                 .ValidateDataset(Arg.Is(viewModel))
-                .Returns(HttpStatusCode.OK);
+                .Returns(response);
 
             ILogger logger = CreateLogger();
 

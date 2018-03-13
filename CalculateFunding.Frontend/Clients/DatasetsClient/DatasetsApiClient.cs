@@ -76,11 +76,11 @@
             return ValidatedPostAsync<CreateNewDatasetResponseModel, CreateNewDatasetModel>($"{_datasetsPath}/create-new-dataset", dataset);
         }
 
-        public Task<HttpStatusCode> ValidateDataset(ValidateDatasetModel model)
+        public Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return PostAsync($"{_datasetsPath}/validate-dataset", model);
+            return PostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>($"{_datasetsPath}/validate-dataset", model);
         }
 
         public Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)

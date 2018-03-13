@@ -64,13 +64,18 @@
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
 
-            HttpStatusCode status = await _datasetApiClient.ValidateDataset(vm);
+            ApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
 
-            if (!status.IsSuccess())
+            if (!apiResponse.StatusCode.IsSuccess())
             {
-                _logger.Error($"Failed to validate dataset with status code: {(int)status}");
-                return new StatusCodeResult((int)status);
+                _logger.Error($"Failed to validate dataset with status code: {(int)apiResponse.StatusCode}");
+                
+
+                return new StatusCodeResult((int)apiResponse.StatusCode);
             }
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)
+                return new OkObjectResult(apiResponse.Content);
 
             return new NoContentResult();
         }
