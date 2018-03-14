@@ -10,8 +10,12 @@ var lodash = require("lodash"),
     sass = require("gulp-sass"),
     uglify = require("gulp-uglify"),
     rev = require('gulp-rev'),
-    runSequence = require('run-sequence');
+    runSequence = require('run-sequence'),
+    cache = require('gulp-cached');
 
+
+
+var debug = require('gulp-debug');
 
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
@@ -53,7 +57,6 @@ gulp.task("min:js", function () {
 });
 
 gulp.task("min:css", ["min:maincss", "min:librarycss"]);
-
 
 gulp.task("min:maincss", function () {
     return gulp.src(paths.webroot + "assets/css/main.css")
@@ -145,7 +148,7 @@ gulp.task('copy-assets', function () {
         "editor/editor.main.js",
         "editor/editor.main.css",
         "editor/editor.main.nls.js",
-        "editor/standalone/browser/quickOpen/symbol-sprite.svg"
+        "editor/standalone/browser/quickOpen/symbol-sprite.svg",
     ];
 
     monacoSourceFiles.forEach(function (value) {
@@ -165,13 +168,46 @@ gulp.task('ts:watch', function () {
     gulp.watch(paths.tsSource, ['ts:builddev']);
 });
 
+var definitions = [
+    "./node_modules/monaco-editor/monaco.d.ts",
+    "./node_modules/@types/jquery/index.d.ts",
+    "./node_modules/@types/knockout/index.d.ts",
+    "./node_modules/@types/requirejs/index.d.ts",
+    "./scripts/**.d.ts"
+];
+
+var tsProjectWatch = ts.createProject({
+    declaration: true,
+    target: "es5",
+    "noImplicitAny": true,
+    "module": "none",
+    
+});
+
 gulp.task("ts:builddev", function () {
 
-    var tsResult = tsProject.src()
+    var src = ["scripts/**.ts"];
+
+    for (var i in definitions) {
+        src.push(definitions[i]);
+    }
+
+
+    var tsResult =// tsProjectWatch.src()
+        gulp.src(src)
+        //gulp.src(merge(gulp.src(paths.tsSource).pipe(cache("tsbuilddev")), gulp.src(definitions)))
+            
+        //.pipe(gulp.src(definitions))
+        //.pipe(cache("tsbuilddev"))
+        .pipe(debug({title: "Typescript files"}))
         .pipe(sourcemaps.init()) // This means sourcemaps will be generated
-        .pipe(tsProject());
+        
+        //.pipe(debug({ title: "Passing to compiler" }))
+            .pipe(tsProjectWatch());
 
     return tsResult
+        .pipe(cache("sourcemapcache-ts"))
+        .pipe(debug({ title: "Generating Sourcemap:" }))
         .pipe(sourcemaps.write()) // Now the sourcemaps are added to the .js file
         .pipe(gulp.dest('wwwroot/js'));
 });
@@ -180,7 +216,8 @@ gulp.task("ts:release", function () {
 
     var tsResult = tsProject.src()
         .pipe(tsProject())
-        .pipe(uglify());
+        .pipe(uglify())
+        .on('error', function (err) { console.log('[Error]', err.toString()); });
 
     return tsResult
         .pipe(gulp.dest('wwwroot/js'));

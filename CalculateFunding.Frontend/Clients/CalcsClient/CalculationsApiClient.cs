@@ -90,5 +90,10 @@
 
             return PostAsync<IEnumerable<CalculationVersion>, CalculationVersionsRequestModel>($"{_calcsPath}/calculation-versions", calcsVersGetModel);
         }
+
+        public Task<ApiResponse<IEnumerable<TypeInformation>>> GetCodeContextForSpecification(string specificationId)
+        {
+            return GetAsync<IEnumerable<TypeInformation>>($"{_calcsPath}/get-calculation-code-context?specificationId={specificationId}");
+        }
     }
 }

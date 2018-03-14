@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients;
@@ -137,6 +138,21 @@
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
             return GetAsync<IEnumerable<DatasetSpecificationRelationshipModel>>($"{_datasetsPath}/get-relationships-by-specificationId?specificationId={specificationId}");
+        }
+
+        public Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId)
+        {
+            return GetAsync<DatasetDefinition>($"{_datasetsPath}/get-dataset-definition-by-id?datasetDefinitionId={datasetDefinitionId}");
+        }
+
+        public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds)
+        {
+            if (datasetDefinitionIds.IsNullOrEmpty())
+            {
+                return Task.FromResult(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, Enumerable.Empty<DatasetDefinition>()));
+            }
+
+            return PostAsync<IEnumerable<DatasetDefinition>, IEnumerable<string>>($"{_datasetsPath}/get-dataset-definitions-by-ids", datasetDefinitionIds);
         }
     }
 }

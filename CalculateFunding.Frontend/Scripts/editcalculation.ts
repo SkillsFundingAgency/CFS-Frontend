@@ -1,4 +1,6 @@
-﻿namespace calculateFunding.editCalculation {
+﻿/// <reference path="common.d.ts" />
+
+namespace calculateFunding.editCalculation {
 
     export class EditCalculationViewModel {
         public state: KnockoutObservable<string> = ko.observable("idle");
@@ -22,6 +24,8 @@
         private successfulCompileSourceCode: KnockoutObservable<string> = ko.observable(null);
 
         private initialCodeContents: string;
+
+        public intellisenseContext: KnockoutObservable<Array<calculateFunding.common.ITypeInformationResponse>> = ko.observable(null);
 
         constructor(options: IEditCalculationViewModelOptions) {
             if (!options.calculationId) {
@@ -60,6 +64,10 @@
                 // Disable save if content is the same as existing verion
                 if (self.sourceCode() == self.initialCodeContents) {
                     return false;
+                }
+
+                if (this.state() !== "idle") {
+                    return;
                 }
 
                 // Is the source code different to last successful compile
@@ -144,24 +152,62 @@
                 });
             }
         }
+
+        public loadIntellisenseContext() {
+            if (this.state() === "idle") {
+                this.state("loadingIntellisense");
+                let request = $.ajax({
+                    url: "/api/specs/" + this.options.specificationId + "/codeContext",
+                    dataType: "json",
+                    method: "GET",
+                    contentType: "application/json"
+                });
+
+                let self = this;
+
+                request.fail((error) => {
+                    let errorMessage = "Error saving calculation:\n";
+                    errorMessage += "Status: " + error.status;
+                    self.saveCalculationResult(errorMessage);
+                    self.state("idle");
+                });
+
+                request.done((result: Array<calculateFunding.common.ITypeInformationResponse>) => {
+                    self.state("idle");
+
+                    console.table(result[0].methods);
+
+                    // Redirect back to Manage Calculations page
+                    //window.location.href = "/calcs";
+                });
+            }
+        }
+
+        public registerMonacoProviders() {
+            console.log("Registering monaco providers");
+            monaco.languages.registerCompletionItemProvider('vb', calculateFunding.providers.getVbCompletionProvider());
+            monaco.languages.registerSignatureHelpProvider('vb', calculateFunding.providers.getSignatureHelpProvider());
+            monaco.languages.registerHoverProvider('vb', calculateFunding.providers.getHoverProvider());
+            monaco.languages.register({ id: "hover" });
+        }
     }
 
-    interface IEditCalculationViewModelOptions {
+    export interface IEditCalculationViewModelOptions {
         calculationId: string,
         specificationId: string,
         existingSourceCode: string,
     }
 
-    interface IPreviewCompileResultReponse {
+    export interface IPreviewCompileResultReponse {
         compilerOutput: ICompilerOutputResponse;
     }
 
-    interface ICompilerOutputResponse {
+    export interface ICompilerOutputResponse {
         success: Boolean;
         compilerMessages: Array<ICompilerMessageResponse>
     }
 
-    interface ICompilerMessageResponse {
+    export interface ICompilerMessageResponse {
         severity: string;
         message: string;
     }

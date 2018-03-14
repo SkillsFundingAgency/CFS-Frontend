@@ -1,6 +1,5 @@
-﻿
-ko.bindingHandlers.monacoEditor = {
-    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+﻿ko.bindingHandlers.monacoEditor = {
+    init: function (element, valueAccessor, allBindings : KnockoutAllBindingsAccessor, viewModel, bindingContext) {
         // This will be called when the binding is first applied to an element
         // Set up any initial state, event handlers, etc. here
 
@@ -8,19 +7,29 @@ ko.bindingHandlers.monacoEditor = {
 
         require.config({ paths: { 'vs': '/assets/libs/js/monaco/vs' } });
         require(['vs/editor/editor.main'], function () {
-            let editor = monaco.editor.create(element, {
+            let editor: monaco.editor.IStandaloneCodeEditor = monaco.editor.create(element, {
                 value: valueUnwrapped,
                 language: 'vb',
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
+                parameterHints: true,
             });
 
-            
+
             // When content editor is updated, then update knockout observable
             editor.onDidChangeModelContent((e: monaco.editor.IModelContentChangedEvent) => {
                 let value = valueAccessor();
                 value(editor.getValue());
             });
+
+            let monacoEditorOptions = allBindings.get("monacoEditorOptions");
+            if (monacoEditorOptions) {
+                if (typeof (monacoEditorOptions.editorCreatedCallback) !== "undefined") {
+                    if ($.isFunction(monacoEditorOptions.editorCreatedCallback)) {
+                        monacoEditorOptions.editorCreatedCallback();
+                    }
+                }
+            }
 
             ko.utils.domData.set(element, "editor", editor);
         });
@@ -38,6 +47,6 @@ ko.bindingHandlers.monacoEditor = {
         if (editor) {
             editor.setValue(unwrapped);
         }
-        
+
     }
 };

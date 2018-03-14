@@ -21,6 +21,14 @@
         /// <returns>Calculation object, otherwise null if not found</returns>
         Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId);
 
+        /// <summary>
+        /// Get code context for Specification.
+        /// This includes methods, datasets and providers available to call from calculation code
+        /// </summary>
+        /// <param name="specificationId">Specification Id</param>
+        /// <returns>Code context/returns>
+        Task<ApiResponse<IEnumerable<TypeInformation>>> GetCodeContextForSpecification(string specificationId);
+
         Task<ApiResponse<IEnumerable<CalculationVersion>>> GetMultipleVersionsByCalculationId(IEnumerable<int> versionIds, string calculationId);
 
         Task<ApiResponse<IEnumerable<CalculationVersion>>> GetAllVersionsByCalculationId(string calculationId);

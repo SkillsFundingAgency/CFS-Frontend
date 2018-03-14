@@ -46,7 +46,7 @@
 <div class="row">
     <div class="col-xs-12 edit-calculation" id="edit-calculation">
         <strong>Calculation script:</strong>
-        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode"></div>
+        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: registerMonacoProviders}"></div>
 
         <div>
             <a href="/calcs/compare/@Model.Calculation.Id" id="view-previous-versions-button">View previous versions</a>
@@ -84,7 +84,9 @@
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/regex.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/editcalculation.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
@@ -96,8 +98,10 @@
                 existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))"
             };
             var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
+            //viewModel.loadIntellisenseContext();
             ko.applyBindings(viewModel, editCalculationElement);
         }
 
+        //var editorVariables = @Html.Raw(Model.VariablesJson);
     </script>
 }

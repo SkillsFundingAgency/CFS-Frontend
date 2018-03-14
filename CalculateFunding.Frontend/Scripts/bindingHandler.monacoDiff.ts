@@ -1,5 +1,4 @@
-﻿
-ko.bindingHandlers.monacoDiff = {
+﻿ko.bindingHandlers.monacoDiff = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         // This will be called when the binding is first applied to an element
         // Set up any initial state, event handlers, etc. here

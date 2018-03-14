@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
@@ -70,6 +71,23 @@
             else
             {
                 throw new InvalidOperationException($"An error occurred while compiling calculation. Status code={response.StatusCode}");
+            }
+        }
+
+        [Route("api/specs/{specificationId}/codeContext")]
+        [HttpGet]
+        public async Task<IActionResult> GetCodeContext(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<IEnumerable<TypeInformation>> response = await _calcClient.GetCodeContextForSpecification(specificationId);
+            if(response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
         }
     }

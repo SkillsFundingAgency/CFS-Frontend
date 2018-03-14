@@ -30,6 +30,7 @@
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\list-providerresults.ts" />
+    <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +116,7 @@
     <TypeScriptCompile Include="Scripts\compare.ts" />
     <TypeScriptCompile Include="Scripts\common.d.ts" />
     <TypeScriptCompile Include="Scripts\list-providerresults.ts" />
+    <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
   </ItemGroup>
 

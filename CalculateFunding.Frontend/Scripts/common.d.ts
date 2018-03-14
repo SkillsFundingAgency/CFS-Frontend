@@ -36,4 +36,33 @@
         name: string;
         count: number;
     }
+
+    export interface ITypeInformationResponse {
+        name: string;
+        description: string;
+        type: string;
+        methods: Array<IMethodInformationResponse>;
+        properties: Array<IPropertyInformationResponse>;
+    }
+
+    export interface IMethodInformationResponse {
+        name: string;
+        description: string;
+        returnType: string;
+        entityId: string;
+        parameters: Array<IParameterInformationResponse>;
+    }
+
+    export interface IParameterInformationResponse {
+        name: string;
+        description: string;
+        type: string;
+    }
+
+    export interface IPropertyInformationResponse {
+        name: string;
+        description: string;
+        type: string;
+        children: Array<IPropertyInformationResponse>;
+    }
 }

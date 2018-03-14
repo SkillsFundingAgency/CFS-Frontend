@@ -23,7 +23,9 @@
         /// <returns>List of Calculations</returns>
         Task<PagedResult<DatasetSearchResultItem>> FindDatasets(SearchFilterRequest filterOptions);
 
-        Task<ApiResponse<Reference[]>> GetDefinitions();
+        Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId);
+
+        Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds);
 
         Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset);
 

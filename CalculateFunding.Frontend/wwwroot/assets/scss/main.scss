@@ -277,7 +277,7 @@ blockquote {
     line-height: 16px;
 }
 
-.gds-select-title{
+.gds-select-title {
     font-weight: 800;
     line-height: 19px;
     font-size: 17px;
@@ -1526,8 +1526,8 @@ table {
     color: #bfc1c3;
 }
 
-.no-margin{
-    margin : 0px;
+.no-margin {
+    margin: 0px;
 }
 
 .success-message {
@@ -1536,14 +1536,15 @@ table {
     border-left: 15px solid #006435;
     padding: 15px;
     margin-bottom: 20px;
+
     a, link {
         text-decoration: none;
         color: #333333;
     }
 }
 
-.float-right{
-    float:right
+.float-right {
+    float: right
 }
 
 .spec-rel-grey-back {
@@ -1553,7 +1554,7 @@ table {
     margin-bottom: 15px;
 }
 
-.providers-searchresult-container p{
+.providers-searchresult-container p {
     margin-bottom: 3px;
 }
 
@@ -1564,13 +1565,12 @@ table {
 .provider-item-container {
     border-bottom: #dee0e2 1px solid;
     padding-bottom: 10px;
-
 }
 
 .spec-rel-white-back {
     padding: 10px;
     padding-bottom: 1px;
-    margin-bottom:15px;
+    margin-bottom: 15px;
 }
 
 
@@ -1619,22 +1619,23 @@ table {
         border: 1px solid #000;
         outline: 3px solid #ffbf47
     }
-
 }
 
 .ds-versions-container {
-   
-    padding-top:10px;
-    h4{
-        margin-top:0px !important;
-    },
-    label{
-        font-weight:400;
-        display:block;
-    },
-    input{
-         margin-right:10px
-     }
+    padding-top: 10px;
+
+    h4 {
+        margin-top: 0px !important;
+    }
+
+    label {
+        font-weight: 400;
+        display: block;
+    }
+
+    input {
+        margin-right: 10px
+    }
 }
 
 .grey-left-border {
@@ -1674,7 +1675,7 @@ table {
     padding-top: 15px;
 }
 
-.specs-relationship-searchresult-container .specs-relationship-searchresult-container-item:last-child{
+.specs-relationship-searchresult-container .specs-relationship-searchresult-container-item:last-child {
     border-bottom: 1px solid #ccc;
 }
 
@@ -1690,4 +1691,18 @@ table {
 
 #footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
     background-image: url('/libs/govuk_bootstrap/images/open-government-licence.png?0.17.1');
+}
+
+.monaco-editor{
+    .button{
+        background-color: transparent;
+    }
+}
+
+/* Disable word breaking in hover contents in monaco editor*/
+.mtk1 {
+    text-wrap: normal;
+    white-space: normal;
+    text-space-collapse: collapse;
+    word-break: normal;
 }

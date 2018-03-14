@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -33,6 +34,8 @@
 
         public string SpecificationId { get; set; }
 
+        public string VariablesJson { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
@@ -40,13 +43,13 @@
                 return new BadRequestObjectResult(ErrorMessages.CalculationIdNullOrEmpty);
             }
 
-            ApiResponse<Clients.CalcsClient.Models.Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
 
             if (calculation == null || calculation.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
-
+           
             ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
             if (specCalculation == null || specCalculation.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -58,7 +61,7 @@
             SpecificationId = calculation.Content.SpecificationId;
 
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
-
+            
             return Page();
         }
     }
