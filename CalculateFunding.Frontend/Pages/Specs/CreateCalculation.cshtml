@@ -49,15 +49,13 @@
                 </div>
             </div>
             <div>
-                <div gds-validationblock-for="CreateCalculationViewModel.AllocationLineId">
                     <div class="form-group">
-                        <a validationanchor-for="CreateCalculationViewModel.AllocationLineId"></a>
                         <label asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
                         <select asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
                             <option></option>
                         </select>
                     </div>
-                </div>
+              
             </div>
             <div>
                 <div gds-validationblock-for="CreateCalculationViewModel.Description">

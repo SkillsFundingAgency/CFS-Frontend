@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -110,9 +111,16 @@
 
             ApiResponse<Calculation> newCalculationResponse = await _specsClient.PostCalculation(calculation);
 
-            Calculation newCalculation = newCalculationResponse.Content;
-
-            return Redirect($"/specs/policies/{specificationId}#calculation-{newCalculation.Id}");
+            if (newCalculationResponse.StatusCode == HttpStatusCode.OK)
+            { 
+                Calculation newCalculation = newCalculationResponse.Content;
+          
+                return Redirect($"/specs/policies/{specificationId}#calculation-{newCalculation.Id}");
+            }
+            else
+            {
+                throw new  InvalidOperationException($"Unable to create calculation specifications. Status Code = {newCalculationResponse.StatusCode}");
+            }
         }
 
         private void PopulatePolicies(Specification specification)
