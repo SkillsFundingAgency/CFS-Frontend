@@ -1567,6 +1567,14 @@ table {
     padding-bottom: 10px;
 }
 
+.provider-item-property-container .provider-item-property {
+    padding-right: 15px
+}
+
+.provider-item-property-container:last-child .provider-item-property {
+    padding-right: 0
+}
+
 .spec-rel-white-back {
     padding: 10px;
     padding-bottom: 1px;
