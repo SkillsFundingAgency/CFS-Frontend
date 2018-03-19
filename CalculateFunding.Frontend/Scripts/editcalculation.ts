@@ -1,4 +1,5 @@
 ﻿/// <reference path="common.d.ts" />
+/// <reference path="provider.completion.vb.ts" />
 
 namespace calculateFunding.editCalculation {
 
@@ -26,6 +27,8 @@ namespace calculateFunding.editCalculation {
         private initialCodeContents: string;
 
         public intellisenseContext: KnockoutObservable<Array<calculateFunding.common.ITypeInformationResponse>> = ko.observable(null);
+
+        private codeContext: calculateFunding.providers.VisualBasicIntellisenseProvider = new calculateFunding.providers.VisualBasicIntellisenseProvider();
 
         constructor(options: IEditCalculationViewModelOptions) {
             if (!options.calculationId) {
@@ -115,7 +118,6 @@ namespace calculateFunding.editCalculation {
                         }
                     }
 
-
                     self.state("idle");
                 });
             }
@@ -175,20 +177,82 @@ namespace calculateFunding.editCalculation {
                 request.done((result: Array<calculateFunding.common.ITypeInformationResponse>) => {
                     self.state("idle");
 
-                    console.table(result[0].methods);
+                    let variables: calculateFunding.providers.IVariableContainer = {};
+                    let functions: calculateFunding.providers.ILocalFunctionContainer = {};
+                    let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
+                        return item.name === "Calculations";
+                    });
 
-                    // Redirect back to Manage Calculations page
-                    //window.location.href = "/calcs";
+                    if (calculationType) {
+
+                        // Local Functions
+                        for (let m in calculationType.methods) {
+                            let currentMethod: calculateFunding.common.IMethodInformationResponse = calculationType.methods[m];
+
+                            let functionInformation: calculateFunding.providers.ILocalFunction = new calculateFunding.providers.VisualBasicSub({
+                                label: currentMethod.name,
+                                description: currentMethod.description,
+                                returnType: currentMethod.returnType,
+                                parameters: [],
+                            });
+
+                            for (let p in currentMethod.parameters) {
+                                let parameter = currentMethod.parameters[p];
+                                let parameterInformation: calculateFunding.providers.IFunctionParameter = {
+                                    name: parameter.name,
+                                    description: parameter.description,
+                                    type: parameter.type,
+                                };
+
+                                functionInformation.parameters.push(parameterInformation);
+                            }
+
+                            functions[functionInformation.label.toLowerCase()] = functionInformation;
+                        }
+                    }
+
+                    // Variables
+                    for (let v in calculationType.properties) {
+                        let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
+                        let variable: providers.IVariable = EditCalculationViewModel.convertPropertyInformationReponseToVariable(propertyInfo, result);
+
+                        variables[variable.name.toLowerCase()] = variable;
+                    }
+
+                    self.codeContext.setContextVariables(variables);
+                    self.codeContext.setLocalFunctions(functions);
+
                 });
             }
         }
 
-        public registerMonacoProviders() {
+        private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>): providers.IVariable {
+            let variable: providers.IVariable = {
+                name: property.name,
+                description: property.description,
+                type: property.type,
+                items: {}
+            };
+
+            let typeInformation = ko.utils.arrayFirst(types, (item: common.ITypeInformationResponse) => {
+                return item.name == variable.type;
+            });
+
+            if (typeInformation) {
+                for (let i in typeInformation.properties) {
+                    let childVariable: providers.IVariable = EditCalculationViewModel.convertPropertyInformationReponseToVariable(typeInformation.properties[i], types);
+                    variable.items[childVariable.name.toLowerCase()] = childVariable;
+                }
+            }
+
+            return variable;
+        }
+
+        /* Register types for the monaco editor to support Intellisense */
+        public registerMonacoProviders(viewModel: EditCalculationViewModel) {
             console.log("Registering monaco providers");
-            monaco.languages.registerCompletionItemProvider('vb', calculateFunding.providers.getVbCompletionProvider());
-            monaco.languages.registerSignatureHelpProvider('vb', calculateFunding.providers.getSignatureHelpProvider());
-            monaco.languages.registerHoverProvider('vb', calculateFunding.providers.getHoverProvider());
-            monaco.languages.register({ id: "hover" });
+            monaco.languages.registerCompletionItemProvider('vb', viewModel.codeContext.getCompletionProvider());
+            monaco.languages.registerHoverProvider('vb', viewModel.codeContext.getHoverProvider());
         }
     }
 

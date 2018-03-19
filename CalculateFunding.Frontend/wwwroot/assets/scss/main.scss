@@ -1701,9 +1701,18 @@ table {
     background-image: url('/libs/govuk_bootstrap/images/open-government-licence.png?0.17.1');
 }
 
-.monaco-editor{
-    .button{
+.monaco-editor {
+    .button {
         background-color: transparent;
+    }
+
+    .monaco-scrollable-element {
+        .body {
+            text-wrap: normal;
+            white-space: normal;
+            text-space-collapse: collapse;
+            word-break: normal;
+        }
     }
 }
 
