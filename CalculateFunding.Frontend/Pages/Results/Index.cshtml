@@ -78,30 +78,33 @@
                         <span class="provider-item-property provider-item-property-upin">
                             UPIN: 
                             <strong>
-                                <span id="provider-item-upin-@providerRow">@provider.Upin</span>
+                                <span id="provider-item-upin-@providerRow">                              
+                                      @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
+                                </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-ukprn">
                             UKPRN: 
                             <strong>
                                 <span id="provider-item-ukprn-@providerRow">
-                                    @provider.Ukprn
+                                    @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
+                                  
                                 </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-urn">
                             URN: 
                             <strong>
-                                <span id="provider-item-urn-@providerRow">
-                                    @provider.Urn
+                                <span id="provider-item-urn-@providerRow">                                
+                                    @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
                                 </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-estab-num">
                            Establishment number: 
                             <strong>
-                                <span id="provider-item-establishmentnumber-@providerRow">
-                                    @provider.EstablishmentNumber
+                                <span id="provider-item-establishmentnumber-@providerRow">                           
+                                    @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
                                 </span>
                             </strong>
                         </span>
