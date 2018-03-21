@@ -8,29 +8,27 @@
 }
 
 @section FormBannerLeft{
-    <p class="hero-title">@Model.Calculation.Name for @Model.Calculation.PeriodName</p>
-    <div>
-        <p class="what-is-title-nojs withjs-hide">What is @Model.Calculation.Name?</p>
+    <p class="hero-pre-text">@Model.SpecificationName </p>
+    <p class="hero-title">@Model.Calculation.Name </p>
 
-        <div class="inline-collapse-container">
-            <div class="inline-collapse-heading withjs-show">
-                <i class="inline-collapse-arrow"></i>
-                <span>What is @Model.Calculation.Name?</span>
-            </div>
-            <div class="inline-collapse-contents withjs-hide what-is-description">
-                @Model.Calculation.Description
-            </div>
+    <div class="inline-calculation-container">
+        <div class="inline-calculation-heading">
+            <span>Description</span>
+        </div>
+        <div class="inline-calculation-contents">
+            @Model.Calculation.Description
         </div>
     </div>
+
 }
 
 @section FormBannerRight{
-    <div class="bannerpublish-container">
-        <div class="bannerpublish-title">Status</div>
-        <div class="bannerpublish-status"><strong>Status:</strong> @Model.Calculation.Status</div>
-        <div class="bannerpublish-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
-        <div class="bannerpublish-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
-        <div class="bannerpublish-button-container"><input type="button" value="Publish" class="button button-publish" disabled id="publish-button" /></div>
+    <div class="bannerblue-container">
+        <div class="bannerblue-title">Status</div>
+        <div class="bannerblue-status">@Model.Calculation.Status</div>
+        <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
+        <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
+        <div class="bannerblue-button-container"><input type="button" class="button-blue" value="Approve" disabled id="approve-button" /></div>
     </div>
 }
 
@@ -45,7 +43,7 @@
 }
 <div class="row">
     <div class="col-xs-12 edit-calculation" id="edit-calculation">
-        <strong>Calculation script:</strong>
+        <strong>Calculation script</strong>
         <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
 
         <div>
@@ -53,10 +51,10 @@
         </div>
 
         <div class="spacing-30">
-            <input type="button" class="button" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+            <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
         </div>
 
-        <strong>Build output:</strong>
+        <strong>Build output</strong>
 
         <div class="build-output">
             <div data-bind="text: buildOutput"></div>
@@ -69,7 +67,7 @@
             </div>
         </div>
 
-        <div class="spacing-30" data-bind="visible: !calculationBuilt()">Please build calculation before saving the calculation:</div>
+        <div class="spacing-30" data-bind="visible: !calculationBuilt()">Your calculation's build output must be successful before you can save it.</div>
         <div class="spacing-15">
             <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
         </div>

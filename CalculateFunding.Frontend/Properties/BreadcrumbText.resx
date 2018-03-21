@@ -148,7 +148,7 @@
     <value>Load dataset</value>
   </data>
   <data name="ManageCalculations" xml:space="preserve">
-    <value>Manage Calculations</value>
+    <value>Calculations</value>
   </data>
   <data name="ManageDatasets" xml:space="preserve">
     <value>Manage data</value>

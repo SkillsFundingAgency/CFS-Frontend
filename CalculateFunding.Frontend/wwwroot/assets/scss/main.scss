@@ -156,6 +156,7 @@ blockquote {
     width: 100%;
 }
 
+
 .hero-title {
     font-size: 48px;
     margin-bottom: 30px;
@@ -595,6 +596,62 @@ blockquote {
     }
 }
 
+.bannerblue-container {
+    border-top: 5px solid $govuk-blue;
+    padding-top: 5px;
+
+    .bannerblue-title {
+        font-size: 19px;
+        font-weight: bold;
+    }
+
+    .bannerblue-status {
+        margin-bottom: 15px;
+    }
+
+    .bannerblue-lastmodifiedby,
+    .bannerblue-lastmodified {
+        color: $grey-2;
+    }
+
+    .bannerblue-lastmodified {
+        margin-bottom: 5px;
+    }
+
+    .button-blue {
+        color: white;
+        cursor: pointer;
+        background-color: #005ea5;
+        width: 100%;
+        box-shadow: none;
+        padding: .526315em .789473em .263157em;
+        border: none;
+        -webkit-appearance: button;
+        font-size: 18px;
+    }
+
+    .button-blue:hover {
+        background-color: #004172;
+    }
+}
+
+.button-calculation {
+    color: white;
+    cursor: pointer;
+    background-color: #005ea5;
+    box-shadow: none;
+    padding: .526315em .789473em .263157em;
+    border: none;
+    -webkit-appearance: button;
+    font-size: 18px;
+
+    &:hover {
+        background-color: #004172;
+    }
+}
+
+
+
 .withjs-show {
     display: none;
 }
@@ -604,6 +661,26 @@ blockquote {
 
 .withjs-hide-hidden {
     display: none;
+}
+
+.inline-calculation-container {
+    border-left: 5px solid #6f777b;
+    margin-left: 5px;
+
+    .inline-calculation-heading {
+        margin-left: 10px;
+
+        span {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    }
+
+    .inline-calculation-contents {
+        padding: 5px 0;
+        font-size: 15px;
+        margin-left: 10px;
+    }
 }
 
 .inline-collapse-container {
@@ -1272,6 +1349,11 @@ table {
     .hero-title {
         margin-bottom: 0;
     }
+
+    .hero-pre-text {
+        color: $grey-2;
+        font-size: 22px;
+    }
 }
 
 .filter-container {
@@ -1572,6 +1654,36 @@ table {
 }
 
 .provider-item-property-container:last-child .provider-item-property {
+    padding-right: 0
+}
+
+.test-scenario-searchresult-container .test-scenario-item-container {
+    border-top: 1px solid #ccc;
+    padding: 15px 0;
+}
+
+.test-scenario-searchresult-container .test-scenario-item-container:last-child {
+    border-bottom: 1px solid #ccc;
+}
+
+.test-scenario-searchresult-container .test-scenario-item-header {
+    font-size: 22px;
+    padding: 10px 0;
+}
+
+.test-scenario-searchresult-container .test-scenario-item-property {
+    margin-left: 15px;
+}
+
+.test-scenario-searchresult-container .test-scenario-item-property:first-child {
+    margin-left: 0;
+}
+
+.test-scenario-item-property-container .test-scenario-item-property {
+    padding-right: 15px
+}
+
+.test-scenario-item-property-container:last-child .test-scenario-item-property {
     padding-right: 0
 }
 

@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
+    using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
@@ -36,6 +37,8 @@
 
         public string VariablesJson { get; set; }
 
+        public string SpecificationName { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
@@ -61,7 +64,17 @@
             SpecificationId = calculation.Content.SpecificationId;
 
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
-            
+
+            ApiResponse<Clients.SpecsClient.Models.Specification> specificationResponse = await _specsClient.GetSpecification(SpecificationId);
+
+            if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                SpecificationName = specificationResponse.Content.Name;
+            }
+            else
+            {
+                SpecificationName = "Unknown";
+            }
             return Page();
         }
     }
