@@ -628,10 +628,14 @@ blockquote {
         border: none;
         -webkit-appearance: button;
         font-size: 18px;
-    }
 
-    .button-blue:hover {
-        background-color: #004172;
+        &:hover {
+            background-color: #004172;
+        }
+
+        &[disabled] {
+            opacity: 0.5;
+        }
     }
 }
 
@@ -647,6 +651,10 @@ blockquote {
 
     &:hover {
         background-color: #004172;
+    }
+
+    &[disabled] {
+        opacity: 0.5;
     }
 }
 

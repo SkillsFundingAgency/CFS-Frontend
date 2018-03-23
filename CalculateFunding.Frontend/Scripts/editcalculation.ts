@@ -47,7 +47,7 @@ namespace calculateFunding.editCalculation {
             let self = this;
 
             this.canBuildCalculation = ko.computed(() => {
-                if (self.state() === "buildingCalculation") {
+                if (this.state() !== "idle") {
                     return false;
                 }
 
@@ -70,7 +70,7 @@ namespace calculateFunding.editCalculation {
                 }
 
                 if (this.state() !== "idle") {
-                    return;
+                    return false;
                 }
 
                 // Is the source code different to last successful compile
@@ -125,6 +125,7 @@ namespace calculateFunding.editCalculation {
 
         public saveCalculation() {
             if (this.state() === "idle" && this.canSaveCalculation()) {
+                this.state("savingcalculation");
                 let data = {
                     sourceCode: this.sourceCode(),
                 };
