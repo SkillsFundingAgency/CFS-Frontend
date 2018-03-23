@@ -143,7 +143,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         {
             var specResponse = await _resultsApiClient.GetSpecifications(providerId);
 
-            var specifications = specResponse.Content.Where(m => m.Period.Id == PeriodId);
+            var specifications = specResponse.Content.Where(m => m.Period?.Id == PeriodId);
 
             if (string.IsNullOrWhiteSpace(specificationId))
             {
