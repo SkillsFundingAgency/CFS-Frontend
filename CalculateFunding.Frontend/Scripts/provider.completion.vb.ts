@@ -8,8 +8,9 @@ namespace calculateFunding.providers {
         private contextFunctions: ILocalFunctionContainer = {};
 
         private variableAllowedNowPrefixes: Array<string> = [
-            // If and If with brackets and spaces, but not matching End If
-            "(?<!End )If(\s)*(\\()?( )*",
+            // If and If with brackets and spaces, but not matching End If - regex not supported in IE11
+            //"(?<!End )If(\s)*(\\()?( )*",
+            "If(\s)*(\\()?( )*",
             "Return ",
             "ElseIf\\(",
             "ElseIf \\(",
@@ -107,12 +108,13 @@ namespace calculateFunding.providers {
                                                 detail: variable.type,
                                             }
 
-                                            if (typeof variable.description !== "undefined") {
-                                                pathVariable.documentation = {
-                                                    value: variable.description,
-                                                    isTrusted: false,
-                                                };
-                                            }
+                                            //// TODO - reenable once backend is providing data
+                                            //if (typeof variable.description !== "undefined") {
+                                            //    pathVariable.documentation = {
+                                            //        value: variable.description,
+                                            //        isTrusted: false,
+                                            //    };
+                                            //}
 
                                             results.push(pathVariable);
                                         }
@@ -170,9 +172,10 @@ namespace calculateFunding.providers {
                                     detail: variable.type,
                                 };
 
-                                if (typeof variable.description != "undefined") {
-                                    variableItem.documentation = variable.description;
-                                }
+                                //// TODO - reenable once backend is providing data
+                                //if (typeof variable.description != "undefined") {
+                                //    variableItem.documentation = variable.description;
+                                //}
 
                                 results.push(variableItem);
                             }
@@ -217,15 +220,15 @@ namespace calculateFunding.providers {
                                 let localFunctionItem: monaco.languages.CompletionItem = {
                                     label: localFunction.label,
                                     kind: monaco.languages.CompletionItemKind.Function,
-                                    documentation: {
-                                        value: localFunction.description,
-                                        isTrusted: false,
-                                    },
                                     detail: localFunction.getFunctionAndParameterDescription(),
                                 };
 
+                                // TODO - reenable once backend is providing data
                                 //if (typeof localFunction.description !== "undefined") {
-                                //    localFunctionItem.detail = localFunction.description;
+                                //    localFunctionItem.documentation: {
+                                //value: localFunction.description,
+                                //    isTrusted: false,
+                                //    };
                                 //}
 
                                 results.push(localFunctionItem);
@@ -255,18 +258,19 @@ namespace calculateFunding.providers {
             let hoverProvider: monaco.languages.HoverProvider = {
                 provideHover: function (model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.Hover | monaco.Thenable<monaco.languages.Hover> {
 
-                    let lineContents = model.getLineContent(position.lineNumber);
-                    let forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
+                    // TODO - reenable once backend is providing data
+                    //let lineContents = model.getLineContent(position.lineNumber);
+                    //let forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
 
-                    let variableHover: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, self.contextVariables);
-                    if (variableHover) {
-                        return variableHover;
-                    }
+                    //let variableHover: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, self.contextVariables);
+                    //if (variableHover) {
+                    //    return variableHover;
+                    //}
 
-                    let variableLocalFunction: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, self.contextFunctions);
-                    if (variableLocalFunction) {
-                        return variableLocalFunction;
-                    }
+                    //let variableLocalFunction: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, self.contextFunctions);
+                    //if (variableLocalFunction) {
+                    //    return variableLocalFunction;
+                    //}
 
                     return null;
                 }
@@ -457,6 +461,7 @@ namespace calculateFunding.providers {
         }
 
         public static FindDeclaredVariables(contents: string): Array<string> {
+            variableRegex = /\b(\s)?Dim\s+([a-zA-Z][(\w}|\d){0-254}]*([,]([ ])?)*)+/g;
             let regex = new RegExp(variableRegex);
             let matches: Array<string> = [];
             let match = null;
@@ -471,9 +476,9 @@ namespace calculateFunding.providers {
                 let variableNames = match[0].substr(3).trim();
 
                 // Support multiple variables declared at once eg Dim var1, var2, var3
-                let variableNamesSplit: Array<string> = variableNames.split(", ");
+                let variableNamesSplit: Array<string> = variableNames.split(",");
                 for (let k in variableNamesSplit) {
-                    let variableName = variableNamesSplit[k];
+                    let variableName = variableNamesSplit[k].trim();
 
                     // Make sure there are no duplicates (if the user has defined a variable twice)
                     if (result.indexOf(variableName) < 0) {
