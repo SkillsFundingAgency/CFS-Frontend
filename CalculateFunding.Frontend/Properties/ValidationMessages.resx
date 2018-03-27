@@ -156,6 +156,18 @@
   <data name="RelationshipNameAlreadyExists" xml:space="preserve">
     <value>Given relationship name is not unique, please provide different relationship name </value>
   </data>
+  <data name="ScenarioDescriptionRequired" xml:space="preserve">
+    <value>Enter a description</value>
+  </data>
+  <data name="ScenarioGherkinRequired" xml:space="preserve">
+    <value>You must enter a gherkin test</value>
+  </data>
+  <data name="ScenarioNameRequired" xml:space="preserve">
+    <value>Enter a name</value>
+  </data>
+  <data name="ScenarioSpecificationIdRequired" xml:space="preserve">
+    <value>Select a specification</value>
+  </data>
   <data name="SpecificationAlreadyExists" xml:space="preserve">
     <value>You must give a unique specification name</value>
   </data>

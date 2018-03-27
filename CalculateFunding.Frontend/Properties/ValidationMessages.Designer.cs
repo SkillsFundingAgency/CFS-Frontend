@@ -178,6 +178,42 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter a description.
+        /// </summary>
+        internal static string ScenarioDescriptionRequired {
+            get {
+                return ResourceManager.GetString("ScenarioDescriptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must enter a gherkin test.
+        /// </summary>
+        internal static string ScenarioGherkinRequired {
+            get {
+                return ResourceManager.GetString("ScenarioGherkinRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a name.
+        /// </summary>
+        internal static string ScenarioNameRequired {
+            get {
+                return ResourceManager.GetString("ScenarioNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a specification.
+        /// </summary>
+        internal static string ScenarioSpecificationIdRequired {
+            get {
+                return ResourceManager.GetString("ScenarioSpecificationIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must give a unique specification name.
         /// </summary>
         internal static string SpecificationAlreadyExists {

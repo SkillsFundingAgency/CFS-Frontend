@@ -1,0 +1,128 @@
+﻿@page "{periodId}"
+@model CalculateFunding.Frontend.Pages.Scenarios.CreateTestScenarioPageModel
+
+@{
+    ViewData["Title"] = "Create test scenario";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="~/scenarios">Quality assurance</a></li>
+            <li>Create test</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <p class="hero-title">Create quality assurance test</p>
+
+}
+
+@section FormBannerRight{
+    <div class="bannerblue-container">
+        <div class="bannerblue-title">Status</div>
+        <div class="bannerblue-status"> Draft</div>
+        <div class="bannerblue-button-container"><input type="button" value="Approve" class="button button-blue" disabled id="appr-button" /></div>
+    </div>
+}
+<div class="row" id="create-test-scenario">
+    <div class="col-xs-12 create-scenario">
+
+        <form method="post" class="form" id="test-scenario-form">
+            <div class="validation-summary-errors" style="display:none;" data-valmsg-summary="true" data-bind="visible: isValidationSummaryVisible, attr:{'display': 'block'}">
+                <h3 class="heading-large">There is a problem</h3>
+                <p><strong>Check that you have answered the questions correctly</strong></p>
+                <ul data-bind="foreach: validationLinks">
+                    <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
+                </ul>
+            </div>
+            <div class="row ">
+                <div class="col-md-6">
+                    <div data-bind="css: { 'validation-failed-block': !isSpecificationIdValid() }">
+                        <a name="field-CreateTestScenarioModel-SpecificationId"></a>
+                        <label asp-for="@Model.Specifications"> Select a specification</label>
+                        <select data-bind="value: specificationId, css:{'input-validation-error': !isSpecificationIdValid() }" asp-items="@(Model.Specifications)" class="form-control test-scenario-control" id="select-specifications" name="specifications">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row ">
+                <div class="col-md-6" >
+                    <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
+                        <a validationanchor-for="CreateTestScenarioModel.Name"></a>
+                        <label asp-for="CreateTestScenarioModel.Name">Test name</label>
+                        <input data-bind="value: name, css:{ 'input-validation-error': !isNameValid() }" asp-for="CreateTestScenarioModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
+                        <a validationanchor-for="CreateTestScenarioModel.Description"></a>
+                        <label asp-for="CreateTestScenarioModel.Description">Test description</label>
+                        <textarea data-bind="value: description, css: { 'input-validation-error': !isDescriptionValid() }" asp-for="CreateTestScenarioModel.Description" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div id="create-test-scenario">
+                <strong>Test scenario:</strong>
+                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'text', editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+                <div class="spacing-30">
+                    <input type="button" class="button-calculation" value="Validate QA Test" data-bind="click: compileTestScenario, disable: !canRunTest()" id="validate-qa-test-button" />
+                </div>
+
+                <strong>Build output:</strong>
+
+                <div class="build-output">
+                    <div data-bind="if: validationRequested">
+                        <div data-bind="text: testOutput"></div>
+                        Test compiled successfully: <span data-bind="text: testBuilt"></span>
+                        <div id="test-compiler-response">
+                            <div class="compiler-messages" data-bind="foreach: validationResponse">
+                                <span data-bind="text: errorMessage"></span>:
+                                Line <span data-bind="text: line"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spacing-30" data-bind="visible: !testBuilt()">You must have a valid test before you can save it:</div>
+
+                <div class="spacing-15">
+                    <input type="button" class="button" value="Create test" id="create-test-button" data-bind="click: saveTestScenario, enable: canSaveTestScenario()" />
+                </div>
+
+                <div class="spacing-15" data-bind="visible: saveTestScenarioResult, text: saveTestScenarioResult"></div>
+
+                <div>
+                    <a href="~/scenarios" id="link-back">Back</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/staticjs/regex.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/createtestscenario.js" type="text/javascript" asp-append-version="true"></script>
+    <script type="text/javascript">
+        var createTestScenarioElement = document.getElementById("create-test-scenario");
+        var vm = new calculateFunding.createTestScenario.CreateTestScenarioViewModel();
+
+        if (createTestScenarioElement) {
+            ko.applyBindings(vm, createTestScenarioElement);
+        }
+    </script>
+}

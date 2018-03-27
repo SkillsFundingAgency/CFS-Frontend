@@ -512,7 +512,7 @@ blockquote {
 
 .monaco-editor-container {
     min-height: 600px;
-    border: 4px solid #000000;
+    border: 2px solid #000000;
 }
 
 .monaco-editor-diff-container {
@@ -528,13 +528,11 @@ blockquote {
     overflow: visible;
 }
 
-.edit-calculation {
-    .build-output {
-        background-color: rgb(222,224,226);
-        border: 4px solid #000000;
-        min-height: 150px;
-        padding: 15px;
-    }
+.build-output {
+    background-color: rgb(222,224,226);
+    border: 2px solid #000000;
+    min-height: 150px;
+    padding: 15px;
 }
 
 .diff-container {

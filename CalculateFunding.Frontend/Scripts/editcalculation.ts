@@ -117,7 +117,6 @@ namespace calculateFunding.editCalculation {
                             self.successfulCompileSourceCode(self.sourceCode());
                         }
                     }
-
                     self.state("idle");
                 });
             }

@@ -19,7 +19,7 @@
         }
 
         [HttpPost]
-        [Route("/results/api/results/searchproviders")] // This need to be verified
+        [Route("api/results/searchproviders")]
         public async Task<IActionResult> SearchProviders([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));

@@ -1,5 +1,5 @@
 ﻿ko.bindingHandlers.monacoEditor = {
-    init: function (element, valueAccessor, allBindings : KnockoutAllBindingsAccessor, viewModel, bindingContext) {
+    init: function (element, valueAccessor, allBindings: KnockoutAllBindingsAccessor, viewModel, bindingContext) {
         // This will be called when the binding is first applied to an element
         // Set up any initial state, event handlers, etc. here
 
@@ -7,6 +7,17 @@
 
         require.config({ paths: { 'vs': '/assets/libs/js/monaco/vs' } });
         require(['vs/editor/editor.main'], function () {
+
+            let monacoEditorOptions = allBindings.get("monacoEditorOptions");
+            let language: string = "vb";
+
+            if (monacoEditorOptions) {
+                if (monacoEditorOptions["language"]) {
+                    language = ko.unwrap(monacoEditorOptions["language"]);
+                    console.log("Setting language to ", language);
+                }
+            }
+
             let editor: monaco.editor.IStandaloneCodeEditor = monaco.editor.create(element, {
                 value: valueUnwrapped,
                 language: 'vb',
@@ -22,7 +33,6 @@
                 value(editor.getValue());
             });
 
-            let monacoEditorOptions = allBindings.get("monacoEditorOptions");
             if (monacoEditorOptions) {
                 if (typeof (monacoEditorOptions.editorCreatedCallback) !== "undefined") {
                     if ($.isFunction(monacoEditorOptions.editorCreatedCallback)) {

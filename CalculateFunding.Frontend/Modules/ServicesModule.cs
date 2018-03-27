@@ -13,6 +13,7 @@
             services.AddScoped<IDatasetSearchService, DatasetSearchService>();
             services.AddScoped<IProviderSearchService, ProviderSearchService>();
             services.AddScoped<IDatasetRelationshipsSearchService, DatasetRelationshipsSearchService>();
+            services.AddScoped<IScenarioSearchService, ScenarioSearchService>();
         }
     }
 }

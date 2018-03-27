@@ -13,5 +13,6 @@
         public HttpStatusCode StatusCode { get; private set; }
 
         public T Content { get; private set; }
+        
     }
 }

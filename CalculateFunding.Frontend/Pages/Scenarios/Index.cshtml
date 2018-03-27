@@ -1,0 +1,192 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Scenarios.IndexModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.Helpers
+@using CalculateFunding.Frontend.ViewModels.Common
+
+@{
+    ViewData["Title"] = "Manage Test";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">Calculate Funding</a></li>
+            <li>Quality assurance</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Quality assurance</h1>
+    <h2 class="hero-description"> Run and design tests for funding calculations.</h2>
+}
+
+@section BannerMiddle{
+    <form method="post" action="scenarios/scenarios-search" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading"></div>
+            <div class="col-xs-3 filter-field-heading withjs-show"></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search tests" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <a href="/scenarios/createtestscenario/@Model.PeriodId" class="btn btn-filter-link-button" id="createQATestButton">Create QA test</a>
+            </div>
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text"></div>
+        </div>
+    </form>
+}
+
+<div class="row manage-tests" id="manage-tests-container">
+    @Html.Partial("_SearchErrorPartial")
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.ScenarioResults, "scenarios", Model.SearchTerm))
+        </div>
+
+        <div class="test-scenario-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+            @{
+                int ScenariosRow = 0;
+            }
+            @foreach (var testScenario in Model.ScenarioResults.Scenarios)
+            {
+
+                <div class="test-scenario-item-container" id="test-scenario-item-result-@ScenariosRow">
+                    <div class="test-scenario-item-header">
+                        <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow"> @testScenario.Name</a>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-description" id="test-scenario-item-property-Description-@ScenariosRow">
+                            @testScenario.TestDescription
+                        </span>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-specification">
+                            Spec:
+                            <strong>
+                                <span class="test-scenario-item-property" id="test-scenario-item-specification-@ScenariosRow">
+                                    @testScenario.SpecificationName
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-status">
+                            Status:
+                            <strong>
+                                <span id="test-item-status-@ScenariosRow">@testScenario.Status</span>
+                            </strong>
+                        </span>
+                        <span class="test-scenario-item-property test-scenario-item-property-updated-on">
+                            Update on:
+                            <strong>
+                                <span id="test-item-lastupdated-@ScenariosRow">
+                                    @testScenario.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+                ScenariosRow++;
+            }
+        </div>
+        <div class="withjs-show test-scenario-searchresult-container test-scenario-searchresult-dynamic-container">
+            <div data-bind="foreach: testScenarios">
+                <div class="test-scenario-item-container" data-bind="test-scenario-item-result-$index()">
+                    <div class="test-scenario-item-header">
+                        <a data-bind="text: name, attr: { 'href': '/scenarios/edittestscenario/' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-description" data-bind="text: testDescription">
+                        </span>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-specification">
+                            Spec:
+                            <strong>
+                                <span class="test-scenario-item-property" data-bind="text: specificationName">
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property test-scenario-item-property-status">
+                            Status:
+                            <strong>
+                                <span id="test-item-status-@ScenariosRow" data-bind="text: status"></span>
+                            </strong>
+                        </span>
+                        <span class="test-scenario-item-property test-scenario-item-property-updated-on">
+                            Update on:
+                            <strong>
+                                <span id="test-item-lastupdated-@ScenariosRow" data-bind="text: lastUpdatedDisplay"></span>
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Test Results</p>
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/list-test-scenarios.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.listTestScenarios.ScenariosSearchViewModel();
+
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var scenarioContainer = document.getElementById("manage-tests-container");
+        if (scenarioContainer) {
+            ko.applyBindings(vm, scenarioContainer);
+
+        }
+        vm.performSearch();
+    </script>
+
+    <script type="text/javascript">
+        $("#search-button").hide();
+        $('select').change(function () {
+            if ($(this).attr('id') == "PeriodId") {
+                $("#SpecificationId").val('');
+            }
+            $("#search-button").click();
+        });
+    </script>
+
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}
+
+
+
+
+
+
+
+
+
+

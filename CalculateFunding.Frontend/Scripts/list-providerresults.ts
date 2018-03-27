@@ -60,7 +60,7 @@
         public performSearch(pageNumber?: number): void {
             let self = this;
 
-            super.makeSearchResultAndProcess("api/results/searchproviders", pageNumber, (resultUntyped) => {
+            super.makeSearchResultAndProcess("/api/results/searchproviders", pageNumber, (resultUntyped) => {
                 let result: IProviderSearchResultResponse = resultUntyped;
                 self.providerSearchResults(result.providers);
                 self.populateCommonSearchResultProperties(result);

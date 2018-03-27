@@ -28,6 +28,6 @@
 
         Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId);
+        Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId);      
     }
 }

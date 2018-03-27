@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Manage Calculations.
+        ///   Looks up a localized string similar to Calculations.
         /// </summary>
         public static string ManageCalculations {
             get {

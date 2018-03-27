@@ -16,5 +16,10 @@
         public string CalcsPath { get; set; }
 
         public string DatasetsPath { get; set; }
+
+        public string ScenariosPath { get; set; }
+
+        public string TestEnginePath { get; set; }
+
     }
 }

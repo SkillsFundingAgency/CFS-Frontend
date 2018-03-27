@@ -67,4 +67,10 @@
         type: string;
         children: Array<IPropertyInformationResponse>;
     }
+
+    export interface IScenarioCompileErrorResponse {
+        errorMessage: string;
+        line: number;
+        column: number;
+    }
 }
