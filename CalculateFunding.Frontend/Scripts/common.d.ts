@@ -47,6 +47,7 @@
 
     export interface IMethodInformationResponse {
         name: string;
+        friendlyName: string;
         description: string;
         returnType: string;
         entityId: string;
@@ -61,6 +62,7 @@
 
     export interface IPropertyInformationResponse {
         name: string;
+        friendlyName: string;
         description: string;
         type: string;
         children: Array<IPropertyInformationResponse>;

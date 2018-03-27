@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,   
-    "target":"es5"
+    "noImplicitAny": true,
+    "target": "es5"
   },
   "exclude": [
     "wwwroot",
@@ -9,8 +9,8 @@
     "node_modules/gulp-typescript"
   ],
   "include": [
-    "scripts/*.ts",
-    "./node_modules/**/*.d.ts",
+    "scripts/Tests/*.ts",
+    "node_modules/**/*.d.ts",
     "node_modules/monaco-editor/monaco.d.ts",
     "node_modules/@types/jasmine/index.d.ts"
   ]

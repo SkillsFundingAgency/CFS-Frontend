@@ -195,6 +195,7 @@ namespace calculateFunding.editCalculation {
                                 description: currentMethod.description,
                                 returnType: currentMethod.returnType,
                                 parameters: [],
+                                friendlyName: currentMethod.friendlyName,
                             });
 
                             for (let p in currentMethod.parameters) {
@@ -230,6 +231,7 @@ namespace calculateFunding.editCalculation {
         private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>): providers.IVariable {
             let variable: providers.IVariable = {
                 name: property.name,
+                friendlyName: property.friendlyName,
                 description: property.description,
                 type: property.type,
                 items: {}

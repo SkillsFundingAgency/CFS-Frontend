@@ -108,13 +108,37 @@ namespace calculateFunding.providers {
                                                 detail: variable.type,
                                             }
 
-                                            //// TODO - reenable once backend is providing data
-                                            //if (typeof variable.description !== "undefined") {
-                                            //    pathVariable.documentation = {
-                                            //        value: variable.description,
-                                            //        isTrusted: false,
-                                            //    };
-                                            //}
+                                            let description = "";
+                                            let friendlyName = "";
+
+                                            if (typeof variable.description !== "undefined") {
+                                                description = variable.description;
+                                            }
+
+                                            if (typeof variable.friendlyName !== "undefined") {
+                                                friendlyName = variable.friendlyName;
+                                            }
+
+                                            if (description || friendlyName) {
+                                                let documentationValue = "";
+
+                                                if (friendlyName) {
+                                                    documentationValue = "**" + friendlyName + "**";
+                                                }
+
+                                                if (description) {
+                                                    if (documentationValue) {
+                                                        documentationValue = documentationValue + "\r\n\r\n";
+                                                    }
+                                                    documentationValue = documentationValue + description;
+                                                }
+
+                                                pathVariable.documentation = {
+                                                    value: documentationValue,
+                                                    isTrusted: true,
+                                                };
+                                            }
+
 
                                             results.push(pathVariable);
                                         }
@@ -172,10 +196,36 @@ namespace calculateFunding.providers {
                                     detail: variable.type,
                                 };
 
-                                //// TODO - reenable once backend is providing data
-                                //if (typeof variable.description != "undefined") {
-                                //    variableItem.documentation = variable.description;
-                                //}
+                                let description = "";
+                                let friendlyName = "";
+
+                                if (typeof variable.description !== "undefined") {
+                                    description = variable.description;
+                                }
+
+                                if (typeof variable.friendlyName !== "undefined") {
+                                    friendlyName = variable.friendlyName;
+                                }
+
+                                if (description || friendlyName) {
+                                    let documentationValue = "";
+
+                                    if (friendlyName) {
+                                        documentationValue = "**" + friendlyName + "**";
+                                    }
+
+                                    if (description) {
+                                        if (documentationValue) {
+                                            documentationValue = documentationValue + "\r\n\r\n";
+                                        }
+                                        documentationValue = documentationValue + description;
+                                    }
+
+                                    variableItem.documentation = {
+                                        value: documentationValue,
+                                        isTrusted: true,
+                                    };
+                                }
 
                                 results.push(variableItem);
                             }
@@ -223,13 +273,36 @@ namespace calculateFunding.providers {
                                     detail: localFunction.getFunctionAndParameterDescription(),
                                 };
 
-                                // TODO - reenable once backend is providing data
-                                //if (typeof localFunction.description !== "undefined") {
-                                //    localFunctionItem.documentation: {
-                                //value: localFunction.description,
-                                //    isTrusted: false,
-                                //    };
-                                //}
+                                let description = "";
+                                let friendlyName = "";
+
+                                if (typeof localFunction.description !== "undefined") {
+                                    description = localFunction.description;
+                                }
+
+                                if (typeof localFunction.friendlyName !== "undefined") {
+                                    friendlyName = localFunction.friendlyName;
+                                }
+
+                                if (description || friendlyName) {
+                                    let documentationValue = "";
+
+                                    if (friendlyName) {
+                                        documentationValue = "**" + friendlyName + "**";
+                                    }
+
+                                    if (description) {
+                                        if (documentationValue) {
+                                            documentationValue = documentationValue + "\r\n\r\n";
+                                        }
+                                        documentationValue = documentationValue + description;
+                                    }
+
+                                    localFunctionItem.documentation = {
+                                        value: documentationValue,
+                                        isTrusted: true,
+                                    };
+                                }
 
                                 results.push(localFunctionItem);
                             }
@@ -257,20 +330,18 @@ namespace calculateFunding.providers {
             let self = this;
             let hoverProvider: monaco.languages.HoverProvider = {
                 provideHover: function (model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.Hover | monaco.Thenable<monaco.languages.Hover> {
+                    let lineContents = model.getLineContent(position.lineNumber);
+                    let forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
 
-                    // TODO - reenable once backend is providing data
-                    //let lineContents = model.getLineContent(position.lineNumber);
-                    //let forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
+                    let variableHover: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, self.contextVariables);
+                    if (variableHover) {
+                        return variableHover;
+                    }
 
-                    //let variableHover: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, self.contextVariables);
-                    //if (variableHover) {
-                    //    return variableHover;
-                    //}
-
-                    //let variableLocalFunction: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, self.contextFunctions);
-                    //if (variableLocalFunction) {
-                    //    return variableLocalFunction;
-                    //}
+                    let variableLocalFunction: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, self.contextFunctions);
+                    if (variableLocalFunction) {
+                        return variableLocalFunction;
+                    }
 
                     return null;
                 }
@@ -325,17 +396,27 @@ namespace calculateFunding.providers {
 
                 let foundLocalFunction: ILocalFunction = functions[localFunctionKey];
                 if (foundLocalFunction) {
-                    let description = foundLocalFunction.label;
 
-                    if (typeof foundLocalFunction.description !== "undefined" && foundLocalFunction.description) {
+                    let description = "";
+                    let documentationValue = "Return type: " + foundLocalFunction.returnType;
+
+                    if (typeof foundLocalFunction.description !== "undefined") {
                         description = foundLocalFunction.description;
+                    }
+
+                    if (description) {
+                        if (documentationValue) {
+                            documentationValue = documentationValue + "\r\n\r\n";
+                        }
+
+                        documentationValue = documentationValue + description;
                     }
 
                     let hover: monaco.languages.Hover = {
                         contents: [
                             {
-                                value: description,
-                                isTrusted: false,
+                                value: documentationValue,
+                                isTrusted: true,
                             }
                         ],
                         range: null,
@@ -344,6 +425,8 @@ namespace calculateFunding.providers {
                     return hover;
                 }
             }
+
+            return null;
         }
 
         public static getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, variables: IVariableContainer): monaco.languages.Hover {
@@ -390,17 +473,26 @@ namespace calculateFunding.providers {
 
                 let foundVariable: IVariable = VisualBasicIntellisenseProvider.GetVariableByPath(variableText, variables);
                 if (foundVariable) {
-                    let description = foundVariable.name;
+                    let description = "";
+                    let documentationValue = "Type: " + foundVariable.type;
 
-                    if (typeof foundVariable.description !== "undefined" && foundVariable.description) {
+                    if (typeof foundVariable.description !== "undefined") {
                         description = foundVariable.description;
+                    }
+
+                    if (description) {
+                        if (documentationValue) {
+                            documentationValue = documentationValue + "\r\n\r\n";
+                        }
+
+                        documentationValue = documentationValue + description;
                     }
 
                     let hover: monaco.languages.Hover = {
                         contents: [
                             {
-                                value: description,
-                                isTrusted: false,
+                                value: documentationValue,
+                                isTrusted: true,
                             }
                         ],
                         range: null
@@ -409,6 +501,8 @@ namespace calculateFunding.providers {
                     return hover;
                 }
             }
+
+            return null;
         }
 
         public static ProcessSourceToRemoveComments(contents: string) {
@@ -584,6 +678,7 @@ namespace calculateFunding.providers {
 
     export interface IVariable {
         name: string;
+        friendlyName: string;
         type: string;
         description?: string;
         items?: IVariableContainer;
@@ -624,6 +719,8 @@ namespace calculateFunding.providers {
     export interface ILocalFunction {
         label: string;
 
+        friendlyName: string;
+
         description: string;
 
         parameters: Array<IFunctionParameter>;
@@ -646,6 +743,8 @@ namespace calculateFunding.providers {
 
         description: string;
 
+        friendlyName: string;
+
         parameters: Array<IFunctionParameter>;
 
         returnType: string;
@@ -658,10 +757,13 @@ namespace calculateFunding.providers {
                 this.description = data.description;
                 this.parameters = data.parameters;
                 this.returnType = data.returnType;
+                this.friendlyName = data.friendlyName;
             }
         }
 
         public label: string;
+
+        public friendlyName: string;
 
         public description: string;
 

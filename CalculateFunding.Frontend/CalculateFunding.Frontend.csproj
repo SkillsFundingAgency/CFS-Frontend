@@ -32,6 +32,7 @@
     <None Remove="Scripts\list-providerresults.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
@@ -118,6 +119,7 @@
     <TypeScriptCompile Include="Scripts\list-providerresults.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -125,4 +127,6 @@
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
 
   </PropertyGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties tsconfig_1tests_1json__JSONSchema="http://json.schemastore.org/tsconfig" /></VisualStudio></ProjectExtensions>
 </Project>

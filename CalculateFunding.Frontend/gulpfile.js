@@ -19,6 +19,8 @@ var debug = require('gulp-debug');
 
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
+var tsProjectTests = ts.createProject("tsconfig.tests.json");
+
 var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge2');
 
@@ -34,7 +36,7 @@ paths.minCss = paths.webroot + "assets/css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "assetsjs/main.min.js";
 paths.concatCssDest = paths.webroot + "assets/css/main.min.css";
 paths.minCssFolder = paths.webroot + "assetscss";
-paths.tsSource = "Scripts/*.ts";
+paths.tsSource = "Scripts/**/*.ts";
 paths.jsSource = "Scripts/*.js";
 
 gulp.task("clean:js", function (cb) {
@@ -117,7 +119,10 @@ gulp.task('copy-assets', function () {
             //'./node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
             './node_modules/knockout/build/output/knockout-latest.debug.js',
-            './node_modules/select2/dist/js/select2.min.js'
+            './node_modules/select2/dist/js/select2.min.js',
+            "./node_modules/jasmine-core/lib/jasmine-core/jasmine.js",
+            "./node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js",
+            "./node_modules/jasmine-core/lib/jasmine-core/boot.js"
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
@@ -126,7 +131,9 @@ gulp.task('copy-assets', function () {
             //'./node_modules/summernote/dist/**/*.eot',
             //'./node_modules/summernote/dist/**/*.ttf',
             './node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css',
-            './node_modules/select2/dist/css/select2.min.css'
+            './node_modules/select2/dist/css/select2.min.css',
+            "./node_modules/jasmine-core/lib/jasmine-core/jasmine.css"
+
         ],
         fonts: [
             './node_modules/material-design-icons/iconfont/*.woff2',
@@ -148,7 +155,7 @@ gulp.task('copy-assets', function () {
         "editor/editor.main.js",
         "editor/editor.main.css",
         "editor/editor.main.nls.js",
-        "editor/standalone/browser/quickOpen/symbol-sprite.svg",
+        "editor/standalone/browser/quickOpen/symbol-sprite.svg"
     ];
 
     monacoSourceFiles.forEach(function (value) {
@@ -173,6 +180,7 @@ var definitions = [
     "./node_modules/@types/jquery/index.d.ts",
     "./node_modules/@types/knockout/index.d.ts",
     "./node_modules/@types/requirejs/index.d.ts",
+    "./node_modules/@types/jasmine/index.d.ts",
     "./scripts/**.d.ts"
 ];
 
@@ -180,13 +188,12 @@ var tsProjectWatch = ts.createProject({
     declaration: true,
     target: "es5",
     "noImplicitAny": true,
-    "module": "none",
-    
+    "module": "none"
 });
 
 gulp.task("ts:builddev", function () {
 
-    var src = ["scripts/**.ts"];
+    var src = ["scripts/**/*.ts"];
 
     for (var i in definitions) {
         src.push(definitions[i]);
@@ -223,6 +230,16 @@ gulp.task("ts:release", function () {
         .pipe(gulp.dest('wwwroot/js'));
 });
 
+gulp.task("ts:tests:release", function () {
+
+    var tsResult = tsProjectTests.src()
+        .pipe(tsProjectTests())
+        .on('error', function (err) { console.log('[Error]', err.toString()); });
+
+    return tsResult
+        .pipe(gulp.dest('wwwroot/js/Tests'));
+});
+
 gulp.task("release", function (callback) {
-    runSequence("clean", "sass", "copy-assets", "ts:release", "min", callback);
+    runSequence("clean", "sass", "copy-assets", "ts:release", "min", "ts:tests:release", callback);
 });
