@@ -64,9 +64,10 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 Filters = new Dictionary<string, string[]> { { "periodId", new[] { periodId } } }
             };
 
-            SearchTerm = searchTerm; 
+            SearchTerm = searchTerm;
 
             //await PopulateAsync( periodId, specificationId);
+            await PopulatePeriods();
            
             //ScenarioResults =   GetSearchResults();
 
@@ -163,19 +164,26 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         private async Task PopulatePeriods(string periodId = null)
         {
             var periodsResponse = await _specsClient.GetAcademicYears();
-            var periods = periodsResponse.Content;
+            IEnumerable<Reference> periods = periodsResponse.Content;
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            Reference period = periods.FirstOrDefault();
+            if (period != null)
             {
-                periodId = PeriodId;
+                PeriodId = period.Id;
             }
 
-            Periods = periods.Select(m => new SelectListItem
-            {
-                Value = m.Id,
-                Text = m.Name,
-                Selected = m.Id == periodId
-            }).ToList();
+
+            //if (string.IsNullOrWhiteSpace(periodId))
+            //{
+            //    periodId = PeriodId;
+            //}
+
+            //Periods = periods.Select(m => new SelectListItem
+            //{
+            //    Value = m.Id,
+            //    Text = m.Name,
+            //    Selected = m.Id == periodId
+            //}).ToList();
         }
 
         public async Task PopulateSpecifications(string periodId)
@@ -207,7 +215,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 SpecificationName = "General Annual Grant 17/18",
                 TestDescription = "Check if census and estimate academies have a positive number of pupils on roll",
                 Status = "Draft",
-                LastUpdatedDisplay = "20 Jan 2018"
+                LastUpdatedDateDisplay = "20 Jan 2018"
 
             };
 
@@ -218,7 +226,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 SpecificationName = "General Annual Grant 17/18",
                 TestDescription = "Check SBS funding tolerances between the APT and Store are within £1",
                 Status = "Draft",
-                LastUpdatedDisplay = "7 Jan 2018"
+                LastUpdatedDateDisplay = "7 Jan 2018"
 
             };   
 

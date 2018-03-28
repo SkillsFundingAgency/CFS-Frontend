@@ -40,7 +40,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         {
             Guard.IsNullOrWhiteSpace(periodId, nameof(periodId));
 
-            PeriodId = periodId;
+           PeriodId = periodId;
 
             await PopulateSpecifications(periodId);
 
@@ -59,7 +59,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
             var specifications = apiResponse.Content.Where(m => m.AcademicYear.Id == periodId);
 
-            Specifications = specifications.Select(m => new SelectListItem
+            Specifications = apiResponse.Content.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name

@@ -81,7 +81,7 @@
                
             }
 
-            itemResults.OrderBy(f => f.LastUpdated);
+            itemResults.OrderBy(f => f.LastUpdatedDate);
 
             results.Scenarios = itemResults.AsEnumerable();
 

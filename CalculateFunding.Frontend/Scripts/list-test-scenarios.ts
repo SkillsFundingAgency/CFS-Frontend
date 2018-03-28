@@ -48,8 +48,8 @@ namespace calculateFunding.listTestScenarios {
         periodId: string;
         fundingStreamName: string;
         fundingStreamId: string;
-        lastUpdated: Date;
-        lastUpdatedDisplay: string;
+        lastUpdatedDate: Date;
+        lastUpdatedDateDisplay: string;
         status: string;
     }
 }

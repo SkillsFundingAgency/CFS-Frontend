@@ -77,10 +77,10 @@
         private void MapScenario()
         {
             CreateMap<ScenarioSearchResultItem, ScenarioSearchResultItemViewModel>()
-                 .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
+                 .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
                  .AfterMap((ScenarioSearchResultItem source, ScenarioSearchResultItemViewModel destination) =>
                  {
-                     destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
+                     destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
                  });
 
             this.CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
