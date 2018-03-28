@@ -83,9 +83,9 @@
                 <strong>Build output:</strong>
 
                 <div class="build-output">
-                    <div data-bind="if: validationRequested">
+                    <div data-bind="if: (validationRequested() && !isCompilingTest())">
                         <div data-bind="text: testOutput"></div>
-                        Test compiled successfully: <span data-bind="text: testBuilt"></span>
+                        Test validated successfully: <span data-bind="text: testBuilt"></span>
                         <div id="test-compiler-response">
                             <div class="compiler-messages" data-bind="foreach: validationResponse">
                                 <span data-bind="text: errorMessage"></span>:
@@ -93,9 +93,13 @@
                             </div>
                         </div>
                     </div>
+                    <div data-bind="visible: isCompilingTest()">
+                        <span>Validating</span>
+                        <span data-bind="foreach: compilingSeconds">.</span>
+                    </div>
                 </div>
 
-                <div class="spacing-30" data-bind="visible: !testBuilt()">You must have a valid test before you can save it:</div>
+                <div class="spacing-30" data-bind="visible: (!testBuilt() && !isCompilingTest())">You must have a valid test before you can save it:</div>
 
                 <div class="spacing-15">
                     <input type="button" class="button" value="Create test" id="create-test-button" data-bind="click: saveTestScenario, enable: canSaveTestScenario()" />

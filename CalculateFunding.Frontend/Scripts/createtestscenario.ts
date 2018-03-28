@@ -32,6 +32,10 @@ namespace calculateFunding.createTestScenario {
 
         public canRunTest: KnockoutComputed<boolean>;
 
+        public isCompilingTest: KnockoutComputed<boolean>;
+
+        public compilingSeconds: KnockoutObservableArray<number> = ko.observableArray([]);
+
         public canSaveTestScenario: KnockoutComputed<boolean>;
 
         public testBuilt: KnockoutObservable<boolean> = ko.observable(false);
@@ -49,6 +53,8 @@ namespace calculateFunding.createTestScenario {
         private successfulValidationSourceCode: KnockoutObservable<string> = ko.observable(null);
 
         private initialCodeContents: string;
+
+        private compilerSecondsFunctionReference: number;
 
         constructor() {
 
@@ -107,6 +113,9 @@ namespace calculateFunding.createTestScenario {
                 return true;
             });
 
+            self.isCompilingTest = ko.computed(() => {
+                return self.state() === 'compilingTest';
+            });
         }
 
         private resetValidation() {
@@ -117,12 +126,17 @@ namespace calculateFunding.createTestScenario {
 
         public compileTestScenario() {
 
+            let self = this;
             if (this.state() === "idle") {
                 this.state("compilingTest");
                 this.buildValidation("Building......");
                 this.validationResponse([]);
                 this.validationRequested(true);
                 this.testBuilt(false);
+                this.compilingSeconds([]);
+                this.compilerSecondsFunctionReference = setInterval(() => {
+                    self.compilingSeconds.push(1);
+                }, 1000);
 
                 //check  
                 let data = {
@@ -146,6 +160,7 @@ namespace calculateFunding.createTestScenario {
                     errorMessage += "Status: " + error.status;
                     self.buildValidation(errorMessage);
                     self.state("idle");
+                    clearInterval(self.compilerSecondsFunctionReference);
                 });
 
                 request.done((response) => {
@@ -162,6 +177,7 @@ namespace calculateFunding.createTestScenario {
                         }
                     }
                     self.state("idle");
+                    clearInterval(self.compilerSecondsFunctionReference);
                 });
             }
         }
@@ -195,6 +211,9 @@ namespace calculateFunding.createTestScenario {
                 if (response.status === 400) {
                     self.handleValidationFormFailed(response.responseJSON);
                 }
+                else {
+                    alert("Error creating test scenario");
+                }
             });
 
             request.done((response) => {
@@ -207,47 +226,49 @@ namespace calculateFunding.createTestScenario {
 
             this.validationLinks([]);
 
-            if (modelState.Name && modelState.Name.length > 0) {
-                this.isNameValid(false);
-                let link = {
-                    href: "#field-CreateTestScenarioModel-Name",
-                    message: modelState.Name[0],
-                    id: "validation-link-for-CreateTestScenarioModel-Name"
-                }
-                this.validationLinks.push(link);
-            }
+            if (modelState) {
 
-            if (modelState.Description && modelState.Description.length > 0) {
-                this.isDescriptionValid(false);
-                let link = {
-                    href: "#field-CreateTestScenarioModel-Description",
-                    message: modelState.Description[0],
-                    id: "validation-link-for-CreateTestScenarioModel-Description"
-                }
-                this.validationLinks.push(link);
-            }
-
-            if (modelState.SpecificationId && modelState.SpecificationId.length > 0) {
-                this.isSpecificationIdValid(false);
-                let link = {
-                    href: "#field-CreateTestScenarioModel-Specification",
-                    message: modelState.SpecificationId[0],
-                    id: "validation-link-for-CreateTestScenarioModel-Specification"
-                }
-                this.validationLinks.push(link);
-            }
-
-            if (modelState.SourceCode && modelState.SourceCode.length > 0) {
-                this.isSourceCodeValid(false);
-                let link = {
-                    href: "#field-CreateTestScenarioModel-SourceCode",
-                    message: modelState.SourceCode[0],
-                    id: "validation-link-for-CreateTestScenarioModel-SourceCode"
+                if (modelState.Name && modelState.Name.length > 0) {
+                    this.isNameValid(false);
+                    let link = {
+                        href: "#field-CreateTestScenarioModel-Name",
+                        message: modelState.Name[0],
+                        id: "validation-link-for-CreateTestScenarioModel-Name"
+                    }
+                    this.validationLinks.push(link);
                 }
 
-                this.validationLinks.push(link);
-            }
+                if (modelState.Description && modelState.Description.length > 0) {
+                    this.isDescriptionValid(false);
+                    let link = {
+                        href: "#field-CreateTestScenarioModel-Description",
+                        message: modelState.Description[0],
+                        id: "validation-link-for-CreateTestScenarioModel-Description"
+                    }
+                    this.validationLinks.push(link);
+                }
 
+                if (modelState.SpecificationId && modelState.SpecificationId.length > 0) {
+                    this.isSpecificationIdValid(false);
+                    let link = {
+                        href: "#field-CreateTestScenarioModel-Specification",
+                        message: modelState.SpecificationId[0],
+                        id: "validation-link-for-CreateTestScenarioModel-Specification"
+                    }
+                    this.validationLinks.push(link);
+                }
+
+                if (modelState.SourceCode && modelState.SourceCode.length > 0) {
+                    this.isSourceCodeValid(false);
+                    let link = {
+                        href: "#field-CreateTestScenarioModel-SourceCode",
+                        message: modelState.SourceCode[0],
+                        id: "validation-link-for-CreateTestScenarioModel-SourceCode"
+                    }
+
+                    this.validationLinks.push(link);
+                }
+            }
         }
 
         /* Register types for the monaco editor to support intellisense */
