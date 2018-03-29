@@ -148,14 +148,14 @@ namespace CalculateFunding.Frontend.Pages.Results
             if (string.IsNullOrWhiteSpace(specificationId))
             {
                 specificationId = SpecificationId;
-            } 
+            }
 
             Specifications = specifications.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
                 Selected = m.Id == specificationId
-            }).ToList();
+            }).ToList().OrderBy(o => o.Text);
 
         }
     }
