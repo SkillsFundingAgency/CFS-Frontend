@@ -31,7 +31,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns((ProviderSearchResultViewModel)null);
 
-            IndexPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
+            ViewProviderResultsPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty);
@@ -63,7 +63,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(model);
 
-            IndexPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
+            ViewProviderResultsPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty);
@@ -74,9 +74,9 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .BeOfType<PageResult>();
         }
 
-        private static IndexPageModel CreatePageModel(IResultsApiClient resultsApiClient, IProviderSearchService searchService)
+        private static ViewProviderResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, IProviderSearchService searchService)
         {
-            return new IndexPageModel(resultsApiClient ?? CreateApiClient(), searchService ?? CreateSearchService());
+            return new ViewProviderResultsPageModel(resultsApiClient ?? CreateApiClient(), searchService ?? CreateSearchService());
         }
 
         private static IResultsApiClient CreateApiClient()
