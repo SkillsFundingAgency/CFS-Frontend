@@ -274,6 +274,51 @@ namespace calculateFunding.createTestScenario {
         /* Register types for the monaco editor to support intellisense */
         public registerMonacoProviders(viewModel: CreateTestScenarioViewModel) {
             console.log("Registering monaco providers");
+            monaco.languages.register({ id: "gherkin" });
+
+            monaco.languages.setMonarchTokensProvider('gherkin', {
+                tokenPostfix: ".gherkin",
+                tokenizer: {
+                    root: [
+
+                        { regex: /^(\s)*Given/, action: { token: "keyword" } },
+                        { regex: /^(\s)*When/, action: { token: "keyword" } },
+                        { regex: /^(\s)*Then/, action: { token: "keyword" } },
+                        { regex: /^(\s)*And/, action: { token: "keyword" } },
+
+                        { regex: /(#).*$/, action: { token: 'comment' } },
+                    ]
+                }
+                
+            });
+
+            monaco.editor.defineTheme('gherkin', {
+                base: 'vs',
+                inherit: true,
+                rules: [
+                    //{ token: 'keyword', foreground: '808080' },
+                    //{ token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+                    //{ token: 'custom-notice', foreground: 'FFA500' },
+                    //{ token: 'custom-date', foreground: '008800' },
+                ],
+                colors: {
+                }
+            });
+
+
+            monaco.languages.setLanguageConfiguration("gherkin", {
+                comments: {
+                    lineComment: '#'
+                },
+                indentationRules: {
+                    increaseIndentPattern : /^(\s)*(Given|When|Then)/,
+                    decreaseIndentPattern: /^(\s)*(Given|When|Then)/,
+                }
+            });
+        }
+
+        public configureMonacoEditor(editor : monaco.editor.IStandaloneCodeEditor) {
+           
         }
     }
 

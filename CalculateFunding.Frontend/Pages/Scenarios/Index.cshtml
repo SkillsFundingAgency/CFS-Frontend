@@ -62,20 +62,16 @@
 
                 <div class="test-scenario-item-container" id="test-scenario-item-result-@ScenariosRow">
                     <div class="test-scenario-item-header">
-                        <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow"> @testScenario.Name</a>
+                        <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
                     </div>
                     <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property test-scenario-item-property-description" id="test-scenario-item-property-Description-@ScenariosRow">
-                            @testScenario.TestDescription
-                        </span>
+                        <span class="test-scenario-item-property data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.TestDescription</span>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property test-scenario-item-property-specification">
                             Spec:
                             <strong>
-                                <span class="test-scenario-item-property" id="test-scenario-item-specification-@ScenariosRow">
-                                    @testScenario.SpecificationName
-                                </span>
+                                <span class="test-scenario-item-property data-static-specificationName" id="test-scenario-item-specification-@ScenariosRow">@testScenario.SpecificationName</span>
                             </strong>
                         </span>
                     </div>
@@ -83,13 +79,13 @@
                         <span class="test-scenario-item-property test-scenario-item-property-status">
                             Status:
                             <strong>
-                                <span id="test-item-status-@ScenariosRow">@testScenario.Status</span>
+                                <span id="test-item-status-@ScenariosRow" class="data-static-status">@testScenario.Status</span>
                             </strong>
                         </span>
                         <span class="test-scenario-item-property test-scenario-item-property-updated-on">
                             Update on:
                             <strong>
-                                <span id="test-item-lastupdated-@ScenariosRow">
+                                <span id="test-item-lastupdated-@ScenariosRow" class="data-static-lastUpdated">
                                     @testScenario.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString)
                                 </span>
                             </strong>
@@ -101,20 +97,18 @@
         </div>
         <div class="withjs-show test-scenario-searchresult-container test-scenario-searchresult-dynamic-container">
             <div data-bind="foreach: testScenarios">
-                <div class="test-scenario-item-container" data-bind="test-scenario-item-result-$index()">
+                <div class="test-scenario-item-container data-dynamic-scenarioContainer" data-bind="attr: {id : 'data-dynamic-scenarioContainer-' + $index()}">
                     <div class="test-scenario-item-header">
                         <a data-bind="text: name, attr: { 'href': '/scenarios/edittestscenario/' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
                     </div>
                     <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property test-scenario-item-property-description" data-bind="text: testDescription">
-                        </span>
+                        <span class="test-scenario-item-property data-dynamic-description" data-bind="text: testDescription"></span>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property test-scenario-item-property-specification">
                             Spec:
                             <strong>
-                                <span class="test-scenario-item-property" data-bind="text: specificationName">
-                                </span>
+                                <span class="test-scenario-item-property data-dynamic-specificationName" data-bind="text: specificationName"></span>
                             </strong>
                         </span>
                     </div>
@@ -122,13 +116,13 @@
                         <span class="test-scenario-item-property test-scenario-item-property-status">
                             Status:
                             <strong>
-                                <span id="test-item-status-@ScenariosRow" data-bind="text: status"></span>
+                                <span class="test-scenario-item-property data-dynamic-status" data-bind="text: status"></span>
                             </strong>
                         </span>
-                        <span class="test-scenario-item-property test-scenario-item-property-updated-on">
+                        <span class="test-scenario-item-property-lastUpdatedDate">
                             Update on:
                             <strong>
-                                <span id="test-item-lastupdated-@ScenariosRow" data-bind="text: lastUpdatedDateDisplay"></span>
+                                <span  class="test-scenario-item-property data-dynamic-lastUpdatedDate"  data-bind="text: lastUpdatedDateDisplay"></span>
                             </strong>
                         </span>
                     </div>

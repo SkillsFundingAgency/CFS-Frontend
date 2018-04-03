@@ -10,20 +10,39 @@
 
             let monacoEditorOptions = allBindings.get("monacoEditorOptions");
             let language: string = "vb";
-
+            let theme: string = "";
+            let autoIndent: boolean = false;
+            
             if (monacoEditorOptions) {
+                if (typeof (monacoEditorOptions.editorCreatingCallback) !== "undefined") {
+                    if ($.isFunction(monacoEditorOptions.editorCreatingCallback)) {
+                        monacoEditorOptions.editorCreatingCallback();
+                    }
+                }
+
                 if (monacoEditorOptions["language"]) {
                     language = ko.unwrap(monacoEditorOptions["language"]);
                     console.log("Setting language to ", language);
+                }
+
+                if (monacoEditorOptions["theme"]) {
+                    theme = ko.unwrap(monacoEditorOptions["language"]);
+                    console.log("Setting theme to ", theme);
+                }
+
+                if (monacoEditorOptions["autoIndent"] !== undefined) {
+                    autoIndent = ko.unwrap(monacoEditorOptions["autoIndent"]);
                 }
             }
 
             let editor: monaco.editor.IStandaloneCodeEditor = monaco.editor.create(element, {
                 value: valueUnwrapped,
-                language: 'vb',
+                language: language,
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 parameterHints: true,
+                theme: theme,
+                autoIndent: autoIndent,
             });
 
 
@@ -36,7 +55,7 @@
             if (monacoEditorOptions) {
                 if (typeof (monacoEditorOptions.editorCreatedCallback) !== "undefined") {
                     if ($.isFunction(monacoEditorOptions.editorCreatedCallback)) {
-                        monacoEditorOptions.editorCreatedCallback();
+                        monacoEditorOptions.editorCreatedCallback(editor);
                     }
                 }
             }

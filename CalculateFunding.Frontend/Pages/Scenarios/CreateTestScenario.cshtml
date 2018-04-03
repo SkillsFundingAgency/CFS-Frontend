@@ -74,7 +74,7 @@
             <br />
             <div id="create-test-scenario">
                 <strong>Test scenario:</strong>
-                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'text', editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
                 <div class="spacing-30">
                     <input type="button" class="button-calculation" value="Validate QA Test" data-bind="click: compileTestScenario, disable: !canRunTest()" id="validate-qa-test-button" />
