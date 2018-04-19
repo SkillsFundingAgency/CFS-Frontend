@@ -1,4 +1,5 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models.Results
 {
@@ -6,5 +7,6 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models.Results
     {
         public Reference Calculation { get; set; }
         public double? Value { get; set; }
+        public CalculationSpecificationType CalculationType { get; set; }
     }
 }

@@ -1848,3 +1848,27 @@ table {
     padding-top: 10px;
     padding-bottom: 10px;
 }
+
+.flag.flag--soon {
+    background-color: #6f777b;
+}
+
+/*@media all and (min-width:641px)*/
+.flag {
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.flag {
+    display: inline-block;
+    color: #fff;
+    padding: 0.36842em 0.42105em 0.26316em;
+    font-family: "nta",Arial,sans-serif;
+    font-weight: 400;
+    text-transform: none;
+    font-size: 14px;
+    line-height: 1.1428;
+    line-height: 0.84em;
+    text-decoration: none;
+}
+

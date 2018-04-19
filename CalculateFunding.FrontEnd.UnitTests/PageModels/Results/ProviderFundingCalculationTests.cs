@@ -17,6 +17,7 @@
     using System.Net;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using System.Linq;
 
     [TestClass]
     public class ProviderFundingCalculationTests
@@ -301,6 +302,9 @@
             // Assert
             provideCalcPageModel.ViewModel.CalculationItems.Should().HaveSameCount(calResult);
 
+            provideCalcPageModel.ViewModel.CalculationItems.First().CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Number);
+
+            provideCalcPageModel.ViewModel.CalculationItems.Last().CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Funding);
         }
 
         [TestMethod]
@@ -448,13 +452,14 @@
             CalculationResultItem cal1 = new CalculationResultItem()
             {
                 Calculation = new Reference { Id = "1", Name = "Calc 1" },
-                Value = 234234234
+                Value = 234234234,
+                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Number
             };
             CalculationResultItem cal2 = new CalculationResultItem()
             {
                 Calculation = new Reference { Id = "2", Name = "Calc 2" },
                 Value = 4234234,
-
+                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
             };
 
             IList<CalculationResultItem> calResult = new List<CalculationResultItem>

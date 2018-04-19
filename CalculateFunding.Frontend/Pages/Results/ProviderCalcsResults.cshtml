@@ -79,7 +79,8 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width:85%" scope="col">Calculation Name</th>
+                            <th style="width:70%" scope="col">Calculation Name</th>
+                            <th style="width:15%" scope="col">Calculation Type</th>
                             <th scope="col">Value</th>
                         </tr>
                     </thead>
@@ -87,10 +88,11 @@
                     <tbody>
                         @foreach (var result in Model.ViewModel.CalculationItems)
                         {
-                            <tr>
-                                <th scope="row">@result.Calculation</th>
-                                <td>@result.TotalFormatted</td>
-                            </tr>
+                        <tr>
+                            <th scope="row">@result.Calculation</th>
+                            <td>@result.CalculationType.ToString()</td>
+                            <td>@result.TotalFormatted</td>
+                        </tr>
                         }
                     </tbody>
                 </table>

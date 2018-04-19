@@ -20,7 +20,8 @@ namespace CalculateFunding.Frontend.Pages.Results
                          new CalculationItemResult
                          {
                              Calculation = m.Calculation.Name,
-                             SubTotal = m.Value.HasValue ? m.Value.Value : 0
+                             SubTotal = m.Value.HasValue ? m.Value.Value : 0,
+                             CalculationType = m.CalculationType
                          }
                      );
         }

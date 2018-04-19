@@ -1,10 +1,13 @@
-﻿using System.Globalization;
+﻿using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using System.Globalization;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
     public class CalculationItemResult
     {
         public string Calculation { get; set; }
+
+        public CalculationSpecificationType CalculationType { get; set; }
 
         public double SubTotal { get; set; }
 

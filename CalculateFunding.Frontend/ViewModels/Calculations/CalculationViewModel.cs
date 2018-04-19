@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using System;
 
     public class CalculationViewModel
@@ -21,5 +22,7 @@
         public string LastModifiedByName { get; set; }
 
         public string SourceCode { get; set; }
+
+        public CalculationSpecificationType CalculationType { get; set; }
     }
 }

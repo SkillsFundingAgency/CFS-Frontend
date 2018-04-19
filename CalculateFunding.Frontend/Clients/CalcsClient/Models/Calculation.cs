@@ -2,6 +2,7 @@
 {
     using System;
     using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using Newtonsoft.Json;
 
     public class Calculation : Reference
@@ -23,5 +24,7 @@
         public Reference LastModifiedBy { get; set; }
 
         public int Version { get; set; }
+
+        public CalculationSpecificationType CalculationType { get; set; }
     }
 }

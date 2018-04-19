@@ -9,7 +9,10 @@
 
 @section FormBannerLeft{
     <p class="hero-pre-text">@Model.SpecificationName </p>
-    <p class="hero-title">@Model.Calculation.Name </p>
+    <p class="hero-title">
+        @Model.Calculation.Name
+        <span class="flag flag--soon">@Model.Calculation.CalculationType</span>
+    </p>
 
     <div class="inline-calculation-container">
         <div class="inline-calculation-heading">
