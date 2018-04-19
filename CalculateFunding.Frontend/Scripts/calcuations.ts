@@ -118,5 +118,6 @@
         periodName: string;
         specificationName: string;
         status: string;
+        calculationType: string;
     }
 }

@@ -18,5 +18,8 @@
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("calculationType")]
+        public CalculationSpecificationType CalculationType { get; set; }
     }
 }

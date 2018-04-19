@@ -35,7 +35,6 @@
             <div class="col-xs-3 filter-field-heading">Funding Stream</div>
             <div class="col-xs-3 filter-field-heading">Spec name</div>
             <div class="col-xs-3 filter-field-heading">Calculation status</div>
-
         </div>
         <div class="row withjs-show">
             <div class="col-xs-3">
@@ -95,6 +94,7 @@
                     <th>Status</th>
                     <th>Spec name</th>
                     <th>Year</th>
+                    <th>Type</th>
                 </tr>
             </thead>
 
@@ -104,6 +104,7 @@
                     <td data-bind="text: status"></td>
                     <td data-bind="text: specificationName"></td>
                     <td data-bind="text: periodName"></td>
+                    <td data-bind="text: calculationType"></td>
                 </tr>
             </tbody>
             <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
@@ -112,12 +113,13 @@
                 }
                 @foreach (var calculation in Model.SearchResults.Calculations)
                 {
-                    <tr>
-                        <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
-                        <td id="static-results-status-@rowId">@calculation.Status</td>
-                        <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
-                        <td id="static-results-periodName-@rowId">@calculation.PeriodName</td>
-                    </tr>
+                <tr>
+                    <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
+                    <td id="static-results-status-@rowId">@calculation.Status</td>
+                    <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                    <td id="static-results-periodName-@rowId">@calculation.PeriodName</td>
+                    <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
+                </tr>
                     rowId++;
                 }
             </tbody>

@@ -132,6 +132,9 @@
   <data name="CalculationPolicyIdRequired" xml:space="preserve">
     <value>You must select a policy or subpolicy</value>
   </data>
+  <data name="CalculationTypeRequired" xml:space="preserve">
+    <value>You must select a calculation type</value>
+  </data>
   <data name="DatasetSchemaDescriptionRequired" xml:space="preserve">
     <value>You must provide a description for this new relationship</value>
   </data>

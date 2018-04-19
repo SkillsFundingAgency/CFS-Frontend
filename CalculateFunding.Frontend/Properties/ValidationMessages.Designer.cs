@@ -106,6 +106,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must select a calculation type.
+        /// </summary>
+        internal static string CalculationTypeRequired {
+            get {
+                return ResourceManager.GetString("CalculationTypeRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must provide a description for this new relationship.
         /// </summary>
         internal static string DatasetSchemaDescriptionRequired {

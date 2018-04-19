@@ -9,5 +9,7 @@
         public string PeriodName { get; set; }
 
         public string Status { get; set; }
+
+        public string CalculationType { get; set; }
     }
 }

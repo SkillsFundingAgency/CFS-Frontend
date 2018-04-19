@@ -49,13 +49,26 @@
                 </div>
             </div>
             <div>
+                <div gds-validationblock-for="CreateCalculationViewModel.CalculationType">
                     <div class="form-group">
-                        <label asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
-                        <select asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
+                        <a validationanchor-for="CreateCalculationViewModel.CalculationType"></a>
+                        <label asp-for="CreateCalculationViewModel.CalculationType">Calculation type</label>
+                        <select id="CalculationTypes" asp-items="@(Model.CalculationTypes)" asp-for="CreateCalculationViewModel.CalculationType" class="form-control">
                             <option></option>
                         </select>
                     </div>
-              
+                </div>
+            </div>
+            <div class="inline-allocation-line-container">
+                <div gds-validationblock-for="CreateCalculationViewModel.AllocationLineId">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateCalculationViewModel.AllocationLineId"></a>
+                        <label asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
+                        <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div>
                 <div gds-validationblock-for="CreateCalculationViewModel.Description">
@@ -72,3 +85,25 @@
 
     </div>
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+        
+        if ($("#CalculationTypes").val() !== "Funding") {
+
+            $('.inline-allocation-line-container').hide();
+        }
+        $("#CalculationTypes").on('change', function () {
+           
+            var selectedValue = $(this).val();
+            if (selectedValue == "Funding") {
+                $('.inline-allocation-line-container').show();
+            }
+            else {
+                $('.inline-allocation-line-container').hide();
+                $("#AllocationLines").val("");
+            }
+        });
+
+    </script>
+    }

@@ -21,6 +21,8 @@
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
 
+        private static readonly IEnumerable<string> _calculationTypes = new[] { CalculationSpecificationType.Funding.ToString(), CalculationSpecificationType.Number.ToString() };
+
         public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper)
         {
             _specsClient = specsClient;
@@ -44,9 +46,13 @@
 
         public string AllocationLineId { get; set; }
 
+        public string CalculationType { get; set; }
+
         public IList<SelectListItem> Policies { get; set; }
 
         public IEnumerable<SelectListItem> AllocationLines { get; set; }
+
+        public IEnumerable<SelectListItem> CalculationTypes { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
         {
@@ -67,6 +73,8 @@
                 PopulatePolicies(specification);
 
                 await PopulateAllocationLines();
+
+                PopulateCalculationTypes();
             }
 
             return Page();
@@ -86,6 +94,11 @@
                 }
             }
 
+            if(CreateCalculationViewModel.CalculationType == "Funding" && string.IsNullOrWhiteSpace(CreateCalculationViewModel.AllocationLineId))
+            {
+                this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.AllocationLineId)}", ValidationMessages.CalculationAllocationLineRequired);
+            }
+
             if (!ModelState.IsValid)
             {
                 Specification specification = await GetSpecification(specificationId);
@@ -101,6 +114,8 @@
                 PopulatePolicies(specification);
 
                 await PopulateAllocationLines();
+
+                PopulateCalculationTypes();
 
                 return Page();
             }
@@ -121,6 +136,16 @@
             {
                 throw new  InvalidOperationException($"Unable to create calculation specifications. Status Code = {newCalculationResponse.StatusCode}");
             }
+        }
+
+        private void PopulateCalculationTypes()
+        {
+            CalculationTypes = _calculationTypes.Select(m => new SelectListItem
+            {
+                Value = m,
+                Text = m,
+                Selected = string.Equals(m, CalculationType, StringComparison.InvariantCultureIgnoreCase)
+            });
         }
 
         private void PopulatePolicies(Specification specification)

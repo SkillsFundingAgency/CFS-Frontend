@@ -17,5 +17,8 @@
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationNameRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Name { get; set; }
+
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationTypeRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
+        public string CalculationType { get; set; }
     }
 }
