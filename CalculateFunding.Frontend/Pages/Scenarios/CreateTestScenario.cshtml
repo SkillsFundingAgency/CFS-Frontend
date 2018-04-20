@@ -52,7 +52,7 @@
             </div>
             <br />
             <div class="row ">
-                <div class="col-md-6" >
+                <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                         <a validationanchor-for="CreateTestScenarioModel.Name"></a>
                         <label asp-for="CreateTestScenarioModel.Name">Test name</label>
@@ -73,6 +73,7 @@
             </div>
             <br />
             <div id="create-test-scenario">
+                <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
                 <strong>Test scenario:</strong>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
@@ -88,8 +89,10 @@
                         Test validated successfully: <span data-bind="text: testBuilt"></span>
                         <div id="test-compiler-response">
                             <div class="compiler-messages" data-bind="foreach: validationResponse">
-                                <span data-bind="text: errorMessage"></span>:
-                                Line <span data-bind="text: line"></span>
+                                <div>
+                                    <span data-bind="text: errorMessage"></span>:
+                                    Line <span data-bind="text: line"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -120,6 +123,7 @@
     <script asp-src-include="~/assets/staticjs/regex.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/provider.completion.gherkin.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/createtestscenario.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var createTestScenarioElement = document.getElementById("create-test-scenario");

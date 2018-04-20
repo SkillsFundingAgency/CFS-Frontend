@@ -1,9 +1,11 @@
 /// <reference path="common.d.ts" />
-/// <reference path="provider.completion.vb.ts" />
+/// <reference path="provider.completion.gherkin.ts" />
 
 namespace calculateFunding.createTestScenario {
 
     export class CreateTestScenarioViewModel {
+        private readonly stateKeyIntellisenseLoading: string = "intellisenseLoading";
+
         public state: KnockoutObservable<string> = ko.observable("idle");
 
         public specificationId: KnockoutObservable<string> = ko.observable("");
@@ -27,6 +29,8 @@ namespace calculateFunding.createTestScenario {
         public isDescriptionValid: KnockoutObservable<boolean> = ko.observable(true);
 
         public isSourceCodeValid: KnockoutObservable<boolean> = ko.observable(true);
+
+        public isIntellisenseLoading: KnockoutComputed<boolean>;
 
         public validationLinks: KnockoutObservableArray<IValidationLink> = ko.observableArray([]);
 
@@ -55,6 +59,10 @@ namespace calculateFunding.createTestScenario {
         private initialCodeContents: string;
 
         private compilerSecondsFunctionReference: number;
+
+        private completionProvider: calculateFunding.providers.GherkinIntellisenseProvider = new calculateFunding.providers.GherkinIntellisenseProvider();
+
+        private codeContexts: ILoadedCodeContexts = {};
 
         constructor() {
 
@@ -115,6 +123,20 @@ namespace calculateFunding.createTestScenario {
 
             self.isCompilingTest = ko.computed(() => {
                 return self.state() === 'compilingTest';
+            });
+
+            self.specificationId.subscribe((newValue) => {
+                if (newValue) {
+                    self.loadIntellisenseContext(newValue);
+                }
+                else {
+                    self.completionProvider.setCalculations([]);
+                    self.completionProvider.setDatasets([]);
+                }
+            });
+
+            this.isIntellisenseLoading = ko.pureComputed(() => {
+                return self.state() === this.stateKeyIntellisenseLoading;
             });
         }
 
@@ -271,6 +293,102 @@ namespace calculateFunding.createTestScenario {
             }
         }
 
+        public loadIntellisenseContext(specificationId: string) {
+            if (this.state() === "idle") {
+
+                if (this.codeContexts[specificationId]) {
+                    this.setCodeContext(this.codeContexts[specificationId]);
+                }
+                else {
+                    this.state(this.stateKeyIntellisenseLoading);
+                    let request = $.ajax({
+                        url: "/api/specs/" + this.specificationId() + "/codeContext",
+                        dataType: "json",
+                        method: "GET",
+                        contentType: "application/json"
+                    });
+
+                    let self = this;
+
+                    request.fail((error) => {
+                        let errorMessage = "Error loading intellisense for specification:\n";
+                        errorMessage += "Status: " + error.status;
+                        self.testOutput(errorMessage);
+                        self.state("idle");
+                    });
+
+                    request.done((result: Array<calculateFunding.common.ITypeInformationResponse>) => {
+
+                        let codeContext: ITestScenarioCodeContext = {
+                            calculations: [],
+                            datasets: [],
+                        };
+
+                        let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
+                            return item.name === "Calculations";
+                        });
+
+                        if (calculationType) {
+
+                            for (let m in calculationType.methods) {
+                                let currentMethod: calculateFunding.common.IMethodInformationResponse = calculationType.methods[m];
+
+                                if (currentMethod.entityId) {
+                                    let functionInformation: calculateFunding.providers.ICalculation = {
+                                        name: currentMethod.friendlyName,
+                                        description: currentMethod.description,
+                                    };
+
+                                    codeContext.calculations.push(functionInformation);
+                                }
+                            }
+                        }
+
+                        let datasetsType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
+                            return item.name === "Datasets";
+                        });
+
+                        if (datasetsType) {
+                            for (let d in datasetsType.properties) {
+                                let datasetProperty: common.IPropertyInformationResponse = datasetsType.properties[d];
+                                let dataset: calculateFunding.providers.IDataset = {
+                                    name: datasetProperty.friendlyName,
+                                    description: datasetProperty.description,
+                                    fields: [],
+                                };
+
+                                let datasetClassType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
+                                    return item.type === datasetProperty.type;
+                                });
+
+                                if (datasetClassType) {
+                                    for (let f in datasetClassType.properties) {
+                                        let property: common.IPropertyInformationResponse = datasetClassType.properties[f];
+                                        dataset.fields.push({
+                                            name: property.friendlyName,
+                                            fieldName: property.name,
+                                            type: property.type,
+                                            description: property.description,
+                                        });
+                                    }
+                                }
+                                else {
+                                    console.error("Unable to find class:", datasetClassType.type);
+                                }
+
+                                codeContext.datasets.push(dataset);
+                            }
+                        }
+
+                        self.setCodeContext(codeContext);
+                        self.codeContexts[specificationId] = codeContext;
+
+                        self.state("idle");
+                    });
+                }
+            }
+        }
+
         /* Register types for the monaco editor to support intellisense */
         public registerMonacoProviders(viewModel: CreateTestScenarioViewModel) {
             console.log("Registering monaco providers");
@@ -285,11 +403,12 @@ namespace calculateFunding.createTestScenario {
                         { regex: /^(\s)*When/, action: { token: "keyword" } },
                         { regex: /^(\s)*Then/, action: { token: "keyword" } },
                         { regex: /^(\s)*And/, action: { token: "keyword" } },
+                        { regex: /('[a-zA-Z0-9\s--_]+')/, action: { token: "string" } },
 
                         { regex: /(#).*$/, action: { token: 'comment' } },
                     ]
                 }
-                
+
             });
 
             monaco.editor.defineTheme('gherkin', {
@@ -311,15 +430,24 @@ namespace calculateFunding.createTestScenario {
                     lineComment: '#'
                 },
                 indentationRules: {
-                    increaseIndentPattern : /^(\s)*(Given|When|Then)/,
+                    increaseIndentPattern: /^(\s)*(Given|When|Then)/,
                     decreaseIndentPattern: /^(\s)*(Given|When|Then)/,
                 }
             });
+
+            monaco.languages.registerCompletionItemProvider('gherkin', viewModel.completionProvider.getCompletionProvider());
+            //monaco.languages.registerHoverProvider('vb', viewModel.codeContext.getHoverProvider());
         }
 
-        public configureMonacoEditor(editor : monaco.editor.IStandaloneCodeEditor) {
-           
+        public configureMonacoEditor(editor: monaco.editor.IStandaloneCodeEditor) {
         }
+
+        private setCodeContext(context: ITestScenarioCodeContext) {
+            this.completionProvider.setDatasets(context.datasets);
+            this.completionProvider.setCalculations(context.calculations);
+        }
+
+
     }
 
     export interface IParseScenarioResultReponse {
@@ -364,6 +492,15 @@ namespace calculateFunding.createTestScenario {
     export interface IAuthorReference {
         id: string;
         name: string;
+    }
+
+    export interface ILoadedCodeContexts {
+        [key: string]: ITestScenarioCodeContext;
+    }
+
+    export interface ITestScenarioCodeContext {
+        datasets: Array<calculateFunding.providers.IDataset>;
+        calculations: Array<calculateFunding.providers.ICalculation>;
     }
 
 }
