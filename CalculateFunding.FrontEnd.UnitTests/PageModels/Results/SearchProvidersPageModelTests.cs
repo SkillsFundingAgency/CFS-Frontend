@@ -39,12 +39,8 @@ namespace CalculateFunding.Frontend.PageModels.Results
             // Assert
             actionResult
                 .Should()
-                .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = actionResult as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
+                .BeOfType<StatusCodeResult>()
+                .Which.StatusCode
                 .Should()
                 .Be(500);
         }

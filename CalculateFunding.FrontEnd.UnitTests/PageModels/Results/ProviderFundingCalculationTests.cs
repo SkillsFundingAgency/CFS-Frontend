@@ -43,7 +43,7 @@
         }
 
         [TestMethod]
-        public void onGetAsync_ReturnsErrorWhenAcademicYearResponseIsNull()
+        public void OnGetAsync_ReturnsErrorWhenAcademicYearResponseIsNull()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -141,16 +141,15 @@
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
-            PageResult pageResult = result as PageResult;
-
-            pageResult.Should().NotBeNull();
+            result.Should()
+                .BeOfType<PageResult>()
+                .Which.Should().NotBeNull("Action result was null");
 
             provideCalcPageModel.Periods.Should().NotBeNull();
-
         }
 
         [TestMethod]
-        public void onGetAsync_WhenGettingProviderResponseIsNotSuccess_ThrowsException()
+        public void OnGetAsync_WhenGettingProviderResponseIsNotSuccess_ThrowsException()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -202,7 +201,7 @@
         }
 
         [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResponseIsSuccess_PopulatesProviderDetails()
+        public async Task OnGetAsync_WhenGettingProviderResponseIsSuccess_PopulatesProviderDetails()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -255,7 +254,7 @@
         }
 
         [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResultsIsSuccess_CalculationDetails_Populated()
+        public async Task OnGetAsync_WhenGettingProviderResultsIsSuccess_CalculationDetails_Populated()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -308,7 +307,7 @@
         }
 
         [TestMethod]
-        public async Task onGetAsync_WhenGettingProviderResultsIsNotSuccess_CalculationDetails_NotPopulated()
+        public async Task OnGetAsync_WhenGettingProviderResultsIsNotSuccess_CalculationDetails_NotPopulated()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -357,7 +356,7 @@
 
 
         [TestMethod]
-        public void onGetAsync_WhenGettingSpecificationSummaryIsNotSuccess_ThrowsError()
+        public void OnGetAsync_WhenGettingSpecificationSummaryIsNotSuccess_ThrowsError()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -394,14 +393,14 @@
             resultsApiClient.GetSpecifications("2")
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
 
-           
+
             // Act
             Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
             test
             .Should()
-            .ThrowExactly<System.ArgumentNullException>();        
+            .ThrowExactly<System.ArgumentNullException>();
         }
 
         private Provider CreateProvider()

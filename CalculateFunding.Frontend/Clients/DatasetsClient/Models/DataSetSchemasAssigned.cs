@@ -9,5 +9,9 @@
         public Reference DatasetDefinition { get; set; }
 
         public Reference Specification { get; set; }
+
+        public bool IsSetAsProviderData { get; set; }
+
+        public bool UsedInDataAggregations { get; set; }
     }
 }

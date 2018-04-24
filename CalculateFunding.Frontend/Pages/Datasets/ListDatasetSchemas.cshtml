@@ -31,12 +31,29 @@
                     <a id="nav-policy-tab" href="/specs/policies/@Model.Specification.Id" role="tab" aria-selected="true">View policies</a>
                 </li>
                 <li class="nav-item active">
-                    <a id="nav-dataset-tab" href="#" role="tab" aria-selected="false">Datasets</a>
+
+                    <a id="nav-dataset-tab" href="#" role="tab" aria-selected="false">
+                        <span class="provider-datasets-warning-tab">
+                            <span>Datasets</span>
+                            @if (!Model.HasProviderDatasetsAssigned)
+                            {
+                                <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
+                            }
+                        </span>
+                    </a>
                 </li>
             </ul>
+
             <div>
                 @if (!Model.DatasetDefinitions.IsNullOrEmpty())
                 {
+                    @if (!Model.HasProviderDatasetsAssigned)
+                    {
+                        <div class="provider-datasets-warning-container spacing-15-bottom">
+                            <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
+                        </div>
+                    }
+
                     @foreach (var dataDefinition in Model.DatasetDefinitions)
                     {
                         <div class="dataset-assigned-list">
@@ -56,8 +73,8 @@
                                         if (dataset.DatasetVersion == null)
                                         {
                                             @*<p>
-                                                <a href="/datasets/AssignDatasetVersion/@dataDefinition.Id">No datasets are assigned, choose data type relationship</a>
-                                            </p>*@
+                                                    <a href="/datasets/AssignDatasetVersion/@dataDefinition.Id">No datasets are assigned, choose data type relationship</a>
+                                                </p>*@
                                         }
                                     }
                                 }

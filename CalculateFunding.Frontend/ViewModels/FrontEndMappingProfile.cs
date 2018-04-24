@@ -1,5 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels
 {
+    using System;
+    using System.Collections;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -21,6 +23,36 @@
     {
         public FrontEndMappingProfile()
         {
+            this.MapCommon();
+            this.MapDatasets();
+            this.MapResults();
+            this.MapSpecs();
+            this.MapCalcs();
+            this.MapScenario();
+            this.MapTestEngine();
+        }
+
+        private void MapResults()
+        {
+            CreateMap<ProviderSearchResultItem, ProviderSearchResultItemViewModel>()
+                        .ForMember(m => m.ConvertDate, opt => opt.Ignore())
+                        .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
+                        .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
+                        .ForMember(m => m.DateClosed, opt => opt.Ignore());
+        }
+
+        private void MapCalcs()
+        {
+            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationEditViewModel>();
+            CreateMap<Clients.CalcsClient.Models.Calculation, Calculations.CalculationViewModel>()
+                .ForMember(m => m.Description, opt => opt.Ignore());
+
+            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
+            CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
+        }
+
+        private void MapSpecs()
+        {
             CreateMap<CreateSpecificationViewModel, Specification>()
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.AcademicYear, opt => opt.Ignore())
@@ -39,33 +71,25 @@
             CreateMap<CreateCalculationViewModel, CreateCalculationModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
-            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationEditViewModel>();
-            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationViewModel>()
-                .ForMember(m => m.Description, opt => opt.Ignore());
+            CreateMap<Specification, SpecificationViewModel>();
 
-            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
+            CreateMap<Policy, PolicyViewModel>();
 
-            CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
+            CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
+        }
+
+        private void MapDatasets()
+        {
             CreateMap<DatasetSearchResultItem, DatasetSearchResultItemViewModel>()
-                .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
-                .AfterMap((DatasetSearchResultItem source, DatasetSearchResultItemViewModel destination) =>
-                {
-                    destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
-                });
+               .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
+               .AfterMap((DatasetSearchResultItem source, DatasetSearchResultItemViewModel destination) =>
+               {
+                   destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
+               });
 
             CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
-
-            CreateMap<ProviderSearchResultItem, ProviderSearchResultItemViewModel>()
-             .ForMember(m => m.ConvertDate, opt => opt.Ignore())
-             .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
-             .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-             .ForMember(m => m.DateClosed, opt => opt.Ignore());
-
-            this.MapCommon();
-            this.MapScenario();
-            this.MapTestEngine();
         }
 
         private void MapTestEngine()

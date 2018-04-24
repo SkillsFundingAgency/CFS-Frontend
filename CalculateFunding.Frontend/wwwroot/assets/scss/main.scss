@@ -1699,7 +1699,28 @@ table {
     margin-bottom: 15px;
 }
 
+.provider-datasets-warning-container {
+    background-color: $orange;
+    color: white;
+    padding: 15px 15px;
+    line-height: 24px;
+    display: flex;
+    vertical-align: middle;
 
+    span {
+        padding-left: 10px;
+    }
+}
+
+.provider-datasets-warning-tab {
+    display: flex;
+    vertical-align: middle;
+
+    .icon-not-HasProviderDatasetsAssigned {
+        color: $orange;
+        padding-left: 15px;
+    }
+}
 
 .ds-container {
 
@@ -1871,4 +1892,3 @@ table {
     line-height: 0.84em;
     text-decoration: none;
 }
-

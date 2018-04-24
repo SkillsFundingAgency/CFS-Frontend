@@ -1,14 +1,11 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using System;
 
-    public class CalculationViewModel
+    public class CalculationViewModel : ReferenceViewModel
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
         public string Description { get; set; }
 
         public string PeriodName { get; set; }

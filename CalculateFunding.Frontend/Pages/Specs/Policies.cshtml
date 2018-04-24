@@ -29,12 +29,11 @@
             <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
             <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
 
-            <div class="inline-collapse-container">
+            <div class="inline-collapse-container spacing-15-bottom">
                 <div class="inline-collapse-heading withjs-show">
                     <i class="inline-collapse-arrow"></i>
                     <span>What is @Model.Specification.Name?</span>
                 </div>
-                <br />
                 <div class="inline-collapse-contents withjs-hide policy-spec-description">
                     @Model.Specification.Description
                 </div>
@@ -44,17 +43,27 @@
                     <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View policies</a>
                 </li>
                 <li class="nav-item">
-                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">Datasets</a>
+                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">
+                        <span class="provider-datasets-warning-tab">
+                            <span>Datasets</span>
+                            @if (!Model.HasProviderDatasetsAssigned)
+                            {
+                                <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
+                            }
+                        </span>
+                    </a>
                 </li>
             </ul>
             <br />
             <div>
 
-
                 <p class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create policy</a></p>
-                <p class="text-right">
-                    <a href="#" class="policy-list-openall withjs-show">Open All</a>
-                </p>
+                @if (!Model.Specification.Policies.IsNullOrEmpty())
+                {
+                    <p class="text-right">
+                        <a href="#" class="policy-list-openall withjs-show">Open All</a>
+                    </p>
+                }
                 <div class="policy-list">
                     @if (!Model.Specification.Policies.IsNullOrEmpty())
                     {
@@ -148,6 +157,9 @@
     <div class="col-xs-12 col-sm-3">
         <div class="rightcolumn-container">
             <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
+            <div>
+                <a href="/specs/createPolicy/@Model.Specification.Id">Create policy</a>
+            </div>
             @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())
             {
                 <div>
@@ -215,10 +227,5 @@
 
 
         });
-                //$('#managePolicies a').on('click', function (e) {
-                //    e.preventDefault()
-                //    $(this).tab('show')
-                //});
-
     </script>
 }
