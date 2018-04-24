@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -153,6 +154,15 @@
             }
 
             return PostAsync<IEnumerable<DatasetDefinition>, IEnumerable<string>>($"{_datasetsPath}/get-dataset-definitions-by-ids", datasetDefinitionIds);
+        }
+
+        public Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId)
+        {
+            if(string.IsNullOrWhiteSpace(datasetId))
+            {
+                throw new ArgumentNullException( nameof(datasetId), "Dataset Id for dataset download is null");
+            }
+            return GetAsync<DownloadDatasourceModel>($"{_datasetsPath}/download-dataset-file?datasetId={datasetId}");
         }
     }
 }

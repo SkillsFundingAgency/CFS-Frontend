@@ -42,5 +42,7 @@
         Task<ApiResponse<SelectDataSourceModel>> GetDatasourcesByRelationshipId(string relationshipId);
 
         Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion);
+
+        Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId);
     }
 }

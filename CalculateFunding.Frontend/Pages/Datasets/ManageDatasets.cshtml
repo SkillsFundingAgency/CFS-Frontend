@@ -88,7 +88,7 @@
                 <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
                     <div class="dataset-item-header">@dataset.Name</div>
                     <div>
-                        <span class="dataset-item-property">
+                        <span class="dataset-item-property ">
                             <strong>Status:</strong>
                             <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
                         </span>
@@ -97,6 +97,12 @@
                             <span id="dataset-item-lastupdated-@datasetRow">
                                 @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
                             </span>
+                        </span>
+                        <span class="dataset-item-property ">
+                            <strong><a href="/datasets/updatedatasource?datasetId=@dataset.Id" id="update-dataset-link-@datasetRow" class="update-dataset-link">Update</a></strong>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong> <a href="api/datasets/download-dataset-file/@dataset.Id" id="download-dataset-link-@datasetRow" class="download-dataset-link">Download</a></strong>
                         </span>
                     </div>
                 </div>
@@ -116,6 +122,13 @@
                             <strong>Update on:</strong>
                             <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
                         </span>
+                        <span class="dataset-item-property">
+                            <strong><a data-bind="attr: {'href' : '/datasets/updatedatasource?datasetId=' + id}, text: 'Update'" class="update-dataset-link" ></a></strong>
+                        </span>
+                        <span class="dataset-item-property">
+                            <strong><a data-bind="   attr: {'href' : '/api/datasets/download-dataset-file/' + id}, text: 'Download'" class="download-dataset-link"></a></strong>
+                        </span>
+
                     </div>
                 </div>
             </div>
