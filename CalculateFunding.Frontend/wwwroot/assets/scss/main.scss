@@ -1804,6 +1804,13 @@ table {
     border-left-color: #28a197;
 }
 
+.alert--info-grey {
+    border-left: 3px solid #6f777b;
+    background-color: #eaedef;
+    position: relative;
+    margin: 0.52632em 0;
+}
+
 .alert {
     clear: both;
     border-left-width: 5px;
@@ -1874,6 +1881,14 @@ table {
     background-color: #6f777b;
 }
 
+.flag.flag--urgent {
+    background-color: #b10e1e;
+}
+
+.flag.flag--success {
+    background-color: #28a197;
+}
+
 /*@media all and (min-width:641px)*/
 .flag {
     font-size: 16px;
@@ -1892,3 +1907,8 @@ table {
     line-height: 0.84em;
     text-decoration: none;
 }
+
+.alert-content-margin {
+    margin-left:20px;
+}
+

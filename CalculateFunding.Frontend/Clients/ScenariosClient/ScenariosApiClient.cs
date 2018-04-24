@@ -1,6 +1,5 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient
 {
-    using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -45,9 +44,14 @@
             {
                 return null;
             }
-
         }
 
+        public Task<ApiResponse<Scenario>> GetScenarioById(string scenarioId)
+        {
+            Guard.IsNullOrWhiteSpace(scenarioId, nameof(scenarioId));
+
+            return GetAsync<Scenario>($"{_testsPath}/get-scenario-by-id?scenarioId={scenarioId}");
+        }
 
         public Task<ApiResponse<Scenario>> CreateTestScenario(CreateScenarioModel testScenario)
         {

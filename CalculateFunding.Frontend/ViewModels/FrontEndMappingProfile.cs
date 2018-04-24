@@ -1,7 +1,5 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels
 {
-    using System;
-    using System.Collections;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -39,6 +37,12 @@
                         .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
                         .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
                         .ForMember(m => m.DateClosed, opt => opt.Ignore());
+
+            CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
+               .ForMember(m => m.ConvertDate, opt => opt.Ignore())
+               .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
+               .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
+               .ForMember(m => m.DateClosed, opt => opt.Ignore());
         }
 
         private void MapCalcs()
@@ -75,6 +79,8 @@
 
             CreateMap<Policy, PolicyViewModel>();
 
+            CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
+
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
         }
 
@@ -109,6 +115,10 @@
 
             this.CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
                     .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+
+            CreateMap<Scenario, ScenarioViewModel>();
+
+            CreateMap<CurrentScenarioVersion, CurrentScenarioVersionViewModel>();
         }
 
         private void MapCommon()

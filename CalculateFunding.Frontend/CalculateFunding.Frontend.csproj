@@ -34,6 +34,7 @@
     <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
+    <None Remove="Scripts\Tests\list-provider-test-results.ts" />
     <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +124,7 @@
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
+    <TypeScriptCompile Include="Scripts\list-provider-test-results.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
 

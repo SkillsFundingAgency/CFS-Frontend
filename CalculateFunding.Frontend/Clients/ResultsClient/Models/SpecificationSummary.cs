@@ -10,5 +10,8 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 
         [JsonProperty("fundingStream")]
         public Reference FundingStream { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
     }
 }

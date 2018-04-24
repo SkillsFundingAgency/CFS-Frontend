@@ -13,5 +13,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// <param name="compileModel">Compile Model</param>
         /// <returns>Empty array on success, list of errors on failure</returns>
         Task<ApiResponse<IEnumerable<ScenarioCompileError>>> CompileScenario(ScenarioCompileModel compileModel);
+
+        Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions);
     }
 }

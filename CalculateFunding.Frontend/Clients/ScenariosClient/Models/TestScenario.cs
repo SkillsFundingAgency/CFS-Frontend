@@ -9,8 +9,5 @@ namespace CalculateFunding.Frontend.Clients.QAClient.Models
         public string TestDescription { get; set; }
 
         public string Status { get; set; }
-
-
-
     }
 }

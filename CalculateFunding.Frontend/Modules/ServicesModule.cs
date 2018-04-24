@@ -14,6 +14,7 @@
             services.AddScoped<IProviderSearchService, ProviderSearchService>();
             services.AddScoped<IDatasetRelationshipsSearchService, DatasetRelationshipsSearchService>();
             services.AddScoped<IScenarioSearchService, ScenarioSearchService>();
+            services.AddScoped<ITestResultsSearchService, TestResultsSearchService>();
         }
     }
 }

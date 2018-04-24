@@ -35,5 +35,7 @@
         /// <param name="filterOptions">Filter Options</param>
         /// <returns>List of Scenarios</returns>
         Task<PagedResult<ScenarioSearchResultItem>> FindScenarios(SearchFilterRequest filterOptions);
+
+        Task<ApiResponse<Scenario>> GetScenarioById(string scenarioId);
     }
 }
