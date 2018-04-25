@@ -89,7 +89,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             SpecificationId = specificationId;
 
             ApiResponse<Provider> apiResponse = await _resultsApiClient.GetProviderByProviderId(providerId);
-
+            
             Provider response = apiResponse.Content;
             // TODO - add a check for StatusCode == OK
 

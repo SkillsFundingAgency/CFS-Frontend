@@ -16,6 +16,7 @@
             services.AddScoped<IScenarioSearchService, ScenarioSearchService>();
             services.AddScoped<ITestScenarioSearchService, TestScenarioSearchService>();
             services.AddScoped<ITestResultsSearchService, TestResultsSearchService>();
+            services.AddScoped<ITestScenarioResultsService, TestScenarioResultsService>();
         }
     }
 }

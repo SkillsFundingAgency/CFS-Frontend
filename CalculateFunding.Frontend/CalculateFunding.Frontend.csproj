@@ -21,17 +21,18 @@
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
     <None Remove="Scripts\bootstrap-multiselect.d.ts" />
-    <None Remove="Scripts\calcuations.ts" />
     <None Remove="Scripts\common.d.ts" />
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
-    <None Remove="Scripts\datasets.ts" />
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\editcalculation.ts" />
-    <None Remove="Scripts\list-providerresults.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
+    <None Remove="Scripts\search.calcuations.ts" />
+    <None Remove="Scripts\search.datasets.ts" />
+    <None Remove="Scripts\search.providers.ts" />
+    <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <None Remove="Scripts\Tests\list-provider-test-results.ts" />
@@ -113,18 +114,19 @@
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
-    <TypeScriptCompile Include="Scripts\datasets.ts" />
+    <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
+    <TypeScriptCompile Include="Scripts\search.datasets.ts" />
     <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
-    <TypeScriptCompile Include="Scripts\calcuations.ts" />
+    <TypeScriptCompile Include="Scripts\search.calcuations.ts" />
     <TypeScriptCompile Include="Scripts\editcalculation.ts" />
     <TypeScriptCompile Include="Scripts\compare.ts" />
     <TypeScriptCompile Include="Scripts\common.d.ts" />
-    <TypeScriptCompile Include="Scripts\list-providerresults.ts" />
+    <TypeScriptCompile Include="Scripts\search.providers.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
-    <TypeScriptCompile Include="Scripts\list-provider-test-results.ts" />
+    <TypeScriptCompile Include="Scripts\search.providerTestResults.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
 

@@ -84,7 +84,7 @@
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
+        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId)
         {
             Specification expectedSpecification = new Specification
             {
@@ -101,7 +101,7 @@
 
             List<Specification> listSpec = new List<Specification> { expectedSpecification };
 
-            ApiResponse<List<Specification>> specificationResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, listSpec);
+            ApiResponse<IEnumerable<Specification>> specificationResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, listSpec);
 
             return Task.FromResult(specificationResponse);
         }

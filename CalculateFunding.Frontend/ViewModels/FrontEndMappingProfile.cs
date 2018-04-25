@@ -43,6 +43,18 @@
                .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
                .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
                .ForMember(m => m.DateClosed, opt => opt.Ignore());
+
+            CreateMap<TestScenarioResultCounts, TestScenarioResultCountsViewModel>();
+
+            CreateMap<ScenarioSearchResultViewModel, TestScenarioResultViewModel>()
+                .ForMember(m => m.TestResults, opt => opt.MapFrom(s => s.Scenarios))
+                .ForMember(m => m.Specifications, opt => opt.Ignore())
+                .ForMember(m => m.PeriodId, opt => opt.Ignore());
+
+
+            CreateMap<ScenarioSearchResultItemViewModel, TestScenarioResultItemViewModel>()
+                .ForMember(m => m.Passes, opt => opt.UseValue(0))
+                .ForMember(m => m.Failures, opt => opt.UseValue(0));
         }
 
         private void MapCalcs()

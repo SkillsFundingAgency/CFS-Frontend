@@ -4,7 +4,7 @@
     using System;
     public class ScenarioSearchResultItemViewModel : ReferenceViewModel
     {
-        public string TestDescription { get; set; }
+        public string Description { get; set; }
 
         public string SpecificationName { get; set; }
 

@@ -9,7 +9,7 @@ require.config({ paths: { 'vs': '/assets/libs/js/monaco/vs' } });
 describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
     describe("when no text in editor", function () {
-        let result;
+        let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
         // Arrange
         beforeEach((done) => {
@@ -38,7 +38,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
         describe("dataset name parsing", () => {
             describe("When a single item in datasets", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 // Arrange
                 beforeEach((done) => {
@@ -63,7 +63,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
             });
             describe("When no items set in datasets", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 beforeEach((done) => {
                     runMonacoCompletion("Given the dataset '", 1, 21, [], [], done, (r) => { result = r });
@@ -78,7 +78,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
             });
             describe("When a multiple items in datasets", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 beforeEach((done) => {
                     let datasets: Array<calculateFunding.providers.IDataset> = [];
@@ -133,7 +133,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
         });
         describe("dataset field name parsing", () => {
             describe("When previous dataset given and fields exist", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 // Arrange
                 beforeEach((done) => {
@@ -176,7 +176,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
             });
             describe("When previous dataset given and dataset doesn't exist", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
                 let cip: monaco.languages.CompletionItemProvider;
 
                 // Arrange
@@ -208,7 +208,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
             });
             describe("When previous dataset given and no fields exist", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
                 let cip: monaco.languages.CompletionItemProvider;
 
                 // Arrange
@@ -244,7 +244,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
     describe("calculation syntax", () => {
         describe("calculation field lookup", () => {
             describe("When calculations exist", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 // Arrange
                 beforeEach((done) => {
@@ -286,7 +286,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
             });
             describe("When no calculations exist", () => {
-                let result;
+                let result: monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList>, completionProvider: monaco.languages.CompletionItemProvider;
 
                 // Arrange
                 beforeEach((done) => {
@@ -305,12 +305,6 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                     expect(result).toEqual(expectedResult);
                 });
             });
-
-
-        });
-        describe("calculation value lookup fixed value", () => { // pending(); 
-        });
-        describe("calculation value lookup dataset lookup", () => { //pending(); 
         });
     });
 });

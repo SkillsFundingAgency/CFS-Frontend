@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="academicYearId">Academic Year Id</param>
         /// <returns></returns>
-        Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId);
+        Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId);
 
         Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification);
 

@@ -470,6 +470,31 @@ blockquote {
 }
 
 
+.view-qa-results{
+    .view-qa-filter-container{
+        background-color: $panel-colour;
+    }
+    .paging-container {
+        margin-bottom: 15px;
+    }
+    .qa-results-table{
+        thead {
+            border-bottom: 2px solid #000 !important;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc !important;
+        }
+
+        td {
+            padding: 15px 0;
+        }
+    }
+}
+
+
+
+
 .dataset-searchresult-container {
 
     .dataset-item-container {

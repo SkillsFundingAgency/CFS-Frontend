@@ -188,7 +188,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public async Task PopulateSpecifications(string periodId)
         {
-            ApiResponse<List<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
+            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {
@@ -213,7 +213,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 Id = "1",
                 Name = "NOR 2.1a",
                 SpecificationName = "General Annual Grant 17/18",
-                TestDescription = "Check if census and estimate academies have a positive number of pupils on roll",
+                Description = "Check if census and estimate academies have a positive number of pupils on roll",
                 Status = "Draft",
                 LastUpdatedDateDisplay = "20 Jan 2018"
 
@@ -224,7 +224,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 Id = "2",
                 Name = "SBS 3.1",
                 SpecificationName = "General Annual Grant 17/18",
-                TestDescription = "Check SBS funding tolerances between the APT and Store are within £1",
+                Description = "Check SBS funding tolerances between the APT and Store are within £1",
                 Status = "Draft",
                 LastUpdatedDateDisplay = "7 Jan 2018"
 

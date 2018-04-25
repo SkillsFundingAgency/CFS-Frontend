@@ -14,7 +14,7 @@
 
     public class ScenarioSearchService : IScenarioSearchService
     {
-        private const int PageSize = 50; 
+        private const int PageSize = 50;
         private IScenariosApiClient _scenariosApiClient;
         private IMapper _mapper;
         private ILogger _logger;
@@ -35,7 +35,7 @@
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = 1,
-                PageSize = PageSize,
+                PageSize = request.PageSize.HasValue && request.PageSize > 0 ? request.PageSize.Value : PageSize,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = true,
                 Filters = request.Filters,
@@ -46,10 +46,8 @@
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-              PagedResult<ScenarioSearchResultItem> ScenariosResult = await _scenariosApiClient.FindScenarios(requestOptions);
-
-            //PagedResult<ScenarioSearchResultItem> ScenariosResult = await _scenariosApiClient.GetScenarioResults(request);
-            if (ScenariosResult == null)
+            PagedResult<ScenarioSearchResultItem> scenariosResult = await _scenariosApiClient.FindScenarios(requestOptions);
+            if (scenariosResult == null)
             {
                 _logger.Error("Find Scenarios HTTP request failed");
                 return null;
@@ -57,15 +55,15 @@
 
             ScenarioSearchResultViewModel results = new ScenarioSearchResultViewModel
             {
-                TotalResults = ScenariosResult.TotalItems,
-                CurrentPage = ScenariosResult.PageNumber
+                TotalResults = scenariosResult.TotalItems,
+                CurrentPage = scenariosResult.PageNumber
             };
 
             IList<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-      
-            if (ScenariosResult.Facets != null)
+
+            if (scenariosResult.Facets != null)
             {
-                foreach (SearchFacet facet in ScenariosResult.Facets)
+                foreach (SearchFacet facet in scenariosResult.Facets)
                 {
                     searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
                 }
@@ -75,10 +73,10 @@
 
             List<ScenarioSearchResultItemViewModel> itemResults = new List<ScenarioSearchResultItemViewModel>();
 
-            foreach(ScenarioSearchResultItem searchResult in ScenariosResult.Items)
+            foreach (ScenarioSearchResultItem searchResult in scenariosResult.Items)
             {
                 itemResults.Add(_mapper.Map<ScenarioSearchResultItemViewModel>(searchResult));
-               
+
             }
 
             itemResults.OrderBy(f => f.LastUpdatedDate);
@@ -96,12 +94,12 @@
                 results.EndItemNumber = results.StartItemNumber + requestOptions.PageSize - 1;
             }
 
-            if (results.EndItemNumber > ScenariosResult.TotalItems)
+            if (results.EndItemNumber > scenariosResult.TotalItems)
             {
-                results.EndItemNumber = ScenariosResult.TotalItems;
+                results.EndItemNumber = scenariosResult.TotalItems;
             }
 
-            results.PagerState = new PagerState(requestOptions.Page, ScenariosResult.TotalPages, 4);
+            results.PagerState = new PagerState(requestOptions.Page, scenariosResult.TotalPages, 4);
 
             return results;
         }

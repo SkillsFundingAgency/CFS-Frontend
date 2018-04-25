@@ -174,7 +174,7 @@
                     </div>
                     <div>
                         <span class="provider-item-property">
-                            Local authority:&nbsp;<strong><span data-bind="text: authority, attr: {'id' : 'provider-item-localauthority-'+$index}"></span></strong>
+                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: {'id' : 'provider-item-localauthority-'+$index}"></span></strong>
                         </span>
                     </div>
                     <div>
@@ -205,7 +205,7 @@
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
-    <script asp-src-include="~/js/list-providerresults.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.providers.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
         var vm = new calculateFunding.results.listProviderResults.ProviderSearchViewModel();
         var filterElement = document.getElementById("filter-container");

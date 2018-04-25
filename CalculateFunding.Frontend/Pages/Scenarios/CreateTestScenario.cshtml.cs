@@ -50,7 +50,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
        
         public async Task PopulateSpecifications(string periodId)
         {
-            ApiResponse<List<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
+            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {

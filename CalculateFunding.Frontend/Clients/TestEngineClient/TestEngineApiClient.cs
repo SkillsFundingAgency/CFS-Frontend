@@ -53,6 +53,13 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         }
 
 
+        public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestSecenarioResultCountsRequestModel testScenarioIdsModel)
+        {
+            Guard.ArgumentNotNull(testScenarioIdsModel, nameof(testScenarioIdsModel));
+
+            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestSecenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
+        }
+
         public async Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));

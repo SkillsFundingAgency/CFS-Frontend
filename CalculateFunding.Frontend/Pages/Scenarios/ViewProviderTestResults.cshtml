@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{pageNumber?}"
 @*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
 @model CalculateFunding.Frontend.Pages.Scenarios.ViewProvideTestResultsPageModel;
 @using CalculateFunding.Frontend.ViewModels.Common
@@ -212,7 +212,7 @@
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
-    <script asp-src-include="~/js/list-provider-test-results.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.providerTestResults.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
         var vm = new calculateFunding.results.listProviderTestResults.ProviderSearchViewModel({ testScenarioId: '@Model.TestScenario.Id', specificationId: '@Model.TestScenario.Specification.Id', periodId: '@Model.TestScenario.Specification.Period.Id' });
         var filterElement = document.getElementById("filter-container");

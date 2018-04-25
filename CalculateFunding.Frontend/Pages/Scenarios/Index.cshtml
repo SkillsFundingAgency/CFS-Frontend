@@ -62,10 +62,10 @@
 
                 <div class="test-scenario-item-container" id="test-scenario-item-result-@ScenariosRow">
                     <div class="test-scenario-item-header">
-                        <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
+                        <a href="/scenarios/ViewproviderTestResults?scenarioId=@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
                     </div>
                     <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.TestDescription</span>
+                        <span class="test-scenario-item-property data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.Description</span>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property test-scenario-item-property-specification">
@@ -99,10 +99,10 @@
             <div data-bind="foreach: testScenarios">
                 <div class="test-scenario-item-container data-dynamic-scenarioContainer" data-bind="attr: {id : 'data-dynamic-scenarioContainer-' + $index()}">
                     <div class="test-scenario-item-header">
-                        <a data-bind="text: name, attr: { 'href': '/scenarios/edittestscenario/' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
+                        <a data-bind="text: name, attr: { 'href': '/scenarios/ViewproviderTestResults?scenarioId=' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
                     </div>
                     <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property data-dynamic-description" data-bind="text: testDescription"></span>
+                        <span class="test-scenario-item-property data-dynamic-description" data-bind="text: description"></span>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property test-scenario-item-property-specification">
@@ -142,7 +142,7 @@
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
-    <script asp-src-include="~/js/list-test-scenarios.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.scenarios.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
         var vm = new calculateFunding.listTestScenarios.ScenariosSearchViewModel();
 

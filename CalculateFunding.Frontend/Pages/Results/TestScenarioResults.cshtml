@@ -1,0 +1,133 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Results.TestScenarioResultsPageModel
+@using CalculateFunding.Frontend.ViewModels.Results
+@using CalculateFunding.Frontend.ViewModels.Common
+@{
+    ViewData["Title"] = "View QA results";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="~/results/index">View results</a></li>
+            <li>View QA test results</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title no-margin">View QA test results</h1>
+}
+
+@section BannerMiddle{
+    <form method="get" class="filter-container spacing-15" id="filter-container" asp-antiforgery="false" data-bind="submit: performSearch">
+
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search test" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row spacing-15-top withjs-show">
+            <div class="col-xs-3 filter-field-heading">Year</div>
+            <div class="col-xs-4 filter-field-heading">Specification</div>
+        </div>
+        <div class="row row withjs-show">
+            <div class="col-xs-3">
+                <select asp-items="@(Model.Periods)" asp-for="@Model.PeriodId" class="form-control filter" data-bind="value: selectedPeriodId">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-4">
+                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" data-bind="value: selectedSpecificationId">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-1">
+                <button type="submit" class="button" data-bind="visible: false" id="search-button">Search</button>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="row view-qa-results" id="view-testscenarioresults-container">
+    @Html.Partial("_SearchErrorPartial")
+    <div data-bind="visible: isResultsVisible" class="col-xs-12">
+        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "test scenarios", Model.SearchTerm))
+    </div>
+
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+        </div>
+
+        <table class="qa-results-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
+            <thead>
+                <tr>
+                    <th>QA Test</th>
+                    <th>Updated</th>
+                    <th>Failures</th>
+                    <th>Passes</th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: testScenarioResults" class="withjs-show" id="dynamic-results-table-body">
+                <tr>
+                    <td><a data-bind="text: name, attr: {'href': '/scenarios/viewprovidertestresults?scenarioId=' + id}"></a></td>
+                    <td data-bind="text: lastUpdatedDateDisplay"></td>
+                    <td data-bind="text: failures"></td>
+                    <td data-bind="text: passes"></td>
+                </tr>
+
+            </tbody>
+            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                @{
+                    int rowId = 0;
+                }
+                @foreach (TestScenarioResultItemViewModel result in Model.SearchResults.TestResults)
+                {
+                    <tr>
+                        <td id="static-results-name-@rowId"><a href="/scenarios/viewprovidertestresults?scenarioId=@result.Id">@result.Name</a></td>
+                        <td id="static-results-status-@rowId">@result.LastUpdatedDate</td>
+                        <td id="static-results-specificationName-@rowId">@result.Failures</td>
+                        <td id="static-results-periodName-@rowId">@result.Passes</td>
+                    </tr>
+                    rowId++;
+                }
+            </tbody>
+        </table>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading QA Results</p>
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.testScenarioResults.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.testScenarioResults.TestScenarioResultsSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+        var providerResultsContainer = document.getElementById("view-testscenarioresults-container");
+        if (providerResultsContainer) {
+            ko.applyBindings(vm, providerResultsContainer);
+        }
+
+        var initialResults = @Html.Raw(Model.InitialSearchResults);
+
+        vm.setInitialResults(initialResults);
+
+    </script>
+}

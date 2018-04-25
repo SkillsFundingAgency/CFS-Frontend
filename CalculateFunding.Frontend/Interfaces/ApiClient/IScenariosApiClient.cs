@@ -2,7 +2,6 @@
 {
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public interface IScenariosApiClient

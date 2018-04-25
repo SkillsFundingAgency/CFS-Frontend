@@ -18,7 +18,7 @@
             _specsClient = specsClient;
         }
 
-        public IList<Specification> Specifications { get; set; }
+        public IEnumerable<Specification> Specifications { get; set; }
 
         public IList<SelectListItem> Years { get; set; }
 

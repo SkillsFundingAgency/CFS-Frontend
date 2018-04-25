@@ -1,4 +1,7 @@
 ﻿namespace calculateFunding.results.listProviderResults {
+    /**
+     * Lists providers so results can be displayed in detail on the next page - no provider test results in this model
+     * */
     export class ProviderSearchViewModel extends calculateFunding.search.SearchViewModel {
 
         public providerSearchResults: KnockoutObservableArray<IProviderDetailResponse> = ko.observableArray([]);

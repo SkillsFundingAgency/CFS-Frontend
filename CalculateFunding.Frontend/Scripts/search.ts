@@ -182,6 +182,18 @@
             }
         }
 
+        protected populateSearchResults(results: any, searchResultCallback: (searchRequestResponse: any) => void) {
+            this.state(SearchingStateKey);
+            this.errorMessage(null);
+
+            if (searchResultCallback) {
+                searchResultCallback(results);
+            }
+
+            this.searchPerformed(true);
+            this.state(IdleStateKey);
+        }
+
         protected populateCommonSearchResultProperties(searchResponse: calculateFunding.common.ISearchResultResponse) {
             this.startItemNumber(searchResponse.startItemNumber);
             this.endItemNumber(searchResponse.endItemNumber);

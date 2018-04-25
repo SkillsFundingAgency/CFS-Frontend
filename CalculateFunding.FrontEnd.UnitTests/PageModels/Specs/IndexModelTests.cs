@@ -27,7 +27,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             indexModel
                .Specifications
-               .Count
+               .Count()
                .Should()
                .Be(0);
         }
@@ -72,7 +72,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             indexModel
                .Specifications
-               .Count
+               .Count()
                .Should()
                .Be(0);
         }
@@ -117,7 +117,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             indexModel
                .Specifications
-               .Count
+               .Count()
                .Should()
                .Be(0);
         }
@@ -162,7 +162,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = SpecificationTestData.Data();
 
-            ApiResponse<List<Specification>> specsResponse = new ApiResponse<List<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
 
@@ -196,7 +196,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             indexModel
                .Specifications
-               .Count
+               .Count()
                .Should()
                .Be(3);
         }

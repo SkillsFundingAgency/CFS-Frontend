@@ -32,9 +32,9 @@
             return GetAsync<List<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
-        public Task<ApiResponse<List<Specification>>> GetSpecifications(string academicYearId)
+        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId)
         {
-            return GetAsync<List<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
+            return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
