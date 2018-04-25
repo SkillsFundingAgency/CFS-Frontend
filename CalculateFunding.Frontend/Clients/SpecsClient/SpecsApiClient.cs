@@ -153,7 +153,7 @@
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
             ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-search", request);
-            if (results.StatusCode == System.Net.HttpStatusCode.OK)
+            if (results.StatusCode == HttpStatusCode.OK)
             {
                 PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
                 {

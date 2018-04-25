@@ -37,12 +37,12 @@
             }
 
             ViewModel.AllocationLineItems = providerResponse.Content.AllocationResults.Select(m =>
-                       new AllocationLineResult
-                       {
-                           AllocationLine = m.AllocationLine.Name,
-                           SubTotal = m.Value.HasValue ? m.Value.Value : 0
-                       }
-                   );
+                new AllocationLineResult
+                {
+                    AllocationLine = m.AllocationLine.Name,
+                    SubTotal = m.Value.HasValue ? m.Value.Value : 0
+                }
+            );
         }
     }
 }

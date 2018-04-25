@@ -96,12 +96,26 @@
             CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
+
+            CreateMap<Provider, ProviderViewModel>()
+              .ForMember(m => m.LastUpdatedDate, opt => opt.Ignore());
+
         }
 
         private void MapTestEngine()
         {
             this.CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+
+            CreateMap<TestScenarioSearchResultItem, TestScenarioSearchResultItemViewModel>()
+           .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+            .AfterMap((TestScenarioSearchResultItem source, TestScenarioSearchResultItemViewModel destination) =>
+            {
+                if (source.LastUpdatedDate.HasValue)
+                {
+                    destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
+                }
+            });
         }
 
         private void MapScenario()

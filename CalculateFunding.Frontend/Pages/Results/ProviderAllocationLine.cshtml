@@ -72,6 +72,9 @@
                 <li class="nav-item">
                     <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Calculation results</a>
                 </li>
+                <li class="nav-item">
+                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
+                </li>
             </ul>
             <br />
             @if (!@Model.ViewModel.AllocationLineItems.IsNullOrEmpty())

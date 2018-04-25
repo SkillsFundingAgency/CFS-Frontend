@@ -400,7 +400,7 @@
             // Assert
             test
             .Should()
-            .ThrowExactly<System.ArgumentNullException>();
+            .ThrowExactly<System.InvalidOperationException>();
         }
 
         private Provider CreateProvider()

@@ -14,6 +14,8 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         /// <returns>Empty array on success, list of errors on failure</returns>
         Task<ApiResponse<IEnumerable<ScenarioCompileError>>> CompileScenario(ScenarioCompileModel compileModel);
 
+        Task<PagedResult<TestScenarioSearchResultItem>> FindTestScenariosForProvider(SearchFilterRequest filterOptions);
+
         Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions);
     }
 }

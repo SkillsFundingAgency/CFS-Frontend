@@ -11,6 +11,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
             AllocationLineItems = Enumerable.Empty<AllocationLineResult>();
 
             CalculationItems = Enumerable.Empty<CalculationItemResult>();
+
+            ScenarioItems = Enumerable.Empty<ScenarioItemResult>();
         }
 
         public string ProviderName { get; set; }
@@ -55,5 +57,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public IEnumerable<AllocationLineResult> AllocationLineItems { get; set; }
 
         public IEnumerable<CalculationItemResult> CalculationItems { get; set; }
+
+        public IEnumerable<ScenarioItemResult> ScenarioItems { get; set; }
     }
 }

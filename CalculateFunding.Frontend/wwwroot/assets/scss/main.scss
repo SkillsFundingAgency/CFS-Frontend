@@ -450,6 +450,26 @@ blockquote {
     }
 }
 
+
+
+.view-provider-test-results {
+    .test-results-table {
+        thead {
+            border-bottom: 2px solid #000 !important;
+        }
+
+        tr {
+            border-top: none !important;
+            border-bottom: 1px solid #ccc !important;
+        }
+
+        td {
+            padding: 15px 0;
+        }
+    }
+}
+
+
 .dataset-searchresult-container {
 
     .dataset-item-container {

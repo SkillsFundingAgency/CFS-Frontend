@@ -60,7 +60,7 @@
             }
 
             ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
-            if (calculationResponse == null || calculationResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (calculationResponse == null || calculationResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
@@ -73,7 +73,7 @@
 
             ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.CalculationSpecification.Id);
 
-            if (specCalculation == null || specCalculation.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
             }

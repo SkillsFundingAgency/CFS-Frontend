@@ -143,19 +143,26 @@ namespace CalculateFunding.Frontend.Pages.Results
         {
             var specResponse = await _resultsApiClient.GetSpecifications(providerId);
 
-            var specifications = specResponse.Content.Where(m => m.Period?.Id == PeriodId);
-
-            if (string.IsNullOrWhiteSpace(specificationId))
+            if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                specificationId = SpecificationId;
+                var specifications = specResponse.Content.Where(m => m.Period?.Id == PeriodId);
+
+                if (string.IsNullOrWhiteSpace(specificationId))
+                {
+                    specificationId = SpecificationId;
+                }
+
+                Specifications = specifications.Select(m => new SelectListItem
+                {
+                    Value = m.Id,
+                    Text = m.Name,
+                    Selected = m.Id == specificationId
+                }).ToList().OrderBy(o => o.Text);
             }
-
-            Specifications = specifications.Select(m => new SelectListItem
+            else
             {
-                Value = m.Id,
-                Text = m.Name,
-                Selected = m.Id == specificationId
-            }).ToList().OrderBy(o => o.Text);
+                throw new InvalidOperationException($"Unable to retreive Specifications: Status Code = {specResponse.StatusCode}");
+            }
 
         }
     }

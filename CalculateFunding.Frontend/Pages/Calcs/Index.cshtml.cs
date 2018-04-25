@@ -1,6 +1,5 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
-    using System;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Helpers;

@@ -29,6 +29,30 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             return PostAsync<IEnumerable<ScenarioCompileError>, ScenarioCompileModel>($"{_apiPath}/validate-test", compileModel);
         }
 
+ 
+        public async Task<PagedResult<TestScenarioSearchResultItem>> FindTestScenariosForProvider(SearchFilterRequest filterOptions)
+        {
+            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
+
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<TestScenarioSearchResultItem>> results = await PostAsync<SearchResults<TestScenarioSearchResultItem>, SearchQueryRequest>($"{_apiPath}/testscenario-search", request);
+            if (results.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                PagedResult<TestScenarioSearchResultItem> result = new SearchPagedResult<TestScenarioSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
         public async Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
