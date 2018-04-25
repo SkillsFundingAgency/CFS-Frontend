@@ -7,8 +7,8 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
     {
         public string Description { get; set; }
 
-        public IEnumerable<CalculationViewModel> Calculations { get; set; }
+        public List<CalculationViewModel> Calculations { get; set; }
 
-        public IEnumerable<PolicyViewModel> SubPolicies { get; set; }
+        public List<PolicyViewModel> SubPolicies { get; set; }
     }
 }
