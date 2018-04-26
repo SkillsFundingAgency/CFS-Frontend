@@ -29,14 +29,14 @@
 
                 let specFilter: calculateFunding.search.SearchFilter =
                     {
-                        name: ko.observable("specificationId"),
-                        term: self.selectedSpec
+                        name: "specificationId",
+                        term: self.selectedSpec()
                     };
 
                 let specProviderId: calculateFunding.search.SearchFilter =
                     {
-                        name: ko.observable("providerId"),
-                        term: ko.observable(this.providerId)
+                        name: "providerId",
+                        term: this.providerId
                     };
 
                 filters.push(specFilter);

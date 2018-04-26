@@ -20,8 +20,8 @@
 
                 let filter: calculateFunding.search.SearchFilter =
                     {
-                        name : ko.observable("periodId"),
-                        term: ko.observable(self.selectedPeriod())
+                        name : "periodId",
+                        term: self.selectedPeriod()
                     };
 
                 filters.push(filter);

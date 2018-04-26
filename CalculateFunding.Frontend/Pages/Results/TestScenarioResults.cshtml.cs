@@ -1,8 +1,10 @@
 namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -53,16 +55,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, string periodId = null, string specificationId = null)
         {
-            await PopulatePeriods(periodId);
-
-            if (string.IsNullOrWhiteSpace(periodId))
-            {
-                periodId = Periods?.First().Value;
-            }
-
-            PeriodId = periodId;
-
-            await PopulateSpecifications(periodId);
+            Task populatePeriodsTask = PopulatePeriods(periodId);
 
             TestScenarioResultRequestViewModel testScenarioResultRequestViewModel = new TestScenarioResultRequestViewModel()
             {
@@ -71,13 +64,24 @@ namespace CalculateFunding.Frontend.Pages.Results
                 SearchTerm = searchTerm,
                 SpecificationId = specificationId,
             };
+            Task<TestScenarioResultViewModel> testScenarioResultsTask = _testScenarioResultsService.PerformSearch(testScenarioResultRequestViewModel);
 
-            SearchResults = await _testScenarioResultsService.PerformSearch(testScenarioResultRequestViewModel);
+            await TaskHelper.WhenAllAndThrow(testScenarioResultsTask, populatePeriodsTask);
 
+            if (string.IsNullOrWhiteSpace(periodId))
+            {
+                periodId = Periods?.First().Value;
+            }
+
+            PeriodId = periodId;
+
+            SearchResults =  testScenarioResultsTask.Result;
             if (SearchResults == null)
             {
                 return new StatusCodeResult(500);
             }
+
+            PopulateSpecifications(SearchResults.Specifications);
 
             InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()
             {
@@ -110,12 +114,8 @@ namespace CalculateFunding.Frontend.Pages.Results
             }).ToList();
         }
 
-        private async Task PopulateSpecifications(string academicYearId = null)
+        private void PopulateSpecifications(IEnumerable<ReferenceViewModel> specifications)
         {
-            var specResponse = await _specsApiClient.GetSpecifications(academicYearId);
-
-            var specifications = specResponse.Content.Where(m => m.AcademicYear?.Id == PeriodId);
-
             Specifications = specifications.Select(m => new SelectListItem
             {
                 Value = m.Id,

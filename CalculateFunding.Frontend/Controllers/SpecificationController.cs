@@ -4,6 +4,7 @@ using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -31,9 +32,17 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult((int)apiResponse.StatusCode);
             }
 
+            if(apiResponse.Content == null)
+            {
+                return new ObjectResult("List of Specifications was null")
+                {
+                    StatusCode = 500,
+                };
+            }
+
             List<ReferenceViewModel> result = new List<ReferenceViewModel>();
 
-            foreach (Specification specification in apiResponse.Content)
+            foreach (Specification specification in apiResponse.Content.OrderBy(o => o.Name))
             {
                 result.Add(new ReferenceViewModel(specification.Id, specification.Name));
             }

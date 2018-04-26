@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
@@ -53,22 +56,51 @@ namespace CalculateFunding.Frontend.Services
                 searchRequest.Filters = new Dictionary<string, string[]>();
             }
 
-            if (!string.IsNullOrWhiteSpace(request.SpecificationId))
+            SetFilterValue(searchRequest, "specificationId", request.SpecificationId);
+            SetFilterValue(searchRequest, "periodId", request.PeriodId);
+
+            Task<ScenarioSearchResultViewModel> scenarioSearchResultsTask = _scenariosSearchService.PerformSearch(searchRequest);
+            Task<ApiResponse<IEnumerable<Specification>>> specificationsLookupTask;
+
+            if (string.IsNullOrWhiteSpace(request.PeriodId))
             {
-                if (searchRequest.Filters.ContainsKey("specificationId") && searchRequest.Filters["specificationId"] != null && searchRequest.Filters["specificationId"].Contains(request.SpecificationId))
-                {
-                    searchRequest.Filters.Add("specificationId", new string[] { request.SpecificationId });
-                }
-                else if (!searchRequest.Filters.ContainsKey("specificationId"))
-                {
-                    searchRequest.Filters.Add("specificationId", new string[] { request.SpecificationId });
-                }
+                specificationsLookupTask = _specsClient.GetSpecifications();
+            }
+            else
+            {
+                specificationsLookupTask = _specsClient.GetSpecifications(request.PeriodId);
             }
 
-            ScenarioSearchResultViewModel scenarioSearchResults = await _scenariosSearchService.PerformSearch(searchRequest);
+            await TaskHelper.WhenAllAndThrow(scenarioSearchResultsTask, specificationsLookupTask);
+
+            ScenarioSearchResultViewModel scenarioSearchResults = scenarioSearchResultsTask.Result;
 
             IEnumerable<string> testScenarioIds = scenarioSearchResults.Scenarios.Select(s => s.Id);
             TestScenarioResultViewModel result = _mapper.Map<TestScenarioResultViewModel>(scenarioSearchResults);
+
+            ApiResponse<IEnumerable<Specification>> specificationsApiResponse = specificationsLookupTask.Result;
+            if (specificationsApiResponse == null)
+            {
+                throw new InvalidOperationException("Specifications API Response was null");
+            }
+
+            if (specificationsApiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new InvalidOperationException($"Specifications API Response content did not return OK, but instead {specificationsApiResponse.StatusCode}");
+            }
+
+            if (specificationsApiResponse.Content == null)
+            {
+                throw new InvalidOperationException("Specifications API Response content was null");
+            }
+
+            List<ReferenceViewModel> specifications = new List<ReferenceViewModel>();
+            foreach (Specification specification in specificationsApiResponse.Content.OrderBy(s=>s.Name))
+            {
+                specifications.Add(new ReferenceViewModel(specification.Id, specification.Name));
+            }
+
+            result.Specifications = specifications;
 
             if (testScenarioIds.Any())
             {
@@ -96,6 +128,27 @@ namespace CalculateFunding.Frontend.Services
 
             return result;
 
+        }
+
+        private static void SetFilterValue(SearchRequestViewModel searchRequest, string fieldKey, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                if (!searchRequest.Filters.ContainsKey(fieldKey))
+                {
+                    searchRequest.Filters.Add(fieldKey, new string[] { value });
+                }
+
+                if (searchRequest.Filters[fieldKey] == null)
+                {
+                    searchRequest.Filters.Add(fieldKey, new string[] { value });
+                }
+
+                if (!searchRequest.Filters[fieldKey].Contains(value))
+                {
+                    searchRequest.Filters[fieldKey] = searchRequest.Filters[fieldKey].Append(value).ToArray();
+                }
+            }
         }
     }
 }

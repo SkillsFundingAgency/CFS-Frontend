@@ -28,8 +28,8 @@
 
                 let searchFilter = new calculateFunding.search.SearchFilter();
 
-                searchFilter.name = ko.observable("testScenarioId");
-                searchFilter.term = ko.observable(options.testScenarioId);
+                searchFilter.name = "testScenarioId";
+                searchFilter.term = options.testScenarioId;
 
                 if (typeof options.testScenarioId === "undefined") {
                     throw new Error("options.testScenarioId is undefined")

@@ -79,7 +79,7 @@
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<List<Specification>>> GetSpecifications()
+        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
         {
             throw new NotImplementedException();
         }

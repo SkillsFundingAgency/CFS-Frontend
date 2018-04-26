@@ -27,7 +27,7 @@
         <div class="row">
             <div class="col-xs-9">
                 <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search test" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search QA test" data-bind="textInput: searchTerm, enable: canSelectFilters" />
                     <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 </select>
             </div>
             <div class="col-xs-4">
-                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" data-bind="value: selectedSpecificationId">
+                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" data-bind="value: selectedSpecificationId, options: specifications, optionsText: 'name', optionsValue: 'id', optionsCaption: ''">
                     <option></option>
                 </select>
             </div>
@@ -58,7 +58,7 @@
 <div class="row view-qa-results" id="view-testscenarioresults-container">
     @Html.Partial("_SearchErrorPartial")
     <div data-bind="visible: isResultsVisible" class="col-xs-12">
-        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "test scenarios", Model.SearchTerm))
+        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "QA tests", Model.SearchTerm))
     </div>
 
     <div class="col-xs-12">

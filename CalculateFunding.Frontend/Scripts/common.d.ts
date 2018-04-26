@@ -74,3 +74,7 @@
         column: number;
     }
 }
+
+interface Object {
+    assign: (target: Object, sources: Object) => Object
+}

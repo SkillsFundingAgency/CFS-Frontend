@@ -3,12 +3,14 @@
     export class TestScenarioResultsSearchViewModel extends calculateFunding.search.SearchViewModel {
         public testScenarioResults: KnockoutObservableArray<ITestScenarioResponse> = ko.observableArray([]);
 
-        public specifications: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
-        public selectedSpecificationId: KnockoutObservable<string> = ko.observable();
+        public specifications: KnockoutObservableArray<ISpecification> = ko.observableArray([]);
+        public selectedSpecificationId: KnockoutObservable<string> = ko.observable("");
 
-        public selectedPeriodId: KnockoutObservable<string> = ko.observable();
+        // Set default value to empty string, so subscribe won't trigger a search request on initial page request
+        public selectedPeriodId: KnockoutObservable<string> = ko.observable("");
 
-        public searchCompleted: (resultUntyped: any) => void;
+        // Callback when search has been performed, used for ajax and initial page load
+        private searchCompleted: (resultUntyped: any) => void;
 
         constructor() {
             super();
@@ -20,15 +22,8 @@
             });
 
             this.selectedSearchFacets = ko.computed(() => {
-                let facets: Array<calculateFunding.search.SearchFacet> = [];
+                return [];
 
-                //super.buildSelectedSearchFacets(facets, self.selectedSpecificationId(), self.specifications());
-                //super.buildSelectedSearchFacets(facets, self.selectedPeriods(), self.periods());
-                //super.buildSelectedSearchFacets(facets, self.selectedFundingStreams(), self.fundingStreams());
-                //super.buildSelectedSearchFacets(facets, self.selectedSpecifications(), self.specifications());
-                //super.buildSelectedSearchFacets(facets, self.selectedCalculationStatus(), self.calculationStatus());
-
-                return facets;
             }).extend({ throttle: 5 });
 
             this.selectedSearchFilters = ko.computed(() => {
@@ -36,8 +31,8 @@
 
                 if (self.selectedSpecificationId()) {
                     let specFilter = new calculateFunding.search.SearchFilter();
-                    specFilter.name = ko.observable("specificationId");
-                    specFilter.term = self.selectedSpecificationId;
+                    specFilter.name = "specificationId";
+                    specFilter.term = self.selectedSpecificationId();
                     filters.push(specFilter);
                 }
 
@@ -64,12 +59,14 @@
                 console.log("Selected search facets string:", newValue);
             });
 
-            self.state.subscribe((newValue) => {
-                console.log("State changed: ", newValue);
+            self.selectedPeriodId.subscribe((newValue) => {
+                if (self.state() === "idle") {
+                    self.performSearch(1);
+                }
             });
 
             self.selectedSpecificationId.subscribe((newValue: string) => {
-                self.performSearch(self.pageNumber());
+                self.performSearch(1);
             });
 
             self.searchCompleted = (resultUntyped: any) => {
@@ -78,84 +75,43 @@
                     self.testScenarioResults(result.testResults);
 
                     self.populateCommonSearchResultProperties(result);
+
+                    if (typeof result.specifications !== "undefined" && result.specifications) {
+                        this.specifications(result.specifications);
+                    }
                 }
             }
-
-            self.selectedPeriodId.subscribe((newValue) => {
-                if (newValue) {
-
-                }
-            });
         }
 
         public performSearch(pageNumber: number = null) {
             let self = this;
 
-            super.makeSearchResultAndProcess("/api/results/testscenarios", pageNumber, (resultUntyped) => {
-                let result: ITestScenarioResultsResponse = resultUntyped;
-                self.testScenarioResults(result.testResults);
+            let additionalAjaxQueryOptions = {
+                specificationId: self.selectedSpecificationId(),
+                periodId: self.selectedPeriodId()
+            };
 
-                self.populateCommonSearchResultProperties(result);
-
-                //self.populateFacets("", result.facets, self.allocationLines);
-                //self.populateFacets("periodName", result.facets, self.periods);
-                //self.populateFacets("specificationName", result.facets, self.specifications);
-                //self.populateFacets("fundingStreamName", result.facets, self.fundingStreams);
-                //self.populateFacets("status", result.facets, self.calculationStatus);
-            });
+            super.makeSearchResultAndProcess("/api/results/testscenarios", pageNumber, self.searchCompleted, additionalAjaxQueryOptions);
         }
 
-        public removeFilter(searchFacet: calculateFunding.search.SearchFacet) {
-            //if (searchFacet && this.canSelectFilters()) {
-            //    let selectedArray: KnockoutObservableArray<string> = null;
-            //    let fieldName = searchFacet.fieldName();
-            //    if (fieldName === "allocationLineName") {
-            //        selectedArray = this.selectedAllocationLines;
-            //    } else if (fieldName === "periodName") {
-            //        selectedArray = this.selectedPeriods;
-            //    } else if (fieldName === "specificationName") {
-            //        selectedArray = this.selectedSpecifications;
-            //    } else if (fieldName === "fundingStreamName") {
-            //        selectedArray = this.selectedFundingStreams;
-            //    } else if (fieldName === "status") {
-            //        selectedArray = this.selectedCalculationStatus;
-            //    }
-
-            //    if (selectedArray == null) {
-            //        throw new Error("Unable to find selected item array");
-            //    }
-
-            //    let itemIndex = selectedArray.indexOf(searchFacet.name());
-            //    if (itemIndex > -1) {
-            //        selectedArray.splice(itemIndex, 1);
-            //    }
-            //}
-        }
-
+        /**
+         * Sets the initial result (from PageModel via CSHTML of JSON Ajax payload)
+         * @param response
+         */
         public setInitialResults(response: ITestScenarioResultsResponse): void {
             if (response) {
                 this.populateSearchResults(response, this.searchCompleted);
+
+                if (typeof response.specifications !== "undefined" && response.specifications) {
+                    this.specifications(response.specifications);
+                }
             }
         }
 
-        public loadSpecificationsForPeriod(periodId: string) {
-            let request = $.ajax({
-                url: "/api/specifications-by-period/" + periodId,
-                dataType: 'json'
-            });
-
-            this.state("loading");
-
-            request.done((r) => {
-                if (r) {
-                    let specifications = [];
-                    for (let i = 0; i < r.length; i++) {
-
-                    }
-                }
-            });
-
+        public removeFilter(searchFacet: search.SearchFacet): void {
+            throw new Error("Method not implemented and required for this page.");
         }
+
     }
 
     export interface ITestScenarioResultsResponse extends calculateFunding.common.ISearchResultResponse {

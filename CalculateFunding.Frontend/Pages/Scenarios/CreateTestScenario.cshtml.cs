@@ -33,33 +33,25 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
-        [BindProperty]
-       public string PeriodId { get; set; }
-
-        public async Task<IActionResult> OnGetAsync(string periodId = null )
+        public async Task<IActionResult> OnGetAsync()
         {
-            Guard.IsNullOrWhiteSpace(periodId, nameof(periodId));
 
-           PeriodId = periodId;
-
-            await PopulateSpecifications(periodId);
+            await PopulateSpecifications();
 
             return Page();
 
         }
-       
-        public async Task PopulateSpecifications(string periodId)
+
+        public async Task PopulateSpecifications()
         {
-            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
+            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications();
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Specification information: Status Code = {apiResponse.StatusCode}");
             }
 
-            var specifications = apiResponse.Content.Where(m => m.AcademicYear.Id == periodId);
-
-            Specifications = apiResponse.Content.Select(m => new SelectListItem
+            Specifications = apiResponse.Content.OrderBy(s => s.Name).Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name

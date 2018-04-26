@@ -19,7 +19,11 @@
 
         Task<ApiResponse<Product>> GetProduct(string specificationId, string productId);
 
-        Task<ApiResponse<List<Specification>>> GetSpecifications();
+        /// <summary>
+        /// Gets all Specifications
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications();
 
         /// <summary>
         /// Gets Specifications by Academic Year ID

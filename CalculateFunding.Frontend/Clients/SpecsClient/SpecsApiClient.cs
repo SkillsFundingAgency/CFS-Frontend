@@ -27,9 +27,9 @@
             _cancellationToken = context.HttpContext.RequestAborted;
         }
 
-        public Task<ApiResponse<List<Specification>>> GetSpecifications()
+        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
         {
-            return GetAsync<List<Specification>>($"{_specsPath}/specifications", _cancellationToken);
+            return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
         public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId)
@@ -48,7 +48,7 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<Specification>($"{_specsPath}/specifications?specificationId={specificationId}");
+            return GetAsync<Specification>($"{_specsPath}/specification-by-id?specificationId={specificationId}");
         }
 
         public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)

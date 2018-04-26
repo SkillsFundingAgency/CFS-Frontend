@@ -39,9 +39,9 @@
 
     export class SearchFilter {
 
-        public name: KnockoutObservable<string> = ko.observable();
+        public name: string;
 
-        public term: KnockoutObservable<string> = ko.observable();
+        public term: string;
     }
 
     export abstract class SearchViewModel {
@@ -105,7 +105,7 @@
             }
         }
 
-        protected makeSearchResultAndProcess(searchUrl : string, pageNumber: number = null, searchResultCallback: (searchRequestResponse: any) => void) : void {
+        protected makeSearchResultAndProcess(searchUrl: string, pageNumber: number = null, searchResultCallback: (searchRequestResponse: any) => void, optionalQueryData: Object = null): void {
             if (this.state() === IdleStateKey) {
                 if (!searchUrl) {
                     throw new Error("Empty or null searchUrl");
@@ -121,7 +121,7 @@
 
                 var filters: calculateFunding.common.ISearchFilterRequest = {};
 
-                if (this.selectedSearchFacets){
+                if (this.selectedSearchFacets) {
                     ko.utils.arrayForEach(this.selectedSearchFacets(), (facet: calculateFunding.search.SearchFacet, i: number) => {
                         if (facet) {
                             if (!filters[facet.fieldName()]) {
@@ -136,23 +136,29 @@
                 if (this.selectedSearchFilters) {
                     ko.utils.arrayForEach(this.selectedSearchFilters(), (searchFilter: calculateFunding.search.SearchFilter, i: number) => {
                         if (searchFilter) {
-                            if (!filters[searchFilter.name()]) {
-                                filters[searchFilter.name()] = [];
+                            if (!filters[searchFilter.name]) {
+                                filters[searchFilter.name] = [];
                             }
 
-                            filters[searchFilter.name()].push(searchFilter.term());
+                            filters[searchFilter.name].push(searchFilter.term);
                         }
                     });
                 }
 
                 //cant bind to the search term box for some reason, needs looking at
 
-                let data: calculateFunding.common.ISearchRequest = {
+                let searchRequestData: calculateFunding.common.ISearchRequest = {
                     pageNumber: queryPageNumber,
                     searchTerm: this.searchTerm(),
                     includeFacets: true,
                     filters: filters,
                 };
+
+                let data = searchRequestData;
+
+                if (optionalQueryData) {
+                    optionalQueryData = Object.assign(data, optionalQueryData);
+                }
 
                 let request = $.ajax({
                     data: JSON.stringify(data),
@@ -242,4 +248,34 @@
             });
         }
     }
+}
+
+if (typeof Object.prototype.assign != 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+        value: function assign(target: any, varArgs: any) { // .length of function is 2
+            'use strict';
+            if (target == null) { // TypeError if undefined or null
+                throw new TypeError('Cannot convert undefined or null to object');
+            }
+
+            var to = Object(target);
+
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+
+                if (nextSource != null) { // Skip over if undefined or null
+                    for (var nextKey in nextSource) {
+                        // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        },
+        writable: true,
+        configurable: true
+    });
 }
