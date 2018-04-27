@@ -31,7 +31,7 @@
             <span>Provider subtype:&nbsp;<strong>@Model.ProviderInfoModel.ProviderSubtype</strong></span>
         </div>
         <div>
-            <span>Date opened:&nbsp;<strong>@Model.ProviderInfoModel.DateOpened</strong>&nbsp;</span>
+            <span>Date opened:&nbsp;<strong>@Model.ProviderInfoModel.DateOpenedDisplay</strong>&nbsp;</span>
         </div>
     </p>
 
@@ -101,7 +101,7 @@
                           {
                                 <tr>
                                     <td id="static-test-result-name-@rowId" scope="row">@result.TestScenarioName</td>
-                                    <td id="static-test-result-updated-date-@rowId">@result.LastUpdatedDateDisplay</td>
+                                    <td id="static-test-result-updated-date-@rowId">@result.LastUpdatedDate</td>
                                     <td id="static-test-result-value-@rowId">@result.TestResult</td>
                                 </tr>
                             rowId++;

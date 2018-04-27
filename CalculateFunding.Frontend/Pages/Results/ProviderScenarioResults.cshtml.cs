@@ -3,6 +3,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -74,8 +75,11 @@ namespace CalculateFunding.Frontend.Pages.Results
                 }
             };
 
-            // Specs, periods and provider info can be in parallel too
-            await PopulatePeriods(periodId);
+            Task populatePeriodsTask =  PopulatePeriods(periodId);
+
+            Task<ApiResponse<Provider>> apiResponseTask =  _resultsApiClient.GetProviderByProviderId(providerId);
+
+            await TaskHelper.WhenAllAndThrow(populatePeriodsTask, apiResponseTask);
 
             if (string.IsNullOrWhiteSpace(periodId))
             {
@@ -88,37 +92,32 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             SpecificationId = specificationId;
 
-            ApiResponse<Provider> apiResponse = await _resultsApiClient.GetProviderByProviderId(providerId);
-            
-            Provider response = apiResponse.Content;
-            // TODO - add a check for StatusCode == OK
-
-            ProviderViewModel providerViewModel = new ProviderViewModel
+            ApiResponse<Provider> apiResponse = apiResponseTask.Result;
+  
+            if (apiResponse != null   && apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null )
             {
-                Id = response.Id,
-                Name = response.Name,
-                Urn = response.URN,
-                Ukprn = response.UKPRN,
-                Upin = response.UPIN,
-                LocalAuthority = response.LocalAuthority,
-                ProviderType = response.ProviderType,
-                ProviderSubtype = response.ProviderSubtype,
-                DateOpened = response.DateOpened.HasValue ? response.DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown",
-            };
+                Provider response = apiResponse.Content;
 
-            ProviderInfoModel = providerViewModel;
+                ProviderViewModel providerViewModel = _mapper.Map<ProviderViewModel>(apiResponse.Content);
+         
+                ProviderInfoModel = providerViewModel;
+            }
+            else
+            {
+                _logger.Error("Provider response content is null");
+                return new StatusCodeResult(500);
+            }
 
             if (!string.IsNullOrWhiteSpace(specificationId))
             {
-                // TODO this call and the GetProviderByProviderId in parallel
                 TestScenarioSearchResults = await _testScenarioSearchService.PerformSearch(searchRequest);
             }
 
             if (TestScenarioSearchResults == null)
             {
-                _logger.Error("Test scenario results content is null");
-                // Return something other than null, eg 500
-                return null;
+                _logger.Error("Test scenario results content is null");  
+                
+                return new StatusCodeResult(500);
             }
 
             return Page();

@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
             ApiResponse<SearchResults<TestScenarioSearchResultItem>> results = await PostAsync<SearchResults<TestScenarioSearchResultItem>, SearchQueryRequest>($"{_apiPath}/testscenario-search", request);
-            if (results.StatusCode == System.Net.HttpStatusCode.OK)
+            if (results.StatusCode == HttpStatusCode.OK)
             {
                 PagedResult<TestScenarioSearchResultItem> result = new SearchPagedResult<TestScenarioSearchResultItem>(filterOptions, results.Content.TotalCount)
                 {

@@ -1,4 +1,6 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
+using Newtonsoft.Json;
+using System;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -16,8 +18,10 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public int? Urn { get; set; }
 
-        public string DateOpened { get; set; }
+        [JsonProperty("openDate")]
+        public DateTime? DateOpened { get; set; }
 
-        public string LastUpdatedDate { get; set; }
+        public string DateOpenedDisplay { get; set; } 
+ 
     }
 }

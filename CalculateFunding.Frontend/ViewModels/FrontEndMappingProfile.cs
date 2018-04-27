@@ -110,10 +110,17 @@
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
             CreateMap<Provider, ProviderViewModel>()
-              .ForMember(m => m.LastUpdatedDate, opt => opt.Ignore());
+              .ForMember(m => m.DateOpenedDisplay, opt => opt.Ignore())
 
+             .AfterMap((Provider source, ProviderViewModel destination) =>
+              {
+                  if (source.DateOpened.HasValue)
+                  {
+                      destination.DateOpenedDisplay = source.DateOpened.Value.ToString(FormatStrings.DateTimeFormatString);
+
+                  }
+              });
         }
-
         private void MapTestEngine()
         {
             this.CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()
