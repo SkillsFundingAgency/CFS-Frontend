@@ -1,7 +1,9 @@
 namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
+    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -26,8 +28,13 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly ISpecsApiClient _specsApiClient;
         private readonly ILogger _logger;
 
-        public TestScenarioResultsPageModel(ITestScenarioResultsService testScenarioResultsService, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
+        public TestScenarioResultsPageModel(ITestScenarioResultsService testScenarioResultsService, ISpecsApiClient specsApiClient, ILogger logger, IMapper mapper)
         {
+            Guard.ArgumentNotNull(testScenarioResultsService, nameof(testScenarioResultsService));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
             _testScenarioResultsService = testScenarioResultsService;
             _mapper = mapper;
             _specsApiClient = specsApiClient;
@@ -78,7 +85,10 @@ namespace CalculateFunding.Frontend.Pages.Results
             SearchResults =  testScenarioResultsTask.Result;
             if (SearchResults == null)
             {
-                return new StatusCodeResult(500);
+                return new ObjectResult("Search result was null")
+                {
+                    StatusCode = 500
+                };
             }
 
             PopulateSpecifications(SearchResults.Specifications);
@@ -93,13 +103,22 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulatePeriods(string periodId = null)
         {
-            var periodsResponse = await _specsApiClient.GetAcademicYears();
+            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetAcademicYears();
+            if(periodsResponse == null)
+            {
+                throw new InvalidOperationException($"Unable to retreive Periods: response was null");
+            }
 
             if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            var periods = periodsResponse.Content;
+
+            IEnumerable<Reference> periods = periodsResponse.Content;
+            if (periodsResponse.Content == null)
+            {
+                throw new InvalidOperationException($"Unable to retreive Periods: Content was null");
+            }
 
             if (string.IsNullOrWhiteSpace(periodId))
             {

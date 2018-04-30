@@ -42,6 +42,8 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<TestScenarioResultViewModel> PerformSearch(TestScenarioResultRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
                 IncludeFacets = false,
@@ -74,25 +76,33 @@ namespace CalculateFunding.Frontend.Services
             await TaskHelper.WhenAllAndThrow(scenarioSearchResultsTask, specificationsLookupTask);
 
             ScenarioSearchResultViewModel scenarioSearchResults = scenarioSearchResultsTask.Result;
-
-            IEnumerable<string> testScenarioIds = scenarioSearchResults.Scenarios.Select(s => s.Id);
-            TestScenarioResultViewModel result = _mapper.Map<TestScenarioResultViewModel>(scenarioSearchResults);
+            if(scenarioSearchResults == null)
+            {
+                _logger.Warning("Scenario Search Results response was null");
+                throw new InvalidOperationException("Scenario Search Results response was null");
+            }
 
             ApiResponse<IEnumerable<Specification>> specificationsApiResponse = specificationsLookupTask.Result;
             if (specificationsApiResponse == null)
             {
+                _logger.Warning("Specifications API Response was null");
                 throw new InvalidOperationException("Specifications API Response was null");
             }
 
             if (specificationsApiResponse.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                throw new InvalidOperationException($"Specifications API Response content did not return OK, but instead {specificationsApiResponse.StatusCode}");
+                _logger.Warning("Specifications API Response content did not return OK, but instead {specificationsApiResponse.StatusCode}", specificationsApiResponse.StatusCode);
+                throw new InvalidOperationException($"Specifications API Response content did not return OK, but instead '{specificationsApiResponse.StatusCode}'");
             }
 
             if (specificationsApiResponse.Content == null)
             {
+                _logger.Warning("Specifications API Response content was null");
                 throw new InvalidOperationException("Specifications API Response content was null");
             }
+
+            IEnumerable<string> testScenarioIds = scenarioSearchResults.Scenarios.Select(s => s.Id);
+            TestScenarioResultViewModel result = _mapper.Map<TestScenarioResultViewModel>(scenarioSearchResults);
 
             List<ReferenceViewModel> specifications = new List<ReferenceViewModel>();
             foreach (Specification specification in specificationsApiResponse.Content.OrderBy(s=>s.Name))
@@ -109,11 +119,23 @@ namespace CalculateFunding.Frontend.Services
                     TestScenarioIds = testScenarioIds,
                 });
 
-                if (rowCounts.StatusCode != System.Net.HttpStatusCode.OK)
+                if (rowCounts == null)
                 {
-                    return null;
+                    _logger.Warning("Row counts api request failed with null response");
+                    throw new InvalidOperationException($"Row counts api request failed with null response");
                 }
 
+                if (rowCounts.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.Warning("Row counts api request failed with status code: {rowCounts.StatusCode}", rowCounts.StatusCode);
+                    throw new InvalidOperationException($"Row counts api request failed with status code: {rowCounts.StatusCode}");
+                }
+
+                if (rowCounts.Content == null)
+                {
+                    _logger.Warning("Row counts api request failed with null content");
+                    throw new InvalidOperationException($"Row counts api request failed with null content");
+                }
 
                 foreach (TestScenarioResultItemViewModel vm in result.TestResults)
                 {
@@ -127,7 +149,6 @@ namespace CalculateFunding.Frontend.Services
             }
 
             return result;
-
         }
 
         private static void SetFilterValue(SearchRequestViewModel searchRequest, string fieldKey, string value)

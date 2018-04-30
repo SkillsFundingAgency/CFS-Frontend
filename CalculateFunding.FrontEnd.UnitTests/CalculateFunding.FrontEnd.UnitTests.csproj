@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <RootNamespace>CalculateFunding.Frontend</RootNamespace>
+    <RootNamespace>CalculateFunding.Frontend.UnitTests</RootNamespace>
     <CodeAnalysisRuleSet>CalculateFunding.Tests.ruleset</CodeAnalysisRuleSet>
 
     <AssemblyName>CalculateFunding.Frontend.UnitTests</AssemblyName>
