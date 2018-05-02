@@ -59,8 +59,10 @@
 }
 
 <div class="row providers-search" id="providers-search-container">
-    <div class="grey-alert alert--info-grey" role="alert">
-        <p class="alert__message"> <span>Status: <strong>@Model.Calculation.Status</strong></span><span class="alert-content-margin"> Last saved by: <strong>@Model.Calculation.LastModifiedByName</strong></span><span class="alert-content-margin"><strong>@Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")</strong></span><span class="alert-content-margin"> Calculation type: <strong>@Model.Calculation.CalculationType</strong></span> <a href="/calcs/editCalculation/@Model.Calculation.Id" class="float-right"><strong>View calculation</strong></a></p>
+    <div class="col-xs-12">
+        <div class="grey-alert alert--info-grey" role="alert">
+            <div class="alert__message"> <span>Status: <strong>@Model.Calculation.Status</strong></span><span class="alert-content-margin"> Last saved by: <strong>@Model.Calculation.LastModifiedByName</strong></span><span class="alert-content-margin"><strong>@Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")</strong></span><span class="alert-content-margin"> Calculation type: <strong>@Model.Calculation.CalculationType</strong></span> <a href="/calcs/editCalculation/@Model.Calculation.Id" class="float-right"><strong>View calculation</strong></a></div>
+        </div>
     </div>
     @Html.Partial("_SearchFilterPartial")
     @Html.Partial("_SearchErrorPartial")
