@@ -101,5 +101,29 @@
 
             return provider;
         }
+
+        public async Task<PagedResult<CalculationProviderResultSearchResultItem>> FindCalculationProviderResults(SearchFilterRequest filterOptions)
+        {
+            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
+
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<CalculationProviderResultSearchResultItem>> results = await PostAsync<SearchResults<CalculationProviderResultSearchResultItem>, SearchQueryRequest>($"{_resultsPath}/calculation-provider-results-search", request);
+
+            if (results.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<CalculationProviderResultSearchResultItem> result = new SearchPagedResult<CalculationProviderResultSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results,
+                    Facets = results.Content.Facets,
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

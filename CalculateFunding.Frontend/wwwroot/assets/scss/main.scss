@@ -1869,6 +1869,14 @@ table {
     }
 }
 
+.grey-alert {
+    clear: both;
+    border-left-width: 5px;
+    border-left-style: solid;
+    margin: 0 0 1.05263em;
+    padding: 0.89474em 0.78947em;
+}
+
 .specs-relationship-searchresult-container .specs-relationship-searchresult-container-item {
     border-top: 1px solid #ccc;
     padding-top: 15px;

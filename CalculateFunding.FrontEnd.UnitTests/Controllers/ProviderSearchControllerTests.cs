@@ -87,14 +87,95 @@ namespace CalculateFunding.Frontend.Controllers
                 .BeOfType<OkObjectResult>();
         }
 
-        private static ProviderSearchController CreateController(IProviderSearchService searchService = null)
+        [TestMethod]
+        public void SearchCalculationProviderResults_GivenNullRequestObject_ThrowsArgumentNullException()
         {
-            return new ProviderSearchController(searchService ?? CreateSearchService());
+            // Arrange
+            ProviderSearchController controller = CreateController();
+
+            SearchRequestViewModel requestModel = null;
+
+            // Act
+            Func<Task> test = async () => await controller.SearchCalculationProviderResults(requestModel);
+
+            // Assert
+            test
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+
+        [TestMethod]
+        public async Task SearchCalculationProviderResults_GivenNullResultsReturnedFromSearch_ReturnsStatusCode500()
+        {
+            // Arrange
+            SearchRequestViewModel requestModel = new SearchRequestViewModel();
+
+            ICalculationProviderResultsSearchService searchService = CreateCalculationProviderResultsSearchService();
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns((CalculationProviderResultSearchResultViewModel)null);
+
+            ProviderSearchController controller = CreateController(calculationProviderResultsSearchService: searchService);
+
+            // Act
+            IActionResult actionResult = await controller.SearchCalculationProviderResults(requestModel);
+
+            // Asserts
+            actionResult
+                .Should()
+                .BeOfType<StatusCodeResult>();
+
+            StatusCodeResult statusCodeResult = actionResult as StatusCodeResult;
+
+            statusCodeResult
+                .StatusCode
+                .Should()
+                .Be(500);
+        }
+
+        [TestMethod]
+        public async Task SearchCalculationProviderResults_GivenResultsReturnedFromSearch_ReturnsOK()
+        {
+            // Arrange
+            SearchRequestViewModel requestModel = new SearchRequestViewModel();
+
+            CalculationProviderResultSearchResultViewModel results = new CalculationProviderResultSearchResultViewModel();
+
+            ICalculationProviderResultsSearchService searchService = CreateCalculationProviderResultsSearchService();
+
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(results);
+
+            ProviderSearchController controller = CreateController(calculationProviderResultsSearchService: searchService);
+
+            // Act
+            IActionResult actionResult = await controller.SearchCalculationProviderResults(requestModel);
+
+            // Asserts
+            actionResult
+                .Should()
+                .BeOfType<OkObjectResult>();
+        }
+
+        private static ProviderSearchController CreateController(
+            IProviderSearchService searchService = null,
+            ICalculationProviderResultsSearchService calculationProviderResultsSearchService = null)
+        {
+            return new ProviderSearchController(
+                searchService ?? CreateSearchService(), 
+                calculationProviderResultsSearchService ?? CreateCalculationProviderResultsSearchService());
         }
 
         private static IProviderSearchService CreateSearchService()
         {
             return Substitute.For<IProviderSearchService>();
+        }
+
+        private static ICalculationProviderResultsSearchService CreateCalculationProviderResultsSearchService()
+        {
+            return Substitute.For<ICalculationProviderResultsSearchService>();
         }
     }
 }

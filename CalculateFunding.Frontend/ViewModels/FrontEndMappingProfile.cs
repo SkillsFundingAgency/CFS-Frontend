@@ -55,6 +55,8 @@
             CreateMap<ScenarioSearchResultItemViewModel, TestScenarioResultItemViewModel>()
                 .ForMember(m => m.Passes, opt => opt.UseValue(0))
                 .ForMember(m => m.Failures, opt => opt.UseValue(0));
+
+            CreateMap<CalculationProviderResultSearchResultItem, CalculationProviderResultSearchResultItemViewModel>();
         }
 
         private void MapCalcs()
