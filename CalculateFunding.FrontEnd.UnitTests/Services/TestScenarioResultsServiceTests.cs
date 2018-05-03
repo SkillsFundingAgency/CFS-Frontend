@@ -726,7 +726,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return Substitute.For<ILogger>();
         }
 
-        private List<Specification> CreateSpecifications()
+        private static List<Specification> CreateSpecifications()
         {
             List<Specification> specifications = new List<Specification>();
             specifications.Add(new Specification()

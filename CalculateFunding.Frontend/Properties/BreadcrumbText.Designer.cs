@@ -169,6 +169,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage data sources.
+        /// </summary>
+        public static string ManageDataSources {
+            get {
+                return ResourceManager.GetString("ManageDataSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Policies.
         /// </summary>
         public static string ManagePolicies {
@@ -192,6 +201,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string SelectSourceDataset {
             get {
                 return ResourceManager.GetString("SelectSourceDataset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update data source.
+        /// </summary>
+        public static string UpdateDataSource {
+            get {
+                return ResourceManager.GetString("UpdateDataSource", resourceCulture);
             }
         }
         

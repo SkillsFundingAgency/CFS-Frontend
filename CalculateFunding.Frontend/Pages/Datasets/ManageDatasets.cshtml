@@ -12,7 +12,6 @@
 
 @section BannerLeft{
     <h1 class="hero-title">Manage data sources</h1>
-    <h2 class="hero-description"> View and update existing data sources or create a new one.</h2>
 }
 
 @section BannerMiddle{
@@ -37,25 +36,12 @@
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-5 filter-field-heading">Data schema</div>
-            <div class="col-xs-3 filter-field-heading">Specification</div>
-            <div class="col-xs-2 filter-field-heading">Year</div>
-            <div class="col-xs-2 filter-field-heading">Status</div>
 
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
                 <select id="dataschema"  data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
             </div>
-            <div class="col-xs-3" id="manageDatasetsSpecificationDropDown">
-                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-2" id="manageDatasetsYearDropDown">
-                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select year', buttonWidth: '100%', disableIfEmpty: true}, options: periods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedPeriods, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-2" id="manageDatasetsStatusDropDown" >
-                <select id="status" data-bind="multiselect2: {nonSelectedText: 'All', buttonWidth: '100%', disableIfEmpty: true}, options: status, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatus, enable: canSelectFilters" multiple></select>
-            </div>
-
         </div>
     </form>
 }
@@ -71,7 +57,6 @@
 }
 
 <div class="row manage-datasets" id="manage-datasets-container">
-    @Html.Partial("_SearchFilterPartial")
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible" >
@@ -85,34 +70,41 @@
             @foreach (var dataset in Model.SearchResults.Datasets)
             {
 
-                <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
-                    <div class="dataset-item-header">@dataset.Name</div>
-                    <div>
-                        <span class="dataset-item-property ">
-                            <strong>Status:</strong>
-                            <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong>Update on:</strong>
-                            <span id="dataset-item-lastupdated-@datasetRow">
-                                @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
-                            </span>
-                        </span>
-                        <span class="dataset-item-property ">
-                            <strong><a href="/datasets/updatedatasource?datasetId=@dataset.Id" id="update-dataset-link-@datasetRow" class="update-dataset-link">Update</a></strong>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong> <a href="api/datasets/download-dataset-file/@dataset.Id" id="download-dataset-link-@datasetRow" class="download-dataset-link">Download</a></strong>
-                        </span>
-                    </div>
-                </div>
+            <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
+                <div class="dataset-item-header">
+                    <span class="data-dataset-name">@dataset.Name</span> <span class="dataset-item-secondary">(version <span class="data-dataset-version">@dataset.Version</span>)</span>
+            </div>
+            <div class="dataset-item-secondary data-dataset-description spacing-5-bottom">@dataset.Description</div>
+
+            <div>
+                <span class="dataset-item-property ">
+                    <strong>Status:</strong>
+                    <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
+                </span>
+                <span class="dataset-item-property">
+                    <strong>Update on:</strong>
+                    <span id="dataset-item-lastupdated-@datasetRow">
+                        @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
+                    </span>
+                </span>
+                <span class="dataset-item-property ">
+                    <strong><a href="/datasets/updatedataset?datasetId=@dataset.Id" id="update-dataset-link-@datasetRow" class="update-dataset-link">Update</a></strong>
+                </span>
+                <span class="dataset-item-property">
+                    <strong> <a href="api/datasets/download-dataset-file/@dataset.Id" id="download-dataset-link-@datasetRow" class="download-dataset-link">Download</a></strong>
+                </span>
+            </div>
+            </div>
                 datasetRow++;
             }
         </div>
         <div data-bind="visible: isResultsVisible">
             <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
                 <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
-                    <div class="dataset-item-header" data-bind="text: name"></div>
+                    <div class="dataset-item-header">
+                        <span data-bind="text: name" class="data-dataset-name"></span> <span class="dataset-item-secondary">(version <span data-bind="text: version" class="data-dataset-version"></span>)</span>
+                    </div>
+                    <div data-bind="text: description" class="dataset-item-secondary data-dataset-description spacing-5-bottom"></div>
                     <div>
                         <span class="dataset-item-property">
                             <strong>Status:</strong>
@@ -123,7 +115,7 @@
                             <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
                         </span>
                         <span class="dataset-item-property">
-                            <strong><a data-bind="attr: {'href' : '/datasets/updatedatasource?datasetId=' + id}, text: 'Update'" class="update-dataset-link" ></a></strong>
+                            <strong><a data-bind="attr: {'href' : '/datasets/updatedataset?datasetId=' + id}, text: 'Update'" class="update-dataset-link" ></a></strong>
                         </span>
                         <span class="dataset-item-property">
                             <strong><a data-bind="   attr: {'href' : '/api/datasets/download-dataset-file/' + id}, text: 'Download'" class="download-dataset-link"></a></strong>

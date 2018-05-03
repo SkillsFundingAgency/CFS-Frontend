@@ -9,6 +9,7 @@ namespace CalculateFunding.Frontend.Controllers
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using FluentAssertions;
@@ -41,7 +42,7 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task SaveDataset_GivenViewModelIsNotNullButResponseContainsModelErrors_ReturnsBadRequest()
         {
             // Arrange
-            ValidatedApiResponse<CreateNewDatasetResponseModel> response = new ValidatedApiResponse<CreateNewDatasetResponseModel>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest);
             response.ModelState = new Dictionary<string, object>
             {
                 { "Name", "Invalid name" }
@@ -51,7 +52,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .PostDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -75,13 +76,13 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task SaveDataset_GivenResponseIsInternalServerError_ReturnsStatusCode500()
         {
             // Arrange
-            ValidatedApiResponse<CreateNewDatasetResponseModel> response = new ValidatedApiResponse<CreateNewDatasetResponseModel>(HttpStatusCode.InternalServerError);
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.InternalServerError);
 
             CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .PostDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -112,18 +113,18 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task SaveDataset_GivenResponseIsSuccess_ReturnsSuccess()
         {
             // Arrange
-            CreateNewDatasetResponseModel responseModel = new CreateNewDatasetResponseModel
+            NewDatasetVersionResponseModel responseModel = new NewDatasetVersionResponseModel
             {
                 DatasetId = "dataset-id"
             };
 
-            ValidatedApiResponse<CreateNewDatasetResponseModel> response = new ValidatedApiResponse<CreateNewDatasetResponseModel>(HttpStatusCode.OK, responseModel);
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.OK, responseModel);
 
             CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .PostDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -140,7 +141,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             OkObjectResult objectResult = result as OkObjectResult;
 
-            CreateNewDatasetResponseModel content = objectResult.Value as CreateNewDatasetResponseModel;
+            NewDatasetVersionResponseModel content = objectResult.Value as NewDatasetVersionResponseModel;
 
             content
                 .DatasetId
@@ -188,18 +189,13 @@ namespace CalculateFunding.Frontend.Controllers
             // Assert
             result
                .Should()
-               .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
-                .Should()
-                .Be(400);
+               .BeOfType<InternalServerErrorResult>()
+               .Which
+               .Value.Should().Be("Failed to validate dataset with status code: 400");
 
             logger
                 .Received(1)
-                .Error(Arg.Is("Failed to validate dataset with status code: 400"));
+                .Warning(Arg.Is("Failed to validate dataset with status code: {statusCode}"), Arg.Is(HttpStatusCode.BadRequest));
         }
 
         [TestMethod]

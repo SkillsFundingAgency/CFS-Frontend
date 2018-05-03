@@ -168,8 +168,16 @@ blockquote {
     margin-bottom: 15px;
 }
 
+.hero-description-strong {
+    color: #000;
+}
+
 .hero-text {
     font-size: 19px;
+}
+
+.hero-spacing-right{
+    padding-right: 15px;
 }
 
 .spacing-0 {
@@ -179,6 +187,10 @@ blockquote {
 
 .spacing-5 {
     margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.spacing-5-bottom{
     margin-bottom: 5px;
 }
 
@@ -517,6 +529,10 @@ blockquote {
 
     .dataset-item-property:first-child {
         margin-left: 0;
+    }
+
+    .dataset-item-secondary{
+        color: $grey-1;
     }
 }
 
@@ -1767,6 +1783,15 @@ table {
     }
 }
 
+.material-icons-content-container {
+    display: flex;
+    vertical-align: middle;
+
+    .material-icons.material-icons-left {
+        padding-right: 5px;
+    }
+}
+
 .ds-container {
 
     .block-label input, .block-label--stacked input, .vertically-aligned-input {
@@ -1831,7 +1856,7 @@ table {
 }
 
 .grey-left-border {
-    border-left: solid 5px #dee0e2;
+    border-left: solid 5px $secondary-text-colour;
     padding: 10px;
 }
 

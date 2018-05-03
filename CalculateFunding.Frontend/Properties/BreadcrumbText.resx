@@ -153,6 +153,9 @@
   <data name="ManageDatasets" xml:space="preserve">
     <value>Manage data</value>
   </data>
+  <data name="ManageDataSources" xml:space="preserve">
+    <value>Manage data sources</value>
+  </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage Policies</value>
   </data>
@@ -161,6 +164,9 @@
   </data>
   <data name="SelectSourceDataset" xml:space="preserve">
     <value>Select source dataset</value>
+  </data>
+  <data name="UpdateDataSource" xml:space="preserve">
+    <value>Update data source</value>
   </data>
   <data name="ViewCalculationVersions" xml:space="preserve">
     <value>View calculation versions</value>

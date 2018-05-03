@@ -122,6 +122,13 @@
 
                   }
               });
+
+            CreateMap<DatasetVersionResponse, DatasetVersionFullViewModel>()
+               .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+               .AfterMap((DatasetVersionResponse source, DatasetVersionFullViewModel destination) =>
+               {
+                   destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
+               });
         }
         private void MapTestEngine()
         {

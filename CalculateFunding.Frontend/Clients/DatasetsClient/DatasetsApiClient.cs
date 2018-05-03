@@ -71,11 +71,18 @@
             return Task.FromResult(response);
         }
 
-        public Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset)
+        public Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> CreateDataset(CreateNewDatasetModel dataset)
         {
             Guard.ArgumentNotNull(dataset, nameof(dataset));
 
-            return ValidatedPostAsync<CreateNewDatasetResponseModel, CreateNewDatasetModel>($"{_datasetsPath}/create-new-dataset", dataset);
+            return ValidatedPostAsync<NewDatasetVersionResponseModel, CreateNewDatasetModel>($"{_datasetsPath}/create-new-dataset", dataset);
+        }
+
+        public Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset)
+        {
+            Guard.ArgumentNotNull(dataset, nameof(dataset));
+
+            return ValidatedPostAsync<NewDatasetVersionResponseModel, DatasetVersionUpdateModel>($"{_datasetsPath}/dataset-version-update", dataset);
         }
 
         public Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
@@ -163,6 +170,13 @@
                 throw new ArgumentNullException( nameof(datasetId), "Dataset Id for dataset download is null");
             }
             return GetAsync<DownloadDatasourceModel>($"{_datasetsPath}/download-dataset-file?datasetId={datasetId}");
+        }
+
+        public Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId)
+        {
+            Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
+
+            return GetAsync<DatasetVersionResponse>($"{_datasetsPath}/get-currentdatasetversion-by-datasetid?datasetId={datasetId}");
         }
     }
 }

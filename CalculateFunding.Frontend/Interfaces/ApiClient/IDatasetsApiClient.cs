@@ -27,7 +27,9 @@
 
         Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds);
 
-        Task<ValidatedApiResponse<CreateNewDatasetResponseModel>> PostDataset(CreateNewDatasetModel dataset);
+        Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> CreateDataset(CreateNewDatasetModel dataset);
+
+        Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset);
 
         Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model);
 
@@ -44,5 +46,7 @@
         Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion);
 
         Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId);
+
+        Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId);
     }
 }

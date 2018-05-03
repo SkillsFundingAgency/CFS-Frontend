@@ -1,17 +1,9 @@
 ﻿namespace calculateFunding.manageDatasets {
-    export class DatasetSearchViewModel extends calculateFunding.search.SearchViewModel{
+    export class DatasetSearchViewModel extends calculateFunding.search.SearchViewModel {
         public datasets: KnockoutObservableArray<IDatasetResponse> = ko.observableArray([]);
-        public periods: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
-        public selectedPeriods: KnockoutObservableArray<string> = ko.observableArray([]);
 
         public dataSchemas: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedDataSchemas: KnockoutObservableArray<string> = ko.observableArray([]);
-
-        public specifications: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
-        public selectedSpecifications: KnockoutObservableArray<string> = ko.observableArray([]);
-
-        public status: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
-        public selectedStatus: KnockoutObservableArray<string> = ko.observableArray([]);
 
         constructor() {
             super();
@@ -21,10 +13,7 @@
             this.selectedSearchFacets = ko.computed(() => {
                 let facets: Array<calculateFunding.search.SearchFacet> = [];
 
-                super.buildSelectedSearchFacets(facets, self.selectedPeriods(), self.periods());
                 super.buildSelectedSearchFacets(facets, self.selectedDataSchemas(), self.dataSchemas());
-                super.buildSelectedSearchFacets(facets, self.selectedSpecifications(), self.specifications());
-                super.buildSelectedSearchFacets(facets, self.selectedStatus(), self.status());
 
                 return facets;
             }).extend({ throttle: 5 });
@@ -58,10 +47,7 @@
 
                 self.populateCommonSearchResultProperties(result);
 
-                self.populateFacets("periodName", result.facets, self.periods);
-                self.populateFacets("specification", result.facets, self.specifications);
                 self.populateFacets("definitionName", result.facets, self.dataSchemas);
-                self.populateFacets("status", result.facets, self.status);
             });
         }
 
@@ -69,14 +55,8 @@
             if (searchFacet && this.canSelectFilters()) {
                 let selectedArray: KnockoutObservableArray<string> = null;
                 let fieldName = searchFacet.fieldName();
-                if (fieldName === "periodName") {
-                    selectedArray = this.selectedPeriods;
-                } else if (fieldName === "specification") {
-                    selectedArray = this.selectedSpecifications;
-                } else if (fieldName === "definitionName") {
+                if (fieldName === "definitionName") {
                     selectedArray = this.selectedDataSchemas;
-                } else if (fieldName === "status") {
-                    selectedArray = this.selectedStatus;
                 }
 
                 if (selectedArray == null) {
@@ -101,5 +81,7 @@
         lastUpdated: Date;
         lastUpdatedDisplay: string;
         status: string;
+        description: string;
+        version: string;
     }
 }
