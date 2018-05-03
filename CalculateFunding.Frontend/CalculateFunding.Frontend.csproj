@@ -29,6 +29,7 @@
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
+    <None Remove="Scripts\search.calcuation-results.ts" />
     <None Remove="Scripts\search.calcuations.ts" />
     <None Remove="Scripts\search.calculationProviderResults.ts" />
     <None Remove="Scripts\search.datasets.ts" />
@@ -115,6 +116,7 @@
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
+    <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
     <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
     <TypeScriptCompile Include="Scripts\search.datasets.ts" />

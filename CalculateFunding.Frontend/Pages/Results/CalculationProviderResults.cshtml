@@ -2,6 +2,7 @@
 @*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
 @model CalculateFunding.Frontend.Pages.Results.CalculationProviderResultsPageModel;
 @using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Helpers
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
 
@@ -15,7 +16,7 @@
         <ol>
             <li><a href="/">Calculate Funding</a></li>
             <li><a href="/results">View results</a></li>
-            <li><a href="/results">View calculation results</a></li>
+            <li><a href="/results/viewcalculationresults">View calculation results</a></li>
             <li>@Model.Calculation.Name</li>
         </ol>
     </div>
@@ -242,7 +243,7 @@
 
     <script asp-src-include="~/js/search.calculationProviderResults.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
-        var vm = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationId: '@Model.Calculation.Id', specificationId: '@Model.Calculation.Specification.Id', periodId: '@Model.Calculation.Specification.Period.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
+        var vm = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationId: '@Model.Calculation.Id', specificationId: '@Model.Calculation.Specification.Id', periodId: '@Model.Calculation.Specification.Period?.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {
             ko.applyBindings(vm, filterElement);

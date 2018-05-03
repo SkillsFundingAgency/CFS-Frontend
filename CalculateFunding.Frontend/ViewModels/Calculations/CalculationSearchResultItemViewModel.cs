@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿using CalculateFunding.Frontend.Helpers;
+using System;
+
+namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
     public class CalculationSearchResultItemViewModel
     {
@@ -13,5 +16,12 @@
         public string Status { get; set; }
 
         public string CalculationType { get; set; }
+
+        public DateTimeOffset? LastUpdatedDate { get; set; }
+
+        public string LastUpdatedDateDisplay
+        {
+            get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown" ; }
+        }
     }
 }
