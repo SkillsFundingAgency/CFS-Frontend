@@ -146,7 +146,7 @@
         </div>
         <div data-bind="visible: isResultsVisible">
             <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
-                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index">
+                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index()">
                     <div class="provider-item-header">
                         <h4 class="heading-small"><a data-bind="attr: {href: '/results/providerallocationline?providerId=' + ukprn }, text: name"></a></h4>
                     </div>
@@ -166,20 +166,20 @@
                     </p>
                     <div>
                         <span class="provider-item-property">
-                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: {'id' : 'provider-item-providertype-'+$index}"></span></strong>
+                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: {'id' : 'provider-item-providertype-'+$index()}"></span></strong>
                         </span>
                         <span class="provider-item-property">
-                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{'id' : 'provider-item-providersubtype-' +$index}"></span></strong>
-                        </span>
-                    </div>
-                    <div>
-                        <span class="provider-item-property">
-                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: {'id' : 'provider-item-localauthority-'+$index}"></span></strong>
+                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{'id' : 'provider-item-providersubtype-' +$index()}"></span></strong>
                         </span>
                     </div>
                     <div>
                         <span class="provider-item-property">
-                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index}"> </span></strong>
+                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: {'id' : 'provider-item-localauthority-'+$index()}"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index()}"> </span></strong>
                         </span>
                     </div>
                 </div>

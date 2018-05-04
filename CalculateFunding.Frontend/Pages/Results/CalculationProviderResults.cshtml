@@ -2,7 +2,6 @@
 @*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
 @model CalculateFunding.Frontend.Pages.Results.CalculationProviderResultsPageModel;
 @using CalculateFunding.Frontend.ViewModels.Common
-@using CalculateFunding.Frontend.Helpers
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
 
@@ -175,7 +174,7 @@
 
         <div data-bind="visible: isResultsVisible">
             <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
-                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index">
+                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index()">
                     <div class="provider-item-header">
                         <strong><span class="float-right" data-bind="text: calculationResultDisplay"></span></strong>
                         <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + ukprn + '&periodId=' + $root.periodId + '&specificationId=' + $root.specificationId }, text: name"></a></h4>
@@ -202,20 +201,20 @@
                     </p>
                     <div>
                         <span class="provider-item-property">
-                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: {'id' : 'provider-item-providertype-'+$index}"></span></strong>
+                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: { 'id' : 'provider-item-providertype-'+$index() }"></span></strong>
                         </span>
                         <span class="provider-item-property">
-                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{'id' : 'provider-item-providersubtype-' +$index}"></span></strong>
-                        </span>
-                    </div>
-                    <div>
-                        <span class="provider-item-property">
-                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: {'id' : 'provider-item-localauthority-'+$index}"></span></strong>
+                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{ 'id' : 'provider-item-providersubtype-' +$index() }"></span></strong>
                         </span>
                     </div>
                     <div>
                         <span class="provider-item-property">
-                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index}"> </span></strong>
+                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: { 'id' : 'provider-item-localauthority-'+$index() }"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: { 'id' :'provider-item-dateopened-'+$index() }"> </span></strong>
                         </span>
                     </div>
                 </div>
