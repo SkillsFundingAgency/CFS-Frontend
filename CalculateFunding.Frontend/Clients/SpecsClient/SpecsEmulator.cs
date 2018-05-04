@@ -23,7 +23,7 @@
             return Task.FromResult(yearsResponse);
         }
 
-        public Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines()
+        public Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLinesByFundingStreamId()
         {
             throw new NotImplementedException();
         }
@@ -34,6 +34,11 @@
         }
 
         public Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId)
         {
             throw new NotImplementedException();
         }
@@ -122,6 +127,11 @@
         }
 
         public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<IEnumerable<FundingStream>>> ISpecsApiClient.GetFundingStreams()
         {
             throw new NotImplementedException();
         }

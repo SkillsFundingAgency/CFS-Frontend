@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Specs;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -21,6 +22,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     public class CreateCalculationPageModelTests
     {
         const string specificationId = "5acedc70-b8e8-4769-9840-5692e4826579";
+        const string fundingStreamId = "ABCDE";
 
         [TestMethod]
         public void OnGetAsync_GivenNullOrEmptySpecificationId_ThrowsArgumentNullException()
@@ -80,6 +82,33 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                .BeNullOrWhiteSpace();
         }
 
+        [TestMethod]
+        public async Task OnGetAsync_GivenResponseReturnsNullWhenFetchingAllocationLines_ReturnsInternalServerError()
+        {
+            //Arrange
+            Specification specification = CreateSpecification();
+
+            ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+
+            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(apiResponse);
+            specsClient
+                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .Returns((ApiResponse<FundingStream>)null);
+
+            CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
+
+            //Act
+            IActionResult result = await pageModel.OnGetAsync(specificationId);
+
+            //Assert
+            result
+                .Should()
+                .BeAssignableTo<InternalServerErrorResult>();
+        }
+
 
         [TestMethod]
         public async Task OnGetAsync_GivenSpecificationFound_PopulatesFormReturnsPage()
@@ -96,7 +125,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            ApiResponse<IEnumerable<Reference>> allocationLinesResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, allocationLines);
+            FundingStream fundingStream = new FundingStream
+            {
+                Id = fundingStreamId,
+                AllocationLines = allocationLines
+            };
+
+            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -107,8 +142,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Returns(apiResponse);
 
             specsClient
-                .GetAllocationLines()
-                .Returns(allocationLinesResponse);
+                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -195,7 +230,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            ApiResponse<IEnumerable<Reference>> allocationLinesResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, allocationLines);
+            FundingStream fundingStream = new FundingStream
+            {
+                Id = fundingStreamId,
+                AllocationLines = allocationLines
+            };
+
+            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -212,8 +253,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
               .Returns(apiResponse);
 
             specsClient
-                .GetAllocationLines()
-                .Returns(allocationLinesResponse);
+                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -276,14 +317,21 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
+            FundingStream fundingStream = new FundingStream
+            {
+                Id = fundingStreamId,
+                AllocationLines = allocationLines
+            };
+
+            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
+
+
             CreateCalculationModel createModel = new CreateCalculationModel
             {
                 SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
-
-            ApiResponse<IEnumerable<Reference>> allocationLinesResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, allocationLines);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -298,8 +346,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             .Returns(apiResponse);
 
             specsClient
-                .GetAllocationLines()
-                .Returns(allocationLinesResponse);
+                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -483,7 +531,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                              new Policy { Id = "sub-policy-id", Name = "sub-policy-name"}
                          }
                      }
-                 }
+                 },
+                FundingStream = new Reference
+                {
+                    Id = fundingStreamId
+                }
+                
             };
         }
 

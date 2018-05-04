@@ -8,6 +8,7 @@
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
@@ -70,12 +71,24 @@
 
                 SpecificationName = specification.Name;
 
-                PopulatePolicies(specification);
-
-                await PopulateAllocationLines();
-
-                PopulateCalculationTypes();
+                return await PopulateForm(specification);
             }
+
+            return Page();
+        }
+
+        async Task<IActionResult> PopulateForm(Specification specification)
+        {
+            await PopulateAllocationLines(specification.FundingStream.Id);
+
+            if (AllocationLines.IsNullOrEmpty())
+            {
+                return new InternalServerErrorResult($"Failed to load allocation lines for funding stream id: {specification.FundingStream.Id}");
+            }
+
+            PopulatePolicies(specification);
+
+            PopulateCalculationTypes();
 
             return Page();
         }
@@ -111,13 +124,7 @@
 
                 AcademicYearId = specification.AcademicYear.Id;
 
-                PopulatePolicies(specification);
-
-                await PopulateAllocationLines();
-
-                PopulateCalculationTypes();
-
-                return Page();
+                return await PopulateForm(specification);
             }
 
             CreateCalculationModel calculation = _mapper.Map<CreateCalculationModel>(CreateCalculationViewModel);
@@ -186,13 +193,13 @@
             }
         }
 
-        private async Task PopulateAllocationLines()
+        private async Task PopulateAllocationLines(string fundingStreamId)
         {
-            ApiResponse<IEnumerable<Reference>> allocationLinesResponse = await _specsClient.GetAllocationLines();
+            ApiResponse<FundingStream> fundingStreamResponse = await _specsClient.GetFundingStreamByFundingStreamId(fundingStreamId);
 
-            if (allocationLinesResponse != null && allocationLinesResponse.StatusCode == HttpStatusCode.OK)
+            if (fundingStreamResponse != null && fundingStreamResponse.StatusCode == HttpStatusCode.OK)
             {
-                AllocationLines = allocationLinesResponse.Content.Select(m => new SelectListItem
+                AllocationLines = fundingStreamResponse.Content.AllocationLines.Select(m => new SelectListItem
                 {
                     Value = m.Id,
                     Text = m.Name,

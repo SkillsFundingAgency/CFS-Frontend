@@ -38,7 +38,7 @@
 
         Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears();
 
-        Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams();
+        Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams();
 
         Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
 
@@ -50,7 +50,7 @@
 
         Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation);
 
-        Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines();
+        Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId);
 
         Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
     }

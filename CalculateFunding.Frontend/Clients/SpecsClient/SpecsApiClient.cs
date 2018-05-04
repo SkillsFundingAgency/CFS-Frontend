@@ -105,17 +105,17 @@
             var response = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, years.AsEnumerable());
 
             return Task.FromResult(response);
-            ////return GetAsync<Reference[]>($"{_specsPath}/academic-years");
         }
 
-        public Task<ApiResponse<IEnumerable<Reference>>> GetFundingStreams()
+        public Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams()
         {
-            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/funding-streams");
+            return GetAsync<IEnumerable<FundingStream>>($"{_specsPath}/get-fundingstreams");
         }
 
-        public Task<ApiResponse<IEnumerable<Reference>>> GetAllocationLines()
+        public Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId)
         {
-            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/allocation-lines");
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            return GetAsync<FundingStream>($"{_specsPath}/get-fundingstream-by-id?fundingstreamId={fundingStreamId}");
         }
 
         public Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName)
