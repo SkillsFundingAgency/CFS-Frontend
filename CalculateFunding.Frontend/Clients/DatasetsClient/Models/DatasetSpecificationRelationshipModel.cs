@@ -11,5 +11,7 @@
         public int? Version { get; set; }
 
         public string DatasetId { get; set; }
+
+        public string RelationshipDescription { get; set; }
     }
 }

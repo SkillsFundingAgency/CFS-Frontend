@@ -80,7 +80,8 @@
                 DefinitionDescription = m.Definition != null ? m.Definition.Description : string.Empty,
                 DatasetVersion = m.Version.HasValue ? m.Version.Value : 0,
                 RelationName = m.Name,
-                RelationshipId = m.Id
+                RelationshipId = m.Id,
+                RelationshipDescription = m.RelationshipDescription
             });
 
             return viewModel;

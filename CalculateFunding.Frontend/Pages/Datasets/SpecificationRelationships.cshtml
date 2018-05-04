@@ -51,9 +51,9 @@
             @foreach (var item in Model.ViewModel.Items)
             {
                 <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container" >
-                    <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.RelationName</h2>
-                    <h4 class="heading-small no-margin specification-relationship-definition-name">@item.DefinitionName</h4>
-                    <p  class="faded-text small no-margin specification-relationship-description">@item.DefinitionDescription</p>
+                    <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.DefinitionName</h2>
+                    <h4 class="heading-small no-margin specification-relationship-definition-name">@item.RelationName</h4>
+                    <p  class="faded-text small no-margin specification-relationship-description">@item.RelationshipDescription</p>
                     <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectsourcedataset?relationshipId=@item.RelationshipId">@item.LinkPhrase</a></p>
                 </div>
 

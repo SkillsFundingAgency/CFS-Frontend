@@ -10,6 +10,8 @@
 
         public string DatasetName { get; set; }
 
+        public string RelationshipDescription { get; set; }
+
         public int DatasetVersion { get; set; }
 
         public string DatasetId { get; set; }

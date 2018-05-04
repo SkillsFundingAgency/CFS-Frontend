@@ -208,6 +208,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 {
                     DatasetId = "any-ds-id",
                     DatasetName = "any ds name",
+                    RelationshipDescription = "any relationship description",
                     Definition = new SpecificationDataDefinitionRelationshipModel
                     {
                         Id = "def-id",
@@ -250,6 +251,46 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Count()
                 .Should()
                 .Be(1);
+
+            pageModel
+                .ViewModel
+                .Items
+                .First()
+                .DatasetId
+                .Should()
+                .Be("any-ds-id");
+
+            pageModel
+                .ViewModel
+                .Items
+                .First()
+                .DatasetName
+                .Should()
+                .Be("any ds name");
+
+            pageModel
+                .ViewModel
+                .Items
+                .First()
+                .RelationshipDescription
+                .Should()
+                .Be("any relationship description");
+
+            pageModel
+                 .ViewModel
+                 .Items
+                 .First()
+                 .DatasetVersion
+                 .Should()
+                 .Be(1);
+
+            pageModel
+                .ViewModel
+                .Items
+                .First()
+                .RelationshipId
+                .Should()
+                .Be("rel-id");
         }
 
         private static SpecificationRelationshipsPageModel CreatePageModel(ISpecsApiClient specsApiClient = null, 
