@@ -1,5 +1,5 @@
 ﻿<div class="col-xs-12 withjs-show" data-bind="visible: errorMessage">
-    <div class="error-summary" id="error-summary">
+    <div class="error-summary hidden" id="error-summary" data-bind="css:{hidden: $root.isPageLoaded() === false}">
         <h2 class="heading-medium error-summary-heading">
             Error performing search query
         </h2>

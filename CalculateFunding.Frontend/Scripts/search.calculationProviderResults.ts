@@ -139,7 +139,7 @@
         }
     }
     export interface ICalculationProviderResultSearchResultResponse extends calculateFunding.common.ISearchResultResponse {
-        providers: Array<ICalculationProviderResultDetailResponse>
+        calculationProviderResults: Array<ICalculationProviderResultDetailResponse>
         }
 
     export interface ICalculationProviderResultDetailResponse {

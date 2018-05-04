@@ -75,8 +75,14 @@
 
         public selectedSearchFilters: KnockoutComputed<Array<calculateFunding.search.SearchFilter>>;
 
+        public isPageLoaded: KnockoutComputed<boolean>;
+
         constructor() {
             var self = this;
+
+            this.isPageLoaded = ko.pureComputed(() => {
+                return true;
+            });
 
             this.canPerformSearch = ko.pureComputed(() => {
                 return self.state() === IdleStateKey;
