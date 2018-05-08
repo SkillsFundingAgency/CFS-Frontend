@@ -97,14 +97,14 @@
         {
             if (relationshipCount == 0)
             {
-                return "No datasources mapped to datasets";
+                return "No data sources mapped to datasets";
             }
             else if (relationshipCount == 1)
             {
-                return "1 datasource mapped to datasets";
+                return "1 data source mapped to dataset";
             }
 
-            return $"{relationshipCount} datasources mapped to datasets";
+            return $"{relationshipCount} data sources mapped to datasets";
         }
     }
 }

@@ -3,6 +3,8 @@
 @model CalculateFunding.Frontend.Pages.IndexModel
 @{
     Layout = "~/Pages/_Layout.cshtml";
+    ViewData["Title"] = "Homepage";
+
 }
 @section BreadCrumb{
 
@@ -12,7 +14,7 @@
 }
 @section BannerLeft{
     <h1 class="heading-large">Calculate Funding</h1>
-    <p>Calculate funding, quality assure the results or release funding to providers.</p>
+    <p>Calculate funding, quality assure the results or approve funding.</p>
 }
 
 <div class="row homepage-section-container">
@@ -21,19 +23,19 @@
             <div class="homepage-section-title">
                 <a href="/specs" class="heading-small">Specifications</a>
             </div>
-            <div>Create and manage the policy specifications used to distribute funding.</div>
+            <div>Create and manage the policy specifications used to calculate funding.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
                 <a href="/datasets" class="heading-small">Manage data</a>
             </div>
-            <div>Create and manage datasets and their relationships.</div>
+            <div>Create and manage data sources, and map data sources to datasets.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
                 <a href="/scenarios" class="heading-small">Quality assurance</a>
             </div>
-            <div>Design or reuse tests for funding calculations.</div>
+            <div>Run and design tests to check calculations and data.</div>
         </div>
     </div>
     <div class="row">
@@ -41,19 +43,19 @@
             <div class="homepage-section-title">
                 <a href="/calcs" class="heading-small">Calculations</a>
             </div>
-            <div>Create and manage funding calculation scripts.</div>
+            <div>View and edit calculations.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
                 <a href="/results" class="heading-small">View results</a>
             </div>
-            <div>Review and validate the results of the calculations and the tests for each provider.</div>
+            <div>View results for providers, calculations and quality assurance tests.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/results/publish" class="heading-small">Release funding</a>
+                <a href="/results/publish" class="heading-small">Approve funding</a>
             </div>
-            <div>Release funding for providers and say how it’s been calculated.</div>
+            <div>Approve funding for providers and view how it's been calculated.</div>
         </div>
     </div>
 </div>

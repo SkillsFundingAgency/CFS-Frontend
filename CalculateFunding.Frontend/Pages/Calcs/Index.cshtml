@@ -3,21 +3,20 @@
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
 @using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "Manage the Calculations";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section BannerLeft{
-    <h1 class="hero-title">Manage the Calculations</h1>
-    <div class="hero-text">Specify the calculation specifications that will distribute ESFA funding for an academic year</div>
+    <h1 class="hero-title">Calculations</h1>
 }
 
 @section BannerMiddle{
     <form method="post" action="/calcs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-9 filter-field-heading">Search calculations</div>
-            <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
+            <div class="col-xs-3 filter-field-heading withjs-show">Allocation line</div>
         </div>
         <div class="row">
             <div class="col-xs-9">
@@ -27,13 +26,13 @@
                 </div>
             </div>
             <div class="withjs-show col-xs-3">
-                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select Allocation Line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
+                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select allocation line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
             </div>
         </div>
         <div class="row spacing-15-top withjs-show">
             <div class="col-xs-3 filter-field-heading">Year</div>
-            <div class="col-xs-3 filter-field-heading">Funding Stream</div>
-            <div class="col-xs-3 filter-field-heading">Spec name</div>
+            <div class="col-xs-3 filter-field-heading">Funding stream</div>
+            <div class="col-xs-3 filter-field-heading">Specification</div>
             <div class="col-xs-3 filter-field-heading">Calculation status</div>
         </div>
         <div class="row withjs-show">
@@ -44,10 +43,10 @@
                 <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all status', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
+                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all statuses', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
             </div>
 
         </div>
@@ -57,8 +56,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li>Manage the Calculations</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.ManageCalculations</li>
         </ol>
     </div>
 }
@@ -80,7 +79,7 @@
         {
             <div class="publish-notification-panel" id="publish-notification-panel">
                 <a href="/calc?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right" id="dismiss-published-link">Dismiss</a>
-                @Model.PublishedCalculation.Name published successfully.
+                @Model.PublishedCalculation.Name approved.
             </div>
         }
         <div data-bind="visible: isResultsVisible">
@@ -90,9 +89,9 @@
         <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
             <thead>
                 <tr>
-                    <th>Calculation Name</th>
+                    <th>Calculation</th>
                     <th>Status</th>
-                    <th>Spec name</th>
+                    <th>Specification</th>
                     <th>Year</th>
                     <th>Type</th>
                 </tr>
@@ -126,7 +125,7 @@
         </table>
         <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
             <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading Calculations Results</p>
+            <p>Loading calculation results</p>
         </div>
     </div>
 </div>

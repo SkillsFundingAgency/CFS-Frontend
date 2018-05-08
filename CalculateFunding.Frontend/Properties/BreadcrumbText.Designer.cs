@@ -133,6 +133,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Map data sources to datasets for a specification.
+        /// </summary>
+        public static string DatasetRelationships {
+            get {
+                return ResourceManager.GetString("DatasetRelationships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit Calculation.
         /// </summary>
         public static string EditCalculation {
@@ -142,11 +151,11 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load dataset.
+        ///   Looks up a localized string similar to Load new data source.
         /// </summary>
-        public static string LoadDataset {
+        public static string LoadDatasource {
             get {
-                return ResourceManager.GetString("LoadDataset", resourceCulture);
+                return ResourceManager.GetString("LoadDatasource", resourceCulture);
             }
         }
         

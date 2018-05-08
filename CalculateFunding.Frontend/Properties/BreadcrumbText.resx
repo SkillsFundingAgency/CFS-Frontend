@@ -144,8 +144,8 @@
   <data name="EditCalculation" xml:space="preserve">
     <value>Edit Calculation</value>
   </data>
-  <data name="LoadDataset" xml:space="preserve">
-    <value>Load dataset</value>
+  <data name="LoadDatasource" xml:space="preserve">
+    <value>Load new data source</value>
   </data>
   <data name="ManageCalculations" xml:space="preserve">
     <value>Calculations</value>
@@ -170,5 +170,8 @@
   </data>
   <data name="ViewCalculationVersions" xml:space="preserve">
     <value>View calculation versions</value>
+  </data>
+  <data name="DatasetRelationships" xml:space="preserve">
+    <value>Map data sources to datasets for a specification</value>
   </data>
 </root>
