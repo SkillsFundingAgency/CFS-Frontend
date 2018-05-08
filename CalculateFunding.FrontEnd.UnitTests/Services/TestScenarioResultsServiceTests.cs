@@ -114,6 +114,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                         Name ="Test Scenario 1",
                         Passes = 5,
                         Failures = 10,
+                        Ignored = 50,
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
                      }
                  }
@@ -215,6 +216,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                         Name ="Test Scenario 1",
                         Passes = 5,
                         Failures = 10,
+                        Ignored = 50,
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
                      }
                  }
@@ -320,6 +322,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                         Name ="Test Scenario 1",
                         Passes = 5,
                         Failures = 10,
+                        Ignored = 50,
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
                      }
                  }

@@ -67,6 +67,24 @@
 
 <div class="row provider-test-scenario-searchresult-container" id="provider-scenario-results">
 
+    <div class="col-xs-12">
+        <div class="alert alert--info-grey">
+            <span class="testcoverage-item">
+                <span class="testcoverage-title">Pass:</span> <span class="testcoverage-value data-testcoverage-passed" data-bind="text: passed">@Model.Passed</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">Fail:</span> <span class="testcoverage-value data-testcoverage-failed" data-bind="text: failed">@Model.Failed</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">Ignored:</span> <span class="testcoverage-value data-testcoverage-ignored" data-bind="text: ignored">@Model.Ignored</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">QA Coverage:</span> <span class="testcoverage-value data-testcoverage-testcoverage" data-bind="text: testCoverage() + '%'">@Model.TestCoverage%</span>
+            </span>
+        </div>
+    </div>
+   
+
     <div class="col-xs-12 view-provider-test-results">
         <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="TestSceanarioTabs" role="tablist">
             <li class="nav-item">
@@ -81,10 +99,11 @@
 
         </ul>
 
+
         @if (Model.TestScenarioSearchResults != null)
+        {
+            @if (!Model.TestScenarioSearchResults.TestScenarios.IsNullOrEmpty())
             {
-                @if (!Model.TestScenarioSearchResults.TestScenarios.IsNullOrEmpty())
-                {
                 <table class="test-results-table" id="provider-scenario-results-table" data-bind="visible:!searchPerformed()">
                     <thead>
                         <tr>
@@ -95,31 +114,31 @@
                     </thead>
                     <tbody data-bind="visible: searchPerformed()" id="static-test-results-table-body">
                         @{
-                        int rowId = 0;
+                            int rowId = 0;
                         }
                         @foreach (var result in Model.TestScenarioSearchResults.TestScenarios)
-                          {
-                                <tr>
-                                    <td id="static-test-result-name-@rowId" scope="row">@result.TestScenarioName</td>
-                                    <td id="static-test-result-updated-date-@rowId">@result.LastUpdatedDate</td>
-                                    <td id="static-test-result-value-@rowId">@result.TestResult</td>
-                                </tr>
+                        {
+                            <tr>
+                                <td id="static-test-result-name-@rowId" scope="row">@result.TestScenarioName</td>
+                                <td id="static-test-result-updated-date-@rowId">@result.LastUpdatedDate</td>
+                                <td id="static-test-result-value-@rowId">@result.TestResult</td>
+                            </tr>
                             rowId++;
-                          }
+                        }
                     </tbody>
                 </table>
-                }
-                else 
-                {
-                    <p class="no-test-results-for-spec" data-bind="visible:false">
+            }
+            else
+            {
+                <p class="no-test-results-for-spec" data-bind="visible:false">
                     <strong>There are no results for given specification </strong>
-                    </p>
-                }
+                </p>
+            }
         }
-        else if(Model.TestScenarioSearchResults == null)  
+        else if (Model.TestScenarioSearchResults == null)
         {
             <p class="no-spec-selected-for-provider-search-static" data-bind="visible: !selectedSpec()">
-               <strong>Select a specification to view test results</strong>
+                <strong>Select a specification to view test results</strong>
             </p>
         }
 
@@ -168,7 +187,7 @@
         @if (!string.IsNullOrEmpty(Model.SpecificationId)) {
 
             <text> vm.selectedSpec("@Model.SpecificationId"); </text>
-        } 
+        }
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {
 

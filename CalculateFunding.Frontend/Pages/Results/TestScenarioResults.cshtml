@@ -72,6 +72,7 @@
                     <th>Updated</th>
                     <th>Failures</th>
                     <th>Passes</th>
+                    <th>Coverage</th>
                 </tr>
             </thead>
 
@@ -81,6 +82,7 @@
                     <td data-bind="text: lastUpdatedDateDisplay"></td>
                     <td data-bind="text: failures"></td>
                     <td data-bind="text: passes"></td>
+                    <td data-bind="text: testCoverage + '%'" class="text-right"></td>
                 </tr>
 
             </tbody>
@@ -95,6 +97,7 @@
                         <td id="static-results-status-@rowId">@result.LastUpdatedDate</td>
                         <td id="static-results-specificationName-@rowId">@result.Failures</td>
                         <td id="static-results-periodName-@rowId">@result.Passes</td>
+                        <td id="static-results-coverage-@rowId" class="text-right">@result.TestCoverage%/td>
                     </tr>
                     rowId++;
                 }

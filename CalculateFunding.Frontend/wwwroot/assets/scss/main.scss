@@ -72,7 +72,9 @@ a.button:hover {
 }
 
 a,
-a:visited {
+a:visited,
+a.normal,
+a.normal:visited{
     text-decoration: underline;
     color: $govuk-blue;
 }
@@ -499,7 +501,7 @@ blockquote {
         }
 
         td {
-            padding: 15px 0;
+            padding: 15px 5px;
         }
     }
 }
@@ -1901,6 +1903,10 @@ table {
     border-left-style: solid;
     margin: 0 0 1.05263em;
     padding: 30px 0.78947em;
+}
+
+.testcoverage-value{
+    font-weight: bold;
 }
 
 .specs-relationship-searchresult-container .specs-relationship-searchresult-container-item {

@@ -28,13 +28,24 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly IResultsApiClient _resultsApiClient;
         private readonly ITestScenarioSearchService _testScenarioSearchService;
 
-        public ProviderScenarioResultsPageModel(ITestScenarioSearchService testScenarioSearchService, IResultsApiClient resultsApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
+        public ProviderScenarioResultsPageModel(
+            ITestScenarioSearchService testScenarioSearchService,
+            IResultsApiClient resultsApiClient,
+            IMapper mapper,
+            ISpecsApiClient specsApiClient,
+            ILogger logger)
 
         {
+            Guard.ArgumentNotNull(testScenarioSearchService, nameof(testScenarioSearchService));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
+            _testScenarioSearchService = testScenarioSearchService;
             _resultsApiClient = resultsApiClient;
             _mapper = mapper;
             _specsApiClient = specsApiClient;
-            _testScenarioSearchService = testScenarioSearchService;
             _logger = logger;
         }
 
@@ -51,6 +62,14 @@ namespace CalculateFunding.Frontend.Pages.Results
         public string ProviderId { get; set; }
 
         public string SearchTerm { get; set; }
+
+        public int Passed { get; set; } = 0;
+
+        public int Failed { get; set; } = 0;
+
+        public int Ignored { get; set; } = 0;
+
+        public decimal TestCoverage { get; set; } = 0;
 
         //To store provider information
         public ProviderViewModel ProviderInfoModel { get; set; }
@@ -75,9 +94,10 @@ namespace CalculateFunding.Frontend.Pages.Results
                 }
             };
 
-            Task populatePeriodsTask =  PopulatePeriods(periodId);
+            Task populatePeriodsTask = PopulatePeriods(periodId);
 
-            Task<ApiResponse<Provider>> apiResponseTask =  _resultsApiClient.GetProviderByProviderId(providerId);
+            Task<ApiResponse<Provider>> apiResponseTask = _resultsApiClient.GetProviderByProviderId(providerId);
+
 
             await TaskHelper.WhenAllAndThrow(populatePeriodsTask, apiResponseTask);
 
@@ -93,13 +113,13 @@ namespace CalculateFunding.Frontend.Pages.Results
             SpecificationId = specificationId;
 
             ApiResponse<Provider> apiResponse = apiResponseTask.Result;
-  
-            if (apiResponse != null   && apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null )
+
+            if (apiResponse != null && apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)
             {
                 Provider response = apiResponse.Content;
 
                 ProviderViewModel providerViewModel = _mapper.Map<ProviderViewModel>(apiResponse.Content);
-         
+
                 ProviderInfoModel = providerViewModel;
             }
             else
@@ -111,13 +131,18 @@ namespace CalculateFunding.Frontend.Pages.Results
             if (!string.IsNullOrWhiteSpace(specificationId))
             {
                 TestScenarioSearchResults = await _testScenarioSearchService.PerformSearch(searchRequest);
-            }
+                if(TestScenarioSearchResults != null)
+                {
+                    Passed = TestScenarioSearchResults.TestScenarios.Where(c=>c.TestResult == "Passed").Count();
+                    Failed = TestScenarioSearchResults.TestScenarios.Where(c => c.TestResult == "Failed").Count();
+                    Ignored = TestScenarioSearchResults.TestScenarios.Where(c => c.TestResult == "Ignored").Count();
 
-            if (TestScenarioSearchResults == null)
-            {
-                _logger.Error("Test scenario results content is null");  
-                
-                return new StatusCodeResult(500);
+                    int totalRecords = Passed + Failed + Ignored;
+                    if(totalRecords > 0)
+                    {
+                        TestCoverage = Math.Round((decimal)(Passed + Failed) / totalRecords * 100, 1);
+                    }
+                }
             }
 
             return Page();

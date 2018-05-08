@@ -60,6 +60,13 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             return PostAsync<IEnumerable<TestScenarioResultCounts>, TestSecenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
         }
 
+        public Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            return GetAsync<ProviderTestScenarioResultCounts>($"{_apiPath}/get-testscenario-result-counts-for-provider?providerId={providerId}");
+        }
+
         public async Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
@@ -84,5 +91,7 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
                 return null;
             }
         }
+
+
     }
 }

@@ -10,6 +10,14 @@
 
         public providerTestScenarios: KnockoutObservableArray<IProviderTestScenarioResponse> = ko.observableArray([]);
 
+        public passed: KnockoutObservable<number> = ko.observable(0);
+
+        public failed: KnockoutObservable<number> = ko.observable(0);
+
+        public ignored: KnockoutObservable<number> = ko.observable(0);
+
+        public testCoverage: KnockoutObservable<string> = ko.observable("0");
+
         constructor(options: IProviderTestSearchViewModelConstructorParameters) {
             super();
             if (typeof options === "undefined") {
@@ -74,6 +82,31 @@
                 let result: ITestScenarioSearchResultResponse = resultUntyped;
                 self.providerTestScenarios(result.testScenarios);
                 self.populateCommonSearchResultProperties(result);
+
+                let passed: IProviderTestScenarioResponse[] = ko.utils.arrayFilter(result.testScenarios, (item: IProviderTestScenarioResponse) => {
+                    return item.testResult === "Passed";
+                });
+
+                let failed: IProviderTestScenarioResponse[] = ko.utils.arrayFilter(result.testScenarios, (item: IProviderTestScenarioResponse) => {
+                    return item.testResult === "Failed";
+                });
+
+                let ignored: IProviderTestScenarioResponse[] = ko.utils.arrayFilter(result.testScenarios, (item: IProviderTestScenarioResponse) => {
+                    return item.testResult === "Ignored";
+                });
+
+                let total: number = passed.length + failed.length + ignored.length;
+
+                let testCoverage: string = "0";
+
+                if (total > 0) {
+                    testCoverage = ((passed.length + failed.length) / total * 100).toFixed(1);
+                }
+
+                self.passed(passed.length);
+                self.failed(failed.length);
+                self.ignored(ignored.length);
+                self.testCoverage(testCoverage);
             });
         }
 
@@ -88,14 +121,14 @@
 
     export interface IProviderTestScenarioResponse {
         id: string;
-        testresult: string;
-        specificationid: string;
-        specificationname: string;
-        testScenarioid: string;
-        testScenarioname: string;
-        providerid: string;
-        providername: string;
-        lastupdated: string;
+        testResult: string;
+        specificationId: string;
+        specificationName: string;
+        testScenarioId: string;
+        testScenarioName: string;
+        providerId: string;
+        providerName: string;
+        lastUpdated: string;
     }
 
     export interface IProviderTestSearchViewModelConstructorParameters {

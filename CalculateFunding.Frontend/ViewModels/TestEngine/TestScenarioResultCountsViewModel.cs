@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CalculateFunding.Frontend.Helpers;
+using System;
 
 namespace CalculateFunding.Frontend.ViewModels.TestEngine
 {
@@ -22,7 +23,7 @@ namespace CalculateFunding.Frontend.ViewModels.TestEngine
             {
                 get
                 {
-                    return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "";
+                    return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "";
                 }
             }
         }

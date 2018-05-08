@@ -3,6 +3,7 @@
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -34,7 +35,7 @@
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             // Act - Assert
             Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerScenarioResultsPageModel.OnGetAsync(null, 1, "", "1819", "1"));
@@ -51,7 +52,7 @@
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             Provider provider = CreateProvider();
 
@@ -84,7 +85,7 @@
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             Provider provider = CreateProvider();
 
@@ -107,7 +108,11 @@
             // Assert
             actionResult
                 .Should()
-                 .BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(500);
+                 .BeOfType<PageResult>();
+
+            await specsClient
+                .Received(1)
+                .GetAcademicYears();
         }
 
         [TestMethod]
@@ -120,7 +125,7 @@
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             Provider provider = null;
 
@@ -156,7 +161,7 @@
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             Provider provider = CreateProvider();
 
@@ -179,7 +184,7 @@
             // Assert
             actionResult
             .Should()
-            .BeOfType<StatusCodeResult>();
+            .BeOfType<PageResult>();
 
             providerScenarioResultsPageModel.ProviderInfoModel.Should().NotBeNull();
             providerScenarioResultsPageModel.ProviderInfoModel.Upin.Should().Be(234234);
@@ -189,60 +194,7 @@
 
         }
 
-        [TestMethod]
-        public async Task OnGetAsync_WhenNoTestScenariosSearchResultsFound_StatusCode500_Returned()
-        {
-            // Arrange
-            IResultsApiClient resultsApiClient = CreateApiClient();
-
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
-
-            ILogger logger = CreateLogger();
-
-            ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
-
-            Provider provider = CreateProvider();
-
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
-
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
-
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
-
-            resultsApiClient.GetSpecifications("2")
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
-
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
-
-            TestScenarioSearchResultViewModel results = null;
-
-            SearchRequestViewModel searchRequest = CreateSearchRequest();
-
-            searchService.PerformSearch(searchRequest)
-                .Returns(results);
-
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient, logger: logger);
-
-            // Act
-            IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
-
-            // Assert
-            actionResult
-               .Should()
-               .BeOfType<StatusCodeResult>()
-               .Which
-               .StatusCode
-               .Should()
-               .Be(500);
-
-            logger
-                .Received(1)
-                .Error(Arg.Is<string>("Test scenario results content is null"));
-        }
-
-
+      
         [TestMethod]
         public async Task OnGetAsync_WhenTestScenariosSearchResultsFound_ThenSuccessfullyShown()
         {
@@ -285,7 +237,7 @@
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(results);
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
@@ -305,8 +257,95 @@
                r.Filters["providerId"][0] == searchRequest.Filters["providerId"][0] &&
                r.Filters["specificationId"][0] == searchRequest.Filters["specificationId"][0]
            ));
+        }
 
+        [TestMethod]
+        public async Task OnGetAsync_WhenTestScenariosSearchResultsFoundThenTestCoverageIsCalculated_ThenSuccessfullyShown()
+        {
+            // Arrange
+            IResultsApiClient resultsApiClient = CreateApiClient();
 
+            ISpecsApiClient specsClient = CreateSpecsApiClient();
+
+            ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
+
+            Provider provider = CreateProvider();
+
+            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+
+            IList<SpecificationSummary> specSummary = GetSpecSummary();
+
+            specsClient.GetAcademicYears()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+
+            resultsApiClient.GetSpecifications(Arg.Any<string>())
+               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+
+            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
+                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+
+            IList<TestScenarioSearchResultItemViewModel> testScenarioSearchResultItems = GetTestScenarioSearchResults();
+            TestScenarioSearchResultItemViewModel ignoredItem = new TestScenarioSearchResultItemViewModel()
+            {
+                Id = "3",
+                LastUpdatedDate = new DateTime(12, 01, 23),
+                ProviderId = "1",
+                ProviderName = "Provider 1",
+                SpecificationId = "2",
+                SpecificationName = "Spec 02",
+                TestResult = "Ignored",
+                TestScenarioId = "2",
+                TestScenarioName = "Test Scenario 02",
+                LastUpdatedDateDisplay = "1",
+            };
+
+            testScenarioSearchResultItems.Add(ignoredItem);
+
+            TestScenarioSearchResultItemViewModel failedItem = new TestScenarioSearchResultItemViewModel()
+            {
+                Id = "4",
+                LastUpdatedDate = new DateTime(12, 01, 23),
+                ProviderId = "1",
+                ProviderName = "Provider 1",
+                SpecificationId = "2",
+                SpecificationName = "Spec 02",
+                TestResult = "Failed",
+                TestScenarioId = "2",
+                TestScenarioName = "Test Scenario 02",
+                LastUpdatedDateDisplay = "1",
+            };
+
+            testScenarioSearchResultItems.Add(failedItem);
+
+            string specificationId = "2";
+
+            TestScenarioSearchResultViewModel results = new TestScenarioSearchResultViewModel()
+            {
+                TestScenarios = testScenarioSearchResultItems,
+                TotalResults = 4,
+                CurrentPage = 1,
+            };
+
+            SearchRequestViewModel searchRequest = CreateSearchRequest();
+            searchRequest.Filters["specificationId"][0] = specificationId;
+
+            searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(results);
+
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+
+            //Act
+            IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
+
+            // Assert
+            actionResult
+               .Should()
+               .BeOfType<PageResult>();
+
+            providerScenarioResultsPageModel.Passed.Should().Be(2);
+            providerScenarioResultsPageModel.Failed.Should().Be(1);
+            providerScenarioResultsPageModel.Ignored.Should().Be(1);
+            providerScenarioResultsPageModel.TestCoverage.Should().Be(75);
         }
 
         private Provider CreateProvider()
@@ -351,11 +390,11 @@
                 ProviderName = "Provider 1",
                 SpecificationId = "1",
                 SpecificationName = "Spec 01",
-                TestResult = "Pass",
+                TestResult = "Passed",
                 TestScenarioId = "1",
                 TestScenarioName = "Test Scenario 01",
                 LastUpdatedDateDisplay = "1",
-            };
+            }; 
             TestScenarioSearchResultItemViewModel testScen2 = new TestScenarioSearchResultItemViewModel()
             {
                 Id = "2",
@@ -364,7 +403,7 @@
                 ProviderName = "Provider 1",
                 SpecificationId = "2",
                 SpecificationName = "Spec 02",
-                TestResult = "Pass",
+                TestResult = "Passed",
                 TestScenarioId = "2",
                 TestScenarioName = "Test Scenario 02",
                 LastUpdatedDateDisplay = "1",
@@ -432,7 +471,8 @@
                 IMapper mapper = null,
                 ILogger logger = null)
         {
-            return new ProviderScenarioResultsPageModel(testScenarioSearchService ?? CreateTestScenarioSearchService(),
+            return new ProviderScenarioResultsPageModel(
+                testScenarioSearchService ?? CreateTestScenarioSearchService(),
             resultsApiClient ?? CreateApiClient(),
             mapper ?? CreateMapper(),
             specsApiClient ?? CreateSpecsApiClient(),

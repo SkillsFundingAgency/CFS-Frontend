@@ -144,6 +144,7 @@ namespace CalculateFunding.Frontend.Services
                     {
                         vm.Failures = counts.Failed;
                         vm.Passes = counts.Passed;
+                        vm.Ignored = counts.Ignored;
                     }
                 }
             }
