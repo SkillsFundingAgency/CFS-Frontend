@@ -4,6 +4,7 @@
 @using CalculateFunding.Frontend.Helpers
 @using CalculateFunding.Frontend.ViewModels.Common
 @using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Manage Datasets";
@@ -50,8 +51,8 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="~/">Calculate Funding</a></li>
-            <li><a href="~/datasets">Manage Data</a></li>
-            <li>Manage Datasets</li>
+            <li><a href="~/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li>@BreadcrumbText.ManageDataSources</li>
         </ol>
     </div>
 }
@@ -60,7 +61,7 @@
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible" >
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "datasets", Model.SearchTerm))
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "data sources", Model.SearchTerm))
         </div>
 
         <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
@@ -72,7 +73,7 @@
 
             <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
                 <div class="dataset-item-header">
-                    <span class="data-dataset-name">@dataset.Name</span> <span class="dataset-item-secondary">(version <span class="data-dataset-version">@dataset.Version</span>)</span>
+                    <span class="dataset-item-specificationName data-dataset-name">@dataset.Name</span> <span class="dataset-item-secondary">(version <span class="data-dataset-version">@dataset.Version</span>)</span>
             </div>
             <div class="dataset-item-secondary data-dataset-description spacing-5-bottom">@dataset.Description</div>
 
@@ -82,7 +83,7 @@
                     <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
                 </span>
                 <span class="dataset-item-property">
-                    <strong>Update on:</strong>
+                    <strong>Updated:</strong>
                     <span id="dataset-item-lastupdated-@datasetRow">
                         @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
                     </span>
@@ -102,7 +103,7 @@
             <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
                 <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
                     <div class="dataset-item-header">
-                        <span data-bind="text: name" class="data-dataset-name"></span> <span class="dataset-item-secondary">(version <span data-bind="text: version" class="data-dataset-version"></span>)</span>
+                        <span data-bind="text: name" class="dataset-item-specificationName data-dataset-name"></span> <span class="dataset-item-secondary">(version <span data-bind="text: version" class="data-dataset-version"></span>)</span>
                     </div>
                     <div data-bind="text: description" class="dataset-item-secondary data-dataset-description spacing-5-bottom"></div>
                     <div>
@@ -111,7 +112,7 @@
                             <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
                         </span>
                         <span class="dataset-item-property">
-                            <strong>Update on:</strong>
+                            <strong>Updated:</strong>
                             <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
                         </span>
                         <span class="dataset-item-property">
@@ -127,7 +128,7 @@
         </div>
         <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
             <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading Datasets Results</p>
+            <p>Loading data sources</p>
         </div>
     </div>
 </div>
