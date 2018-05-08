@@ -5,13 +5,12 @@
 
 
 @{
-    ViewData["Title"] = "Map data sources to datasets";
+    ViewData["Title"] = "Map data sources to datasets for a specification";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section BannerLeft{
-<h1 class="hero-title no-margin">Map data sources to datasets</h1>
-    <div class="hero-text">Create the references between data sources and datasets.</div>
+    <h1 class="hero-title no-margin">Map data sources to datasets for a specification</h1>
 }
 
 @section BannerMiddle{
@@ -25,7 +24,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-3 spacing-30-top filter-field-heading">Filter by year</div>
+            <div class="col-xs-3 spacing-30-top filter-field-heading">Filter by funding period</div>
         </div>
         <div class="row">
             <div class="col-xs-3">
@@ -40,7 +39,7 @@
         <ol>
             <li><a href="~/">Calculate Funding</a></li>
             <li><a href="~/datasets">Manage Data</a></li>
-            <li>Choose data sources for specifications</li>
+            <li>Map data sources to datasets for a specification</li>
         </ol>
     </div>
 }
@@ -49,7 +48,7 @@
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial_SpecRelationships", new PagerPartialViewModel(Model.SearchResults, "specs", Model.SearchTerm))
+            @Html.Partial("_SearchPagerPartial_SpecRelationships", new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm))
         </div>
         @*end of row*@
         <div class="row">
@@ -109,4 +108,3 @@
         vm.performSearch();
     </script>
 }
-
