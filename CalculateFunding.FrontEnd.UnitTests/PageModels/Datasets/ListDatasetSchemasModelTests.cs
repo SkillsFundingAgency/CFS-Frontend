@@ -106,41 +106,42 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             listDatasetSchemasPageModel.Specification.Should().NotBeNull();
             listDatasetSchemasPageModel.DatasetDefinitions.Should().NotBeNull();
 
-            List<AssignedDataDefinitionToSpecificationViewModel> expectedDatasets = new List<AssignedDataDefinitionToSpecificationViewModel>();
-            expectedDatasets.Add(new AssignedDataDefinitionToSpecificationViewModel()
+            List<AssignedDataDefinitionToSpecificationViewModel> expectedDatasets = new List<AssignedDataDefinitionToSpecificationViewModel>
             {
-                Id = datasetSchemasAssigned[0].DatasetDefinition.Id,
-                Name = datasetSchemasAssigned[0].DatasetDefinition.Name,
-                Datasets = new List<AssignedDatasetViewModel>()
+                new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                     new AssignedDatasetViewModel()
-                     {
-                        Id = datasetSchemasAssigned[0].Id,
-                        Name= datasetSchemasAssigned[0].Name,
-                        Description = datasetSchemasAssigned[0].Description,
-                     }
+                    Id = datasetSchemasAssigned[0].DatasetDefinition.Id,
+                    Name = datasetSchemasAssigned[0].DatasetDefinition.Name,
+                    Datasets = new List<AssignedDatasetViewModel>()
+                    {
+                         new AssignedDatasetViewModel()
+                         {
+                            Id = datasetSchemasAssigned[0].Id,
+                            Name= datasetSchemasAssigned[0].Name,
+                            Description = datasetSchemasAssigned[0].Description,
+                         }
+                    },
                 },
-            });
 
-            expectedDatasets.Add(new AssignedDataDefinitionToSpecificationViewModel()
-            {
-                Id = datasetSchemasAssigned[1].DatasetDefinition.Id,
-                Name = datasetSchemasAssigned[1].DatasetDefinition.Name,
-                Datasets = new List<AssignedDatasetViewModel>()
+                new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                     new AssignedDatasetViewModel()
-                     {
-                        Id = datasetSchemasAssigned[1].Id,
-                        Name= datasetSchemasAssigned[1].Name,
-                        Description = datasetSchemasAssigned[1].Description,
-                     }
+                    Id = datasetSchemasAssigned[1].DatasetDefinition.Id,
+                    Name = datasetSchemasAssigned[1].DatasetDefinition.Name,
+                    Datasets = new List<AssignedDatasetViewModel>()
+                    {
+                         new AssignedDatasetViewModel()
+                         {
+                            Id = datasetSchemasAssigned[1].Id,
+                            Name= datasetSchemasAssigned[1].Name,
+                            Description = datasetSchemasAssigned[1].Description,
+                         }
+                    },
                 },
-            });
-            expectedDatasets.Add(new AssignedDataDefinitionToSpecificationViewModel()
-            {
-                Id = datasetSchemasAssigned[2].DatasetDefinition.Id,
-                Name = datasetSchemasAssigned[2].DatasetDefinition.Name,
-                Datasets = new List<AssignedDatasetViewModel>()
+                new AssignedDataDefinitionToSpecificationViewModel()
+                {
+                    Id = datasetSchemasAssigned[2].DatasetDefinition.Id,
+                    Name = datasetSchemasAssigned[2].DatasetDefinition.Name,
+                    Datasets = new List<AssignedDatasetViewModel>()
                 {
                      new AssignedDatasetViewModel()
                      {
@@ -155,13 +156,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                         Description = datasetSchemasAssigned[3].Description,
                      }
                 },
-            });
+                },
 
-            expectedDatasets.Add(new AssignedDataDefinitionToSpecificationViewModel()
-            {
-                Id = datasetSchemasAssigned[4].DatasetDefinition.Id,
-                Name = datasetSchemasAssigned[4].DatasetDefinition.Name,
-                Datasets = new List<AssignedDatasetViewModel>()
+                new AssignedDataDefinitionToSpecificationViewModel()
+                {
+                    Id = datasetSchemasAssigned[4].DatasetDefinition.Id,
+                    Name = datasetSchemasAssigned[4].DatasetDefinition.Name,
+                    Datasets = new List<AssignedDatasetViewModel>()
                 {
                      new AssignedDatasetViewModel()
                      {
@@ -170,7 +171,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                         Description = datasetSchemasAssigned[4].Description,
                      }
                 },
-            });
+                }
+            };
 
 
             listDatasetSchemasPageModel.DatasetDefinitions.Should()
@@ -402,7 +404,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
                 Description = "Test Spec",
 

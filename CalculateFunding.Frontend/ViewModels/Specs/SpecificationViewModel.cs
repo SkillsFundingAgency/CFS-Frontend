@@ -7,7 +7,7 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
     {
         public ReferenceViewModel AcademicYear { get; set; }
 
-        public ReferenceViewModel FundingStream { get; set; }
+        public IEnumerable<ReferenceViewModel> FundingStreams { get; set; }
 
         public string Description { get; set; }
 

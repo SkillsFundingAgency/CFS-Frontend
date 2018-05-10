@@ -1,14 +1,15 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
     using Newtonsoft.Json;
+    using System.Collections.Generic;
 
     public class CreateSpecificationModel
     {
         [JsonProperty("academicYearId")]
         public string AcademicYearId { get; set; }
 
-        [JsonProperty("fundingStreamId")]
-        public string FundingStreamId { get; set; }
+        [JsonProperty("fundingStreamIds")]
+        public IEnumerable<string> FundingStreamIds { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }

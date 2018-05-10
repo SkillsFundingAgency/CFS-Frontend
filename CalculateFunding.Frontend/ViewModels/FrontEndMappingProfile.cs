@@ -75,11 +75,12 @@
             CreateMap<CreateSpecificationViewModel, Specification>()
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.AcademicYear, opt => opt.Ignore())
-                .ForMember(m => m.FundingStream, opt => opt.Ignore())
+                .ForMember(m => m.FundingStreams, opt => opt.Ignore())
                 .ForMember(m => m.Policies, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
                 .ForMember(m => m.AcademicYearId, opt => opt.Ignore());
+                
 
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());

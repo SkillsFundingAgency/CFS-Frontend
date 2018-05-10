@@ -532,11 +532,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                          }
                      }
                  },
-                FundingStream = new Reference
+                FundingStreams = new List<Reference>()
                 {
-                    Id = fundingStreamId
-                }
-                
+                    new Reference
+                    {
+                        Id = fundingStreamId
+                    },
+                },
             };
         }
 

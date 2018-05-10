@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 Name = "Test Specification",
                 AcademicYear = new Reference("1617", "2016/2017"),
                 Description = "Test Description",
-                FundingStream = new Reference("fs1", "Funding Stream Name"),
+                FundingStreams = new List<Reference>() { new Reference("fs1", "Funding Stream Name"), },
                 Policies = new List<Policy>()
                 {
                     new Policy()
@@ -88,7 +88,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 Name = "Test Specification",
                 AcademicYear = new ReferenceViewModel("1617", "2016/2017"),
                 Description = "Test Description",
-                FundingStream = new ReferenceViewModel("fs1", "Funding Stream Name"),
+                FundingStreams = new List<ReferenceViewModel>() { new ReferenceViewModel("fs1", "Funding Stream Name"),  },
                 Policies = new List<PolicyViewModel>()
                 {
                     new PolicyViewModel()

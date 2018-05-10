@@ -424,7 +424,7 @@
         {
             SpecificationSummary specsummary1 = new SpecificationSummary()
             {
-                FundingStream = new Reference() { Id = "1", Name = "Test Funding Stream 1" },
+                FundingStreams = new List<Reference>() { new Reference() { Id = "1", Name = "Test Funding Stream 1" } },
                 Period = new Reference() { Id = "1617", Name = "2016-2017" },
                 Id = "1",
                 Name = "Test Spec 1"
@@ -432,7 +432,7 @@
 
             SpecificationSummary specsummary2 = new SpecificationSummary()
             {
-                FundingStream = new Reference() { Id = "2", Name = "Test Funding Stream 2" },
+                FundingStreams = new List<Reference>() { new Reference() { Id = "2", Name = "Test Funding Stream 2" } },
                 Period = new Reference() { Id = "1617", Name = "2016-2017" },
                 Id = "2",
                 Name = "Test Spec 2"

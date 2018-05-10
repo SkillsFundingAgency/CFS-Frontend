@@ -64,7 +64,7 @@
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19") },
 
                 Description = "Test Spec",
 
@@ -94,13 +94,9 @@
             Specification expectedSpecification = new Specification
             {
                 AcademicYear = new Reference("2018", "17-18"),
-
-                FundingStream = new Reference("2018", "18-19"),
-
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19") },
                 Description = "Test Spec",
-
                 Id = "1",
-
                 Name = "APT Final Baselines current year"
             };
 

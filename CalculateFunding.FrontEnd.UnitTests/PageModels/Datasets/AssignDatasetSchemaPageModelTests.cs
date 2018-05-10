@@ -73,7 +73,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
                 Description = "Test Spec",
 
@@ -248,7 +248,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
                 Description = "Test Spec",
 
@@ -300,7 +300,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
                 Description = "Test Spec",
 
@@ -347,7 +347,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 AcademicYear = new Reference("2018", "17-18"),
 
-                FundingStream = new Reference("2018", "18-19"),
+                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
                 Description = "Test Spec",
 

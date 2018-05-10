@@ -115,7 +115,7 @@
     export interface ICalculationResponse {
         id: string;
         name: string;
-        LastUpdatedDateDisplay: string;
+        lastUpdatedDateDisplay: string;
         specificationName: string;
         status: string;
         calculationType: string;

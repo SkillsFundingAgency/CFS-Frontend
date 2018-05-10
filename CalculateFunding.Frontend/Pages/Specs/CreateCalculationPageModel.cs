@@ -79,11 +79,11 @@
 
         async Task<IActionResult> PopulateForm(Specification specification)
         {
-            await PopulateAllocationLines(specification.FundingStream.Id);
+            await PopulateAllocationLines(specification.FundingStreams.Select(s=>s.Id));
 
             if (AllocationLines.IsNullOrEmpty())
             {
-                return new InternalServerErrorResult($"Failed to load allocation lines for funding stream id: {specification.FundingStream.Id}");
+                return new InternalServerErrorResult($"Failed to load allocation lines for specification id: {specification.Id}");
             }
 
             PopulatePolicies(specification);
@@ -193,19 +193,27 @@
             }
         }
 
-        private async Task PopulateAllocationLines(string fundingStreamId)
+        private async Task PopulateAllocationLines(IEnumerable<string> fundingStreamIds)
         {
-            ApiResponse<FundingStream> fundingStreamResponse = await _specsClient.GetFundingStreamByFundingStreamId(fundingStreamId);
+            List<SelectListItem> result = new List<SelectListItem>();
+            // TODO optimise call
 
-            if (fundingStreamResponse != null && fundingStreamResponse.StatusCode == HttpStatusCode.OK)
+            foreach(string fundingStreamId in fundingStreamIds)
             {
-                AllocationLines = fundingStreamResponse.Content.AllocationLines.Select(m => new SelectListItem
+                ApiResponse<FundingStream> fundingStreamResponse = await _specsClient.GetFundingStreamByFundingStreamId(fundingStreamId);
+
+                if (fundingStreamResponse != null && fundingStreamResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    Value = m.Id,
-                    Text = m.Name,
-                    Selected = m.Id == AllocationLineId
-                }).ToList();
+                    result.AddRange(fundingStreamResponse.Content.AllocationLines.Select(m => new SelectListItem
+                    {
+                        Value = m.Id,
+                        Text = m.Name,
+                        Selected = m.Id == AllocationLineId
+                    }));
+                }
             }
+           
+            AllocationLines = result.OrderBy(c=>c.Text);
         }
 
         private async Task<Specification> GetSpecification(string specificationId)

@@ -1,5 +1,6 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
@@ -8,8 +9,8 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
         [JsonProperty("period")]
         public Reference Period { get; set; }
 
-        [JsonProperty("fundingStream")]
-        public Reference FundingStream { get; set; }
+        [JsonProperty("fundingStreams")]
+        public IEnumerable<Reference> FundingStreams { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }

@@ -17,21 +17,21 @@ namespace CalculateFunding.Frontend.TestData
                 new Specification
                 {
                     AcademicYear = new Reference(),
-                    FundingStream = new Reference(),
+                    FundingStreams = new List<Reference>(),
                     Description = "test",
                     Policies = new List<Policy>()
                 },
                 new Specification
                 {
                     AcademicYear = new Reference(),
-                    FundingStream = new Reference(),
+                    FundingStreams = new List<Reference>(),
                     Description = "test",
                     Policies = new List<Policy>()
                 },
                 new Specification
                 {
                     AcademicYear = new Reference(),
-                    FundingStream = new Reference(),
+                    FundingStreams = new List<Reference>(),
                     Description = "test",
                     Policies = new List<Policy>()
                 }
