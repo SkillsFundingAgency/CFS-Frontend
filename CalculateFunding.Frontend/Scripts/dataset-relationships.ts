@@ -30,7 +30,7 @@
             });
         }
 
-        public selectedPeriodChanged(): void {
+        public fundingPeriodChanged(): void {
             let selectedItem: string = $("#select-spec-period").val().toString();
             this.selectedFundingPeriod(selectedItem);
             this.performSearch();

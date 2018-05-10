@@ -46,7 +46,7 @@
                 PageNumber = pageNumber,
                 IncludeFacets = false,
                 SearchTerm = searchTerm,
-                Filters = new Dictionary<string, string[]> { { "periodId", new[] { fundingPeriodId } } }
+                Filters = new Dictionary<string, string[]> { { "fundingPeriodId", new[] { fundingPeriodId } } }
             };
 
             SearchTerm = searchTerm;
@@ -70,7 +70,7 @@
                 PageNumber = pageNumber,
                 SearchTerm = SearchTerm,
                 IncludeFacets = false,
-                Filters = new Dictionary<string, string[]> { { "periodId", new[] { FundingPeriodId } } }
+                Filters = new Dictionary<string, string[]> { { "fundingPeriodId", new[] { FundingPeriodId } } }
             };
 
             SearchResults = await _datasetRelationshipsSearchService.PerformSearch(searchRequest);
