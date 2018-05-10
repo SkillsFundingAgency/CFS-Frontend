@@ -33,9 +33,9 @@
 
         public string SpecificationName { get; set; }
 
-        public string AcademicYearId { get; set; }
+        public string FundingPeriodId { get; set; }
 
-        public string AcademicYearName { get; set; }
+        public string FundingPeriodName { get; set; }
 
         public string ParentPolicyId { get; set; }
 
@@ -51,9 +51,9 @@
 
             if (specification != null)
             {
-                AcademicYearName = specification.AcademicYear.Name;
+                FundingPeriodName = specification.FundingPeriod.Name;
 
-                AcademicYearId = specification.AcademicYear.Id;
+                FundingPeriodId = specification.FundingPeriod.Id;
 
                 SpecificationName = specification.Name;
 
@@ -85,9 +85,9 @@
 
                 SpecificationId = specificationId;
 
-                AcademicYearName = specification.AcademicYear.Name;
+                FundingPeriodName = specification.FundingPeriod.Name;
 
-                AcademicYearId = specification.AcademicYear.Id;
+                FundingPeriodId = specification.FundingPeriod.Id;
 
                 PopulatePolicies(specification);
 

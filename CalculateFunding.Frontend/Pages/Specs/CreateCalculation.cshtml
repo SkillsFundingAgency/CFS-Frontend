@@ -8,7 +8,7 @@
 }
 
 @section FormBannerLeft{
-    <p class="hero-text">Year: @Model.AcademicYearName</p>
+    <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
     <h1 class="hero-title">Create calculation specification for policy</h1>
     <p class="hero-text">Creating calculation specification for @Model.SpecificationName</p>
 }
@@ -17,7 +17,7 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/specs?academicYearId=@Model.AcademicYearId#spec-@Model.SpecificationId">@Model.AcademicYearName</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId#spec-@Model.SpecificationId">@Model.FundingPeriodName</a></li>
             <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
             <li>@BreadcrumbText.CreateCalculation</li>
         </ol>

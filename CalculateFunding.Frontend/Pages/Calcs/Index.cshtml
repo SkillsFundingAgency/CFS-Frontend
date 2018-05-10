@@ -30,14 +30,14 @@
             </div>
         </div>
         <div class="row spacing-15-top withjs-show">
-            <div class="col-xs-3 filter-field-heading">Year</div>
+            <div class="col-xs-3 filter-field-heading">Funding Period</div>
             <div class="col-xs-3 filter-field-heading">Funding stream</div>
             <div class="col-xs-3 filter-field-heading">Specification</div>
             <div class="col-xs-3 filter-field-heading">Calculation status</div>
         </div>
         <div class="row withjs-show">
             <div class="col-xs-3">
-                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select year', buttonWidth: '100%', disableIfEmpty: true}, options: periods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedPeriods, enable: canSelectFilters" multiple></select>
+                <select id="fundingPeriods" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
                 <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
@@ -92,7 +92,7 @@
                     <th>Calculation</th>
                     <th>Status</th>
                     <th>Specification</th>
-                    <th>Year</th>
+                    <th>Funding Period</th>
                     <th>Type</th>
                 </tr>
             </thead>
@@ -102,7 +102,7 @@
                     <td><a data-bind="attr: {href: '/calcs/editCalculation/' + id }, text: name"></a></td>
                     <td data-bind="text: status"></td>
                     <td data-bind="text: specificationName"></td>
-                    <td data-bind="text: periodName"></td>
+                    <td data-bind="text: fundingPeriodName"></td>
                     <td data-bind="text: calculationType"></td>
                 </tr>
             </tbody>
@@ -116,7 +116,7 @@
                     <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
                     <td id="static-results-status-@rowId">@calculation.Status</td>
                     <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
-                    <td id="static-results-periodName-@rowId">@calculation.PeriodName</td>
+                    <td id="static-results-periodName-@rowId">@calculation.FundingPeriodName</td>
                     <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
                 </tr>
                     rowId++;

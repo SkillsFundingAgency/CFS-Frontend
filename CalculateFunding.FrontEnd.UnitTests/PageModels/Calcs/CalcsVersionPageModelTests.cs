@@ -114,7 +114,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             {
                 Id = "2",
                 Name = "Specs Calculation",
-                PeriodName = "2018/19",
+                FundingPeriodName = "2018/19",
                 SpecificationId = "3",
                 Status = "Draft",
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
@@ -165,7 +165,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             {
                 Id = "1",
                 Name = "Specs Calculation",
-                PeriodName = "2018/19",
+                FundingPeriodName = "2018/19",
                 SpecificationId = "3",
                 Status = "Draft",
                 LastModifiedBy = new Reference("1", "Matt Vallily"),

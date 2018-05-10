@@ -1,7 +1,7 @@
 ﻿namespace calculateFunding.results.listProviderTestResults {
     export class ProviderSearchViewModel extends calculateFunding.search.SearchViewModel {
         private testScenarioId: string;
-        private periodId: string;
+        private fundingPeriodId: string;
         private specificationId: string;
 
         public providerSearchResults: KnockoutObservableArray<IProviderTestResultDetailResponse> = ko.observableArray([]);
@@ -37,12 +37,12 @@
                 if (typeof options.specificationId === "undefined") {
                     throw new Error("options.specificationId is undefined")
                 }
-                if (typeof options.periodId === "undefined") {
+                if (typeof options.fundingPeriodId === "undefined") {
                     throw new Error("options.periodId is undefined")
                 }
 
                 self.testScenarioId = options.testScenarioId;
-                self.periodId = options.periodId;
+                self.fundingPeriodId = options.fundingPeriodId;
                 self.specificationId = options.specificationId;
                 
 
@@ -167,7 +167,7 @@
     export interface IProviderSearchViewModelConstructorParameters
     {
         testScenarioId: string;
-        periodId: string;
+        fundingPeriodId: string;
         specificationId: string;
     }
 }

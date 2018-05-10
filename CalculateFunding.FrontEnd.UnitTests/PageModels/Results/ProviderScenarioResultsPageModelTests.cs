@@ -42,7 +42,7 @@
         }
 
         [TestMethod]
-        public void OnGetAsync_ReturnsErrorWhenAcademicYearResponseIsNull()
+        public void OnGetAsync_ReturnsErrorWhenFundingPeriodResponseIsNull()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -55,15 +55,15 @@
 
             Provider provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = null;
+            IEnumerable<Reference> fundingPeriods = null;
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
 
             SearchRequestViewModel searchRequest = CreateSearchRequest();
 
-            var academicyears = specsClient.GetAcademicYears()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.NotFound, academicYears));
+            specsClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.NotFound, fundingPeriods));
 
             // Act
             Func<Task> test = async () => await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
@@ -75,7 +75,7 @@
         }
 
         [TestMethod]
-        public async Task OnGetAsync_ReturnsValidAcademicYearAsync()
+        public async Task OnGetAsync_ReturnsValidFundingPeriodAsync()
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
@@ -88,12 +88,12 @@
 
             Provider provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
             IList<SpecificationSummary> specSummary = GetSpecSummary();
 
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+            specsClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecifications("2")
                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
@@ -111,7 +111,7 @@
 
             await specsClient
                 .Received(1)
-                .GetAcademicYears();
+                .GetFundingPeriods();
         }
 
         [TestMethod]
@@ -128,12 +128,12 @@
 
             Provider provider = null;
 
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
             IList<SpecificationSummary> specSummary = GetSpecSummary();
 
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+            specsClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecifications("2")
                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
@@ -164,12 +164,12 @@
 
             Provider provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
             IList<SpecificationSummary> specSummary = GetSpecSummary();
 
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+            specsClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecifications("2")
                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
@@ -206,12 +206,12 @@
 
             Provider provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
             IList<SpecificationSummary> specSummary = GetSpecSummary();
 
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+            specsClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecifications(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
@@ -247,7 +247,7 @@
                .BeOfType<PageResult>();
 
             providerScenarioResultsPageModel.TestScenarioSearchResults.Should().NotBeNull();
-            providerScenarioResultsPageModel.Periods.Count().Should().Be(3);
+            providerScenarioResultsPageModel.FundingPeriods.Count().Should().Be(3);
 
             await searchService.Received(1).PerformSearch(Arg.Is<SearchRequestViewModel>(r =>
                r.PageNumber == searchRequest.PageNumber &&
@@ -270,12 +270,12 @@
 
             Provider provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
             IList<SpecificationSummary> specSummary = GetSpecSummary();
 
-            specsClient.GetAcademicYears()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+            specsClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecifications(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
@@ -422,7 +422,7 @@
             SpecificationSummary specsummary1 = new SpecificationSummary()
             {
                 FundingStreams = new List<Reference>() { new Reference() { Id = "1", Name = "Test Funding Stream 1" } },
-                Period = new Reference() { Id = "1617", Name = "2016-2017" },
+                FundingPeriod = new Reference() { Id = "1617", Name = "2016-2017" },
                 Id = "1",
                 Name = "Test Spec 1"
             };
@@ -430,7 +430,7 @@
             SpecificationSummary specsummary2 = new SpecificationSummary()
             {
                 FundingStreams = new List<Reference>() { new Reference() { Id = "2", Name = "Test Funding Stream 2" } },
-                Period = new Reference() { Id = "1819", Name = "2018-2019" },
+                FundingPeriod = new Reference() { Id = "1819", Name = "2018-2019" },
                 Id = "2",
                 Name = "Test Spec 2"
             };

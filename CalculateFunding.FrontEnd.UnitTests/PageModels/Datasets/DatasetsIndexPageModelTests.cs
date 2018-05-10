@@ -472,7 +472,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
                 {
                     Id = $"{i}",
                     Name = $"Calculation {i}",
-                    PeriodName = "Test Period",
+                    FundingPeriodName = "Test Period",
                     SpecificationName = "Spec Name",
                     Status = "Unknown",
                 });
@@ -506,7 +506,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
                 {
                     Id = $"{i}",
                     Name = $"Calculation {i}",
-                    PeriodName = "Test Period",
+                    FundingPeriodName = "Test Period",
                     SpecificationName = "Spec Name",
                     Status = "Unknown",
                 });

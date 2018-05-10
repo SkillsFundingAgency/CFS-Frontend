@@ -4,7 +4,7 @@
 
     public class ViewSpecificationViewModel
     {
-        public Reference AcademicYear { get; set; }
+        public Reference FundingPeriod { get; set; }
 
         public string Description { get; set; }
 

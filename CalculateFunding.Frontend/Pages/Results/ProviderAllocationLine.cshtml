@@ -46,7 +46,7 @@
         </div>
         <div class="row">
             <div class="col-xs-3">
-                <select asp-items="@(Model.Periods)" asp-for="@Model.PeriodId" class="form-control filter">
+                <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter">
                     <option></option>
                 </select>
             </div>
@@ -70,10 +70,10 @@
                     <a id="nav-allocations-tab" href="#" role="tab" aria-selected="true">Allocation line</a>
                 </li>
                 <li class="nav-item">
-                    <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Calculation results</a>
+                    <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Calculation results</a>
                 </li>
                 <li class="nav-item">
-                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
+                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
                 </li>
             </ul>
             <br />

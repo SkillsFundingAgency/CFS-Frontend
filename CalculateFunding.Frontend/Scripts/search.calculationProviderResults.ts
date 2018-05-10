@@ -1,7 +1,7 @@
 ﻿namespace calculateFunding.results.listCalulationProviderResults {
     export class ProviderSearchViewModel extends calculateFunding.search.SearchViewModel {
         private calculationId: string;
-        private periodId: string;
+        private fundingPeriodId: string;
         private specificationId: string;
         private doSearch: boolean;
 
@@ -38,15 +38,15 @@
                 if (typeof options.specificationId === "undefined") {
                     throw new Error("options.specificationId is undefined")
                 }
-                if (typeof options.periodId === "undefined") {
-                    throw new Error("options.periodId is undefined")
+                if (typeof options.fundingPeriodId === "undefined") {
+                    throw new Error("options.fundingPeriodId is undefined")
                 }
                 if (typeof options.doSearch === "undefined") {
                     throw new Error("options.doSearch is undefined")
                 }
 
                 self.calculationId = options.calculationId;
-                self.periodId = options.periodId;
+                self.fundingPeriodId = options.fundingPeriodId;
                 self.specificationId = options.specificationId;
                 self.doSearch = options.doSearch;
 
@@ -161,7 +161,7 @@
     export interface ICaluclationProviderResultSearchViewModelConstructorParameters
     {
         calculationId: string;
-        periodId: string;
+        fundingPeriodId: string;
         specificationId: string;
         doSearch: boolean;
     }

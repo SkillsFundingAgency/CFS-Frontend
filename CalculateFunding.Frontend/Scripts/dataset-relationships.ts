@@ -4,7 +4,7 @@
 
         public specRelationships: KnockoutObservableArray<IDatasetRelationshipResponse> = ko.observableArray([]);
 
-        public selectedPeriod: KnockoutObservable<string> = ko.observable();
+        public selectedFundingPeriod: KnockoutObservable<string> = ko.observable();
 
         constructor() {
             super();
@@ -20,8 +20,8 @@
 
                 let filter: calculateFunding.search.SearchFilter =
                     {
-                        name : "periodId",
-                        term: self.selectedPeriod()
+                        name : "fundingPeriodId",
+                        term: self.selectedFundingPeriod()
                     };
 
                 filters.push(filter);
@@ -30,9 +30,9 @@
             });
         }
 
-        public periodChanged(): void {
+        public selectedPeriodChanged(): void {
             let selectedItem: string = $("#select-spec-period").val().toString();
-            this.selectedPeriod(selectedItem);
+            this.selectedFundingPeriod(selectedItem);
             this.performSearch();
         }
 

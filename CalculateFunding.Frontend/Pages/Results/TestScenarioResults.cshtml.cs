@@ -45,12 +45,12 @@ namespace CalculateFunding.Frontend.Pages.Results
         [BindProperty]
         public string SearchTerm { get; set; }
 
-        public IEnumerable<SelectListItem> Periods { get; set; }
+        public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
         [BindProperty]
-        public string PeriodId { get; set; }
+        public string FundingPeriodId { get; set; }
 
         public string SpecificationId { get; set; }
 
@@ -60,14 +60,14 @@ namespace CalculateFunding.Frontend.Pages.Results
         public TestScenarioResultViewModel SearchResults { get; set; }
 
 
-        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, string periodId = null, string specificationId = null)
+        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, string fundingPeriodId = null, string specificationId = null)
         {
-            Task populatePeriodsTask = PopulatePeriods(periodId);
+            Task populatePeriodsTask = PopulateFundingPeriods(fundingPeriodId);
 
             TestScenarioResultRequestViewModel testScenarioResultRequestViewModel = new TestScenarioResultRequestViewModel()
             {
                 PageNumber = pageNumber,
-                PeriodId = periodId,
+                FundingPeriodId = fundingPeriodId,
                 SearchTerm = searchTerm,
                 SpecificationId = specificationId,
             };
@@ -75,12 +75,12 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             await TaskHelper.WhenAllAndThrow(testScenarioResultsTask, populatePeriodsTask);
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = Periods?.First().Value;
+                fundingPeriodId = FundingPeriods?.First().Value;
             }
 
-            PeriodId = periodId;
+            FundingPeriodId = fundingPeriodId;
 
             SearchResults =  testScenarioResultsTask.Result;
             if (SearchResults == null)
@@ -101,9 +101,9 @@ namespace CalculateFunding.Frontend.Pages.Results
             return Page();
         }
 
-        private async Task PopulatePeriods(string periodId = null)
+        private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetAcademicYears();
+            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
             if(periodsResponse == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: response was null");
@@ -114,22 +114,22 @@ namespace CalculateFunding.Frontend.Pages.Results
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
 
-            IEnumerable<Reference> periods = periodsResponse.Content;
+            IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
             if (periodsResponse.Content == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Content was null");
             }
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = PeriodId;
+                fundingPeriodId = FundingPeriodId;
             }
 
-            Periods = periods.Select(m => new SelectListItem
+            FundingPeriods = fundingPeriods.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
-                Selected = m.Id == periodId
+                Selected = m.Id == fundingPeriodId
             }).ToList();
         }
 

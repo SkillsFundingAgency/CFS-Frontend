@@ -26,16 +26,16 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenNullSearchResultsReturns_ReturnsStatusCode500()
         {
             // Arrange
-            IEnumerable<Reference> periods = new[]
+            IEnumerable<Reference> fundingPeriods = new[]
             {
                 new Reference { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, periods);
+            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
 
             ISpecsApiClient specsApiClient = CreateApiClient();
             specsApiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(apiResponse);
 
             IDatasetRelationshipsSearchService searchService = CreateSearchService();
@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Be(500);
 
             pageModel
-                .Periods
+                .FundingPeriods
                 .Count()
                 .Should()
                 .Be(1);
@@ -71,16 +71,16 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenSearchResultsReturnsResults_ReturnsPage()
         {
             // Arrange
-            IEnumerable<Reference> periods = new[]
+            IEnumerable<Reference> fundingPeriods = new[]
             {
                 new Reference { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, periods);
+            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
 
             ISpecsApiClient specsApiClient = CreateApiClient();
             specsApiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(apiResponse);
 
             SpecificationDatasourceRelationshipSearchResultViewModel model = new SpecificationDatasourceRelationshipSearchResultViewModel();
@@ -101,7 +101,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .BeOfType<PageResult>();
 
             pageModel
-                .Periods
+                .FundingPeriods
                 .Count()
                 .Should()
                 .Be(1);

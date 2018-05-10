@@ -34,41 +34,41 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public ProviderResultsViewModel ViewModel { get; set; }
 
-        public IEnumerable<SelectListItem> Periods { get; set; }
+        public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
         [BindProperty]
-        public string PeriodId { get; set; }
+        public string FundingPeriodId { get; set; }
 
         public string SpecificationId { get; set; }
 
         public string ProviderId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string providerId, string periodId = null, string specificationId = null)
+        public async Task<IActionResult> OnGetAsync(string providerId, string fundingPeriodId = null, string specificationId = null)
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            await PopulateAsync(providerId, periodId, specificationId);
+            await PopulateAsync(providerId, fundingPeriodId, specificationId);
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string providerId, string periodId = null, string specificationId = null)
+        public async Task<IActionResult> OnPostAsync(string providerId, string fundingPeriodId = null, string specificationId = null)
         {
-            return await OnGetAsync(providerId, periodId, specificationId);
+            return await OnGetAsync(providerId, fundingPeriodId, specificationId);
         }
 
-        async Task PopulateAsync(string providerId, string periodId = null, string specificationId = null)
+        async Task PopulateAsync(string providerId, string fundingPeriodId = null, string specificationId = null)
         {
-            await PopulatePeriods(periodId);
+            await PopulatePeriods(fundingPeriodId);
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = Periods?.First().Value;
+                fundingPeriodId = FundingPeriods?.First().Value;
             }
 
-            PeriodId = periodId;
+            FundingPeriodId = fundingPeriodId;
 
             await PopulateSpecifications(providerId, specificationId);
 
@@ -116,26 +116,26 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public abstract void PopulateResults(ApiResponse<ProviderResults> providerResponse);
 
-        private async Task PopulatePeriods(string periodId = null)
+        private async Task PopulatePeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsApiClient.GetAcademicYears();
+            var periodsResponse = await _specsApiClient.GetFundingPeriods();
 
             if(periodsResponse.StatusCode != HttpStatusCode.OK )
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            var periods = periodsResponse.Content;
+            var fundingPeriods = periodsResponse.Content;
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = PeriodId;
+                fundingPeriodId = FundingPeriodId;
             }
 
-            Periods = periods.Select(m => new SelectListItem
+            FundingPeriods = fundingPeriods.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
-                Selected = m.Id == periodId
+                Selected = m.Id == fundingPeriodId
             }).ToList();
         }
 
@@ -145,7 +145,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                var specifications = specResponse.Content.Where(m => m.Period?.Id == PeriodId);
+                var specifications = specResponse.Content.Where(m => m.FundingPeriod?.Id == FundingPeriodId);
 
                 if (string.IsNullOrWhiteSpace(specificationId))
                 {

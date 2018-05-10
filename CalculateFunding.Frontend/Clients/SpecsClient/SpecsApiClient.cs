@@ -32,9 +32,9 @@
             return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
-        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId)
+        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string fundingPeriodId)
         {
-            return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications-by-year?academicYearId={academicYearId}", _cancellationToken);
+            return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications-by-year?fundingPeriodId={fundingPeriodId}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
@@ -93,18 +93,9 @@
             return GetAsync<Specification[]>($"{_specsPath}/budgets");
         }
 
-        public Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears()
+        public Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
         {
-            var years = new[]
-            {
-                new Reference("1819", "2018/19"),
-                new Reference("1718", "2017/18"),
-                new Reference("1617", "2016/17")
-            };
-
-            var response = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, years.AsEnumerable());
-
-            return Task.FromResult(response);
+            return GetAsync<IEnumerable<Reference>>($"{_specsPath}/get-fundingperiods");
         }
 
         public Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams()

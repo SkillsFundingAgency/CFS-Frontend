@@ -402,7 +402,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = new Specification
             {
-                AcademicYear = new Reference("2018", "17-18"),
+                FundingPeriod = new Reference("2018", "17-18"),
 
                 FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 

@@ -4,7 +4,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 {
     public class TestScenarioResultRequestViewModel 
     {
-        public string PeriodId { get; set; }
+        public string FundingPeriodId { get; set; }
 
         public int? PageNumber { get; set; }
 

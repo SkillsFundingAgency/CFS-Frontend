@@ -15,6 +15,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public IEnumerable<ReferenceViewModel> Specifications { get; set; }
 
-        public string PeriodId { get; set; }
+        public string FundingPeriodId { get; set; }
     }
 }

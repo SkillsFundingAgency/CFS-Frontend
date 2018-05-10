@@ -39,9 +39,9 @@
 
         public string SpecificationName { get; set; }
 
-        public string AcademicYear { get; set; }
+        public string FundingPeriodId { get; set; }
 
-        public string AcademicYearName { get; set; }
+        public string FundingPeriodName { get; set; }
 
         public string SpecificationDescription { get; set; }
 
@@ -80,9 +80,9 @@
 
                     SpecificationDescription = specContent.Description;
 
-                    AcademicYear = specContent.AcademicYear.Id;
+                    FundingPeriodId = specContent.FundingPeriod.Id;
 
-                    AcademicYearName = specContent.AcademicYear.Name;
+                    FundingPeriodName = specContent.FundingPeriod.Name;
                
                 }
 
@@ -171,9 +171,9 @@
 
                         SpecificationDescription = specContent.Description;
 
-                        AcademicYear = specContent.AcademicYear.Id;
+                        FundingPeriodId = specContent.FundingPeriod.Id;
 
-                        AcademicYearName = specContent.AcademicYear.Name;
+                        FundingPeriodName = specContent.FundingPeriod.Name;
 
                         PopulateDatasetSchemas(datasetDefinitionList);
 

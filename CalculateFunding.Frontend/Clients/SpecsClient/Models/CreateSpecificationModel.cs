@@ -5,8 +5,8 @@
 
     public class CreateSpecificationModel
     {
-        [JsonProperty("academicYearId")]
-        public string AcademicYearId { get; set; }
+        [JsonProperty("fundingPeriodId")]
+        public string FundingPeriodId { get; set; }
 
         [JsonProperty("fundingStreamIds")]
         public IEnumerable<string> FundingStreamIds { get; set; }

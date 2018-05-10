@@ -6,7 +6,7 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 
     public class TestSpecificationSummary : Reference
     {
-        [JsonProperty("period")]
-        public Reference Period { get; set; }
+        [JsonProperty("fundingPeriod")]
+        public Reference FundingPeriod { get; set; }
     }
 }

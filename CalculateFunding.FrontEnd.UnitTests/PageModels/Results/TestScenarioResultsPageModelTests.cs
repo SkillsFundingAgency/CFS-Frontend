@@ -30,7 +30,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             ITestScenarioResultsService testScenarioResultsService = CreateScenarioResultsService();
 
-            List<Reference> academicYears = new List<Reference>
+            List<Reference> fundingPeriods = new List<Reference>
             {
                 new Reference("1617", "2016/2017"),
                 new Reference("1718", "2017/2018"),
@@ -40,8 +40,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
 
             specsApiClient
-                 .GetAcademicYears()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+                 .GetFundingPeriods()
+                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
                 .BeOfType<PageResult>();
 
             pageModel
-                .Periods
+                .FundingPeriods
                 .Should()
                 .BeEquivalentTo(new List<SelectListItem>()
                 {
@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             ITestScenarioResultsService testScenarioResultsService = CreateScenarioResultsService();
 
-            List<Reference> academicYears = new List<Reference>
+            List<Reference> fundingPeriods = new List<Reference>
             {
                 new Reference("1617", "2016/2017"),
                 new Reference("1718", "2017/2018"),
@@ -125,8 +125,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
 
             specsApiClient
-                 .GetAcademicYears()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+                 .GetFundingPeriods()
+                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -164,7 +164,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
                 .BeOfType<PageResult>();
 
             pageModel
-                .Periods
+                .FundingPeriods
                 .Should()
                 .BeEquivalentTo(new List<SelectListItem>()
                 {
@@ -202,7 +202,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
 
             string searchTerm = "searchTerm";
 
-            List<Reference> academicYears = new List<Reference>
+            List<Reference> fundingPeriods = new List<Reference>
             {
                 new Reference("1617", "2016/2017"),
                 new Reference("1718", "2017/2018"),
@@ -212,8 +212,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
 
             specsApiClient
-                 .GetAcademicYears()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears));
+                 .GetFundingPeriods()
+                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -251,7 +251,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
                 .BeOfType<PageResult>();
 
             pageModel
-                .Periods
+                .FundingPeriods
                 .Should()
                 .BeEquivalentTo(new List<SelectListItem>()
                 {

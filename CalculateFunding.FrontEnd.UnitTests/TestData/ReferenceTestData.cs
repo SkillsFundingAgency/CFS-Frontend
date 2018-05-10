@@ -9,7 +9,7 @@ namespace CalculateFunding.Frontend.TestData
 
     public static class ReferenceTestData
     {
-        public static IEnumerable<Reference> AcademicYears()
+        public static IEnumerable<Reference> FundingPeriods()
         {
             return new[]
             {

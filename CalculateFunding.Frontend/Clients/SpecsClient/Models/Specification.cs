@@ -12,8 +12,8 @@
             Policies = Enumerable.Empty<Policy>();
         }
 
-        [JsonProperty("academicYear")]
-        public Reference AcademicYear { get; set; }
+        [JsonProperty("fundingPeriod")]
+        public Reference FundingPeriod { get; set; }
 
         [JsonProperty("fundingStreams")]
         public IEnumerable<Reference> FundingStreams { get; set; }

@@ -34,27 +34,27 @@
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
-        public Reference AcademicYear { get; set; }
+        public Reference FundingPeriod { get; set; }
 
         [BindProperty]
         public CreateSpecificationViewModel CreateSpecificationViewModel { get; set; }
 
-        public string AcademicYearId { get; set; }
+        public string FundingPeriodId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string academicYearId)
+        public async Task<IActionResult> OnGetAsync(string fundingPeriodId)
         {
-            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
-            await TaskHelper.WhenAllAndThrow(PopulateAcademicYears(academicYearId), PopulateFundingStreams());
+            await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
 
-            AcademicYearId = academicYearId;
+            FundingPeriodId = fundingPeriodId;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string academicYearId)
+        public async Task<IActionResult> OnPostAsync(string fundingPeriodId)
         {
-            Guard.IsNullOrWhiteSpace(academicYearId, nameof(academicYearId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
             if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
             {
@@ -67,17 +67,17 @@
 
             if (!ModelState.IsValid)
             {
-                await TaskHelper.WhenAllAndThrow(PopulateAcademicYears(academicYearId), PopulateFundingStreams());
+                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
 
                 return Page();
             }
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
-            specification.AcademicYearId = academicYearId;
+            specification.FundingPeriodId = fundingPeriodId;
 
             await _specsClient.PostSpecification(specification);
 
-            return Redirect($"/specs?academicYearId={academicYearId}");
+            return Redirect($"/specs?fundingPeriodId={fundingPeriodId}");
         }
 
         private async Task PopulateFundingStreams()
@@ -99,12 +99,12 @@
             }
         }
 
-        private async Task PopulateAcademicYears(string academicYearId)
+        private async Task PopulateFundingPeriods(string fundingPeriodId)
         {
-            var yearsResponse = await _specsClient.GetAcademicYears();
+            var yearsResponse = await _specsClient.GetFundingPeriods();
             var years = yearsResponse.Content;
 
-            AcademicYear = years.FirstOrDefault(m => m.Id == academicYearId);
+            FundingPeriod = years.FirstOrDefault(m => m.Id == fundingPeriodId);
         }
     }
 }

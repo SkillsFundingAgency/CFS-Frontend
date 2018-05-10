@@ -71,7 +71,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = new Specification
             {
-                AcademicYear = new Reference("2018", "17-18"),
+                FundingPeriod = new Reference("2018", "17-18"),
 
                 FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
@@ -117,8 +117,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             datasetSchemaPageModel.SpecificationDescription.Should().Be(expectedSpecification.Description);
             datasetSchemaPageModel.SpecificationId.Should().Be(expectedSpecification.Id);
             datasetSchemaPageModel.SpecificationName.Should().Be(expectedSpecification.Name);
-            datasetSchemaPageModel.AcademicYear.Should().Be(expectedSpecification.AcademicYear.Id);
-            datasetSchemaPageModel.AcademicYearName.Should().Be(expectedSpecification.AcademicYear.Name);
+            datasetSchemaPageModel.FundingPeriodId.Should().Be(expectedSpecification.FundingPeriod.Id);
+            datasetSchemaPageModel.FundingPeriodName.Should().Be(expectedSpecification.FundingPeriod.Name);
 
             List<SelectListItem> datasetDefinition = new List<SelectListItem>(datasetSchemaPageModel.Datasets);
 
@@ -246,7 +246,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = new Specification
             {
-                AcademicYear = new Reference("2018", "17-18"),
+                FundingPeriod = new Reference("2018", "17-18"),
 
                 FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
@@ -298,7 +298,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = new Specification
             {
-                AcademicYear = new Reference("2018", "17-18"),
+                FundingPeriod = new Reference("2018", "17-18"),
 
                 FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 
@@ -345,7 +345,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = new Specification
             {
-                AcademicYear = new Reference("2018", "17-18"),
+                FundingPeriod = new Reference("2018", "17-18"),
 
                 FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
 

@@ -10,7 +10,7 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/specs?academicYearId=@Model.Specification.AcademicYear.Id#spec-@Model.Specification.Id">@Model.Specification.AcademicYear.Name</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
             <li>@BreadcrumbText.ManagePolicies</li>
         </ol>
     </div>
@@ -18,7 +18,7 @@
 @section BannerLeft{
     <h1 class="hero-title"> @Model.Specification.Name </h1>
     <p class="hero-description ">@PageText.ManagePolicies</p>
-    <p class="hero-description">Year: @Model.Specification.AcademicYear.Name</p>
+    <p class="hero-description">Funding Period: @Model.Specification.FundingPeriod.Name</p>
     <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
 }
 

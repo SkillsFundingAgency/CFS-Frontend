@@ -11,7 +11,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public string SpecificationName { get; set; }
 
-        public string PeriodName { get; set; }
+        public string FundingPeriodName { get; set; }
 
         public string Status { get; set; }
 

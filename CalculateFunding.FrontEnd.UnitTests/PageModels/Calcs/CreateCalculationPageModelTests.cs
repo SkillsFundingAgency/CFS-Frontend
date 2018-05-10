@@ -67,12 +67,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .BeAssignableTo<PageResult>();
 
             pageModel
-                .AcademicYearName
+                .FundingPeriodName
                 .Should()
                 .BeNullOrWhiteSpace();
 
             pageModel
-               .AcademicYearId
+               .FundingPeriodId
                .Should()
                .BeNullOrWhiteSpace();
 
@@ -160,12 +160,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .BeAssignableTo<PageResult>();
 
             pageModel
-                .AcademicYearName
+                .FundingPeriodName
                 .Should()
                 .Be("2018 - 19");
 
             pageModel
-               .AcademicYearId
+               .FundingPeriodId
                .Should()
                .Be("2018/19");
 
@@ -275,12 +275,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .BeAssignableTo<PageResult>();
 
             pageModel
-                .AcademicYearName
+                .FundingPeriodName
                 .Should()
                 .NotBeNullOrWhiteSpace();
 
             pageModel
-               .AcademicYearId
+               .FundingPeriodId
                .Should()
                .NotBeNullOrWhiteSpace();
 
@@ -515,7 +515,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             {
                 Id = specificationId,
                 Name = "spec-name",
-                AcademicYear = new Reference
+                FundingPeriod = new Reference
                 {
                     Id = "2018/19",
                     Name = "2018 - 19"

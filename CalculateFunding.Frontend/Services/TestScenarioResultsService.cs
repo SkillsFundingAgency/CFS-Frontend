@@ -59,18 +59,18 @@ namespace CalculateFunding.Frontend.Services
             }
 
             SetFilterValue(searchRequest, "specificationId", request.SpecificationId);
-            SetFilterValue(searchRequest, "periodId", request.PeriodId);
+            SetFilterValue(searchRequest, "periodId", request.FundingPeriodId);
 
             Task<ScenarioSearchResultViewModel> scenarioSearchResultsTask = _scenariosSearchService.PerformSearch(searchRequest);
             Task<ApiResponse<IEnumerable<Specification>>> specificationsLookupTask;
 
-            if (string.IsNullOrWhiteSpace(request.PeriodId))
+            if (string.IsNullOrWhiteSpace(request.FundingPeriodId))
             {
                 specificationsLookupTask = _specsClient.GetSpecifications();
             }
             else
             {
-                specificationsLookupTask = _specsClient.GetSpecifications(request.PeriodId);
+                specificationsLookupTask = _specsClient.GetSpecifications(request.FundingPeriodId);
             }
 
             await TaskHelper.WhenAllAndThrow(scenarioSearchResultsTask, specificationsLookupTask);

@@ -6,8 +6,8 @@
         public allocationLines: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedAllocationLines: KnockoutObservableArray<string> = ko.observableArray([]);
 
-        public periods: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
-        public selectedPeriods: KnockoutObservableArray<string> = ko.observableArray([]);
+        public fundingPeriods: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
+        public selectedFundingPeriods: KnockoutObservableArray<string> = ko.observableArray([]);
 
         public fundingStreams: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedFundingStreams: KnockoutObservableArray<string> = ko.observableArray([]);
@@ -30,7 +30,7 @@
                 let facets: Array<calculateFunding.search.SearchFacet> = [];
 
                 super.buildSelectedSearchFacets(facets, self.selectedAllocationLines(), self.allocationLines());
-                super.buildSelectedSearchFacets(facets, self.selectedPeriods(), self.periods());
+                super.buildSelectedSearchFacets(facets, self.selectedFundingPeriods(), self.fundingPeriods());
                 super.buildSelectedSearchFacets(facets, self.selectedFundingStreams(), self.fundingStreams());
                 super.buildSelectedSearchFacets(facets, self.selectedSpecifications(), self.specifications());
                 super.buildSelectedSearchFacets(facets, self.selectedCalculationStatus(), self.calculationStatus());
@@ -73,7 +73,7 @@
                 self.populateCommonSearchResultProperties(result);
 
                 self.populateFacets("allocationLineName", result.facets, self.allocationLines);
-                self.populateFacets("periodName", result.facets, self.periods);
+                self.populateFacets("fundingPeriodName", result.facets, self.fundingPeriods);
                 self.populateFacets("specificationName", result.facets, self.specifications);
                 self.populateFacets("fundingStreamName", result.facets, self.fundingStreams);
                 self.populateFacets("status", result.facets, self.calculationStatus);
@@ -86,8 +86,8 @@
                 let fieldName = searchFacet.fieldName();
                 if (fieldName === "allocationLineName") {
                     selectedArray = this.selectedAllocationLines;
-                } else if (fieldName === "periodName") {
-                    selectedArray = this.selectedPeriods;
+                } else if (fieldName === "fundingPeriodName") {
+                    selectedArray = this.selectedFundingPeriods;
                 } else if (fieldName === "specificationName") {
                     selectedArray = this.selectedSpecifications;
                 } else if (fieldName === "fundingStreamName") {

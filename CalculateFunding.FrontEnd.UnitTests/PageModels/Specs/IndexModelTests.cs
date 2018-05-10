@@ -29,18 +29,18 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(academicYears.First().Id))
+                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
                 .Returns(specsResponse);
 
             apiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(yearsResponse);
 
             IndexModel indexModel = new IndexModel(apiClient);
@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .NotBeNull();
 
             indexModel
-                .Years
+                .FundingPeriods
                 .Count
                 .Should()
                 .Be(3);
@@ -74,24 +74,24 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(academicYears.First().Id))
+                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
                 .Returns(specsResponse);
 
             apiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(yearsResponse);
 
             IndexModel indexModel = new IndexModel(apiClient);
 
             // Act
-            IActionResult result = await indexModel.OnGetAsync(Arg.Is(academicYears.First().Id));
+            IActionResult result = await indexModel.OnGetAsync(Arg.Is(fundingPeriods.First().Id));
 
             // Assert
             result
@@ -99,7 +99,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .NotBeNull();
 
             indexModel
-                .Years
+                .FundingPeriods
                 .Count
                 .Should()
                 .Be(3);
@@ -119,18 +119,18 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(academicYears.First().Id))
+                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
                 .Returns(specsResponse);
 
             apiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(yearsResponse);
 
             IndexModel indexModel = new IndexModel(apiClient);
@@ -144,7 +144,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .NotBeNull();
 
             indexModel
-                .Years
+                .FundingPeriods
                 .Count
                 .Should()
                 .Be(3);
@@ -164,18 +164,18 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
             ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
 
-            IEnumerable<Reference> academicYears = ReferenceTestData.AcademicYears();
+            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, academicYears.ToArray());
+            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
 
             ISpecsApiClient apiClient = CreateApiClient();
 
             apiClient
-                .GetSpecifications(Arg.Is(academicYears.First().Id))
+                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
                 .Returns(specsResponse);
 
             apiClient
-                .GetAcademicYears()
+                .GetFundingPeriods()
                 .Returns(yearsResponse);
 
             IndexModel indexModel = new IndexModel(apiClient);
@@ -189,7 +189,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .NotBeNull();
 
             indexModel
-                .Years
+                .FundingPeriods
                 .Count
                 .Should()
                 .Be(3);

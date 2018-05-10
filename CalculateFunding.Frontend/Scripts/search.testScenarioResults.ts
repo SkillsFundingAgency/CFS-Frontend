@@ -7,7 +7,7 @@
         public selectedSpecificationId: KnockoutObservable<string> = ko.observable("");
 
         // Set default value to empty string, so subscribe won't trigger a search request on initial page request
-        public selectedPeriodId: KnockoutObservable<string> = ko.observable("");
+        public selectedFundingPeriodId: KnockoutObservable<string> = ko.observable("");
 
         // Callback when search has been performed, used for ajax and initial page load
         private searchCompleted: (resultUntyped: any) => void;
@@ -59,7 +59,7 @@
                 console.log("Selected search facets string:", newValue);
             });
 
-            self.selectedPeriodId.subscribe((newValue) => {
+            self.selectedFundingPeriodId.subscribe((newValue) => {
                 if (self.state() === "idle") {
                     self.performSearch(1);
                 }
@@ -88,7 +88,7 @@
 
             let additionalAjaxQueryOptions = {
                 specificationId: self.selectedSpecificationId(),
-                periodId: self.selectedPeriodId()
+                fundingPeriodId: self.selectedFundingPeriodId()
             };
 
             super.makeSearchResultAndProcess("/api/results/testscenarios", pageNumber, self.searchCompleted, additionalAjaxQueryOptions);
@@ -117,7 +117,7 @@
     export interface ITestScenarioResultsResponse extends calculateFunding.common.ISearchResultResponse {
         testResults: Array<ITestScenarioResponse>;
         specifications: Array<ISpecification>;
-        periodId: string;
+        fundingPeriodId: string;
     }
 
     export interface ITestScenarioResponse {

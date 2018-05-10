@@ -30,9 +30,9 @@
 
         public string SpecificationName { get; set; }
 
-        public string AcademicYearId { get; set; }
+        public string FundingPeriodId { get; set; }
 
-        public string AcademicYearName { get; set; }
+        public string FundingPeriodName { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
         {
@@ -46,9 +46,9 @@
 
             SpecificationName = specification.Name;
 
-            AcademicYearName = specification.AcademicYear.Name;
+            FundingPeriodName = specification.FundingPeriod.Name;
 
-            AcademicYearId = specification.AcademicYear.Id;
+            FundingPeriodId = specification.FundingPeriod.Id;
 
             return Page();
         }
@@ -75,9 +75,9 @@
 
                 SpecificationId = specificationId;
 
-                AcademicYearName = specification.AcademicYear.Name;
+                FundingPeriodName = specification.FundingPeriod.Name;
 
-                AcademicYearId = specification.AcademicYear.Id;
+                FundingPeriodId = specification.FundingPeriod.Id;
 
                 return Page();
             }

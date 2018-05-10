@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -53,7 +53,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     {
                         Id = "ts1",
                         Name ="Test Scenario 1",
-                        PeriodName = "2018/2019",
+                        FundingPeriodName = "2018/2019",
                         Status = "Passed",
                         SpecificationName = "Specifcation 1",
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
@@ -96,7 +96,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 CurrentPage = 1,
                 EndItemNumber = 1,
                 Facets = new List<SearchFacetViewModel>(),
-                PeriodId = null,
+                FundingPeriodId = null,
                 Specifications = new List<ReferenceViewModel>()
                 {
                     new ReferenceViewModel("spec1", "Specification 1"),
@@ -139,7 +139,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = specificationId,
             };
 
@@ -155,7 +155,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     {
                         Id = "ts1",
                         Name ="Test Scenario 1",
-                        PeriodName = "2018/2019",
+                        FundingPeriodName = "2018/2019",
                         Status = "Passed",
                         SpecificationName = "Specifcation 1",
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
@@ -198,7 +198,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 CurrentPage = 1,
                 EndItemNumber = 1,
                 Facets = new List<SearchFacetViewModel>(),
-                PeriodId = null,
+                FundingPeriodId = null,
                 Specifications = new List<ReferenceViewModel>()
                 {
                     new ReferenceViewModel("spec1", "Specification 1"),
@@ -245,7 +245,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = periodId,
+                FundingPeriodId = periodId,
                 SpecificationId = null,
             };
 
@@ -261,7 +261,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     {
                         Id = "ts1",
                         Name ="Test Scenario 1",
-                        PeriodName = "2018/2019",
+                        FundingPeriodName = "2018/2019",
                         Status = "Passed",
                         SpecificationName = "Specifcation 1",
                         LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
@@ -304,7 +304,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 CurrentPage = 1,
                 EndItemNumber = 1,
                 Facets = new List<SearchFacetViewModel>(),
-                PeriodId = null,
+                FundingPeriodId = null,
                 Specifications = new List<ReferenceViewModel>()
                 {
                     new ReferenceViewModel("spec1", "Specification 1"),
@@ -356,7 +356,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = specificationId,
             };
 
@@ -398,7 +398,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -440,7 +440,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -480,7 +480,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -541,7 +541,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -602,7 +602,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -644,7 +644,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 SearchTerm = "",
                 PageNumber = 1,
-                PeriodId = null,
+                FundingPeriodId = null,
                 SpecificationId = null,
             };
 
@@ -736,21 +736,21 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 Id = "spec1",
                 Name = "Specification 1",
-                AcademicYear = new Reference("1718", "2017/2018"),
+                FundingPeriod = new Reference("1718", "2017/2018"),
             });
 
             specifications.Add(new Specification()
             {
                 Id = "spec2",
                 Name = "Specification 2",
-                AcademicYear = new Reference("1718", "2017/2018"),
+                FundingPeriod = new Reference("1718", "2017/2018"),
             });
 
             specifications.Add(new Specification()
             {
                 Id = "spec3",
                 Name = "Specification for 2018/2019",
-                AcademicYear = new Reference("1819", "2018/2019"),
+                FundingPeriod = new Reference("1819", "2018/2019"),
             });
 
 

@@ -5,7 +5,6 @@
     using CalculateFunding.Frontend.Clients.DatasetsClient;
     using CalculateFunding.Frontend.Clients.PreviewClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
-    using CalculateFunding.Frontend.Clients.SpecsClient;
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +23,6 @@
 
             services
                 .AddScoped<IResultsApiClient, ResultsApiClient>();
-
-            services
-               .AddScoped<ISpecsApiClient, SpecsEmulator>();
 
             services
                .AddScoped<IDatasetsApiClient, DatasetsApiClient>();

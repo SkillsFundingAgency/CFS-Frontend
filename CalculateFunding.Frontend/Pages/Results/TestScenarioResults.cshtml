@@ -34,12 +34,12 @@
         </div>
 
         <div class="row spacing-15-top withjs-show">
-            <div class="col-xs-3 filter-field-heading">Year</div>
+            <div class="col-xs-3 filter-field-heading">Funding Period</div>
             <div class="col-xs-4 filter-field-heading">Specification</div>
         </div>
         <div class="row row withjs-show">
             <div class="col-xs-3">
-                <select asp-items="@(Model.Periods)" asp-for="@Model.PeriodId" class="form-control filter" data-bind="value: selectedPeriodId">
+                <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter" data-bind="value: selectedPeriodId">
                     <option></option>
                 </select>
             </div>

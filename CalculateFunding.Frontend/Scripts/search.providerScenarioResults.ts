@@ -6,7 +6,7 @@
 
         public selectedSpec: KnockoutObservable<string> = ko.observable();
 
-        public selectedPeriod: KnockoutObservable<string> = ko.observable();
+        public selectedFundingPeriod: KnockoutObservable<string> = ko.observable();
 
         public providerTestScenarios: KnockoutObservableArray<IProviderTestScenarioResponse> = ko.observableArray([]);
 
@@ -69,9 +69,9 @@
         public specChanged(): void {
         }
 
-        public periodChanged(): void {
+        public fundingPeriodChanged(): void {
             let selectedItem: string = $("#select-spec-period").val().toString();
-            this.selectedPeriod(selectedItem);
+            this.selectedFundingPeriod(selectedItem);
             this.selectedSpec("");
         }
 

@@ -49,12 +49,12 @@ namespace CalculateFunding.Frontend.Pages.Results
             _logger = logger;
         }
 
-        public IEnumerable<SelectListItem> Periods { get; set; }
+        public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
         [BindProperty]
-        public string PeriodId { get; set; }
+        public string FundingPeriodId { get; set; }
 
         [BindProperty]
         public string SpecificationId { get; set; }
@@ -76,7 +76,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public TestScenarioSearchResultViewModel TestScenarioSearchResults { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string providerId, int? pageNumber, string searchTerm = null, string periodId = null, string specificationId = null)
+        public async Task<IActionResult> OnGetAsync(string providerId, int? pageNumber, string searchTerm = null, string fundingPeriodId = null, string specificationId = null)
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
@@ -94,19 +94,19 @@ namespace CalculateFunding.Frontend.Pages.Results
                 }
             };
 
-            Task populatePeriodsTask = PopulatePeriods(periodId);
+            Task populatePeriodsTask = PopulateFundingPeriods(fundingPeriodId);
 
             Task<ApiResponse<Provider>> apiResponseTask = _resultsApiClient.GetProviderByProviderId(providerId);
 
 
             await TaskHelper.WhenAllAndThrow(populatePeriodsTask, apiResponseTask);
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = Periods?.First().Value;
+                fundingPeriodId = FundingPeriods?.First().Value;
             }
 
-            PeriodId = periodId;
+            FundingPeriodId = fundingPeriodId;
 
             await PopulateSpecifications(providerId);
 
@@ -148,26 +148,26 @@ namespace CalculateFunding.Frontend.Pages.Results
             return Page();
         }
 
-        private async Task PopulatePeriods(string periodId = null)
+        private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsApiClient.GetAcademicYears();
+            var periodsResponse = await _specsApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            var periods = periodsResponse.Content;
+            var fundingPeriods = periodsResponse.Content;
 
-            if (string.IsNullOrWhiteSpace(periodId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                periodId = PeriodId;
+                fundingPeriodId = FundingPeriodId;
             }
 
-            Periods = periods.Select(m => new SelectListItem
+            FundingPeriods = fundingPeriods.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
-                Selected = m.Id == periodId
+                Selected = m.Id == fundingPeriodId
             }).ToList();
         }
 
@@ -177,7 +177,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                var specifications = specResponse.Content.Where(m => m.Period?.Id == PeriodId);
+                var specifications = specResponse.Content.Where(m => m.FundingPeriod?.Id == FundingPeriodId);
 
                 Specifications = specifications.Select(m => new SelectListItem
                 {

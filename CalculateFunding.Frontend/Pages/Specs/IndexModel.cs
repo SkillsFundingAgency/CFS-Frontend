@@ -20,32 +20,32 @@
 
         public IEnumerable<Specification> Specifications { get; set; }
 
-        public IList<SelectListItem> Years { get; set; }
+        public IList<SelectListItem> FundingPeriods { get; set; }
 
-        public string AcademicYearId { get; set; }
+        public string FundingPeriodId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string academicYearId = null)
+        public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
         {
-            var yearsResponse = await _specsClient.GetAcademicYears();
-            var years = yearsResponse.Content;
+            var yearsResponse = await _specsClient.GetFundingPeriods();
+            var fundingPeriods = yearsResponse.Content;
 
-            if (string.IsNullOrWhiteSpace(academicYearId))
+            if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                academicYearId = years.FirstOrDefault().Id;
+                fundingPeriodId = fundingPeriods.FirstOrDefault().Id;
             }
 
-            var specstask = _specsClient.GetSpecifications(academicYearId);
+            var specstask = _specsClient.GetSpecifications(fundingPeriodId);
 
             Specifications = specstask.Result == null ? new List<Specification>() : specstask.Result.Content;
 
-            Years = years.Select(m => new SelectListItem
+            FundingPeriods = fundingPeriods.Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,
-                Selected = m.Id == academicYearId
+                Selected = m.Id == fundingPeriodId
             }).ToList();
 
-            AcademicYearId = academicYearId;
+            FundingPeriodId = fundingPeriodId;
 
             return Page();
         }

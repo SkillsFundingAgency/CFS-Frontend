@@ -19,9 +19,9 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [Route("api/specifications-by-period/{periodId}")]
-        public async Task<IActionResult> GetSpecificationsByPeriod(string periodId)
+        public async Task<IActionResult> GetSpecificationsByFundingPeriod(string fundingPeriodId)
         {
-            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(periodId);
+            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
             if (apiResponse == null)
             {
                 return new StatusCodeResult(500);

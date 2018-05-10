@@ -28,15 +28,15 @@
         /// <summary>
         /// Gets Specifications by Academic Year ID
         /// </summary>
-        /// <param name="academicYearId">Academic Year Id</param>
+        /// <param name="fundingPeriodId">Academic Year Id</param>
         /// <returns></returns>
-        Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string academicYearId);
+        Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string fundingPeriodId);
 
         Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification);
 
         Task<HttpStatusCode> PostProduct(string specificationId, Product product);
 
-        Task<ApiResponse<IEnumerable<Reference>>> GetAcademicYears();
+        Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods();
 
         Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams();
 

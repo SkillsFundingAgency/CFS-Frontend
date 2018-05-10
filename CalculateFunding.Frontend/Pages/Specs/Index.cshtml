@@ -27,8 +27,8 @@
     <div class="col-xs-9">
         <form class="form-inline" method="get" role="form">
             <div class="form-group">
-                <label class="form-label" for="select-box">Select year:</label>
-                <select asp-items="@(Model.Years)" class="form-control spec-mgr-control" id="select-spec-year" name="academicYearId"></select>
+                <label class="form-label" for="select-box">Select funding period:</label>
+                <select asp-items="@(Model.FundingPeriods)" class="form-control spec-mgr-control" id="select-spec-year" name="fundingPeriodId"></select>
                 <input id="btn-select-year" type="submit" class="button button-in-line" value="Go" />
             </div>
         </form>
@@ -45,7 +45,7 @@
 <div class="row">
     <div class="col-xs-9 col-md-9">
         <p>
-            <a href="/specs/createSpecification/@Model.AcademicYearId" class="button spec-mgr-control" id="create-specification-button">Create Specification</a>
+            <a href="/specs/createSpecification/@Model.FundingPeriodId" class="button spec-mgr-control" id="create-specification-button">Create Specification</a>
         </p>
         <hr />
         <div class="panel-group wrap esfa-collapse" id="esfa-list">
@@ -72,7 +72,7 @@
                 else
                 {
                     <p>
-                        <a href="/specs/createSpecification/@Model.AcademicYearId" id="create-specification-button-noneexists">No specification exists, create a specfication</a>
+                        <a href="/specs/createSpecification/@Model.FundingPeriodId" id="create-specification-button-noneexists">No specification exists, create a specfication</a>
                     </p>
 
                 }

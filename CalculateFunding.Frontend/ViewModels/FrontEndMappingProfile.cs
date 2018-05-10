@@ -49,7 +49,7 @@
             CreateMap<ScenarioSearchResultViewModel, TestScenarioResultViewModel>()
                 .ForMember(m => m.TestResults, opt => opt.MapFrom(s => s.Scenarios))
                 .ForMember(m => m.Specifications, opt => opt.Ignore())
-                .ForMember(m => m.PeriodId, opt => opt.Ignore());
+                .ForMember(m => m.FundingPeriodId, opt => opt.Ignore());
 
 
             CreateMap<ScenarioSearchResultItemViewModel, TestScenarioResultItemViewModel>()
@@ -74,13 +74,12 @@
         {
             CreateMap<CreateSpecificationViewModel, Specification>()
                 .ForMember(m => m.Id, opt => opt.Ignore())
-                .ForMember(m => m.AcademicYear, opt => opt.Ignore())
+                .ForMember(m => m.FundingPeriod, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
                 .ForMember(m => m.Policies, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
-                .ForMember(m => m.AcademicYearId, opt => opt.Ignore());
-                
+                .ForMember(m => m.FundingPeriodId, opt => opt.Ignore());
 
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());

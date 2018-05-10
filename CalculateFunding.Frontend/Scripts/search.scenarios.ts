@@ -44,10 +44,10 @@ namespace calculateFunding.listTestScenarios {
         description: string;
         specificationId: string;
         specificationName: string;
-        periodName: string;
-        periodId: string;
-        fundingStreamNames: string[];
-        fundingStreamIds: string[];
+        fundingPeriodName: string;
+        fundingPeriodId: string;
+        fundingStreamNames: string;
+        fundingStreamId: string;
         lastUpdatedDate: Date;
         lastUpdatedDateDisplay: string;
         status: string;

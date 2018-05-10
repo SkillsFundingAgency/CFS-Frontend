@@ -68,7 +68,7 @@
             Calculation calculation = calculationResponse.Content;
 
             CalculationName = calculation.Name;
-            CalculationPeriodName = calculation.PeriodName;
+            CalculationPeriodName = calculation.FundingPeriodName;
             CalculationId = calculation.Id;
 
             ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.CalculationSpecification.Id);

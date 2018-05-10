@@ -59,12 +59,7 @@
 }
 
 <div class="row providers-search" id="providers-search-container">
-    @*<div class="alert alert--success">
-            <span>Version: @Model.TestScenario.Version</span> Last saved by: <strong>@Model.TestScenario.LastModifiedBy @Model.TestScenario.LastModified.ToString("dd/MM/yy HH:mm")</strong>
-        </div>*@
     <div class="col-xs-12">
-
-
         <div class="alert alert--info-grey" role="alert">
             <p class="alert__message">
                 <span>Version: <strong>@Model.TestScenario.CurrentVersion.Version</strong></span>
@@ -94,7 +89,7 @@
         {
             <div class="provider-item-container" id="provider-item-result-@providerRow">
                 <div class="provider-item-header">
-                    <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn&periodId=@Model.TestScenario.Specification.Period.Id&specificationId=@Model.TestScenario.Specification.Id">@provider.Name</a> <span class="flag flag--soon">@provider.TestResult</span></h4>
+                    <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn&periodId=@Model.TestScenario.Specification.FundingPeriod.Id&specificationId=@Model.TestScenario.Specification.Id">@provider.Name</a> <span class="flag flag--soon">@provider.TestResult</span></h4>
                 </div>
                 <div class="provider-item-property-container">
                     <span class="provider-item-property provider-item-property-upin">
@@ -228,7 +223,7 @@
 
     <script asp-src-include="~/js/search.providerTestResults.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
-        var vm = new calculateFunding.results.listProviderTestResults.ProviderSearchViewModel({ testScenarioId: '@Model.TestScenario.Id', specificationId: '@Model.TestScenario.Specification.Id', periodId: '@Model.TestScenario.Specification.Period.Id' });
+        var vm = new calculateFunding.results.listProviderTestResults.ProviderSearchViewModel({ testScenarioId: '@Model.TestScenario.Id', specificationId: '@Model.TestScenario.Specification.Id', fundingPeriodId: '@Model.TestScenario.Specification.FundingPeriod.Id' });
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {
             ko.applyBindings(vm, filterElement);

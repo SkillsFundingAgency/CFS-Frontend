@@ -101,7 +101,7 @@ namespace CalculateFunding.Frontend.Services
             first.Id.Should().Be("10");
             first.SpecificationName.Should().Be("Spec Name");
             first.Status.Should().Be("Unknown");
-            first.PeriodName.Should().Be("Test Period");
+            first.FundingPeriodName.Should().Be("Test Period");
             first.Name.Should().Be("Calculation 1");
         }
 
@@ -138,7 +138,7 @@ namespace CalculateFunding.Frontend.Services
             first.Id.Should().Be("10");
             first.SpecificationName.Should().Be("Spec Name");
             first.Status.Should().Be("Unknown");
-            first.PeriodName.Should().Be("Test Period");
+            first.FundingPeriodName.Should().Be("Test Period");
             first.Name.Should().Be("Calculation 1");
 
             results.Facets.Count().Should().Be(2);
@@ -193,7 +193,7 @@ namespace CalculateFunding.Frontend.Services
             first.Id.Should().Be("10");
             first.SpecificationName.Should().Be("Spec Name");
             first.Status.Should().Be("Unknown");
-            first.PeriodName.Should().Be("Test Period");
+            first.FundingPeriodName.Should().Be("Test Period");
             first.Name.Should().Be("Calculation 1");
 
             results.Facets.Count().Should().Be(2);
@@ -339,7 +339,7 @@ namespace CalculateFunding.Frontend.Services
                 {
                     Id = $"{i + 10}",
                     Name = $"Calculation {i + 1}",
-                    PeriodName = "Test Period",
+                    FundingPeriodName = "Test Period",
                     SpecificationName = "Spec Name",
                     Status = "Unknown",
                 });

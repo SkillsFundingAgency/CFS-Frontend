@@ -41,12 +41,12 @@
 @section BannerMiddle{
     <form method="post" class="filter-container spacing-15" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-3 filter-field-heading">Select a year</div>
+            <div class="col-xs-3 filter-field-heading">Select a funding period</div>
             <div class="col-xs-4 filter-field-heading">Select a specification</div>
         </div>
         <div class="row">
             <div class="col-xs-3">
-                <select asp-items="@(Model.Periods)" asp-for="@Model.PeriodId" class="form-control filter">
+                <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter">
                     <option></option>
                 </select>
             </div>
@@ -67,13 +67,13 @@
         <div class="row view-policy">
             <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="AllocationLineTabs" role="tablist">
                 <li class="nav-item">
-                    <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true">Allocation line</a>
+                    <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true">Allocation line</a>
                 </li>
                 <li class="nav-item active">
                     <a id="nav-calculations-tab" href="#" role="tab" aria-selected="false">Calculation results</a>
                 </li>
                 <li class="nav-item">
-                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&periodId=@Model.PeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
+                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
                 </li>
 
             </ul>
