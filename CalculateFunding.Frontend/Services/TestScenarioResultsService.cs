@@ -59,7 +59,7 @@ namespace CalculateFunding.Frontend.Services
             }
 
             SetFilterValue(searchRequest, "specificationId", request.SpecificationId);
-            SetFilterValue(searchRequest, "periodId", request.FundingPeriodId);
+            SetFilterValue(searchRequest, "fundingPeriodId", request.FundingPeriodId);
 
             Task<ScenarioSearchResultViewModel> scenarioSearchResultsTask = _scenariosSearchService.PerformSearch(searchRequest);
             Task<ApiResponse<IEnumerable<Specification>>> specificationsLookupTask;

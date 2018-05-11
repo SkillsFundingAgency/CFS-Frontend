@@ -332,7 +332,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             await searchService
                  .Received(1)
-                 .PerformSearch(Arg.Is<SearchRequestViewModel>(a => a.Filters["periodId"][0] == periodId));
+                 .PerformSearch(Arg.Is<SearchRequestViewModel>(a => a.Filters["fundingPeriodId"][0] == periodId));
 
             await specsApiClient
                 .Received(1)

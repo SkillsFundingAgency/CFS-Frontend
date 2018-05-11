@@ -53,7 +53,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 PageNumber = pageNumber,
                 IncludeFacets = false,
                 SearchTerm = searchTerm,
-                Filters = new Dictionary<string, string[]> { { "periodId", new[] { fundingPeriodId } } }
+                Filters = new Dictionary<string, string[]> { { "fundingPeriodId", new[] { fundingPeriodId } } }
             };
 
             SearchTerm = searchTerm;

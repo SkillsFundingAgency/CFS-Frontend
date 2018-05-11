@@ -89,7 +89,7 @@
         {
             <div class="provider-item-container" id="provider-item-result-@providerRow">
                 <div class="provider-item-header">
-                    <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn&periodId=@Model.TestScenario.Specification.FundingPeriod.Id&specificationId=@Model.TestScenario.Specification.Id">@provider.Name</a> <span class="flag flag--soon">@provider.TestResult</span></h4>
+                    <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn&fundingPeriodId=@Model.TestScenario.Specification.FundingPeriod.Id&specificationId=@Model.TestScenario.Specification.Id">@provider.Name</a> <span class="flag flag--soon">@provider.TestResult</span></h4>
                 </div>
                 <div class="provider-item-property-container">
                     <span class="provider-item-property provider-item-property-upin">
@@ -164,7 +164,7 @@
         <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
             <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index">
                 <div class="provider-item-header">
-                    <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + ukprn + '&periodId=' + $root.periodId + '&specificationId=' + $root.specificationId }, text: name"></a> <span data-bind="text: testResult, css: $root.applyResultLabelCss(testResult)"></span></h4>
+                    <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + ukprn + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationId=' + $root.specificationId }, text: name"></a> <span data-bind="text: testResult, css: $root.applyResultLabelCss(testResult)"></span></h4>
                 </div>
                 <p>
                     <span class="provider-item-property">
