@@ -35,16 +35,7 @@
         {
             services.AddMvc();
 
-            bool useEmulator = this.Configuration.GetValue<bool>("UseEmulator");
-
-            if (useEmulator)
-            {
-                services.AddModule<EmulatedApiModule>(Configuration);
-            }
-            else
-            {
-                services.AddModule<ApiModule>(Configuration);
-            }
+            services.AddModule<ApiModule>(Configuration);
 
             services.AddModule<ProxiesModule>(Configuration);
 

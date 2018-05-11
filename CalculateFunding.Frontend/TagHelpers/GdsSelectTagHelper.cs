@@ -169,6 +169,7 @@
                 htmlAttributes: htmlAttributes);
 
             tagBuilder.AddCssClass("gds-select");
+            tagBuilder.AddCssClass("gds-select-taghelper");
 
             if (tagBuilder != null)
             {

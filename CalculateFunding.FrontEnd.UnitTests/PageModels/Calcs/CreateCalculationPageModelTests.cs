@@ -125,13 +125,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+
             FundingStream fundingStream = new FundingStream
             {
                 Id = fundingStreamId,
                 AllocationLines = allocationLines
             };
 
-            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
+            fundingStreams.Add(fundingStream);
+
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -142,7 +147,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Returns(apiResponse);
 
             specsClient
-                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
@@ -230,13 +235,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+
             FundingStream fundingStream = new FundingStream
             {
                 Id = fundingStreamId,
                 AllocationLines = allocationLines
             };
 
-            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
+            fundingStreams.Add(fundingStream);
+
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -253,7 +263,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
               .Returns(apiResponse);
 
             specsClient
-                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
@@ -317,13 +327,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+
             FundingStream fundingStream = new FundingStream
             {
                 Id = fundingStreamId,
                 AllocationLines = allocationLines
             };
 
-            ApiResponse<FundingStream> fundingStreamResponse = new ApiResponse<FundingStream>(HttpStatusCode.OK, fundingStream);
+            fundingStreams.Add(fundingStream);
+
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
 
             CreateCalculationModel createModel = new CreateCalculationModel
@@ -346,7 +361,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             .Returns(apiResponse);
 
             specsClient
-                .GetFundingStreamByFundingStreamId(Arg.Is(fundingStreamId))
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);

@@ -44,7 +44,6 @@
         public async Task<IActionResult> OnGetAsync(string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-
             await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
 
             FundingPeriodId = fundingPeriodId;
@@ -68,7 +67,6 @@
             if (!ModelState.IsValid)
             {
                 await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
-
                 return Page();
             }
 

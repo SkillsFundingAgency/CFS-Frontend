@@ -17,7 +17,7 @@ namespace CalculateFunding.Frontend.TestData
                 new Specification
                 {
                     FundingPeriod = new Reference(),
-                   FundingStreams = new List<Reference>(),
+                    FundingStreams = new List<Reference>(),
                     Description = "test",
                     Policies = new List<Policy>()
                 },

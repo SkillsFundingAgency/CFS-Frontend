@@ -103,6 +103,13 @@
             return GetAsync<IEnumerable<FundingStream>>($"{_specsPath}/get-fundingstreams");
         }
 
+        public Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreamsForSpecification(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return GetAsync<IEnumerable<FundingStream>>($"{_specsPath}/get-fundingstreams-for-specification?specificationId={specificationId}");
+        }
+
         public Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId)
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));

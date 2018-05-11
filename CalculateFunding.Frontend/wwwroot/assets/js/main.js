@@ -245,7 +245,7 @@ $(".inline-collapse-heading").on("click", function (e) {
 // Gds Select List Tag Helper counterpart
 $(function () {
 
-    var dataDefinitionDropdown = $("select.gds-select").each(function (i, item) {
+    var dataDefinitionDropdown = $("select.gds-select-taghelper").each(function (i, item) {
         var $item = $(item);
         $item.select2({
             templateResult: function (option) {

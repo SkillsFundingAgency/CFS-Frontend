@@ -42,8 +42,7 @@
                     <div class="form-group">
 
                         <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding stream</label>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control">
-                            <option></option>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple">
                         </select>
                     </div>
                 </div>
@@ -63,3 +62,14 @@
 
     </div>
 </div>
+
+@section scripts{ 
+    <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $("#CreateSpecificationViewModel-FundingStreamIds").select2();
+    </script>
+}
+
+@section styles{ 
+    <link rel="stylesheet" href="~/assets/libs/css/select2.min.css" />
+}

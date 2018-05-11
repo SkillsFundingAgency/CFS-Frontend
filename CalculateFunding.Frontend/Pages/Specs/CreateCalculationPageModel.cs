@@ -79,7 +79,11 @@
 
         async Task<IActionResult> PopulateForm(Specification specification)
         {
-            await PopulateAllocationLines(specification.FundingStreams.Select(s=>s.Id));
+            IActionResult populateResult = await PopulateAllocationLines(specification.Id);
+            if(populateResult != null)
+            {
+                return populateResult;
+            }
 
             if (AllocationLines.IsNullOrEmpty())
             {
@@ -107,7 +111,7 @@
                 }
             }
 
-            if(CreateCalculationViewModel.CalculationType == "Funding" && string.IsNullOrWhiteSpace(CreateCalculationViewModel.AllocationLineId))
+            if (CreateCalculationViewModel.CalculationType == "Funding" && string.IsNullOrWhiteSpace(CreateCalculationViewModel.AllocationLineId))
             {
                 this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.AllocationLineId)}", ValidationMessages.CalculationAllocationLineRequired);
             }
@@ -134,14 +138,14 @@
             ApiResponse<Calculation> newCalculationResponse = await _specsClient.PostCalculation(calculation);
 
             if (newCalculationResponse.StatusCode == HttpStatusCode.OK)
-            { 
+            {
                 Calculation newCalculation = newCalculationResponse.Content;
-          
+
                 return Redirect($"/specs/policies/{specificationId}#calculation-{newCalculation.Id}");
             }
             else
             {
-                throw new  InvalidOperationException($"Unable to create calculation specifications. Status Code = {newCalculationResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to create calculation specifications. Status Code = {newCalculationResponse.StatusCode}");
             }
         }
 
@@ -193,27 +197,39 @@
             }
         }
 
-        private async Task PopulateAllocationLines(IEnumerable<string> fundingStreamIds)
+        private async Task<IActionResult> PopulateAllocationLines(string specificationId)
         {
             List<SelectListItem> result = new List<SelectListItem>();
-            // TODO optimise call
 
-            foreach(string fundingStreamId in fundingStreamIds)
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = await _specsClient.GetFundingStreamsForSpecification(specificationId);
+            if (fundingStreamResponse == null)
             {
-                ApiResponse<FundingStream> fundingStreamResponse = await _specsClient.GetFundingStreamByFundingStreamId(fundingStreamId);
-
-                if (fundingStreamResponse != null && fundingStreamResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    result.AddRange(fundingStreamResponse.Content.AllocationLines.Select(m => new SelectListItem
-                    {
-                        Value = m.Id,
-                        Text = m.Name,
-                        Selected = m.Id == AllocationLineId
-                    }));
-                }
+                return new InternalServerErrorResult("Funding Stream lookup API call returned null");
             }
-           
-            AllocationLines = result.OrderBy(c=>c.Text);
+
+            if (fundingStreamResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new InternalServerErrorResult($"Funding Stream lookup API call returned HTTP Error '{fundingStreamResponse.StatusCode}'");
+            }
+
+            if (fundingStreamResponse.Content == null)
+            {
+                return new InternalServerErrorResult("Funding Stream lookup API call content returned null");
+            }
+
+            foreach (FundingStream fundingStream in fundingStreamResponse.Content)
+            {
+                result.AddRange(fundingStream.AllocationLines.Select(m => new SelectListItem
+                {
+                    Value = m.Id,
+                    Text = m.Name,
+                    Selected = m.Id == AllocationLineId
+                }));
+            }
+
+            AllocationLines = result.OrderBy(c => c.Text);
+
+            return null;
         }
 
         private async Task<Specification> GetSpecification(string specificationId)

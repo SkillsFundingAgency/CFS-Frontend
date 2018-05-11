@@ -74,7 +74,7 @@ a.button:hover {
 a,
 a:visited,
 a.normal,
-a.normal:visited{
+a.normal:visited {
     text-decoration: underline;
     color: $govuk-blue;
 }
@@ -178,7 +178,7 @@ blockquote {
     font-size: 19px;
 }
 
-.hero-spacing-right{
+.hero-spacing-right {
     padding-right: 15px;
 }
 
@@ -192,7 +192,7 @@ blockquote {
     margin-bottom: 5px;
 }
 
-.spacing-5-bottom{
+.spacing-5-bottom {
     margin-bottom: 5px;
 }
 
@@ -284,6 +284,30 @@ blockquote {
     & ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
         top: 10px;
     }
+}
+
+.gds-select-multiple {
+    & ~ .select2-container--default .select2-selection--multiple,
+    & ~ .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: 2px solid #000;
+        border-radius: 0;
+    }
+
+    & ~ .select2-container--default.select2-container--focus .select2-selection--multiple {
+        outline: 3px solid #ffbf47;
+    }
+
+    & ~ .select2-container .select2-selection__rendered {
+        margin-top: 10px;
+    }
+
+    & ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 10px;
+    }
+}
+
+.select2-container .select2-dropdown {
+    border: 2px solid #000;
 }
 
 .gds-select-description {
@@ -484,14 +508,16 @@ blockquote {
 }
 
 
-.view-qa-results{
-    .view-qa-filter-container{
+.view-qa-results {
+    .view-qa-filter-container {
         background-color: $panel-colour;
     }
+
     .paging-container {
         margin-bottom: 15px;
     }
-    .qa-results-table{
+
+    .qa-results-table {
         thead {
             border-bottom: 2px solid #000 !important;
         }
@@ -520,7 +546,7 @@ blockquote {
         border-bottom: 1px solid #ccc;
     }
 
-    .dataset-item-specificationName{
+    .dataset-item-specificationName {
         font-weight: bold;
     }
 
@@ -537,7 +563,7 @@ blockquote {
         margin-left: 0;
     }
 
-    .dataset-item-secondary{
+    .dataset-item-secondary {
         color: $grey-1;
     }
 }
@@ -1909,7 +1935,7 @@ table {
     padding: 30px 0.78947em;
 }
 
-.testcoverage-value{
+.testcoverage-value {
     font-weight: bold;
 }
 
@@ -1998,6 +2024,5 @@ table {
 }
 
 .alert-content-margin {
-    margin-left:20px;
+    margin-left: 20px;
 }
-

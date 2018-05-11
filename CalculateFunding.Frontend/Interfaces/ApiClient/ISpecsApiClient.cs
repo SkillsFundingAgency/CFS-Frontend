@@ -40,6 +40,8 @@
 
         Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams();
 
+        Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreamsForSpecification(string specificationId);
+
         Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
 
         Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy);
