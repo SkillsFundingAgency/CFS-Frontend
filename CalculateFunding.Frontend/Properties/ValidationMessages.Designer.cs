@@ -241,6 +241,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must select a funding period.
+        /// </summary>
+        internal static string SpecificationFundingPeriodRequired {
+            get {
+                return ResourceManager.GetString("SpecificationFundingPeriodRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must select at least one funding stream.
         /// </summary>
         internal static string SpecificationFundingStreamRequired {

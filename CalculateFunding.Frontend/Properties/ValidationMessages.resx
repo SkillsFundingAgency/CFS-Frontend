@@ -177,6 +177,9 @@
   <data name="SpecificationDescriptionRequired" xml:space="preserve">
     <value>You must give a description for the specification</value>
   </data>
+  <data name="SpecificationFundingPeriodRequired" xml:space="preserve">
+    <value>You must select a funding period</value>
+  </data>
   <data name="SpecificationFundingStreamRequired" xml:space="preserve">
     <value>You must select at least one funding stream</value>
   </data>

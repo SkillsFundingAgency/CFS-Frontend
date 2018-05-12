@@ -78,8 +78,7 @@
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
                 .ForMember(m => m.Policies, opt => opt.Ignore());
 
-            CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
-                .ForMember(m => m.FundingPeriodId, opt => opt.Ignore());
+            CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>();
 
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());

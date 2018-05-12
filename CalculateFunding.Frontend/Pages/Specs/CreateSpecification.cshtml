@@ -1,4 +1,4 @@
-﻿@page "{fundingPeriodId}"
+﻿@page "{fundingPeriodId?}"
 @model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationPageModel
 
 @{
@@ -7,7 +7,7 @@
 }
 
 @section FormBannerLeft{
-    <h1 class="heading-large">Create Specification for @Model.FundingPeriod.Name</h1>
+    <h1 class="heading-large">Create Specification</h1>
     <p class="description-text">This specification describes how a funding stream will be used for an academic year.</p>
 }
 
@@ -15,7 +15,7 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
+            <li><a href="/specs">Specifications</a></li>
             <li>Create Specification</li>
         </ol>
     </div>
@@ -36,14 +36,26 @@
                 </div>
             </div>
             <div>
+                <a validationanchor-for="CreateSpecificationViewModel.FundingPeriodId"></a>
+
+                <div gds-validationblock-for="CreateSpecificationViewModel.FundingPeriodId">
+                    <div class="form-group">
+
+                        <label asp-for="CreateSpecificationViewModel.FundingPeriodId">Funding period</label>
+                        <select asp-items="@(Model.FundingPeriods)" asp-for="CreateSpecificationViewModel.FundingPeriodId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <a validationanchor-for="CreateSpecificationViewModel.FundingStreamIds"></a>
 
                 <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamIds">
                     <div class="form-group">
 
                         <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding stream</label>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple">
-                        </select>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
                     </div>
                 </div>
             </div>
@@ -63,13 +75,13 @@
     </div>
 </div>
 
-@section scripts{ 
+@section scripts{
     <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
     <script type="text/javascript">
         $("#CreateSpecificationViewModel-FundingStreamIds").select2();
     </script>
 }
 
-@section styles{ 
+@section styles{
     <link rel="stylesheet" href="~/assets/libs/css/select2.min.css" />
 }

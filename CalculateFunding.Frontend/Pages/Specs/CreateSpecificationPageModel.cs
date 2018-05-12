@@ -34,30 +34,31 @@
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
-        public Reference FundingPeriod { get; set; }
+        public IEnumerable<SelectListItem> FundingPeriods { get; set; }
+
+        public string FundingPeriodId { get; set; }
 
         [BindProperty]
         public CreateSpecificationViewModel CreateSpecificationViewModel { get; set; }
 
-        public string FundingPeriodId { get; set; }
-
-        public async Task<IActionResult> OnGetAsync(string fundingPeriodId)
+        public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
         {
-            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-            await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
+            if(!string.IsNullOrWhiteSpace(fundingPeriodId))
+            {
+                FundingPeriodId = fundingPeriodId;
+            }
 
-            FundingPeriodId = fundingPeriodId;
+            await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string fundingPeriodId)
+        public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null)
         {
-            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-
             if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
             {
                 ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(CreateSpecificationViewModel.Name);
+
                 if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
                 {
                     this.ModelState.AddModelError($"{nameof(CreateSpecificationViewModel)}.{nameof(CreateSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
@@ -71,17 +72,17 @@
             }
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
-            specification.FundingPeriodId = fundingPeriodId;
 
             await _specsClient.PostSpecification(specification);
 
-            return Redirect($"/specs?fundingPeriodId={fundingPeriodId}");
+            return Redirect($"/specs?fundingPeriodId={specification.FundingPeriodId}");
         }
 
         private async Task PopulateFundingStreams()
         {
             var fundingStreamsResponse = await _specsClient.GetFundingStreams();
-            if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK)
+
+            if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
                 var fundingStreams = fundingStreamsResponse.Content;
 
@@ -99,10 +100,23 @@
 
         private async Task PopulateFundingPeriods(string fundingPeriodId)
         {
-            var yearsResponse = await _specsClient.GetFundingPeriods();
-            var years = yearsResponse.Content;
+            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = await _specsClient.GetFundingPeriods();
 
-            FundingPeriod = years.FirstOrDefault(m => m.Id == fundingPeriodId);
+            if (fundingPeriodsResponse.StatusCode == HttpStatusCode.OK && !fundingPeriodsResponse.Content.IsNullOrEmpty())
+            {
+                var fundingPeriods = fundingPeriodsResponse.Content;
+
+                FundingPeriods = fundingPeriods.Select(m => new SelectListItem
+                {
+                    Value = m.Id,
+                    Text = m.Name,
+                    Selected = m.Id == fundingPeriodId
+                }).ToList();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
+            }
         }
     }
 }

@@ -14,5 +14,8 @@
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationDescriptionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Description { get; set; }
+
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingPeriodRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
+        public string FundingPeriodId { get; set; }
     }
 }
