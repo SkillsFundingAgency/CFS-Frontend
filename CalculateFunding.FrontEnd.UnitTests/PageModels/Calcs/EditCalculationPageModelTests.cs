@@ -82,13 +82,15 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             ILogger logger = Substitute.For<ILogger>();
 
-            string calculationId = "5";
+            const string calculationId = "5";
+            const string specificationId = "specId";
+            const string specificationName = "Spec Name";
 
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
                 CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
-                SpecificationId = "54",
+                SpecificationId = specificationId,
                 SourceCode = "Test Source Code"
             };
 
@@ -107,6 +109,16 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
                 .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specsCalculation));
 
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+                Name = specificationName
+            };
+
+            specsClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(System.Net.HttpStatusCode.OK, specificationSummary));
+
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
 
             // Act
@@ -121,6 +133,19 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
             pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
+            pageModel.SpecificationName.Should().Be(specificationName);
+
+            await calcsClient
+                .Received(1)
+                .GetCalculationById(Arg.Is(calculationId));
+
+            await specsClient
+               .Received(1)
+               .GetSpecificationSummary(Arg.Is(specificationId));
+
+            await specsClient
+                .Received(1)
+                .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId));
         }
 
         [TestMethod]

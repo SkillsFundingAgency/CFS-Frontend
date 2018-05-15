@@ -2,9 +2,11 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
+using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Datasets;
 using FluentAssertions;
@@ -47,11 +49,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             string specificationId = Guid.NewGuid().ToString();
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.BadRequest);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ILogger logger = CreateLogger();
@@ -84,16 +86,16 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             string specificationId = Guid.NewGuid().ToString();
 
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId
             };
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.BadRequest);
@@ -137,16 +139,16 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             string specificationId = Guid.NewGuid().ToString();
 
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId
             };
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK);
@@ -190,16 +192,16 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             string specificationId = Guid.NewGuid().ToString();
 
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId
             };
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             IEnumerable<DatasetSpecificationRelationshipModel> relationships = new[]
@@ -293,11 +295,17 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Be("rel-id");
         }
 
-        private static SpecificationRelationshipsPageModel CreatePageModel(ISpecsApiClient specsApiClient = null, 
-            IDatasetsApiClient datasetsApiClient = null, ILogger logger = null)
+        private static SpecificationRelationshipsPageModel CreatePageModel(
+            ISpecsApiClient specsApiClient = null, 
+            IDatasetsApiClient datasetsApiClient = null, 
+            ILogger logger = null,
+            IMapper mapper = null)
         {
-            return new SpecificationRelationshipsPageModel(specsApiClient ?? CreateSpecsApiClient(), datasetsApiClient ?? CreateDatasetApiClient(),
-                logger ?? CreateLogger());
+            return new SpecificationRelationshipsPageModel(
+                specsApiClient ?? CreateSpecsApiClient(), 
+                datasetsApiClient ?? CreateDatasetApiClient(),
+                logger ?? CreateLogger(),
+                mapper ?? MappingHelper.CreateFrontEndMapper());
         }
 
         private static ISpecsApiClient CreateSpecsApiClient()

@@ -4,12 +4,14 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Datasets;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Serilog;
@@ -19,12 +21,14 @@
         private readonly ISpecsApiClient _specsApiClient;
         private readonly IDatasetsApiClient _datasetsApiClient;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
-        public SpecificationRelationshipsPageModel(ISpecsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger)
+        public SpecificationRelationshipsPageModel(ISpecsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger, IMapper mapper)
         {
             _specsApiClient = specsApiClient;
             _datasetsApiClient = datasetsApiClient;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public SpecificationDatasetRelationshipsViewModel ViewModel { get; set; }
@@ -37,7 +41,7 @@
 
             ShowSuccessMessage = wasSuccess;
 
-            ApiResponse<Specification> specificationResponse = await _specsApiClient.GetSpecification(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsApiClient.GetSpecificationSummary(specificationId);
 
             if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {
@@ -58,9 +62,10 @@
             return Page();
         }
 
-        private async Task<SpecificationDatasetRelationshipsViewModel> PopulateViewModel(Specification specification)
+        private async Task<SpecificationDatasetRelationshipsViewModel> PopulateViewModel(SpecificationSummary specification)
         {
-            SpecificationDatasetRelationshipsViewModel viewModel = new SpecificationDatasetRelationshipsViewModel(specification);
+            SpecificationSummaryViewModel vm = _mapper.Map<SpecificationSummaryViewModel>(specification);
+            SpecificationDatasetRelationshipsViewModel viewModel = new SpecificationDatasetRelationshipsViewModel(vm);
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> apiResponse = await _datasetsApiClient.GetDatasetSpecificationRelationshipsBySpecificationId(specification.Id);
 

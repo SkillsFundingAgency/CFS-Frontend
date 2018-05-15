@@ -59,7 +59,7 @@
 
             SpecificationId = specificationId;
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
 
             if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
             {
@@ -68,7 +68,7 @@
 
             if (specificationResponse.StatusCode.IsSuccess())
             {
-                Specification specContent = specificationResponse.Content;
+                SpecificationSummary specContent = specificationResponse.Content;
 
                 if (specContent == null)
                 {
@@ -135,7 +135,7 @@
 
             if (!ModelState.IsValid)
             {
-                ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+                ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
 
                 if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
                 {
@@ -144,7 +144,7 @@
 
                 if (specificationResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    Specification specContent = specificationResponse.Content;
+                    SpecificationSummary specContent = specificationResponse.Content;
 
                     if (specContent == null)
                     {

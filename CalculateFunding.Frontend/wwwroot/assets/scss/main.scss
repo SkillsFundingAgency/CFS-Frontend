@@ -304,6 +304,10 @@ blockquote {
     & ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
         top: 10px;
     }
+
+    & ~ .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #000;
+    }
 }
 
 .select2-container .select2-dropdown {
@@ -1637,7 +1641,7 @@ table {
     }
 
     .form-group {
-        margin-bottom: 0px;
+        margin-bottom: 15px;
         padding-bottom: 15px;
     }
 
@@ -1704,7 +1708,7 @@ table {
 }
 
 .faded-text {
-    color: #bfc1c3;
+    color: #6f777b;
 }
 
 .no-margin {
@@ -1907,9 +1911,9 @@ table {
 }
 
 .alert--warning {
-    background-color: orange;
+    background-color: #f47738;
     color: #fff;
-    font-size: small;
+    font-size: 19px;
 }
 
 .alert--info-grey {
@@ -2035,7 +2039,7 @@ table {
 
 .icon-funding-stream-removed{
     width:30px;
-    margin-top:5px;
     margin-right:10px;
+    margin-bottom: 20px;
     float:left;
 }

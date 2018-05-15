@@ -40,9 +40,7 @@
 
             SpecificationId = specificationId;
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
-
-            Specification specification = await GetSpecification(specificationId);
+            SpecificationSummary specification = await GetSpecification(specificationId);
 
             SpecificationName = specification.Name;
 
@@ -69,7 +67,7 @@
 
             if (!ModelState.IsValid)
             {
-                Specification specification = await GetSpecification(specificationId);
+                SpecificationSummary specification = await GetSpecification(specificationId);
 
                 SpecificationName = specification.Name;
 
@@ -93,11 +91,11 @@
             return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
         }
 
-        private async Task<Specification> GetSpecification(string specificationId)
+        private async Task<SpecificationSummary> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
 
             if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
             {

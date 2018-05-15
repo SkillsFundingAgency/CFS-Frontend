@@ -121,6 +121,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             };
 
             resultViewModel.Should().BeEquivalentTo(expectedResult);
+
+            await specsApiClient
+                 .Received(1)
+                .GetSpecificationSummaries();
         }
 
         [TestMethod]
@@ -386,7 +390,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         }
 
         [TestMethod]
-        public void TestScenarioResultsService_PerformSearch_WhenGetAllSpecificationsLookupIsNull_ThenExceptionThrown()
+        public async Task TestScenarioResultsService_PerformSearch_WhenGetAllSpecificationsLookupIsNull_ThenExceptionThrown()
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
@@ -410,8 +414,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns((ApiResponse<IEnumerable<Specification>>)null);
+                .GetSpecificationSummaries()
+                .Returns((ApiResponse<IEnumerable<SpecificationSummary>>)null);
 
             // Act
             Func<Task> action = async () => await testScenarioResultsService.PerformSearch(resultRequestViewModel);
@@ -425,6 +429,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             logger
                 .Received(1)
                 .Warning(Arg.Is("Specifications API Response was null"));
+
+            await specsApiClient
+                 .Received(1)
+                .GetSpecificationSummaries();
         }
 
         [TestMethod]

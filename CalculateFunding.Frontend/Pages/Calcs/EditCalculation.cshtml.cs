@@ -65,7 +65,7 @@
 
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
 
-            ApiResponse<Clients.SpecsClient.Models.Specification> specificationResponse = await _specsClient.GetSpecification(SpecificationId);
+            ApiResponse<Clients.SpecsClient.Models.SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(SpecificationId);
 
             if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
             {

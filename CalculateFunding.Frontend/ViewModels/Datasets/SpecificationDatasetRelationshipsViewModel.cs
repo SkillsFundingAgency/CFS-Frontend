@@ -2,11 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.ViewModels.Specs;
 
     public class SpecificationDatasetRelationshipsViewModel
     {
-        public SpecificationDatasetRelationshipsViewModel(Specification specification)
+        public SpecificationDatasetRelationshipsViewModel(SpecificationSummaryViewModel specification)
         {
             Items = Enumerable.Empty<SpecificationDatasetRelationshipItemViewModel>();
 
@@ -15,7 +15,7 @@
 
         public IEnumerable<SpecificationDatasetRelationshipItemViewModel> Items { get; set; }
 
-        public Specification Specification { get; set; }
+        public SpecificationSummaryViewModel Specification { get; set; }
 
         public string GetCountPhrase()
         {

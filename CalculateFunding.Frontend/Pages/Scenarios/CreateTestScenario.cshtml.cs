@@ -3,7 +3,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Microsoft.AspNetCore.Mvc;
@@ -17,9 +16,9 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
     public class CreateTestScenarioPageModel : PageModel
     {
-        private ISpecsApiClient _specsClient;
-        private IScenariosApiClient _scenariosClient;
-        private IMapper _mapper;
+        private readonly ISpecsApiClient _specsClient;
+        private readonly IScenariosApiClient _scenariosClient;
+        private readonly IMapper _mapper;
 
         public CreateTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper)
         {
@@ -35,7 +34,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public async Task<IActionResult> OnGetAsync()
         {
-
             await PopulateSpecifications();
 
             return Page();
@@ -44,7 +42,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public async Task PopulateSpecifications()
         {
-            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications();
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationSummaries();
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {

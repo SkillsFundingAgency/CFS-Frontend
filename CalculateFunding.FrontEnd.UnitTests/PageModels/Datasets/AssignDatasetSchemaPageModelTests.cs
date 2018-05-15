@@ -69,7 +69,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = new Specification
+            SpecificationSummary expectedSpecification = new SpecificationSummary
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
@@ -85,8 +85,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+            .GetSpecificationSummary(expectedSpecificationId)
+            .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
             {
@@ -195,13 +195,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+            .GetSpecificationSummary(expectedSpecificationId)
+            .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
             {
@@ -244,7 +244,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = new Specification
+            SpecificationSummary expectedSpecification = new SpecificationSummary
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
@@ -260,8 +260,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+            .GetSpecificationSummary(expectedSpecificationId)
+            .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IEnumerable<DatasetDefinition> dataDefn = null;
 
@@ -296,7 +296,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = new Specification
+            SpecificationSummary expectedSpecification = new SpecificationSummary
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
@@ -313,8 +313,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+            .GetSpecificationSummary(expectedSpecificationId)
+            .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IEnumerable<DatasetDefinition> dataDefn = null;
 
@@ -343,7 +343,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = new Specification
+            SpecificationSummary expectedSpecification = new SpecificationSummary
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
@@ -359,8 +359,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
 
             specsClient
-                .GetSpecification(expectedSpecificationId)
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+                .GetSpecificationSummary(expectedSpecificationId)
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
             {
