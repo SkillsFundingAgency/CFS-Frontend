@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@types/bootstrap": "^3.3.37",
+    "@types/select2": "^4.0.45",
     "bootstrap": "~3.3.7",
     "bootstrap-multiselect": "^0.9.13-1",
     "govuk-elements-sass": "^3.1.2",

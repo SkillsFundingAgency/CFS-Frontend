@@ -181,6 +181,7 @@ var definitions = [
     "./node_modules/@types/knockout/index.d.ts",
     "./node_modules/@types/requirejs/index.d.ts",
     "./node_modules/@types/jasmine/index.d.ts",
+    "./node_modules/@types/select2/index.d.ts",
     "./scripts/**.d.ts"
 ];
 
