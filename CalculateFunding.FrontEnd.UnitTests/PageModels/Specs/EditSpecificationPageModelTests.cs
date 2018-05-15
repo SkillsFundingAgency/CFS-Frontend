@@ -686,6 +686,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
+            apiClient
+                .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
+                .Returns(HttpStatusCode.OK);
+
             IMapper mapper = CreateMapper();
             mapper
                 .Map<EditSpecificationModel>(Arg.Is(viewModel))

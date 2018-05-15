@@ -44,7 +44,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 
-            if(specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content != null)
+            if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content != null)
             {
                 EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
                 EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
@@ -80,9 +80,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             EditSpecificationModel specification = _mapper.Map<EditSpecificationModel>(EditSpecificationViewModel);
 
-            await _specsClient.UpdateSpecification(specificationId, specification);
-
-            return Redirect($"/specs/policies/{specificationId}");
+            HttpStatusCode editResult = await _specsClient.UpdateSpecification(specificationId, specification);
+            if(editResult == HttpStatusCode.OK)
+            {
+                return Redirect($"/specs/policies/{specificationId}");
+            }
+            else
+            {
+                return new InternalServerErrorResult($"Unable to update specification. API returned {editResult}");
+            }
         }
 
         private async Task PopulateFundingStreams(IEnumerable<string> fundingStreamIds)
@@ -114,7 +120,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = await _specsClient.GetFundingPeriods();
 
-            if(fundingPeriodsResponse == null)
+            if (fundingPeriodsResponse == null)
             {
                 throw new InvalidOperationException($"Null funding periods response returned");
             }
