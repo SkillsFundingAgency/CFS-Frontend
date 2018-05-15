@@ -16,7 +16,7 @@
         {
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(parameterName));
+                throw new ArgumentNullException(parameterName);
             }
         }
 
@@ -30,7 +30,7 @@
         {
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(parameterName), message);
+                throw new ArgumentNullException(parameterName, message);
             }
         }
 
@@ -43,7 +43,7 @@
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentNullException(nameof(parameterName));
+                throw new ArgumentNullException(parameterName);
             }
         }
 
@@ -57,7 +57,7 @@
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentNullException(nameof(parameterName), message);
+                throw new ArgumentNullException(parameterName, message);
             }
         }
     }

@@ -90,13 +90,13 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             specsClient.GetFundingPeriods()
                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
-            resultsApiClient.GetSpecifications("2")
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+               .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
@@ -130,13 +130,13 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             specsClient.GetFundingPeriods()
                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
-            resultsApiClient.GetSpecifications("2")
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+               .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.NotFound, provider));
@@ -166,13 +166,13 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             specsClient.GetFundingPeriods()
                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
-            resultsApiClient.GetSpecifications("2")
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+               .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
@@ -208,13 +208,13 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             specsClient.GetFundingPeriods()
                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
-            resultsApiClient.GetSpecifications(Arg.Any<string>())
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
+               .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
@@ -272,13 +272,13 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             specsClient.GetFundingPeriods()
                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
 
-            resultsApiClient.GetSpecifications(Arg.Any<string>())
-               .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
+               .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
@@ -417,30 +417,13 @@
             return TestScenarioResults;
         }
 
-        private IList<SpecificationSummary> GetSpecSummary()
+        private IEnumerable<string> GetSpecificationsWithResults()
         {
-            SpecificationSummary specsummary1 = new SpecificationSummary()
+            return new List<string>()
             {
-                FundingStreams = new List<Reference>() { new Reference() { Id = "1", Name = "Test Funding Stream 1" } },
-                FundingPeriod = new Reference() { Id = "1617", Name = "2016-2017" },
-                Id = "1",
-                Name = "Test Spec 1"
+                "1",
+                "2",
             };
-
-            SpecificationSummary specsummary2 = new SpecificationSummary()
-            {
-                FundingStreams = new List<Reference>() { new Reference() { Id = "2", Name = "Test Funding Stream 2" } },
-                FundingPeriod = new Reference() { Id = "1819", Name = "2018-2019" },
-                Id = "2",
-                Name = "Test Spec 2"
-            };
-
-            IList<SpecificationSummary> specSummary = new List<SpecificationSummary>
-            {
-                specsummary1,
-                specsummary2
-            };
-            return specSummary;
         }
 
         private static IResultsApiClient CreateApiClient()

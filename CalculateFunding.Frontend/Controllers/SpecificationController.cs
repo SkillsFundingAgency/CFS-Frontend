@@ -21,7 +21,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specifications-by-period/{periodId}")]
         public async Task<IActionResult> GetSpecificationsByFundingPeriod(string fundingPeriodId)
         {
-            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
             if (apiResponse == null)
             {
                 return new StatusCodeResult(500);
@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             List<ReferenceViewModel> result = new List<ReferenceViewModel>();
 
-            foreach (Specification specification in apiResponse.Content.OrderBy(o => o.Name))
+            foreach (SpecificationSummary specification in apiResponse.Content.OrderBy(o => o.Name))
             {
                 result.Add(new ReferenceViewModel(specification.Id, specification.Name));
             }

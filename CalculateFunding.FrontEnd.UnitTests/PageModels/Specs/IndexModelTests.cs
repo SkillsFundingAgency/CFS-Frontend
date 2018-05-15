@@ -27,7 +27,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
@@ -72,7 +72,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
@@ -117,7 +117,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
 
-            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
@@ -162,7 +162,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             // Arrange
             IEnumerable<Specification> specifications = SpecificationTestData.Data();
 
-            ApiResponse<IEnumerable<Specification>> specsResponse = new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.ToList());
+            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
             IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 

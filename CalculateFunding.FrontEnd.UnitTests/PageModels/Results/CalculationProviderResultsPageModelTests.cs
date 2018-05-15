@@ -2,7 +2,6 @@
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Results;
 using CalculateFunding.Frontend.Services;
@@ -75,19 +74,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -119,7 +112,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -146,19 +157,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -190,7 +195,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -217,19 +222,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -261,7 +260,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -288,19 +287,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -332,7 +325,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -360,19 +353,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
@@ -412,7 +399,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(calculationProviderResultSearchResultViewModel);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -440,19 +445,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
@@ -489,7 +488,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper, 
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -515,19 +532,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
@@ -567,7 +578,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(calculationProviderResultSearchResultViewModel);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(calculationId, null, "");
@@ -636,19 +665,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -680,7 +703,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(calculationId, null, "");
@@ -707,19 +748,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -751,7 +786,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(calculationId, null, "");
@@ -778,19 +813,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
@@ -822,7 +851,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(calculationId, null, "");
@@ -850,19 +897,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
@@ -902,7 +943,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(calculationProviderResultSearchResultViewModel);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(calculationId, null, "");
@@ -930,19 +989,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
                 Id = calculationId,
-                Specification = new SpecificationSummary
-                {
-                    Id = specificationId
-                }
+                SpecificationId = specificationId
             };
 
             IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
@@ -982,7 +1035,25 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(calculationProviderResultSearchResultViewModel);
 
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper, datasetsApiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(calculationId, null, "");
@@ -1003,6 +1074,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
         static CalculationProviderResultsPageModel CreatePageModel(
             ICalculationProviderResultsSearchService resultsSearchService = null,
             ICalculationsApiClient calculationsApiClient = null,
+            ISpecsApiClient specsApiClient = null,
             IMapper mapper = null,
             IDatasetsApiClient datasetsApiClient = null,
             ILogger logger = null)
@@ -1010,6 +1082,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             return new CalculationProviderResultsPageModel(
                 resultsSearchService ?? CreateResultsSearchService(),
                 calculationsApiClient ?? CreateCalculationsApiClient(),
+                specsApiClient ?? CreateSpecsApiClient(),
                 mapper ?? CreateMapper(),
                 datasetsApiClient ?? CreateDatasetsApiClient(),
                 logger ?? Createlogger());
@@ -1023,6 +1096,11 @@ namespace CalculateFunding.Frontend.PageModels.Results
         static ICalculationProviderResultsSearchService CreateResultsSearchService()
         {
             return Substitute.For<ICalculationProviderResultsSearchService>();
+        }
+
+        static ISpecsApiClient CreateSpecsApiClient()
+        {
+            return Substitute.For<ISpecsApiClient>();
         }
 
         static IMapper CreateMapper()

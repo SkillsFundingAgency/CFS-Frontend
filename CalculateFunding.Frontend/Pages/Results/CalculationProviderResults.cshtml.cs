@@ -6,6 +6,7 @@
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -13,6 +14,7 @@
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Serilog;
@@ -22,18 +24,21 @@
         private readonly IMapper _mapper;
         private readonly ICalculationProviderResultsSearchService _resultsSearchService;
         private readonly ICalculationsApiClient _calculationsApiClient;
+        private readonly ISpecsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly ILogger _logger;
 
         public CalculationProviderResultsPageModel(
-            ICalculationProviderResultsSearchService resultsSearchService, 
-            ICalculationsApiClient calculationsApiClient, 
+            ICalculationProviderResultsSearchService resultsSearchService,
+            ICalculationsApiClient calculationsApiClient,
+            ISpecsApiClient specsApiClient,
             IMapper mapper,
             IDatasetsApiClient datasetsClient,
             ILogger logger)
         {
             Guard.ArgumentNotNull(resultsSearchService, nameof(resultsSearchService));
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
+            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
@@ -41,6 +46,7 @@
             _mapper = mapper;
             _resultsSearchService = resultsSearchService;
             _calculationsApiClient = calculationsApiClient;
+            _specsClient = specsApiClient;
             _datasetsClient = datasetsClient;
             _logger = logger;
         }
@@ -53,6 +59,8 @@
         public ViewModels.Calculations.CalculationViewModel Calculation { get; set; }
 
         public bool HasProviderDatasetsAssigned { get; set; }
+
+        public SpecificationSummaryViewModel Specification { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string calculationId, int? pageNumber, string searchTerm)
         {
@@ -104,14 +112,30 @@
                 return new NotFoundResult();
             }
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecification(Calculation.Specification.Id);
+            Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummary(Calculation.SpecificationId);
+            Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(Calculation.SpecificationId);
+
+            await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask);
+
+            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaTask.Result; ;
 
             if (datasetSchemaResponse == null || (!datasetSchemaResponse.StatusCode.IsSuccess() || datasetSchemaResponse.Content == null))
             {
-                _logger.Error("A Problem ooccured getting assigned dataset schemas");
+                _logger.Error("A Problem occcured getting assigned dataset schemas");
 
                 return new StatusCodeResult(500);
             }
+
+            ApiResponse<SpecificationSummary> specResponse = specLookupTask.Result;
+
+            if (specResponse == null || (!specResponse.StatusCode.IsSuccess() || specResponse.Content == null))
+            {
+                _logger.Warning("Unable to retrieve Specification Summary with Spec ID '{SpecificationId}' for Calculation ID '{Id}", Calculation.SpecificationId, Calculation.Id);
+
+                return new InternalServerErrorResult($"Unable to retrieve Specification Summary with Spec ID '{Calculation.SpecificationId}' for Calculation ID '{Calculation.Id}");
+            }
+
+            Specification = _mapper.Map<SpecificationSummaryViewModel>(specResponse.Content);
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
 

@@ -38,7 +38,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Which
                 .Message
                 .Should()
-                .Be("Value cannot be null.\r\nParameter name: parameterName");
+                .Be("Value cannot be null.\r\nParameter name: specificationId");
         }
 
         [TestMethod]

@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -31,9 +32,14 @@
             return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
-        public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string fundingPeriodId)
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
-            return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications-by-year?fundingPeriodId={fundingPeriodId}", _cancellationToken);
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specification-summaries", _cancellationToken);
+        }
+
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId)
+        {
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specifications-by-year?fundingPeriodId={fundingPeriodId}", _cancellationToken);
         }
 
         public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
@@ -48,6 +54,25 @@
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             return GetAsync<Specification>($"{_specsPath}/specification-current-version-by-id?specificationId={specificationId}");
+        }
+
+        public Task<ApiResponse<SpecificationSummary>> GetSpecificationSummary(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return GetAsync<SpecificationSummary>($"{_specsPath}/specification-summary-by-id?specificationId={specificationId}");
+        }
+
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries(IEnumerable<string> specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
+
+            if (!specificationIds.Any())
+            {
+                return Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
+            }
+
+            return PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>($"{_specsPath}/specification-summaries-by-ids", specificationIds);
         }
 
         public Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification)

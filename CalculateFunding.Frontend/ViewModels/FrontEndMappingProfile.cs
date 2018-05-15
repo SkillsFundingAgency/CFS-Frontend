@@ -59,6 +59,8 @@
                 .ForMember(m => m.Ignored, opt => opt.UseValue(0));
 
             CreateMap<CalculationProviderResultSearchResultItem, CalculationProviderResultSearchResultItemViewModel>();
+
+            CreateMap<Clients.ResultsClient.Models.SpecificationSummary, SpecificationSummaryViewModel>();
         }
 
         private void MapCalcs()
@@ -96,7 +98,7 @@
 
             CreateMap<Policy, PolicyViewModel>();
 
-            CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
+            CreateMap<Clients.SpecsClient.Models.SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
 

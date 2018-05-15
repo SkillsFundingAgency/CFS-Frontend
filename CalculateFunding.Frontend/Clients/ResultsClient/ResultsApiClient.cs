@@ -84,9 +84,9 @@
             }
         }
 
-        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string providerId)
+        public Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId)
         {
-            return GetAsync<IEnumerable<SpecificationSummary>>($"{_resultsPath}/get-provider-specs?providerId={providerId}");
+            return GetAsync<IEnumerable<string>>($"{_resultsPath}/get-provider-specs?providerId={providerId}");
         }
 
         public async Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId)
@@ -96,7 +96,9 @@
             if (provider!=null && provider.StatusCode == HttpStatusCode.OK)
             {
                 if(provider.Content.UKPRN.HasValue)
+                {
                     provider.Content.Id = provider.Content.UKPRN.Value.ToString();
+                }
             }
 
             return provider;

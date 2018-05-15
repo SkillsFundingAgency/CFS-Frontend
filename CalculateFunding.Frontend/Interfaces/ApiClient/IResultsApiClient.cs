@@ -24,7 +24,12 @@
         /// <returns>List of Providers</returns>
         Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions);
 
-        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string providerId);
+        /// <summary>
+        /// Returns specification IDs with results for given provider
+        /// </summary>
+        /// <param name="providerId">Provider ID</param>
+        /// <returns></returns>
+        Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId);
 
         Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken));
 

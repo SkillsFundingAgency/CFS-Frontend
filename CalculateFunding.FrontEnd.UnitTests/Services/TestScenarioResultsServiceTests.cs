@@ -64,11 +64,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
                 .Returns(scenarioSearchResultViewModel);
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
 
             List<TestScenarioResultCounts> testScenarioResultCounts = new List<TestScenarioResultCounts>();
             testScenarioResultCounts.Add(new TestScenarioResultCounts()
@@ -166,11 +166,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
                 .Returns(scenarioSearchResultViewModel);
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
 
             List<TestScenarioResultCounts> testScenarioResultCounts = new List<TestScenarioResultCounts>();
             testScenarioResultCounts.Add(new TestScenarioResultCounts()
@@ -272,11 +272,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
                 .Returns(scenarioSearchResultViewModel);
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
                 .GetSpecifications(Arg.Is(periodId))
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
 
             List<TestScenarioResultCounts> testScenarioResultCounts = new List<TestScenarioResultCounts>();
             testScenarioResultCounts.Add(new TestScenarioResultCounts()
@@ -365,11 +365,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
                 .Returns(scenarioSearchResultViewModel);
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
 
             // Act
             Func<Task> action = async () => await testScenarioResultsService.PerformSearch(resultRequestViewModel);
@@ -407,7 +407,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(new ScenarioSearchResultViewModel());
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
                 .GetSpecifications()
@@ -450,8 +450,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Returns(new ScenarioSearchResultViewModel());
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.InternalServerError, null));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.InternalServerError, null));
 
             // Act
             Func<Task> action = async () => await testScenarioResultsService.PerformSearch(resultRequestViewModel);
@@ -504,11 +504,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     }
                 });
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
@@ -565,11 +565,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     }
                 });
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
@@ -611,11 +611,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(new ScenarioSearchResultViewModel());
 
-            List<Specification> specifications = CreateSpecifications();
-
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, null));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, null));
 
             // Act
             Func<Task> action = async () => await testScenarioResultsService.PerformSearch(resultRequestViewModel);
@@ -668,11 +666,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     }
                 });
 
-            List<Specification> specifications = CreateSpecifications();
+            List<SpecificationSummary> specifications = CreateSpecifications();
 
             specsApiClient
-                .GetSpecifications()
-                .Returns(new ApiResponse<IEnumerable<Specification>>(HttpStatusCode.OK, specifications));
+                .GetSpecificationSummaries()
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
@@ -729,24 +727,24 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return Substitute.For<ILogger>();
         }
 
-        private static List<Specification> CreateSpecifications()
+        private static List<SpecificationSummary> CreateSpecifications()
         {
-            List<Specification> specifications = new List<Specification>();
-            specifications.Add(new Specification()
+            List<SpecificationSummary> specifications = new List<SpecificationSummary>();
+            specifications.Add(new SpecificationSummary()
             {
                 Id = "spec1",
                 Name = "Specification 1",
                 FundingPeriod = new Reference("1718", "2017/2018"),
             });
 
-            specifications.Add(new Specification()
+            specifications.Add(new SpecificationSummary()
             {
                 Id = "spec2",
                 Name = "Specification 2",
                 FundingPeriod = new Reference("1718", "2017/2018"),
             });
 
-            specifications.Add(new Specification()
+            specifications.Add(new SpecificationSummary()
             {
                 Id = "spec3",
                 Name = "Specification for 2018/2019",

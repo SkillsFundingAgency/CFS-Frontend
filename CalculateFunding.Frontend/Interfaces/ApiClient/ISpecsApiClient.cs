@@ -10,6 +10,9 @@
     {
         Task<ApiResponse<Specification>> GetSpecification(string specificationId);
 
+        Task<ApiResponse<SpecificationSummary>> GetSpecificationSummary(string specificationId);
+
+
         /// <summary>
         /// Get Specification By Name
         /// </summary>
@@ -26,11 +29,24 @@
         Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications();
 
         /// <summary>
+        /// Gets all Specification Summaries
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries();
+
+        /// <summary>
+        /// Gets all Specification Summaries given provided Specification IDs
+        /// </summary>
+        /// <returns></returns>
+        /// <param name="specificationIds">Specification IDs</param>
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries(IEnumerable<string> specificationIds);
+
+        /// <summary>
         /// Gets Specifications by Academic Year ID
         /// </summary>
         /// <param name="fundingPeriodId">Academic Year Id</param>
         /// <returns></returns>
-        Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string fundingPeriodId);
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId);
 
         Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification);
 

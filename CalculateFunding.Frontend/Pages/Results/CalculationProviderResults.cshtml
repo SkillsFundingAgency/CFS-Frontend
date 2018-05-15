@@ -22,7 +22,7 @@
 }
 
 @section BannerLeft{
-    <p class="hero-description">@Model.Calculation.Specification.Name </p>
+    <p class="hero-description">@Model.Specification.Name </p>
     <h1 class="hero-title">@Model.Calculation.Name</h1>
 }
 @section BannerMiddle{
@@ -89,7 +89,7 @@
                     <div class="provider-item-container" id="provider-item-result-@providerRow">
                         <div class="provider-item-header">
                             <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
-                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.Id&periodId=@Model.Calculation.Specification.FundingPeriod.Id&specificationId=@Model.Calculation.Specification.Id">@provider.Name</a></h4>
+                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.Id&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
                         </div>
                         <div class="provider-item-property-container">
                             <span class="provider-item-property provider-item-property-last-updated">
@@ -242,7 +242,7 @@
 
     <script asp-src-include="~/js/search.calculationProviderResults.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
-        var vm = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationId: '@Model.Calculation.Id', specificationId: '@Model.Calculation.Specification.Id', fundingPeriodId: '@Model.Calculation.Specification.FundingPeriod?.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
+        var vm = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationId: '@Model.Calculation.Id', specificationId: '@Model.Specification.Id', fundingPeriodId: '@Model.Specification.FundingPeriod?.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {
             ko.applyBindings(vm, filterElement);

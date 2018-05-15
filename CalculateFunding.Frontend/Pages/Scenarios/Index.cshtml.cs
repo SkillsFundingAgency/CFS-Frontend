@@ -102,7 +102,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public async Task PopulateSpecifications(string fundingPeriodId)
         {
-            ApiResponse<IEnumerable<Specification>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {

@@ -173,17 +173,18 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateSpecifications(string providerId)
         {
-            var specResponse = await _resultsApiClient.GetSpecifications(providerId);
+            var specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                var specifications = specResponse.Content.Where(m => m.FundingPeriod?.Id == FundingPeriodId);
+                var specifications = specResponse.Content.Where(m => m == FundingPeriodId);
 
+                // TODO - lookup specification names
                 Specifications = specifications.Select(m => new SelectListItem
                 {
-                    Value = m.Id,
-                    Text = m.Name,
-                    Selected = m.Id == SpecificationId
+                    Value = m,
+                    Text = m,
+                    Selected = m == SpecificationId
                 }).ToList();
             }
             else

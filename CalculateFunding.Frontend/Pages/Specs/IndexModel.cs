@@ -18,7 +18,7 @@
             _specsClient = specsClient;
         }
 
-        public IEnumerable<Specification> Specifications { get; set; }
+        public IEnumerable<SpecificationSummary> Specifications { get; set; }
 
         public IList<SelectListItem> FundingPeriods { get; set; }
 
@@ -36,7 +36,7 @@
 
             var specstask = _specsClient.GetSpecifications(fundingPeriodId);
 
-            Specifications = specstask.Result == null ? new List<Specification>() : specstask.Result.Content;
+            Specifications = specstask.Result == null ? new List<SpecificationSummary>() : specstask.Result.Content;
 
             FundingPeriods = fundingPeriods.Select(m => new SelectListItem
             {

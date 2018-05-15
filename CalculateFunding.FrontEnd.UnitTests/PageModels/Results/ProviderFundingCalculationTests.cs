@@ -60,7 +60,7 @@
 
             IEnumerable<Reference> fundingPeriods = null;
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -81,8 +81,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
 
@@ -112,7 +112,7 @@
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -134,8 +134,8 @@
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -166,7 +166,7 @@
 
             Provider provider = null;
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -187,8 +187,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
             Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -218,7 +218,7 @@
 
             Provider provider = CreateProvider();
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -239,8 +239,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-            .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+            .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -271,7 +271,7 @@
 
             Provider provider = CreateProvider();
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -292,8 +292,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -324,7 +324,7 @@
 
             Provider provider = CreateProvider();
 
-            IList<SpecificationSummary> specSummary = GetSpecSummary();
+            IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -341,8 +341,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -373,7 +373,7 @@
 
             Provider provider = CreateProvider();
 
-            IList<SpecificationSummary> specSummary = null;
+            IList<string> specSummary = null;
 
             IList<CalculationResultItem> calResult = GetCalcResults();
 
@@ -390,8 +390,8 @@
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));
 
-            resultsApiClient.GetSpecifications("2")
-                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specSummary));
+            resultsApiClient.GetSpecificationIdsForProvider("2")
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
 
             // Act
@@ -420,30 +420,13 @@
 
         }
 
-        private IList<SpecificationSummary> GetSpecSummary()
+        private IEnumerable<string> GetSpecificationsWithResults()
         {
-            SpecificationSummary specsummary1 = new SpecificationSummary()
+            return new List<string>()
             {
-                FundingStreams = new List<Reference>() { new Reference() { Id = "1", Name = "Test Funding Stream 1" } },
-                FundingPeriod = new Reference() { Id = "1617", Name = "2016-2017" },
-                Id = "1",
-                Name = "Test Spec 1"
+                "1",
+                "2",
             };
-
-            SpecificationSummary specsummary2 = new SpecificationSummary()
-            {
-                FundingStreams = new List<Reference>() { new Reference() { Id = "2", Name = "Test Funding Stream 2" } },
-                FundingPeriod = new Reference() { Id = "1617", Name = "2016-2017" },
-                Id = "2",
-                Name = "Test Spec 2"
-            };
-
-            IList<SpecificationSummary> specSummary = new List<SpecificationSummary>
-            {
-                specsummary1,
-                specsummary2
-            };
-            return specSummary;
         }
 
         private IList<CalculationResultItem> GetCalcResults()

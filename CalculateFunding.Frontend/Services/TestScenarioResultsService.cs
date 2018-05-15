@@ -62,11 +62,11 @@ namespace CalculateFunding.Frontend.Services
             SetFilterValue(searchRequest, "fundingPeriodId", request.FundingPeriodId);
 
             Task<ScenarioSearchResultViewModel> scenarioSearchResultsTask = _scenariosSearchService.PerformSearch(searchRequest);
-            Task<ApiResponse<IEnumerable<Specification>>> specificationsLookupTask;
+            Task<ApiResponse<IEnumerable<SpecificationSummary>>> specificationsLookupTask;
 
             if (string.IsNullOrWhiteSpace(request.FundingPeriodId))
             {
-                specificationsLookupTask = _specsClient.GetSpecifications();
+                specificationsLookupTask = _specsClient.GetSpecificationSummaries();
             }
             else
             {
@@ -82,7 +82,7 @@ namespace CalculateFunding.Frontend.Services
                 throw new InvalidOperationException("Scenario Search Results response was null");
             }
 
-            ApiResponse<IEnumerable<Specification>> specificationsApiResponse = specificationsLookupTask.Result;
+            ApiResponse<IEnumerable<SpecificationSummary>> specificationsApiResponse = specificationsLookupTask.Result;
             if (specificationsApiResponse == null)
             {
                 _logger.Warning("Specifications API Response was null");
@@ -105,7 +105,7 @@ namespace CalculateFunding.Frontend.Services
             TestScenarioResultViewModel result = _mapper.Map<TestScenarioResultViewModel>(scenarioSearchResults);
 
             List<ReferenceViewModel> specifications = new List<ReferenceViewModel>();
-            foreach (Specification specification in specificationsApiResponse.Content.OrderBy(s=>s.Name))
+            foreach (SpecificationSummary specification in specificationsApiResponse.Content.OrderBy(s=>s.Name))
             {
                 specifications.Add(new ReferenceViewModel(specification.Id, specification.Name));
             }

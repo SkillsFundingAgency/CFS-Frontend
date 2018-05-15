@@ -141,27 +141,64 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateSpecifications(string providerId, string specificationId = null)
         {
-            var specResponse = await _resultsApiClient.GetSpecifications(providerId);
+            var specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                var specifications = specResponse.Content.Where(m => m.FundingPeriod?.Id == FundingPeriodId);
+                IEnumerable<string> specificationIds = specResponse.Content.Where(m => m == FundingPeriodId);
 
                 if (string.IsNullOrWhiteSpace(specificationId))
                 {
                     specificationId = SpecificationId;
                 }
 
-                Specifications = specifications.Select(m => new SelectListItem
+                Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary> specificationSummaries = new Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary>();
+
+                if (specificationIds.Any())
                 {
-                    Value = m.Id,
-                    Text = m.Name,
-                    Selected = m.Id == specificationId
-                }).ToList().OrderBy(o => o.Text);
+                    ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>> specificationSummaryLookup = await _specsApiClient.GetSpecificationSummaries(specificationIds);
+                    if(specificationSummaryLookup == null)
+                    {
+                        throw new InvalidOperationException("Specification Summary Lookup returned null");
+                    }
+
+                    if(specificationSummaryLookup.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new InvalidOperationException($"Specification Summary lookup returned HTTP Status code {specificationSummaryLookup.StatusCode}");
+                    }
+
+                    if (!specificationSummaryLookup.Content.IsNullOrEmpty())
+                    {
+                        foreach(Clients.SpecsClient.Models.SpecificationSummary specSummary in specificationSummaryLookup.Content)
+                        {
+                            specificationSummaries.Add(specSummary.Id, specSummary);
+                        }
+                    }
+                }
+
+                List<SelectListItem> selectListItems = new List<SelectListItem>();
+
+                foreach(string specId in specificationIds)
+                {
+                    string specName = specId;
+                    if (specificationSummaries.ContainsKey(specId))
+                    {
+                        specName = specificationSummaries[specId].Name;
+                    }
+
+                    selectListItems.Add(new SelectListItem
+                    {
+                        Value = specId,
+                        Text = specName,
+                        Selected = specId == specificationId
+                    });
+                }
+
+                Specifications = selectListItems.OrderBy(o => o.Text);
             }
             else
             {
-                throw new InvalidOperationException($"Unable to retreive Specifications: Status Code = {specResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to retrieve provider result Specifications: Status Code = {specResponse.StatusCode}");
             }
 
         }
