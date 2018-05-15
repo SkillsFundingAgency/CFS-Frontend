@@ -166,5 +166,23 @@
 
             return response.StatusCode;
         }
+
+        public async Task<HttpStatusCode> PutAsync<TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            string json = JsonConvert.SerializeObject(request, _serializerSettings);
+            _logger.Debug($"ApiClient PUT: {{url}} ({typeof(TRequest).Name})", url);
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+            }
+
+            return response.StatusCode;
+        }
     }
 }

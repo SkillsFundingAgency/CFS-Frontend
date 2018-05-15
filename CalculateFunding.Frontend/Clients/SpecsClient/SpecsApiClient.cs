@@ -1,7 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -48,31 +47,39 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<Specification>($"{_specsPath}/specification-by-id?specificationId={specificationId}");
+            return GetAsync<Specification>($"{_specsPath}/specification-current-version-by-id?specificationId={specificationId}");
         }
 
-        public Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification)
+        public Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
             return PostAsync($"{_specsPath}/specifications", specification);
         }
 
-        public Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy)
+        public Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(specification, nameof(specification));
+
+            return PutAsync($"{_specsPath}/specification-edit?specificationId={specificationId}", specification);
+        }
+
+        public Task<ApiResponse<Policy>> CreatePolicy(CreatePolicyModel policy)
         {
             Guard.ArgumentNotNull(policy, nameof(policy));
 
             return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
         }
 
-        public Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation)
+        public Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
             return PostAsync<Calculation, CreateCalculationModel>($"{_specsPath}/calculations", calculation);
         }
 
-        public Task<HttpStatusCode> PostProduct(string specificationId, Product product)
+        public Task<HttpStatusCode> CreateProduct(string specificationId, Product product)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(product, nameof(product));

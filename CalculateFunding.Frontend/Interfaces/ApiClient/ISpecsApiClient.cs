@@ -32,9 +32,9 @@
         /// <returns></returns>
         Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications(string fundingPeriodId);
 
-        Task<HttpStatusCode> PostSpecification(CreateSpecificationModel specification);
+        Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification);
 
-        Task<HttpStatusCode> PostProduct(string specificationId, Product product);
+        Task<HttpStatusCode> CreateProduct(string specificationId, Product product);
 
         Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods();
 
@@ -44,16 +44,18 @@
 
         Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
 
-        Task<ApiResponse<Policy>> PostPolicy(CreatePolicyModel policy);
+        Task<ApiResponse<Policy>> CreatePolicy(CreatePolicyModel policy);
 
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
 
         Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId);
 
-        Task<ApiResponse<Calculation>> PostCalculation(CreateCalculationModel calculation);
+        Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation);
 
         Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId);
 
         Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
+
+        Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);
     }
 }

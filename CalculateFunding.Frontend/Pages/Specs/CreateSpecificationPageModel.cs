@@ -73,7 +73,7 @@
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
 
-            await _specsClient.PostSpecification(specification);
+            await _specsClient.CreateSpecification(specification);
 
             return Redirect($"/specs?fundingPeriodId={specification.FundingPeriodId}");
         }

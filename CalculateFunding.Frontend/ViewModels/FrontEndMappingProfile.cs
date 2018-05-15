@@ -16,6 +16,7 @@
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using CalculateFunding.Frontend.ViewModels.TestEngine;
+    using System.Linq;
 
     public class FrontEndMappingProfile : Profile
     {
@@ -80,6 +81,8 @@
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>();
 
+            CreateMap<EditSpecificationViewModel, EditSpecificationModel>();
+
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
@@ -96,6 +99,16 @@
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
+
+            CreateMap<Specification, EditSpecificationViewModel>()
+                .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
+                .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingStreams, opt => opt.Ignore())
+                .AfterMap((Specification source, EditSpecificationViewModel destination) =>
+                {
+                    destination.FundingPeriodId = source.FundingPeriod.Id;
+                    destination.FundingStreamIds = source.FundingStreams.Select(m => m.Id);
+                });
         }
 
         private void MapDatasets()

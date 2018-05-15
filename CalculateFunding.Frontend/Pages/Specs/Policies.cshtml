@@ -158,6 +158,9 @@
         <div class="rightcolumn-container">
             <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
             <div>
+                <a href="/specs/editspecification/@Model.Specification.Id">Edit specification</a>
+            </div>
+            <div>
                 <a href="/specs/createPolicy/@Model.Specification.Id">Create policy</a>
             </div>
             @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())

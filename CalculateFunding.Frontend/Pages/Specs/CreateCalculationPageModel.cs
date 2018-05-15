@@ -135,7 +135,7 @@
 
             calculation.SpecificationId = specificationId;
 
-            ApiResponse<Calculation> newCalculationResponse = await _specsClient.PostCalculation(calculation);
+            ApiResponse<Calculation> newCalculationResponse = await _specsClient.CreateCalculation(calculation);
 
             if (newCalculationResponse.StatusCode == HttpStatusCode.OK)
             {

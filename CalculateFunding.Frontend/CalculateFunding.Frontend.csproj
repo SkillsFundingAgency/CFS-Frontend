@@ -26,6 +26,7 @@
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
+    <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
@@ -116,6 +117,7 @@
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
+    <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
     <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />

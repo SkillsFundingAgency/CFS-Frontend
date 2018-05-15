@@ -1906,6 +1906,12 @@ table {
     border-left-color: #28a197;
 }
 
+.alert--warning {
+    background-color: orange;
+    color: #fff;
+    font-size: small;
+}
+
 .alert--info-grey {
     border-left: 3px solid #6f777b;
     background-color: #eaedef;
@@ -2025,4 +2031,11 @@ table {
 
 .alert-content-margin {
     margin-left: 20px;
+}
+
+.icon-funding-stream-removed{
+    width:30px;
+    margin-top:5px;
+    margin-right:10px;
+    float:left;
 }

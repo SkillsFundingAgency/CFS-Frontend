@@ -433,7 +433,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Returns(calcApiRespnse);
 
             specsClient
-                .PostCalculation(Arg.Is(createModel))
+                .CreateCalculation(Arg.Is(createModel))
                 .Returns(newCalcApiResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient, mapper);
@@ -506,7 +506,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Returns(calcApiRespnse);
 
             specsClient
-                .PostCalculation(Arg.Is(createModel))
+                .CreateCalculation(Arg.Is(createModel))
                 .Returns(newCalcApiResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient, mapper);

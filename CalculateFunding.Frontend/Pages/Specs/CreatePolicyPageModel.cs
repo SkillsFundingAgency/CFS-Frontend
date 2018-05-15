@@ -86,7 +86,7 @@
 
             policy.SpecificationId = specificationId;
 
-            ApiResponse<Policy> newPolicyResponse = await _specsClient.PostPolicy(policy);
+            ApiResponse<Policy> newPolicyResponse = await _specsClient.CreatePolicy(policy);
 
             Policy newPolicy = newPolicyResponse.Content;
 
