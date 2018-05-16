@@ -108,7 +108,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             FundingPeriodId = fundingPeriodId;
 
-            await PopulateSpecifications(providerId);
+            await PopulateSpecifications(providerId, specificationId);
 
             SpecificationId = specificationId;
 
@@ -171,26 +171,77 @@ namespace CalculateFunding.Frontend.Pages.Results
             }).ToList();
         }
 
-        private async Task PopulateSpecifications(string providerId)
+        private async Task PopulateSpecifications(string providerId, string specificationId = null)
         {
             var specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                var specifications = specResponse.Content.Where(m => m == FundingPeriodId);
-
-                // TODO - lookup specification names
-                Specifications = specifications.Select(m => new SelectListItem
+                IEnumerable<string> specificationIds = specResponse.Content;
+                if (string.IsNullOrWhiteSpace(specificationId))
                 {
-                    Value = m,
-                    Text = m,
-                    Selected = m == SpecificationId
-                }).ToList();
+                    specificationId = SpecificationId;
+                }
+
+                Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary> specificationSummaries = new Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary>();
+
+                if (specificationIds.Any())
+                {
+                    ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>> specificationSummaryLookup = await _specsApiClient.GetSpecificationSummaries(specificationIds);
+                    if (specificationSummaryLookup == null)
+                    {
+                        throw new InvalidOperationException("Specification Summary Lookup returned null");
+                    }
+
+                    if (specificationSummaryLookup.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new InvalidOperationException($"Specification Summary lookup returned HTTP Status code {specificationSummaryLookup.StatusCode}");
+                    }
+
+                    if (!specificationSummaryLookup.Content.IsNullOrEmpty())
+                    {
+                        foreach (Clients.SpecsClient.Models.SpecificationSummary specSummary in specificationSummaryLookup.Content)
+                        {
+                            specificationSummaries.Add(specSummary.Id, specSummary);
+                        }
+                    }
+                }
+
+                List<SelectListItem> selectListItems = new List<SelectListItem>();
+
+                foreach (string specId in specificationIds)
+                {
+                    string specName = specId;
+
+                    if (specificationSummaries.ContainsKey(specId))
+                    {
+                        if (specificationSummaries[specId].FundingPeriod.Id != FundingPeriodId)
+                        {
+                            continue;
+                        }
+
+                        specName = specificationSummaries[specId].Name;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    selectListItems.Add(new SelectListItem
+                    {
+                        Value = specId,
+                        Text = specName,
+                        Selected = specId == specificationId
+                    });
+                }
+
+                Specifications = selectListItems.OrderBy(o => o.Text);
             }
             else
             {
-                throw new InvalidOperationException($"Unable to retreive Specifications: Status Code = {specResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to retrieve provider result Specifications: Status Code = {specResponse.StatusCode}");
             }
+
         }
     }
 }

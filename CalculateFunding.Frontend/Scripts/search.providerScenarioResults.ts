@@ -18,11 +18,22 @@
 
         public testCoverage: KnockoutObservable<string> = ko.observable("0");
 
+        public allocationLineUrl: KnockoutComputed<string>;
+
+        public calculationResultsUrl: KnockoutComputed<string>;
+
+
         constructor(options: IProviderTestSearchViewModelConstructorParameters) {
             super();
             if (typeof options === "undefined") {
                 throw new Error("Constructor parameter options not passed");
             }
+
+            if (typeof options.fundingPeriodId == "undefined") {
+                throw new Error("Funding period ID not defined in options");
+            }
+
+            this.selectedFundingPeriod(options.fundingPeriodId);
 
             this.extractProviderId(options);
 
@@ -59,6 +70,14 @@
 
             self.state.subscribe((newValue) => {
                 console.log("State changed: ", newValue);
+            });
+
+            this.allocationLineUrl = ko.pureComputed(() => {
+                return "/results/ProviderAllocationLine?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationId=" + self.selectedSpec();
+            });
+
+            this.calculationResultsUrl = ko.pureComputed(() => {
+                return "/results/ProviderCalcsResults?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationId=" + self.selectedSpec();
             });
         }
 
@@ -133,5 +152,6 @@
 
     export interface IProviderTestSearchViewModelConstructorParameters {
         providerId: string;
+        fundingPeriodId: string;
     }
 }

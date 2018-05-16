@@ -101,6 +101,10 @@
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
 
+            specsClient
+                .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
 
@@ -141,6 +145,10 @@
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.NotFound, provider));
 
+            specsClient
+                .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
 
@@ -176,6 +184,10 @@
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+
+            specsClient
+                .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
@@ -218,6 +230,10 @@
 
             resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
                 .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+
+            specsClient
+                .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
 
             IList<TestScenarioSearchResultItemViewModel> testScenarioSearchResultItems = GetTestScenarioSearchResults();
 
@@ -330,6 +346,10 @@
 
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(results);
+
+            specsClient
+                .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
 
             ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 

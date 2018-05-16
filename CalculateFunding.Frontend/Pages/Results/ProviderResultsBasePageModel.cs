@@ -145,8 +145,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
-                IEnumerable<string> specificationIds = specResponse.Content.Where(m => m == FundingPeriodId);
-
+                IEnumerable<string> specificationIds = specResponse.Content;
                 if (string.IsNullOrWhiteSpace(specificationId))
                 {
                     specificationId = SpecificationId;
@@ -157,19 +156,19 @@ namespace CalculateFunding.Frontend.Pages.Results
                 if (specificationIds.Any())
                 {
                     ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>> specificationSummaryLookup = await _specsApiClient.GetSpecificationSummaries(specificationIds);
-                    if(specificationSummaryLookup == null)
+                    if (specificationSummaryLookup == null)
                     {
                         throw new InvalidOperationException("Specification Summary Lookup returned null");
                     }
 
-                    if(specificationSummaryLookup.StatusCode != HttpStatusCode.OK)
+                    if (specificationSummaryLookup.StatusCode != HttpStatusCode.OK)
                     {
                         throw new InvalidOperationException($"Specification Summary lookup returned HTTP Status code {specificationSummaryLookup.StatusCode}");
                     }
 
                     if (!specificationSummaryLookup.Content.IsNullOrEmpty())
                     {
-                        foreach(Clients.SpecsClient.Models.SpecificationSummary specSummary in specificationSummaryLookup.Content)
+                        foreach (Clients.SpecsClient.Models.SpecificationSummary specSummary in specificationSummaryLookup.Content)
                         {
                             specificationSummaries.Add(specSummary.Id, specSummary);
                         }
@@ -178,19 +177,29 @@ namespace CalculateFunding.Frontend.Pages.Results
 
                 List<SelectListItem> selectListItems = new List<SelectListItem>();
 
-                foreach(string specId in specificationIds)
+                foreach (string specId in specificationIds)
                 {
                     string specName = specId;
+
                     if (specificationSummaries.ContainsKey(specId))
                     {
+                        if (specificationSummaries[specId].FundingPeriod.Id != FundingPeriodId)
+                        {
+                            continue;
+                        }
+
                         specName = specificationSummaries[specId].Name;
+                    }
+                    else
+                    {
+                        continue;
                     }
 
                     selectListItems.Add(new SelectListItem
                     {
                         Value = specId,
                         Text = specName,
-                        Selected = specId == specificationId
+                        Selected = specId == specificationId,
                     });
                 }
 
