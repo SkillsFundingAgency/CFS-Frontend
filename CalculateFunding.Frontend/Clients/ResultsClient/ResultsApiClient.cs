@@ -24,40 +24,12 @@
             _resultsPath = options.Value.ResultsPath ?? "/api/results";
         }
 
-        public Task<ApiResponse<BudgetSummary[]>> GetBudgetResults(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return GetAsync<BudgetSummary[]>($"{_resultsPath}/budgets", cancellationToken);
-        }
-
-        public Task<ApiResponse<ProviderTestResult[]>> GetProviderResults(string budgetId, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
-
-            return GetAsync<ProviderTestResult[]>($"{_resultsPath}/providers?budgetId={budgetId}", cancellationToken);
-        }
-
         public Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             return GetAsync<ProviderResults>($"{_resultsPath}/get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
-        }
-
-        public Task<ApiResponse<ProviderTestResult>> GetProviderResult(string budgetId, string providerId, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
-            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
-
-            return GetAsync<ProviderTestResult>($"{_resultsPath}/providers?budgetId={budgetId}&providerId={providerId}", cancellationToken);
-        }
-
-        public Task<ApiResponse<AllocationLine>> GetAllocationLine(string budgetId, string allocationLineId, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            Guard.IsNullOrWhiteSpace(budgetId, nameof(budgetId));
-            Guard.IsNullOrWhiteSpace(allocationLineId, nameof(allocationLineId));
-
-            return GetAsync<AllocationLine>($"{_resultsPath}/allocationLine?budgetId={budgetId}&allocationLineId={allocationLineId}", cancellationToken);
         }
 
         public async Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions)

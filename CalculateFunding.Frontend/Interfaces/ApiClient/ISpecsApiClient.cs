@@ -12,15 +12,12 @@
 
         Task<ApiResponse<SpecificationSummary>> GetSpecificationSummary(string specificationId);
 
-
         /// <summary>
         /// Get Specification By Name
         /// </summary>
         /// <param name="specificationName">Specification Name</param>
         /// <returns>Specification when exists, null when it doesn't</returns>
         Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName);
-
-        Task<ApiResponse<Product>> GetProduct(string specificationId, string productId);
 
         /// <summary>
         /// Gets all Specifications
@@ -49,8 +46,6 @@
         Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId);
 
         Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification);
-
-        Task<HttpStatusCode> CreateProduct(string specificationId, Product product);
 
         Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods();
 

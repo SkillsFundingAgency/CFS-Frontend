@@ -59,18 +59,6 @@
             return GetAsync<IEnumerable<DatasetDefinition>>($"{_datasetsPath}/get-data-definitions");
         }
 
-        public Task<ApiResponse<Reference[]>> GetDefinitions()
-        {
-            var definitions = new[]
-            {
-                new Reference("9183", "14/15")
-            };
-
-            ApiResponse<Reference[]> response = new ApiResponse<Reference[]>(HttpStatusCode.OK, definitions);
-
-            return Task.FromResult(response);
-        }
-
         public Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> CreateDataset(CreateNewDatasetModel dataset)
         {
             Guard.ArgumentNotNull(dataset, nameof(dataset));

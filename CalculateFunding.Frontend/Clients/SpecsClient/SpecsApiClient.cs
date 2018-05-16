@@ -104,27 +104,6 @@
             return PostAsync<Calculation, CreateCalculationModel>($"{_specsPath}/calculations", calculation);
         }
 
-        public Task<HttpStatusCode> CreateProduct(string specificationId, Product product)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(product, nameof(product));
-
-            return PostAsync($"{_specsPath}/products?budgetId={specificationId}", product);
-        }
-
-        public Task<ApiResponse<Product>> GetProduct(string specificationId, string productId)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(productId, nameof(productId));
-
-            return GetAsync<Product>($"{_specsPath}/products?budgetId={specificationId}&productId={productId}");
-        }
-
-        public Task<ApiResponse<Specification[]>> GetBudgets()
-        {
-            return GetAsync<Specification[]>($"{_specsPath}/budgets");
-        }
-
         public Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
         {
             return GetAsync<IEnumerable<Reference>>($"{_specsPath}/get-fundingperiods");
