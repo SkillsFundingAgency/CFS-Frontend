@@ -91,7 +91,7 @@ namespace calculateFunding.editCalculation {
                 };
 
                 let request = $.ajax({
-                    url: "/api/preview/compile",
+                    url: "/api/specs/" + this.options.specificationId + "/calculations/" + this.options.calculationId + "/compilePreview",
                     data: JSON.stringify(data),
                     dataType: "json",
                     method: "POST",

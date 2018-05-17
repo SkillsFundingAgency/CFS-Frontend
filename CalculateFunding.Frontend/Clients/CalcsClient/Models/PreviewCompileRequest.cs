@@ -4,6 +4,8 @@
     {
         public string CalculationId { get; set; }
 
+        public string SpecificationId { get; set; }
+
         public string SourceCode { get; set; }
     }
 }

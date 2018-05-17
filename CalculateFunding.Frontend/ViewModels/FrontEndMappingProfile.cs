@@ -71,6 +71,10 @@
 
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
             CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
+
+            CreateMap<PreviewCompileRequestViewModel, PreviewCompileRequest>()
+                .ForMember(m => m.CalculationId, opt => opt.Ignore())
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
         }
 
         private void MapSpecs()

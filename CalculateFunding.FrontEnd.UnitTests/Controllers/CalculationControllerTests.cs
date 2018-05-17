@@ -129,11 +129,11 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationController controller = new CalculationController(calcsClient, mapper);
 
             string calculationId = "5";
+            string specificationId = "65";
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
                 SourceCode = "Updated source code",
-                CalculationId = calculationId,
             };
 
             PreviewCompileResult apiResultCalculation = new PreviewCompileResult()
@@ -149,7 +149,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(new ApiResponse<PreviewCompileResult>(System.Net.HttpStatusCode.OK, apiResultCalculation));
 
             // Act
-            IActionResult result = await controller.CompilePreview(previewViewModel);
+            IActionResult result = await controller.CompilePreview(specificationId, calculationId, previewViewModel);
 
             // Assert
             result.Should().NotBeNull();
@@ -170,18 +170,18 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationController controller = new CalculationController(calcsClient, mapper);
 
             string calculationId = "5";
+            string specificationId = "65";
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
                 SourceCode = "Updated source code",
-                CalculationId = calculationId,
             };
 
             // Force validation failed
             controller.ModelState.AddModelError(nameof(previewViewModel.SourceCode), "Test");
 
             // Act
-            IActionResult result = await controller.CompilePreview(previewViewModel);
+            IActionResult result = await controller.CompilePreview(specificationId, calculationId, previewViewModel);
 
             // Assert
             result.Should().NotBeNull();
@@ -198,11 +198,11 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationController controller = new CalculationController(calcsClient, mapper);
 
             string calculationId = "5";
+            string specificationId = "65";
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
                 SourceCode = "Updated source code",
-                CalculationId = calculationId,
             };
 
             calcsClient
@@ -217,7 +217,7 @@ namespace CalculateFunding.Frontend.Controllers
             // Act
             Action a = new Action(() =>
             {
-                IActionResult result = controller.CompilePreview(previewViewModel).Result;
+                IActionResult result = controller.CompilePreview(specificationId, calculationId, previewViewModel).Result;
             });
 
             // Assert

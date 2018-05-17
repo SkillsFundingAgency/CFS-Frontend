@@ -51,9 +51,9 @@
             }
         }
 
-        [Route("api/preview/compile")]
+        [Route("api/specs/{specificationId}/calculations/{calculationId}/compilePreview")]
         [HttpPost]
-        public async Task<IActionResult> CompilePreview([FromBody]PreviewCompileRequestViewModel vm)
+        public async Task<IActionResult> CompilePreview([FromRoute]string specificationId,[FromRoute] string calculationId, [FromBody]PreviewCompileRequestViewModel vm)
         {
             if (!ModelState.IsValid)
             {
@@ -61,6 +61,8 @@
             }
 
             PreviewCompileRequest request = _mapper.Map<PreviewCompileRequest>(vm);
+            request.CalculationId = calculationId;
+            request.SpecificationId = specificationId;
 
             ApiResponse<PreviewCompileResult> response = await _calcClient.PreviewCompile(request);
 

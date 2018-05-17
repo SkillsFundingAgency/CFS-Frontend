@@ -5,9 +5,6 @@
     public class PreviewCompileRequestViewModel
     {
         [Required]
-        public string CalculationId { get; set; }
-
-        [Required]
         public string SourceCode { get; set; }
     }
 }
