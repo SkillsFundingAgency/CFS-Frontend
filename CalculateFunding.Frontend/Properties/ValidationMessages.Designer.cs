@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must select an allocation line.
+        ///   Looks up a localized string similar to Select an allocation line.
         /// </summary>
         internal static string CalculationAllocationLineRequired {
             get {
@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a description for the calculation.
+        ///   Looks up a localized string similar to Enter a description.
         /// </summary>
         internal static string CalculationDescriptionRequired {
             get {
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique calculation name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string CalculationNameAlreadyExists {
             get {
@@ -88,7 +88,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique calculation name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string CalculationNameRequired {
             get {
@@ -97,7 +97,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must select a policy or subpolicy.
+        ///   Looks up a localized string similar to Select a policy or Select a subpolicy.
         /// </summary>
         internal static string CalculationPolicyIdRequired {
             get {
@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must provide a description for this new relationship.
+        ///   Looks up a localized string similar to Enter a description.
         /// </summary>
         internal static string DatasetSchemaDescriptionRequired {
             get {
@@ -124,7 +124,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique name for this dataset schema relationship.
+        ///   Looks up a localized string similar to Enter a unique description.
         /// </summary>
         internal static string DatasetSchemaRelationshipNameRequired {
             get {
@@ -133,7 +133,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must assign a dataset for the specification.
+        ///   Looks up a localized string similar to Enter a data schema.
         /// </summary>
         internal static string DatasetSchemaRequiredForSpecification {
             get {
@@ -142,7 +142,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a description for the policy.
+        ///   Looks up a localized string similar to Enter a description.
         /// </summary>
         internal static string PolicyDescriptionRequired {
             get {
@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique policy name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string PolicyNameAlreadyExists {
             get {
@@ -160,7 +160,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique policy name.
+        ///   Looks up a localized string similar to Enter a name.
         /// </summary>
         internal static string PolicyNameRequired {
             get {
@@ -169,7 +169,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must select a policy.
+        ///   Looks up a localized string similar to Select a policy.
         /// </summary>
         internal static string PolicyParentIdRequired {
             get {
@@ -178,7 +178,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Given relationship name is not unique, please provide different relationship name .
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string RelationshipNameAlreadyExists {
             get {
@@ -196,7 +196,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must enter a gherkin test.
+        ///   Looks up a localized string similar to Enter test scenario code.
         /// </summary>
         internal static string ScenarioGherkinRequired {
             get {
@@ -205,7 +205,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter a name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string ScenarioNameRequired {
             get {
@@ -223,7 +223,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique specification name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string SpecificationAlreadyExists {
             get {
@@ -232,7 +232,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a description for the specification.
+        ///   Looks up a localized string similar to Enter a description.
         /// </summary>
         internal static string SpecificationDescriptionRequired {
             get {
@@ -250,7 +250,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must select at least one funding stream.
+        ///   Looks up a localized string similar to Select at least one funding stream.
         /// </summary>
         internal static string SpecificationFundingStreamRequired {
             get {
@@ -259,7 +259,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a unique specification name.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string SpecificationNameRequired {
             get {
@@ -268,7 +268,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must give a description for the subpolicy.
+        ///   Looks up a localized string similar to Enter a description.
         /// </summary>
         internal static string SubPolicyDescriptionRequired {
             get {

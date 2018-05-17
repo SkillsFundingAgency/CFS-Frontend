@@ -276,7 +276,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             result.Should().BeOfType<BadRequestObjectResult>();
 
             BadRequestObjectResult typedResult = result as BadRequestObjectResult;
-            typedResult.Value.Should().Be("The provided calculation ID was null or empty string");
+            typedResult.Value.Should().Be("Enter a unique name");
         }
     }
 }

@@ -1,20 +1,26 @@
 /// <reference path="common.d.ts" />
 /// <reference path="provider.completion.gherkin.ts" />
 
-namespace calculateFunding.createTestScenario {
+namespace calculateFunding.editTestScenario {
 
-    export class CreateTestScenarioViewModel {
+    export class EditTestScenarioViewModel {
         private readonly stateKeyIntellisenseLoading: string = "intellisenseLoading";
+
+        private readonly stateKeyCompilingTest : string = "compilingTest";
 
         public state: KnockoutObservable<string> = ko.observable("idle");
 
-        public specificationId: KnockoutObservable<string> = ko.observable("");
+        public name: KnockoutObservable<string> = ko.observable();
 
-        public name: KnockoutObservable<string> = ko.observable("");
+        public savedTestScenarioName: KnockoutObservable<string> = ko.observable(null);
 
-        public description: KnockoutObservable<string> = ko.observable("");
+        public BannerText: KnockoutObservable<string> = ko.observable(null);
 
-        public sourceCode: KnockoutObservable<string> = ko.observable("");
+        public description: KnockoutObservable<string> = ko.observable();
+
+        public scenarioId: KnockoutObservable<string> = ko.observable();
+
+        public sourceCode: KnockoutObservable<string> = ko.observable();
 
         public isFormVisible: KnockoutComputed<boolean>;
 
@@ -54,9 +60,9 @@ namespace calculateFunding.createTestScenario {
 
         public validationRequested: KnockoutObservable<boolean> = ko.observable(false);
 
-        private successfulValidationSourceCode: KnockoutObservable<string> = ko.observable(null);
+        private successfulValidationSourceCode: KnockoutObservable<string> = ko.observable();
 
-        private initialCodeContents: string;
+        public specificationId: string;
 
         private compilerSecondsFunctionReference: number;
 
@@ -64,22 +70,59 @@ namespace calculateFunding.createTestScenario {
 
         private codeContexts: ILoadedCodeContexts = {};
 
-        constructor() {
+        private initialName: KnockoutObservable<string> = ko.observable();
+
+        private initialDescription: KnockoutObservable<string> = ko.observable();
+
+        private initialSourceCode: KnockoutObservable<string> = ko.observable();
+
+        public hasGherkinEdited: KnockoutObservable<boolean> = ko.observable();
+
+        constructor(options: IEditTestScenarioViewModelConstructorParameters) {
+  
+            if (typeof options === "undefined" ) {
+                throw new Error("Constructor parameter options not passed");
+            }
+
+            if(typeof options.description === "undefined"){
+                throw new Error("Constructor parameter variable description not passed");
+            }
+
+            if(typeof options.name === "undefined"){
+                throw new Error("Constructor parameter variable name not passed");
+            }
+
+            if(typeof options.sourceCode === "undefined"){
+                throw new Error("Constructor parameter variable sourcecode not passed");
+            }   
+
+            if(typeof options.scenarioId === "undefined"){
+                throw new Error("Constructor parameter variable scenarioId not passed");
+            }  
+
+            if(typeof options.specificationId === "undefined"){
+                throw new Error("Constructor parameter variable specificationId not passed");
+            }  
+
+            this.extractTestScenarioDetails(options);
 
             let self = this;
 
-            //self.isFormVisible = ko.pureComputed(() => {
-            //    return self.state() === "idle";
-            //});
+            self.loadIntellisenseContext(this.specificationId);
+            self.completionProvider.setCalculations([]);
+            self.completionProvider.setDatasets([]);
+
+            self.isFormVisible = ko.pureComputed(() => {
+                return self.state() === "idle";
+            });
 
             self.isValidationSummaryVisible = ko.pureComputed(() => {
-                return !(this.isSpecificationIdValid() && this.isNameValid() && this.isDescriptionValid());
+                return !(this.isNameValid() && this.isDescriptionValid());
             });
 
             self.isCreateScenarioButtonEnabled = ko.computed(() => {
-                let isEnabled = (this.description().length > 0
-                    && this.specificationId().length > 0
-                    && this.name().length > 0);
+                let isEnabled = (this.description()                   
+                    && this.name() && true);
                 return isEnabled;
             });
 
@@ -88,11 +131,7 @@ namespace calculateFunding.createTestScenario {
                     return false;
                 }
 
-                if (!self.sourceCode()) {
-                    return false;
-                }
-
-                if (!self.specificationId()) {
+                if (!self.sourceCode() || (self.sourceCode() === self.initialSourceCode())) {
                     return false;
                 }
 
@@ -100,39 +139,27 @@ namespace calculateFunding.createTestScenario {
             });
 
             this.canSaveTestScenario = ko.computed(() => {
-                // Has the user entered the test cases
-                if (!self.successfulValidationSourceCode()) {
-                    return false;
-                }
-
-                // Disable save if content is the same
-                if (self.sourceCode() !== self.successfulValidationSourceCode()) {
-                    return false;
-                }
-
+               
                 if (this.state() !== "idle") {
                     return false;
                 }
-
-                if (!this.specificationId()) {
-                    return false;
+                else if (self.name() !== self.initialName() || self.description() !== self.initialDescription() || (self.sourceCode() !== self.initialSourceCode() && self.successfulValidationSourceCode())) {
+                    return true;
                 }
+                
+                return false;
+            });
 
-                return true;
+            this.hasGherkinEdited = ko.computed(() => {
+                if(self.sourceCode() === self.initialSourceCode()){
+                    return false;
+                } else{
+                    return true;
+                }
             });
 
             self.isCompilingTest = ko.computed(() => {
-                return self.state() === 'compilingTest';
-            });
-
-            self.specificationId.subscribe((newValue) => {
-                if (newValue) {
-                    self.loadIntellisenseContext(newValue);
-                }
-                else {
-                    self.completionProvider.setCalculations([]);
-                    self.completionProvider.setDatasets([]);
-                }
+                return self.state() === this.stateKeyCompilingTest;
             });
 
             this.isIntellisenseLoading = ko.pureComputed(() => {
@@ -140,12 +167,28 @@ namespace calculateFunding.createTestScenario {
             });
         }
 
+        private extractTestScenarioDetails(options: IEditTestScenarioViewModelConstructorParameters){
+            this.name(options.name);
+            this.description(options.description);        
+            this.sourceCode(options.sourceCode); 
+            this.initialSourceCode(options.sourceCode);
+            this.scenarioId(options.scenarioId);
+
+            // Included to identify, if name and description contents have changed 
+            this.initialName(options.name);
+            this.initialDescription(options.description);
+            this.specificationId = options.specificationId;
+           
+        }
+
         private resetValidation() {
             this.isNameValid(true);
             this.isDescriptionValid(true);
-            this.isSpecificationIdValid(true);
         }
 
+        public dismissSaveAlert(){
+            this.savedTestScenarioName(null);
+        }
         public compileTestScenario() {
 
             let self = this;
@@ -160,7 +203,7 @@ namespace calculateFunding.createTestScenario {
                     self.compilingSeconds.push(1);
                 }, 1000);
 
-                //check  
+                
                 let data = {
                     gherkin: this.sourceCode(),
                 };
@@ -168,7 +211,7 @@ namespace calculateFunding.createTestScenario {
                 // Parsing requests to be set here
 
                 let request = $.ajax({
-                    url: "/api/specs/" + this.specificationId() + "/scenario-compile",
+                    url: "/api/specs/" + this.specificationId + "/scenario-compile",  
                     data: JSON.stringify(data),
                     dataType: "json",
                     method: "POST",
@@ -211,40 +254,47 @@ namespace calculateFunding.createTestScenario {
             }
 
             let data = {
-                scenario: this.sourceCode(),
+                gherkin: this.sourceCode(),
                 name: this.name(),
                 description: this.description(),
             };
 
             let request = $.ajax({
-                url: "/api/specs/" + this.specificationId() + "/testscenarios",
+                url: "/api/specs/" + this.specificationId + "/testscenarios/" + this.scenarioId(),  
                 data: JSON.stringify(data),
                 dataType: "json",
-                method: "POST",
+                method: "PUT",
                 contentType: "application/json"
             });
 
             let self = this;
 
-            self.state("Creating test scenario");
+            self.state("Saving test scenario");
 
             request.fail((response) => {
                 self.state("idle");
                 if (response.status === 400) {
                     self.handleValidationFormFailed(response.responseJSON);
+                    this.BannerText("Error saving test scenario.");
                 }
                 else {
-                    alert("Error creating test scenario");
+                    alert("Error saving test scenario");
                 }
             });
 
             request.done((response) => {
-                let responseModel : ICreateNewTestScenarioResponseModel = response ;
-                window.location.href = "/scenarios/edittestscenario/" +responseModel.id;
+                this.savedTestScenarioName(response.name);
+                self.initialDescription(response.description);
+                self.initialName(response.name);
+                self.initialSourceCode(response.gherkin);
+                self.successfulValidationSourceCode(response.gherkin);
+                this.BannerText("Test scenario: " + response.name +" is saved.");
+                this.state("idle"); 
             });
         }
 
-        private handleValidationFormFailed(modelState: ICreateNewTestScenarioModelState) {
+        private handleValidationFormFailed(modelState: IEditTestScenarioModelState) {
+
             this.resetValidation();
 
             this.validationLinks([]);
@@ -254,9 +304,9 @@ namespace calculateFunding.createTestScenario {
                 if (modelState.Name && modelState.Name.length > 0) {
                     this.isNameValid(false);
                     let link = {
-                        href: "#field-CreateTestScenarioModel-Name",
+                        href: "#field-EditTestScenarioModel-Name",
                         message: modelState.Name[0],
-                        id: "validation-link-for-CreateTestScenarioModel-Name"
+                        id: "validation-link-for-EditTestScenarioModel-Name"
                     }
                     this.validationLinks.push(link);
                 }
@@ -264,19 +314,9 @@ namespace calculateFunding.createTestScenario {
                 if (modelState.Description && modelState.Description.length > 0) {
                     this.isDescriptionValid(false);
                     let link = {
-                        href: "#field-CreateTestScenarioModel-Description",
+                        href: "#field-EditTestScenarioModel-Description",
                         message: modelState.Description[0],
-                        id: "validation-link-for-CreateTestScenarioModel-Description"
-                    }
-                    this.validationLinks.push(link);
-                }
-
-                if (modelState.SpecificationId && modelState.SpecificationId.length > 0) {
-                    this.isSpecificationIdValid(false);
-                    let link = {
-                        href: "#field-CreateTestScenarioModel-Specification",
-                        message: modelState.SpecificationId[0],
-                        id: "validation-link-for-CreateTestScenarioModel-Specification"
+                        id: "validation-link-for-EditTestScenarioModel-Description"
                     }
                     this.validationLinks.push(link);
                 }
@@ -284,9 +324,9 @@ namespace calculateFunding.createTestScenario {
                 if (modelState.SourceCode && modelState.SourceCode.length > 0) {
                     this.isSourceCodeValid(false);
                     let link = {
-                        href: "#field-CreateTestScenarioModel-SourceCode",
+                        href: "#field-EditTestScenarioModel-SourceCode",
                         message: modelState.SourceCode[0],
-                        id: "validation-link-for-CreateTestScenarioModel-SourceCode"
+                        id: "validation-link-for-EditTestScenarioModel-SourceCode"
                     }
 
                     this.validationLinks.push(link);
@@ -303,7 +343,7 @@ namespace calculateFunding.createTestScenario {
                 else {
                     this.state(this.stateKeyIntellisenseLoading);
                     let request = $.ajax({
-                        url: "/api/specs/" + this.specificationId() + "/codeContext",
+                        url: "/api/specs/" + this.specificationId + "/codeContext",
                         dataType: "json",
                         method: "GET",
                         contentType: "application/json"
@@ -339,7 +379,6 @@ namespace calculateFunding.createTestScenario {
                                         name: currentMethod.friendlyName,
                                         description: currentMethod.description,
                                     };
-
                                     codeContext.calculations.push(functionInformation);
                                 }
                             }
@@ -391,7 +430,7 @@ namespace calculateFunding.createTestScenario {
         }
 
         /* Register types for the monaco editor to support intellisense */
-        public registerMonacoProviders(viewModel: CreateTestScenarioViewModel) {
+        public registerMonacoProviders(viewModel: EditTestScenarioViewModel) {
             console.log("Registering monaco providers");
             monaco.languages.register({ id: "gherkin" });
 
@@ -411,6 +450,7 @@ namespace calculateFunding.createTestScenario {
                 }
 
             });
+
 
             monaco.editor.defineTheme('gherkin', {
                 base: 'vs',
@@ -437,7 +477,6 @@ namespace calculateFunding.createTestScenario {
             });
 
             monaco.languages.registerCompletionItemProvider('gherkin', viewModel.completionProvider.getCompletionProvider());
-            //monaco.languages.registerHoverProvider('vb', viewModel.codeContext.getHoverProvider());
         }
 
         public configureMonacoEditor(editor: monaco.editor.IStandaloneCodeEditor) {
@@ -447,8 +486,6 @@ namespace calculateFunding.createTestScenario {
             this.completionProvider.setDatasets(context.datasets);
             this.completionProvider.setCalculations(context.calculations);
         }
-
-
     }
 
     export interface IParseScenarioResultReponse {
@@ -472,22 +509,11 @@ namespace calculateFunding.createTestScenario {
         id: string;
     }
 
-    export interface ICreateNewTestScenarioModelState {
+    export interface IEditTestScenarioModelState {
         Name: string[];
-        SpecificationId: string[];
+        SpecificationId: string;
         Description: string[];
         SourceCode: string[];
-
-    }
-
-    //Required in future for Edit scenario page  
-    export interface ICreateNewTestScenarioResponseModel {
-        specificationId: string;
-        id: string;
-        author: IAuthorReference;
-        name: string;
-        description: string;
-        sourceCode: string;
     }
 
     export interface IAuthorReference {
@@ -504,4 +530,11 @@ namespace calculateFunding.createTestScenario {
         calculations: Array<calculateFunding.providers.ICalculation>;
     }
 
+    export interface IEditTestScenarioViewModelConstructorParameters {
+        name: string;
+        description: string;
+        sourceCode: string;
+        specificationId: string;
+        scenarioId: string;
+    }
 }

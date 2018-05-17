@@ -31,11 +31,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenScenarioNotReturned_ReturnsNotFoundResult()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.NotFound);
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.NotFound);
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(scenariosApiClient: apiClient);
@@ -53,14 +53,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenResultsIsNull_ReturnsStatusCodeResult500()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
-            ScenarioViewModel scenarioViewModel = new ScenarioViewModel();
+            TestScenarioViewModel scenarioViewModel = new TestScenarioViewModel();
 
             ITestResultsSearchService resultsService = CreateResultsService();
             resultsService
@@ -86,14 +86,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenResultsReturned_ReturnsPage()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient scenariosClient = CreateApiClient();
+            IScenariosApiClient scenariosClient = CreateScenariosClient();
             scenariosClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
-            ScenarioViewModel scenarioViewModel = new ScenarioViewModel();
+            TestScenarioViewModel scenarioViewModel = new TestScenarioViewModel();
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
 
@@ -110,8 +110,12 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Is<TestSecenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
+            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            specsApiClient
+                .GetSpecificationSummary(Arg.Any<string>())
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
 
-            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient);
+            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(Scenarioid, null, "");
@@ -126,11 +130,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnPostAsync_GivenScenarioNotReturned_ReturnsNotFoundResult()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.NotFound);
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.NotFound);
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(scenariosApiClient: apiClient);
@@ -148,14 +152,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnPostAsync_GivenResultsIsNull_ReturnsStatusCodeResult500()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
-            ScenarioViewModel scenarioViewModel = new ScenarioViewModel();
+            TestScenarioViewModel scenarioViewModel = new TestScenarioViewModel();
 
             ITestResultsSearchService resultsService = CreateResultsService();
             resultsService
@@ -181,14 +185,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnPostAsync_GivenResultsReturned_ReturnsPage()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient scenariosClient = CreateApiClient();
+            IScenariosApiClient scenariosClient = CreateScenariosClient();
             scenariosClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
-            ScenarioViewModel scenarioViewModel = new ScenarioViewModel();
+            TestScenarioViewModel scenarioViewModel = new TestScenarioViewModel();
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
 
@@ -205,8 +209,12 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Is<TestSecenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
+            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            specsApiClient
+                .GetSpecificationSummary(Arg.Any<string>())
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
 
-            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient);
+            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnPostAsync(Scenarioid, null, "");
@@ -221,11 +229,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenCountTaskIsNull_ThenErrorIsReturned()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -264,11 +272,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnPostAsync_GivenCountTaskIsNull_ThenErrorIsReturned()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -307,11 +315,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenCountTaskStatusCodeNotOk_ThenErrorIsReturned()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -350,11 +358,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenCountTaskReturnsNullContent_ThenErrorIsReturned()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -393,11 +401,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenCountTaskReturnsNoItems_ThenCoverageIsSetCorrectly()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -413,7 +421,15 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, Enumerable.Empty<TestScenarioResultCounts>()));
 
-            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            specsApiClient
+                .GetSpecificationSummary(Arg.Any<string>())
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+
+            ViewProviderTestResultsPageModel pageModel = CreatePageModel(
+                resultsService, testEngineApiClient,
+                scenariosApiClient: apiClient,
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(Scenarioid, null, "");
@@ -440,11 +456,11 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
         public async Task OnGetAsync_GivenCountTaskHasItemsForTestCoverage_ThenCoverageIsSetCorrectly()
         {
             //Arrange
-            ApiResponse<Scenario> scenario = new ApiResponse<Scenario>(HttpStatusCode.OK, new Scenario());
+            ApiResponse<TestScenario> scenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario());
 
-            IScenariosApiClient apiClient = CreateApiClient();
+            IScenariosApiClient apiClient = CreateScenariosClient();
             apiClient
-                .GetScenarioById(Arg.Is(Scenarioid))
+                .GetCurrentTestScenarioById(Arg.Is(Scenarioid))
                 .Returns(scenario);
 
             ProviderTestsSearchResultViewModel viewModel = new ProviderTestsSearchResultViewModel();
@@ -469,7 +485,15 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
-            ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
+            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            specsApiClient
+                .GetSpecificationSummary(Arg.Any<string>())
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+
+            ViewProviderTestResultsPageModel pageModel = CreatePageModel(
+                resultsService, testEngineApiClient, 
+                scenariosApiClient: apiClient, 
+                specsApiClient: specsApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(Scenarioid, null, "");
@@ -496,12 +520,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestResultsSearchService testResultsSearchService = null,
             ITestEngineApiClient testEngineApiClient = null,
             IScenariosApiClient scenariosApiClient = null,
+            ISpecsApiClient specsApiClient = null,
             IMapper mapper = null)
         {
             return new ViewProviderTestResultsPageModel(
                 testResultsSearchService ?? CreateResultsService(),
                 testEngineApiClient ?? CreateTestEngineClient(),
-                scenariosApiClient ?? CreateApiClient(),
+                scenariosApiClient ?? CreateScenariosClient(),
+                specsApiClient ?? CreateSpecsClient(),
                 mapper ?? CreateMapper());
         }
 
@@ -515,9 +541,14 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             return Substitute.For<ITestEngineApiClient>();
         }
 
-        static IScenariosApiClient CreateApiClient()
+        static IScenariosApiClient CreateScenariosClient()
         {
             return Substitute.For<IScenariosApiClient>();
+        }
+
+        static ISpecsApiClient CreateSpecsClient()
+        {
+            return Substitute.For<ISpecsApiClient>();
         }
 
         static IMapper CreateMapper()

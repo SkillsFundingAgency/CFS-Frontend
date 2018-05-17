@@ -46,18 +46,26 @@
             }
         }
 
-        public Task<ApiResponse<Scenario>> GetScenarioById(string scenarioId)
-        {
-            Guard.IsNullOrWhiteSpace(scenarioId, nameof(scenarioId));
-
-            return GetAsync<Scenario>($"{_testsPath}/get-scenario-by-id?scenarioId={scenarioId}");
-        }
-
-        public Task<ApiResponse<Scenario>> CreateTestScenario(CreateScenarioModel testScenario)
+        public Task<ApiResponse<TestScenario>> CreateTestScenario(CreateScenarioModel testScenario)
         {
             Guard.ArgumentNotNull(testScenario, nameof(testScenario));
 
-            return PostAsync<Scenario, CreateScenarioModel>($"{_testsPath}/save-scenario-test-version", testScenario);
+            return PostAsync<TestScenario, CreateScenarioModel>($"{_testsPath}/save-scenario-test-version", testScenario);
+        }
+
+        public Task<ApiResponse<TestScenario>> UpdateTestScenario(TestScenarioIUpdateModel testScenario)
+        {
+            Guard.ArgumentNotNull(testScenario, nameof(testScenario));
+
+            return PostAsync<TestScenario, TestScenarioIUpdateModel>($"{_testsPath}/save-scenario-test-version", testScenario);  
+        }
+
+
+        public Task<ApiResponse<TestScenario>> GetCurrentTestScenarioById(string scenarioId)
+        {
+            Guard.ArgumentNotNull(scenarioId, nameof(scenarioId));
+
+            return GetAsync<TestScenario>($"{_testsPath}/get-current-scenario-by-id?scenarioId={scenarioId}");
         }
     }
 }

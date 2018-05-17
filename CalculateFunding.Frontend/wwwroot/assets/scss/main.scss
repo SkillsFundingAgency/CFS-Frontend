@@ -1958,6 +1958,18 @@ table {
     border-bottom: 1px solid #ccc;
 }
 
+.edit-scenario .heading-grey-container {
+    border-left: 5px solid #6f777b;
+    position: relative;
+    margin: 0.52632em 0;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.edit-scenario .heading-grey-container .div-title {
+    padding-bottom: 5px;
+}
+
 
 /*image path overrides*/
 #global-header #logo {

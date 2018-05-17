@@ -214,6 +214,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View QA test results.
+        /// </summary>
+        public static string TestScenarioResults {
+            get {
+                return ResourceManager.GetString("TestScenarioResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Update data source.
         /// </summary>
         public static string UpdateDataSource {

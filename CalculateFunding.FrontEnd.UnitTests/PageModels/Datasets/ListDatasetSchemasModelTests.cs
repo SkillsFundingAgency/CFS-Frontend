@@ -321,7 +321,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be("The provided specification ID was null or empty string");
+            result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be("Select a specification");
         }
 
         [TestMethod]

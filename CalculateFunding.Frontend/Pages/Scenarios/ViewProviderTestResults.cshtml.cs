@@ -5,39 +5,45 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
+    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using CalculateFunding.Frontend.ViewModels.TestEngine;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
     public class ViewProviderTestResultsPageModel : PageModel
     {
         private readonly ITestResultsSearchService _testResultsSearchService;
         private readonly ITestEngineApiClient _testEngineClient;
         private readonly IScenariosApiClient _scenariosApiClient;
+        private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
 
         public ViewProviderTestResultsPageModel(
             ITestResultsSearchService testResultsSearchService,
             ITestEngineApiClient testEngineApiClient,
             IScenariosApiClient scenariosApiClient,
+            ISpecsApiClient specsApiClient,
             IMapper mapper)
         {
             Guard.ArgumentNotNull(testResultsSearchService, nameof(testResultsSearchService));
             Guard.ArgumentNotNull(testEngineApiClient, nameof(testEngineApiClient));
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
+            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
 
             _testResultsSearchService = testResultsSearchService;
             _testEngineClient = testEngineApiClient;
             _scenariosApiClient = scenariosApiClient;
+            _specsClient = specsApiClient;
             _mapper = mapper;
         }
 
@@ -46,7 +52,9 @@
 
         public ProviderTestsSearchResultViewModel ProviderResults { get; set; }
 
-        public ScenarioViewModel TestScenario { get; set; }
+        public TestScenarioViewModel TestScenario { get; set; }
+
+        public SpecificationSummaryViewModel Specification { get; set; }
 
         public decimal TestCoverage { get; set; }
 
@@ -110,6 +118,23 @@
                 TestCoverage = 0;
             }
 
+            ApiResponse<SpecificationSummary> specResponse = await _specsClient.GetSpecificationSummary(TestScenario.SpecificationId);
+            if (specResponse == null)
+            {
+                return new InternalServerErrorResult("Specification summary API call result was null");
+            }
+
+            if (specResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return new InternalServerErrorResult($"Specification summary API call didn't return OK, but instead '{countTask.Result.StatusCode}'");
+            }
+
+            if (specResponse.Content == null)
+            {
+                return new InternalServerErrorResult("Specification summary API call content was null");
+            }
+
+            Specification = _mapper.Map<SpecificationSummaryViewModel>(specResponse.Content);
 
             return Page();
         }
@@ -119,16 +144,16 @@
             return OnGetAsync(scenarioId, pageNumber, searchTerm);
         }
 
-        private async Task<ScenarioViewModel> GetTestScenario(string scenarioId)
+        private async Task<TestScenarioViewModel> GetTestScenario(string scenarioId)
         {
-            ApiResponse<Scenario> scenario = await _scenariosApiClient.GetScenarioById(scenarioId);
+            ApiResponse<TestScenario> scenario = await _scenariosApiClient.GetCurrentTestScenarioById(scenarioId);
 
             if (scenario.Content == null)
             {
                 return null;
             }
 
-            return _mapper.Map<ScenarioViewModel>(scenario.Content);
+            return _mapper.Map<TestScenarioViewModel>(scenario.Content);
         }
     }
 }

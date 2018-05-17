@@ -60,8 +60,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
             await PopulateFundingPeriods();
            
-            //ScenarioResults =   GetSearchResults();
-
             ScenarioResults = await _scenarioSearchservice.PerformSearch(searchRequest);
 
             if (ScenarioResults == null)
@@ -70,7 +68,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
             }
 
             return Page();
-
         }
 
         async Task PopulateAsync(string fundingPeriodId, string specificationId)
@@ -91,12 +88,22 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
             var periodsResponse = await _specsClient.GetFundingPeriods();
-            IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
 
-            Reference fundingPeriod = fundingPeriods.FirstOrDefault();
-            if (fundingPeriod != null)
+            if (periodsResponse.StatusCode.Equals(HttpStatusCode.OK) && periodsResponse.Content != null)
             {
-                FundingPeriodId = fundingPeriod.Id;
+                IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
+
+                Reference fundingPeriod = fundingPeriods.FirstOrDefault();
+
+                if (fundingPeriod != null)
+                {
+                    FundingPeriodId = fundingPeriod.Id;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unable to retreive funding period information: Status Code = {periodsResponse.StatusCode}");
+
             }
         }
 

@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The provided calculation ID was null or empty string.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string CalculationIdNullOrEmpty {
             get {
@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculation not found in Calcs Service.
+        ///   Looks up a localized string similar to Check the calculation name you entered.
         /// </summary>
         internal static string CalculationNotFoundInCalcsService {
             get {
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculation was not found in Specs Service.
+        ///   Looks up a localized string similar to Check the specification you entered - one or more of the specifications you entered aren&apos;t working.
         /// </summary>
         internal static string CalculationNotFoundInSpecsService {
             get {
@@ -88,7 +88,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dataset definition not found in Datasets Service.
+        ///   Looks up a localized string similar to Check the data schema - one or more the data definitions aren&apos;t working.
         /// </summary>
         internal static string DatasetDefinitionNotFoundInDatasetService {
             get {
@@ -97,7 +97,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dataset Schema is mandatory for specification.
+        ///   Looks up a localized string similar to Select a data schema.
         /// </summary>
         internal static string DatasetSchemaRequired {
             get {
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The provided specification ID was null or empty string.
+        ///   Looks up a localized string similar to Select a specification.
         /// </summary>
         internal static string SpecificationIdNullOrEmpty {
             get {

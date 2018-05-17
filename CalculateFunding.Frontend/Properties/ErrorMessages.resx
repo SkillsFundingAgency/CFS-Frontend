@@ -118,21 +118,21 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CalculationIdNullOrEmpty" xml:space="preserve">
-    <value>The provided calculation ID was null or empty string</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="CalculationNotFoundInCalcsService" xml:space="preserve">
-    <value>Calculation not found in Calcs Service</value>
+    <value>Check the calculation name you entered</value>
   </data>
   <data name="CalculationNotFoundInSpecsService" xml:space="preserve">
-    <value>Calculation was not found in Specs Service</value>
+    <value>Check the specification you entered - one or more of the specifications you entered aren't working</value>
   </data>
   <data name="DatasetDefinitionNotFoundInDatasetService" xml:space="preserve">
-    <value>Dataset definition not found in Datasets Service</value>
+    <value>Check the data schema - one or more the data definitions aren't working</value>
   </data>
   <data name="DatasetSchemaRequired" xml:space="preserve">
-    <value>Dataset Schema is mandatory for specification</value>
+    <value>Select a data schema</value>
   </data>
   <data name="SpecificationIdNullOrEmpty" xml:space="preserve">
-    <value>The provided specification ID was null or empty string</value>
+    <value>Select a specification</value>
   </data>
 </root>

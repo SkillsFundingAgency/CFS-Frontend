@@ -62,7 +62,7 @@
 
                 <div class="test-scenario-item-container" id="test-scenario-item-result-@ScenariosRow">
                     <div class="test-scenario-item-header">
-                        <a href="/scenarios/ViewproviderTestResults?scenarioId=@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
+                        <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.Description</span>
@@ -99,7 +99,7 @@
             <div data-bind="foreach: testScenarios">
                 <div class="test-scenario-item-container data-dynamic-scenarioContainer" data-bind="attr: {id : 'data-dynamic-scenarioContainer-' + $index()}">
                     <div class="test-scenario-item-header">
-                        <a data-bind="text: name, attr: { 'href': '/scenarios/ViewproviderTestResults?scenarioId=' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
+                        <a data-bind="text: name, attr: { 'href': '/scenarios/edittestscenario/' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
                     </div>
                     <div class="test-scenario-item-property-container">
                         <span class="test-scenario-item-property data-dynamic-description" data-bind="text: description"></span>

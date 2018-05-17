@@ -29,8 +29,8 @@ namespace CalculateFunding.Frontend.Controllers
             _logger = logger;
         }
 
-        [HttpPut]
-        [Route("api/specs/{specificationId}/scenarios")]
+        [HttpPost]
+        [Route("api/specs/{specificationId}/testScenarios")]
         public async Task<IActionResult> CreateTestScenario(string specificationId, [FromBody] ScenarioCreateViewModel vm)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
@@ -39,12 +39,12 @@ namespace CalculateFunding.Frontend.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
+            }   
 
             CreateScenarioModel createScenario = _mapper.Map<CreateScenarioModel>(vm);
             createScenario.SpecificationId = specificationId;
 
-            ApiResponse<Scenario> result = await _scenariosClient.CreateTestScenario(createScenario);
+            ApiResponse<TestScenario> result = await _scenariosClient.CreateTestScenario(createScenario);
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -60,5 +60,46 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
         }
+
+        /// <summary>
+        /// This method saves changes of Name, Description and Gherkin code details of Scenario in 'Edit' mode
+        /// </summary>
+        /// <param name="specificationId"></param>
+        /// <param name="vm"></param>
+        /// <returns></returns>
+        /// 
+        [HttpPut]
+        [Route("api/specs/{specificationId}/testscenarios/{testScenarioId}")]
+
+        public async Task<IActionResult> SaveTestScenario(string specificationId, string testScenarioId, [FromBody] ScenarioEditViewModel vm)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            TestScenarioIUpdateModel editScenario = _mapper.Map<TestScenarioIUpdateModel>(vm);
+            editScenario.SpecificationId = specificationId;
+            editScenario.Id = testScenarioId;
+
+            ApiResponse<TestScenario> result = await _scenariosClient.UpdateTestScenario(editScenario);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(result.Content);
+            }
+           else
+            {
+                HttpStatusCode statusCode = result.StatusCode;
+
+                _logger.Error("An error occurred while updating scenario. Status code from backend={statusCode} for specification {specificationId}", statusCode, specificationId);
+
+                throw new InvalidOperationException($"An error occurred while updating scenario. Status code={result.StatusCode}");
+            }         
+        }
+        
     }
 }

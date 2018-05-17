@@ -52,7 +52,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be("The provided specification ID was null or empty string");
+            result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be("Select a specification");
         }
 
         [TestMethod]
@@ -279,7 +279,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             NotFoundObjectResult typeResult = result as NotFoundObjectResult;
 
-            typeResult.Value.Should().Be("Dataset definition not found in Datasets Service");
+            typeResult.Value.Should().Be("Check the data schema - one or more the data definitions aren't working");
         }
 
         [TestMethod]

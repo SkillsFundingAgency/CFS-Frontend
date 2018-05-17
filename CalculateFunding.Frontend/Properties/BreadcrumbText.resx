@@ -174,4 +174,13 @@
   <data name="DatasetRelationships" xml:space="preserve">
     <value>Map data sources to datasets for a specification</value>
   </data>
+  <data name="TestScenarioResults" xml:space="preserve">
+    <value>View QA test results</value>
+  </data>
+  <data name="TestScenarioResults" xml:space="preserve">
+    <value>View QA test results</value>
+  </data>
+  <data name="DatasetRelationships" xml:space="preserve">
+    <value>Map data sources to datasets for a specification</value>
+  </data>
 </root>

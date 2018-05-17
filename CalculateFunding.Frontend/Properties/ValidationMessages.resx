@@ -118,75 +118,75 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CalculationAllocationLineRequired" xml:space="preserve">
-    <value>You must select an allocation line</value>
+    <value>Select an allocation line</value>
   </data>
   <data name="CalculationDescriptionRequired" xml:space="preserve">
-    <value>You must give a description for the calculation</value>
+    <value>Enter a description</value>
   </data>
   <data name="CalculationNameAlreadyExists" xml:space="preserve">
-    <value>You must give a unique calculation name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="CalculationNameRequired" xml:space="preserve">
-    <value>You must give a unique calculation name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="CalculationPolicyIdRequired" xml:space="preserve">
-    <value>You must select a policy or subpolicy</value>
+    <value>Select a policy or Select a subpolicy</value>
   </data>
   <data name="CalculationTypeRequired" xml:space="preserve">
     <value>You must select a calculation type</value>
   </data>
   <data name="DatasetSchemaDescriptionRequired" xml:space="preserve">
-    <value>You must provide a description for this new relationship</value>
+    <value>Enter a description</value>
   </data>
   <data name="DatasetSchemaRelationshipNameRequired" xml:space="preserve">
-    <value>You must give a unique name for this dataset schema relationship</value>
+    <value>Enter a unique description</value>
   </data>
   <data name="DatasetSchemaRequiredForSpecification" xml:space="preserve">
-    <value>You must assign a dataset for the specification</value>
+    <value>Enter a data schema</value>
   </data>
   <data name="PolicyDescriptionRequired" xml:space="preserve">
-    <value>You must give a description for the policy</value>
+    <value>Enter a description</value>
   </data>
   <data name="PolicyNameAlreadyExists" xml:space="preserve">
-    <value>You must give a unique policy name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="PolicyNameRequired" xml:space="preserve">
-    <value>You must give a unique policy name</value>
+    <value>Enter a name</value>
   </data>
   <data name="PolicyParentIdRequired" xml:space="preserve">
-    <value>You must select a policy</value>
+    <value>Select a policy</value>
   </data>
   <data name="RelationshipNameAlreadyExists" xml:space="preserve">
-    <value>Given relationship name is not unique, please provide different relationship name </value>
+    <value>Enter a unique name</value>
   </data>
   <data name="ScenarioDescriptionRequired" xml:space="preserve">
     <value>Enter a description</value>
   </data>
   <data name="ScenarioGherkinRequired" xml:space="preserve">
-    <value>You must enter a gherkin test</value>
+    <value>Enter test scenario code</value>
   </data>
   <data name="ScenarioNameRequired" xml:space="preserve">
-    <value>Enter a name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="ScenarioSpecificationIdRequired" xml:space="preserve">
     <value>Select a specification</value>
   </data>
   <data name="SpecificationAlreadyExists" xml:space="preserve">
-    <value>You must give a unique specification name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="SpecificationDescriptionRequired" xml:space="preserve">
-    <value>You must give a description for the specification</value>
+    <value>Enter a description</value>
   </data>
   <data name="SpecificationFundingPeriodRequired" xml:space="preserve">
     <value>You must select a funding period</value>
   </data>
   <data name="SpecificationFundingStreamRequired" xml:space="preserve">
-    <value>You must select at least one funding stream</value>
+    <value>Select at least one funding stream</value>
   </data>
   <data name="SpecificationNameRequired" xml:space="preserve">
-    <value>You must give a unique specification name</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="SubPolicyDescriptionRequired" xml:space="preserve">
-    <value>You must give a description for the subpolicy</value>
+    <value>Enter a description</value>
   </data>
 </root>

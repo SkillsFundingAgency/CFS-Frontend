@@ -136,7 +136,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             result.Should().BeOfType<NotFoundObjectResult>();
 
             NotFoundObjectResult typeResult = result as NotFoundObjectResult;
-            typeResult.Value.Should().Be("Calculation was not found in Specs Service");
+            typeResult.Value.Should().Be("Check the specification you entered - one or more of the specifications you entered aren't working");
         }
 
         [TestMethod]
