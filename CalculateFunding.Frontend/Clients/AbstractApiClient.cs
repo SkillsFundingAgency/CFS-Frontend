@@ -143,7 +143,8 @@
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, object>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
+                apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, IEnumerable<string>>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
+
             }
 
             return apiResponse;
@@ -183,6 +184,36 @@
             }
 
             return response.StatusCode;
+        }
+
+        public async Task<ValidatedApiResponse<TResponse>> ValidatedPutAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
+            var response = await _httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ValidatedApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
+            }
+
+            ValidatedApiResponse<TResponse> apiResponse = new ValidatedApiResponse<TResponse>(response.StatusCode);
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, IEnumerable<string>>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
+            }
+
+            return apiResponse;
         }
     }
 }

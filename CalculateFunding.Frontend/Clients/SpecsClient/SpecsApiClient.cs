@@ -97,6 +97,13 @@
             return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
         }
 
+        public Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy)
+        {
+            Guard.ArgumentNotNull(updatedPolicy, nameof(updatedPolicy));
+
+            return ValidatedPutAsync<Policy, EditPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy); 
+        }
+
         public Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));

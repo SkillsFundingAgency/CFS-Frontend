@@ -10,6 +10,6 @@
         {
         }
 
-        public IDictionary<string, object> ModelState { get; set; }
+        public IDictionary<string, IEnumerable<string>> ModelState { get; set; }
     }
 }
