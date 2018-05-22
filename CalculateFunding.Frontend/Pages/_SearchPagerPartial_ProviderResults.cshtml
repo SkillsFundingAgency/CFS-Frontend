@@ -16,7 +16,6 @@
             {
                 <a href="/results/whatever?pageNumber=@pageNumber&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">@pageNumber</a>
             }
-
         }
 
         @if (Model.PagerState.NextPage.HasValue)
@@ -24,7 +23,7 @@
             <a href="/results/whatever?pageNumber=@Model.PagerState.NextPage.Value&searchTerm=@Html.Raw(HttpUtility.UrlEncode(Model.SearchTerm))" class="paging-link">Next</a>
         }
     </div>
-    Showing @Model.StartItemNumber-@Model.EndItemNumber of <strong>@Model.TotalResults</strong> @Model.EntityName
+    Showing @Model.StartItemNumber-@Model.EndItemNumber of <strong>string.Format(CultureInfo.InvariantCulture, "{0:N0}", @Model.TotalResults)</strong> @Model.EntityName
 </div>
 <div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rownavigation-container">
     <div class="pull-right paging-container" data-bind="with: pagerState" id="dynamic-paging-container">

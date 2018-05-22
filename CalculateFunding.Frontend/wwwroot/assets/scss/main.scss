@@ -470,6 +470,22 @@ blockquote {
             padding: 0;
         }
     }
+
+    .calculation-status-draft {
+        color: orange;
+    }
+
+    .calculation-status-updated {
+        color: purple;
+    }
+
+    .calculation-status-published {
+        color: green;
+    }
+
+    .calculation-status-none {
+        color: gray;
+    }
 }
 
 .manage-calculations {

@@ -154,7 +154,7 @@
     <value>Manage data</value>
   </data>
   <data name="ManageDataSources" xml:space="preserve">
-    <value>Manage data sources</value>
+    <value>Manage data source files</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage Policies</value>
@@ -163,7 +163,7 @@
     <value>Manage Specification</value>
   </data>
   <data name="SelectSourceDataset" xml:space="preserve">
-    <value>Select source dataset</value>
+    <value>Select data source</value>
   </data>
   <data name="UpdateDataSource" xml:space="preserve">
     <value>Update data source</value>
@@ -176,11 +176,5 @@
   </data>
   <data name="TestScenarioResults" xml:space="preserve">
     <value>View QA test results</value>
-  </data>
-  <data name="TestScenarioResults" xml:space="preserve">
-    <value>View QA test results</value>
-  </data>
-  <data name="DatasetRelationships" xml:space="preserve">
-    <value>Map data sources to datasets for a specification</value>
   </data>
 </root>
