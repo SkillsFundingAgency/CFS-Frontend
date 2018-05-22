@@ -28,7 +28,7 @@
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-9 filter-field-heading">You can search by provider name, UPIN, UKPRN, URN or establishment number</div>
+            <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
         </div>
         <div class="row">
             <div class="col-xs-9">
@@ -68,110 +68,122 @@
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         @if (!Model.HasProviderDatasetsAssigned)
-        {
-            <div class="provider-datasets-warning-container spacing-15-bottom">
-                <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
-            </div>
-        }
-        else
-        {
-            <div data-bind="visible: isResultsVisible">
-                @Html.Partial("_SearchPagerPartial_ProviderResults", new PagerPartialViewModel(Model.CalculationProviderResults, "providers", Model.SearchTerm))
+    {
+        <div class="provider-datasets-warning-container spacing-15-bottom">
+            <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
+        </div>
+}
+else
+{
 
-            </div>
-            <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
-                @{
-                    int providerRow = 0;
-                }
+    <div data-bind="visible: isResultsVisible">
+        @Html.Partial("_SearchPagerPartial_ProviderResults", new PagerPartialViewModel(Model.CalculationProviderResults, "providers", Model.SearchTerm))
+    </div>
+    <div class="providers-searchresult-header row" data-bind="visible: !searchPerformed()">
+        <div class="col-xs-12">
+            <span> <strong> Provider </strong></span>
+            <span class="float-right"> <strong>Total funding</strong></span>
+        </div>
+    </div>
 
-                @foreach (var provider in Model.CalculationProviderResults.CalculationProviderResults)
-                {
-                    <div class="provider-item-container" id="provider-item-result-@providerRow">
-                        <div class="provider-item-header">
-                            <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
-                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.Id&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-last-updated">
-                                Updated:
-                                <strong>
-                                    <span id="provider-item-last-updated-@providerRow">
-                                        @Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")
-                                    </span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-upin">
-                                UPIN:
-                                <strong>
-                                    <span id="provider-item-upin-@providerRow">
-                                        @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-ukprn">
-                                UKPRN:
-                                <strong>
-                                    <span id="provider-item-ukprn-@providerRow">
-                                        @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
-
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-urn">
-                                URN:
-                                <strong>
-                                    <span id="provider-item-urn-@providerRow">
-                                        @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-estab-num">
-                                Establishment number:
-                                <strong>
-                                    <span id="provider-item-establishmentnumber-@providerRow">
-                                        @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-providertype">
-                                Provider type:
-                                <strong>
-                                    <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-provider">
-                                &nbsp;Provider subtype:
-                                <strong>
-                                    <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-local-authority">
-                                Local authority:
-                                <strong>
-                                    <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-date-opened">
-                                Date Opened:
-                                <strong>
-                                    <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
-                                </strong>
-                            </span>
-                        </div>
-                    </div>
-                    providerRow++;
-                }
-            </div>
+    <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+        @{
+        int providerRow = 0;
         }
 
+        @foreach (var provider in Model.CalculationProviderResults.CalculationProviderResults)
+    {
+        <div class="provider-item-container" id="provider-item-result-@providerRow">
+            <div class="provider-item-header">
+                <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
+                <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.Id&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
+            </div>
+            <div class="provider-item-property-container">
+                <span class="provider-item-property provider-item-property-last-updated">
+                    Updated:
+                    <strong>
+                        <span id="provider-item-last-updated-@providerRow">
+                            @Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")
+                        </span>
+                    </strong>
+                </span>
+            </div>
+            <div class="provider-item-property-container">
+                <span class="provider-item-property provider-item-property-upin">
+                    UPIN:
+                    <strong>
+                        <span id="provider-item-upin-@providerRow">
+                            @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
+                        </span>
+                    </strong>
+                </span>
+                <span class="provider-item-property provider-item-property-ukprn">
+                    UKPRN:
+                    <strong>
+                        <span id="provider-item-ukprn-@providerRow">
+                            @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
+
+                        </span>
+                    </strong>
+                </span>
+                <span class="provider-item-property provider-item-property-urn">
+                    URN:
+                    <strong>
+                        <span id="provider-item-urn-@providerRow">
+                            @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
+                        </span>
+                    </strong>
+                </span>
+                <span class="provider-item-property provider-item-property-estab-num">
+                    Establishment number:
+                    <strong>
+                        <span id="provider-item-establishmentnumber-@providerRow">
+                            @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
+                        </span>
+                    </strong>
+                </span>
+            </div>
+            <div class="provider-item-property-container">
+                <span class="provider-item-property provider-item-property-providertype">
+                    Provider type:
+                    <strong>
+                        <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
+                    </strong>
+                </span>
+                <span class="provider-item-property provider-item-property-provider">
+                    &nbsp;Provider subtype:
+                    <strong>
+                        <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
+                    </strong>
+                </span>
+            </div>
+            <div class="provider-item-property-container">
+                <span class="provider-item-property provider-item-property-local-authority">
+                    Local authority:
+                    <strong>
+                        <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
+                    </strong>
+                </span>
+            </div>
+            <div class="provider-item-property-container">
+                <span class="provider-item-property provider-item-property-date-opened">
+                    Date Opened:
+                    <strong>
+                        <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
+                    </strong>
+                </span>
+            </div>
+        </div>
+    providerRow++;
+}
+    </div>
+}
+        <div class="providers-searchresult-header row" data-bind="visible: isResultsVisible()">
+            <div class="col-xs-12">
+                <span> <strong>Provider</strong></span>
+                <span class="float-right"><strong>Total funding</strong>   </span>
+            </div>
+        </div>
         <div data-bind="visible: isResultsVisible">
             <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
                 <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index()">
