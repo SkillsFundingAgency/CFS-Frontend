@@ -93,7 +93,12 @@
                .ForMember(m => m.SpecificationId, opt => opt.Ignore()); 
 
             CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+                .AfterMap((CreateSubPolicyViewModel source, CreateSubPolicyModel destination) =>
+                {
+                    destination.ParentPolicyId = source.ParentPolicyId;            
+                });
+            
 
             CreateMap<CreateCalculationViewModel, CreateCalculationModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
@@ -102,7 +107,13 @@
 
             CreateMap<Policy, PolicyViewModel>();
 
-            CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
+            CreateMap<EditSubPolicyViewModel, EditSubPolicyModel>()
+             .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+     
+            CreateMap<Policy, EditSubPolicyViewModel>()
+             .ForMember(m => m.ParentPolicyId, opt => opt.Ignore());
+
+            CreateMap<Clients.SpecsClient.Models.SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<EditPolicyViewModel, Policy>()
                 .ForMember(m => m.SubPolicies, opt => opt.Ignore())
