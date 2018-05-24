@@ -27,14 +27,14 @@
         <div class="row">
             <div class="col-xs-9">
                 <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search QA test" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search QA tests" data-bind="textInput: searchTerm, enable: canSelectFilters" />
                     <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
         </div>
 
         <div class="row spacing-15-top withjs-show">
-            <div class="col-xs-3 filter-field-heading">Funding Period</div>
+            <div class="col-xs-3 filter-field-heading">Funding period</div>
             <div class="col-xs-4 filter-field-heading">Specification</div>
         </div>
         <div class="row row withjs-show">
@@ -68,7 +68,7 @@
         <table class="qa-results-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
             <thead>
                 <tr>
-                    <th>QA Test</th>
+                    <th>QA Tests</th>
                     <th>Updated</th>
                     <th>Failures</th>
                     <th>Passes</th>
