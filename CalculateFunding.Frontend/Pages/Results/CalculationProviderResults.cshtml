@@ -79,13 +79,12 @@ else
     <div data-bind="visible: isResultsVisible">
         @Html.Partial("_SearchPagerPartial_ProviderResults", new PagerPartialViewModel(Model.CalculationProviderResults, "providers", Model.SearchTerm))
     </div>
-    <div class="providers-searchresult-header row" data-bind="visible: !searchPerformed()">
-        <div class="col-xs-12">
-            <span> <strong> Provider </strong></span>
-            <span class="float-right"> <strong>Total funding</strong></span>
+    <div class="row" data-bind="visible: !searchPerformed()">       
+        <div class="provider-item-property-container">
+            <span> Provider </span>
+            <span> Funding  </span>
         </div>
     </div>
-
     <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
         @{
         int providerRow = 0;
