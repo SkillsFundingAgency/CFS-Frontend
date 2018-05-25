@@ -13,5 +13,7 @@
 
         [JsonProperty("policies")]
         public IEnumerable<Policy> Policies { get; set; }
+
+        public new IEnumerable<FundingStream> FundingStreams { get; set; }
     }
 }

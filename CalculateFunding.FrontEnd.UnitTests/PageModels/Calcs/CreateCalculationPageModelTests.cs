@@ -116,9 +116,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             //Arrange
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -226,9 +226,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -318,9 +318,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -547,9 +547,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                          }
                      }
                  },
-                FundingStreams = new List<Reference>()
+                FundingStreams = new List<FundingStream>()
                 {
-                    new Reference
+                    new FundingStream
                     {
                         Id = fundingStreamId
                     },

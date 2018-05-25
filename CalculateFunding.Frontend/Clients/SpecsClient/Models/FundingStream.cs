@@ -8,9 +8,16 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
     {
         public FundingStream()
         {
-            AllocationLines = Enumerable.Empty<Reference>();
+            AllocationLines = Enumerable.Empty<AllocationLine>();
         }
 
-        public IEnumerable<Reference> AllocationLines { get; set; }
+        public FundingStream(string id, string name)
+            : base(id, name)
+        {
+            AllocationLines = Enumerable.Empty<AllocationLine>();
+
+        }
+
+        public IEnumerable<AllocationLine> AllocationLines { get; set; }
     }
 }

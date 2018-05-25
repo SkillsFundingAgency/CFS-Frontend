@@ -84,9 +84,7 @@
 
                 EditCalculationViewModel = _mapper.Map<EditCalculationViewModel>(calculation);
 
-                PopulateForm(specification);
-
-                return Page();
+                return PopulateForm(specification);
             }
             else
             {

@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 Name = "Test Specification",
                 FundingPeriod = new Reference("1617", "2016/2017"),
                 Description = "Test Description",
-                FundingStreams = new List<Reference>() { new Reference("fs1", "Funding Stream Name"), },
+                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), },
                 Policies = new List<Policy>()
                 {
                     new Policy()

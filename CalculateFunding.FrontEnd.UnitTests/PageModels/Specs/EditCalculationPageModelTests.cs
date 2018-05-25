@@ -235,20 +235,20 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     {
                         Id="fsId",
                         Name= "Funding Stream 1",
-                        AllocationLines = new List<Reference>()
+                        AllocationLines = new List<AllocationLine>()
                         {
-                            new Reference("al1", "Funding Stream - Allocation Line 1"),
-                            new Reference("al2", "Funding Stream - Allocation Line 2"),
+                            new AllocationLine("al1", "Funding Stream - Allocation Line 1"),
+                            new AllocationLine("al2", "Funding Stream - Allocation Line 2"),
                         }
                     },
                     new FundingStream()
                     {
                         Id="fs2Id",
                         Name= "Funding Stream 2",
-                        AllocationLines = new List<Reference>()
+                        AllocationLines = new List<AllocationLine>()
                         {
-                            new Reference("al3", "Funding Stream 2 - Allocation Line 1"),
-                            new Reference("al4", "Funding Stream 2 - Allocation Line 2"),
+                            new AllocationLine("al3", "Funding Stream 2 - Allocation Line 1"),
+                            new AllocationLine("al4", "Funding Stream 2 - Allocation Line 2"),
                         }
                     }
                  },
