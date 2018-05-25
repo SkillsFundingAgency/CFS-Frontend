@@ -95,7 +95,7 @@
                                                 @foreach (var calculation in policy.Calculations)
                                                 {
                                                     <tr>
-                                                        <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                                        <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="calculation-link">@calculation.Name</a></td>
                                                         <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
                                                     </tr>
                                                 }
@@ -129,7 +129,7 @@
                                                                 @foreach (var calculation in subPolicy.Calculations)
                                                                 {
                                                                     <tr>
-                                                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
+                                                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="calculation-link">@calculation.Name</a></td>
                                                                         <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
                                                                     </tr>
                                                                 }

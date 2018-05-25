@@ -78,7 +78,7 @@
             SearchTerm = searchTerm;
 
             Task<ProviderTestsSearchResultViewModel> providerResultsTask = _testResultsSearchService.PerformProviderTestResultsSearch(searchRequest);
-            Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> countTask = _testEngineClient.GetTestResultCounts(new TestSecenarioResultCountsRequestModel()
+            Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> countTask = _testEngineClient.GetTestResultCounts(new TestScenarioResultCountsRequestModel()
             {
                 TestScenarioIds = new string[] { scenarioId }
             });

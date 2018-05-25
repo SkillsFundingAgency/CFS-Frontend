@@ -66,7 +66,8 @@
             CreateMap<Clients.CalcsClient.Models.Calculation, Calculations.CalculationViewModel>()
                 .ForMember(m => m.Description, opt => opt.Ignore());
 
-            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
+            CreateMap<CalculationUpdateViewModel, Clients.CalcsClient.Models.CalculationUpdateModel>();
+
             CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
 
             CreateMap<PreviewCompileRequestViewModel, PreviewCompileRequest>()
@@ -100,7 +101,7 @@
                 });
             
 
-            CreateMap<CreateCalculationViewModel, CreateCalculationModel>()
+            CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<Specification, SpecificationViewModel>();
@@ -113,13 +114,15 @@
             CreateMap<Policy, EditSubPolicyViewModel>()
              .ForMember(m => m.ParentPolicyId, opt => opt.Ignore());
 
-            CreateMap<Clients.SpecsClient.Models.SpecificationSummary, SpecificationSummaryViewModel>();
+            CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<EditPolicyViewModel, Policy>()
                 .ForMember(m => m.SubPolicies, opt => opt.Ignore())
                 .ForMember(m => m.Calculations, opt => opt.Ignore());
           
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
+
+            CreateMap<CalculationCurrentVersion, Specs.CalculationViewModel>();
 
             CreateMap<Specification, EditSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())

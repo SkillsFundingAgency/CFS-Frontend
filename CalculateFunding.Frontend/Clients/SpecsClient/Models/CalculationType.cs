@@ -2,7 +2,7 @@
 {
     public enum CalculationType
     {
-        VisualBasic,
-        CSharp
+        Number = 0,
+        Funding = 10,
     }
 }

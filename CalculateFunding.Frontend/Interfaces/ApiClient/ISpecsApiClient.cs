@@ -61,9 +61,11 @@
 
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
 
-        Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId);
+        Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId);
 
-        Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation);
+        Task<ApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation);
+
+        Task<ValidatedApiResponse<Calculation>> UpdateCalculation(string specificationId, string calculationId, CalculationUpdateModel calculation);
 
         Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId);
 

@@ -53,11 +53,11 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         }
 
 
-        public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestSecenarioResultCountsRequestModel testScenarioIdsModel)
+        public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestScenarioResultCountsRequestModel testScenarioIdsModel)
         {
             Guard.ArgumentNotNull(testScenarioIdsModel, nameof(testScenarioIdsModel));
 
-            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestSecenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
+            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestScenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
         }
 
         public Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId)

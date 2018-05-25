@@ -82,7 +82,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             });
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
             // Act
@@ -188,7 +188,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             });
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
             // Act
@@ -294,7 +294,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             });
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
             // Act
@@ -519,7 +519,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns((ApiResponse<IEnumerable<TestScenarioResultCounts>>)null);
 
             // Act
@@ -580,7 +580,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.InternalServerError, null));
 
             // Act
@@ -681,7 +681,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications));
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, null));
 
             // Act

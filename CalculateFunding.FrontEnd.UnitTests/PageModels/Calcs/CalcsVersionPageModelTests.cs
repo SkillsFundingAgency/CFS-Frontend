@@ -126,7 +126,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById("2")
                 .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedCalculation));
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -136,7 +136,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
             .GetCalculationById(calculationId, "3")
-            .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, specCalculation));
+            .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.NotFound, specCalculation));
 
             ComparePageModel compPageModel = new ComparePageModel(specsClient, calcsClient, mapper);
 
@@ -178,7 +178,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedCalculation));
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -188,7 +188,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
            .GetCalculationById(expectedCalculation.SpecificationId, calculationId)
-           .Returns(new ApiResponse<Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));
+           .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specCalculation));
 
             CalculationVersion calcsVersion1 = new CalculationVersion()
             {

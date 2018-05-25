@@ -1,12 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
-    using System.ComponentModel.DataAnnotations;
     using CalculateFunding.Frontend.Properties;
+    using System.ComponentModel.DataAnnotations;
 
-    public class CreateCalculationViewModel
+    public class EditCalculationViewModel
     {
-        public string SpecificationId { get; set; }
-
         public string AllocationLineId { get; set; }
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationPolicyIdRequired), ErrorMessageResourceType = typeof(ValidationMessages))]

@@ -71,7 +71,7 @@
             CalculationPeriodName = calculation.FundingPeriodName;
             CalculationId = calculation.Id;
 
-            ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.CalculationSpecification.Id);
+            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.CalculationSpecification.Id);
 
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {

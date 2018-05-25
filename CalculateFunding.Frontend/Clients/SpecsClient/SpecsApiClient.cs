@@ -111,11 +111,20 @@
             return ValidatedPutAsync<Policy, EditPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy); 
         }
 
-        public Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation)
+        public Task<ApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
-            return PostAsync<Calculation, CreateCalculationModel>($"{_specsPath}/calculations", calculation);
+            return PostAsync<Calculation, CalculationCreateModel>($"{_specsPath}/calculations", calculation);
+        }
+
+        public Task<ValidatedApiResponse<Calculation>> UpdateCalculation(string specificationId, string calculationId, CalculationUpdateModel calculation)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+            Guard.ArgumentNotNull(calculation, nameof(calculation));
+
+            return ValidatedPutAsync<Calculation, CalculationUpdateModel>($"{_specsPath}/calculations?specificationId={specificationId}&calculationId={calculationId}", calculation);
         }
 
         public Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
@@ -161,12 +170,12 @@
             return PostAsync<Calculation, CalculationByNameRequestModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
         }
 
-        public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
+        public Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
+            return GetAsync<CalculationCurrentVersion>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
 
         public async Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions)

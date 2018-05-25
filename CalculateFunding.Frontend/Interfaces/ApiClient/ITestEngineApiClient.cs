@@ -18,7 +18,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
 
         Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions);
 
-        Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestSecenarioResultCountsRequestModel testScenarioIdsModel);
+        Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestScenarioResultCountsRequestModel testScenarioIdsModel);
 
         Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId);
     }

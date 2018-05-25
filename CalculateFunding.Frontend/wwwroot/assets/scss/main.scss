@@ -200,6 +200,19 @@ blockquote {
     margin-bottom: 5px;
 }
 
+.spacing-10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.spacing-10-top {
+    margin-top: 10px;
+}
+
+.spacing-10-bottom {
+    margin-bottom: 10px;
+}
+
 .spacing-15 {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -213,6 +226,19 @@ blockquote {
     margin-bottom: 15px;
 }
 
+.spacing-20 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.spacing-20-top {
+    margin-top: 20px;
+}
+
+.spacing-20-bottom {
+    margin-bottom: 20px;
+}
+
 .spacing-30 {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -220,6 +246,10 @@ blockquote {
 
 .spacing-30-top {
     margin-top: 30px;
+}
+
+.spacing-bottom-0{
+    margin-bottom: 0;
 }
 
 .jscollapse-container {
@@ -2022,7 +2052,7 @@ table {
     word-break: normal;
 }
 
-.inline-allocation-line-container {
+.inline-form-section {
     border-left: 5px solid #6f777b;
     padding-left: 10px;
     padding-top: 10px;

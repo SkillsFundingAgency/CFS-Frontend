@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            <div class="inline-allocation-line-container">
+            <div id="inline-allocation-line-container" class="inline-form-section spacing-20-bottom">
                 <div gds-validationblock-for="CreateCalculationViewModel.AllocationLineId">
                     <div class="form-group">
                         <a validationanchor-for="CreateCalculationViewModel.AllocationLineId"></a>
@@ -67,6 +67,18 @@
                         <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
                             <option></option>
                         </select>
+                    </div>
+                </div>
+            </div>
+            <div id="inline-ispublic" class="inline-form-section spacing-20-bottom">
+                <div gds-validationblock-for="CreateCalculationViewModel.IsPublic">
+                    <div class="checkbox">
+                        <a validationanchor-for="CreateCalculationViewModel.IsPublic"></a>
+                        <label asp-for="CreateCalculationViewModel.IsPublic">
+                            <input type="checkbox" asp-for="CreateCalculationViewModel.IsPublic" />
+                            Show this information on the funding statement
+                        </label>
+
                     </div>
                 </div>
             </div>
@@ -86,24 +98,7 @@
     </div>
 </div>
 
-@section Scripts{
-    <script type="text/javascript">
-        
-        if ($("#CalculationTypes").val() !== "Funding") {
+@section scripts{
+    <script asp-src-include="~/js/calculationspec.create-edit.js" asp-append-version="true" type="text/javascript"></script>
 
-            $('.inline-allocation-line-container').hide();
-        }
-        $("#CalculationTypes").on('change', function () {
-           
-            var selectedValue = $(this).val();
-            if (selectedValue == "Funding") {
-                $('.inline-allocation-line-container').show();
-            }
-            else {
-                $('.inline-allocation-line-container').hide();
-                $("#AllocationLines").val("");
-            }
-        });
-
-    </script>
-    }
+}

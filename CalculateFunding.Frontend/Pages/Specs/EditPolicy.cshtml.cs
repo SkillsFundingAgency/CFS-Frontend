@@ -109,14 +109,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
             else if (updatePolicyResult.StatusCode == HttpStatusCode.BadRequest)
             {
-                foreach (var validationResult in updatePolicyResult.ModelState)
-                {
-                    List<string> errors = new List<string>(validationResult.Value);
-                    for (int i = 0; i < errors.Count; i++)
-                    {
-                        ModelState.AddModelError($"{validationResult.Key}.{i}", errors[i]);
-                    }
-                }
+                updatePolicyResult.AddValidationResultErrors(ModelState);
 
                 Specification specification = await GetSpecification(specificationId);
 

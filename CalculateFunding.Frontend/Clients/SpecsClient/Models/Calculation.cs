@@ -7,5 +7,9 @@
         public Reference AllocationLine { get; set; }
 
         public string Description { get; set; }
+
+        public bool IsPublic { get; set; }
+
+        public CalculationType CalculationType { get; set; }
     }
 }

@@ -107,7 +107,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             List<TestScenarioResultCounts> countResults = new List<TestScenarioResultCounts>();
 
             testEngineClient
-                .GetTestResultCounts(Arg.Is<TestSecenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
+                .GetTestResultCounts(Arg.Is<TestScenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
             ISpecsApiClient specsApiClient = CreateSpecsClient();
@@ -206,7 +206,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             List<TestScenarioResultCounts> countResults = new List<TestScenarioResultCounts>();
 
             testEngineClient
-                .GetTestResultCounts(Arg.Is<TestSecenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
+                .GetTestResultCounts(Arg.Is<TestScenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
             ISpecsApiClient specsApiClient = CreateSpecsClient();
@@ -246,7 +246,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestEngineApiClient testEngineApiClient = CreateTestEngineClient();
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns((ApiResponse<IEnumerable<TestScenarioResultCounts>>)null);
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
@@ -265,7 +265,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
         }
 
         [TestMethod]
@@ -289,7 +289,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestEngineApiClient testEngineApiClient = CreateTestEngineClient();
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns((ApiResponse<IEnumerable<TestScenarioResultCounts>>)null);
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
@@ -308,7 +308,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
         }
 
         [TestMethod]
@@ -332,7 +332,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestEngineApiClient testEngineApiClient = CreateTestEngineClient();
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.InternalServerError, null));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
@@ -351,7 +351,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
         }
 
         [TestMethod]
@@ -375,7 +375,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestEngineApiClient testEngineApiClient = CreateTestEngineClient();
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, null));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineApiClient, scenariosApiClient: apiClient);
@@ -394,7 +394,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
         }
 
         [TestMethod]
@@ -418,7 +418,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestEngineApiClient testEngineApiClient = CreateTestEngineClient();
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, Enumerable.Empty<TestScenarioResultCounts>()));
 
             ISpecsApiClient specsApiClient = CreateSpecsClient();
@@ -444,7 +444,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
 
             pageModel
                 .TestCoverage
@@ -482,7 +482,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             });
 
             testEngineApiClient
-                .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>())
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
             ISpecsApiClient specsApiClient = CreateSpecsClient();
@@ -508,7 +508,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
 
             await testEngineApiClient
                  .Received(1)
-                 .GetTestResultCounts(Arg.Any<TestSecenarioResultCountsRequestModel>());
+                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>());
 
             pageModel
                 .TestCoverage

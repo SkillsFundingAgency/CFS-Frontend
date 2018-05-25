@@ -1,0 +1,103 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Specs.EditCalculationPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Create calculation specification for policy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Funding Period: @Model.Specification.FundingPeriod.Name</p>
+    <h1 class="hero-title">Edit calculation specification for policy</h1>
+    <p class="hero-text">Edit calculation specification for @Model.Specification.Name</p>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
+            <li><a href="/specs/policies/@Model.Specification.Id">@Model.Specification.Name</a></li>
+            <li>@BreadcrumbText.EditCalculation</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div gds-validation-summary="All"></div>
+            <div>
+                <div gds-validationblock-for="EditCalculationViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="EditCalculationViewModel.Name"></a>
+                        <label asp-for="EditCalculationViewModel.Name">Name</label>
+                        <input asp-for="EditCalculationViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditCalculationViewModel.PolicyId">
+                    <div class="form-group">
+                        <a validationanchor-for="EditCalculationViewModel.PolicyId"></a>
+                        <label asp-for="EditCalculationViewModel.PolicyId">Select policy or subpolicy</label>
+                        <select asp-items="@(Model.Policies)" asp-for="EditCalculationViewModel.PolicyId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditCalculationViewModel.CalculationType">
+                    <div class="form-group">
+                        <a validationanchor-for="EditCalculationViewModel.CalculationType"></a>
+                        <label asp-for="EditCalculationViewModel.CalculationType">Calculation type</label>
+                        <select id="CalculationTypes" asp-items="@(Model.CalculationTypes)" asp-for="EditCalculationViewModel.CalculationType" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="inline-allocation-line-container" class="inline-form-section spacing-20-bottom">
+                <div gds-validationblock-for="EditCalculationViewModel.AllocationLineId">
+                    <div class="form-group">
+                        <a validationanchor-for="EditCalculationViewModel.AllocationLineId"></a>
+                        <label asp-for="EditCalculationViewModel.AllocationLineId">Allocation line</label>
+                        <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="EditCalculationViewModel.AllocationLineId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="inline-ispublic" class="inline-form-section spacing-20-bottom">
+                <div gds-validationblock-for="EditCalculationViewModel.IsPublic">
+                    <div class="checkbox">
+                        <a validationanchor-for="EditCalculationViewModel.IsPublic"></a>
+                        <label asp-for="EditCalculationViewModel.IsPublic">
+                            <input type="checkbox" asp-for="EditCalculationViewModel.IsPublic" />
+                            Show this information on the funding statement
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditCalculationViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="EditCalculationViewModel.Description"></a>
+                        <label asp-for="EditCalculationViewModel.Description">Description</label>
+                        <textarea asp-for="EditCalculationViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/specs/policies/@Model.Specification.Id" id="cancel-link">Cancel</a></p>
+
+        </form>
+
+    </div>
+</div>
+
+@section scripts {
+    <script asp-src-include="~/js/calculationspec.create-edit.js" asp-append-version="true" type="text/javascript"></script>
+}

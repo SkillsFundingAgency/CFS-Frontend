@@ -114,7 +114,7 @@ namespace CalculateFunding.Frontend.Services
 
             if (testScenarioIds.Any())
             {
-                ApiResponse<IEnumerable<TestScenarioResultCounts>> rowCounts = await _testEngineClient.GetTestResultCounts(new TestSecenarioResultCountsRequestModel()
+                ApiResponse<IEnumerable<TestScenarioResultCounts>> rowCounts = await _testEngineClient.GetTestResultCounts(new TestScenarioResultCountsRequestModel()
                 {
                     TestScenarioIds = testScenarioIds,
                 });
