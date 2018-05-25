@@ -25,7 +25,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResults_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
+            IEnumerable<SpecificationSummary> specifications = Enumerable.Empty<SpecificationSummary>();
 
             ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResultsAndParameterSupplied_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
+            IEnumerable<SpecificationSummary> specifications = Enumerable.Empty<SpecificationSummary>();
 
             ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         public async Task OnGetAsync_GivenInvalidParameterSupplied_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
+            IEnumerable<SpecificationSummary> specifications = Enumerable.Empty<SpecificationSummary>();
 
             ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
@@ -160,7 +160,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         public async Task OnGetAsync_GivenGetSpecificationsReturnsResults_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = SpecificationTestData.Data();
+            IEnumerable<SpecificationSummary> specifications = SpecificationTestData.DataSummary();
 
             ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
 
