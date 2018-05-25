@@ -66,7 +66,6 @@ $glyph: 'glyphicons-halflings-regular';
     font-feature-settings: 'liga';
 }
 
-
 a.button:hover {
     text-decoration: none;
 }
@@ -176,6 +175,11 @@ blockquote {
 
 .hero-text {
     font-size: 19px;
+}
+
+.hero-text-strong{
+    color: #6F777b;
+    font-size:36px;
 }
 
 .hero-spacing-right {
@@ -464,6 +468,22 @@ blockquote {
             width: 0;
             padding: 0;
         }
+    }
+
+    .calculation-status-draft {
+        color: orange;
+    }
+
+    .calculation-status-updated {
+        color: purple;
+    }
+
+    .calculation-status-published {
+        color: green;
+    }
+
+    .calculation-status-none {
+        color: gray;
     }
 }
 
@@ -1540,9 +1560,6 @@ table {
     }
 }
 
-
-
-
 .multiselect-container {
     border-radius: 0;
     font-size: 16px;
@@ -1578,7 +1595,6 @@ table {
         line-height: 19px;
     }
 }
-
 
 .homepage-section-container {
     padding: 15px 0;
@@ -1828,7 +1844,6 @@ table {
 .material-icons-content-container {
     display: flex;
     vertical-align: middle;
-
     .material-icons.material-icons-left {
         padding-right: 5px;
     }

@@ -40,14 +40,26 @@
 
         public bool HasProviderDatasetsAssigned { get; set; }
 
-        public async Task<IActionResult> OnGet(string specificationId)
+        public bool ShowSuccessMessage { get; set; }
+
+        public string PolicyType { get; set; }
+
+        public async Task<IActionResult> OnGet(string specificationId, bool wasSuccess = false , string policyType="Policy")
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ShowSuccessMessage = wasSuccess;
+
+            PolicyType = policyType; 
+
             Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
+
             Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaResponseTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(specificationId);
 
             await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
             ApiResponse<Specification> specificationResponse = specificationResponseTask.Result;
+
             ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 
             if (specificationResponse == null)

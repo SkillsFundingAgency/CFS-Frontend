@@ -28,7 +28,6 @@
         <div class="row view-policy">
             <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
             <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
-
             <div class="inline-collapse-container spacing-15-bottom">
                 <div class="inline-collapse-heading withjs-show">
                     <i class="inline-collapse-arrow"></i>
@@ -38,6 +37,13 @@
                     @Model.Specification.Description
                 </div>
             </div>
+            @if (Model.ShowSuccessMessage)
+            {
+                <div class="alert alert--success">
+                    <span>@Model.PolicyType has been updated successfully</span> <a id="dismiss-link" class="float-right" href="~/specs/policies/@Model.Specification.Id">Dismiss</a>
+                </div>
+            }
+
             <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
                 <li class="nav-item active">
                     <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View policies</a>
@@ -71,7 +77,7 @@
                         {
                             <div class="jscollapse-container policy-list-item">
                                 <div class="policy-list-header jscollapse-header">
-                                    @*<a href="/specs/editPolicy/@policy.Id" class="policy-list-edit-link">Edit</a>*@
+                                    <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="policy-list-edit-link">Edit policy</a>
                                     <h2 class="policy-list-title-container collapse-title jscollapse-active">
                                         <a name="policy-@policy.Id"></a>
                                         <a class="policy-title" href="/calculations/@policy.Id">@policy.Name</a>
@@ -104,16 +110,14 @@
                                             <div class="subpolicy-container jscollapse-container">
                                                 <div class="subpolicy-list-header jscollapse-header">
 
-                                                    @*<a href="/specs/editPolicy/@subPolicy.Id" class="policy-list-edit-link">Edit</a>*@
+                                                    <a href="/specs/editsubPolicy/@Model.Specification.Id/@subPolicy.Id/@policy.Id" class="policy-list-edit-link">Edit sub policy</a>
                                                     <h2 class="policy-list-title-container collapse-title jscollapse-active">
                                                         <a name="policy-@subPolicy.Id"></a>
-                                                        <a class="policy-title" href="/calculations/@subPolicy.Id">@subPolicy.Name</a>
+                                                        <a class="policy-title" href="/specs/editsubpolicy/@subPolicy.Id">@subPolicy.Name</a>
                                                     </h2>
 
                                                 </div>
                                                 <div class="jscollapse-body">
-
-
                                                     <p class="subpolicy-description">
                                                         @subPolicy.Description
                                                     </p>
@@ -227,8 +231,13 @@
                     }
                 }
             }
+        });
+    </script>
 
-
+    <script type="text/javascript">
+        $('#dismiss-link').on('click', function (e) {
+            e.preventDefault();
+            $('.alert').hide();
         });
     </script>
 }

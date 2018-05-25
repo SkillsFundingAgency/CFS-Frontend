@@ -41,8 +41,8 @@
 @section BannerMiddle{
     <form method="post" class="filter-container spacing-15" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-3 filter-field-heading">Select a funding period</div>
-            <div class="col-xs-4 filter-field-heading">Select a specification</div>
+            <div class="col-xs-3 filter-field-heading">Funding period</div>
+            <div class="col-xs-4 filter-field-heading">Specification</div>
         </div>
         <div class="row">
             <div class="col-xs-3">
@@ -78,36 +78,36 @@
             </ul>
             <br />
             @if (!@Model.ViewModel.AllocationLineItems.IsNullOrEmpty())
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th style="width:85%" scope="col">Allocation Name</th>
-                            <th scope="col">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var result in Model.ViewModel.AllocationLineItems)
-                        {
-                            <tr>
-                                <th scope="row">@result.AllocationLine</th>
-                                <td>@result.TotalFormatted</td>
-                            </tr>
-                        }
-                        
-                        <tr class=" bg-info">
-
-                            <th scope="row" class="spec-rel-grey-back"><strong>Total school budget share (excluding rates)</strong></th>
-                            <td class="spec-rel-grey-back"><strong>@Model.ViewModel.TotalFormatted</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width:85%" scope="col">Allocation Name</th>
+                        <th scope="col">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Model.ViewModel.AllocationLineItems)
+                {
+                    <tr>
+                        <th scope="row">@result.AllocationLine</th>
+                        <td>@result.TotalFormatted</td>
+                    </tr>
             }
-            else
-            {
-                <p><strong>Select a specification to view results</strong></p>
 
-            }
+                    <tr class=" bg-info">
+
+                        <th scope="row" class="spec-rel-grey-back"><strong>Total school budget share (excluding rates)</strong></th>
+                        <td class="spec-rel-grey-back"><strong>@Model.ViewModel.TotalFormatted</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+    }
+    else
+    {
+        <p><strong>Select a specification to view results</strong></p>
+
+}
         </div>
     </div>
 </div>

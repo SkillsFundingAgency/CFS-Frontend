@@ -219,7 +219,7 @@
         private handleBlobUploadSuccess(datasetId: string, filename: string) {
             let self = this;
 
-            self.loadingMessage("Validating dataset..");
+            self.loadingMessage("Validating data source");
 
             let data = {
                 DatasetId: datasetId,

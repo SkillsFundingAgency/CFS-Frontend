@@ -43,9 +43,9 @@ namespace CalculateFunding.Frontend.Controllers
         {
             // Arrange
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest);
-            response.ModelState = new Dictionary<string, object>
+            response.ModelState = new Dictionary<string, IEnumerable<string>>
             {
-                { "Name", "Invalid name" }
+                { "Name", new [] {"Invalid name" } }
             };
 
             CreateDatasetViewModel viewModel = new CreateDatasetViewModel();

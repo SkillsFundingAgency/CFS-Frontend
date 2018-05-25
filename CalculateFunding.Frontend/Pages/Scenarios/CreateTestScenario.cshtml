@@ -12,6 +12,7 @@
             <li><a href="/">Calculate Funding</a></li>
             <li><a href="~/scenarios">Quality assurance</a></li>
             <li>Create test</li>
+            <li>Quality assurance tests</li>
         </ol>
     </div>
 }
@@ -43,7 +44,7 @@
                 <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isSpecificationIdValid() }">
                         <a name="field-CreateTestScenarioModel-SpecificationId"></a>
-                        <label asp-for="@Model.Specifications"> Select a specification</label>
+                        <label asp-for="@Model.Specifications"> Specification</label>
                         <select data-bind="value: specificationId, css:{'input-validation-error': !isSpecificationIdValid() }" asp-items="@(Model.Specifications)" class="form-control test-scenario-control" id="select-specifications" name="specifications">
                             <option></option>
                         </select>
@@ -56,6 +57,7 @@
                     <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                         <a validationanchor-for="CreateTestScenarioModel.Name"></a>
                         <label asp-for="CreateTestScenarioModel.Name">Test name</label>
+                        <p> <span class="text-muted">Use a descriptive unique name other users can understand </span> </p>
                         <input data-bind="value: name, css:{ 'input-validation-error': !isNameValid() }" asp-for="CreateTestScenarioModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -74,14 +76,14 @@
             <br />
             <div id="create-test-scenario">
                 <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
-                <strong>Test scenario:</strong>
+                <strong>Test scenario</strong>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
                 <div class="spacing-30">
                     <input type="button" class="button-calculation" value="Validate QA Test" data-bind="click: compileTestScenario, disable: !canRunTest()" id="validate-qa-test-button" />
                 </div>
 
-                <strong>Build output:</strong>
+                <strong>Test validation output</strong>
 
                 <div class="build-output">
                     <div data-bind="if: (validationRequested() && !isCompilingTest())">
@@ -102,10 +104,10 @@
                     </div>
                 </div>
 
-                <div class="spacing-30" data-bind="visible: (!testBuilt() && !isCompilingTest())">You must have a valid test before you can save it:</div>
+                <div class="spacing-30" data-bind="visible: (!testBuilt() && !isCompilingTest())">You must have a valid test before you can save it.</div>
 
                 <div class="spacing-15">
-                    <input type="button" class="button" value="Create test" id="create-test-button" data-bind="click: saveTestScenario, enable: canSaveTestScenario()" />
+                    <input type="button" class="button" value="Create QA test" id="create-test-button" data-bind="click: saveTestScenario, enable: canSaveTestScenario()" />
                 </div>
 
                 <div class="spacing-15" data-bind="visible: saveTestScenarioResult, text: saveTestScenarioResult"></div>

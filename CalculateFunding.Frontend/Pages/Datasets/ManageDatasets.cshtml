@@ -12,7 +12,7 @@
 }
 
 @section BannerLeft{
-    <h1 class="hero-title">Manage data sources</h1>
+    <h1 class="hero-title">Manage data source files</h1>
 }
 
 @section BannerMiddle{
@@ -24,16 +24,16 @@
         <div class="row">
             <div class="col-xs-9">
                 <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data sources" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" />
                     <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
                 </div>
             </div>
             <div class="col-xs-3">
-                <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasetsButton">Load new data source</a>
+                <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Load new data source file</a>
             </div>
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter datasets</div>
+            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter data source files</div>
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
             <div class="col-xs-5 filter-field-heading">Data schema</div>
@@ -61,7 +61,7 @@
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible" >
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "data sources", Model.SearchTerm))
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "data source files (most recent version)", Model.SearchTerm))
         </div>
 
         <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">

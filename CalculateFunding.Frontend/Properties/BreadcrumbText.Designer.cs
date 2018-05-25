@@ -178,7 +178,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Manage data sources.
+        ///   Looks up a localized string similar to Manage data source files.
         /// </summary>
         public static string ManageDataSources {
             get {
@@ -205,7 +205,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select source dataset.
+        ///   Looks up a localized string similar to Select data source.
         /// </summary>
         public static string SelectSourceDataset {
             get {

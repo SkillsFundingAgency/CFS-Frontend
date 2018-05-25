@@ -57,6 +57,8 @@
 
         Task<ApiResponse<Policy>> CreatePolicy(CreatePolicyModel policy);
 
+        Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy);
+
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
 
         Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId);
@@ -68,5 +70,7 @@
         Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
 
         Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);
+
+        Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel updateSubPolicyModel);
     }
 }
