@@ -11,6 +11,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using Castle.Core.Logging;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
@@ -198,7 +199,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
             pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Number);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Number);
         }
 
         [TestMethod]
@@ -251,7 +252,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
             pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Funding);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Funding);
         }
 
         [TestMethod]

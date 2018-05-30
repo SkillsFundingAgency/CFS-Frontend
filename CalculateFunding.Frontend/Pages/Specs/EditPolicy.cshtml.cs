@@ -1,19 +1,18 @@
 namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using System.Net;
-    using System.Threading.Tasks;
     using Serilog;
-    using System;
-    using CalculateFunding.Frontend.Extensions;
-    using System.Collections.Generic;
 
     public class EditPolicyPageModel : PageModel
     {

@@ -177,9 +177,9 @@ blockquote {
     font-size: 19px;
 }
 
-.hero-text-strong{
+.hero-text-strong {
     color: #6F777b;
-    font-size:36px;
+    font-size: 36px;
 }
 
 .hero-spacing-right {
@@ -248,7 +248,7 @@ blockquote {
     margin-top: 30px;
 }
 
-.spacing-bottom-0{
+.spacing-bottom-0 {
     margin-bottom: 0;
 }
 
@@ -482,6 +482,15 @@ blockquote {
         a,
         a:visited {
             text-decoration: none;
+        }
+    }
+}
+
+.policy-spec-what {
+    .inline-collapse-container {
+        .inline-collapse-heading {
+            color: #000;
+            text-decoration: underline;
         }
     }
 }
@@ -1392,9 +1401,7 @@ table {
         content: "\e259";
     }
 }
-
 /*Gherkin scenario page*/
-
 .gherkin-scenario {
     #scenario-name {
     }
@@ -1681,6 +1688,9 @@ table {
     border: 4px solid $error-colour;
 }
 
+@import "_tablelayout.scss";
+@import "_pageheaders.scss";
+
 @media (min-width: 641px) {
     .form-control {
         width: 100%;
@@ -1703,12 +1713,10 @@ table {
     .validation-failed-label {
         color: $error-colour;
     }
-
     /*.validation-passed-block {
         border-left: 5px solid $page-colour;
         padding-left: 10px;
     }*/
-
     .validation-summary-errors {
         border: 5px $error-colour solid;
         padding: 20px 15px 15px;
@@ -1868,6 +1876,7 @@ table {
 .material-icons-content-container {
     display: flex;
     vertical-align: middle;
+
     .material-icons.material-icons-left {
         padding-right: 5px;
     }
@@ -2014,8 +2023,6 @@ table {
 .edit-scenario .heading-grey-container .div-title {
     padding-bottom: 5px;
 }
-
-
 /*image path overrides*/
 #global-header #logo {
     background-image: url('/libs/govuk_bootstrap/images/gov.uk_logotype_crown.png?version=0.17.1');
@@ -2043,7 +2050,6 @@ table {
         }
     }
 }
-
 /* Disable word breaking in hover contents in monaco editor*/
 .mtk1 {
     text-wrap: normal;
@@ -2070,7 +2076,6 @@ table {
 .flag.flag--success {
     background-color: #28a197;
 }
-
 /*@media all and (min-width:641px)*/
 .flag {
     font-size: 16px;
@@ -2094,9 +2099,9 @@ table {
     margin-left: 20px;
 }
 
-.icon-funding-stream-removed{
-    width:30px;
-    margin-right:10px;
+.icon-funding-stream-removed {
+    width: 30px;
+    margin-right: 10px;
     margin-bottom: 20px;
-    float:left;
+    float: left;
 }

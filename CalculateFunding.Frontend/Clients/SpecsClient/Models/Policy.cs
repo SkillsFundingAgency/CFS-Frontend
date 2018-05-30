@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
+    using System;
     using System.Collections.Generic;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using Newtonsoft.Json;
@@ -14,5 +15,7 @@
 
         [JsonProperty("subPolicies")]
         public List<Policy> SubPolicies { get; set; }
+
+        public DateTime LastUpdated { get; set; }
     }
 }

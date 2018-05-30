@@ -70,6 +70,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Funding Streams.
+        /// </summary>
+        public static string FundingStreams {
+            get {
+                return ResourceManager.GetString("FundingStreams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage the specification, policies and map datasets..
         /// </summary>
         public static string ManagePolicies {

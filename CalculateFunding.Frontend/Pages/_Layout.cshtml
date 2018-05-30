@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon"  asp-href-include="~/assets/images/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" asp-href-include="~/assets/images/favicon.ico" type="image/x-icon" />
     <link rel="mask-icon" asp-href-include="~/assets/images/gov.uk_logotype_crown.svg" color="#0b0c0c">
     <title>@ViewData["Title"] - Calculate funding</title>
     @if (hostingEnv.IsDevelopment())
@@ -136,7 +136,28 @@
             </div>
         </section>
     }
+    else if (IsSectionDefined("BannerWhole"))
+    {
+        <section class="banner-link-wrapper">
+            <div class="container">
+                @if (IsSectionDefined("BreadCrumb"))
+                {
+                    <div class="row">
+                        <div class="col-xs-9">
+                            @RenderSection("BreadCrumb", false)
+                        </div>
+                    </div>
 
+                }
+                <div class="row">
+                    <div class="col-xs-12">
+                        @RenderSection("BannerWhole")
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    }
     <main role="main">
         <div class="container">
             @*<div class="row">
@@ -182,14 +203,14 @@
     <script asp-src-include="~/assets/libs/js/jquery.min.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="/assets/libs/js/bootstrap.js" asp-append-version="true" type="text/javascript"></script>
     @*<script src="/assets/libs/js/ace.js"></script>
-    <script src="/assets/libs/js/keybinding-vim.js"></script>
-    <script src="/assets/libs/js/keybinding-emacs.js"></script>
-    <script src="/assets/libs/js/ext-language_tools.js"></script>
-    <script src="/assets/libs/js/csharp.js"></script>
-    <script src="/assets/libs/js/mode-csharp.js"></script>
-    <script src="/assets/libs/js/mode-gherkin.js"></script>
-    <script src="/assets/libs/js/mode-vbscript.js"></script>
-    <script src="/assets/libs/js/summernote.min.js"></script>*@
+        <script src="/assets/libs/js/keybinding-vim.js"></script>
+        <script src="/assets/libs/js/keybinding-emacs.js"></script>
+        <script src="/assets/libs/js/ext-language_tools.js"></script>
+        <script src="/assets/libs/js/csharp.js"></script>
+        <script src="/assets/libs/js/mode-csharp.js"></script>
+        <script src="/assets/libs/js/mode-gherkin.js"></script>
+        <script src="/assets/libs/js/mode-vbscript.js"></script>
+        <script src="/assets/libs/js/summernote.min.js"></script>*@
 
     @if (!hostingEnv.IsDevelopment())
     {
@@ -201,8 +222,8 @@
     }
 
     @*<script type="text/javascript">
-        var exports = {};
-    </script>*@
+            var exports = {};
+        </script>*@
     @RenderSection("Scripts", required: false)
 </body>
 </html>

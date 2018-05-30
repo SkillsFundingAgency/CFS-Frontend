@@ -91,7 +91,7 @@
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<EditPolicyViewModel, EditPolicyModel>()
-               .ForMember(m => m.SpecificationId, opt => opt.Ignore()); 
+               .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore())
@@ -116,9 +116,9 @@
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
-            CreateMap<EditPolicyViewModel, Policy>()
-                .ForMember(m => m.SubPolicies, opt => opt.Ignore())
-                .ForMember(m => m.Calculations, opt => opt.Ignore());
+            //CreateMap<EditPolicyViewModel, Policy>()
+            //    .ForMember(m => m.SubPolicies, opt => opt.Ignore())
+            //    .ForMember(m => m.Calculations, opt => opt.Ignore());
           
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
 
