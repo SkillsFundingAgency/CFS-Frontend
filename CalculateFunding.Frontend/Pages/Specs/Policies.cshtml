@@ -52,6 +52,12 @@
     </div>
 
 }
+
+@if (Model.OperationType.HasValue)
+{
+    <div class="notification-panel"><i class="material-icons">check</i> @Model.OperationEntityType @Model.OperationEntityName updated</div>
+}
+
 <div class="row">
     <div class="col-xs-12 policy-spec-what ">
         <p class="withjs-hide">What is @Model.Specification.Name?</p>

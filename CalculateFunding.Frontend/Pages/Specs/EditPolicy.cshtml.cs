@@ -104,7 +104,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (updatePolicyResult.StatusCode == HttpStatusCode.OK)
             {
-                return Redirect($"/specs/policies/{specificationId}&wasSuccess=true&policyType=Policy");
+                return Redirect($"/specs/policies/{specificationId}?operationType=PolicyUpdated&operationId={updatePolicyResult.Content.Id}");
             }
             else if (updatePolicyResult.StatusCode == HttpStatusCode.BadRequest)
             {

@@ -560,7 +560,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Which
                 .Url
                 .Should()
-                .Be($"/specs/policies/{specificationId}#calculation-{calculationId}");
+                .Be($"/specs/policies/{specificationId}?operationId={calculationId}&operationType=CalculationUpdated");
 
             await specsClient
                 .Received(1)

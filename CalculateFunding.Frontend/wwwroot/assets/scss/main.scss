@@ -602,6 +602,21 @@ blockquote {
     }
 }
 
+.notification-panel {
+    background-color: $turquoise;
+    color: #fff;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+
+    i.material-icons{
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+}
+
 .dataset-searchresult-container {
 
     .dataset-item-container {

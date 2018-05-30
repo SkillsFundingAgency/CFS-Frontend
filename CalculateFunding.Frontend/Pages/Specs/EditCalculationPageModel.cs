@@ -111,7 +111,7 @@
             {
                 Calculation editedCalculation = editCalculationResponse.Content;
 
-                return Redirect($"/specs/policies/{specificationId}#calculation-{editedCalculation.Id}");
+                return Redirect($"/specs/policies/{specificationId}?operationId={editedCalculation.Id}&operationType=CalculationUpdated");
             }
             else if (editCalculationResponse.StatusCode == HttpStatusCode.BadRequest)
             {

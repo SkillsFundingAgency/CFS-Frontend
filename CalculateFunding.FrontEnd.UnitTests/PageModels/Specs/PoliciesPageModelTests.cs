@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.PageModels.Specs
 {
@@ -77,7 +78,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<PageResult>();
@@ -88,7 +89,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 Name = "Test Specification",
                 FundingPeriod = new ReferenceViewModel("1617", "2016/2017"),
                 Description = "Test Description",
-                FundingStreams = new List<ReferenceViewModel>() { new ReferenceViewModel("fs1", "Funding Stream Name"),  },
+                FundingStreams = new List<ReferenceViewModel>() { new ReferenceViewModel("fs1", "Funding Stream Name"), },
                 Policies = new List<PolicyViewModel>()
                 {
                     new PolicyViewModel()
@@ -140,7 +141,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<NotFoundObjectResult>()
@@ -166,7 +167,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.NotFound, null));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<ObjectResult>()
@@ -195,7 +196,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<ObjectResult>()
@@ -225,7 +226,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<ObjectResult>()
@@ -259,7 +260,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns((ApiResponse<IEnumerable<DatasetSchemasAssigned>>)null);
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
 
             // Assert
             result.Should().BeOfType<ObjectResult>()
@@ -271,6 +272,323 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             logger
                 .Received(1)
                 .Warning("Dataset Schema Response API Request came back null for Specification ID = '{specificationId}'", specificationId);
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSpecificationUpdated_ThenBannerPopulated()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.SpecificationUpdated, specificationId);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            policiesModel
+                   .OperationEntityType
+                   .Should()
+                   .Be("Specification");
+
+            policiesModel
+                .OperationEntityName
+                .Should()
+                .Be("Test Specification");
+
+            policiesModel
+                .OperationType
+                .Should()
+                .Be(SpecificationBannerOperationType.SpecificationUpdated);
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsPolicy_ThenBannerPopulated()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.PolicyUpdated, "policy2");
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            policiesModel
+                   .OperationEntityType
+                   .Should()
+                   .Be("Policy");
+
+            policiesModel
+                .OperationEntityName
+                .Should()
+                .Be("Policy Two");
+
+            policiesModel
+                .OperationType
+                .Should()
+                .Be(SpecificationBannerOperationType.PolicyUpdated);
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubpolicy_ThenBannerPopulated()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.SubpolicyUpdated, "subPolicy2");
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            policiesModel
+                   .OperationEntityType
+                   .Should()
+                   .Be("Subpolicy");
+
+            policiesModel
+                .OperationEntityName
+                .Should()
+                .Be("Sub Policy 2");
+
+            policiesModel
+                .OperationType
+                .Should()
+                .Be(SpecificationBannerOperationType.SubpolicyUpdated);
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsCalculation_ThenBannerPopulated()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, "calc1");
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            policiesModel
+                   .OperationEntityType
+                   .Should()
+                   .Be("Calculation specification");
+
+            policiesModel
+                .OperationEntityName
+                .Should()
+                .Be("Calculation 1");
+
+            policiesModel
+                .OperationType
+                .Should()
+                .Be(SpecificationBannerOperationType.CalculationUpdated);
+
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubPolicyCalculation_ThenBannerPopulated()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, "subpolicyCalculation1");
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            policiesModel
+                   .OperationEntityType
+                   .Should()
+                   .Be("Calculation specification");
+
+            policiesModel
+                .OperationEntityName
+                .Should()
+                .Be("Sub Policy 2 Calculation 1");
+
+            policiesModel
+                .OperationType
+                .Should()
+                .Be(SpecificationBannerOperationType.CalculationUpdated);
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSpecifiedButNoOperationId_ThenPrecondionFailedReturned()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+            Specification specification = CreateSpecificationForBannerChecks(specificationId);
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, null);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PreconditionFailedResult>()
+                .Which
+                .Value
+                .Should()
+                .Be("Operation ID not provided");
+        }
+
+        private static Specification CreateSpecificationForBannerChecks(string specificationId)
+        {
+            return new Specification()
+            {
+                Id = specificationId,
+                Name = "Test Specification",
+                FundingPeriod = new Reference("1617", "2016/2017"),
+                Description = "Test Description",
+                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), },
+                Policies = new List<Policy>()
+                {
+                    new Policy()
+                    {
+                        Id = "pol1",
+                        Name = "Policy 1",
+                        Description = "Policy 1 Description",
+                        Calculations = new List<Calculation>()
+                        {
+                            new Calculation()
+                            {
+                                Id ="calc1",
+                                Name = "Calculation 1",
+                                Description = "Calculation with allocation line",
+                                AllocationLine = new Reference("al1", "Allocation Line 1"),
+                            },
+                            new Calculation()
+                            {
+                                Id ="calc2",
+                                Name = "Calculation Two",
+                                Description = "Calculation without allocation line",
+                                AllocationLine = null
+                            },
+                        },
+                        SubPolicies = new List<Policy>()
+                        {
+                            new Policy()
+                            {
+                                Id="subPolicy1",
+                                Name="Sub Policy 1"
+                            },
+                            new Policy()
+                            {
+                                Id="subPolicy2",
+                                Name="Sub Policy 2",
+                                Calculations = new List<Calculation>()
+                                {
+                                    new Calculation()
+                                    {
+                                         Id="subpolicyCalculation1",
+                                         Name="Sub Policy 2 Calculation 1",
+                                    }
+                                }
+                            },
+                            new Policy()
+                            {
+                                Id="subPolicy3",
+                                Name="Sub Policy 3"
+                            }
+                        }
+                    },
+                    new Policy()
+                    {
+                        Id="policy2",
+                        Name="Policy Two",
+                    }
+                }
+            };
         }
 
         private PoliciesModel GetPoliciesModel(

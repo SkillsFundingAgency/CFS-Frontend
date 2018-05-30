@@ -714,7 +714,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be($"/specs/policies/{specificationId}");
+                .Be($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId=spec-id");
 
             await
                 apiClient

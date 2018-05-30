@@ -83,7 +83,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             HttpStatusCode editResult = await _specsClient.UpdateSpecification(specificationId, specification);
             if(editResult == HttpStatusCode.OK)
             {
-                return Redirect($"/specs/policies/{specificationId}");
+                return Redirect($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
             }
             else
             {
