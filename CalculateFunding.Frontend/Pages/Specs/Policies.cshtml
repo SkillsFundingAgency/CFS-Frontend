@@ -86,8 +86,9 @@
     <div class="col-xs-12">
         <div class="jump-to-container">
             <div>Policy:</div>
+            <div class="pull-right"><a href="#" data-action="expand" id="expandCollapseAll">Expand all</a></div>
             <div>
-                <select>
+                <select id="policy-jump">
                     <option>Jump to</option>
                     @foreach (var policy in Model.Specification.Policies)
                     {
@@ -116,9 +117,23 @@
                 <tr class="data-policy-container cr-table-primary-highlight">
                     <td class="table-primary-border"><a name="policy-@policy.Id"></a></td>
                     <td class="no-border min-width-sm data-policy-name">Policy</td>
-                    <td class="min-width-md"><a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons">edit</i></a> <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink"><span class="data-policy-name">@policy.Name</span></a></td>
+                    <td class="min-width-md">
+                        <span class="button-split-container">
+                            <span class="button-split-icon">
+                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons">edit</i></a>
+                            </span>
+                            <span class="button-split-text">
+                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink"><span class="data-policy-name">@policy.Name</span></a>
+                            </span>
+                        </span>
+                    </td>
                     <td colspan="2" class="data-policy-description-firstline">@policy.DescriptionFirstLine</td>
-                    <td class="text-nowrap data-policy-lastupdated">@policy.LastUpdatedDisplay</td>
+                    <td class="text-nowrap data-policy-lastupdated">
+                        <span class="datetime-split-container">
+                            <span class="datetime-split-date data-policy-lastupdated-date">@policy.LastUpdatedDateFormatted</span>
+                            <span class="datetime-split-time data-policy-lastupdated-time">@policy.LastUpdatedTimeFormatted</span>
+                        </span>
+                    </td>
                     <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
                 </tr>
                 <tr class="cr-table-primary-highlight expander-container">
@@ -139,17 +154,30 @@
                             <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
                             @if (i == 0)
                             {
-                                <td rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight" data-totalItems="@calculations.Count" data-openItems="0">
+                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
                                     <div class="table-type-header">Calcuation Specification</div>
                                 </td>
-
                             }
 
-                            <td><a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a> <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a></td>
+                            <td>
+                                <span class="button-split-container">
+                                    <span class="button-split-icon">
+                                        <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
+                                    </span>
+                                    <span class="button-split-text">
+                                        <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
+                                    </span>
+                                </span>
+                            </td>
                             <td class="data-calculation-description-firstline">@calculation.DescriptionFirstLine</td>
                             <td class="data-calculation-type">@calculation.CalculationType</td>
-                            <td class="text-nowrap data-calculation-lastupdated">@calculation.LastUpdatedDisplay</td>
-                            <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
+                            <td class="text-nowrap data-calculation-lastupdated">
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-calculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-calculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
                         </tr>
                         <tr class="cr-table-primary-highlight expander-container">
                             <td class="table-primary-border"></td>
@@ -172,18 +200,32 @@
                             <td class="table-primary-border"><a name="policy-@subpolicy.Id"></a></td>
                             @if (i == 0)
                             {
-                                <td rowspan="@subpolicies.Count" class="data-subpolicy-label cr-table-secondary-highlight" data-totalItems="@subpolicies.Count" data-openItems="0">
+                                <td id="subpolicies-for-@policy.Id" rowspan="@subpolicies.Count" class="data-subpolicy-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@subpolicies.Count" data-openItems="0">
                                     <div class="table-type-header">Subpolicy</div>
                                 </td>
                             }
-                            <td><a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink-icon"><i class="material-icons">edit</i></a> <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink"><span class="data-subpolicy-name">@subpolicy.Name</span></a></td>
+                            <td>
+                                <span class="button-split-container">
+                                    <span class="button-split-icon">
+                                        <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink-icon"><i class="material-icons">edit</i></a>
+                                    </span>
+                                    <span class="button-split-text">
+                                        <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink"><span class="data-subpolicy-name">@subpolicy.Name</span></a>
+                                    </span>
+                                </span>
+                            </td>
                             <td colspan="2" class="data-subpolicy-description-firstline">@subpolicy.DescriptionFirstLine</td>
-                            <td class="text-nowrap data-subpolicy-lastupdated">@subpolicy.LastUpdatedDisplay</td>
-                            <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
+                            <td class="text-nowrap data-subpolicy-lastupdated">
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-subpolicy-lastupdated-date">@subpolicy.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-subpolicy-lastupdated-time">@subpolicy.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td class="expander-trigger-cell" data-multi-row-header="subpolicies-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
                         </tr>
                         <tr class="cr-table-primary-highlight expander-container">
                             <td class="table-primary-border"></td>
-                            <td colspan="6" class="no-border data-subpolicy-description ">
+                            <td colspan="6" class="no-border data-subpolicy-description">
                                 @subpolicy.Description.ReplaceLineBreaksForHtml()
                             </td>
                         </tr>
@@ -199,15 +241,29 @@
                                     <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
                                     @if (k == 0)
                                     {
-                                        <td rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight" data-totalItems="@calculations.Count" data-openItems="0">
+                                        <td id="calcs-for-@subpolicy.Id" rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
                                             <div class="table-type-header">Calcuation Specification</div>
                                         </td>
                                     }
-                                    <td><a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-subpolicycalculation-editlink"><i class="material-icons">edit</i></a> <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-subpolicycalculation-editlink"><span class="data-subpolicycalculation-name">@calculation.Name</span></a></td>
+                                    <td>
+                                        <span class="button-split-container">
+                                            <span class="button-split-icon">
+                                                <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
+                                            </span>
+                                            <span class="button-split-text">
+                                                <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
+                                            </span>
+                                        </span>
+                                    </td>
                                     <td class="data-subpolicycalculation-description-firstline">@calculation.DescriptionFirstLine</td>
                                     <td class="data-subpolicycalculation-type">@calculation.CalculationType</td>
-                                    <td class="data-subpolicycalculation-lastupdated">@calculation.LastUpdatedDisplay</td>
-                                    <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
+                                    <td class="data-subpolicycalculation-lastupdated">
+                                        <span class="datetime-split-container">
+                                            <span class="datetime-split-date data-subpolicycalculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
+                                            <span class="datetime-split-time data-subpolicycalculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
+                                        </span>
+                                    </td>
+                                    <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@subpolicy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
                                 </tr>
                                 <tr class="cr-table-primary-highlight expander-container">
                                     <td class="table-primary-border"></td>
@@ -399,7 +455,7 @@
 
 
 @section scripts{
-
+    <script type="text/javascript" asp-src-include="~/js/policies.js"></script>
     <script type="text/javascript">
 
 
@@ -408,42 +464,42 @@
         $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
         $(".jscollapse-active").addClass("jscollapse-jsenabled-active");
 
-        $(".policy-list-openall").on("click", function (e) {
-            $(".jscollapse-container").find(".jscollapse-body").removeClass("hidden");
-            $(".jscollapse-container").find(".jscollapse-header").children(".collapse-title").addClass("jscollapse-jsenabled-active");
+        //$(".policy-list-openall").on("click", function (e) {
+        //    $(".jscollapse-container").find(".jscollapse-body").removeClass("hidden");
+        //    $(".jscollapse-container").find(".jscollapse-header").children(".collapse-title").addClass("jscollapse-jsenabled-active");
 
-            e.preventDefault();
-        });
+        //    e.preventDefault();
+        //});
 
-        $(".collapse-title").on("click", function (e, selector, data) {
+        //$(".collapse-title").on("click", function (e, selector, data) {
 
-            var $this = $(e.target);
-            var setActive = !$this.hasClass("jscollapse-jsenabled-active");
-            if (!setActive) {
-                $this.removeClass("jscollapse-jsenabled-active");
-            }
-            else {
-                $this.addClass("jscollapse-jsenabled-active");
-            }
+        //    var $this = $(e.target);
+        //    var setActive = !$this.hasClass("jscollapse-jsenabled-active");
+        //    if (!setActive) {
+        //        $this.removeClass("jscollapse-jsenabled-active");
+        //    }
+        //    else {
+        //        $this.addClass("jscollapse-jsenabled-active");
+        //    }
 
-            var headerElement = $this.parent();
-            if (headerElement.hasClass("jscollapse-header")) {
+        //    var headerElement = $this.parent();
+        //    if (headerElement.hasClass("jscollapse-header")) {
 
-                var containerElement = headerElement.parent();
-                if (containerElement.hasClass("jscollapse-container")) {
-                    var bodyElement = containerElement.children(".jscollapse-body");
-                    if (bodyElement) {
-                        if (setActive) {
-                            bodyElement.removeClass("hidden");
-                        }
-                        else {
-                            bodyElement.addClass("hidden");
-                        }
+        //        var containerElement = headerElement.parent();
+        //        if (containerElement.hasClass("jscollapse-container")) {
+        //            var bodyElement = containerElement.children(".jscollapse-body");
+        //            if (bodyElement) {
+        //                if (setActive) {
+        //                    bodyElement.removeClass("hidden");
+        //                }
+        //                else {
+        //                    bodyElement.addClass("hidden");
+        //                }
 
-                    }
-                }
-            }
-        });
+        //            }
+        //        }
+        //    }
+        //});
     </script>
 
     <script type="text/javascript">

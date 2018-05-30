@@ -81,10 +81,35 @@ table.cf {
     .min-width-sm {
         min-width: 150px;
     }
+
+    .expander-trigger-cell {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .expander-trigger-cell i {
+        transition: transform ease-in-out 0.4s;
+    }
+
+    .expander-trigger-cell-open i {
+        transform: rotate(180deg);
+    }
+
+    .button-split-container{
+        display: flex;
+        align-items:center;
+
+        .button-split-icon{
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .button-split-text{}
+    }
 }
 
 .jump-to-container {
     background-color: #DEE0E2;
-    padding: 30px 5px;
+    padding: 30px 45px 30px 10px;
     font-size: 16px;
 }

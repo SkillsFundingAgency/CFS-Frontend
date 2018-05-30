@@ -43,5 +43,21 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
                 return LastUpdated.ToString(FormatStrings.DateTimeFormatString);
             }
         }
+
+        public string LastUpdatedDateFormatted
+        {
+            get
+            {
+                return LastUpdated.ToString(FormatStrings.DateFormatString);
+            }
+        }
+
+        public string LastUpdatedTimeFormatted
+        {
+            get
+            {
+                return LastUpdated.ToString(FormatStrings.TimeFormatString);
+            }
+        }
     }
 }

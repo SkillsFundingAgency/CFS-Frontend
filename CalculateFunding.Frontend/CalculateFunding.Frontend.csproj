@@ -29,6 +29,7 @@
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.calcuation-results.ts" />
@@ -120,6 +121,7 @@
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
+    <TypeScriptCompile Include="Scripts\policies.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
     <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
