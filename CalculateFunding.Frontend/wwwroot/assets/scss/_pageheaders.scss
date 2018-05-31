@@ -43,4 +43,22 @@
     .hero-text {
         margin: 0;
     }
+
+    .hero-subtext {
+        font-size: 16px;
+        margin: 0;
+    }
+}
+
+.banner-floating-link-container {
+    background-color: #000;
+    padding: 20px;
+    font-size: 19px;
+    display: inline-block;
+
+    a,
+    a:visited {
+        color: #fff;
+        text-decoration: underline;
+    }
 }

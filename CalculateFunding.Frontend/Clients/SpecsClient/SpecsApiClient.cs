@@ -199,5 +199,26 @@
                 return null;
             }
         }
+
+        public async Task<PagedResult<SpecificationSearchResultItem>> FindSpecifications(SearchFilterRequest filterOptions)
+        {
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<SpecificationSearchResultItem>> results = await PostAsync<SearchResults<SpecificationSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-search", request);
+            if (results.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<SpecificationSearchResultItem> result = new SearchPagedResult<SpecificationSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results,
+                    Facets = results.Content.Facets,
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

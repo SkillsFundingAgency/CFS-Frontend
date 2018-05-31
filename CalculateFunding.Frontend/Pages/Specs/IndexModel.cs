@@ -1,51 +1,55 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.Services;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
 
     public class IndexModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationSearchService _searchService;
 
-        public IndexModel(ISpecsApiClient specsClient)
+        public IndexModel(ISpecificationSearchService specsSearchService)
         {
-            _specsClient = specsClient;
+            Guard.ArgumentNotNull(specsSearchService, nameof(specsSearchService));
+
+            _searchService = specsSearchService;
         }
 
-        public IEnumerable<SpecificationSummary> Specifications { get; set; }
+        public string SearchTerm { get; set; }
 
-        public IList<SelectListItem> FundingPeriods { get; set; }
+        public SpecificationSearchResultViewModel SearchResults { get; set; }
 
-        public string FundingPeriodId { get; set; }
+        public string InitialSearchResults { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
+        public async Task<IActionResult> OnGetAsync(string searchTerm, int? pageNumber)
         {
-            var yearsResponse = await _specsClient.GetFundingPeriods();
-            var fundingPeriods = yearsResponse.Content;
-
-            if (string.IsNullOrWhiteSpace(fundingPeriodId))
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
-                fundingPeriodId = fundingPeriods.FirstOrDefault().Id;
+                PageNumber = pageNumber ?? 1,
+                IncludeFacets = true,
+                SearchTerm = searchTerm,
+            };
+
+            SearchTerm = searchTerm;
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new InternalServerErrorResult("Search results returned null from API call");
             }
 
-            var specstask = _specsClient.GetSpecifications(fundingPeriodId);
-
-            Specifications = specstask.Result == null ? new List<SpecificationSummary>() : specstask.Result.Content;
-
-            FundingPeriods = fundingPeriods.Select(m => new SelectListItem
+            InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()
             {
-                Value = m.Id,
-                Text = m.Name,
-                Selected = m.Id == fundingPeriodId
-            }).ToList();
-
-            FundingPeriodId = fundingPeriodId;
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            });
 
             return Page();
         }

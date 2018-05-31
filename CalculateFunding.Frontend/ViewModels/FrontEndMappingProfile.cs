@@ -116,10 +116,6 @@
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
-            //CreateMap<EditPolicyViewModel, Policy>()
-            //    .ForMember(m => m.SubPolicies, opt => opt.Ignore())
-            //    .ForMember(m => m.Calculations, opt => opt.Ignore());
-          
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
 
             CreateMap<CalculationCurrentVersion, Specs.CalculationViewModel>();
@@ -133,6 +129,8 @@
                     destination.FundingPeriodId = source.FundingPeriod.Id;
                     destination.FundingStreamIds = source.FundingStreams.Select(m => m.Id);
                 });
+
+            CreateMap<SpecificationSearchResultItem, SpecificationSearchResultItemViewModel>();
         }
 
         private void MapDatasets()

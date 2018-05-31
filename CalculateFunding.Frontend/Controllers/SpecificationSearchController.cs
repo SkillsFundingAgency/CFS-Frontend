@@ -3,27 +3,28 @@
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
 
-    public class CalculationSearchController : Controller
+    public class SpecificationSearchController : Controller
     {
-        private ICalculationSearchService _calculationSearchService;
+        private ISpecificationSearchService _specificationSearchService;
 
-        public CalculationSearchController(ICalculationSearchService calculationSearchService)
+        public SpecificationSearchController(ISpecificationSearchService specificationSearchService)
         {
-            Guard.ArgumentNotNull(calculationSearchService, nameof(calculationSearchService));
-            _calculationSearchService = calculationSearchService;
+            Guard.ArgumentNotNull(specificationSearchService, nameof(specificationSearchService));
+
+            _specificationSearchService = specificationSearchService;
         }
 
         [HttpPost]
-        [Route("api/calculations/search")]
+        [Route("api/specifications/search")]
         public async Task<IActionResult> SearchCalculations([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            CalculationSearchResultViewModel result = await _calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel result = await _specificationSearchService.PerformSearch(request);
             if (result != null)
             {
                 return Ok(result);

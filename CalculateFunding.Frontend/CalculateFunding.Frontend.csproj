@@ -37,8 +37,10 @@
     <None Remove="Scripts\search.calculationProviderResults.ts" />
     <None Remove="Scripts\search.datasets.ts" />
     <None Remove="Scripts\search.providers.ts" />
+    <None Remove="Scripts\search.specifications.ts" />
     <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\table.expander.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <None Remove="Scripts\Tests\list-provider-test-results.ts" />
     <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
@@ -122,6 +124,7 @@
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
+    <TypeScriptCompile Include="Scripts\search.specifications.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
     <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
@@ -135,12 +138,19 @@
     <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\table.expander.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <TypeScriptCompile Include="Scripts\search.providerTestResults.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Pages\Specs\EditCalculation.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTablePagerPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTableRowCountPartial.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>

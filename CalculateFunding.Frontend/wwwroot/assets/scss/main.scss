@@ -896,6 +896,13 @@ blockquote {
     }
 }
 
+.inline-list{
+    .inline-list-item{
+        padding-right: 15px;
+        white-space: nowrap;
+    }
+}
+
 .nav-tabs-pagenavigation {
     a,
     a:visited {
@@ -1167,51 +1174,6 @@ blockquote {
                     background-color: $filter-hover-bg;
                     border-color: $filter-hover-bg;
                 }
-            }
-        }
-    }
-}
-
-.product-details {
-    .summary {
-        display: block;
-
-        > div:first-of-type {
-            display: inline-block;
-            vertical-align: middle;
-            /*Standard*/
-            width: calc(100% - 25px);
-            /*Firefox*/
-            width: -moz-calc(100% - 25px);
-            /*Webkit*/
-            width: -webkit-calc(100% - 25px);
-            /*Opera*/
-            width: -o-calc(100% - 25px);
-
-            .list-title {
-                float: left;
-                margin: 0;
-            }
-
-            .folder {
-                float: right;
-                display: inline-block;
-                margin: 0;
-
-                > span {
-                    margin-right: 5px;
-                }
-            }
-        }
-    }
-}
-
-.provider-stats {
-    ul {
-        > li {
-            dt, dd {
-                display: inline-block;
-                font-size: 19px;
             }
         }
     }
@@ -2123,4 +2085,20 @@ table {
     margin-right: 10px;
     margin-bottom: 20px;
     float: left;
+}
+
+.status-draft{
+    color: $pink;
+}
+
+.status-updated{
+    color: $orange;
+}
+
+.status-approved{
+    color: $turquoise;
+}
+
+.status-published {
+    color: $grass-green;
 }

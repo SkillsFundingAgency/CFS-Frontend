@@ -69,6 +69,8 @@
 
         Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId);
 
+        Task<PagedResult<SpecificationSearchResultItem>> FindSpecifications(SearchFilterRequest filterOptions);
+
         Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
 
         Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);

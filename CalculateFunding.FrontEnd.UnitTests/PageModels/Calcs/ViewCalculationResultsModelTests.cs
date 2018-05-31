@@ -1,6 +1,7 @@
-﻿using CalculateFunding.Frontend.Extensions;
+﻿using System.Threading.Tasks;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Results;
-using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Common;
 using FluentAssertions;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 {

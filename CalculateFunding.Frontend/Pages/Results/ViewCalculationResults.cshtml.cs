@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Services;
+    using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using Microsoft.AspNetCore.Mvc;

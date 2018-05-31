@@ -1,4 +1,4 @@
-﻿// <copyright file="CalculationSearchServiceTests.cs" company="Department for Education">
+﻿// <copyright file="SpecificationSearchServiceTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
@@ -10,32 +10,32 @@ namespace CalculateFunding.Frontend.Services
     using System.Net.Http;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using Serilog;
 
     [TestClass]
-    public class CalculationSearchServiceTests
+    public class SpecificationSearchServiceTests
     {
         [TestMethod]
-        public void PerformSearch_WhenFindCalculationsServiceUnavailable_ThenHttpExceptionThrown()
+        public void PerformSearch_WhenFindSpecificationsServiceUnavailable_ThenHttpExceptionThrown()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
-            calcsClient
-                .When(a => a.FindCalculations(Arg.Any<SearchFilterRequest>()))
+            specsClient
+                .When(a => a.FindSpecifications(Arg.Any<SearchFilterRequest>()))
                 .Do(x => { throw new HttpRequestException(); });
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -43,7 +43,7 @@ namespace CalculateFunding.Frontend.Services
             // Act
             Action pageAction = new Action(() =>
             {
-                CalculationSearchResultViewModel result = calculationSearchService.PerformSearch(request).Result;
+                SpecificationSearchResultViewModel result = SpecificationSearchService.PerformSearch(request).Result;
             });
 
             // Assert
@@ -51,24 +51,24 @@ namespace CalculateFunding.Frontend.Services
         }
 
         [TestMethod]
-        public async Task PerformSearch_WhenFindCalculationsServiceReturnsNotFound_ThenNullReturned()
+        public async Task PerformSearch_WhenFindSpecificationsServiceReturnsNotFound_ThenNullReturned()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
-            PagedResult<CalculationSearchResultItem> expectedServiceResult = null;
+            PagedResult<SpecificationSearchResultItem> expectedServiceResult = null;
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(expectedServiceResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel result = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel result = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
             result.Should().BeNull();
@@ -78,42 +78,41 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_FirstSearchResultReturnedCorrectly()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
+            SpecificationSearchResultItemViewModel first = results.Specifications.First();
             first.Should().NotBeNull();
             first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
+            first.Name.Should().Be("Specification 1");
+            first.Status.Should().Be("Draft");
             first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
         }
 
         [TestMethod]
         public async Task PerformSearch_FirstSearchResultWithFacets_ReturnedCorrectly()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -122,37 +121,54 @@ namespace CalculateFunding.Frontend.Services
                 new SearchFacet(), new SearchFacet()
             };
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
-            first.Should().NotBeNull();
-            first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
-            first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
+            SpecificationSearchResultItemViewModel first = results.Specifications.First();
 
-            results.Facets.Count().Should().Be(2);
+            first
+                .Should()
+                .NotBeNull();
+
+            first
+                .Should()
+                .BeEquivalentTo(new SpecificationSearchResultItemViewModel()
+                {
+                    Id = "10",
+                    Name = "Specification 1",
+                    FundingPeriodName = "Test Period",
+                    FundingPeriodId = "FundingPeriodID",
+                    Status = "Draft",
+                    Description = "Description",
+                    FundingStreamIds = new[] { "fs1", "fs2" },
+                    FundingStreamNames = new[] { "Funding Stream 1", "Funding Stream 2" },
+                    LastUpdatedDate = new DateTime(2018, 12, 5, 12, 5, 6),
+                });
+
+            results
+                .Facets
+                .Count()
+                .Should()
+                .Be(2);
         }
 
         [TestMethod]
         public async Task PerformSearch_FirstSearchResultWithFacets_EnsuresFacetsLoadedCorrectly()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -177,25 +193,24 @@ namespace CalculateFunding.Frontend.Services
                 }
             };
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
+            SpecificationSearchResultItemViewModel first = results.Specifications.First();
             first.Should().NotBeNull();
             first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
+            first.Name.Should().Be("Specification 1");
+            first.Status.Should().Be("Draft");
             first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
 
             results.Facets.Count().Should().Be(2);
             results.Facets.First().Name.Should().Be("facet 1");
@@ -214,23 +229,23 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnZeroItems()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 0;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
             results.StartItemNumber.Should().Be(0);
@@ -241,23 +256,23 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSinglePageOfItems()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
             results.StartItemNumber.Should().Be(1);
@@ -268,20 +283,20 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithLessThanPageSize()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
             itemResult.PageNumber = 2;
             itemResult.PageSize = 50;
             itemResult.TotalItems = 75;
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel()
@@ -290,7 +305,7 @@ namespace CalculateFunding.Frontend.Services
             };
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
             results.StartItemNumber.Should().Be(51);
@@ -301,20 +316,20 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithMorePagesAvailable()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
 
             int numberOfItems = 50;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            PagedResult<SpecificationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
             itemResult.PageNumber = 2;
             itemResult.PageSize = 50;
             itemResult.TotalItems = 175;
 
-            calcsClient
-                .FindCalculations(Arg.Any<SearchFilterRequest>())
+            specsClient
+                .FindSpecifications(Arg.Any<SearchFilterRequest>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel()
@@ -323,26 +338,30 @@ namespace CalculateFunding.Frontend.Services
             };
 
             // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
 
             // Assert
             results.StartItemNumber.Should().Be(51);
             results.EndItemNumber.Should().Be(100);
         }
 
-        private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+        private PagedResult<SpecificationSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
-            PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>();
-            List<CalculationSearchResultItem> items = new List<CalculationSearchResultItem>();
+            PagedResult<SpecificationSearchResultItem> result = new PagedResult<SpecificationSearchResultItem>();
+            List<SpecificationSearchResultItem> items = new List<SpecificationSearchResultItem>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new CalculationSearchResultItem()
+                items.Add(new SpecificationSearchResultItem()
                 {
                     Id = $"{i + 10}",
-                    Name = $"Calculation {i + 1}",
+                    Name = $"Specification {i + 1}",
                     FundingPeriodName = "Test Period",
-                    SpecificationName = "Spec Name",
-                    Status = "Unknown",
+                    FundingPeriodId = "FundingPeriodID",
+                    Status = "Draft",
+                    Description = "Description",
+                    FundingStreamIds = new[] { "fs1", "fs2" },
+                    FundingStreamNames = new[] { "Funding Stream 1", "Funding Stream 2" },
+                    LastUpdatedDate = new DateTime(2018, 12, 5, 12, 5, 6),
                 });
             }
 
