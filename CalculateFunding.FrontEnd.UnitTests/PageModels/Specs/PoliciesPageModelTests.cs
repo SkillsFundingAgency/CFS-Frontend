@@ -294,7 +294,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.SpecificationUpdated, specificationId);
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.SpecificationUpdated, specificationId);
 
             // Assert
             result
@@ -314,7 +314,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             policiesModel
                 .OperationType
                 .Should()
-                .Be(SpecificationBannerOperationType.SpecificationUpdated);
+                .Be(PoliciesPageBannerOperationType.SpecificationUpdated);
         }
 
         [TestMethod]
@@ -337,7 +337,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.PolicyUpdated, "policy2");
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.PolicyUpdated, "policy2");
 
             // Assert
             result
@@ -357,7 +357,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             policiesModel
                 .OperationType
                 .Should()
-                .Be(SpecificationBannerOperationType.PolicyUpdated);
+                .Be(PoliciesPageBannerOperationType.PolicyUpdated);
         }
 
         [TestMethod]
@@ -380,7 +380,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.SubpolicyUpdated, "subPolicy2");
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.SubpolicyUpdated, "subPolicy2");
 
             // Assert
             result
@@ -400,7 +400,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             policiesModel
                 .OperationType
                 .Should()
-                .Be(SpecificationBannerOperationType.SubpolicyUpdated);
+                .Be(PoliciesPageBannerOperationType.SubpolicyUpdated);
         }
 
         [TestMethod]
@@ -423,7 +423,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, "calc1");
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, "calc1");
 
             // Assert
             result
@@ -443,7 +443,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             policiesModel
                 .OperationType
                 .Should()
-                .Be(SpecificationBannerOperationType.CalculationUpdated);
+                .Be(PoliciesPageBannerOperationType.CalculationUpdated);
 
         }
 
@@ -467,7 +467,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, "subpolicyCalculation1");
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, "subpolicyCalculation1");
 
             // Assert
             result
@@ -487,7 +487,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             policiesModel
                 .OperationType
                 .Should()
-                .Be(SpecificationBannerOperationType.CalculationUpdated);
+                .Be(PoliciesPageBannerOperationType.CalculationUpdated);
         }
 
         [TestMethod]
@@ -510,7 +510,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
 
             // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, SpecificationBannerOperationType.CalculationUpdated, null);
+            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, null);
 
             // Assert
             result

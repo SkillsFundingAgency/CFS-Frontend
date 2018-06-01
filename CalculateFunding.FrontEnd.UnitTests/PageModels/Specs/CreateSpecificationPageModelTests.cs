@@ -445,6 +445,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
+            Specification createdSpecification = new Specification()
+            {
+                Id = "specId",
+            };
+
+            apiClient
+                .CreateSpecification(Arg.Any<CreateSpecificationModel>())
+                .Returns(new ValidatedApiResponse<Specification>(HttpStatusCode.OK, createdSpecification));
+
             IMapper mapper = CreateMapper();
             mapper
                 .Map<CreateSpecificationModel>(Arg.Any<CreateSpecificationViewModel>())
@@ -475,7 +484,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be("/specs?fundingPeriodId=fp1");
+                .Be("/specs?operationType=SpecificationCreated&operationId=specId");
         }
 
         private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null)

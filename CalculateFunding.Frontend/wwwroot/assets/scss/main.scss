@@ -596,8 +596,8 @@ blockquote {
 }
 
 
-.datetime-split-container{
-    .datetime-split-date{
+.datetime-split-container {
+    .datetime-split-date {
         padding-right: 5px;
     }
 }
@@ -609,11 +609,56 @@ blockquote {
     padding: 20px 5px;
     margin-bottom: 20px;
     display: flex;
-    align-items: center;
+    align-content: space-between;
+    justify-content:space-between;
 
-    i.material-icons{
+    .notification-panel-text{
+        display: flex;
+    }
+
+
+    i.material-icons {
         padding-left: 15px;
         padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        color: #fff;
+    }
+
+    .notification-panel-view {
+        margin-right: 10px;
+    }
+}
+
+.noresults-panel {
+    background-color: $orange;
+    color: #fff;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-content: space-between;
+    justify-content: space-between;
+
+    .noresults-panel-text {
+        display: flex;
+    }
+
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        color: #fff;
+    }
+
+    .noresults-panel-view {
+        margin-right: 10px;
     }
 }
 
@@ -896,8 +941,8 @@ blockquote {
     }
 }
 
-.inline-list{
-    .inline-list-item{
+.inline-list {
+    .inline-list-item {
         padding-right: 15px;
         white-space: nowrap;
     }
@@ -2087,15 +2132,15 @@ table {
     float: left;
 }
 
-.status-draft{
+.status-draft {
     color: $pink;
 }
 
-.status-updated{
+.status-updated {
     color: $orange;
 }
 
-.status-approved{
+.status-approved {
     color: $turquoise;
 }
 

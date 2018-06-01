@@ -75,11 +75,11 @@
             return PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>($"{_specsPath}/specification-summaries-by-ids", specificationIds);
         }
 
-        public Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification)
+        public Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/specifications", specification);
+            return ValidatedPostAsync<Specification, CreateSpecificationModel>($"{_specsPath}/specifications", specification);
         }
 
         public Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification)

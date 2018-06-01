@@ -43,7 +43,7 @@
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
         {
-            if(!string.IsNullOrWhiteSpace(fundingPeriodId))
+            if (!string.IsNullOrWhiteSpace(fundingPeriodId))
             {
                 FundingPeriodId = fundingPeriodId;
             }
@@ -73,9 +73,21 @@
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
 
-            await _specsClient.CreateSpecification(specification);
+            ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
+            if (result.StatusCode.IsSuccess())
+            {
+                return Redirect($"/specs?operationType=SpecificationCreated&operationId={result.Content.Id}");
+            }
+            else if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                result.AddValidationResultErrors(ModelState);
 
-            return Redirect($"/specs?fundingPeriodId={specification.FundingPeriodId}");
+                return Page();
+            }
+            else
+            {
+                return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
+            }
         }
 
         private async Task PopulateFundingStreams()

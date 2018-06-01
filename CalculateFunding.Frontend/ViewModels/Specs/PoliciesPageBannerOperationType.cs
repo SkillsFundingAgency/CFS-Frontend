@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
-    public enum SpecificationBannerOperationType
+    public enum PoliciesPageBannerOperationType
     {
         SpecificationUpdated,
         PolicyUpdated,

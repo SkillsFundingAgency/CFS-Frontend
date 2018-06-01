@@ -40,13 +40,13 @@
 
         public bool HasProviderDatasetsAssigned { get; set; }
 
-        public SpecificationBannerOperationType? OperationType { get; set; }
+        public PoliciesPageBannerOperationType? OperationType { get; set; }
 
         public string OperationEntityName { get; set; }
 
         public string OperationEntityType { get; set; }
 
-        public async Task<IActionResult> OnGet(string specificationId, SpecificationBannerOperationType? operationType, string operationId)
+        public async Task<IActionResult> OnGet(string specificationId, PoliciesPageBannerOperationType? operationType, string operationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -116,15 +116,15 @@
 
                 switch (operationType.Value)
                 {
-                    case SpecificationBannerOperationType.SpecificationUpdated:
+                    case PoliciesPageBannerOperationType.SpecificationUpdated:
                         OperationEntityName = Specification.Name;
                         OperationEntityType = "Specification";
                         break;
-                    case SpecificationBannerOperationType.PolicyUpdated:
+                    case PoliciesPageBannerOperationType.PolicyUpdated:
                         OperationEntityName = Specification.Policies.Where(p => p.Id == operationId).FirstOrDefault()?.Name;
                         OperationEntityType = "Policy";
                         break;
-                    case SpecificationBannerOperationType.SubpolicyUpdated:
+                    case PoliciesPageBannerOperationType.SubpolicyUpdated:
                         if (Specification.Policies.AnyWithNullCheck())
                         {
                             foreach (PolicyViewModel policy in Specification.Policies)
@@ -143,7 +143,7 @@
                         }
                         OperationEntityType = "Subpolicy";
                         break;
-                    case SpecificationBannerOperationType.CalculationUpdated:
+                    case PoliciesPageBannerOperationType.CalculationUpdated:
                         if (Specification.Policies.AnyWithNullCheck())
                         {
                             foreach (PolicyViewModel policy in Specification.Policies)

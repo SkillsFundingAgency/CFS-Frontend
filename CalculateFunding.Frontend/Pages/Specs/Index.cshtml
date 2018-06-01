@@ -35,6 +35,16 @@
     </div>
 }
 
+@if (Model.OperationType.HasValue)
+{
+    <div class="notification-panel">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i> @Model.OperationEntityType @Model.OperationEntityName @Model.OperationAction
+        </span>
+        <a href="/specs/policies/@Model.OperationId" class="notification-panel-view">View</a>
+    </div>
+}
+
 <div class="row" id="manage-specifications-container">
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
@@ -89,7 +99,7 @@
                     <td>
                         <span class="button-split-container">
                             <span class="button-split-icon">
-                                <a data-bind="attr: {href: '/specs/policies/' + id }"><i class="material-icons">edit</i></a>
+                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }"><i class="material-icons">edit</i></a>
                             </span>
                             <span class="button-split-text">
                                 <a data-bind="attr: {href: '/specs/policies/' + id }, text: name"></a>
@@ -128,7 +138,16 @@
                 @foreach (var specification in Model.SearchResults.Specifications)
                 {
                     <tr>
-                        <td><a href="/specs/polices/@specification.Id" class="data-static-specification-name">@specification.Name</a></td>
+                        <td>
+                            <span class="button-split-container">
+                                <span class="button-split-icon">
+                                    <a href="/specs/EditSpecification/@specification.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">edit</i></a>
+                                </span>
+                                <span class="button-split-text">
+                                    <a href="/specs/Policies/@specification.Id" class="data-static-specification-name">@specification.Name</a>
+                                </span>
+                            </span>
+                        </td>
                         <td>
                             <span class="datetime-split-container">
                                 <span class="datetime-split-date data-static-specification-lastupdated-date">@specification.LastUpdatedDateFormatted</span>
@@ -140,7 +159,6 @@
                     </tr>
                     <tr>
                         <td colspan="4">
-
                             <div class="spacing-15-bottom">
                                 <span>Funding period:</span> <strong class="data-static-specification-fundingperiod">@specification.FundingPeriodName</strong>
                             </div>
@@ -166,6 +184,21 @@
         <div class="withjs-show search-loading-container spacing-30-top" data-bind="visible: isLoading">
             <img src="~/assets/images/loader.gif" alt="Loading" />
             <p>Loading specifications</p>
+        </div>
+
+        @if (!Model.SearchResults.Specifications.AnyWithNullCheck())
+        {
+            <div class="noresults-panel spacing-30">
+                <span class="noresults-panel-text">
+                    <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
+                </span>
+            </div>
+        }
+
+        <div class="noresults-panel spacing-30 withjs-show" data-bind="visible: specifications().length === 0">
+            <span class="noresults-panel-text">
+                <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
+            </span>
         </div>
 
         @Html.Partial("_SearchTablePagerPartial", new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm))

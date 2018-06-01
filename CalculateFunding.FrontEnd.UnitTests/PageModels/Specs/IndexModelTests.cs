@@ -8,6 +8,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Specs;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -42,7 +43,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(searchResult);
 
-            IndexModel indexModel = new IndexModel(searchService);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
             IActionResult result = await indexModel.OnGetAsync(null, null);
@@ -100,7 +101,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(searchResult);
 
-            IndexModel indexModel = new IndexModel(searchService);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
             IActionResult result = await indexModel.OnGetAsync(null, null);
@@ -174,7 +175,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(searchResult);
 
-            IndexModel indexModel = new IndexModel(searchService);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
             IActionResult result = await indexModel.OnGetAsync(null, 2);
@@ -222,7 +223,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(searchResult);
 
-            IndexModel indexModel = new IndexModel(searchService);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
             IActionResult result = await indexModel.OnGetAsync(searchTerm, null);
@@ -259,7 +260,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(searchResult);
 
-            IndexModel indexModel = new IndexModel(searchService);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
             IActionResult result = await indexModel.OnGetAsync(null, null);
@@ -280,14 +281,23 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                     c.SearchTerm == null));
         }
 
+        private static IndexModel CreateIndexModel(
+            ISpecificationSearchService searchService = null,
+            ISpecsApiClient specsApiClient = null)
+        {
+            return new IndexModel(
+                searchService ?? CreateSearchService(),
+                specsApiClient ?? CreateSpecsApiClient());
+        }
+
         private static ISpecificationSearchService CreateSearchService()
         {
             return Substitute.For<ISpecificationSearchService>();
         }
 
-        private static IndexModel CreateIndexModel(ISpecificationSearchService searchService = null)
+        private static ISpecsApiClient CreateSpecsApiClient()
         {
-            return new IndexModel(searchService ?? CreateSearchService());
+            return Substitute.For<ISpecsApiClient>();
         }
     }
 }

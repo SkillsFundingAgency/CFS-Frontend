@@ -45,7 +45,7 @@
         /// <returns></returns>
         Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId);
 
-        Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification);
+        Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification);
 
         Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods();
 

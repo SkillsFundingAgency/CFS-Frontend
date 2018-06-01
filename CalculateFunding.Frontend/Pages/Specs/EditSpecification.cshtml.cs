@@ -60,7 +60,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId = null)
+        public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
             if (!string.IsNullOrWhiteSpace(EditSpecificationViewModel.Name) && EditSpecificationViewModel.Name != EditSpecificationViewModel.OriginalSpecificationName)
             {
@@ -83,11 +83,18 @@ namespace CalculateFunding.Frontend.Pages.Specs
             HttpStatusCode editResult = await _specsClient.UpdateSpecification(specificationId, specification);
             if(editResult == HttpStatusCode.OK)
             {
-                return Redirect($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
+                if(returnPage == EditSpecificationRedirectAction.ManagePolicies)
+                {
+                    return Redirect($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
+                }
+                else
+                {
+                    return Redirect($"/specs?operationType=SpecificationUpdated&operationId={specificationId}");
+                }
             }
             else
             {
-                return new InternalServerErrorResult($"Unable to update specification. API returned {editResult}");
+                return new InternalServerErrorResult($"Unable to update specification. API returned '{editResult}'");
             }
         }
 

@@ -31,7 +31,7 @@
         </div>
         <div class="banner-link-right-container">
             <div>
-                <a href="/specs/editspecification/@Model.Specification.Id">Edit specification</a>
+                <a href="/specs/editspecification/@Model.Specification.Id&returnPage=ManagePolicies">Edit specification</a>
             </div>
             <div>
                 <a href="/specs/createPolicy/@Model.Specification.Id">Create policy</a>
@@ -55,7 +55,11 @@
 
 @if (Model.OperationType.HasValue)
 {
-    <div class="notification-panel"><i class="material-icons">check</i> @Model.OperationEntityType @Model.OperationEntityName updated</div>
+    <div class="notification-panel">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i> @Model.OperationEntityType @Model.OperationEntityName updated
+        </span>
+    </div>
 }
 
 <div class="row">

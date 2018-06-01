@@ -126,7 +126,7 @@
                 throw new ArgumentNullException(nameof(url));
             }
 
-            var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
