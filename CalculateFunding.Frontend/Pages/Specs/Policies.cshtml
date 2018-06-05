@@ -91,6 +91,9 @@
             </span>
         </a>
     </li>
+    <li class="nav-item-right" id="approve-status">
+        <approve-status-button params="publishStatus : '@Model.Specification.PublishStatus', stateChangeUrl : '/api/specs/@Model.Specification.Id/status'"></approve-status-button>
+    </li>
 </ul>
 <div class="row">
     <div class="col-xs-12">
@@ -303,11 +306,16 @@
 @section scripts{
     <script type="text/javascript" asp-src-include="~/js/policies.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/table.expander.js" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @Html.Partial("_ApproveStatusButtonPartial")
 
     <script type="text/javascript">
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
 
         $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
         $(".jscollapse-active").addClass("jscollapse-jsenabled-active");
+
+        ko.applyBindings({}, document.getElementById('approve-status'));
     </script>
+
 }

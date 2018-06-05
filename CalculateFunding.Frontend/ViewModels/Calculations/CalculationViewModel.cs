@@ -13,8 +13,6 @@
 
         public string FundingPeriodName { get; set; }
 
-        public string Status { get; set; }
-
         public DateTime LastModified { get; set; }
 
         public int Version { get; set; }
@@ -24,5 +22,7 @@
         public string SourceCode { get; set; }
 
         public CalculationSpecificationTypeViewModel CalculationType { get; set; }
+
+        public PublishStatusViewModel PublishStatus { get; set; }
     }
 }

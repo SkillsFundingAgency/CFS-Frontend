@@ -77,6 +77,6 @@
 
         Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel updateSubPolicyModel);
 
-        Task<ValidatedApiResponse<Specification>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
+        Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
     }
 }

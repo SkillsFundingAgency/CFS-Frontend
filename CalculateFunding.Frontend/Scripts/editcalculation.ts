@@ -12,6 +12,8 @@ namespace calculateFunding.editCalculation {
 
         public canSaveCalculation: KnockoutComputed<boolean>;
 
+        public canApproveCalculation: KnockoutComputed<boolean>;
+
         public calculationBuilt: KnockoutObservable<boolean> = ko.observable(false);
 
         public saveCalculationResult: KnockoutObservable<string> = ko.observable(null);
@@ -75,6 +77,15 @@ namespace calculateFunding.editCalculation {
 
                 // Is the source code different to last successful compile
                 return self.successfulCompileSourceCode() === self.sourceCode();
+            });
+
+            this.canApproveCalculation = ko.pureComputed(() => {
+                // Code must be the same as when the page loads - otherwise the user needs to save and then come back to the page
+                if (self.initialCodeContents === self.sourceCode()) {
+                    return true;
+                }
+
+                return false;
             });
         }
 

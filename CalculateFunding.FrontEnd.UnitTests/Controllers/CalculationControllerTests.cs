@@ -233,7 +233,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel();
            
-            ValidatedApiResponse<CalculationVersion> response = new ValidatedApiResponse<CalculationVersion>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
@@ -261,9 +261,9 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel();
 
-            CalculationVersion calcVersion = new CalculationVersion();
+            PublishStatusResult publishStatusResult = new PublishStatusResult();
 
-            ValidatedApiResponse<CalculationVersion> response = new ValidatedApiResponse<CalculationVersion>(HttpStatusCode.OK, calcVersion);
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
@@ -284,7 +284,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .Which
                 .Value
                 .Should()
-                .Be(calcVersion);
+                .Be(publishStatusResult);
         }
     }
 }

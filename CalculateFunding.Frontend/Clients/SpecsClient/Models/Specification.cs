@@ -21,6 +21,10 @@
         [JsonProperty("policies")]
         public IEnumerable<Policy> Policies { get; set; }
 
+        [JsonProperty("fundingStreams")]
         public IEnumerable<FundingStream> FundingStreams { get; set; }
+
+        [JsonProperty("publishStatus")]
+        public PublishStatus PublishStatus { get; set; }
     }
 }

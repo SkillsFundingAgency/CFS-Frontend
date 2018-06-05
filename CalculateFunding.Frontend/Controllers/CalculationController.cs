@@ -101,7 +101,7 @@
 
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
 
-            ValidatedApiResponse<CalculationVersion> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
+            ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

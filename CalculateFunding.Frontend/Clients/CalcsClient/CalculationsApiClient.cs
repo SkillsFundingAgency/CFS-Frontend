@@ -96,12 +96,12 @@
             return GetAsync<IEnumerable<TypeInformation>>($"{_calcsPath}/get-calculation-code-context?specificationId={specificationId}");
         }
 
-        public Task<ValidatedApiResponse<CalculationVersion>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model)
+        public Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model)
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPutAsync<CalculationVersion, PublishStatusEditModel>($"{_calcsPath}/calculation-edit-status?calculationId={calculationId}", model);
+            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{_calcsPath}/calculation-edit-status?calculationId={calculationId}", model);
         }
     }
 }

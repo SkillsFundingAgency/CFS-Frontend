@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
 
-            ValidatedApiResponse<Specification> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
+            ValidatedApiResponse<PublishStatusResult> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

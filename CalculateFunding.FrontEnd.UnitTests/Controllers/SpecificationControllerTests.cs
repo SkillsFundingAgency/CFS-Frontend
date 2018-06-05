@@ -1,5 +1,4 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using FluentAssertions;
@@ -23,7 +22,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel();
 
-            ValidatedApiResponse<Specification> response = new ValidatedApiResponse<Specification>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             specsClient
@@ -49,9 +48,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel();
 
-            Specification specification = new Specification();
+            PublishStatusResult publishStatusResult = new PublishStatusResult();
 
-            ValidatedApiResponse<Specification> response = new ValidatedApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             specsClient
@@ -70,7 +69,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Which
                 .Value
                 .Should()
-                .Be(specification);
+                .Be(publishStatusResult);
         }
     }
 }

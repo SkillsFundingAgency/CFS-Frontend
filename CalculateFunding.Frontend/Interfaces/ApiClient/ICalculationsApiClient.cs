@@ -61,6 +61,6 @@
         /// <param name="calculationId">Calcuation Id</param>
         /// <param name="model">Status model</param>
         /// <returns>Updated calculation version</returns>
-        Task<ValidatedApiResponse<CalculationVersion>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model);
+        Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model);
     }
 }

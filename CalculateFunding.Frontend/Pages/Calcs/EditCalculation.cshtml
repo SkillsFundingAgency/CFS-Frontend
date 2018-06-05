@@ -28,10 +28,11 @@
 @section FormBannerRight{
     <div class="bannerblue-container">
         <div class="bannerblue-title">Status</div>
-        <div class="bannerblue-status">@Model.Calculation.Status</div>
         <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
         <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
-        <div class="bannerblue-button-container"><input type="button" class="button-blue" value="Approve" disabled id="approve-button" /></div>
+        <div class="bannerblue-button-container" id="approve-button-container">
+            <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+        </div>
     </div>
 }
 
@@ -89,6 +90,9 @@
     <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/editcalculation.js" type="text/javascript" asp-append-version="true"></script>
+
+    @Html.Partial("_ApproveStatusButtonPartial")
+
     <script type="text/javascript">
         var editCalculationElement = document.getElementById("edit-calculation");
         if (editCalculationElement) {
@@ -100,6 +104,8 @@
             var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
             viewModel.loadIntellisenseContext();
             ko.applyBindings(viewModel, editCalculationElement);
+
+            ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
         }
     </script>
 }

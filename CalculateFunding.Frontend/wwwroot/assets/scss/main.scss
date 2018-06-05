@@ -1713,9 +1713,13 @@ table {
 .input-validation-error {
     border: 4px solid $error-colour;
 }
+.nav-tabs > li.nav-item-right {
+    float: right;
+}
 
 @import "_tablelayout.scss";
 @import "_pageheaders.scss";
+@import "_statusElements.scss";
 
 @media (min-width: 641px) {
     .form-control {
@@ -2130,20 +2134,4 @@ table {
     margin-right: 10px;
     margin-bottom: 20px;
     float: left;
-}
-
-.status-draft {
-    color: $pink;
-}
-
-.status-updated {
-    color: $orange;
-}
-
-.status-approved {
-    color: $turquoise;
-}
-
-.status-published {
-    color: $grass-green;
 }

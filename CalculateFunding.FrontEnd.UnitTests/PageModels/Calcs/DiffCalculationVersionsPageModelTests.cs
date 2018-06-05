@@ -101,7 +101,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "3",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4
@@ -156,7 +156,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "3",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4
@@ -210,7 +210,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "1",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4

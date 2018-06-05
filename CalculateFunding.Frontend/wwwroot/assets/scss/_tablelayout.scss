@@ -133,6 +133,16 @@ table.cf {
     background-color: #DEE0E2;
     padding: 45px 15px 15px 15px;
     font-size: 16px;
+
+    .dropdown-toggle {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-size: 16px;
+    }
+
+    .btn-group {
+        margin-top: 5px;
+    }
 }
 
 $table-paging-border: #DEE0E2;
