@@ -76,5 +76,7 @@
         Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);
 
         Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel updateSubPolicyModel);
+
+        Task<ValidatedApiResponse<Specification>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
     }
 }

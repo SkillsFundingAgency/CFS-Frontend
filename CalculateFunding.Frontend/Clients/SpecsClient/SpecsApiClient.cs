@@ -220,5 +220,13 @@
                 return null;
             }
         }
+
+        public Task<ValidatedApiResponse<Specification>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(model, nameof(model));
+
+            return ValidatedPutAsync<Specification, PublishStatusEditModel>($"{_specsPath}/specification-edit-status?specificationId={specificationId}", model);
+        }
     }
 }

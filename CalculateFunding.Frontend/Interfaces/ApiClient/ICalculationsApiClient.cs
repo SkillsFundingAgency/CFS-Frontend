@@ -54,5 +54,13 @@
         /// <param name="request">Code compile request</param>
         /// <returns>Preview Compile Response</returns>
         Task<ApiResponse<PreviewCompileResult>> PreviewCompile(PreviewCompileRequest request);
+
+        /// <summary>
+        /// Update a Calculation status
+        /// </summary>
+        /// <param name="calculationId">Calcuation Id</param>
+        /// <param name="model">Status model</param>
+        /// <returns>Updated calculation version</returns>
+        Task<ValidatedApiResponse<CalculationVersion>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model);
     }
 }
