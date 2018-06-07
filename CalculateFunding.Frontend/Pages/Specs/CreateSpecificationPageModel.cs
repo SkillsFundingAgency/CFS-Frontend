@@ -11,7 +11,6 @@
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -55,16 +54,6 @@
 
         public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null)
         {
-            if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
-            {
-                ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(CreateSpecificationViewModel.Name);
-
-                if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
-                {
-                    this.ModelState.AddModelError($"{nameof(CreateSpecificationViewModel)}.{nameof(CreateSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
-                }
-            }
-
             if (!ModelState.IsValid)
             {
                 await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
@@ -81,6 +70,8 @@
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {
                 result.AddValidationResultErrors(ModelState);
+
+                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
 
                 return Page();
             }

@@ -177,4 +177,10 @@
   <data name="TestScenarioResults" xml:space="preserve">
     <value>View QA test results</value>
   </data>
+  <data name="FundingApprovals" xml:space="preserve">
+    <value>Funding Approvals</value>
+  </data>
+  <data name="ChooseFundingSpecification" xml:space="preserve">
+    <value>Choose funding specification</value>
+  </data>
 </root>

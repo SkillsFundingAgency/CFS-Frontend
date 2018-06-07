@@ -610,9 +610,9 @@ blockquote {
     margin-bottom: 20px;
     display: flex;
     align-content: space-between;
-    justify-content:space-between;
+    justify-content: space-between;
 
-    .notification-panel-text{
+    .notification-panel-text {
         display: flex;
     }
 
@@ -1713,8 +1713,30 @@ table {
 .input-validation-error {
     border: 4px solid $error-colour;
 }
+
 .nav-tabs > li.nav-item-right {
     float: right;
+}
+
+.choose-container {
+    .choose-funding-stream {
+        color: $grey-1;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .btn-choose {
+        background-color: $green;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 0;
+        margin: 0 15px;
+    }
+
+    .btn-choose:disabled,
+    .btn-choose.btn-disabled {
+        background-color: #bfc1c3;
+    }
 }
 
 @import "_tablelayout.scss";

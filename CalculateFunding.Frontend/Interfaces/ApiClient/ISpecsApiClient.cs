@@ -39,6 +39,14 @@
         Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries(IEnumerable<string> specificationIds);
 
         /// <summary>
+        /// Get approved or updated specifications for a given Funding Period and Funding Stream
+        /// </summary>
+        /// <param name="fundingPeriodId">Funding Period Id</param>
+        /// <param name="fundingStreamId">Funding Stream Id</param>
+        /// <returns></returns>
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId);
+
+        /// <summary>
         /// Gets Specifications by Academic Year ID
         /// </summary>
         /// <param name="fundingPeriodId">Academic Year Id</param>
@@ -75,7 +83,7 @@
 
         Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);
 
-        Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel updateSubPolicyModel);
+        Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy);
 
         Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
     }

@@ -103,5 +103,12 @@
 
             return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{_calcsPath}/calculation-edit-status?calculationId={calculationId}", model);
         }
+
+        public Task<ApiResponse<IEnumerable<CalculationStatusCounts>>> GetCalculationStatusCounts(SpecificationIdsRequestModel request)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            return PostAsync<IEnumerable<CalculationStatusCounts>, SpecificationIdsRequestModel>($"{_calcsPath}/status-counts", request);
+        }
     }
 }

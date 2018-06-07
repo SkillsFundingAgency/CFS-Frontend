@@ -99,5 +99,12 @@
                 return null;
             }
         }
+
+        public Task<ApiResponse<IEnumerable<FundingCalculationResultsTotals>>> GetFundingCalculationResultsTotals(SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
+
+            return PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"{_resultsPath}/get-calculation-result-totals-for-specifications", specificationIds);
+        }
     }
 }

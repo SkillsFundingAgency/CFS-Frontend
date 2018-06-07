@@ -75,6 +75,15 @@
             return PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>($"{_specsPath}/specification-summaries-by-ids", specificationIds);
         }
 
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
+        }
+
         public Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
@@ -97,11 +106,13 @@
             return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
         }
 
-        public Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string policyId, EditSubPolicyModel updatedSubPolicy)
+        public Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy)
         {
-            Guard.ArgumentNotNull(updatedSubPolicy, nameof(updatedSubPolicy));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(subPolicyId, nameof(subPolicyId));
+            Guard.ArgumentNotNull(subPolicy, nameof(subPolicy));
 
-            return ValidatedPutAsync<Policy, EditSubPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={policyId} ", updatedSubPolicy);
+            return ValidatedPutAsync<Policy, EditSubPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={subPolicyId} ", subPolicy);
         }
 
         public Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy)

@@ -70,6 +70,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose funding specification.
+        /// </summary>
+        public static string ChooseFundingSpecification {
+            get {
+                return ResourceManager.GetString("ChooseFundingSpecification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose your data.
         /// </summary>
         public static string ChooseYourData {
@@ -147,6 +156,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string EditCalculation {
             get {
                 return ResourceManager.GetString("EditCalculation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Funding Approvals.
+        /// </summary>
+        public static string FundingApprovals {
+            get {
+                return ResourceManager.GetString("FundingApprovals", resourceCulture);
             }
         }
         

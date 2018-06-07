@@ -121,6 +121,15 @@ table.cf {
     .expander-container-padding-md {
         padding: 15px;
     }
+
+    .highlight-background {
+        background-color: #f8f8f8;
+    }
+
+    .highlight-title {
+        font-weight: bold;
+        font-size: 16px;
+    }
 }
 
 .jump-to-container {
@@ -131,7 +140,7 @@ table.cf {
 
 .table-filter-container {
     background-color: #DEE0E2;
-    padding: 45px 15px 15px 15px;
+    padding: 30px 15px 15px 15px;
     font-size: 16px;
 
     .dropdown-toggle {
@@ -142,6 +151,12 @@ table.cf {
 
     .btn-group {
         margin-top: 5px;
+    }
+
+    select{
+        padding: 10px 5px;
+        border: none;
+        color: rgb(85,85,85);
     }
 }
 

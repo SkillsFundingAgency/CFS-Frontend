@@ -62,5 +62,12 @@
         /// <param name="model">Status model</param>
         /// <returns>Updated calculation version</returns>
         Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model);
+
+        /// <summary>
+        /// Get calculation approval status counts for a list of specifications
+        /// </summary>
+        /// <param name="request">Request including Specification IDS</param>
+        /// <returns></returns>
+        Task<ApiResponse<IEnumerable<CalculationStatusCounts>>> GetCalculationStatusCounts(SpecificationIdsRequestModel request);
     }
 }

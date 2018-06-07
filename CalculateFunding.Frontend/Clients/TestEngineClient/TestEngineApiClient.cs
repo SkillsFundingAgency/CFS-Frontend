@@ -92,6 +92,11 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             }
         }
 
+        public Task<ApiResponse<IEnumerable<SpecificationTestScenarioResultCounts>>> GetTestScenarioCountsForSpecifications(SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
 
+            return PostAsync<IEnumerable<SpecificationTestScenarioResultCounts>, SpecificationIdsRequestModel>($"{_apiPath}/get-testscenario-result-counts-for-specifications", specificationIds);
+        }
     }
 }
