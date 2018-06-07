@@ -17,6 +17,7 @@
     <Content Remove="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Scripts\approvals.choose.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
@@ -117,6 +118,7 @@
     <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
