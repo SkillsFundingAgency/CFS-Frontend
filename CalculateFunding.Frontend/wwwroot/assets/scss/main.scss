@@ -1739,6 +1739,12 @@ table {
     }
 }
 
+.viewfunding-page-container {
+    table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
+        border-bottom: 1px solid #fff !important;
+    }
+}
+
 @import "_tablelayout.scss";
 @import "_pageheaders.scss";
 @import "_statusElements.scss";

@@ -15,11 +15,9 @@
                 if (foundTrigger) {
                     if (currentElement.classList.contains("expander-container")) {
                         if ($target.hasClass("expander-trigger-cell-open")) {
-
                             $(currentElement).hide();
                         }
                         else {
-
                             $(currentElement).show();
                         }
                     }
@@ -30,7 +28,12 @@
                 else {
                     if (currentElement == e.parentElement) {
                         foundTrigger = true;
-                        console.log("Found trigger element: ", e.parentElement);
+                        if ($target.hasClass("expander-trigger-cell-open")) {
+                            currentElement.classList.remove("expander-trigger-row-open");
+                        }
+                        else {
+                            currentElement.classList.add("expander-trigger-row-open");
+                        }
                     }
                 }
             }

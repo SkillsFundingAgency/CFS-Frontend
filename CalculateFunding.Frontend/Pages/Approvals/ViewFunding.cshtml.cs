@@ -55,7 +55,10 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 Selected = specificationId == s.Id,
             });
 
-            GenerateSampleRecords();
+            if (!string.IsNullOrWhiteSpace(specificationId))
+            {
+                GenerateSampleRecords();
+            }
 
             return Page();
         }
@@ -240,8 +243,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                     }
                 }
             });
-
-            //                LastUpdated = new DateTimeOffset(2018, 06, 08, 4, 5, 2, 0, TimeSpan.FromMinutes(60)),
 
             foreach (PublishedProviderResultViewModel provider in results)
             {

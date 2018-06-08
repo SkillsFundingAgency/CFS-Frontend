@@ -106,7 +106,12 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
             if (!string.IsNullOrWhiteSpace(fundingPeriod) && !string.IsNullOrWhiteSpace(fundingStream))
             {
-                IActionResult specificationLookupError = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
+                errorResult = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
+                if(errorResult != null)
+                {
+                    return errorResult;
+                }
+
                 foreach (SpecificationSummary specification in specificationsLookupTask.Result.Content)
                 {
                     ChooseApprovalSpecificationViewModel chooseSpecification = new ChooseApprovalSpecificationViewModel()
