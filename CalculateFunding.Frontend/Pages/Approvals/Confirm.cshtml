@@ -1,0 +1,69 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Approvals.ConfirmPageModel
+@{
+    ViewData["Title"] = "ConfirmSelectedForfunding";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+
+@section FormBannerLeft{
+    <h1 class="heading-large">Choose @Model.SpecificationViewModel.Name</h1>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Approve Funding</a></li>
+        </ol>
+    </div>
+}
+
+<div id="main-container">
+
+    <div class="row confirm-select-fundingstreams-container">
+        <div class="col-sm-9 col-md-6">
+
+            @foreach (string fundingStream in Model.SpecificationViewModel.FundingStreams.Select(m => m.Name))
+            {
+                @:- @fundingStream <br />
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9 col-md-6">
+            <p>
+                The Calculate funding service will generate an Approve funding page.
+            </p>
+            <p>
+                Check funding amounts before confirming, include those from draft or updated calculations as they will be included.
+            </p>
+            <p>
+                The total funding for the specification and any allocation lines or provider results that contribute to it will be locked for this funsing. Further changes to calculations will not affect the amount shown on the Approve funding page.
+            </p>
+            <p>
+                If any specification for @Model.SpecificationViewModel.FundingPeriod.Name shares a funding stream with this specification you wont be able to choose it.
+            </p>
+            <div>
+                <div class="icon-confirm-select-funding-container"><i class="material-icons">error</i></div><div><strong>Once you confirm a specification you cannot change your choice or deselect this specification</strong>.</div>
+            </div>
+            <p class="form-submit-container"><button type="button" class="button" id="confirm-button">Choose this specification</button> <a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Back</a></p>
+        </div>
+    </div>
+
+</div>
+
+<div id="wait-state-container" style="display:none; text-align:center" class="col-sm-12 col-md-12">
+    <p class="heading-medium"><strong>Generating funding values for providers</strong></p>
+    <p>Please wait, this may take a minute or so.</p>
+    <img src="~/assets/images/loader.gif" />
+</div>
+@section scripts{
+    <script asp-src-include="~/js/confirm.funding-specification.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var vm = new calculateFunding.ConfirmSpecificationForFunding.ConfirmationViewModel({ specificationId: '@Model.SpecificationId', fundingPeriodId: '@Model.FundingPeriodId', fundingStreamId: '@Model.FundingStreamId' });
+        vm.RegisterClickEvent();
+    </script>
+}

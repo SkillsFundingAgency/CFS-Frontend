@@ -48,6 +48,7 @@
         }
     }
 
+}
 
 $(".expander-trigger-cell").on("click", (e: JQuery.Event<HTMLElement, null>) => {
     calculateFunding.table.sequential.toggleExpandContainer(e.currentTarget);

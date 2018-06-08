@@ -76,7 +76,7 @@
                         }
                         else if (specification.CanBeChosen)
                         {
-                            <a class="btn btn-choose target-choose" href="/approvals/confirm/@specification.Id">Choose</a>
+                            <a class="btn btn-choose target-choose" href="/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId">Choose</a>
                         }
                         else
                         {

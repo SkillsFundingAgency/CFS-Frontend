@@ -92,5 +92,7 @@
         Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy);
 
         Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
+
+        Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId);
     }
 }

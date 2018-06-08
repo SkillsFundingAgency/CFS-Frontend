@@ -168,6 +168,24 @@
             return response.StatusCode;
         }
 
+        public async Task<HttpStatusCode> PostAsync(string url, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+          
+            _logger.Debug($"ApiClient POST: {{url}}", url);
+            var response = await _httpClient.PostAsync(url, null, cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+            }
+
+            return response.StatusCode;
+        }
+
         public async Task<HttpStatusCode> PutAsync<TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (url == null)

@@ -30,6 +30,10 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
+        public string SelectedFundingStreamId { get; set; }
+
+        public string SelectedFundingPeriodId { get; set; }
+
         public IEnumerable<ChooseApprovalSpecificationViewModel> Specifications { get; set; }
 
         public PageBannerOperation PageBannerOperation { get; set; }
@@ -112,6 +116,11 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                     return errorResult;
                 }
 
+                SelectedFundingPeriodId = fundingPeriod;
+
+                SelectedFundingStreamId = fundingStream;
+
+                IActionResult specificationLookupError = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
                 foreach (SpecificationSummary specification in specificationsLookupTask.Result.Content)
                 {
                     ChooseApprovalSpecificationViewModel chooseSpecification = new ChooseApprovalSpecificationViewModel()

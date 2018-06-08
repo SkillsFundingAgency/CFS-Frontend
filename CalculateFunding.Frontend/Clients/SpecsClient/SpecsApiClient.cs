@@ -244,5 +244,12 @@
 
             return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{_specsPath}/specification-edit-status?specificationId={specificationId}", model);
         }
+
+        public Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            
+            return PostAsync($"{_specsPath}/select-for-funding?specificationId={specificationId}");
+        }
     }
 }

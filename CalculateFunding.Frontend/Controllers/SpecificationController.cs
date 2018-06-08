@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -70,6 +71,24 @@ namespace CalculateFunding.Frontend.Controllers
             else
             {
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
+
+        [Route("api/specs/{specificationId}/selectforfunding")]
+        [HttpPost]
+        public async Task<IActionResult> SelectSpecificationForfunding(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            HttpStatusCode statusCode = await _specsClient.SelectSpecificationForFunding(specificationId);
+
+            if (statusCode == HttpStatusCode.NoContent)
+            {
+                return NoContent();
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
             }
         }
     }

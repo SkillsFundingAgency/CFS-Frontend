@@ -27,6 +27,7 @@
     <None Remove="Scripts\common.d.ts" />
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\component.approveStatusButton.ts" />
+    <None Remove="Scripts\confirm.funding-specification.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
@@ -128,6 +129,7 @@
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
+    <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
