@@ -8,5 +8,6 @@
 
         public const string TimeFormatString = "HH:mm";
 
+        public const string MoneyFormatString = "{0:n}";
     }
 }

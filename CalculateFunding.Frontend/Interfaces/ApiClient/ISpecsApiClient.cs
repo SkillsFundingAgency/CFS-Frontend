@@ -26,6 +26,12 @@
         Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications();
 
         /// <summary>
+        /// Get all specifications which have been selected for funding
+        /// </summary>
+        /// <returns>Specifications</returns>
+        Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFunding();
+
+        /// <summary>
         /// Gets all Specification Summaries
         /// </summary>
         /// <returns></returns>

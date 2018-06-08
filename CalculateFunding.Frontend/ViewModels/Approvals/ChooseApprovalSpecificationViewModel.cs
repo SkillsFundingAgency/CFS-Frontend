@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Frontend.ViewModels.Common;
+﻿using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Common;
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ namespace CalculateFunding.Frontend.ViewModels.Approvals
         {
             get
             {
-                return String.Format("{0:n}", FundingAmount);
+                return String.Format(FormatStrings.MoneyFormatString, FundingAmount);
             }
         }
 

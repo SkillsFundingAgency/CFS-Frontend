@@ -32,6 +32,11 @@
             return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFunding()
+        {
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specifications-selected-for-funding", _cancellationToken);
+        }
+
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
             return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specification-summaries", _cancellationToken);
