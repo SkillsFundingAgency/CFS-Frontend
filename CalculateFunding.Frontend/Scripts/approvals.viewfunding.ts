@@ -44,7 +44,7 @@ $(".expander-trigger-cell").on("click", function (e: JQuery.Event<HTMLSelectElem
 
                 query.fail(() => {
                     $element.data(statusKey, "failed");
-                    nextRow.find(".qa-coverage-loading-failed").hide();
+                    nextRow.find(".qa-coverage-loading-failed").show();
                     nextRow.find(".qa-coverage-loading").hide();
                 });
             }
