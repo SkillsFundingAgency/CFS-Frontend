@@ -1,5 +1,7 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Datasets.SpecificationRelationshipsPageModel
+@using CalculateFunding.Frontend.Properties
+
 @{
     ViewData["Title"] = "Specification Relationships";
     Layout = "~/Pages/_Layout.cshtml";
@@ -10,7 +12,7 @@
         <ol>
             <li><a href="~/">Calculate Funding</a></li>
             <li><a href="~/datasets">Manage Data</a></li>
-            <li><a href="~/datasets/datasetrelationships">Map data source filess to datasets for a specification</a></li>
+            <li><a href="~/datasets/datasetrelationships">@BreadcrumbText.DatasetRelationships</a></li>
             <li>@Model.ViewModel.Specification.Name</li>
         </ol>
     </div>
@@ -50,10 +52,10 @@
         {
             @foreach (var item in Model.ViewModel.Items)
             {
-                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container" >
+                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container">
                     <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.DefinitionName</h2>
                     <h4 class="heading-small no-margin specification-relationship-definition-name">@item.RelationName</h4>
-                    <p  class="faded-text small no-margin specification-relationship-description">@item.RelationshipDescription</p>
+                    <p class="faded-text small no-margin specification-relationship-description">@item.RelationshipDescription</p>
                     <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectsourcedataset?relationshipId=@item.RelationshipId">@item.LinkPhrase</a></p>
                 </div>
 

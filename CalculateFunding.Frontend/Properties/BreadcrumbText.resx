@@ -121,7 +121,7 @@
     <value>Calculate Funding</value>
   </data>
   <data name="ChooseYourData" xml:space="preserve">
-    <value>Choose your data</value>
+    <value>Create dataset</value>
   </data>
   <data name="CompareCalcuationVersions" xml:space="preserve">
     <value>Compare Calculation Versions</value>
@@ -160,7 +160,7 @@
     <value>Manage Policies</value>
   </data>
   <data name="ManageSpecifications" xml:space="preserve">
-    <value>Manage Specification</value>
+    <value>Specifications</value>
   </data>
   <data name="SelectSourceDataset" xml:space="preserve">
     <value>Select data source</value>

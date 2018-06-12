@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Choose your data.
+        ///   Looks up a localized string similar to Create dataset.
         /// </summary>
         public static string ChooseYourData {
             get {
@@ -196,7 +196,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Manage Specification.
+        ///   Looks up a localized string similar to Specifications.
         /// </summary>
         public static string ManageSpecifications {
             get {

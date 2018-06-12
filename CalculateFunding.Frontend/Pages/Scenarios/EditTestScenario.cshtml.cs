@@ -42,11 +42,15 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public string SpecificationName { get; set; }
 
+        public bool CreateTestScenarioStatus { get; set; }
+
         public ScenarioEditViewModel EditScenarioViewModel { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string testScenarioId)
+        public async Task<IActionResult> OnGetAsync(string testScenarioId, bool wasCreateSuccess=false)
         {
             Guard.IsNullOrWhiteSpace(testScenarioId, nameof(testScenarioId));
+
+            CreateTestScenarioStatus = wasCreateSuccess;
 
             TestScenario scenario = await GetCurrentScenario(testScenarioId);
 
