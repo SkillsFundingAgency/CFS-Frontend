@@ -3,28 +3,19 @@ using System;
 
 namespace CalculateFunding.Frontend.ViewModels.TestEngine
 {
-    public class TestScenarioResultCountsViewModel
+    public class TestScenarioResultCountsViewModel : ResultCountsViewModel
     {
-        public class TestScenarioResultCounts
+        public string TestScenarioId { get; set; }
+
+        public string TestScenarioName { get; set; }
+
+        public DateTimeOffset? LastUpdatedDate { get; set; }
+
+        public string LastUpdatedDateDisplay
         {
-            public string TestScenarioId { get; set; }
-
-            public string TestScenarioName { get; set; }
-
-            public int Passed { get; set; }
-
-            public int Failed { get; set; }
-
-            public int Ignored { get; set; }
-
-            public DateTimeOffset? LastUpdatedDate { get; set; }
-
-            public string LastUpdatedDateDisplay
+            get
             {
-                get
-                {
-                    return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "";
-                }
+                return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "";
             }
         }
     }

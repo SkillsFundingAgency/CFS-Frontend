@@ -38,7 +38,6 @@
                 }
             }
 
-
             if ($target.hasClass("expander-trigger-cell-open")) {
                 $target.removeClass("expander-trigger-cell-open");
             }
@@ -47,7 +46,6 @@
             }
         }
     }
-
 }
 
 $(".expander-trigger-cell").on("click", (e: JQuery.Event<HTMLElement, null>) => {

@@ -84,8 +84,15 @@
 
         public fileSelect() {
             let file = (<HTMLInputElement>event.target).files[0];
-            this.fileName(file.name);
-            this.datasetFile = file;
+            if (file) {
+                this.fileName(file.name);
+                this.datasetFile = file;
+            }
+            else {
+                this.fileName(null);
+                this.datasetFile = null;
+                this.isFileNameValid(false);
+            }
         }
 
         public saveDataset() {

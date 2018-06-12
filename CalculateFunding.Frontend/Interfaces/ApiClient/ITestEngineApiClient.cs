@@ -23,5 +23,7 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId);
 
         Task<ApiResponse<IEnumerable<SpecificationTestScenarioResultCounts>>> GetTestScenarioCountsForSpecifications(SpecificationIdsRequestModel specificationIds);
+
+        Task<ApiResponse<ResultCounts>> GetTestScenarioCountsForProviderForSpecification(string specificationId, string providerId);
     }
 }

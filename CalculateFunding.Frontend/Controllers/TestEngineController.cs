@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -73,6 +74,27 @@ namespace CalculateFunding.Frontend.Controllers
             else
             {
                 return new StatusCodeResult(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/specs/{specificationId}/providertestcounts/{providerId}")]
+        public async Task<IActionResult> GetTestResultCountsForSpecificationAndProvider([FromRoute]string specificationId, [FromRoute] string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            ApiResponse<ResultCounts> countResponse = await _testEngineApiClient.GetTestScenarioCountsForProviderForSpecification(specificationId, providerId);
+            IActionResult errorResult = countResponse.IsSuccessOrReturnFailureResult("Test Scenario Counts");
+
+            if (errorResult == null)
+            {
+                ResultCountsViewModel result = _mapper.Map<ResultCountsViewModel>(countResponse.Content);
+                return Ok(result);
+            }
+            else
+            {
+                return errorResult;
             }
         }
     }

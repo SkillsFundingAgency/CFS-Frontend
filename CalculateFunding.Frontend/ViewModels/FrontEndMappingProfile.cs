@@ -9,6 +9,7 @@
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
     using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.ViewModels.Approvals;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
@@ -16,6 +17,7 @@
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using CalculateFunding.Frontend.ViewModels.TestEngine;
+    using System;
     using System.Linq;
 
     public class FrontEndMappingProfile : Profile
@@ -29,6 +31,18 @@
             this.MapCalcs();
             this.MapScenario();
             this.MapTestEngine();
+            this.MapApprovals();
+        }
+
+        private void MapApprovals()
+        {
+            CreateMap<PublishedProviderResult, PublishedProviderResultViewModel>()
+                .ForMember(m => m.TestCoveragePercent, opt => opt.Ignore())
+                .ForMember(m => m.TestsPassed, opt => opt.Ignore())
+                .ForMember(m => m.TestsTotal, opt => opt.Ignore());
+
+            CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
+            CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
         }
 
         private void MapResults()
@@ -98,9 +112,9 @@
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore())
                 .AfterMap((CreateSubPolicyViewModel source, CreateSubPolicyModel destination) =>
                 {
-                    destination.ParentPolicyId = source.ParentPolicyId;            
+                    destination.ParentPolicyId = source.ParentPolicyId;
                 });
-            
+
 
             CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
@@ -111,7 +125,7 @@
 
             CreateMap<EditSubPolicyViewModel, EditSubPolicyModel>()
              .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-     
+
             CreateMap<Policy, EditSubPolicyViewModel>()
              .ForMember(m => m.ParentPolicyId, opt => opt.Ignore());
 
@@ -180,6 +194,8 @@
                     destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
                 }
             });
+
+            this.CreateMap<ResultCounts, ResultCountsViewModel>();
         }
 
         private void MapScenario()
@@ -201,7 +217,7 @@
             this.CreateMap<ScenarioEditViewModel, TestScenarioIUpdateModel>()
               .ForMember(m => m.SpecificationId, opt => opt.Ignore())
               .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
-              .ForMember(m => m.Id, opt => opt.Ignore());             
+              .ForMember(m => m.Id, opt => opt.Ignore());
         }
 
         private void MapCommon()

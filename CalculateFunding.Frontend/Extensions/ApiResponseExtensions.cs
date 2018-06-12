@@ -23,7 +23,7 @@ namespace CalculateFunding.Frontend.Extensions
 
             if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return new InternalServerErrorResult($"{entityName} API call did not return succes, but instead '{apiResponse.StatusCode}'");
+                return new InternalServerErrorResult($"{entityName} API call did not return success, but instead '{apiResponse.StatusCode}'");
             }
 
             if (EqualityComparer<T>.Default.Equals(apiResponse.Content, default(T)))
