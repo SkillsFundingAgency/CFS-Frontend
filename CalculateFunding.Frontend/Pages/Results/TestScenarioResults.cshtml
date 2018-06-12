@@ -78,7 +78,7 @@
 
             <tbody data-bind="foreach: testScenarioResults" class="withjs-show" id="dynamic-results-table-body">
                 <tr>
-                    <td><a data-bind="text: name, attr: {'href': '/scenarios/edittestscenario/' + id}"></a></td>
+                    <td><a data-bind="text: name, attr: {'href': '/scenarios/viewprovidertestresults?scenarioId=' + id}"></a></td>
                     <td data-bind="text: lastUpdatedDateDisplay"></td>
                     <td data-bind="text: failures"></td>
                     <td data-bind="text: passes"></td>
@@ -93,7 +93,7 @@
                 @foreach (TestScenarioResultItemViewModel result in Model.SearchResults.TestResults)
                 {
                     <tr>
-                        <td id="static-results-name-@rowId"><a href="/scenarios/edittestscenario/@result.Id">@result.Name</a></td>
+                        <td id="static-results-name-@rowId"><a href="/scenarios/viewprovidertestresults?scenarioId=@result.Id">@result.Name</a></td>
                         <td id="static-results-status-@rowId">@result.LastUpdatedDate</td>
                         <td id="static-results-specificationName-@rowId">@result.Failures</td>
                         <td id="static-results-periodName-@rowId">@result.Passes</td>

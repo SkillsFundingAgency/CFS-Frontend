@@ -99,5 +99,17 @@
                 return null;
             }
         }
+
+        public Task<ApiResponse<IEnumerable<FundingCalculationResultsTotals>>> GetFundingCalculationResultsTotals(SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
+
+            return PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"{_resultsPath}/get-calculation-result-totals-for-specifications", specificationIds);
+        }
+
+        public Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId)
+        {
+            return GetAsync<IEnumerable<PublishedProviderResult>>($"{_resultsPath}/get-published-provider-results-for-specification?specificationId={specificationId}");
+        }
     }
 }

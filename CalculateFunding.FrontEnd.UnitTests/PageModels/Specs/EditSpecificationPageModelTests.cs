@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Specs;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -20,8 +21,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
     [TestClass]
     public class EditSpecificationPageModelTests
     {
-        const string specificationId = "spec-id";
-        const string specName = "spec name";
+        private const string specificationId = "spec-id";
+        private const string specName = "spec name";
 
         [TestMethod]
         public void OnGetAsync_GivenNuullOrEmptySpecificationId_ThrowsArgumentException()
@@ -507,7 +508,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-
             EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
 
             pageModel.PageContext = new PageContext();
@@ -671,7 +671,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task OnPostAsync_GivenViewModelIsValid_ReturnsRedirect()
+        public async Task OnPostAsync_GivenViewModelIsValidAndNoRedirectActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToManagePolicies()
         {
             //Arrange
             ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
@@ -714,7 +714,108 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be($"/specs/policies/{specificationId}");
+                .Be($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId=spec-id");
+
+            await
+                apiClient
+                    .Received(1)
+                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_GivenViewModelIsValidAndRedirectToSpecificationsActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToSpecificationsPage()
+        {
+            //Arrange
+            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
+
+            EditSpecificationModel editModel = new EditSpecificationModel();
+
+            EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
+
+            ISpecsApiClient apiClient = CreateApiClient();
+
+            apiClient
+                .GetSpecificationByName(Arg.Is(specName))
+                .Returns(existingSpecificationResponse);
+
+            apiClient
+                .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
+                .Returns(HttpStatusCode.OK);
+
+            IMapper mapper = CreateMapper();
+            mapper
+                .Map<EditSpecificationModel>(Arg.Is(viewModel))
+                .Returns(editModel);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+
+            pageModel.EditSpecificationViewModel = viewModel;
+
+            pageModel.PageContext = new PageContext();
+
+            //Act
+            IActionResult result = await pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
+
+            //Assert
+            result
+                .Should()
+                .BeOfType<RedirectResult>();
+
+            RedirectResult redirectResult = result as RedirectResult;
+
+            redirectResult
+                .Url
+                .Should()
+                .Be("/specs?operationType=SpecificationUpdated&operationId=spec-id");
+
+            await
+                apiClient
+                    .Received(1)
+                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_GivenViewModelIsValidAndUpdateSpecificationCallFails_ThenInternalServerErrorReturned()
+        {
+            // Arrange
+            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
+
+            EditSpecificationModel editModel = new EditSpecificationModel();
+
+            EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
+
+            ISpecsApiClient apiClient = CreateApiClient();
+
+            apiClient
+                .GetSpecificationByName(Arg.Is(specName))
+                .Returns(existingSpecificationResponse);
+
+            apiClient
+                .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
+                .Returns(HttpStatusCode.InternalServerError);
+
+            IMapper mapper = CreateMapper();
+            mapper
+                .Map<EditSpecificationModel>(Arg.Is(viewModel))
+                .Returns(editModel);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+
+            pageModel.EditSpecificationViewModel = viewModel;
+
+            pageModel.PageContext = new PageContext();
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
+
+            //Assert
+            result
+                .Should()
+                .BeOfType<InternalServerErrorResult>()
+                .Which
+                .Value
+                .Should()
+                .Be("Unable to update specification. API returned 'InternalServerError'");
 
             await
                 apiClient

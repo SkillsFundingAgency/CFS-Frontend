@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace CalculateFunding.Frontend.Clients.TestEngineClient.Models
 {
-    public class TestSecenarioResultCountsRequestModel
+    public class TestScenarioResultCountsRequestModel
     {
-        public TestSecenarioResultCountsRequestModel()
+        public TestScenarioResultCountsRequestModel()
         {
             TestScenarioIds = Enumerable.Empty<string>();
         }

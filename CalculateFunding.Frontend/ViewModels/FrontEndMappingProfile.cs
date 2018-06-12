@@ -9,6 +9,7 @@
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
     using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.ViewModels.Approvals;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
@@ -16,6 +17,7 @@
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using CalculateFunding.Frontend.ViewModels.TestEngine;
+    using System;
     using System.Linq;
 
     public class FrontEndMappingProfile : Profile
@@ -29,6 +31,18 @@
             this.MapCalcs();
             this.MapScenario();
             this.MapTestEngine();
+            this.MapApprovals();
+        }
+
+        private void MapApprovals()
+        {
+            CreateMap<PublishedProviderResult, PublishedProviderResultViewModel>()
+                .ForMember(m => m.TestCoveragePercent, opt => opt.Ignore())
+                .ForMember(m => m.TestsPassed, opt => opt.Ignore())
+                .ForMember(m => m.TestsTotal, opt => opt.Ignore());
+
+            CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
+            CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
         }
 
         private void MapResults()
@@ -66,7 +80,8 @@
             CreateMap<Clients.CalcsClient.Models.Calculation, Calculations.CalculationViewModel>()
                 .ForMember(m => m.Description, opt => opt.Ignore());
 
-            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>();
+            CreateMap<CalculationUpdateViewModel, Clients.CalcsClient.Models.CalculationUpdateModel>();
+
             CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
 
             CreateMap<PreviewCompileRequestViewModel, PreviewCompileRequest>()
@@ -80,7 +95,9 @@
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.FundingPeriod, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
-                .ForMember(m => m.Policies, opt => opt.Ignore());
+                .ForMember(m => m.Policies, opt => opt.Ignore())
+                .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
+                .ForMember(m => m.PublishStatus, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>();
 
@@ -90,17 +107,17 @@
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<EditPolicyViewModel, EditPolicyModel>()
-               .ForMember(m => m.SpecificationId, opt => opt.Ignore()); 
+               .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore())
                 .AfterMap((CreateSubPolicyViewModel source, CreateSubPolicyModel destination) =>
                 {
-                    destination.ParentPolicyId = source.ParentPolicyId;            
+                    destination.ParentPolicyId = source.ParentPolicyId;
                 });
-            
 
-            CreateMap<CreateCalculationViewModel, CreateCalculationModel>()
+
+            CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<Specification, SpecificationViewModel>();
@@ -109,17 +126,15 @@
 
             CreateMap<EditSubPolicyViewModel, EditSubPolicyModel>()
              .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-     
+
             CreateMap<Policy, EditSubPolicyViewModel>()
              .ForMember(m => m.ParentPolicyId, opt => opt.Ignore());
 
-            CreateMap<Clients.SpecsClient.Models.SpecificationSummary, SpecificationSummaryViewModel>();
+            CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
-            CreateMap<EditPolicyViewModel, Policy>()
-                .ForMember(m => m.SubPolicies, opt => opt.Ignore())
-                .ForMember(m => m.Calculations, opt => opt.Ignore());
-          
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
+
+            CreateMap<CalculationCurrentVersion, Specs.CalculationViewModel>();
 
             CreateMap<Specification, EditSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
@@ -130,6 +145,8 @@
                     destination.FundingPeriodId = source.FundingPeriod.Id;
                     destination.FundingStreamIds = source.FundingStreams.Select(m => m.Id);
                 });
+
+            CreateMap<SpecificationSearchResultItem, SpecificationSearchResultItemViewModel>();
         }
 
         private void MapDatasets()
@@ -178,6 +195,8 @@
                     destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
                 }
             });
+
+            this.CreateMap<ResultCounts, ResultCountsViewModel>();
         }
 
         private void MapScenario()
@@ -199,7 +218,7 @@
             this.CreateMap<ScenarioEditViewModel, TestScenarioIUpdateModel>()
               .ForMember(m => m.SpecificationId, opt => opt.Ignore())
               .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
-              .ForMember(m => m.Id, opt => opt.Ignore());             
+              .ForMember(m => m.Id, opt => opt.Ignore());
         }
 
         private void MapCommon()
@@ -207,6 +226,7 @@
             CreateMap<SearchFacet, SearchFacetViewModel>();
             CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
             CreateMap<Reference, ReferenceViewModel>();
+            CreateMap<PublishStatus, PublishStatusViewModel>();
         }
     }
 }

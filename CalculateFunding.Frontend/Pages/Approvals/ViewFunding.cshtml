@@ -1,0 +1,166 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Approvals.ViewFundingModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.ViewModels.Approvals
+@{
+    ViewData["Title"] = "Approve and publish funding";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
+            <li>@BreadcrumbText.ChooseFundingSpecification</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Approve and publish funding</h1>
+}
+
+@if (Model.PageBannerOperation != null)
+{
+    @Html.Partial("_PageBannerOperationPartial", Model.PageBannerOperation)
+}
+
+<div class="viewfunding-page-container">
+
+    <form method="get" action="/approvals/viewfunding">
+        <div class="table-filter-container">
+            <div class="row">
+                <div class="col-xs-4">
+                    <div>Specification</div>
+                    <select asp-items="@Model.Specifications" id="specificationId" name="specificationId">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+    <table class="cf">
+        <thead>
+            <tr>
+                <th rowspan="2">Provider name</th>
+                <th rowspan="2">UKPRN</th>
+                <th colspan="4" class="text-center">Allocation line statuses</th>
+                <th rowspan="2" class="funding-header">Specification funding</th>
+                <th rowspan="2"></th>
+            </tr>
+            <tr>
+                <th class="text-center sub-heading min-width-xs">Held</th>
+                <th class="text-center sub-heading min-width-xs">Approved</th>
+                <th class="text-center sub-heading min-width-xs">Published</th>
+                <th class="text-center sub-heading">Last updated</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Results.AnyWithNullCheck())
+            {
+                @foreach (PublishedProviderResultViewModel provider in Model.Results)
+                {
+                    <tr class="expander-trigger-container">
+                        <td class="view-funding-provider-border">@provider.ProviderName</td>
+                        <td>@provider.Ukprn</td>
+                        <td class="text-center @(provider.NumberHeld > 0 ? "status-held" : "")">@provider.NumberHeld/@provider.TotalAllocationLines</td>
+                        <td class="text-center @(provider.NumberApproved > 0 ? "status-approved" : "")">@provider.NumberApproved/@provider.TotalAllocationLines</td>
+                        <td class="text-center @(provider.NumberPublished > 0 ? "status-published" : "")">@provider.NumberPublished/@provider.TotalAllocationLines</td>
+                        <td>
+                            <span class="datetime-split-container">
+                                <span class="datetime-split-date">@provider.LastUpdatedDateDisplay</span> <span>@provider.LastUpdatedTimeDisplay</span>
+                            </span>
+                        </td>
+                        <td>&pound;@provider.FundingAmountDisplay</td>
+                        <td class="expander-trigger-cell" data-providerid="@provider.ProviderId"><i class="material-icons">keyboard_arrow_down</i></td>
+                    </tr>
+                    <tr class="expander-container">
+                        <td colspan="2">
+                            <span class="qa-coverage-loading">Loading results</span>
+                            <span class="qa-coverage-loading-failed" style="display: none">Error loading results</span>
+                            <span class="inline-list qa-coverage-container" style="display: none">
+                                <span class="inline-list-item"><span class="highlight-title">QA test coverage:</span> <span class="data-qa-coverage"></span></span>
+                                <span class="inline-list-item"><span class="highlight-title">QA test passes:</span> <span class="data-qa-passed"></span>/<span class="data-qa-totaltests"></span></span>
+                            </span>
+                        </td>
+                        <td colspan="7"></td>
+                    </tr>
+
+                    @foreach (PublishedFundingStreamResultViewModel fundingStream in provider.FundingStreamResults)
+                    {
+                        <tr class="expander-container">
+                            <td colspan="2">@fundingStream.FundingStreamName</td>
+                            <td class="text-center @(fundingStream.NumberHeld > 0 ? "status-held" : "")">@fundingStream.NumberHeld/@fundingStream.TotalAllocationLines</td>
+                            <td class="text-center @(fundingStream.NumberApproved > 0 ? "status-held" : "")">@fundingStream.NumberApproved/@fundingStream.TotalAllocationLines</td>
+                            <td class="text-center @(fundingStream.NumberPublished > 0 ? "status-published" : "")">@fundingStream.NumberPublished/@fundingStream.TotalAllocationLines</td>
+                            <td>
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date">@fundingStream.LastUpdatedDateDisplay</span> <span>@fundingStream.LastUpdatedTimeDisplay</span>
+                                </span>
+                            </td>
+                            <td colspan="2">&pound;@fundingStream.FundingAmountDisplay</td>
+                        </tr>
+
+                        @foreach (PublishedAllocationLineResultViewModel allocationLine in fundingStream.AllocationLineResults)
+                        {
+                            <tr class="expander-container">
+                                <td colspan="2">@allocationLine.AllocationLineName</td>
+
+                                @if (allocationLine.Status == AllocationLineStatusViewModel.Held)
+                                {
+                                    <td class="status-held text-center border-right-hidden">Held</td>
+                                    <td class="border-right-hidden"></td>
+                                    <td></td>
+
+                                }
+                                else if (allocationLine.Status == AllocationLineStatusViewModel.Approved)
+                                {
+                                    <td class="border-right-hidden"></td>
+                                    <td class="text-center status-approved border-right-hidden">Approved</td>
+                                    <td></td>
+
+                                }
+                                else if (allocationLine.Status == AllocationLineStatusViewModel.Published)
+                                {
+                                    <td class="border-right-hidden"></td>
+                                    <td class="border-right-hidden"></td>
+                                    <td class="text-center status-published">Published</td>
+                                }
+
+                                <td>
+                                    <span class="datetime-split-container">
+                                        <span class="datetime-split-date">@allocationLine.LastUpdatedDateDisplay</span> <span>@allocationLine.LastUpdatedTimeDisplay</span>
+                                    </span>
+                                </td>
+                                <td colspan="2">&pound;@allocationLine.FundingAmountDisplay</td>
+                            </tr>
+
+                        }
+
+                    }
+                }
+            }
+        </tbody>
+
+    </table>
+
+    @if (!Model.Results.AnyWithNullCheck())
+    {
+        <div class="noresults-panel spacing-30">
+            <span class="noresults-panel-text">
+                <i class="material-icons">error</i> Select a specification to see providers
+            </span>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding.js" asp-append-version="true"></script>
+    <script type="text/javascript" asp-src-include="~/js/table.expander.sequential.js" asp-append-version="true"></script>
+
+
+    <script type="text/javascript">
+        var testScenarioQueryUrl = '/api/specs/@Model.SelectedSpecificationId/providertestcounts';
+    </script>
+}

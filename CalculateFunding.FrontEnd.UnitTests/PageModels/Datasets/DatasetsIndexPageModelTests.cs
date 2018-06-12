@@ -14,6 +14,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Calcs;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Calculations;

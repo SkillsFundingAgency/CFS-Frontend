@@ -404,7 +404,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
-                FundingStreams = new List<Reference>() { new Reference("2018", "18-19"), },
+                FundingStreams = new List<FundingStream>() { new FundingStream("2018", "18-19"), },
 
                 Description = "Test Spec",
 

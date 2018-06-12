@@ -15,8 +15,6 @@
 
         public Reference CalculationSpecification { get; set; }
 
-        public string Status { get; set; }
-
         public string SourceCode { get; set; }
 
         [JsonProperty("date")]
@@ -28,5 +26,7 @@
         public int Version { get; set; }
 
         public CalculationSpecificationType CalculationType { get; set; }
+
+        public PublishStatus PublishStatus { get; set; }
     }
 }

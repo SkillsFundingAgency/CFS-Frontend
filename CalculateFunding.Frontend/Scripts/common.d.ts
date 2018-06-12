@@ -3,7 +3,8 @@
         pageNumber: number;
         searchTerm: string;
         includeFacets: boolean;
-        filters: ISearchFilterRequest
+        filters: ISearchFilterRequest;
+        pageSize?: number;
     }
 
     export interface ISearchFilterRequest {

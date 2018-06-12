@@ -177,9 +177,9 @@ blockquote {
     font-size: 19px;
 }
 
-.hero-text-strong{
+.hero-text-strong {
     color: #6F777b;
-    font-size:36px;
+    font-size: 36px;
 }
 
 .hero-spacing-right {
@@ -200,6 +200,19 @@ blockquote {
     margin-bottom: 5px;
 }
 
+.spacing-10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.spacing-10-top {
+    margin-top: 10px;
+}
+
+.spacing-10-bottom {
+    margin-bottom: 10px;
+}
+
 .spacing-15 {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -213,6 +226,19 @@ blockquote {
     margin-bottom: 15px;
 }
 
+.spacing-20 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.spacing-20-top {
+    margin-top: 20px;
+}
+
+.spacing-20-bottom {
+    margin-bottom: 20px;
+}
+
 .spacing-30 {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -220,6 +246,10 @@ blockquote {
 
 .spacing-30-top {
     margin-top: 30px;
+}
+
+.spacing-bottom-0 {
+    margin-bottom: 0;
 }
 
 .jscollapse-container {
@@ -456,6 +486,15 @@ blockquote {
     }
 }
 
+.policy-spec-what {
+    .inline-collapse-container {
+        .inline-collapse-heading {
+            color: #000;
+            text-decoration: underline;
+        }
+    }
+}
+
 .compare-container {
     .compare-table {
     }
@@ -557,7 +596,71 @@ blockquote {
 }
 
 
+.datetime-split-container {
+    .datetime-split-date {
+        padding-right: 5px;
+    }
+}
 
+.notification-panel {
+    background-color: $turquoise;
+    color: #fff;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-content: space-between;
+    justify-content: space-between;
+
+    .notification-panel-text {
+        display: flex;
+    }
+
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        color: #fff;
+    }
+
+    .notification-panel-view {
+        margin-right: 10px;
+    }
+}
+
+.noresults-panel {
+    background-color: $orange;
+    color: #fff;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-content: space-between;
+    justify-content: space-between;
+
+    .noresults-panel-text {
+        display: flex;
+    }
+
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        color: #fff;
+    }
+
+    .noresults-panel-view {
+        margin-right: 10px;
+    }
+}
 
 .dataset-searchresult-container {
 
@@ -838,6 +941,13 @@ blockquote {
     }
 }
 
+.inline-list {
+    .inline-list-item {
+        padding-right: 15px;
+        white-space: nowrap;
+    }
+}
+
 .nav-tabs-pagenavigation {
     a,
     a:visited {
@@ -1114,51 +1224,6 @@ blockquote {
     }
 }
 
-.product-details {
-    .summary {
-        display: block;
-
-        > div:first-of-type {
-            display: inline-block;
-            vertical-align: middle;
-            /*Standard*/
-            width: calc(100% - 25px);
-            /*Firefox*/
-            width: -moz-calc(100% - 25px);
-            /*Webkit*/
-            width: -webkit-calc(100% - 25px);
-            /*Opera*/
-            width: -o-calc(100% - 25px);
-
-            .list-title {
-                float: left;
-                margin: 0;
-            }
-
-            .folder {
-                float: right;
-                display: inline-block;
-                margin: 0;
-
-                > span {
-                    margin-right: 5px;
-                }
-            }
-        }
-    }
-}
-
-.provider-stats {
-    ul {
-        > li {
-            dt, dd {
-                display: inline-block;
-                font-size: 19px;
-            }
-        }
-    }
-}
-
 .gherkin-scenario {
 
     p {
@@ -1362,9 +1427,7 @@ table {
         content: "\e259";
     }
 }
-
 /*Gherkin scenario page*/
-
 .gherkin-scenario {
     #scenario-name {
     }
@@ -1651,6 +1714,41 @@ table {
     border: 4px solid $error-colour;
 }
 
+.nav-tabs > li.nav-item-right {
+    float: right;
+}
+
+.choose-container {
+    .choose-funding-stream {
+        color: $grey-1;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .btn-choose {
+        background-color: $green;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 0;
+        margin: 0 15px;
+    }
+
+    .btn-choose:disabled,
+    .btn-choose.btn-disabled {
+        background-color: #bfc1c3;
+    }
+}
+
+.viewfunding-page-container {
+    table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
+        border-bottom: 1px solid #fff !important;
+    }
+}
+
+@import "_tablelayout.scss";
+@import "_pageheaders.scss";
+@import "_statusElements.scss";
+
 @media (min-width: 641px) {
     .form-control {
         width: 100%;
@@ -1673,12 +1771,10 @@ table {
     .validation-failed-label {
         color: $error-colour;
     }
-
     /*.validation-passed-block {
         border-left: 5px solid $page-colour;
         padding-left: 10px;
     }*/
-
     .validation-summary-errors {
         border: 5px $error-colour solid;
         padding: 20px 15px 15px;
@@ -1844,6 +1940,7 @@ table {
 .material-icons-content-container {
     display: flex;
     vertical-align: middle;
+
     .material-icons.material-icons-left {
         padding-right: 5px;
     }
@@ -1990,8 +2087,6 @@ table {
 .edit-scenario .heading-grey-container .div-title {
     padding-bottom: 5px;
 }
-
-
 /*image path overrides*/
 #global-header #logo {
     background-image: url('/libs/govuk_bootstrap/images/gov.uk_logotype_crown.png?version=0.17.1');
@@ -2019,7 +2114,6 @@ table {
         }
     }
 }
-
 /* Disable word breaking in hover contents in monaco editor*/
 .mtk1 {
     text-wrap: normal;
@@ -2028,7 +2122,7 @@ table {
     word-break: normal;
 }
 
-.inline-allocation-line-container {
+.inline-form-section {
     border-left: 5px solid #6f777b;
     padding-left: 10px;
     padding-top: 10px;
@@ -2046,7 +2140,6 @@ table {
 .flag.flag--success {
     background-color: #28a197;
 }
-
 /*@media all and (min-width:641px)*/
 .flag {
     font-size: 16px;
@@ -2070,9 +2163,29 @@ table {
     margin-left: 20px;
 }
 
-.icon-funding-stream-removed{
-    width:30px;
-    margin-right:10px;
+.icon-funding-stream-removed {
+    width: 30px;
+    margin-right: 10px;
     margin-bottom: 20px;
-    float:left;
+    float: left;
+}
+
+.icon-confirm-select-funding-container {
+    margin-top: -5px;
+    float: left;
+    margin-right: 10px;
+    height: 30px;
+        i {
+            font-size: 32px;
+        }
+}
+
+.confirm-select-fundingstreams-container {
+    margin-bottom: 30px;
+}
+
+.confirm-statement-list {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 30px;
 }

@@ -48,13 +48,13 @@
 
             ApiResponse<Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
 
-            if (calculation == null || calculation.StatusCode != System.Net.HttpStatusCode.OK)
+            if (calculation == null || calculation.StatusCode != HttpStatusCode.OK)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
            
-            ApiResponse<Clients.SpecsClient.Models.Calculation> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
-            if (specCalculation == null || specCalculation.StatusCode == System.Net.HttpStatusCode.NotFound)
+            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
+            if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
             }

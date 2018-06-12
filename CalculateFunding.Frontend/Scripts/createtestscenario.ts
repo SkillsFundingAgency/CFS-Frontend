@@ -374,7 +374,7 @@ namespace calculateFunding.createTestScenario {
                                     }
                                 }
                                 else {
-                                    console.error("Unable to find class:", datasetClassType.type);
+                                    console.error("Unable to find class:", datasetProperty.type);
                                 }
 
                                 codeContext.datasets.push(dataset);

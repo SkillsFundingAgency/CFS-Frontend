@@ -14,5 +14,11 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 
         [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("approvalStatus")]
+        public PublishStatus ApprovalStatus { get; set; }
+
+        [JsonProperty("isSelectedForFunding")]
+        public bool IsSelectedForFunding { get; set; }
     }
 }

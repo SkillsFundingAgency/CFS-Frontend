@@ -53,11 +53,11 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         }
 
 
-        public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestSecenarioResultCountsRequestModel testScenarioIdsModel)
+        public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestScenarioResultCountsRequestModel testScenarioIdsModel)
         {
             Guard.ArgumentNotNull(testScenarioIdsModel, nameof(testScenarioIdsModel));
 
-            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestSecenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
+            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestScenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
         }
 
         public Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId)
@@ -92,6 +92,16 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             }
         }
 
+        public Task<ApiResponse<IEnumerable<SpecificationTestScenarioResultCounts>>> GetTestScenarioCountsForSpecifications(SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
 
+            return PostAsync<IEnumerable<SpecificationTestScenarioResultCounts>, SpecificationIdsRequestModel>($"{_apiPath}/get-testscenario-result-counts-for-specifications", specificationIds);
+        }
+
+        public Task<ApiResponse<ResultCounts>> GetTestScenarioCountsForProviderForSpecification(string specificationId, string providerId)
+        {
+            return GetAsync<ResultCounts>($"{_apiPath}/get-testscenario-result-counts-for-specification-for-provider?specificationId={specificationId}&providerId={providerId}");
+        }
     }
 }

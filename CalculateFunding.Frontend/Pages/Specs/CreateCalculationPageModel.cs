@@ -131,7 +131,7 @@
                 return await PopulateForm(specification);
             }
 
-            CreateCalculationModel calculation = _mapper.Map<CreateCalculationModel>(CreateCalculationViewModel);
+            CalculationCreateModel calculation = _mapper.Map<CalculationCreateModel>(CreateCalculationViewModel);
 
             calculation.SpecificationId = specificationId;
 

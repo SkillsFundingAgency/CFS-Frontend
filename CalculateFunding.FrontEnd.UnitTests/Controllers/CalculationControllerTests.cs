@@ -5,6 +5,7 @@
 namespace CalculateFunding.Frontend.Controllers
 {
     using System;
+    using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
@@ -222,6 +223,68 @@ namespace CalculateFunding.Frontend.Controllers
 
             // Assert
             a.Should().Throw<InvalidOperationException>();
+        }
+
+        [TestMethod]
+        public void EditCalculationStatus_GivenFailedStatusCode_ThrowsInvalidOperationException()
+        {
+            //Arrange
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel();
+           
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(response);
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            CalculationController controller = new CalculationController(calcsClient, mapper);
+
+            // Act
+            Func<Task> test = async () => await controller.EditCalculationStatus(calculationId, model);
+
+            // Assert
+            test
+                .Should()
+                .Throw<InvalidOperationException>();
+        }
+
+        [TestMethod]
+        public async Task EditCalculationStatus_GivenOKResponseFromApi_RetunrsOK()
+        {
+            //Arrange
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel();
+
+            PublishStatusResult publishStatusResult = new PublishStatusResult();
+
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(response);
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            CalculationController controller = new CalculationController(calcsClient, mapper);
+
+            // Act
+            IActionResult result = await controller.EditCalculationStatus(calculationId, model);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<OkObjectResult>()
+                .Which
+                .Value
+                .Should()
+                .Be(publishStatusResult);
         }
     }
 }

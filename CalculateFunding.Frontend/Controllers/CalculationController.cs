@@ -92,5 +92,25 @@
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
         }
+
+        [Route("api/specs/{specificationId}/calculations/{calculationId}/status")]
+        [HttpPut]
+        public async Task<IActionResult> EditCalculationStatus([FromRoute]string calculationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+
+            Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+
+            ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
     }
 }

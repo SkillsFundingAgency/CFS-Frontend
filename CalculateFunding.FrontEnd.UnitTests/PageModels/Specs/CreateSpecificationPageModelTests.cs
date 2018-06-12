@@ -235,129 +235,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public void OnPostAsync_GivenNameAlreadyExistsAndPopulateFundingPeriodsReturnsBadRequest_ThrowsInvalidOperationException()
-        {
-            //Arrange
-            const string specName = "spec name";
-
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.BadRequest);
-
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecificationByName(Arg.Is(specName))
-                .Returns(existingSpecificationResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
-
-
-            CreateSpecificationPageModel pageModel = CreatePageModel(apiClient);
-
-            pageModel.PageContext = new PageContext();
-
-            pageModel.CreateSpecificationViewModel = new CreateSpecificationViewModel
-            {
-                Name = specName
-            };
-
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
-
-            test
-                .Should()
-                .ThrowExactly<InvalidOperationException>();
-        }
-
-        [TestMethod]
-        public void OnPostAsync_GivenNameAlreadyExistsAndPopulateFundingPeriodsReturnsOKButNullContent_ThrowsInvalidOperationException()
-        {
-            //Arrange
-            const string specName = "spec name";
-
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK);
-
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecificationByName(Arg.Is(specName))
-                .Returns(existingSpecificationResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
-
-            CreateSpecificationPageModel pageModel = CreatePageModel(apiClient);
-
-            pageModel.PageContext = new PageContext();
-
-            pageModel.CreateSpecificationViewModel = new CreateSpecificationViewModel
-            {
-                Name = specName
-            };
-
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
-
-            test
-                .Should()
-                .ThrowExactly<InvalidOperationException>();
-        }
-
-        [TestMethod]
-        public void OnPostAsync_GivenNameAlreadyExistsPopulateFundingPeriodsIsOKButFundingStreamsReturnsBadRequest_ThrowsInvalidOperationException()
-        {
-            //Arrange
-            const string specName = "spec name";
-
-            IEnumerable<Reference> fundingPeriods = new[]
-            {
-                new Reference { Id = "fp1", Name = "funding" }
-            };
-
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
-
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
-
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.BadRequest);
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecificationByName(Arg.Is(specName))
-                .Returns(existingSpecificationResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
-
-            apiClient
-                .GetFundingStreams()
-                .Returns(fundingStreamsResponse);
-
-            CreateSpecificationPageModel pageModel = CreatePageModel(apiClient);
-
-            pageModel.CreateSpecificationViewModel = new CreateSpecificationViewModel
-            {
-                Name = specName
-            };
-
-            pageModel.PageContext = new PageContext();
-
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
-
-            test
-                .Should()
-                .ThrowExactly<InvalidOperationException>();
-        }
-
-        [TestMethod]
         public async Task OnPostAsync_GivenPagePopulatesButModelStateIsInvalid_ReturnsPage()
         {
             //Arrange
@@ -402,6 +279,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             pageModel.PageContext = new PageContext();
 
+            pageModel.PageContext.ModelState.AddModelError("test", "Invalid model");
+
             //Act
             IActionResult result = await pageModel.OnPostAsync();
 
@@ -445,6 +324,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
+            Specification createdSpecification = new Specification()
+            {
+                Id = "specId",
+            };
+
+            apiClient
+                .CreateSpecification(Arg.Any<CreateSpecificationModel>())
+                .Returns(new ValidatedApiResponse<Specification>(HttpStatusCode.OK, createdSpecification));
+
             IMapper mapper = CreateMapper();
             mapper
                 .Map<CreateSpecificationModel>(Arg.Any<CreateSpecificationViewModel>())
@@ -475,7 +363,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be("/specs?fundingPeriodId=fp1");
+                .Be("/specs?operationType=SpecificationCreated&operationId=specId");
         }
 
         private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null)

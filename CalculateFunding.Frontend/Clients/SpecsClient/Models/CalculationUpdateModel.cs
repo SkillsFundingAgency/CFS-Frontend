@@ -2,11 +2,8 @@
 {
     using Newtonsoft.Json;
 
-    public class CreateCalculationModel
+    public class CalculationUpdateModel
     {
-        [JsonProperty("specificationId")]
-        public string SpecificationId { get; set; }
-
         [JsonProperty("allocationLineId")]
         public string AllocationLineId { get; set; }
 
@@ -21,5 +18,8 @@
 
         [JsonProperty("calculationType")]
         public CalculationSpecificationType CalculationType { get; set; }
+
+        [JsonProperty("isPublic")]
+        public bool IsPublic { get; set; }
     }
 }

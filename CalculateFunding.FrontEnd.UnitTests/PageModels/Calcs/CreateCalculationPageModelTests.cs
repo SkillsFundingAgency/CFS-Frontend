@@ -116,9 +116,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             //Arrange
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -226,9 +226,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -318,9 +318,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Specification specification = CreateSpecification();
 
-            IEnumerable<Reference> allocationLines = new[]
+            IEnumerable<AllocationLine> allocationLines = new[]
             {
-                new Reference
+                new AllocationLine
                 {
                     Id = "alloc-id",
                     Name = "alloc-name"
@@ -341,7 +341,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
 
-            CreateCalculationModel createModel = new CreateCalculationModel
+            CalculationCreateModel createModel = new CalculationCreateModel
             {
                 SpecificationId = specificationId
             };
@@ -409,14 +409,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            CreateCalculationModel createModel = new CreateCalculationModel
+            CalculationCreateModel createModel = new CalculationCreateModel
             {
                 SpecificationId = specificationId
             };
 
             IMapper mapper = CreateMapper();
             mapper
-                .Map<CreateCalculationModel>(Arg.Is(viewModel))
+                .Map<CalculationCreateModel>(Arg.Is(viewModel))
                 .Returns(createModel);
 
             ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
@@ -482,14 +482,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            CreateCalculationModel createModel = new CreateCalculationModel
+            CalculationCreateModel createModel = new CalculationCreateModel
             {
                 SpecificationId = specificationId
             };
 
             IMapper mapper = CreateMapper();
             mapper
-                .Map<CreateCalculationModel>(Arg.Is(viewModel))
+                .Map<CalculationCreateModel>(Arg.Is(viewModel))
                 .Returns(createModel);
 
             ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
@@ -547,9 +547,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                          }
                      }
                  },
-                FundingStreams = new List<Reference>()
+                FundingStreams = new List<FundingStream>()
                 {
-                    new Reference
+                    new FundingStream
                     {
                         Id = fundingStreamId
                     },

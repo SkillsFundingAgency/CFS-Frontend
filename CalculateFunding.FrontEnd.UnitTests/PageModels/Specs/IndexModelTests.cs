@@ -4,17 +4,18 @@
 
 namespace CalculateFunding.Frontend.PageModels.Specs
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Specs;
-    using CalculateFunding.Frontend.TestData;
+    using CalculateFunding.Frontend.ViewModels.Common;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
 
@@ -25,28 +26,27 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResults_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
+            ISpecificationSearchService searchService = CreateSearchService();
 
-            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
+            SpecificationSearchResultViewModel searchResult = new SpecificationSearchResultViewModel()
+            {
+                CurrentPage = 1,
+                EndItemNumber = 0,
+                Facets = new List<SearchFacetViewModel>(),
+                PagerState = new PagerState(1, 1),
+                Specifications = new List<SpecificationSearchResultItemViewModel>(),
+                StartItemNumber = 1,
+                TotalResults = 0
+            };
 
-            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
-                .Returns(specsResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(yearsResponse);
-
-            IndexModel indexModel = new IndexModel(apiClient);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
-            IActionResult result = await indexModel.OnGetAsync();
+            IActionResult result = await indexModel.OnGetAsync(null, null);
 
             // Assert
             result
@@ -54,161 +54,250 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .NotBeNull();
 
             indexModel
-                .FundingPeriods
-                .Count
-                .Should()
-                .Be(3);
-
-            indexModel
-               .Specifications
-               .Count()
-               .Should()
-               .Be(0);
-        }
-
-        [TestMethod]
-        public async Task OnGetAsync_GivenGetSpecificationsReturnsNoResultsAndParameterSupplied_ReturnsPageResult()
-        {
-            // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
-
-            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
-
-            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
-
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
-                .Returns(specsResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(yearsResponse);
-
-            IndexModel indexModel = new IndexModel(apiClient);
-
-            // Act
-            IActionResult result = await indexModel.OnGetAsync(Arg.Is(fundingPeriods.First().Id));
-
-            // Assert
-            result
+                .InitialSearchResults
                 .Should()
                 .NotBeNull();
 
-            indexModel
-                .FundingPeriods
-                .Count
-                .Should()
-                .Be(3);
-
-            indexModel
-               .Specifications
-               .Count()
-               .Should()
-               .Be(0);
-        }
-
-        [TestMethod]
-        public async Task OnGetAsync_GivenInvalidParameterSupplied_ReturnsPageResult()
-        {
-            // Arrange
-            IEnumerable<Specification> specifications = Enumerable.Empty<Specification>();
-
-            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
-
-            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
-
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
-                .Returns(specsResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(yearsResponse);
-
-            IndexModel indexModel = new IndexModel(apiClient);
-
-            // Act
-            IActionResult result = await indexModel.OnGetAsync("an-id");
-
-            // Assert
-            result
-                .Should()
-                .NotBeNull();
-
-            indexModel
-                .FundingPeriods
-                .Count
-                .Should()
-                .Be(3);
-
-            indexModel
-               .Specifications
-               .Count()
-               .Should()
-               .Be(0);
+            await searchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(
+                    c => c.PageNumber == 1 &&
+                    c.SearchTerm == null));
         }
 
         [TestMethod]
         public async Task OnGetAsync_GivenGetSpecificationsReturnsResults_ReturnsPageResult()
         {
             // Arrange
-            IEnumerable<Specification> specifications = SpecificationTestData.Data();
+            ISpecificationSearchService searchService = CreateSearchService();
 
-            ApiResponse<IEnumerable<SpecificationSummary>> specsResponse = new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.ToList());
+            SpecificationSearchResultViewModel searchResult = new SpecificationSearchResultViewModel()
+            {
+                CurrentPage = 1,
+                EndItemNumber = 0,
+                Facets = new List<SearchFacetViewModel>(),
+                PagerState = new PagerState(1, 1),
+                Specifications = new List<SpecificationSearchResultItemViewModel>()
+                {
+                    new SpecificationSearchResultItemViewModel()
+                    {
+                        Id = "search1",
+                        Name = "search one",
+                        Description = "Description",
+                        LastUpdatedDate = new DateTime(2018, 3, 5, 12, 34, 52),
+                        FundingPeriodId = "fundingPeriodId",
+                        FundingPeriodName = "Funding Period Name",
+                        FundingStreamIds = new[] { "fs1", "fs2" },
+                        FundingStreamNames = new[] { "Funding Stream One", "Funding Stream Two" },
+                        Status = "Draft",
+                    },
+                },
+                StartItemNumber = 1,
+                TotalResults = 0
+            };
 
-            IEnumerable<Reference> fundingPeriods = ReferenceTestData.FundingPeriods();
 
-            ApiResponse<IEnumerable<Reference>> yearsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods.ToArray());
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecifications(Arg.Is(fundingPeriods.First().Id))
-                .Returns(specsResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(yearsResponse);
-
-            IndexModel indexModel = new IndexModel(apiClient);
+            IndexModel indexModel = CreateIndexModel(searchService);
 
             // Act
-            IActionResult result = await indexModel.OnGetAsync();
+            IActionResult result = await indexModel.OnGetAsync(null, null);
 
             // Assert
             result
                 .Should()
+                .BeOfType<PageResult>()
+                .Which
+                .Should()
                 .NotBeNull();
 
             indexModel
-                .FundingPeriods
-                .Count
+                .InitialSearchResults
                 .Should()
-                .Be(3);
+                .NotBeNull();
 
             indexModel
-               .Specifications
-               .Count()
-               .Should()
-               .Be(3);
+                .SearchResults
+                .Should()
+                .BeEquivalentTo(new SpecificationSearchResultViewModel()
+                    {
+                        CurrentPage = 1,
+                        EndItemNumber = 0,
+                        Facets = new List<SearchFacetViewModel>(),
+                        PagerState = new PagerState(1, 1),
+                        Specifications = new List<SpecificationSearchResultItemViewModel>()
+                        {
+                            new SpecificationSearchResultItemViewModel()
+                            {
+                                Id = "search1",
+                                Name = "search one",
+                                Description = "Description",
+                                LastUpdatedDate = new DateTime(2018, 3, 5, 12, 34, 52),
+                                FundingPeriodId = "fundingPeriodId",
+                                FundingPeriodName = "Funding Period Name",
+                                FundingStreamIds = new[] { "fs1", "fs2" },
+                                FundingStreamNames = new[] { "Funding Stream One", "Funding Stream Two" },
+                                Status = "Draft",
+                            },
+                        },
+                        StartItemNumber = 1,
+                        TotalResults = 0
+                });
+
+            await searchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(
+                    c => c.PageNumber == 1 &&
+                    c.SearchTerm == null));
         }
 
-        private static ISpecsApiClient CreateApiClient()
+        [TestMethod]
+        public async Task OnGetAsync_GivenGetSpecificationsSecondPageRequested_ReturnsPageResult()
+        {
+            // Arrange
+            ISpecificationSearchService searchService = CreateSearchService();
+
+            SpecificationSearchResultViewModel searchResult = new SpecificationSearchResultViewModel()
+            {
+                CurrentPage = 2,
+                EndItemNumber = 0,
+                Facets = new List<SearchFacetViewModel>(),
+                PagerState = new PagerState(1, 1),
+                Specifications = new List<SpecificationSearchResultItemViewModel>(),
+                StartItemNumber = 1,
+                TotalResults = 0
+            };
+
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
+
+            IndexModel indexModel = CreateIndexModel(searchService);
+
+            // Act
+            IActionResult result = await indexModel.OnGetAsync(null, 2);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>()
+                .Which
+                .Should()
+                .NotBeNull();
+
+            indexModel
+                .InitialSearchResults
+                .Should()
+                .NotBeNull();
+
+            await searchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(
+                    c => c.PageNumber == 2 &&
+                    c.SearchTerm == null));
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_GivenGetSpecificationsSearchTermRequested_ReturnsPageResult()
+        {
+            // Arrange
+            ISpecificationSearchService searchService = CreateSearchService();
+
+            const string searchTerm = "testTerm";
+
+            SpecificationSearchResultViewModel searchResult = new SpecificationSearchResultViewModel()
+            {
+                CurrentPage = 2,
+                EndItemNumber = 0,
+                Facets = new List<SearchFacetViewModel>(),
+                PagerState = new PagerState(1, 1),
+                Specifications = new List<SpecificationSearchResultItemViewModel>(),
+                StartItemNumber = 1,
+                TotalResults = 0
+            };
+
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
+
+            IndexModel indexModel = CreateIndexModel(searchService);
+
+            // Act
+            IActionResult result = await indexModel.OnGetAsync(searchTerm, null);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>()
+                .Which
+                .Should()
+                .NotBeNull();
+
+            indexModel
+                .InitialSearchResults
+                .Should()
+                .NotBeNull();
+
+            await searchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(
+                    c => c.PageNumber == 1 &&
+                    c.SearchTerm == searchTerm));
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_GivenGetSpecificationsReturnsNullResults_ThenErrorReturned()
+        {
+            // Arrange
+            ISpecificationSearchService searchService = CreateSearchService();
+
+            SpecificationSearchResultViewModel searchResult = null;
+
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
+
+            IndexModel indexModel = CreateIndexModel(searchService);
+
+            // Act
+            IActionResult result = await indexModel.OnGetAsync(null, null);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<InternalServerErrorResult>()
+                .Which
+                .Value
+                .Should()
+                .Be("Search results returned null from API call");
+
+            await searchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(
+                    c => c.PageNumber == 1 &&
+                    c.SearchTerm == null));
+        }
+
+        private static IndexModel CreateIndexModel(
+            ISpecificationSearchService searchService = null,
+            ISpecsApiClient specsApiClient = null)
+        {
+            return new IndexModel(
+                searchService ?? CreateSearchService(),
+                specsApiClient ?? CreateSpecsApiClient());
+        }
+
+        private static ISpecificationSearchService CreateSearchService()
+        {
+            return Substitute.For<ISpecificationSearchService>();
+        }
+
+        private static ISpecsApiClient CreateSpecsApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
-        }
-
-        private static IndexModel CreateIndexModel(ISpecsApiClient apiClient = null)
-        {
-            return new IndexModel(apiClient ?? CreateApiClient());
         }
     }
 }

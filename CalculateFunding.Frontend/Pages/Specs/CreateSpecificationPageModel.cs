@@ -11,7 +11,6 @@
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -43,7 +42,7 @@
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
         {
-            if(!string.IsNullOrWhiteSpace(fundingPeriodId))
+            if (!string.IsNullOrWhiteSpace(fundingPeriodId))
             {
                 FundingPeriodId = fundingPeriodId;
             }
@@ -55,16 +54,6 @@
 
         public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null)
         {
-            if (!string.IsNullOrWhiteSpace(CreateSpecificationViewModel.Name))
-            {
-                ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(CreateSpecificationViewModel.Name);
-
-                if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
-                {
-                    this.ModelState.AddModelError($"{nameof(CreateSpecificationViewModel)}.{nameof(CreateSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
-                }
-            }
-
             if (!ModelState.IsValid)
             {
                 await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
@@ -73,9 +62,23 @@
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
 
-            await _specsClient.CreateSpecification(specification);
+            ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
+            if (result.StatusCode.IsSuccess())
+            {
+                return Redirect($"/specs?operationType=SpecificationCreated&operationId={result.Content.Id}");
+            }
+            else if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                result.AddValidationResultErrors(ModelState);
 
-            return Redirect($"/specs?fundingPeriodId={specification.FundingPeriodId}");
+                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
+
+                return Page();
+            }
+            else
+            {
+                return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
+            }
         }
 
         private async Task PopulateFundingStreams()

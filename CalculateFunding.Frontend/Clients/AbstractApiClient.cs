@@ -126,7 +126,7 @@
                 throw new ArgumentNullException(nameof(url));
             }
 
-            var json = JsonConvert.SerializeObject(request, _serializerSettings);
+            string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
@@ -160,6 +160,24 @@
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient POST: {{url}} ({typeof(TRequest).Name})", url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            if (response == null)
+            {
+                throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");
+            }
+
+            return response.StatusCode;
+        }
+
+        public async Task<HttpStatusCode> PostAsync(string url, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+          
+            _logger.Debug($"ApiClient POST: {{url}}", url);
+            var response = await _httpClient.PostAsync(url, null, cancellationToken);
             if (response == null)
             {
                 throw new HttpRequestException($"Unable to connect to server. Url={_httpClient.BaseAddress.AbsoluteUri}{url}");

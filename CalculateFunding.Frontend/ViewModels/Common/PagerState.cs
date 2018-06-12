@@ -44,6 +44,14 @@
             }
         }
 
+        public int LastPage
+        {
+            get
+            {
+                return _totalPages;
+            }
+        }
+
         public IEnumerable<int> Pages { get; set; }
 
         public int CurrentPage

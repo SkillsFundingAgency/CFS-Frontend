@@ -1,0 +1,25 @@
+﻿<script type="text/template" id="componenttemplate-approvestatus-button">
+    <div class="btn-group">
+        <button type="button" class="btn btn-status btn-status-text" data-bind="css : buttonCssClass, enable: !isLoading()">
+            <span data-bind="text: publishStatus, visible: state() === 'idle'"></span>
+            <span data-bind="visible: state() === 'loading'"><i class="material-icons">timer</i> Loading</span>
+        </button>
+        <button type="button" class="btn dropdown-toggle btn-status" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="css : buttonCssClass, enable: canApprove">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-publishstatus">
+            <li class="dropdown-approved"><a href="#" data-bind="click: approve">Approved</a></li>
+        </ul>
+    </div>
+
+</script>
+
+<script asp-src-include="~/js/component.approveStatusButton.js" asp-append-version="true"></script>
+
+<script type="text/javascript">
+    ko.components.register('approve-status-button', {
+        viewModel: calculateFunding.components.approveStatusButton.ApproveStatusButtonViewModel,
+        template: $('#componenttemplate-approvestatus-button').text()
+    });
+</script>

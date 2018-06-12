@@ -32,6 +32,11 @@
             return GetAsync<IEnumerable<Specification>>($"{_specsPath}/specifications", _cancellationToken);
         }
 
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFunding()
+        {
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specifications-selected-for-funding", _cancellationToken);
+        }
+
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
             return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specification-summaries", _cancellationToken);
@@ -75,11 +80,20 @@
             return PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>($"{_specsPath}/specification-summaries-by-ids", specificationIds);
         }
 
-        public Task<HttpStatusCode> CreateSpecification(CreateSpecificationModel specification)
+        public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+
+            return GetAsync<IEnumerable<SpecificationSummary>>($"{_specsPath}/specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
+        }
+
+        public Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return PostAsync($"{_specsPath}/specifications", specification);
+            return ValidatedPostAsync<Specification, CreateSpecificationModel>($"{_specsPath}/specifications", specification);
         }
 
         public Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification)
@@ -97,11 +111,13 @@
             return PostAsync<Policy, CreatePolicyModel>($"{_specsPath}/policies", policy);
         }
 
-        public Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string policyId, EditSubPolicyModel updatedSubPolicy)
+        public Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy)
         {
-            Guard.ArgumentNotNull(updatedSubPolicy, nameof(updatedSubPolicy));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(subPolicyId, nameof(subPolicyId));
+            Guard.ArgumentNotNull(subPolicy, nameof(subPolicy));
 
-            return ValidatedPutAsync<Policy, EditSubPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={policyId} ", updatedSubPolicy);
+            return ValidatedPutAsync<Policy, EditSubPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={subPolicyId} ", subPolicy);
         }
 
         public Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy)
@@ -111,11 +127,20 @@
             return ValidatedPutAsync<Policy, EditPolicyModel>($"{_specsPath}/policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy); 
         }
 
-        public Task<ApiResponse<Calculation>> CreateCalculation(CreateCalculationModel calculation)
+        public Task<ApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
-            return PostAsync<Calculation, CreateCalculationModel>($"{_specsPath}/calculations", calculation);
+            return PostAsync<Calculation, CalculationCreateModel>($"{_specsPath}/calculations", calculation);
+        }
+
+        public Task<ValidatedApiResponse<Calculation>> UpdateCalculation(string specificationId, string calculationId, CalculationUpdateModel calculation)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+            Guard.ArgumentNotNull(calculation, nameof(calculation));
+
+            return ValidatedPutAsync<Calculation, CalculationUpdateModel>($"{_specsPath}/calculations?specificationId={specificationId}&calculationId={calculationId}", calculation);
         }
 
         public Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
@@ -161,12 +186,12 @@
             return PostAsync<Calculation, CalculationByNameRequestModel>($"{_specsPath}/calculation-by-name", model, _cancellationToken);
         }
 
-        public Task<ApiResponse<Calculation>> GetCalculationById(string specificationId, string calculationId)
+        public Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            return GetAsync<Calculation>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
+            return GetAsync<CalculationCurrentVersion>($"{_specsPath}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
 
         public async Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions)
@@ -175,7 +200,7 @@
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-search", request);
+            ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-dataset-relationships-search", request);
             if (results.StatusCode == HttpStatusCode.OK)
             {
                 PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
@@ -189,6 +214,42 @@
             {
                 return null;
             }
+        }
+
+        public async Task<PagedResult<SpecificationSearchResultItem>> FindSpecifications(SearchFilterRequest filterOptions)
+        {
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<SpecificationSearchResultItem>> results = await PostAsync<SearchResults<SpecificationSearchResultItem>, SearchQueryRequest>($"{_specsPath}/specifications-search", request);
+            if (results.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<SpecificationSearchResultItem> result = new SearchPagedResult<SpecificationSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results,
+                    Facets = results.Content.Facets,
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(model, nameof(model));
+
+            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{_specsPath}/specification-edit-status?specificationId={specificationId}", model);
+        }
+
+        public Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            
+            return PostAsync($"{_specsPath}/select-for-funding?specificationId={specificationId}");
         }
     }
 }

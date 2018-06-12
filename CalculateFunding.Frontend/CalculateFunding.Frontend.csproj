@@ -17,17 +17,23 @@
     <Content Remove="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Scripts\approvals.choose.ts" />
+    <None Remove="Scripts\approvals.viewfunding.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
     <None Remove="Scripts\bootstrap-multiselect.d.ts" />
+    <None Remove="Scripts\calculationspec.create-edit.ts" />
     <None Remove="Scripts\common.d.ts" />
     <None Remove="Scripts\compare.ts" />
+    <None Remove="Scripts\component.approveStatusButton.ts" />
+    <None Remove="Scripts\confirm.funding-specification.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.calcuation-results.ts" />
@@ -35,8 +41,11 @@
     <None Remove="Scripts\search.calculationProviderResults.ts" />
     <None Remove="Scripts\search.datasets.ts" />
     <None Remove="Scripts\search.providers.ts" />
+    <None Remove="Scripts\search.specifications.ts" />
     <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\table.expander.sequential.ts" />
+    <None Remove="Scripts\table.expander.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <None Remove="Scripts\Tests\list-provider-test-results.ts" />
     <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
@@ -112,12 +121,19 @@
     <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
+    <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
     <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
+    <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
+    <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
+    <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
+    <TypeScriptCompile Include="Scripts\policies.ts" />
+    <TypeScriptCompile Include="Scripts\search.specifications.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
     <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
@@ -131,9 +147,22 @@
     <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\table.expander.sequential.ts" />
+    <TypeScriptCompile Include="Scripts\table.expander.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <TypeScriptCompile Include="Scripts\search.providerTestResults.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Pages\Specs\EditCalculation.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTablePagerPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTableRowCountPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup>

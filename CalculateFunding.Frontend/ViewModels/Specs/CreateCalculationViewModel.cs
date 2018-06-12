@@ -20,5 +20,7 @@
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationTypeRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string CalculationType { get; set; }
+
+        public bool IsPublic { get; set; }
     }
 }

@@ -40,17 +40,17 @@
 
         public bool HasProviderDatasetsAssigned { get; set; }
 
-        public bool ShowSuccessMessage { get; set; }
+        public PoliciesPageBannerOperationType? OperationType { get; set; }
 
-        public string PolicyType { get; set; }
+        public string OperationEntityName { get; set; }
 
-        public async Task<IActionResult> OnGet(string specificationId, bool wasSuccess = false , string policyType="Policy")
+        public string OperationEntityType { get; set; }
+
+        public async Task<IActionResult> OnGet(string specificationId, PoliciesPageBannerOperationType? operationType, string operationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ShowSuccessMessage = wasSuccess;
-
-            PolicyType = policyType; 
+            OperationType = operationType;
 
             Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
 
@@ -106,6 +106,81 @@
             this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
+
+            if (operationType.HasValue)
+            {
+                if (string.IsNullOrWhiteSpace(operationId))
+                {
+                    return new PreconditionFailedResult("Operation ID not provided");
+                }
+
+                switch (operationType.Value)
+                {
+                    case PoliciesPageBannerOperationType.SpecificationUpdated:
+                        OperationEntityName = Specification.Name;
+                        OperationEntityType = "Specification";
+                        break;
+                    case PoliciesPageBannerOperationType.PolicyUpdated:
+                        OperationEntityName = Specification.Policies.Where(p => p.Id == operationId).FirstOrDefault()?.Name;
+                        OperationEntityType = "Policy";
+                        break;
+                    case PoliciesPageBannerOperationType.SubpolicyUpdated:
+                        if (Specification.Policies.AnyWithNullCheck())
+                        {
+                            foreach (PolicyViewModel policy in Specification.Policies)
+                            {
+                                if (policy.SubPolicies.AnyWithNullCheck())
+                                {
+                                    foreach (PolicyViewModel subpolicy in policy.SubPolicies)
+                                    {
+                                        if(subpolicy.Id == operationId)
+                                        {
+                                            OperationEntityName = subpolicy.Name;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        OperationEntityType = "Subpolicy";
+                        break;
+                    case PoliciesPageBannerOperationType.CalculationUpdated:
+                        if (Specification.Policies.AnyWithNullCheck())
+                        {
+                            foreach (PolicyViewModel policy in Specification.Policies)
+                            {
+                                if (policy.SubPolicies.AnyWithNullCheck())
+                                {
+                                    foreach (PolicyViewModel subpolicy in policy.SubPolicies)
+                                    {
+                                        if (subpolicy.Calculations.AnyWithNullCheck())
+                                        {
+                                            foreach(CalculationViewModel calculation in subpolicy.Calculations)
+                                            {
+                                                if(calculation.Id == operationId)
+                                                {
+                                                    OperationEntityName = calculation.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (policy.Calculations.AnyWithNullCheck())
+                                {
+                                    foreach (CalculationViewModel calculation in policy.Calculations)
+                                    {
+                                        if (calculation.Id == operationId)
+                                        {
+                                            OperationEntityName = calculation.Name;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        OperationEntityType = "Calculation specification";
+                        break;
+                }
+            }
 
             return Page();
         }

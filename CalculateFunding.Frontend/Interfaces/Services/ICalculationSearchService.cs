@@ -1,4 +1,4 @@
-﻿namespace CalculateFunding.Frontend.Services
+﻿namespace CalculateFunding.Frontend.Interfaces.Services
 {
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.ViewModels.Calculations;

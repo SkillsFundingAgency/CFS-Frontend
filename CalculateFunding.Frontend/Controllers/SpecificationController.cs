@@ -1,10 +1,13 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -48,6 +51,45 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(result);
+        }
+
+
+        [Route("api/specs/{specificationId}/status")]
+        [HttpPut]
+        public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+
+            ValidatedApiResponse<PublishStatusResult> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
+
+        [Route("api/specs/{specificationId}/selectforfunding")]
+        [HttpPost]
+        public async Task<IActionResult> SelectSpecificationForfunding(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            HttpStatusCode statusCode = await _specsClient.SelectSpecificationForFunding(specificationId);
+
+            if (statusCode == HttpStatusCode.NoContent)
+            {
+                return NoContent();
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
+            }
         }
     }
 }

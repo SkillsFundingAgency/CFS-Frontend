@@ -11,6 +11,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using Castle.Core.Logging;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
@@ -94,7 +95,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 SourceCode = "Test Source Code"
             };
 
-            Frontend.Clients.SpecsClient.Models.Calculation specsCalculation = new Frontend.Clients.SpecsClient.Models.Calculation()
+            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -107,7 +108,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
             Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
             {
@@ -169,7 +170,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Number
             };
 
-            Frontend.Clients.SpecsClient.Models.Calculation specsCalculation = new Frontend.Clients.SpecsClient.Models.Calculation()
+            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -182,7 +183,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
 
@@ -198,7 +199,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
             pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Number);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Number);
         }
 
         [TestMethod]
@@ -222,7 +223,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
             };
 
-            Frontend.Clients.SpecsClient.Models.Calculation specsCalculation = new Frontend.Clients.SpecsClient.Models.Calculation()
+            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -235,7 +236,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper);
 
@@ -251,7 +252,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
             pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Funding);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Funding);
         }
 
         [TestMethod]

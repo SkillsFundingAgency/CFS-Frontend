@@ -101,7 +101,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "3",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4
@@ -110,7 +110,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IEnumerable<int> versions = new List<int> { 1, 2 };
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -124,7 +124,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
              .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.NotFound, specCalculation));
+             .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.NotFound, specCalculation));
 
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
@@ -156,7 +156,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "3",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4
@@ -165,7 +165,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IEnumerable<int> versions = new List<int> { 1 };  // Not passing two versionIDs in the versions array
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -179,7 +179,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
              .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));
+             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specCalculation));
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
@@ -210,7 +210,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 Name = "Specs Calculation",
                 FundingPeriodName = "2018/19",
                 SpecificationId = "1",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 LastModifiedBy = new Reference("1", "Matt Vallily"),
                 SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product  Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
                 Version = 4
@@ -219,7 +219,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IEnumerable<int> versions = new List<int> { 1, 2 };
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.Calculation specCalculation = new Clients.SpecsClient.Models.Calculation()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -257,7 +257,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
              .GetCalculationById("1", calculationId)
-             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.Calculation>(System.Net.HttpStatusCode.OK, specCalculation));  // CalculateFunding.Frontend.Clients.SpecsClient.Models
+             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specCalculation));  // CalculateFunding.Frontend.Clients.SpecsClient.Models
 
             calcsClient
              .GetMultipleVersionsByCalculationId(versions, calculationId)

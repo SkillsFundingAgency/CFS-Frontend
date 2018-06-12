@@ -1,19 +1,18 @@
 namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using System.Net;
-    using System.Threading.Tasks;
     using Serilog;
-    using System;
-    using CalculateFunding.Frontend.Extensions;
-    using System.Collections.Generic;
 
     public class EditPolicyPageModel : PageModel
     {
@@ -105,18 +104,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (updatePolicyResult.StatusCode == HttpStatusCode.OK)
             {
-                return Redirect($"/specs/policies/{specificationId}&wasSuccess=true&policyType=Policy");
+                return Redirect($"/specs/policies/{specificationId}?operationType=PolicyUpdated&operationId={updatePolicyResult.Content.Id}");
             }
             else if (updatePolicyResult.StatusCode == HttpStatusCode.BadRequest)
             {
-                foreach (var validationResult in updatePolicyResult.ModelState)
-                {
-                    List<string> errors = new List<string>(validationResult.Value);
-                    for (int i = 0; i < errors.Count; i++)
-                    {
-                        ModelState.AddModelError($"{validationResult.Key}.{i}", errors[i]);
-                    }
-                }
+                updatePolicyResult.AddValidationResultErrors(ModelState);
 
                 Specification specification = await GetSpecification(specificationId);
 

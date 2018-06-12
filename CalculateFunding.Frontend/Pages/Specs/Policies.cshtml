@@ -1,6 +1,7 @@
 ﻿@page "{specificationId}"
 @model CalculateFunding.Frontend.Pages.Specs.PoliciesModel
 @using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.ViewModels.Specs
 @{
     ViewData["Title"] = "Policies";
 }
@@ -15,154 +16,22 @@
         </ol>
     </div>
 }
-@section BannerLeft{
-    <h1 class="hero-title"> @Model.Specification.Name </h1>
-    <p class="hero-description ">@PageText.ManagePolicies</p>
-    <p class="hero-description">Funding Period: @Model.Specification.FundingPeriod.Name</p>
-    <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
-}
 
-<div class="row manage-policy">
+@section BannerWhole {
+    <div class="banner-link-container">
+        <div class="banner-link-left-container">
+            <p class="hero-text">@Model.Specification.FundingPeriod.Name</p>
 
-    <div class="col-xs-12 col-sm-9">
-        <div class="row view-policy">
-            <p><strong class="policy-create-text">Create a policy for @Model.Specification.Name:</strong></p>
-            <p class="policy-spec-what withjs-hide">What is @Model.Specification.Name?</p>
-            <div class="inline-collapse-container spacing-15-bottom">
-                <div class="inline-collapse-heading withjs-show">
-                    <i class="inline-collapse-arrow"></i>
-                    <span>What is @Model.Specification.Name?</span>
-                </div>
-                <div class="inline-collapse-contents withjs-hide policy-spec-description">
-                    @Model.Specification.Description
-                </div>
-            </div>
-            @if (Model.ShowSuccessMessage)
+            <h1 class="hero-title"> @Model.Specification.Name </h1>
+            <p class="hero-text ">@PageText.FundingStreams:</p>
+            @foreach (var fundingStream in Model.Specification.FundingStreams)
             {
-                <div class="alert alert--success">
-                    <span>@Model.PolicyType has been updated successfully</span> <a id="dismiss-link" class="float-right" href="~/specs/policies/@Model.Specification.Id">Dismiss</a>
-                </div>
+                <p class="hero-subtext">@fundingStream.Name</p>
             }
-
-            <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
-                <li class="nav-item active">
-                    <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">View policies</a>
-                </li>
-                <li class="nav-item">
-                    <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">
-                        <span class="provider-datasets-warning-tab">
-                            <span>Datasets</span>
-                            @if (!Model.HasProviderDatasetsAssigned)
-                            {
-                                <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
-                            }
-                        </span>
-                    </a>
-                </li>
-            </ul>
-            <br />
-            <div>
-
-                <p class="create-policy-button-container"><a href="/specs/createpolicy/@Model.Specification.Id" class="button">Create policy</a></p>
-                @if (!Model.Specification.Policies.IsNullOrEmpty())
-                {
-                    <p class="text-right">
-                        <a href="#" class="policy-list-openall withjs-show">Open All</a>
-                    </p>
-                }
-                <div class="policy-list">
-                    @if (!Model.Specification.Policies.IsNullOrEmpty())
-                    {
-                        @foreach (var policy in Model.Specification.Policies)
-                        {
-                            <div class="jscollapse-container policy-list-item">
-                                <div class="policy-list-header jscollapse-header">
-                                    <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="policy-list-edit-link">Edit policy</a>
-                                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
-                                        <a name="policy-@policy.Id"></a>
-                                        <a class="policy-title" href="/calculations/@policy.Id">@policy.Name</a>
-                                    </h2>
-                                </div>
-                                <div class="jscollapse-body">
-                                    <p class="policy-description">
-                                        @policy.Description
-                                    </p>
-
-                                    @if (policy.Calculations != null && policy.Calculations.Any())
-                                    {
-                                        <div class="calculation-container">
-                                            <table class="calculation-table table table-bordered table-condensed">
-                                                @foreach (var calculation in policy.Calculations)
-                                                {
-                                                    <tr>
-                                                        <td class="calculation-name"><a name="calculation-@calculation.Id"></a><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
-                                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
-                                                    </tr>
-                                                }
-                                            </table>
-                                        </div>
-                                    }
-
-                                    @if (policy.SubPolicies != null && policy.SubPolicies.Any())
-                                    {
-                                        @foreach (var subPolicy in policy.SubPolicies)
-                                        {
-                                            <div class="subpolicy-container jscollapse-container">
-                                                <div class="subpolicy-list-header jscollapse-header">
-
-                                                    <a href="/specs/editsubPolicy/@Model.Specification.Id/@subPolicy.Id/@policy.Id" class="policy-list-edit-link">Edit sub policy</a>
-                                                    <h2 class="policy-list-title-container collapse-title jscollapse-active">
-                                                        <a name="policy-@subPolicy.Id"></a>
-                                                        <a class="policy-title" href="/specs/editsubpolicy/@subPolicy.Id">@subPolicy.Name</a>
-                                                    </h2>
-
-                                                </div>
-                                                <div class="jscollapse-body">
-                                                    <p class="subpolicy-description">
-                                                        @subPolicy.Description
-                                                    </p>
-
-                                                    @if (subPolicy.Calculations != null && subPolicy.Calculations.Any())
-                                                    {
-                                                        <div class="calculation-container">
-                                                            <table class="calculation-table table table-bordered table-condensed">
-                                                                @foreach (var calculation in subPolicy.Calculations)
-                                                                {
-                                                                    <tr>
-                                                                        <td class="calculation-name"><a name="calculation-@calculation.Id" /><a href="/calculations/@calculation.Id" class="calculation-link">@calculation.Name</a></td>
-                                                                        <td class="claculation-description"><span class="calculation-description">@calculation.Description</span></td>
-                                                                    </tr>
-                                                                }
-                                                            </table>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <p>
-                            <a href="/specs/createPolicy/@Model.Specification.Id">No policies exists, create a policy</a>
-                        </p>
-
-                    }
-                </div>
-
-            </div>
-
         </div>
-    </div>
-
-    <div class="col-xs-12 col-sm-3">
-        <div class="rightcolumn-container">
-            <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
+        <div class="banner-link-right-container">
             <div>
-                <a href="/specs/editspecification/@Model.Specification.Id">Edit specification</a>
+                <a href="/specs/editspecification/@Model.Specification.Id&returnPage=ManagePolicies">Edit specification</a>
             </div>
             <div>
                 <a href="/specs/createPolicy/@Model.Specification.Id">Create policy</a>
@@ -180,64 +49,273 @@
                 <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Create dataset</a>
             </div>
         </div>
-
     </div>
 
+}
+
+@if (Model.OperationType.HasValue)
+{
+    <div class="notification-panel">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i> @Model.OperationEntityType @Model.OperationEntityName updated
+        </span>
+    </div>
+}
+
+<div class="row">
+    <div class="col-xs-12 policy-spec-what ">
+        <p class="withjs-hide">What is @Model.Specification.Name?</p>
+        <div class="inline-collapse-container spacing-15-bottom">
+            <div class="inline-collapse-heading withjs-show">
+                <i class="inline-collapse-arrow"></i>
+                <span>What is @Model.Specification.Name?</span>
+            </div>
+            <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                @Model.Specification.Description
+            </div>
+        </div>
+    </div>
+</div>
+<ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
+    <li class="nav-item active">
+        <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">Policy structure</a>
+    </li>
+    <li class="nav-item">
+        <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">
+            <span class="provider-datasets-warning-tab">
+                <span>Datasets</span>
+                @if (!Model.HasProviderDatasetsAssigned)
+                {
+                    <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
+                }
+            </span>
+        </a>
+    </li>
+    <li class="nav-item-right" id="approve-status">
+        <approve-status-button params="publishStatus : '@Model.Specification.PublishStatus', stateChangeUrl : '/api/specs/@Model.Specification.Id/status'"></approve-status-button>
+    </li>
+</ul>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="jump-to-container">
+            <div>Policy:</div>
+            <div class="pull-right"><a href="#" data-action="expand" id="expandCollapseAll">Expand all</a></div>
+            <div>
+                <select id="policy-jump">
+                    <option>Jump to</option>
+                    @foreach (var policy in Model.Specification.Policies)
+                    {
+                        <option value="@policy.Id">@policy.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <table class="cf">
+            <thead class="table-primary-border">
+                <tr>
+                    <th class="table-primary-border"></th>
+                    <th class="text-center no-border">Name</th>
+                    <th colspan="3" class="text-center">Description</th>
+                    <th class="text-center">Last Edited</th>
+                    <th></th>
+                </tr>
+            </thead>
+            @{
+                List<PolicyViewModel> policies = new List<PolicyViewModel>(Model.Specification.Policies);
+            }
+            @for (int p = 0; p < policies.Count; p++)
+            {
+                PolicyViewModel policy = policies[p];
+
+                <tr class="data-policy-container cr-table-primary-highlight">
+                    <td class="table-primary-border"><a name="policy-@policy.Id"></a></td>
+                    <td class="no-border min-width-sm data-policy-name">Policy</td>
+                    <td class="min-width-md">
+                        <span class="button-split-container">
+                            <span class="button-split-icon">
+                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons">edit</i></a>
+                            </span>
+                            <span class="button-split-text">
+                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink"><span class="data-policy-name">@policy.Name</span></a>
+                            </span>
+                        </span>
+                    </td>
+                    <td colspan="2" class="data-policy-description-firstline">@policy.DescriptionFirstLine</td>
+                    <td class="text-nowrap data-policy-lastupdated">
+                        <span class="datetime-split-container">
+                            <span class="datetime-split-date data-policy-lastupdated-date">@policy.LastUpdatedDateFormatted</span>
+                            <span class="datetime-split-time data-policy-lastupdated-time">@policy.LastUpdatedTimeFormatted</span>
+                        </span>
+                    </td>
+                    <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
+                </tr>
+                <tr class="cr-table-primary-highlight expander-container">
+                    <td class="table-primary-border"></td>
+                    <td colspan="6" class="no-border data-policy-description">
+                        @policy.Description.ReplaceLineBreaksForHtml()
+                    </td>
+                </tr>
+                if (policy.Calculations.AnyWithNullCheck())
+                {
+                    List<CalculationViewModel> calculations = new List<CalculationViewModel>(policy.Calculations);
+
+                    for (int i = 0; i < calculations.Count; i++)
+                    {
+                        CalculationViewModel calculation = calculations[i];
+
+                        <tr class="cr-table-primary-highlight data-calculation-container">
+                            <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
+                            @if (i == 0)
+                            {
+                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
+                                    <div class="table-type-header">Calcuation Specification</div>
+                                </td>
+                            }
+
+                            <td>
+                                <span class="button-split-container">
+                                    <span class="button-split-icon">
+                                        <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
+                                    </span>
+                                    <span class="button-split-text">
+                                        <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="data-calculation-description-firstline">@calculation.DescriptionFirstLine</td>
+                            <td class="data-calculation-type">@calculation.CalculationType</td>
+                            <td class="text-nowrap data-calculation-lastupdated">
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-calculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-calculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
+                        </tr>
+                        <tr class="cr-table-primary-highlight expander-container">
+                            <td class="table-primary-border"></td>
+
+                            <td colspan="5" class="">
+                                @calculation.Description.ReplaceLineBreaksForHtml()
+                            </td>
+                        </tr>
+                    }
+                }
+
+                @if (policy.SubPolicies.AnyWithNullCheck())
+                {
+                    List<PolicyViewModel> subpolicies = new List<PolicyViewModel>(policy.SubPolicies);
+                    for (int i = 0; i < subpolicies.Count; i++)
+                    {
+                        PolicyViewModel subpolicy = subpolicies[i];
+
+                        <tr class="cr-table-primary-highlight data-subpolicy-container">
+                            <td class="table-primary-border"><a name="policy-@subpolicy.Id"></a></td>
+                            @if (i == 0)
+                            {
+                                <td id="subpolicies-for-@policy.Id" rowspan="@subpolicies.Count" class="data-subpolicy-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@subpolicies.Count" data-openItems="0">
+                                    <div class="table-type-header">Subpolicy</div>
+                                </td>
+                            }
+                            <td>
+                                <span class="button-split-container">
+                                    <span class="button-split-icon">
+                                        <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink-icon"><i class="material-icons">edit</i></a>
+                                    </span>
+                                    <span class="button-split-text">
+                                        <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink"><span class="data-subpolicy-name">@subpolicy.Name</span></a>
+                                    </span>
+                                </span>
+                            </td>
+                            <td colspan="2" class="data-subpolicy-description-firstline">@subpolicy.DescriptionFirstLine</td>
+                            <td class="text-nowrap data-subpolicy-lastupdated">
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-subpolicy-lastupdated-date">@subpolicy.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-subpolicy-lastupdated-time">@subpolicy.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td class="expander-trigger-cell" data-multi-row-header="subpolicies-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
+                        </tr>
+                        <tr class="cr-table-primary-highlight expander-container">
+                            <td class="table-primary-border"></td>
+                            <td colspan="6" class="no-border data-subpolicy-description">
+                                @subpolicy.Description.ReplaceLineBreaksForHtml()
+                            </td>
+                        </tr>
+                        if (subpolicy.Calculations.AnyWithNullCheck())
+                        {
+                            List<CalculationViewModel> calculations = new List<CalculationViewModel>(subpolicy.Calculations);
+
+                            for (int k = 0; k < calculations.Count; k++)
+                            {
+                                CalculationViewModel calculation = calculations[k];
+
+                                <tr class="cr-table-primary-highlight data-subpolicycalculation-container">
+                                    <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
+                                    @if (k == 0)
+                                    {
+                                        <td id="calcs-for-@subpolicy.Id" rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
+                                            <div class="table-type-header">Calcuation Specification</div>
+                                        </td>
+                                    }
+                                    <td>
+                                        <span class="button-split-container">
+                                            <span class="button-split-icon">
+                                                <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
+                                            </span>
+                                            <span class="button-split-text">
+                                                <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td class="data-subpolicycalculation-description-firstline">@calculation.DescriptionFirstLine</td>
+                                    <td class="data-subpolicycalculation-type">@calculation.CalculationType</td>
+                                    <td class="data-subpolicycalculation-lastupdated">
+                                        <span class="datetime-split-container">
+                                            <span class="datetime-split-date data-subpolicycalculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
+                                            <span class="datetime-split-time data-subpolicycalculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
+                                        </span>
+                                    </td>
+                                    <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@subpolicy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
+                                </tr>
+                                <tr class="cr-table-primary-highlight expander-container">
+                                    <td class="table-primary-border"></td>
+
+                                    <td colspan="5" class="">
+                                        @calculation.Description.ReplaceLineBreaksForHtml()
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                }
+
+                @if (p <= policies.Count - 2)
+                {
+                    <tr>
+                        <td colspan="6" class="no-border-both"></td>
+                    </tr>
+                }
+            }
+
+        </table>
+    </div>
 </div>
 
-
 @section scripts{
+    <script type="text/javascript" asp-src-include="~/js/policies.js" asp-append-version="true"></script>
+    <script type="text/javascript" asp-src-include="~/js/table.expander.js" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @Html.Partial("_ApproveStatusButtonPartial")
 
     <script type="text/javascript">
-
-
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");
 
         $(".jscollapse-header").addClass("jscollapse-jsenabled-header");
         $(".jscollapse-active").addClass("jscollapse-jsenabled-active");
 
-        $(".policy-list-openall").on("click", function (e) {
-            $(".jscollapse-container").find(".jscollapse-body").removeClass("hidden");
-            $(".jscollapse-container").find(".jscollapse-header").children(".collapse-title").addClass("jscollapse-jsenabled-active");
-
-            e.preventDefault();
-        });
-
-        $(".collapse-title").on("click", function (e, selector, data) {
-
-            var $this = $(e.target);
-            var setActive = !$this.hasClass("jscollapse-jsenabled-active");
-            if (!setActive) {
-                $this.removeClass("jscollapse-jsenabled-active");
-            }
-            else {
-                $this.addClass("jscollapse-jsenabled-active");
-            }
-
-            var headerElement = $this.parent();
-            if (headerElement.hasClass("jscollapse-header")) {
-
-                var containerElement = headerElement.parent();
-                if (containerElement.hasClass("jscollapse-container")) {
-                    var bodyElement = containerElement.children(".jscollapse-body");
-                    if (bodyElement) {
-                        if (setActive) {
-                            bodyElement.removeClass("hidden");
-                        }
-                        else {
-                            bodyElement.addClass("hidden");
-                        }
-
-                    }
-                }
-            }
-        });
+        ko.applyBindings({}, document.getElementById('approve-status'));
     </script>
 
-    <script type="text/javascript">
-        $('#dismiss-link').on('click', function (e) {
-            e.preventDefault();
-            $('.alert').hide();
-        });
-    </script>
 }
