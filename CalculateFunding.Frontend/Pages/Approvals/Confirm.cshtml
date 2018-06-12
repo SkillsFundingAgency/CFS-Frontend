@@ -7,14 +7,16 @@
 
 
 @section FormBannerLeft{
-    <h1 class="heading-large">Choose @Model.SpecificationViewModel.Name</h1>
+<h1 class="heading-large">Confirm selection: @Model.SpecificationViewModel.Name</h1>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Approve Funding</a></li>
+            <li><a href="/approvals">Funding approvals</a></li>
+            <li><a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Choose funding specification</a></li>
+            <li>Confirm selection</li>
         </ol>
     </div>
 }
@@ -22,33 +24,40 @@
 <div id="main-container">
 
     <div class="row confirm-select-fundingstreams-container">
-        <div class="col-sm-9 col-md-6">
+        <div class="col-sm-12 col-md-9">
+            <p>
+                You've selected @Model.SpecificationViewModel.Name for <strong>@Model.SpecificationViewModel.FundingPeriod.Name</strong> with funding streams:
+            </p>
 
             @foreach (string fundingStream in Model.SpecificationViewModel.FundingStreams.Select(m => m.Name))
             {
-                @:- @fundingStream <br />
+                <strong>@fundingStream</strong> <br />
             }
         </div>
     </div>
 
     <div class="row">
-        <div class="col-sm-9 col-md-6">
-            <p>
-                The Calculate funding service will generate an Approve funding page.
-            </p>
+        <div class="col-sm-12 col-md-9">
+
             <p>
                 Check funding amounts before confirming, include those from draft or updated calculations as they will be included.
             </p>
             <p>
-                The total funding for the specification and any allocation lines or provider results that contribute to it will be locked for this funsing. Further changes to calculations will not affect the amount shown on the Approve funding page.
-            </p>
-            <p>
-                If any specification for @Model.SpecificationViewModel.FundingPeriod.Name shares a funding stream with this specification you wont be able to choose it.
+                If you confirm this specification the system will generate an approve funding page with a held status.<br />
+                Funding values will not be published to providers at this point.
             </p>
             <div>
-                <div class="icon-confirm-select-funding-container"><i class="material-icons">error</i></div><div><strong>Once you confirm a specification you cannot change your choice or deselect this specification</strong>.</div>
+                You will not be able to:<br />
+                <ul class="confirm-statement-list">
+                    <li>choose a specification for this funding period if it has a funding stream used by this specification</li>
+                    <li>undo choosing this specification</li>
+                </ul>
             </div>
-            <p class="form-submit-container"><button type="button" class="button" id="confirm-button">Choose this specification</button> <a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Back</a></p>
+            <div>
+                <div class="icon-confirm-select-funding-container"><i class="material-icons">error</i></div><div><strong>Once you confirm a specification you cannot change your choice</strong>.</div>
+            </div>
+
+            <p class="form-submit-container"><button type="button" class="button" id="confirm-button">Choose this specification</button> <a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Back - do not choose</a></p>
         </div>
     </div>
 

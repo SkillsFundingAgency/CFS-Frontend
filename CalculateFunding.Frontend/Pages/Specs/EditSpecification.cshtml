@@ -44,7 +44,11 @@
                     <div class="form-group">
 
                         <label asp-for="EditSpecificationViewModel.FundingPeriodId">Funding period</label>
-                        <select asp-items="@(Model.FundingPeriods)" asp-for="EditSpecificationViewModel.FundingPeriodId" class="form-control">
+                        @if (Model.EditSpecificationViewModel.IsSelectedForFunding)
+                        {
+                            <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">You can't change this as this specification has been chosen for a funding period</span></h4>
+                        }
+                        <select asp-items="@(Model.FundingPeriods)" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" asp-for="EditSpecificationViewModel.FundingPeriodId" class="form-control">
                             <option></option>
                         </select>
                     </div>
@@ -56,8 +60,8 @@
                 <div gds-validationblock-for="EditSpecificationViewModel.FundingStreamIds">
                     <div class="form-group">
                         <label asp-for="EditSpecificationViewModel.FundingStreamIds">Funding stream</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Deleting a funding stream will break the specification's funding calculations</span></h4>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">@(Model.EditSpecificationViewModel.IsSelectedForFunding ? "You can't change this as this specification has been chosen for a funding period" : "Deleting a funding stream will break the specification's funding calculations")</span></h4>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamIds" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control gds-select-multiple"></select>
                     </div>
                 </div>
             </div>

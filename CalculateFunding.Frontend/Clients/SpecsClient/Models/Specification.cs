@@ -26,5 +26,9 @@
 
         [JsonProperty("publishStatus")]
         public PublishStatus PublishStatus { get; set; }
+
+        [JsonProperty("isSelectedForFunding")]
+        public bool IsSelectedForFunding { get; set; }
+
     }
 }
