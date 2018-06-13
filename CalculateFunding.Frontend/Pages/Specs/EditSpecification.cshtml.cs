@@ -49,6 +49,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
                 EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
                 EditSpecificationViewModel.OriginalFundingStreams = string.Join(",", EditSpecificationViewModel.FundingStreamIds);
+                EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
 
                 await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamIds));
 
@@ -70,6 +71,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 {
                     this.ModelState.AddModelError($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
                 }
+            }
+
+            if (EditSpecificationViewModel.IsSelectedForFunding)
+            {
+                ModelState.Remove($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.FundingPeriodId)}");
+                ModelState.Remove($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.FundingStreamIds)}");
+
+                EditSpecificationViewModel.FundingPeriodId = EditSpecificationViewModel.OriginalFundingPeriodId;
+                EditSpecificationViewModel.FundingStreamIds = EditSpecificationViewModel.OriginalFundingStreams.Split(",").ToArraySafe();
             }
 
             if (!ModelState.IsValid)

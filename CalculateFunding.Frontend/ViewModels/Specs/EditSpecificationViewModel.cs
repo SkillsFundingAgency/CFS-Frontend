@@ -12,6 +12,8 @@
 
         public string OriginalFundingStreams { get; set; }
 
+        public string OriginalFundingPeriodId { get; set; }
+
         public bool IsSelectedForFunding { get; set; }
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationNameRequired), ErrorMessageResourceType = typeof(ValidationMessages))]

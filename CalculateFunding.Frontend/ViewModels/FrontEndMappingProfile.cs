@@ -140,6 +140,7 @@
                 .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
                 .ForMember(m => m.OriginalFundingStreams, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingPeriodId, opt => opt.Ignore())
                 .AfterMap((Specification source, EditSpecificationViewModel destination) =>
                 {
                     destination.FundingPeriodId = source.FundingPeriod.Id;

@@ -25,6 +25,8 @@
         <form method="post" class="form">
             <input asp-for="EditSpecificationViewModel.OriginalSpecificationName" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalFundingStreams" type="hidden" />
+            <input asp-for="EditSpecificationViewModel.OriginalFundingPeriodId" type="hidden" />
+            <input asp-for="EditSpecificationViewModel.IsSelectedForFunding" type="hidden" />
             <div gds-validation-summary="All">
             </div>
             <div>
