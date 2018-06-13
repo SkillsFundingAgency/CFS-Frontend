@@ -1,4 +1,4 @@
-﻿@charset "UTF-8";
+@charset "UTF-8";
 @import url('govuk_bootstrap.css');
 @font-face {
   font-family: GDS-Logo;
@@ -2996,7 +2996,8 @@ label {
   display: inline-block;
   max-width: 100%;
   margin-bottom: 5px;
-  font-weight: bold; }
+  font-weight: bold;
+  }
 
 input[type="search"] {
   -webkit-box-sizing: border-box;

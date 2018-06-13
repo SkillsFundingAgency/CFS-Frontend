@@ -25,7 +25,7 @@
     @Html.Partial("_PageBannerOperationPartial", Model.PageBannerOperation)
 }
 
-<div class="viewfunding-page-container">
+<div class="viewfunding-page-container" id="viewfunding-page-container">
 
     <form method="get" action="/approvals/viewfunding">
         <div class="table-filter-container">
@@ -36,16 +36,25 @@
                         <option></option>
                     </select>
                 </div>
+                <div class="col-xs-4 col-xs-offset-4 text-right">
+                    <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" disabled>Approve</button>
+                    <button id="publish" class="button approvalstatus-button approvalstatus-button-publish" disabled>Publish</button>
+                </div>
             </div>
         </div>
     </form>
     <table class="cf">
         <thead>
             <tr>
-                <th rowspan="2">Provider name</th>
-                <th rowspan="2">UKPRN</th>
-                <th colspan="4" class="text-center">Allocation line statuses</th>
-                <th rowspan="2" class="funding-header">Specification funding</th>
+                <th rowspan="2" class="valign-top">
+                    <div>Provider name</div>
+                    <div class="spacing-15-top">
+                        <input type="checkbox" id="selectAll"/> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
+                    </div>
+                </th>
+                <th rowspan="2" class="valign-top">UKPRN</th>
+                <th colspan="4" class="text-center valign-top">Allocation line statuses</th>
+                <th rowspan="2" class="funding-header valign-top">Specification funding</th>
                 <th rowspan="2"></th>
             </tr>
             <tr>
@@ -62,7 +71,9 @@
                 @foreach (PublishedProviderResultViewModel provider in Model.Results)
                 {
                     <tr class="expander-trigger-container">
-                        <td class="view-funding-provider-border">@provider.ProviderName</td>
+                        <td class="view-funding-provider-border">
+                            <input type="checkbox" id="checkbox-provider-@provider.ProviderId" class="target-checkbox-provider" data-providerid="@provider.ProviderId" /> <label for="checkbox-provider-@provider.ProviderId" class="inline-table-label data-provider-name">@provider.ProviderName</label>
+                        </td>
                         <td>@provider.Ukprn</td>
                         <td class="text-center @(provider.NumberHeld > 0 ? "status-held" : "")">@provider.NumberHeld/@provider.TotalAllocationLines</td>
                         <td class="text-center @(provider.NumberApproved > 0 ? "status-approved" : "")">@provider.NumberApproved/@provider.TotalAllocationLines</td>
@@ -90,7 +101,9 @@
                     @foreach (PublishedFundingStreamResultViewModel fundingStream in provider.FundingStreamResults)
                     {
                         <tr class="expander-container">
-                            <td colspan="2">@fundingStream.FundingStreamName</td>
+                            <td colspan="2">
+                                <input type="checkbox" id="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="target-checkbox-fundingstream" data-providerid="@provider.ProviderId" data-fundingstreamid="@fundingStream.FundingStreamId" /> <label for="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="inline-table-label data-fundingstream-name">@fundingStream.FundingStreamName</label>
+                            </td>
                             <td class="text-center @(fundingStream.NumberHeld > 0 ? "status-held" : "")">@fundingStream.NumberHeld/@fundingStream.TotalAllocationLines</td>
                             <td class="text-center @(fundingStream.NumberApproved > 0 ? "status-held" : "")">@fundingStream.NumberApproved/@fundingStream.TotalAllocationLines</td>
                             <td class="text-center @(fundingStream.NumberPublished > 0 ? "status-published" : "")">@fundingStream.NumberPublished/@fundingStream.TotalAllocationLines</td>
@@ -105,7 +118,9 @@
                         @foreach (PublishedAllocationLineResultViewModel allocationLine in fundingStream.AllocationLineResults)
                         {
                             <tr class="expander-container">
-                                <td colspan="2">@allocationLine.AllocationLineName</td>
+                                <td colspan="2">
+                                    <input type="checkbox" id="checkbox-allocationline-@provider.ProviderId-@fundingStream.FundingStreamId-@allocationLine.AllocationLineId" class="target-checkbox-allocationline" data-providerid="@provider.ProviderId" data-fundingstreamid="@fundingStream.FundingStreamId" data-allocationlineid="@allocationLine.AllocationLineId" data-status="@allocationLine.Status" /> <label for="checkbox-allocationline-@provider.ProviderId-@fundingStream.FundingStreamId-@allocationLine.AllocationLineId" class="inline-table-label data-allocationline-name">@allocationLine.AllocationLineName</label>
+                                </td>
 
                                 @if (allocationLine.Status == AllocationLineStatusViewModel.Held)
                                 {
@@ -156,11 +171,13 @@
 </div>
 
 @section scripts{
+    <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/table.expander.sequential.js" asp-append-version="true"></script>
 
 
     <script type="text/javascript">
-        var testScenarioQueryUrl = '/api/specs/@Model.SelectedSpecificationId/providertestcounts';
+        var testScenarioQueryUrl = "/api/specs/@Model.SelectedSpecificationId/providertestcounts";
+        var approveAllocationLineUrl = "/api/specs/@Model.SelectedSpecificationId/allocationlineapprovalstatus";
     </script>
 }

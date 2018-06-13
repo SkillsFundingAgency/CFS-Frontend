@@ -1743,6 +1743,28 @@ table {
     table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
         border-bottom: 1px solid #fff !important;
     }
+
+    .approvalstatus-button {
+        color: #fff;
+        border-radius: 0;
+        border: 1px solid #fff;
+        background-color: $turquoise;
+        padding: 10px 30px;
+        transition: background-color ease-in-out 0.3s;
+    }
+
+    .approvalstatus-button:disabled {
+        background-color: $grey-2;
+        cursor: not-allowed;
+    }
+
+    .approvalstatus-button-approve {
+        margin-right: 15px;
+    }
+
+    .approvalstatus-button-publish {
+        margin-right: 30px;
+    }
 }
 
 @import "_tablelayout.scss";

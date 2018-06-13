@@ -67,12 +67,12 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             {
                 ApiResponse<IEnumerable<PublishedProviderResult>> providerResultLookup = await _resultsClient.GetPublishedProviderResults(specificationId);
                 errorResult = providerResultLookup.IsSuccessOrReturnFailureResult("Provider Result");
-                if(errorResult!= null)
+                if (errorResult != null)
                 {
                     return errorResult;
                 }
 
-                IEnumerable<PublishedProviderResultViewModel> resultObjects = _mapper.Map<IEnumerable<PublishedProviderResultViewModel>>(providerResultLookup.Content);
+                IEnumerable<PublishedProviderResultViewModel> resultObjects = _mapper.Map<IEnumerable<PublishedProviderResultViewModel>>(providerResultLookup.Content.OrderBy(o => o.ProviderName));
 
                 Results = resultObjects;
 

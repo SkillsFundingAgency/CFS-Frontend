@@ -1,9 +1,9 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
-namespace CalculateFunding.Frontend.Extensions
+namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     public static class ApiResponseExtensions
     {

@@ -65,9 +65,9 @@
         {
             ApiResponse<Provider> provider = await GetAsync<Provider>($"{_resultsPath}/get-provider?providerId={providerId}");
 
-            if (provider!=null && provider.StatusCode == HttpStatusCode.OK)
+            if (provider != null && provider.StatusCode == HttpStatusCode.OK)
             {
-                if(provider.Content.UKPRN.HasValue)
+                if (provider.Content.UKPRN.HasValue)
                 {
                     provider.Content.Id = provider.Content.UKPRN.Value.ToString();
                 }
@@ -110,6 +110,14 @@
         public Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId)
         {
             return GetAsync<IEnumerable<PublishedProviderResult>>($"{_resultsPath}/get-published-provider-results-for-specification?specificationId={specificationId}");
+        }
+
+        public Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(updateModel, nameof(updateModel));
+
+            return ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"{_resultsPath}/update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
         }
     }
 }

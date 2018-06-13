@@ -147,6 +147,19 @@ table.cf {
         font-weight: bold;
         font-size: 16px;
     }
+
+    .inline-table-label {
+        font-weight: normal;
+    }
+
+    .select-all-label {
+        font-size: 16px;
+        text-decoration: underline;
+    }
+
+    .valign-top{
+        vertical-align: top;
+    }
 }
 
 .jump-to-container {
