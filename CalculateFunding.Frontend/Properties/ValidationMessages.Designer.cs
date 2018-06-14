@@ -124,7 +124,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter a unique description.
+        ///   Looks up a localized string similar to Enter a unique name.
         /// </summary>
         internal static string DatasetSchemaRelationshipNameRequired {
             get {
