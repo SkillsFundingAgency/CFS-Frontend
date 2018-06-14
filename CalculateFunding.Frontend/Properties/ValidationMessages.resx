@@ -139,7 +139,7 @@
     <value>Enter a description</value>
   </data>
   <data name="DatasetSchemaRelationshipNameRequired" xml:space="preserve">
-    <value>Enter a unique description</value>
+    <value>Enter a unique name</value>
   </data>
   <data name="DatasetSchemaRequiredForSpecification" xml:space="preserve">
     <value>Enter a data schema</value>

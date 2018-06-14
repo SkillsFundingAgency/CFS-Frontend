@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId)
+        public async Task<IActionResult> OnGetAsync(string specificationId, ViewFundingPageBannerOperation? operationType = null, int? updatedProviders = null, int? updatedAllocationLines = null)
         {
             Task<ApiResponse<IEnumerable<SpecificationSummary>>> specificationsLookupTask = _specsClient.GetSpecificationsSelectedForFunding();
 
@@ -77,6 +77,24 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 Results = resultObjects;
 
                 //GenerateSampleRecords();
+            }
+
+            if (operationType.HasValue)
+            {
+                PageBannerOperation = new PageBannerOperation();
+
+                string providerPlural = updatedProviders > 1 ? "s" : string.Empty;
+                string allocationLinePlural = updatedProviders > 1 ? "s" : string.Empty;
+
+                if (operationType == ViewFundingPageBannerOperation.AllocationLineStatusPublished)
+                {
+                    PageBannerOperation.ActionText = $"{updatedAllocationLines} allocation line{allocationLinePlural} for {updatedProviders} provider{providerPlural} published";
+
+                }
+                else if (operationType == ViewFundingPageBannerOperation.AllocationLineStatusApproved)
+                {
+                    PageBannerOperation.ActionText = $"{updatedAllocationLines} allocation line{allocationLinePlural} for {updatedProviders} provider{providerPlural} approved";
+                }
             }
 
             return Page();

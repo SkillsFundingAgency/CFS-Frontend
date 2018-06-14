@@ -206,7 +206,7 @@
         {
             Guard.ArgumentNotNull(datsetDefn, nameof(datsetDefn));
 
-            Datasets = datsetDefn != null ? datsetDefn.Select(m => new GdsSelectListItem
+            Datasets = datsetDefn != null ? datsetDefn.OrderBy(m => m.Name).Select(m => new GdsSelectListItem
             {
                 Value = m.Id,
                 Text = m.Name,

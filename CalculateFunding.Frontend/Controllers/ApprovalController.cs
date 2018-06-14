@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
@@ -32,6 +30,11 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(allocationLines, nameof(allocationLines));
 
+            if (allocationLines.Status != AllocationLineStatusViewModel.Approved && allocationLines.Status != AllocationLineStatusViewModel.Published)
+            {
+                ModelState.AddModelError(nameof(allocationLines.Status), "The status provided is not a valid destination status");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -43,25 +46,25 @@ namespace CalculateFunding.Frontend.Controllers
             };
 
             Dictionary<string, PublishedAllocationLineResultStatusUpdateProviderModel> updateProviders = new Dictionary<string, PublishedAllocationLineResultStatusUpdateProviderModel>();
-            foreach(var allo in allocationLines.Providers)
+            foreach (PublishedAllocationLineResultStatusUpdateProviderViewModel updateItem in allocationLines.Providers)
             {
                 PublishedAllocationLineResultStatusUpdateProviderModel providerUpdateModel = null;
-                if (!updateProviders.ContainsKey(allo.ProviderId))
+                if (!updateProviders.ContainsKey(updateItem.ProviderId))
                 {
                     providerUpdateModel = new PublishedAllocationLineResultStatusUpdateProviderModel()
                     {
-                        ProviderId = allo.ProviderId,
+                        ProviderId = updateItem.ProviderId,
                     };
 
-                    updateProviders.Add(allo.ProviderId, providerUpdateModel);
+                    updateProviders.Add(updateItem.ProviderId, providerUpdateModel);
                     updateModel.AddProvider(providerUpdateModel);
                 }
                 else
                 {
-                    providerUpdateModel = updateProviders[allo.ProviderId];
+                    providerUpdateModel = updateProviders[updateItem.ProviderId];
                 }
 
-                providerUpdateModel.AddAllocationLine(allo.AllocationLineId);
+                providerUpdateModel.AddAllocationLine(updateItem.AllocationLineId);
             }
 
             ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel> updateStatusResponse = await _resultsClient.UpdatePublishedAllocationLineStatus(specificationId, updateModel);
@@ -71,7 +74,9 @@ namespace CalculateFunding.Frontend.Controllers
                 return errorResult;
             }
 
-            return Ok(updateStatusResponse.Content);
+            PublishedAllocationLineResultStatusUpdateResponseViewModel result = _mapper.Map<PublishedAllocationLineResultStatusUpdateResponseViewModel>(updateStatusResponse.Content);
+
+            return Ok(result);
         }
     }
 }

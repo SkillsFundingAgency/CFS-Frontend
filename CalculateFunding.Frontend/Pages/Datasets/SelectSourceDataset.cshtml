@@ -24,50 +24,62 @@
     <h1 class="hero-title">@Model.ViewModel.RelationshipName</h1>
 }
 
-<div class="row spacing-15">
-    <div class="col-xs-8">
-        <form method="post" class="form">
-            <div class="validation-summary-errors" @(Model.ModelState.ErrorCount == 0 ? "style=display:none;" : string.Empty) data-valmsg-summary="true">
-                <h3 class="heading-large">There is a problem</h3>
-                <p><strong>Check that you have answered the questions correctly</strong></p>
-                <ul data-bind="foreach: validationLinks">
-                    <li><a href="#data-sources-anchor" class="validation-summary-link">You must select at least one data source name</a></li>
-                    <li><a href="#data-sources-anchor" class="validation-summary-link">And check you have selected data source version</a></li>
-                </ul>
-            </div>
-            <input name="specificationId" id="specificationId" type="hidden" value="@Model.ViewModel.SpecificationId" />
-            <a name="data-sources-anchor" class="form-anchor"></a>
-            <h4 class="heading-small">Select data source</h4>
-
-            <div class="ds-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "")">
-
-                @foreach (var dataset in Model.ViewModel.Datasets)
-                {
-                    <div class="row selectdataset-item-container">
-                        <div class="col-xs-12">
-                            <label class="block-label @(Model.ModelState.ErrorCount > 0 ? "red-3p-border" : "")">
-                                <span class="selectdataset-item-name">@dataset.Name</span>
-                                <input name="datasets" @(dataset.IsSelected ? "checked" : string.Empty) id="@dataset.Id" type="radio" value="@dataset.Id" class="selectdataset-item-dataset">
-                            </label>
-                        </div>
-                        <div class="col-xs-12">
-                            <div class="ds-versions-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "grey-left-border")" id="@dataset.VersionContainerId">
-                                <h4 class="heading-small">Select data source version</h4>
-                                @foreach (var version in dataset.Versions)
-                                {
-                                    <label><input type="radio" @(version.IsSelected ? "checked" : string.Empty) name="datasetVersion" value="@version.UniqueName" class="selectdataset-item-datasetversion">@version.ToString()</label>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/datasets/specificationrelationships?specificationId=@Model.ViewModel.SpecificationId" id="cancel-link">Cancel</a></p>
-        </form>
+@if (!Model.ViewModel.Datasets.Any())
+{
+    <div class="noresults-panel spacing-10">
+        <span class="noresults-panel-text">
+            <i class="material-icons">warning</i> No data source files available. Upload a data source file with the same data schema.
+        </span>
     </div>
 
-</div>
+}
+else
+{
+    <div class="row spacing-15">
+        <div class="col-xs-8">
+            <form method="post" class="form">
+                <div class="validation-summary-errors" @(Model.ModelState.ErrorCount == 0 ? "style=display:none;" : string.Empty) data-valmsg-summary="true">
+                    <h3 class="heading-large">There is a problem</h3>
+                    <p><strong>Check that you have answered the questions correctly</strong></p>
+                    <ul data-bind="foreach: validationLinks">
+                        <li><a href="#data-sources-anchor" class="validation-summary-link">You must select at least one data source name</a></li>
+                        <li><a href="#data-sources-anchor" class="validation-summary-link">And check you have selected data source version</a></li>
+                    </ul>
+                </div>
+                <input name="specificationId" id="specificationId" type="hidden" value="@Model.ViewModel.SpecificationId" />
+                <a name="data-sources-anchor" class="form-anchor"></a>
+                <h4 class="heading-small">Select data source</h4>
+
+                <div class="ds-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "")">
+
+                    @foreach (var dataset in Model.ViewModel.Datasets)
+                    {
+                        <div class="row selectdataset-item-container">
+                            <div class="col-xs-12">
+                                <label class="block-label @(Model.ModelState.ErrorCount > 0 ? "red-3p-border" : "")">
+                                    <span class="selectdataset-item-name">@dataset.Name</span>
+                                    <input name="datasets" @(dataset.IsSelected ? "checked" : string.Empty) id="@dataset.Id" type="radio" value="@dataset.Id" class="selectdataset-item-dataset">
+                                </label>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="ds-versions-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "grey-left-border")" id="@dataset.VersionContainerId">
+                                    <h4 class="heading-small">Select data source version</h4>
+                                    @foreach (var version in dataset.Versions)
+                                    {
+                                        <label><input type="radio" @(version.IsSelected ? "checked" : string.Empty) name="datasetVersion" value="@version.UniqueName" class="selectdataset-item-datasetversion">@version.ToString()</label>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+                <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/datasets/specificationrelationships?specificationId=@Model.ViewModel.SpecificationId" id="cancel-link">Cancel</a></p>
+            </form>
+        </div>
+
+    </div>
+}
 
 @section Scripts{
     <script type="text/javascript">

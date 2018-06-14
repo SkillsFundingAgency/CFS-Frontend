@@ -13,6 +13,7 @@
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Datasets;
+    using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -33,7 +34,7 @@
             _mapper = mapper;
         }
 
-        public Specification Specification { get; set; }
+        public SpecificationViewModel Specification { get; set; }
 
         public IEnumerable<AssignedDataDefinitionToSpecificationViewModel> DatasetDefinitions { get; set; }
 
@@ -74,7 +75,7 @@
                 return new StatusCodeResult(500);
             }
 
-            this.Specification = specificationResponse.Content;
+            this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
 
             Dictionary<string, AssignedDataDefinitionToSpecificationViewModel> dataDefinitions = new Dictionary<string, AssignedDataDefinitionToSpecificationViewModel>();
             Dictionary<string, List<AssignedDatasetViewModel>> datasets = new Dictionary<string, List<AssignedDatasetViewModel>>();

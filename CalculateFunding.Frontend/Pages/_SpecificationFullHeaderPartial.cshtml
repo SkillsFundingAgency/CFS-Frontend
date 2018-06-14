@@ -1,0 +1,35 @@
+﻿@model CalculateFunding.Frontend.ViewModels.Specs.SpecificationViewModel
+@using CalculateFunding.Frontend.Properties
+
+<div class="banner-link-container">
+    <div class="banner-link-left-container">
+        <p class="hero-text">@Model.FundingPeriod.Name</p>
+
+        <h1 class="hero-title"> @Model.Name </h1>
+        <p class="hero-text ">@PageText.FundingStreams:</p>
+        @foreach (var fundingStream in Model.FundingStreams)
+        {
+            <p class="hero-subtext">@fundingStream.Name</p>
+        }
+    </div>
+    <div class="banner-link-right-container">
+        <div>
+            <a href="/specs/editspecification/@Model.Id&returnPage=ManagePolicies">Edit specification</a>
+        </div>
+        <div>
+            <a href="/specs/createPolicy/@Model.Id">Create policy</a>
+        </div>
+        @if (Model.Policies != null && Model.Policies.Any())
+        {
+            <div>
+                <a href="/specs/createSubPolicy/@Model.Id">Create sub policy</a>
+            </div>
+            <div>
+                <a href="/specs/createcalculation/@Model.Id">Create calculation specification</a>
+            </div>
+        }
+        <div>
+            <a href="/datasets/AssignDatasetSchema/@Model.Id">Create dataset</a>
+        </div>
+    </div>
+</div>

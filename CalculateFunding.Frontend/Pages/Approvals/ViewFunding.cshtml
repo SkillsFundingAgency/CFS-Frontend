@@ -22,7 +22,11 @@
 
 @if (Model.PageBannerOperation != null)
 {
-    @Html.Partial("_PageBannerOperationPartial", Model.PageBannerOperation)
+    <div class="notification-panel">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i> @Model.PageBannerOperation.ActionText
+        </span>
+    </div>
 }
 
 <div class="viewfunding-page-container" id="viewfunding-page-container">
@@ -179,5 +183,7 @@
     <script type="text/javascript">
         var testScenarioQueryUrl = "/api/specs/@Model.SelectedSpecificationId/providertestcounts";
         var approveAllocationLineUrl = "/api/specs/@Model.SelectedSpecificationId/allocationlineapprovalstatus";
+        
+        var viewFundingPageUrl = "/approvals/viewfunding?specificationId=@Model.SelectedSpecificationId";
     </script>
 }
