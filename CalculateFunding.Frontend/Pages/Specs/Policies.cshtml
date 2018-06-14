@@ -211,12 +211,11 @@
 
                         <tr class="cr-table-primary-highlight data-subpolicy-container">
                             <td class="table-primary-border"><a name="policy-@subpolicy.Id"></a></td>
-                            @if (i == 0)
-                            {
-                                <td id="subpolicies-for-@policy.Id" rowspan="@subpolicies.Count" class="data-subpolicy-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@subpolicies.Count" data-openItems="0">
-                                    <div class="table-type-header">Subpolicy</div>
-                                </td>
-                            }
+                           
+                            <td id="subpolicies-for-@policy.Id" rowspan="1" class="data-subpolicy-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@subpolicies.Count" data-openItems="0">
+                                <div class="table-type-header">Subpolicy</div>
+                            </td>
+
                             <td>
                                 <span class="button-split-container">
                                     <span class="button-split-icon">
@@ -234,7 +233,7 @@
                                     <span class="datetime-split-time data-subpolicy-lastupdated-time">@subpolicy.LastUpdatedTimeFormatted</span>
                                 </span>
                             </td>
-                            <td class="expander-trigger-cell" data-multi-row-header="subpolicies-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
+                            <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
                         </tr>
                         <tr class="cr-table-primary-highlight expander-container">
                             <td class="table-primary-border"></td>
