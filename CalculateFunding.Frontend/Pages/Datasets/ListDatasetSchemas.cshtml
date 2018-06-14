@@ -15,11 +15,8 @@
         </ol>
     </div>
 }
-@section BannerLeft{
-    <h1 class="hero-title">@PageText.ManagePolicies</h1>
-    <p class="hero-description">For @Model.Specification.Name</p>
-    <p class="hero-description">Funding Period: @Model.Specification.FundingPeriod.Name</p>
-    <p class="hero-text">@PageText.ManagePoliciesHeadingText</p>
+@section BannerWhole {
+    @Html.Partial("_SpecificationFullHeaderPartial",  Model.Specification)
 }
 
 <div class="row manage-policy">
