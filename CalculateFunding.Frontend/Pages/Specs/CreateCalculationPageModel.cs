@@ -141,7 +141,7 @@
             {
                 Calculation newCalculation = newCalculationResponse.Content;
 
-                return Redirect($"/specs/policies/{specificationId}#calculation-{newCalculation.Id}");
+                return Redirect($"/specs/policies/{specificationId}?operationType=CalculationCreated&operationId={newCalculation.Id}");
             }
             else
             {

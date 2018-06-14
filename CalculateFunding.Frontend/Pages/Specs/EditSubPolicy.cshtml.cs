@@ -1,21 +1,20 @@
 namespace CalculateFunding.Frontend.Pages.Specs
 {
-    using AutoMapper;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
-    using Microsoft.AspNetCore.Mvc;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Helpers;
+    using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Specs;
-    using System.Collections.Generic;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using System.Linq;
-    using System;
+    using Serilog;
 
     public class EditSubPolicyPageModel : PageModel
     {
@@ -61,43 +60,41 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             ParentPolicyId = parentPolicyId;
 
-            Specification specification = await GetSpecification(specificationId);
-
-            if (specification != null)
+            (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
+            if (specificationQuery.error != null)
             {
-                SpecificationName = specification.Name;
+                return specificationQuery.error;
+            }
 
-                FundingPeriodName = specification.FundingPeriod.Name;
+            Specification specification = specificationQuery.specification;
+            PopulateSpecificationProperites(specification);
 
-                FundingPeriodId = specification.FundingPeriod.Id;
-
-                PopulatePolicies(specification);
-
-                foreach (Policy policy in specification.Policies)
+            foreach (Policy policy in specification.Policies)
+            {
+                if (!policy.SubPolicies.IsNullOrEmpty())
                 {
-                    if (!policy.SubPolicies.IsNullOrEmpty())
+                    if (policy.Id == parentPolicyId)
                     {
-                        if (policy.Id == parentPolicyId)
-                        {
-                            Policy subPolicy = policy.SubPolicies.FirstOrDefault(m => m.Id == subPolicyId);
+                        Policy subPolicy = policy.SubPolicies.FirstOrDefault(m => m.Id == subPolicyId);
 
-                            if (subPolicy != null)
+                        if (subPolicy != null)
+                        {
+                            if (subPolicy.Id == subPolicyId)
                             {
-                                if (subPolicy.Id == subPolicyId)
-                                {
-                                    this.EditSubPolicyViewModel = _mapper.Map<EditSubPolicyViewModel>(subPolicy);
-                                }
+                                this.EditSubPolicyViewModel = _mapper.Map<EditSubPolicyViewModel>(subPolicy);
                             }
                         }
                     }
                 }
+            }
 
-                return Page();
-            }
-            else
+            if (EditSubPolicyViewModel == null)
             {
-                return new NotFoundObjectResult($"Unable to retreive specification for the given specification id: " +specificationId);
+                return NotFound("Sub Policy not found");
             }
+
+            return Page();
+
         }
 
         public async Task<IActionResult> OnPostAsync(string specificationId, string subPolicyId)
@@ -106,12 +103,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
-                Specification specification = await GetSpecification(specificationId);
-
-                if (specification == null)
+                (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
+                if (specificationQuery.error != null)
                 {
-                    throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
+                    return specificationQuery.error;
                 }
+
+                PopulateSpecificationProperites(specificationQuery.specification);
 
                 return Page();
             }
@@ -128,32 +126,37 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
             else if (updateSubPolicyResult.StatusCode == HttpStatusCode.BadRequest)
             {
-                foreach (var validationResult in updateSubPolicyResult.ModelState)
+                updateSubPolicyResult.AddValidationResultErrors(ModelState);
+
+                (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
+                if (specificationQuery.error != null)
                 {
-                    List<string> errors = new List<string>(validationResult.Value);
-                    for (int i = 0; i < errors.Count; i++)
-                    {
-                        ModelState.AddModelError($"{validationResult.Key}.{i}", errors[i]);
-                    }
+                    return specificationQuery.error;
                 }
 
-                Specification specification = await GetSpecification(specificationId);
+                Specification specification = specificationQuery.specification;
 
-                if (specification != null)
-                {
-                    SpecificationName = specification.Name;
+                PopulateSpecificationProperites(specification);
 
-                    FundingPeriodName = specification.FundingPeriod.Name;
-
-                    FundingPeriodId = specification.FundingPeriod.Id;
-
-                    PopulatePolicies(specification);
-                }
                 return Page();
             }
             else
             {
                 return new InternalServerErrorResult($"Unable to update policy. API returned {updateSubPolicyResult.StatusCode}");
+            }
+        }
+
+        private void PopulateSpecificationProperites(Specification specification)
+        {
+            if (specification != null)
+            {
+                SpecificationName = specification.Name;
+
+                FundingPeriodName = specification.FundingPeriod.Name;
+
+                FundingPeriodId = specification.FundingPeriod.Id;
+
+                PopulatePolicies(specification);
             }
         }
 
@@ -172,18 +175,14 @@ namespace CalculateFunding.Frontend.Pages.Specs
             Policies.Insert(0, new SelectListItem() { Text = "No parent policy", Value = "" });
         }
 
-        private async Task<Specification> GetSpecification(string specificationId)
+        private async Task<(Specification specification, IActionResult error)> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+            ApiResponse<Specification> specification = await _specsClient.GetSpecification(specificationId);
+            IActionResult error = specification.IsSuccessOrReturnFailureResult("Specification");
 
-            if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                return specificationResponse.Content;
-            }
-
-            return null;
+            return (specification.Content, error);
         }
     }
 }

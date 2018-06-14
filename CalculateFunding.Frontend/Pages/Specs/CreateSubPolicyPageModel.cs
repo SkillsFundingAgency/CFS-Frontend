@@ -102,7 +102,7 @@
 
             Policy newPolicy = newPolicyResponse.Content;
 
-            return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
+            return Redirect($"/specs/policies/{specificationId}?operationType=SubpolicyCreated&operationId={newPolicy.Id}");
         }
 
         private void PopulatePolicies(Specification specification)

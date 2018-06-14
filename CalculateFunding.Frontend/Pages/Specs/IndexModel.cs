@@ -37,13 +37,7 @@
 
         public SpecificationPageBannerOperationType? OperationType { get; set; }
 
-        public string OperationEntityName { get; set; }
-
-        public string OperationEntityType { get; set; }
-
-        public string OperationAction { get; set; }
-
-        public string OperationId { get; set; }
+        public PageBannerOperation PageBanner { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string searchTerm = null, int? pageNumber = null, SpecificationPageBannerOperationType? operationType = null, string operationId = null)
         {
@@ -77,6 +71,8 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
+
+
                 ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(operationId);
                 IActionResult errorResult = specificationResponse.IsSuccessfulOrReturnFailureResult();
                 if (errorResult != null)
@@ -86,17 +82,22 @@
 
                 SpecificationSummary specificationSummary = specificationResponse.Content;
 
-                OperationEntityName = specificationSummary.Name;
-                OperationEntityType = "Specification";
-                OperationId = operationId;
+                PageBanner = new PageBannerOperation()
+                {
+                    EntityName = specificationSummary.Name,
+                    EntityType = "Specification",
+                    OperationId = operationId,
+                    ActionText = "Edit",
+                    ActionUrl = $"/specs/EditSpecification/{specificationSummary.Id}?returnPage=Specifications",
+                };
 
                 switch (operationType)
                 {
                     case SpecificationPageBannerOperationType.SpecificationCreated:
-                        OperationAction = "created";
+                        PageBanner.OperationAction = "created";
                         break;
                     case SpecificationPageBannerOperationType.SpecificationUpdated:
-                        OperationAction = "edited";
+                        PageBanner.OperationAction = "edited";
                         break;
                 }
             }

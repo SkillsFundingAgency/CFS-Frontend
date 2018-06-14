@@ -11,6 +11,7 @@
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -40,17 +41,11 @@
 
         public bool HasProviderDatasetsAssigned { get; set; }
 
-        public PoliciesPageBannerOperationType? OperationType { get; set; }
-
-        public string OperationEntityName { get; set; }
-
-        public string OperationEntityType { get; set; }
+        public PageBannerOperation PageBanner { get; set; }
 
         public async Task<IActionResult> OnGet(string specificationId, PoliciesPageBannerOperationType? operationType, string operationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-
-            OperationType = operationType;
 
             Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
 
@@ -114,17 +109,36 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
+                PageBanner = new PageBannerOperation();
                 switch (operationType.Value)
                 {
                     case PoliciesPageBannerOperationType.SpecificationUpdated:
-                        OperationEntityName = Specification.Name;
-                        OperationEntityType = "Specification";
+                        PageBanner.EntityName = Specification.Name;
+                        PageBanner.EntityType = "Specification";
+                        PageBanner.OperationAction = "updated";
+                        PageBanner.ActionText = "Edit";
+                        PageBanner.ActionUrl = $"/specs/editspecification/{Specification.Id}&returnPage=ManagePolicies";
                         break;
                     case PoliciesPageBannerOperationType.PolicyUpdated:
-                        OperationEntityName = Specification.Policies.Where(p => p.Id == operationId).FirstOrDefault()?.Name;
-                        OperationEntityType = "Policy";
+                    case PoliciesPageBannerOperationType.PolicyCreated:
+                        PageBanner.EntityName = Specification.Policies.Where(p => p.Id == operationId).FirstOrDefault()?.Name;
+                        PageBanner.EntityType = "Policy";
+                        PageBanner.ActionText = "Edit";
+                        PageBanner.ActionUrl = $"/specs/editPolicy/{specificationId}/{operationId}";
+
+                        if (operationType.Value == PoliciesPageBannerOperationType.PolicyUpdated)
+                        {
+                            PageBanner.OperationAction = "updated";
+                        }
+                        else if (operationType.Value == PoliciesPageBannerOperationType.PolicyCreated)
+                        {
+                            PageBanner.OperationAction = "created";
+                        }
+
                         break;
                     case PoliciesPageBannerOperationType.SubpolicyUpdated:
+                    case PoliciesPageBannerOperationType.SubpolicyCreated:
+                        string policyId = null;
                         if (Specification.Policies.AnyWithNullCheck())
                         {
                             foreach (PolicyViewModel policy in Specification.Policies)
@@ -133,17 +147,30 @@
                                 {
                                     foreach (PolicyViewModel subpolicy in policy.SubPolicies)
                                     {
-                                        if(subpolicy.Id == operationId)
+                                        if (subpolicy.Id == operationId)
                                         {
-                                            OperationEntityName = subpolicy.Name;
+                                            PageBanner.EntityName = subpolicy.Name;
+                                            policyId = policy.Id;
                                         }
                                     }
                                 }
                             }
                         }
-                        OperationEntityType = "Subpolicy";
+                        PageBanner.EntityType = "Subpolicy";
+                        PageBanner.ActionText = "Edit";
+                        PageBanner.ActionUrl = $"/specs/EditSubPolicy/{specificationId}/{operationId}/{policyId}";
+
+                        if (operationType.Value == PoliciesPageBannerOperationType.SubpolicyUpdated)
+                        {
+                            PageBanner.OperationAction = "updated";
+                        }
+                        else if(operationType.Value == PoliciesPageBannerOperationType.SubpolicyCreated)
+                        {
+                            PageBanner.OperationAction = "created";
+                        }
                         break;
                     case PoliciesPageBannerOperationType.CalculationUpdated:
+                    case PoliciesPageBannerOperationType.CalculationCreated:
                         if (Specification.Policies.AnyWithNullCheck())
                         {
                             foreach (PolicyViewModel policy in Specification.Policies)
@@ -154,11 +181,11 @@
                                     {
                                         if (subpolicy.Calculations.AnyWithNullCheck())
                                         {
-                                            foreach(CalculationViewModel calculation in subpolicy.Calculations)
+                                            foreach (CalculationViewModel calculation in subpolicy.Calculations)
                                             {
-                                                if(calculation.Id == operationId)
+                                                if (calculation.Id == operationId)
                                                 {
-                                                    OperationEntityName = calculation.Name;
+                                                    PageBanner.EntityName = calculation.Name;
                                                 }
                                             }
                                         }
@@ -171,13 +198,25 @@
                                     {
                                         if (calculation.Id == operationId)
                                         {
-                                            OperationEntityName = calculation.Name;
+                                            PageBanner.EntityName = calculation.Name;
                                         }
                                     }
                                 }
                             }
                         }
-                        OperationEntityType = "Calculation specification";
+                        PageBanner.EntityType = "Calculation specification";
+                        PageBanner.OperationAction = "updated";
+                        PageBanner.ActionText = "Edit";
+                        PageBanner.ActionUrl = $"/specs/EditCalculation/{operationId}?specificationId={specificationId}";
+
+                        if (operationType.Value == PoliciesPageBannerOperationType.CalculationUpdated)
+                        {
+                            PageBanner.OperationAction = "updated";
+                        }
+                        else if (operationType.Value == PoliciesPageBannerOperationType.CalculationCreated)
+                        {
+                            PageBanner.OperationAction = "created";
+                        }
                         break;
                 }
             }
