@@ -46,6 +46,7 @@ $("#publish").on("click", (e: JQuery.Event<HTMLButtonElement, null>) => {
 
 declare var testScenarioQueryUrl: string;
 declare var approveAllocationLineUrl: string;
+declare var viewFundingPageUrl: string;
 
 $("input.target-checkbox-allocationline").on("change", (e: JQuery.Event<HTMLButtonElement, null>) => {
     toggleButtonStatus();
@@ -74,9 +75,33 @@ function updateApprovalStatus(allocationLines: Array<ISelectedProviderAllocation
         toggleButtonStatus();
     });
 
-    query.done(() => {
-        actionRunning = false;
-        toggleButtonStatus();
+    query.done((resultUntyped) => {
+        let result: IAllocationLineUpdateStatusResponse = resultUntyped;
+        if (result) {
+            if (typeof result.updatedAllocationLines === "undefined") {
+                throw new Error("updatedAllocationLines not defined in result");
+            }
+
+            if (typeof result.updatedProviders === "undefined") {
+                throw new Error("updatedProviders is not defined in result");
+            }
+
+            let operationType;
+
+            if (approvalStatus == ApprovalStatus.Approved) {
+                operationType = "AllocationLineStatusApproved";
+            }
+            else {
+                operationType = "AllocationLineStatusPublished";
+            }
+
+            window.location.href = viewFundingPageUrl + "&operationType=" + operationType + "&updatedProviders=" + result.updatedProviders + "&updatedAllocationLines=" + result.updatedAllocationLines;
+
+        }
+        else {
+            actionRunning = false;
+            toggleButtonStatus();
+        }
     });
 }
 
@@ -234,4 +259,9 @@ interface ISelectedProviderAllocationLine {
 enum ApprovalStatus {
     Approved = "Approved",
     Published = "Published",
+}
+
+interface IAllocationLineUpdateStatusResponse {
+    updatedAllocationLines: number;
+    updatedProviders: number;
 }
