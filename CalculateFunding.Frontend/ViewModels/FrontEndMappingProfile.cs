@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels
 {
+    using System.Linq;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -17,8 +18,6 @@
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using CalculateFunding.Frontend.ViewModels.Specs;
     using CalculateFunding.Frontend.ViewModels.TestEngine;
-    using System;
-    using System.Linq;
 
     public class FrontEndMappingProfile : Profile
     {
@@ -43,6 +42,10 @@
 
             CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
             CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
+
+            CreateMap<PublishedAllocationLineResultStatusUpdateViewModel, PublishedAllocationLineResultStatusUpdateModel>();
+            CreateMap<PublishedAllocationLineResultStatusUpdateProviderViewModel, PublishedAllocationLineResultStatusUpdateProviderModel>();
+
         }
 
         private void MapResults()
@@ -140,6 +143,7 @@
                 .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
                 .ForMember(m => m.OriginalFundingStreams, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingPeriodId, opt => opt.Ignore())
                 .AfterMap((Specification source, EditSpecificationViewModel destination) =>
                 {
                     destination.FundingPeriodId = source.FundingPeriod.Id;
