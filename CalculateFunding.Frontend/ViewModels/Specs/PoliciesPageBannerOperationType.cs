@@ -6,5 +6,8 @@
         PolicyUpdated,
         SubpolicyUpdated,
         CalculationUpdated,
+        PolicyCreated,
+        SubpolicyCreated,
+        CalculationCreated,
     }
 }

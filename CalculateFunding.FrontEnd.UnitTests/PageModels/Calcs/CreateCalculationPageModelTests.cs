@@ -459,7 +459,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             redirectResult
                 .Url
                 .Should()
-                .Be($"/specs/policies/{specificationId}#calculation-new-calc-id");
+                .Be($"/specs/policies/{specificationId}?operationType=CalculationCreated&operationId=new-calc-id");
         }
 
         [TestMethod]

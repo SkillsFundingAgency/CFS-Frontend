@@ -88,7 +88,7 @@
 
             Policy newPolicy = newPolicyResponse.Content;
 
-            return Redirect($"/specs/policies/{specificationId}#policy-{newPolicy.Id}");
+            return Redirect($"/specs/policies/{specificationId}?operationType=PolicyCreated&operationId={newPolicy.Id}");
         }
 
         private async Task<SpecificationSummary> GetSpecification(string specificationId)
