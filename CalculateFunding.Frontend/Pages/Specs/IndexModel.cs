@@ -88,7 +88,8 @@
                     EntityType = "Specification",
                     OperationId = operationId,
                     ActionText = "Edit",
-                    ActionUrl = $"/specs/EditSpecification/{specificationSummary.Id}?returnPage=Specifications",
+                    ActionUrl = $"/specs/policies/{specificationSummary.Id}",
+                    SecondaryActionUrl = $"/specs/EditSpecification/{specificationSummary.Id}?returnPage=Specifications",
                 };
 
                 switch (operationType)

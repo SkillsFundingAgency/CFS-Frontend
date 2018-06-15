@@ -14,7 +14,11 @@
 
         <span>&nbsp;@Model.OperationAction</span>
     </span>
-    @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+    @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
+    {
+        <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
+    }
+    else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
     {
         <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
     }
