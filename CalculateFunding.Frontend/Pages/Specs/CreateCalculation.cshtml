@@ -10,14 +10,13 @@
 @section FormBannerLeft{
     <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
     <h1 class="hero-title">Create calculation specification for policy</h1>
-    <p class="hero-text">Creating calculation specification for @Model.SpecificationName</p>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId#spec-@Model.SpecificationId">@BreadcrumbText.ManageSpecifications</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
             <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
             <li>@BreadcrumbText.CreateCalculation</li>
         </ol>
@@ -32,7 +31,7 @@
                 <div gds-validationblock-for="CreateCalculationViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="CreateCalculationViewModel.Name"></a>
-                        <label asp-for="CreateCalculationViewModel.Name">Name</label>
+                        <label asp-for="CreateCalculationViewModel.Name">Calculation name</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input asp-for="CreateCalculationViewModel.Name" class="form-control" type="text">
                     </div>
@@ -93,7 +92,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update calculation specification</button> <a href="/specs/policies/@Model.SpecificationId" id="cancel-link">Back</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Create calculation specification</button> <a href="/specs/policies/@Model.SpecificationId" id="cancel-link">Back</a></p>
 
         </form>
 

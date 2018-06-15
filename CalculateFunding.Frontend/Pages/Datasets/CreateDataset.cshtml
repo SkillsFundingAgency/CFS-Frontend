@@ -10,15 +10,15 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li><a href="/datasets">@BreadcrumbText.ManageDataSources</a></li>
             <li>@BreadcrumbText.LoadDatasource</li>
         </ol>
     </div>
 }
 
 @section FormBannerLeft{
-    <h1 class="hero-title">Load new data source</h1>
-    <p class="hero-text"> Upload a data source so that you can use it in calculations and tests.</p>
+    <h1 class="hero-title">Load new data source file</h1>
+    <p class="hero-text">Load a data source file so you can create a dataset to use in calculations.</p>
 }
 
 
@@ -49,8 +49,8 @@
                 <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                     <div class="form-group">
                         <a validationanchor-for="CreateDatasetViewModel.Name"></a>
-                        <label asp-for="CreateDatasetViewModel.Name">Data source name</label>
-                        <h4 class="faded-text">You must give a unique name</h4>
+                        <label asp-for="CreateDatasetViewModel.Name">Data source file name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input data-bind="value: name, css: { 'input-validation-error': !isNameValid() }" asp-for="CreateDatasetViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -80,11 +80,7 @@
                 </div>
             </div>
         </form>
-        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Upload</button> <a href="/datasets" id="cancelLink">Cancel</a></p>
-
-        <div>
-            <a href="/datasets" id="backLink">Back</a>
-        </div>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Create data source</button> <a href="/datasets" id="cancelLink">Cancel</a></p>
     </div>
 
     <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">

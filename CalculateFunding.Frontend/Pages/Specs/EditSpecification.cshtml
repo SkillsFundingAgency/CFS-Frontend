@@ -1,5 +1,6 @@
 ﻿@page "{specificationId}"
 @model CalculateFunding.Frontend.Pages.Specs.EditSpecificationPageModel
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Edit specification";
@@ -13,9 +14,9 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs/policies/@Model.EditSpecificationViewModel.Id">Specifications</a></li>
-            <li>Edit Specification</li>
+            <li>@BreadcrumbText.EditSpecification</li>
         </ol>
     </div>
 }
@@ -33,7 +34,7 @@
                 <div gds-validationblock-for="EditSpecificationViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="EditSpecificationViewModel.Name"></a>
-                        <label asp-for="EditSpecificationViewModel.Name">Name of the specification</label>
+                        <label asp-for="EditSpecificationViewModel.Name">Specification name</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name users can understand</span></h4>
                         <input asp-for="EditSpecificationViewModel.Name" class="form-control" type="text">
                     </div>
@@ -72,7 +73,7 @@
                     <div class="form-group">
                         <a validationanchor-for="EditSpecificationViewModel.Description"></a>
                         <label asp-for="EditSpecificationViewModel.Description">Description</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Update this to say what's changed</span></h4>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Add to this to say what’s changed</span></h4>
                         <textarea asp-for="EditSpecificationViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>
@@ -84,7 +85,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update specification</button> <a href="/specs/policies/@Model.EditSpecificationViewModel.Id" id="cancel-link">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update specification</button> <a href="/specs/policies/@Model.EditSpecificationViewModel.Id" id="cancel-link">Back</a></p>
 
         </form>
 

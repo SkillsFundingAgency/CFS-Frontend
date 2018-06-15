@@ -3,6 +3,7 @@
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using CalculateFunding.Frontend.Helpers
 @using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Manage Test";
@@ -12,8 +13,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
-            <li>Quality assurance tests</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.QualityAssuranceTests</li>
         </ol>
     </div>
 }
@@ -81,7 +82,7 @@
                                 <span class="test-scenario-item-property data-static-specificationName" id="test-scenario-item-specification-@ScenariosRow">@testScenario.SpecificationName</span>
                             </strong>
                         </span>
-                    </div>          
+                    </div>
                 </div>
                 ScenariosRow++;
             }
@@ -111,7 +112,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
         <div class="withjs-show search-loading-container" data-bind="visible: isLoading">

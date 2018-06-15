@@ -120,8 +120,11 @@
   <data name="AssignDatasetSchemaText" xml:space="preserve">
     <value>Assign dataset schema for calculation specfication</value>
   </data>
+  <data name="ChooseFundingSpecWarningText" xml:space="preserve">
+    <value>Select a funding stream to see approved specifications</value>
+  </data>
   <data name="FundingStreams" xml:space="preserve">
-    <value>Funding Streams</value>
+    <value>Funding streams</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage the specification, policies and map datasets.</value>

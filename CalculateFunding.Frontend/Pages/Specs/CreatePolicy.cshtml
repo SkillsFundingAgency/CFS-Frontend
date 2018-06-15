@@ -9,7 +9,7 @@
 
 @section FormBannerLeft{
     <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
-    <h1 class="hero-title">Create policy</h1>
+    <h1 class="hero-title">@BreadcrumbText.CreatePolicy</h1>
     <p class="hero-text"> Create policy for @Model.SpecificationName</p>
 }
 
@@ -32,7 +32,8 @@
                 <div gds-validationblock-for="CreatePolicyViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="CreatePolicyViewModel.Name"></a>
-                        <label asp-for="CreatePolicyViewModel.Name">Name of the policy</label>
+                        <label asp-for="CreatePolicyViewModel.Name">Policy name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input asp-for="CreatePolicyViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -47,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button">Save</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button">Create policy</button> <a href="/specs/policies/@Model.SpecificationId">Cancel</a></p>
 
         </form>
 

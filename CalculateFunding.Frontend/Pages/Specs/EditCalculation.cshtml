@@ -10,14 +10,13 @@
 @section FormBannerLeft{
     <p class="hero-text">Funding Period: @Model.Specification.FundingPeriod.Name</p>
     <h1 class="hero-title">Edit calculation specification for policy</h1>
-    <p class="hero-text">Edit calculation specification for @Model.Specification.Name</p>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
             <li><a href="/specs/policies/@Model.Specification.Id">@Model.Specification.Name</a></li>
             <li>@BreadcrumbText.EditCalculation</li>
         </ol>
@@ -33,6 +32,7 @@
                     <div class="form-group">
                         <a validationanchor-for="EditCalculationViewModel.Name"></a>
                         <label asp-for="EditCalculationViewModel.Name">Name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input asp-for="EditCalculationViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -87,11 +87,12 @@
                     <div class="form-group">
                         <a validationanchor-for="EditCalculationViewModel.Description"></a>
                         <label asp-for="EditCalculationViewModel.Description">Description</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Add to this to say what’s changed</span></h4>
                         <textarea asp-for="EditCalculationViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/specs/policies/@Model.Specification.Id" id="cancel-link">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update calculation specification</button> <a href="/specs/policies/@Model.Specification.Id" id="cancel-link">Back</a></p>
 
         </form>
 
