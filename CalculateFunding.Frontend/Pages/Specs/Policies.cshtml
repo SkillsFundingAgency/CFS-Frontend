@@ -131,7 +131,7 @@
                             <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
                             @if (i == 0)
                             {
-                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
+                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header multi-row-header" data-totalItems="@calculations.Count" data-openItems="0">
                                     <div class="table-type-header">Calcuation Specification</div>
                                 </td>
                             }
@@ -217,7 +217,7 @@
                                     <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
                                     @if (k == 0)
                                     {
-                                        <td id="calcs-for-@subpolicy.Id" rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
+                                        <td id="calcs-for-@subpolicy.Id" rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight cf-table-columnar-header multi-row-header" data-totalItems="@calculations.Count" data-openItems="0">
                                             <div class="table-type-header">Calcuation Specification</div>
                                         </td>
                                     }
