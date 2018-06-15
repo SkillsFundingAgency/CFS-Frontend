@@ -13,5 +13,7 @@
         public string ActionText { get; set; }
 
         public string ActionUrl { get; set; }
+
+        public string SecondaryActionUrl { get; set; }
     }
 }

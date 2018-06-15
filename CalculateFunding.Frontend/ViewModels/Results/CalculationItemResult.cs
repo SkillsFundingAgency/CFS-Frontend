@@ -15,6 +15,11 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         {
             get
             {
+                if(CalculationType == CalculationSpecificationType.Funding)
+                {
+                    return SubTotal.ToString("N2");
+                }
+
                 return SubTotal.ToString("C", new CultureInfo("en-GB"));
             }
         }

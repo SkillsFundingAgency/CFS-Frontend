@@ -72,7 +72,12 @@
 
                     headerElement.data("openitems", totalItems);
 
-                    headerElement.attr("rowspan", totalItems * 2);
+                    if (headerElement.hasClass("multi-row-header")) {
+                        headerElement.attr("rowspan", totalItems * 2);
+                    }
+                    else {
+                        headerElement.attr("rowspan", 1);
+                    }
 
                 }
             });
@@ -93,7 +98,12 @@
 
                     $element.data("openitems", 0);
 
-                    $element.attr("rowspan", totalItems);
+                    if ($element.hasClass("multi-row-header")) {
+                        $element.attr("rowspan", totalItems);
+                    }
+                    else {
+                        $element.attr("rowspan", 1);
+                    }
 
                 }
             });
