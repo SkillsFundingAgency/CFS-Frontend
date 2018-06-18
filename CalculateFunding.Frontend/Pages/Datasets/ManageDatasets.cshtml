@@ -50,7 +50,7 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="~/datasets">@BreadcrumbText.ManageDatasets</a></li>
             <li>@BreadcrumbText.ManageDataSources</li>
         </ol>
@@ -83,7 +83,7 @@
                     <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
                 </span>
                 <span class="dataset-item-property">
-                    <strong>Updated:</strong>
+                    <strong>Uploaded:</strong>
                     <span id="dataset-item-lastupdated-@datasetRow">
                         @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
                     </span>
@@ -112,7 +112,7 @@
                             <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
                         </span>
                         <span class="dataset-item-property">
-                            <strong>Updated:</strong>
+                            <strong>Uploaded:</strong>
                             <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
                         </span>
                         <span class="dataset-item-property">

@@ -3,6 +3,7 @@
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using CalculateFunding.Frontend.ViewModels.Common
 @using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Manage specification";
@@ -11,8 +12,8 @@
 
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li>Specifications</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.Specifications</li>
         </ol>
     </div>
 }
@@ -31,7 +32,7 @@
 
 @section BannerRight{
     <div class="banner-floating-link-container">
-        <a href="/specs/CreateSpecification">Create Specification</a>
+        <a href="/specs/CreateSpecification">Create specification</a>
     </div>
 }
 
@@ -83,7 +84,7 @@
             <thead>
                 <tr>
                     <th>Specification</th>
-                    <th class="text-center">Last Edited</th>
+                    <th class="text-center">Last edited</th>
                     <th class="text-center">Specification status</th>
                     <th class="text-center">More</th>
                 </tr>
@@ -94,7 +95,7 @@
                     <td>
                         <span class="button-split-container">
                             <span class="button-split-icon">
-                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }"><i class="material-icons">edit</i></a>
+                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }" ><i class="material-icons" title="Edit">edit</i></a>
                             </span>
                             <span class="button-split-text">
                                 <a data-bind="attr: {href: '/specs/policies/' + id }, text: name"></a>

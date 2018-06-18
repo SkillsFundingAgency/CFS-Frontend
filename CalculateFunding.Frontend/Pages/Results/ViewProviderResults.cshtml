@@ -22,12 +22,11 @@
 
 @section BannerLeft{
     <h1 class="hero-title">View provider results</h1>
-    <p class="hero-text">Review and validate the results of calculations and the tests for each provider</p>
 }
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-9 filter-field-heading">You can search by provider name, UPIN, UKPRN, URN or establishment number</div>
+            <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
         </div>
         <div class="row">
             <div class="col-xs-9">
@@ -187,7 +186,7 @@
         </div>
         <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
             <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading Provider Results</p>
+            <p>Loading search results</p>
         </div>
     </div>
 </div>

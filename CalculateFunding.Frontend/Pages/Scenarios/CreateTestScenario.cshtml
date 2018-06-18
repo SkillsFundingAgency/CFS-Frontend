@@ -1,5 +1,6 @@
 ﻿@page "{periodId}"
 @model CalculateFunding.Frontend.Pages.Scenarios.CreateTestScenarioPageModel
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Create test scenario";
@@ -9,10 +10,10 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="~/scenarios">Quality assurance</a></li>
-            <li>Create test</li>
-            <li>Quality assurance tests</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/scenarios">@BreadcrumbText.QualityAssurance</a></li>
+            <li>@BreadcrumbText.CreateTest</li>
+            <li>@BreadcrumbText.QualityAssuranceTests</li>
         </ol>
     </div>
 }

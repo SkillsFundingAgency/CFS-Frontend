@@ -3,6 +3,7 @@
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using CalculateFunding.Frontend.Helpers
 @using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Manage Test";
@@ -12,15 +13,14 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
-            <li>Quality assurance</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.QualityAssuranceTests</li>
         </ol>
     </div>
 }
 
 @section BannerLeft{
-    <h1 class="hero-title">Quality assurance</h1>
-    <h2 class="hero-description"> Run and design tests for funding calculations.</h2>
+    <h1 class="hero-title">Quality assurance tests</h1>
 }
 
 @section BannerMiddle{
@@ -50,7 +50,7 @@
     @Html.Partial("_SearchErrorPartial")
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.ScenarioResults, "scenarios", Model.SearchTerm))
+            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.ScenarioResults, "scenarios QA tests", Model.SearchTerm))
         </div>
 
         <div class="test-scenario-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
@@ -64,30 +64,22 @@
                     <div class="test-scenario-item-header">
                         <a href="/scenarios/edittestscenario/@testScenario.Id" id="specification-link-@ScenariosRow" class="data-static-name"> @testScenario.Name</a>
                     </div>
-                    <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.Description</span>
+                    <div class="test-scenario-item-sub-header">
+                        <span class="test-scenario-item-sub-header data-static-description" id="test-scenario-item-property-Description-@ScenariosRow">@testScenario.Description</span>
                     </div>
                     <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property test-scenario-item-property-specification">
-                            Spec:
-                            <strong>
-                                <span class="test-scenario-item-property data-static-specificationName" id="test-scenario-item-specification-@ScenariosRow">@testScenario.SpecificationName</span>
-                            </strong>
-                        </span>
-                    </div>
-                    <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property test-scenario-item-property-status">
-                            Status:
-                            <strong>
-                                <span id="test-item-status-@ScenariosRow" class="data-static-status">@testScenario.Status</span>
-                            </strong>
-                        </span>
                         <span class="test-scenario-item-property test-scenario-item-property-updated-on">
-                            Update on:
+                            Last edited:
                             <strong>
                                 <span id="test-item-lastupdated-@ScenariosRow" class="data-static-lastUpdated">
                                     @testScenario.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString)
                                 </span>
+                            </strong>
+                        </span>
+                        <span class="test-scenario-item-property test-scenario-item-property-specification">
+                            Specification:
+                            <strong>
+                                <span class="test-scenario-item-property data-static-specificationName" id="test-scenario-item-specification-@ScenariosRow">@testScenario.SpecificationName</span>
                             </strong>
                         </span>
                     </div>
@@ -101,39 +93,31 @@
                     <div class="test-scenario-item-header">
                         <a data-bind="text: name, attr: { 'href': '/scenarios/edittestscenario/' + id, 'id': 'specification-link-dynamic-' + $index()}"></a>
                     </div>
-                    <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property data-dynamic-description" data-bind="text: description"></span>
+                    <div class="test-scenario-item-sub-header">
+                        <span class="data-dynamic-description" data-bind="text: description"></span>
                     </div>
                     <div class="test-scenario-item-property-container">
+                        <span class="test-scenario-item-property-lastUpdatedDate">
+                            Last edited:
+                            <strong>
+                                <span class="test-scenario-item-property data-dynamic-lastUpdatedDate" data-bind="text: lastUpdatedDateDisplay"></span>
+                            </strong>
+                        </span>
                         <span class="test-scenario-item-property test-scenario-item-property-specification">
-                            Spec:
+                            Specification:
                             <strong>
                                 <span class="test-scenario-item-property data-dynamic-specificationName" data-bind="text: specificationName"></span>
                             </strong>
                         </span>
                     </div>
-                    <div class="test-scenario-item-property-container">
-                        <span class="test-scenario-item-property test-scenario-item-property-status">
-                            Status:
-                            <strong>
-                                <span class="test-scenario-item-property data-dynamic-status" data-bind="text: status"></span>
-                            </strong>
-                        </span>
-                        <span class="test-scenario-item-property-lastUpdatedDate">
-                            Update on:
-                            <strong>
-                                <span  class="test-scenario-item-property data-dynamic-lastUpdatedDate"  data-bind="text: lastUpdatedDateDisplay"></span>
-                            </strong>
-                        </span>
-                    </div>
                 </div>
             </div>
-            
+
         </div>
 
         <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
             <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading Test Results</p>
+            <p>Loading more QA tests</p>
         </div>
     </div>
 

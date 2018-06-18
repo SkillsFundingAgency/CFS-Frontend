@@ -240,7 +240,7 @@ namespace calculateFunding.createTestScenario {
 
             request.done((response) => {
                 let responseModel : ICreateNewTestScenarioResponseModel = response ;
-                window.location.href = "/scenarios/edittestscenario/" +responseModel.id;
+                window.location.href = "/scenarios/edittestscenario/" +responseModel.id +"/True";
             });
         }
 

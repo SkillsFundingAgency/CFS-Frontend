@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CalculateFunding" xml:space="preserve">
-    <value>Calculate Funding</value>
+    <value>Calculate funding</value>
   </data>
   <data name="ChooseYourData" xml:space="preserve">
-    <value>Choose your data</value>
+    <value>Create dataset</value>
   </data>
   <data name="CompareCalcuationVersions" xml:space="preserve">
     <value>Compare Calculation Versions</value>
@@ -133,10 +133,10 @@
     <value>Create calculation specification</value>
   </data>
   <data name="CreatePolicy" xml:space="preserve">
-    <value>Create Policy</value>
+    <value>Create policy</value>
   </data>
   <data name="CreateSpecification" xml:space="preserve">
-    <value>Create Specification</value>
+    <value>Create specification</value>
   </data>
   <data name="CreateSubPolicy" xml:space="preserve">
     <value>Create subpolicy</value>
@@ -145,7 +145,7 @@
     <value>Edit Calculation</value>
   </data>
   <data name="LoadDatasource" xml:space="preserve">
-    <value>Load new data source</value>
+    <value>Load new data source file</value>
   </data>
   <data name="ManageCalculations" xml:space="preserve">
     <value>Calculations</value>
@@ -160,7 +160,7 @@
     <value>Manage Policies</value>
   </data>
   <data name="ManageSpecifications" xml:space="preserve">
-    <value>Manage Specification</value>
+    <value>Specifications</value>
   </data>
   <data name="SelectSourceDataset" xml:space="preserve">
     <value>Select data source</value>
@@ -182,5 +182,23 @@
   </data>
   <data name="ChooseFundingSpecification" xml:space="preserve">
     <value>Choose funding specification</value>
+  </data>
+  <data name="Specifications" xml:space="preserve">
+    <value>Specifications</value>
+  </data>
+  <data name="QualityAssurance" xml:space="preserve">
+    <value>Quality assurance</value>
+  </data>
+  <data name="CreateTest" xml:space="preserve">
+    <value>Create test</value>
+  </data>
+  <data name="EditSpecification" xml:space="preserve">
+    <value>Edit specification</value>
+  </data>
+  <data name="EditSubpolicy" xml:space="preserve">
+    <value>Edit subpolicy</value>
+  </data>
+  <data name="QualityAssuranceTests" xml:space="preserve">
+    <value>Quality assurance tests</value>
   </data>
 </root>

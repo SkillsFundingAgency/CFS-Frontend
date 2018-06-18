@@ -1,5 +1,7 @@
-﻿@page "{testScenarioId}"
+﻿@page "{testScenarioId}/{wasCreateSuccess?}"
 @model CalculateFunding.Frontend.Pages.Scenarios.EditTestScenarioPageModel
+@using CalculateFunding.Frontend.Properties
+
 @{
     ViewData["Title"] = "Edit Test Scenario";
     Layout = "~/Pages/_Layout.cshtml";
@@ -12,8 +14,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="~/scenarios">Quality assurance</a></li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/scenarios">@BreadcrumbText.QualityAssurance</a></li>
             <li>Edit @Model.EditScenarioViewModel.Name</li>
         </ol>
     </div>
@@ -22,7 +24,7 @@
 <div class="row" id="edit-test-scenario">
 
     <div class="col-xs-12 edit-scenario">
-        <div class="edit-scenario alert alert--success" role="alert" id="SaveStatus" data-bind="visible: savedTestScenarioName(), attr:{'bannertext': BannerText}">           
+        <div class="edit-scenario alert alert--success" role="alert" id="SaveStatus" data-bind="visible: savedTestScenarioName(), attr:{'bannertext': BannerText}">
             <p class="alert__message">
                 <span data-bind="text: savedTestScenarioName"></span> saved.
                 <button type="button" class="close" data-dismiss="modal" data-bind="click: dismissSaveAlert" aria-label="Close">
@@ -132,4 +134,5 @@
             ko.applyBindings(vm, editTestScenarioElement);
         }
     </script>
+
 }

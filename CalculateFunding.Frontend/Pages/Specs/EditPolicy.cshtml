@@ -1,5 +1,6 @@
 ﻿@page "{specificationId}/{policyId}"
 @model CalculateFunding.Frontend.Pages.Specs.EditPolicyPageModel
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "Edit Policy";
@@ -10,7 +11,7 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
             <li><a href="~/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
             <li>Edit policy</li>
@@ -24,7 +25,7 @@
     </div>
     <div class="hero-title">
         <span class="hero-title">Edit policy</span>
-        </div>
+    </div>
 }
 
 <div class="row edit-policy-container">
@@ -36,7 +37,7 @@
                     <div class="form-group">
                         <a validationanchor-for="EditPolicyViewModel.Name"></a>
                         <label asp-for="EditPolicyViewModel.Name">Policy name</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive name other users can understand</span></h4>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input asp-for="EditPolicyViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -46,7 +47,7 @@
                     <div class="form-group">
                         <a validationanchor-for="EditPolicyViewModel.Description"></a>
                         <label asp-for="EditPolicyViewModel.Description">Description</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Update this to say what's changed</span></h4>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Add to this to say what’s changed</span></h4>
                         <textarea asp-for="EditPolicyViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>

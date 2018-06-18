@@ -46,7 +46,7 @@
                     <div class="form-group">
                         <a validationanchor-for="AssignDatasetSchemaViewModel.Name"></a>
                         <label asp-for="AssignDatasetSchemaViewModel.Name">Dataset name</label>
-                        <input asp-for="AssignDatasetSchemaViewModel.Name" class="form-control" type="text" placeholder="Provide unique name for the relationship." id="datasetSchemaName">
+                        <input asp-for="AssignDatasetSchemaViewModel.Name" class="form-control" type="text" placeholder="Use a descriptive unique name other users can understand" id="datasetSchemaName">
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <p  class="form-submit-container"><button type="submit" class="button" id="createDatasetButton">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId" id="cancelLink">Cancel</a></p>
+                    <p  class="form-submit-container"><button type="submit" class="button" id="createDatasetButton">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId" id="cancelLink">Back</a></p>
                 </div>
             </div>
         </form>

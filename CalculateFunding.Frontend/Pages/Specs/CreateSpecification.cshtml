@@ -1,22 +1,21 @@
 ﻿@page "{fundingPeriodId?}"
 @model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationPageModel
-
+@using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "Create specification";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section FormBannerLeft{
-    <h1 class="heading-large">Create Specification</h1>
-    <p class="description-text">This specification describes how a funding stream will be used for an academic year.</p>
+    <h1 class="heading-large">Create specification</h1>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/specs">Specifications</a></li>
-            <li>Create Specification</li>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li>@BreadcrumbText.CreateSpecification</li>
         </ol>
     </div>
 }
@@ -30,7 +29,8 @@
                 <div gds-validationblock-for="CreateSpecificationViewModel.Name">
                     <div class="form-group">
                         <a validationanchor-for="CreateSpecificationViewModel.Name"></a>
-                        <label asp-for="CreateSpecificationViewModel.Name">Name of the specification</label>
+                        <label asp-for="CreateSpecificationViewModel.Name">Specification name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -54,7 +54,8 @@
                 <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamIds">
                     <div class="form-group">
 
-                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding stream</label>
+                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding streams</label>                       
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select one or more funding streams</span></h4>
                         <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
                     </div>
                 </div>
@@ -64,11 +65,12 @@
                     <div class="form-group">
                         <a validationanchor-for="CreateSpecificationViewModel.Description"></a>
                         <label asp-for="CreateSpecificationViewModel.Description">Description</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Update this to say what's changed</span></h4>
                         <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
 
         </form>
 

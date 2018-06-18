@@ -12,7 +12,9 @@
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
-            <li>@BreadcrumbText.ManagePolicies</li>
+            <li><a href="/specs/policies">@BreadcrumbText.ManagePolicies</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li>@Model.Specification.Name</li>
         </ol>
     </div>
 }
@@ -62,7 +64,7 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="jump-to-container">
-            <div>Policy:</div>
+            <div>Policy</div>
             <div class="pull-right"><a href="#" data-action="expand" id="expandCollapseAll">Expand all</a></div>
             <div>
                 <select id="policy-jump">
@@ -80,7 +82,7 @@
                     <th class="table-primary-border"></th>
                     <th class="text-center no-border">Name</th>
                     <th colspan="3" class="text-center">Description</th>
-                    <th class="text-center">Last Edited</th>
+                    <th class="text-center">Last edited</th>
                     <th></th>
                 </tr>
             </thead>
@@ -97,7 +99,7 @@
                     <td class="min-width-md">
                         <span class="button-split-container">
                             <span class="button-split-icon">
-                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons">edit</i></a>
+                                <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons" alt="Edit">edit</i></a>
                             </span>
                             <span class="button-split-text">
                                 <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink"><span class="data-policy-name">@policy.Name</span></a>
@@ -131,8 +133,8 @@
                             <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
                             @if (i == 0)
                             {
-                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header multi-row-header" data-totalItems="@calculations.Count" data-openItems="0">
-                                    <div class="table-type-header">Calcuation Specification</div>
+                                <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@calculations.Count" data-openItems="0">
+                                    <div class="table-type-header">Calculation specification</div>
                                 </td>
                             }
 
