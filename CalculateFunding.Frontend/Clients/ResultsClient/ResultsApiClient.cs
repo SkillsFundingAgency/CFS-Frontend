@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -9,19 +10,14 @@
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Core;
-    using CalculateFunding.Frontend.Interfaces.Core.Logging;
-    using Microsoft.Extensions.Options;
     using Serilog;
 
-    public class ResultsApiClient : AbstractApiClient, IResultsApiClient
+    public class ResultsApiClient : BaseApiClient, IResultsApiClient
     {
-        private readonly string _resultsPath;
 
-        public ResultsApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
-            : base(options, httpClient, logger, correlationIdProvider)
+        public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger)
+            : base(httpClientFactory, HttpClientKeys.Results, logger)
         {
-            _resultsPath = options.Value.ResultsPath ?? "/api/results";
         }
 
         public Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken))
@@ -29,7 +25,7 @@
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<ProviderResults>($"{_resultsPath}/get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
+            return GetAsync<ProviderResults>($"get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
         }
 
         public async Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions)
@@ -38,7 +34,7 @@
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<ProviderSearchResultItem>> results = await PostAsync<SearchResults<ProviderSearchResultItem>, SearchQueryRequest>($"{_resultsPath}/providers-search", request);
+            ApiResponse<SearchResults<ProviderSearchResultItem>> results = await PostAsync<SearchResults<ProviderSearchResultItem>, SearchQueryRequest>($"providers-search", request);
 
             if (results.StatusCode == HttpStatusCode.OK)
             {
@@ -58,12 +54,12 @@
 
         public Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId)
         {
-            return GetAsync<IEnumerable<string>>($"{_resultsPath}/get-provider-specs?providerId={providerId}");
+            return GetAsync<IEnumerable<string>>($"get-provider-specs?providerId={providerId}");
         }
 
         public async Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId)
         {
-            ApiResponse<Provider> provider = await GetAsync<Provider>($"{_resultsPath}/get-provider?providerId={providerId}");
+            ApiResponse<Provider> provider = await GetAsync<Provider>($"get-provider?providerId={providerId}");
 
             if (provider != null && provider.StatusCode == HttpStatusCode.OK)
             {
@@ -82,7 +78,7 @@
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<CalculationProviderResultSearchResultItem>> results = await PostAsync<SearchResults<CalculationProviderResultSearchResultItem>, SearchQueryRequest>($"{_resultsPath}/calculation-provider-results-search", request);
+            ApiResponse<SearchResults<CalculationProviderResultSearchResultItem>> results = await PostAsync<SearchResults<CalculationProviderResultSearchResultItem>, SearchQueryRequest>($"calculation-provider-results-search", request);
 
             if (results.StatusCode == HttpStatusCode.OK)
             {
@@ -104,12 +100,12 @@
         {
             Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
 
-            return PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"{_resultsPath}/get-calculation-result-totals-for-specifications", specificationIds);
+            return PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"get-calculation-result-totals-for-specifications", specificationIds);
         }
 
         public Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId)
         {
-            return GetAsync<IEnumerable<PublishedProviderResult>>($"{_resultsPath}/get-published-provider-results-for-specification?specificationId={specificationId}");
+            return GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
         }
 
         public Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
@@ -117,7 +113,7 @@
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(updateModel, nameof(updateModel));
 
-            return ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"{_resultsPath}/update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
+            return ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
         }
     }
 }

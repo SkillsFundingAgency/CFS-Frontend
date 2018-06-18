@@ -55,15 +55,15 @@
     </form>
 }
 
-<div class="row view-qa-results" id="view-testscenarioresults-container">
-    @Html.Partial("_SearchErrorPartial")
-    <div data-bind="visible: isResultsVisible" class="col-xs-12">
-        @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "QA tests", Model.SearchTerm))
-    </div>
-
-    <div class="col-xs-12">
-        <div data-bind="visible: isResultsVisible">
+    <div class="row view-qa-results" id="view-testscenarioresults-container">
+        <partial name="_SearchErrorPartial" />
+        <div data-bind="visible: isResultsVisible" class="col-xs-12">
+            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "QA tests", Model.SearchTerm)' />
         </div>
+
+        <div class="col-xs-12">
+            <div data-bind="visible: isResultsVisible">
+            </div>
 
         <table class="qa-results-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
             <thead>
@@ -76,41 +76,41 @@
                 </tr>
             </thead>
 
-            <tbody data-bind="foreach: testScenarioResults" class="withjs-show" id="dynamic-results-table-body">
-                <tr>
-                    <td><a data-bind="text: name, attr: {'href': '/scenarios/viewprovidertestresults?scenarioId=' + id}"></a></td>
-                    <td data-bind="text: lastUpdatedDateDisplay"></td>
-                    <td data-bind="text: failures"></td>
-                    <td data-bind="text: passes"></td>
-                    <td data-bind="text: testCoverage + '%'" class="text-right"></td>
-                </tr>
-
-            </tbody>
-            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
-                @{
-                    int rowId = 0;
-                }
-                @foreach (TestScenarioResultItemViewModel result in Model.SearchResults.TestResults)
-                {
+                <tbody data-bind="foreach: testScenarioResults" class="withjs-show" id="dynamic-results-table-body">
                     <tr>
-                        <td id="static-results-name-@rowId"><a href="/scenarios/viewprovidertestresults?scenarioId=@result.Id">@result.Name</a></td>
-                        <td id="static-results-status-@rowId">@result.LastUpdatedDate</td>
-                        <td id="static-results-specificationName-@rowId">@result.Failures</td>
-                        <td id="static-results-periodName-@rowId">@result.Passes</td>
-                        <td id="static-results-coverage-@rowId" class="text-right">@result.TestCoverage%/td>
+                        <td><a data-bind="text: name, attr: {'href': '/scenarios/viewprovidertestresults?scenarioId=' + id}"></a></td>
+                        <td data-bind="text: lastUpdatedDateDisplay"></td>
+                        <td data-bind="text: failures"></td>
+                        <td data-bind="text: passes"></td>
+                        <td data-bind="text: testCoverage + '%'" class="text-right"></td>
                     </tr>
-                    rowId++;
-                }
-            </tbody>
-        </table>
-        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
-            <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading QA Results</p>
+
+                </tbody>
+                <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                    @{
+                        int rowId = 0;
+                    }
+                    @foreach (TestScenarioResultItemViewModel result in Model.SearchResults.TestResults)
+                    {
+                        <tr>
+                            <td id="static-results-name-@rowId"><a href="/scenarios/viewprovidertestresults?scenarioId=@result.Id">@result.Name</a></td>
+                            <td id="static-results-status-@rowId">@result.LastUpdatedDate</td>
+                            <td id="static-results-specificationName-@rowId">@result.Failures</td>
+                            <td id="static-results-periodName-@rowId">@result.Passes</td>
+                            <td id="static-results-coverage-@rowId" class="text-right">@result.TestCoverage%/td>
+                        </tr>
+                        rowId++;
+                    }
+                </tbody>
+            </table>
+            <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+                <img src="~/assets/images/loader.gif" alt="Loading" />
+                <p>Loading QA Results</p>
+            </div>
         </div>
+
+
     </div>
-
-
-</div>
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>

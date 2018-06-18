@@ -18,12 +18,12 @@
 }
 
 @section BannerWhole {
-    @Html.Partial("_SpecificationFullHeaderPartial", Model.Specification)
+    <partial name="_SpecificationFullHeaderPartial" model="Model.Specification" />
 }
 
 @if (Model.PageBanner != null)
 {
-    @Html.Partial("_PageBannerOperationPartial", Model.PageBanner)
+    <partial name="_PageBannerOperationPartial" model="Model.PageBanner" />
 }
 
 <div class="row">
@@ -270,7 +270,7 @@
     <script type="text/javascript" asp-src-include="~/js/policies.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/table.expander.js" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
-    @Html.Partial("_ApproveStatusButtonPartial")
+    <partial name="_ApproveStatusButtonPartial" />
 
     <script type="text/javascript">
         $(".withjs-collapse-closedbydefault").addClass("collapse").removeClass("withjs-collapse-closedbydefault");

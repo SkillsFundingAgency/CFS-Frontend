@@ -4,62 +4,35 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Headers;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.Core;
-    using CalculateFunding.Frontend.Interfaces.Core.Logging;
-    using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using Serilog;
 
-    public abstract class AbstractApiClient
+    public abstract class BaseApiClient
     {
-        private const string SfaCorellationId = "sfa-correlationId";
-        private const string SfaUsernameProperty = "sfa-username";
-        private const string SfaUserIdProperty = "sfa-userid";
-
-        private const string OcpApimSubscriptionKey = "Ocp-Apim-Subscription-Key";
-
         private readonly ILogger _logger;
+        private readonly string _clientKey;
 
-        private readonly IHttpClient _httpClient;
+        private readonly HttpClient _httpClient;
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
-        private readonly ICorrelationIdProvider _correlationIdProvider;
 
-        public AbstractApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
+        public BaseApiClient(IHttpClientFactory httpClientFactory, string clientKey, ILogger logger)
         {
-            Guard.ArgumentNotNull(options, nameof(options));
-            Guard.ArgumentNotNull(httpClient, nameof(httpClient));
-            Guard.ArgumentNotNull(httpClient, nameof(logger));
-            Guard.ArgumentNotNull(httpClient, nameof(correlationIdProvider));
+            Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
+            Guard.IsNullOrWhiteSpace(clientKey, nameof(clientKey));
+            Guard.ArgumentNotNull(logger, nameof(logger));
 
-            _correlationIdProvider = correlationIdProvider;
+            _httpClient = httpClientFactory.CreateClient(clientKey);
 
-            _httpClient = httpClient;
-            string baseAddress = options.Value.ApiEndpoint;
-            if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
-            {
-                baseAddress = $"{baseAddress}/";
-            }
-
-            _httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
-            _httpClient.DefaultRequestHeaders?.Add(OcpApimSubscriptionKey, options.Value.ApiKey);
-            _httpClient.DefaultRequestHeaders?.Add(SfaCorellationId, _correlationIdProvider.GetCorrelationId());
-            _httpClient.DefaultRequestHeaders?.Add(SfaUsernameProperty, "testuser");
-            _httpClient.DefaultRequestHeaders?.Add(SfaUserIdProperty, "b001af14-3754-4cb1-9980-359e850700a8");
-
-            _httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            _httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-
+            _clientKey = clientKey;
             _logger = logger;
 
-            _logger.Debug("AbstractApiClient created with Base URL: {baseAddress}", baseAddress);
+            _logger.Debug("AbstractApiClient created with Client Key: {clientkey} with base address: {baseAddress}", clientKey, _httpClient.BaseAddress);
         }
 
         protected ILogger Logger
@@ -78,7 +51,7 @@
             }
 
             HttpResponseMessage response = null;
-            _logger.Debug("ApiClient GET: {url}", url);
+            _logger.Debug("ApiClient GET: {clientKey}://{url}", _clientKey, url);
 
             response = await _httpClient.GetAsync(url, cancellationToken);
             if (response == null)
@@ -103,7 +76,7 @@
             }
 
             var json = JsonConvert.SerializeObject(request, _serializerSettings);
-            _logger.Debug($"ApiClient POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
+            _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -127,7 +100,7 @@
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
+            _logger.Debug($"ApiClient Validated POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -158,7 +131,7 @@
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            _logger.Debug($"ApiClient POST: {{url}} ({typeof(TRequest).Name})", url);
+            _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -175,8 +148,8 @@
                 throw new ArgumentNullException(nameof(url));
             }
 
-          
-            _logger.Debug($"ApiClient POST: {{url}}", url);
+
+            _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}}", _clientKey, url);
             var response = await _httpClient.PostAsync(url, null, cancellationToken);
             if (response == null)
             {
@@ -194,7 +167,7 @@
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            _logger.Debug($"ApiClient PUT: {{url}} ({typeof(TRequest).Name})", url);
+            _logger.Debug($"ApiClient PUT: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
             var response = await _httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {
@@ -212,7 +185,7 @@
             }
 
             var json = JsonConvert.SerializeObject(request, _serializerSettings);
-            _logger.Debug($"ApiClient Validated POST: {{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", url);
+            _logger.Debug($"ApiClient Validated POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
             var response = await _httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
             if (response == null)
             {

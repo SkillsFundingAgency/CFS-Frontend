@@ -22,7 +22,7 @@
 
 @if (Model.PageBannerOperation != null)
 {
-    @Html.Partial("_PageBannerOperationPartial", Model.PageBannerOperation)
+    <partial name="_PageBannerOperationPartial" model="Model.PageBannerOperation"></partial>
 }
 
 <div class="choose-container">

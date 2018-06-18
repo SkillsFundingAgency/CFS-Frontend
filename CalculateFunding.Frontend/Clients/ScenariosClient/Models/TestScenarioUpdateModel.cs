@@ -2,7 +2,7 @@
 
 namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
 {
-    public class TestScenarioIUpdateModel : Reference
+    public class TestScenarioUpdateModel : Reference
     {
         public string SpecificationId { get; set; }
 
@@ -12,6 +12,5 @@ namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
         /// Source code of Gherkin
         /// </summary>
         public string Scenario { get; set; }
-
     }
 }

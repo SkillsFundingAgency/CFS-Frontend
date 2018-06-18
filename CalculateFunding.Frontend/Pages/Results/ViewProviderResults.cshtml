@@ -57,11 +57,11 @@
 }
 
 <div class="row providers-search" id="providers-search-container">
-    @Html.Partial("_SearchFilterPartial")
-    @Html.Partial("_SearchErrorPartial")
+    <partial name="_SearchFilterPartial" />
+    <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial_ProviderResults", new PagerPartialViewModel(Model.ProviderResults, "providers", Model.SearchTerm))
+            <partial name="_SearchPagerPartial_ProviderResults" model='new PagerPartialViewModel(Model.ProviderResults, "providers", Model.SearchTerm)' />
         </div>
         <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
             @{
@@ -76,40 +76,40 @@
                     </div>
                     <div class="provider-item-property-container">
                         <span class="provider-item-property provider-item-property-upin">
-                            UPIN: 
+                            UPIN:
                             <strong>
-                                <span id="provider-item-upin-@providerRow">                              
-                                      @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
+                                <span id="provider-item-upin-@providerRow">
+                                    @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
                                 </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-ukprn">
-                            UKPRN: 
+                            UKPRN:
                             <strong>
                                 <span id="provider-item-ukprn-@providerRow">
                                     @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
-                                  
+
                                 </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-urn">
-                            URN: 
+                            URN:
                             <strong>
-                                <span id="provider-item-urn-@providerRow">                                
+                                <span id="provider-item-urn-@providerRow">
                                     @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
                                 </span>
                             </strong>
                         </span>
                         <span class="provider-item-property provider-item-property-estab-num">
-                           Establishment number: 
+                            Establishment number:
                             <strong>
-                                <span id="provider-item-establishmentnumber-@providerRow">                           
+                                <span id="provider-item-establishmentnumber-@providerRow">
                                     @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
                                 </span>
                             </strong>
                         </span>
                     </div>
-                    <div  class="provider-item-property-container">
+                    <div class="provider-item-property-container">
                         <span class="provider-item-property provider-item-property-providertype">
                             Provider type:
                             <strong>
@@ -123,7 +123,7 @@
                             </strong>
                         </span>
                     </div>
-                    <div  class="provider-item-property-container">
+                    <div class="provider-item-property-container">
                         <span class="provider-item-property provider-item-property-local-authority">
                             Local authority:
                             <strong>
@@ -131,7 +131,7 @@
                             </strong>
                         </span>
                     </div>
-                    <div  class="provider-item-property-container">
+                    <div class="provider-item-property-container">
                         <span class="provider-item-property provider-item-property-date-opened">
                             Date Opened:
                             <strong>
