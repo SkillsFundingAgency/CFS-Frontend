@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculate Funding.
+        ///   Looks up a localized string similar to Calculate funding.
         /// </summary>
         public static string CalculateFunding {
             get {
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Choose your data.
+        ///   Looks up a localized string similar to Create dataset.
         /// </summary>
         public static string ChooseYourData {
             get {
@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create Policy.
+        ///   Looks up a localized string similar to Create policy.
         /// </summary>
         public static string CreatePolicy {
             get {
@@ -124,7 +124,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create Specification.
+        ///   Looks up a localized string similar to Create specification.
         /// </summary>
         public static string CreateSpecification {
             get {
@@ -138,6 +138,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string CreateSubPolicy {
             get {
                 return ResourceManager.GetString("CreateSubPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create test.
+        /// </summary>
+        public static string CreateTest {
+            get {
+                return ResourceManager.GetString("CreateTest", resourceCulture);
             }
         }
         
@@ -160,6 +169,24 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit specification.
+        /// </summary>
+        public static string EditSpecification {
+            get {
+                return ResourceManager.GetString("EditSpecification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit subpolicy.
+        /// </summary>
+        public static string EditSubpolicy {
+            get {
+                return ResourceManager.GetString("EditSubpolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Funding Approvals.
         /// </summary>
         public static string FundingApprovals {
@@ -169,7 +196,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load new data source.
+        ///   Looks up a localized string similar to Load new data source file.
         /// </summary>
         public static string LoadDatasource {
             get {
@@ -223,11 +250,38 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quality assurance.
+        /// </summary>
+        public static string QualityAssurance {
+            get {
+                return ResourceManager.GetString("QualityAssurance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quality assurance tests.
+        /// </summary>
+        public static string QualityAssuranceTests {
+            get {
+                return ResourceManager.GetString("QualityAssuranceTests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select data source.
         /// </summary>
         public static string SelectSourceDataset {
             get {
                 return ResourceManager.GetString("SelectSourceDataset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifications.
+        /// </summary>
+        public static string Specifications {
+            get {
+                return ResourceManager.GetString("Specifications", resourceCulture);
             }
         }
         
