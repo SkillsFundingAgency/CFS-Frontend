@@ -2,7 +2,7 @@
 @model CalculateFunding.Frontend.Pages.Datasets.CreateDatasetPageModel
 @using CalculateFunding.Frontend.Properties
 @{
-    ViewData["Title"] = "Create Dataset";
+    ViewData["Title"] = "Load new data source file";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </form>
-        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Create data source</button> <a href="/datasets" id="cancelLink">Cancel</a></p>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Create data source</button> <a href="/datasets" id="cancelLink">Back</a></p>
     </div>
 
     <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">
