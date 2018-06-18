@@ -1,4 +1,8 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -7,11 +11,6 @@ using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {

@@ -81,7 +81,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            TestScenarioIUpdateModel editScenario = _mapper.Map<TestScenarioIUpdateModel>(vm);
+            TestScenarioUpdateModel editScenario = _mapper.Map<TestScenarioUpdateModel>(vm);
             editScenario.SpecificationId = specificationId;
             editScenario.Id = testScenarioId;
 

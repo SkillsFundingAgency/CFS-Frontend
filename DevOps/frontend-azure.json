@@ -98,6 +98,8 @@
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
           "AlwaysOn": true,
+	  "use32BitWorkerProcess": false,
+	  "http20Enabled": true,
           "appSettings": [
             {
               "name": "ApiKey",

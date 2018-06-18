@@ -39,8 +39,6 @@
 
             services.AddModule<ApiModule>(Configuration);
 
-            services.AddModule<ProxiesModule>(Configuration);
-
             if (!_hostingEnvironment.IsDevelopment())
             {
                 services.AddModule<LoggingModule>(Configuration);

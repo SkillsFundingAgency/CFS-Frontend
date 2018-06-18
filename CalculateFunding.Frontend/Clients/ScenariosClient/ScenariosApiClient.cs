@@ -1,24 +1,20 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient
 {
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Core;
-    using CalculateFunding.Frontend.Interfaces.Core.Logging;
-    using Microsoft.Extensions.Options;
     using Serilog;
 
-    public class ScenariosApiClient : AbstractApiClient, IScenariosApiClient
+    public class ScenariosApiClient : BaseApiClient, IScenariosApiClient
     {
-        private readonly string _testsPath;
 
-        public ScenariosApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
-           : base(options, httpClient, logger, correlationIdProvider)
+        public ScenariosApiClient(IHttpClientFactory httpClientFactory,  ILogger logger)
+           : base(httpClientFactory, HttpClientKeys.Scenarios, logger)
         {
-            _testsPath = options.Value.ScenariosPath ?? "/api/scenarios";
         }
 
         public async Task<PagedResult<ScenarioSearchResultItem>> FindScenarios(SearchFilterRequest filterOptions)
@@ -27,7 +23,7 @@
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<ScenarioSearchResultItem>> results = await PostAsync<SearchResults<ScenarioSearchResultItem>, SearchQueryRequest>($"{_testsPath}/scenarios-search", request);
+            ApiResponse<SearchResults<ScenarioSearchResultItem>> results = await PostAsync<SearchResults<ScenarioSearchResultItem>, SearchQueryRequest>("scenarios-search", request);
 
             if (results.StatusCode == HttpStatusCode.OK)
             {
@@ -50,14 +46,14 @@
         {
             Guard.ArgumentNotNull(testScenario, nameof(testScenario));
 
-            return PostAsync<TestScenario, CreateScenarioModel>($"{_testsPath}/save-scenario-test-version", testScenario);
+            return PostAsync<TestScenario, CreateScenarioModel>("save-scenario-test-version", testScenario);
         }
 
-        public Task<ApiResponse<TestScenario>> UpdateTestScenario(TestScenarioIUpdateModel testScenario)
+        public Task<ApiResponse<TestScenario>> UpdateTestScenario(TestScenarioUpdateModel testScenario)
         {
             Guard.ArgumentNotNull(testScenario, nameof(testScenario));
 
-            return PostAsync<TestScenario, TestScenarioIUpdateModel>($"{_testsPath}/save-scenario-test-version", testScenario);  
+            return PostAsync<TestScenario, TestScenarioUpdateModel>("save-scenario-test-version", testScenario);
         }
 
 
@@ -65,7 +61,7 @@
         {
             Guard.ArgumentNotNull(scenarioId, nameof(scenarioId));
 
-            return GetAsync<TestScenario>($"{_testsPath}/get-current-scenario-by-id?scenarioId={scenarioId}");
+            return GetAsync<TestScenario>($"get-current-scenario-by-id?scenarioId={scenarioId}");
         }
     }
 }

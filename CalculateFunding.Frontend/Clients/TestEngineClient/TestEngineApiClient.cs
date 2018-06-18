@@ -1,32 +1,28 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.Interfaces.Core;
-using CalculateFunding.Frontend.Interfaces.Core.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Clients.TestEngineClient
 {
-    public class TestEngineApiClient : AbstractApiClient, ITestEngineApiClient
+    public class TestEngineApiClient : BaseApiClient, ITestEngineApiClient
     {
-        private readonly string _apiPath;
 
-        public TestEngineApiClient(IOptionsSnapshot<ApiOptions> options, IHttpClient httpClient, ILogger logger, ICorrelationIdProvider correlationIdProvider)
-              : base(options, httpClient, logger, correlationIdProvider)
+        public TestEngineApiClient(IHttpClientFactory httpClientFactory, ILogger logger)
+              : base(httpClientFactory, HttpClientKeys.TestEngine, logger)
         {
-            _apiPath = options.Value.TestEnginePath ?? "/api/tests";
         }
 
         public Task<ApiResponse<IEnumerable<ScenarioCompileError>>> CompileScenario(ScenarioCompileModel compileModel)
         {
             Guard.ArgumentNotNull(compileModel, nameof(compileModel));
 
-            return PostAsync<IEnumerable<ScenarioCompileError>, ScenarioCompileModel>($"{_apiPath}/validate-test", compileModel);
+            return PostAsync<IEnumerable<ScenarioCompileError>, ScenarioCompileModel>("validate-test", compileModel);
         }
 
  
@@ -36,7 +32,7 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<TestScenarioSearchResultItem>> results = await PostAsync<SearchResults<TestScenarioSearchResultItem>, SearchQueryRequest>($"{_apiPath}/testscenario-search", request);
+            ApiResponse<SearchResults<TestScenarioSearchResultItem>> results = await PostAsync<SearchResults<TestScenarioSearchResultItem>, SearchQueryRequest>("testscenario-search", request);
             if (results.StatusCode == HttpStatusCode.OK)
             {
                 PagedResult<TestScenarioSearchResultItem> result = new SearchPagedResult<TestScenarioSearchResultItem>(filterOptions, results.Content.TotalCount)
@@ -57,14 +53,14 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         {
             Guard.ArgumentNotNull(testScenarioIdsModel, nameof(testScenarioIdsModel));
 
-            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestScenarioResultCountsRequestModel>($"{_apiPath}/get-result-counts", testScenarioIdsModel);
+            return PostAsync<IEnumerable<TestScenarioResultCounts>, TestScenarioResultCountsRequestModel>("get-result-counts", testScenarioIdsModel);
         }
 
         public Task<ApiResponse<ProviderTestScenarioResultCounts>> GetProviderStatusCountsForTestScenario(string providerId)
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            return GetAsync<ProviderTestScenarioResultCounts>($"{_apiPath}/get-testscenario-result-counts-for-provider?providerId={providerId}");
+            return GetAsync<ProviderTestScenarioResultCounts>($"get-testscenario-result-counts-for-provider?providerId={providerId}");
         }
 
         public async Task<PagedResult<ProviderTestSearchResultItem>> FindTestResults(SearchFilterRequest filterOptions)
@@ -73,7 +69,7 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<ProviderTestSearchResultItem>> results = await PostAsync<SearchResults<ProviderTestSearchResultItem>, SearchQueryRequest>($"{_apiPath}/testscenario-search", request);
+            ApiResponse<SearchResults<ProviderTestSearchResultItem>> results = await PostAsync<SearchResults<ProviderTestSearchResultItem>, SearchQueryRequest>("testscenario-search", request);
 
             if (results.StatusCode == HttpStatusCode.OK)
             {
@@ -96,12 +92,12 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         {
             Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
 
-            return PostAsync<IEnumerable<SpecificationTestScenarioResultCounts>, SpecificationIdsRequestModel>($"{_apiPath}/get-testscenario-result-counts-for-specifications", specificationIds);
+            return PostAsync<IEnumerable<SpecificationTestScenarioResultCounts>, SpecificationIdsRequestModel>("get-testscenario-result-counts-for-specifications", specificationIds);
         }
 
         public Task<ApiResponse<ResultCounts>> GetTestScenarioCountsForProviderForSpecification(string specificationId, string providerId)
         {
-            return GetAsync<ResultCounts>($"{_apiPath}/get-testscenario-result-counts-for-specification-for-provider?specificationId={specificationId}&providerId={providerId}");
+            return GetAsync<ResultCounts>($"get-testscenario-result-counts-for-specification-for-provider?specificationId={specificationId}&providerId={providerId}");
         }
     }
 }

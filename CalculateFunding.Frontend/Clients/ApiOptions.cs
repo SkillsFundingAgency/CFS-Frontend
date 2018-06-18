@@ -3,7 +3,7 @@
     /// <summary>
     /// API Configuration Options
     /// </summary>
-    public class ApiOptions : ApiProxyOptions
+    public class ApiOptions
     {
         public string ApiKey { get; set; }
 

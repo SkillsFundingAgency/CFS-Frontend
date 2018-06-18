@@ -2,33 +2,26 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Core;
-    using CalculateFunding.Frontend.Interfaces.Core.Logging;
-    using Microsoft.Extensions.Options;
     using Serilog;
 
-    public class CalculationsApiClient : AbstractApiClient, ICalculationsApiClient
+    public class CalculationsApiClient : BaseApiClient, ICalculationsApiClient
     {
-        private string _calcsPath = "calcs";
-
         public CalculationsApiClient(
-            IOptionsSnapshot<ApiOptions> options,
-            IHttpClient httpClient,
-            ILogger logger,
-            ICorrelationIdProvider correlationIdProvider)
-            : base(options, httpClient, logger, correlationIdProvider)
+            IHttpClientFactory httpClientFactory,
+            ILogger logger)
+            : base(httpClientFactory, HttpClientKeys.Calculations, logger)
         {
-            _calcsPath = options.Value.CalcsPath ?? "calcs";
         }
 
         public Task<ApiResponse<Calculation>> GetCalculationById(string calculationId)
         {
-            return GetAsync<Calculation>($"{_calcsPath}/calculation-current-version?calculationId={calculationId}");
+            return GetAsync<Calculation>($"calculation-current-version?calculationId={calculationId}");
         }
 
         public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions)
@@ -37,7 +30,7 @@
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<CalculationSearchResultItem>> results = await PostAsync<SearchResults<CalculationSearchResultItem>, SearchQueryRequest>($"{_calcsPath}/calculations-search", request);
+            ApiResponse<SearchResults<CalculationSearchResultItem>> results = await PostAsync<SearchResults<CalculationSearchResultItem>, SearchQueryRequest>($"calculations-search", request);
             if (results.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 PagedResult<CalculationSearchResultItem> result = new SearchPagedResult<CalculationSearchResultItem>(filterOptions, results.Content.TotalCount)
@@ -59,12 +52,12 @@
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
-            return PostAsync<Calculation, CalculationUpdateModel>($"{_calcsPath}/calculation-save-version?calculationId={calculationId}", calculation);
+            return PostAsync<Calculation, CalculationUpdateModel>($"calculation-save-version?calculationId={calculationId}", calculation);
         }
 
         public Task<ApiResponse<PreviewCompileResult>> PreviewCompile(PreviewCompileRequest request)
         {
-            return PostAsync<PreviewCompileResult, PreviewCompileRequest>($"{_calcsPath}/compile-preview", request);
+            return PostAsync<PreviewCompileResult, PreviewCompileRequest>($"compile-preview", request);
         }
 
         public Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId)
@@ -74,7 +67,7 @@
 
         public Task<ApiResponse<IEnumerable<CalculationVersion>>> GetAllVersionsByCalculationId(string calculationId)
         {
-            return GetAsync<IEnumerable<CalculationVersion>>($"{_calcsPath}/calculation-version-history?calculationId={calculationId}");
+            return GetAsync<IEnumerable<CalculationVersion>>($"calculation-version-history?calculationId={calculationId}");
         }
 
         public Task<ApiResponse<IEnumerable<CalculationVersion>>> GetMultipleVersionsByCalculationId(IEnumerable<int> versionIds, string calculationId)
@@ -88,12 +81,12 @@
                 CalculationId = calculationId,
             };
 
-            return PostAsync<IEnumerable<CalculationVersion>, CalculationVersionsRequestModel>($"{_calcsPath}/calculation-versions", calcsVersGetModel);
+            return PostAsync<IEnumerable<CalculationVersion>, CalculationVersionsRequestModel>($"calculation-versions", calcsVersGetModel);
         }
 
         public Task<ApiResponse<IEnumerable<TypeInformation>>> GetCodeContextForSpecification(string specificationId)
         {
-            return GetAsync<IEnumerable<TypeInformation>>($"{_calcsPath}/get-calculation-code-context?specificationId={specificationId}");
+            return GetAsync<IEnumerable<TypeInformation>>($"get-calculation-code-context?specificationId={specificationId}");
         }
 
         public Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string calculationId, PublishStatusEditModel model)
@@ -101,14 +94,14 @@
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{_calcsPath}/calculation-edit-status?calculationId={calculationId}", model);
+            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"calculation-edit-status?calculationId={calculationId}", model);
         }
 
         public Task<ApiResponse<IEnumerable<CalculationStatusCounts>>> GetCalculationStatusCounts(SpecificationIdsRequestModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            return PostAsync<IEnumerable<CalculationStatusCounts>, SpecificationIdsRequestModel>($"{_calcsPath}/status-counts", request);
+            return PostAsync<IEnumerable<CalculationStatusCounts>, SpecificationIdsRequestModel>($"status-counts", request);
         }
     }
 }

@@ -28,7 +28,7 @@
         /// </summary>
         /// <param name="EditScenarioModel"></param>
         /// <returns></returns>
-        Task<ApiResponse<TestScenario>> UpdateTestScenario(TestScenarioIUpdateModel editScenarioModel);
+        Task<ApiResponse<TestScenario>> UpdateTestScenario(TestScenarioUpdateModel testScenario);
 
        Task<ApiResponse<TestScenario>> GetCurrentTestScenarioById(string scenarioId);
     }

@@ -220,7 +220,7 @@
 
             //CreateMap<CurrentScenarioVersion, CurrentScenarioVersionViewModel>();
 
-            this.CreateMap<ScenarioEditViewModel, TestScenarioIUpdateModel>()
+            this.CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
               .ForMember(m => m.SpecificationId, opt => opt.Ignore())
               .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
               .ForMember(m => m.Id, opt => opt.Ignore());
