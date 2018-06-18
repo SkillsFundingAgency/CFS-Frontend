@@ -3,7 +3,7 @@
 @using CalculateFunding.Frontend.Properties
 
 @{
-    ViewData["Title"] = "Create test scenario";
+    ViewData["Title"] = "Create QA test scenario";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
@@ -77,7 +77,7 @@
             <div id="create-test-scenario">
                 <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
                 <strong>QA test scenario</strong>
-                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">! Start typing to see common functions, hints and tips</span></h4>
+                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Start typing to see common functions, hints and tips</span></h4>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
                 <div class="spacing-30">

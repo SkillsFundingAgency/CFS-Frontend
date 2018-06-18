@@ -57,7 +57,7 @@
                 <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                         <a validationanchor-for="@Model.EditScenarioViewModel.Name"></a>
-                        <label asp-for="@Model.EditScenarioViewModel.Name">Test name</label>
+                        <label asp-for="@Model.EditScenarioViewModel.Name">QA test name</label>
                         <input data-bind="textInput: name, css:{ 'input-validation-error': !isNameValid() }" asp-for="@Model.EditScenarioViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                 <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
                         <a validationanchor-for="@Model.EditScenarioViewModel.Description"></a>
-                        <label asp-for="@Model.EditScenarioViewModel.Description">Test description</label>
+                        <label asp-for="@Model.EditScenarioViewModel.Description">QA test description</label>
                         <textarea data-bind="textInput: description, css: { 'input-validation-error': !isDescriptionValid() }" asp-for="@Model.EditScenarioViewModel.Description" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
@@ -75,15 +75,15 @@
             <br />
             <div id="edit-test-scenario">
                 <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
-                <strong>Test scenario:</strong>
+                <strong>QA test scenario:</strong>
+                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Start typing to see common functions, hints and tips</span></h4>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
                 <div class="spacing-30">
                     <input type="button" class="button-calculation" value="Validate QA Test" data-bind="click: compileTestScenario, disable: !canRunTest()" id="validate-qa-test-button" />
                 </div>
 
-                <strong>Build output:</strong>
-
+                <strong>QA test validation output:</strong>
                 <div class="build-output">
                     <div data-bind="if: (validationRequested() && !isCompilingTest() && hasGherkinEdited())">
                         <div data-bind="text: testOutput"></div>
