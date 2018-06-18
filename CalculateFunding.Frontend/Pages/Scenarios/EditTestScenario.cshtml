@@ -24,20 +24,6 @@
 <div class="row" id="edit-test-scenario">
 
     <div class="col-xs-12 edit-scenario">
-        @if (Model.CreateTestScenarioStatus)
-        {
-            <div class="edit-scenario alert alert--success" role="alert" id="createStatus">
-                <p class="alert__message">
-                    <span>@Model.EditScenarioViewModel.Name created and saved.</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <div>
-                        <span><a id="dismiss-link" class="spacing-15-top" href="~/scenarios">View all QA tests</a> </span>
-                    </div>
-                </p>
-            </div>
-        }
         <div class="edit-scenario alert alert--success" role="alert" id="SaveStatus" data-bind="visible: savedTestScenarioName(), attr:{'bannertext': BannerText}">
             <p class="alert__message">
                 <span data-bind="text: savedTestScenarioName"></span> saved.
