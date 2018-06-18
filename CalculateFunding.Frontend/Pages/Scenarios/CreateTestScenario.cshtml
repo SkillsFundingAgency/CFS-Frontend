@@ -11,9 +11,8 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="~/scenarios">@BreadcrumbText.QualityAssurance</a></li>
+            <li><a href="~/scenarios">@BreadcrumbText.QualityAssuranceTests</a></li>
             <li>@BreadcrumbText.CreateTest</li>
-            <li>@BreadcrumbText.QualityAssuranceTests</li>
         </ol>
     </div>
 }
@@ -57,8 +56,8 @@
                 <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                         <a validationanchor-for="CreateTestScenarioModel.Name"></a>
-                        <label asp-for="CreateTestScenarioModel.Name">Test name</label>
-                        <p> <span class="text-muted">Use a descriptive unique name other users can understand </span> </p>
+                        <label asp-for="CreateTestScenarioModel.Name"> QA test name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input data-bind="value: name, css:{ 'input-validation-error': !isNameValid() }" asp-for="CreateTestScenarioModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -69,7 +68,7 @@
                 <div class="col-md-6">
                     <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
                         <a validationanchor-for="CreateTestScenarioModel.Description"></a>
-                        <label asp-for="CreateTestScenarioModel.Description">Test description</label>
+                        <label asp-for="CreateTestScenarioModel.Description">QA test description</label>
                         <textarea data-bind="value: description, css: { 'input-validation-error': !isDescriptionValid() }" asp-for="CreateTestScenarioModel.Description" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
@@ -77,15 +76,15 @@
             <br />
             <div id="create-test-scenario">
                 <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
-                <strong>Test scenario</strong>
+                <strong>QA test scenario</strong>
+                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">! Start typing to see common functions, hints and tips</span></h4>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 
                 <div class="spacing-30">
                     <input type="button" class="button-calculation" value="Validate QA Test" data-bind="click: compileTestScenario, disable: !canRunTest()" id="validate-qa-test-button" />
                 </div>
 
-                <strong>Test validation output</strong>
-
+                <strong>QA test validation output</strong>
                 <div class="build-output">
                     <div data-bind="if: (validationRequested() && !isCompilingTest())">
                         <div data-bind="text: testOutput"></div>

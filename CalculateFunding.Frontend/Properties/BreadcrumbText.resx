@@ -190,7 +190,7 @@
     <value>Quality assurance</value>
   </data>
   <data name="CreateTest" xml:space="preserve">
-    <value>Create test</value>
+    <value>Create quality assurance test</value>
   </data>
   <data name="EditSpecification" xml:space="preserve">
     <value>Edit specification</value>
