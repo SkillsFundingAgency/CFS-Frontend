@@ -60,6 +60,7 @@
             }
 
             Calculation = _mapper.Map<CalculationViewModel>(calculation.Content);
+            Calculation.Description = specCalculation.Content.Description;
             SpecificationId = calculation.Content.SpecificationId;
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
 
