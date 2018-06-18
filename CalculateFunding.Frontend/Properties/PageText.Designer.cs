@@ -70,7 +70,16 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Funding Streams.
+        ///   Looks up a localized string similar to Select a funding stream to see approved specifications.
+        /// </summary>
+        public static string ChooseFundingSpecWarningText {
+            get {
+                return ResourceManager.GetString("ChooseFundingSpecWarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Funding streams.
         /// </summary>
         public static string FundingStreams {
             get {
