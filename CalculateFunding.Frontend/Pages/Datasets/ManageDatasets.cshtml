@@ -58,10 +58,10 @@
 }
 
 <div class="row manage-datasets" id="manage-datasets-container">
-    @Html.Partial("_SearchErrorPartial")
+    <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible" >
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "data source files (most recent version)", Model.SearchTerm))
+            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "data source files (most recent version)", Model.SearchTerm)' />
         </div>
 
         <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">

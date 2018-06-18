@@ -63,8 +63,8 @@
 }
 
 <div class="row manage-calculations" id="manage-calculations-container">
-    @Html.Partial("_SearchFilterPartial")
-    @Html.Partial("_SearchErrorPartial")
+    <partial name="_SearchFilterPartial" />
+    <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
 
         @if (Model.DraftSavedCalculation != null)
@@ -83,7 +83,7 @@
             </div>
         }
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm))
+            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm)' />
         </div>
 
         <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">

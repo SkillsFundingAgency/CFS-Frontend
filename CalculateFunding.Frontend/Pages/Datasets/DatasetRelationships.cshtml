@@ -10,7 +10,7 @@
 }
 
 @section BannerLeft{
-<h1 class="hero-title no-margin">Map data sources to datasets for a specification</h1>
+    <h1 class="hero-title no-margin">Map data sources to datasets for a specification</h1>
 }
 
 @section BannerMiddle{
@@ -45,10 +45,10 @@
 }
 
 <div class="row manage-spec-relationships" id="manage-spec-relationships-container">
-    @Html.Partial("_SearchErrorPartial")
+    <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial_SpecRelationships", new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm))
+            <partial name="_SearchPagerPartial_SpecRelationships" model='new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm)' />
         </div>
         @*end of row*@
         <div class="row">

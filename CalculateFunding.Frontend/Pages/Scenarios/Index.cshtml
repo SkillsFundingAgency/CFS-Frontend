@@ -47,10 +47,10 @@
 }
 
 <div class="row manage-tests" id="manage-tests-container">
-    @Html.Partial("_SearchErrorPartial")
+    <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            @Html.Partial("_SearchPagerPartial", new PagerPartialViewModel(Model.ScenarioResults, "scenarios QA tests", Model.SearchTerm))
+            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.ScenarioResults, "scenarios QA tests", Model.SearchTerm)' />
         </div>
 
         <div class="test-scenario-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
