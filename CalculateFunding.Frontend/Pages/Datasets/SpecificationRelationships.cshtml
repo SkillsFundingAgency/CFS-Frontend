@@ -21,7 +21,7 @@
 
 @section BannerLeft{
     <p class="hero-title">@Model.ViewModel.Specification.Name</p>
-    <p class="hero-text">Schemas with their datasets and the data source files mapped to them.</p>
+    <p class="hero-text">Create a dataset from a data source file.</p>
 }
 
 <div class="row spacing-15">
@@ -42,11 +42,11 @@
 
         @if (Model.ViewModel.Items.IsNullOrEmpty())
         {
-            <p id="noDatasourceMappedMessage">No data sources have been mapped to @Model.ViewModel.Specification.Name</p>
-            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
+            <p id="noDatasourceMappedMessage"> No data source files have been mapped to <a href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id"> @Model.ViewModel.Specification.Name</a>.</p>
+            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a data source file to a specification you must:</h4></p>
             <p id="noDatasourceMappedHowToSteps">
                 1. Go to the specification and create a dataset. <br />
-                2. Return here and add a data source to a dataset.
+                2. Return here and map a data source to dataset.
             </p>
         }
         else

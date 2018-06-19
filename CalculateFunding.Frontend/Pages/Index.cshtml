@@ -1,5 +1,7 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.IndexModel
+@using CalculateFunding.Frontend.Properties
+
 @{
     Layout = "~/Pages/_Layout.cshtml";
     ViewData["Title"] = "Homepage";
@@ -8,12 +10,12 @@
 @section BreadCrumb{
 
     <div class="spacing-15">
- 
+
     </div>
 }
 @section BannerLeft{
-    <h1 class="heading-large">Calculate funding</h1>
-    <p>Calculate funding, quality assure the results or approve funding.</p>
+    <h1 class="heading-large">@PageText.CalculateFunding</h1>
+    <p>@PageText.CFSubHeading</p>
 }
 
 <div class="row homepage-section-container">

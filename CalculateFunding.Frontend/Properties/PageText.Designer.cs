@@ -70,6 +70,24 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calculate funding.
+        /// </summary>
+        public static string CalculateFunding {
+            get {
+                return ResourceManager.GetString("CalculateFunding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calculate funding, quality assure the results or approve funding..
+        /// </summary>
+        public static string CFSubHeading {
+            get {
+                return ResourceManager.GetString("CFSubHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a funding stream to see approved specifications.
         /// </summary>
         public static string ChooseFundingSpecWarningText {
