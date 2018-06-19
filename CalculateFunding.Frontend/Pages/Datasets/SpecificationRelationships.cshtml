@@ -13,14 +13,15 @@
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="~/datasets">@BreadcrumbText.ManageDatasets</a></li>
             <li><a href="~/datasets/datasetrelationships">@BreadcrumbText.DatasetRelationships</a></li>
-            <li>@Model.ViewModel.Specification.Name</li>
+            <li><a href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">@Model.ViewModel.Specification.Name</a></li>
+            <li>@BreadcrumbText.SelectSourceDataset</li>
         </ol>
     </div>
 }
 
 @section BannerLeft{
     <p class="hero-title">@Model.ViewModel.Specification.Name</p>
-    <p class="hero-text">Map specification between data sources and datasets.</p>
+    <p class="hero-text">Schemas with their datasets and the data source files mapped to them.</p>
 }
 
 <div class="row spacing-15">

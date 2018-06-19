@@ -12,7 +12,7 @@
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="~/datasets">@BreadcrumbText.ManageDatasets</a></li>
-            <li><a href="~/datasets/datasetrelationships">Map data sources to datasets</a></li>
+            <li><a href="~/datasets/datasetrelationships">@BreadcrumbText.DatasetRelationships</a></li>
             <li><a href="~/datasets/specificationrelationships/@Model.ViewModel.SpecificationId">@Model.ViewModel.SpecificationName</a></li>
             <li>@BreadcrumbText.SelectSourceDataset</li>
         </ol>
@@ -48,7 +48,7 @@ else
                 </div>
                 <input name="specificationId" id="specificationId" type="hidden" value="@Model.ViewModel.SpecificationId" />
                 <a name="data-sources-anchor" class="form-anchor"></a>
-                <h4 class="heading-small">Select data source</h4>
+                <h4 class="heading-small">Select data source file</h4>
 
                 <div class="ds-container @(Model.ModelState.ErrorCount > 0 ? "red-left-border" : "")">
 
@@ -74,7 +74,7 @@ else
                         </div>
                     }
                 </div>
-                <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/datasets/specificationrelationships?specificationId=@Model.ViewModel.SpecificationId" id="cancel-link">Cancel</a></p>
+                <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/datasets/specificationrelationships?specificationId=@Model.ViewModel.SpecificationId" id="cancel-link">Back</a></p>
             </form>
         </div>
 

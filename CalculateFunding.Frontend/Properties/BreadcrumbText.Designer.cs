@@ -142,7 +142,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create test.
+        ///   Looks up a localized string similar to Create quality assurance test.
         /// </summary>
         public static string CreateTest {
             get {
