@@ -42,8 +42,8 @@
 
         @if (Model.ViewModel.Items.IsNullOrEmpty())
         {
-            <p id="noDatasourceMappedMessage"> No data source files have been mapped to <a href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id"> @Model.ViewModel.Specification.Name</a>.</p>
-            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a data source file to a specification you must:</h4></p>
+            <p id="noDatasourceMappedMessage">No data source mapped - @Model.ViewModel.Specification.Name</p>
+            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
             <p id="noDatasourceMappedHowToSteps">
                 1. Go to the specification and create a dataset. <br />
                 2. Return here and map a data source to dataset.
