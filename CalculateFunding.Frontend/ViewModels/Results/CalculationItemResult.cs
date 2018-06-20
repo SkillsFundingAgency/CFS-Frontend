@@ -1,5 +1,5 @@
 ﻿using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using System.Globalization;
+using System;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -9,18 +9,21 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public CalculationSpecificationType CalculationType { get; set; }
 
-        public double SubTotal { get; set; }
+        public decimal SubTotal { get; set; }
 
         public string TotalFormatted
         {
             get
             {
-                if(CalculationType == CalculationSpecificationType.Funding)
+                switch (CalculationType)
                 {
-                    return SubTotal.ToString("N2");
+                    case CalculationSpecificationType.Funding:
+                        return SubTotal.AsFormattedMoney();
+                    case CalculationSpecificationType.Number:
+                        return SubTotal.AsFormattedNumber();
+                    default:
+                        throw new InvalidOperationException("Unknown calculation type");
                 }
-
-                return SubTotal.ToString("C", new CultureInfo("en-GB"));
             }
         }
     }
