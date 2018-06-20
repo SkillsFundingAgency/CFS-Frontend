@@ -180,7 +180,17 @@
         <div class="providers-searchresult-header row" data-bind="visible: isResultsVisible()">
             <div class="col-xs-12">
                 <span> <strong>Provider</strong></span>
-                <span class="float-right"><strong>Total funding</strong>   </span>
+                <span class="float-right">
+                    @if (Model.Calculation.CalculationType == CalculationSpecificationTypeViewModel.Funding)
+                    {
+                        <strong>Total funding</strong>
+
+                    }
+                    else if (Model.Calculation.CalculationType == CalculationSpecificationTypeViewModel.Number)
+                    {
+                        <strong>Total value</strong>
+                    }
+                </span>
             </div>
         </div>
         <div data-bind="visible: isResultsVisible">
@@ -236,7 +246,7 @@
             <p>Loading Provider Results</p>
         </div>
 
-        @if (!Model.CalculationProviderResults.CalculationProviderResults.AnyWithNullCheck())
+        @if (Model.HasProviderDatasetsAssigned && Model.CalculationProviderResults.CalculationProviderResults.AnyWithNullCheck())
         {
             <noscript>
                 <div class="noresults-panel spacing-30">
