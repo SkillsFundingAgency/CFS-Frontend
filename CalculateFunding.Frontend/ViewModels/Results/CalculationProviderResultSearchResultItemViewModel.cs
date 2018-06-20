@@ -14,7 +14,15 @@
         {
             get
             {
-                return CalculationType == CalculationSpecificationType.Funding ? CalculationResult.AsMoney() : CalculationResult.ToString("#.##");
+                switch (CalculationType)
+                {
+                    case CalculationSpecificationType.Funding:
+                        return CalculationResult.AsFormattedMoney();
+                    case CalculationSpecificationType.Number:
+                        return CalculationResult.AsFormattedNumber();
+                    default:
+                        throw new InvalidOperationException("Unknown calculation type");
+                }
             }
         }
 

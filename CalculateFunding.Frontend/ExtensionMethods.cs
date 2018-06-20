@@ -20,27 +20,17 @@
                 return "-";
             }
 
-            return money.Value.AsMoney();
+            return money.Value.AsFormattedMoney();
         }
 
-        public static string AsMoney(this decimal money)
+        public static string AsFormattedMoney(this decimal money)
         {
-            const decimal oneMillion = 1000000M;
-            const decimal oneBillion = 1000000000M;
+            return $"£{money:###,###,###,###,##0.00}";
+        }
 
-            if (money > oneBillion)
-            {
-                var output = $"£{money / oneBillion:0.00}B";
-                return output.EndsWith(".00B") ? output.Replace(".00B", "B") : output;
-            }
-
-            if (money > oneMillion)
-            {
-                var output = $"£{money / oneMillion:0.00}M";
-                return output.EndsWith(".00M") ? output.Replace(".00M", "M") : output;
-            }
-
-            return $"£{money:0.00}";
+        public static string AsFormattedNumber(this decimal number)
+        {
+            return $"{number:###,###,###,###,##0.##########}";
         }
     }
 }
