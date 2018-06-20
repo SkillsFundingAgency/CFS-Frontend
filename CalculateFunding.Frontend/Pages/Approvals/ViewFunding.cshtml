@@ -109,7 +109,7 @@
                                 <input type="checkbox" id="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="target-checkbox-fundingstream" data-providerid="@provider.ProviderId" data-fundingstreamid="@fundingStream.FundingStreamId" /> <label for="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="inline-table-label data-fundingstream-name">@fundingStream.FundingStreamName</label>
                             </td>
                             <td class="text-center @(fundingStream.NumberHeld > 0 ? "status-held" : "")">@fundingStream.NumberHeld/@fundingStream.TotalAllocationLines</td>
-                            <td class="text-center @(fundingStream.NumberApproved > 0 ? "status-held" : "")">@fundingStream.NumberApproved/@fundingStream.TotalAllocationLines</td>
+                            <td class="text-center @(fundingStream.NumberApproved > 0 ? "status-approved" : "")">@fundingStream.NumberApproved/@fundingStream.TotalAllocationLines</td>
                             <td class="text-center @(fundingStream.NumberPublished > 0 ? "status-published" : "")">@fundingStream.NumberPublished/@fundingStream.TotalAllocationLines</td>
                             <td>
                                 <span class="datetime-split-container">

@@ -1748,7 +1748,6 @@ table {
         color: #fff;
         border-radius: 0;
         border: 1px solid #fff;
-        background-color: $turquoise;
         padding: 10px 30px;
         transition: background-color ease-in-out 0.3s;
     }
@@ -1760,10 +1759,12 @@ table {
 
     .approvalstatus-button-approve {
         margin-right: 15px;
+        background-color: $turquoise;
     }
 
     .approvalstatus-button-publish {
         margin-right: 30px;
+        background-color: $grass-green;
     }
 }
 

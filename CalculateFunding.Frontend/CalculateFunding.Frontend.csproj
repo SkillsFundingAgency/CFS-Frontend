@@ -71,6 +71,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="ViewModels\Preview\**" />
+    <Content Remove="ViewModels\Preview\**" />
+    <EmbeddedResource Remove="ViewModels\Preview\**" />
+    <None Remove="ViewModels\Preview\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\BreadcrumbText.Designer.cs">
@@ -113,7 +117,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModels\Preview\" />
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
   </ItemGroup>
   <ItemGroup>
