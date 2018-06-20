@@ -94,11 +94,11 @@
     </div>
     <div class="col-xs-12 col-sm-3">
         <div class="rightcolumn-container">
-            <h2 class="rightcolumn-heading">@Model.Specification.Name Options</h2>
+            <h2 class="rightcolumn-heading">@Model.Specification.Name options</h2>
             @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())
             {
                 <div>
-                    <a href="/specs/createSubPolicy/@Model.Specification.Id">Create sub policy</a>
+                    <a href="/specs/createSubPolicy/@Model.Specification.Id">Create subpolicy</a>
                 </div>
                 <div>
                     <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
