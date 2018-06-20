@@ -166,7 +166,7 @@
     <value>Select data source</value>
   </data>
   <data name="UpdateDataSource" xml:space="preserve">
-    <value>Update data source</value>
+    <value>Update data source file</value>
   </data>
   <data name="ViewCalculationVersions" xml:space="preserve">
     <value>View calculation versions</value>

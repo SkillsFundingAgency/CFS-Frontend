@@ -295,7 +295,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Update data source.
+        ///   Looks up a localized string similar to Update data source file.
         /// </summary>
         public static string UpdateDataSource {
             get {
