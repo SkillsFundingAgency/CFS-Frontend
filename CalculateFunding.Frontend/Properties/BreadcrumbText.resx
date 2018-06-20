@@ -201,4 +201,7 @@
   <data name="QualityAssuranceTests" xml:space="preserve">
     <value>Quality assurance tests</value>
   </data>
+  <data name="EditPolicy" xml:space="preserve">
+    <value>Edit policy</value>
+  </data>
 </root>

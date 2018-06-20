@@ -40,6 +40,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string FundingPeriodId { get; set; }
 
+        public string FundingPeriodName { get; set; }
+
         private string PolicyId { get; set; }
 
         public async Task<IActionResult> OnGetAsync( string specificationId, string policyId)
@@ -59,6 +61,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 SpecificationName = specification.Name;
 
                 FundingPeriodId = specification.FundingPeriod.Id;
+
+                FundingPeriodName = specification.FundingPeriod.Name;
 
                 foreach (Policy policy in specification.Policies)
                 {
