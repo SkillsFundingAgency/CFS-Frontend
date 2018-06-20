@@ -19,7 +19,7 @@
 }
 
 @section FormBannerLeft{
-    <h1 class="hero-title">Update data source</h1>
+    <h1 class="hero-title">Update data source file</h1>
     <div class="grey-left-border">
         <div class="hero-description">
             <span class="hero-description-strong">@Model.DatasetVersion.Name</span> <span>(version @Model.DatasetVersion.Version)</span>
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </form>
-        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Update data source</button> <a href="/datasets" id="cancelLink">Cancel</a></p>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Update data source</button> <a href="/datasets" id="cancelLink">Back</a></p>
     </div>
 
     <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">

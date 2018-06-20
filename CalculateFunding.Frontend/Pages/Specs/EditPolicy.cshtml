@@ -3,7 +3,7 @@
 @using CalculateFunding.Frontend.Properties
 
 @{
-    ViewData["Title"] = "Edit Policy";
+    ViewData["Title"] = "Edit policy";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
@@ -14,18 +14,15 @@
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
             <li><a href="~/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
-            <li>Edit policy</li>
+            <li>@BreadcrumbText.EditPolicy</li>
         </ol>
     </div>
 }
 
 @section FormBannerLeft{
-    <div class="hero-text">
-        <span class="hero-text-strong">@Model.SpecificationName</span>
-    </div>
-    <div class="hero-title">
-        <span class="hero-title">Edit policy</span>
-    </div>
+    <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
+    <h1 class="hero-title">@BreadcrumbText.EditPolicy</h1>
+    <p class="hero-text"> Edit policy for @Model.SpecificationName</p>
 }
 
 <div class="row edit-policy-container">

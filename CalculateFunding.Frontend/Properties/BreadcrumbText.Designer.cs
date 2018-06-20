@@ -169,6 +169,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit policy.
+        /// </summary>
+        public static string EditPolicy {
+            get {
+                return ResourceManager.GetString("EditPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit specification.
         /// </summary>
         public static string EditSpecification {
@@ -295,7 +304,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Update data source.
+        ///   Looks up a localized string similar to Update data source file.
         /// </summary>
         public static string UpdateDataSource {
             get {

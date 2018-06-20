@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
+    using System;
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
@@ -42,13 +43,20 @@
 
             SpecificationSummary specification = await GetSpecification(specificationId);
 
-            SpecificationName = specification.Name;
+            if (specification != null)
+            {
+                SpecificationName = specification.Name;
 
-            FundingPeriodName = specification.FundingPeriod.Name;
+                FundingPeriodName = specification.FundingPeriod.Name;
 
-            FundingPeriodId = specification.FundingPeriod.Id;
+                FundingPeriodId = specification.FundingPeriod.Id;
 
-            return Page();
+                return Page();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unable to retreive specification");
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(string specificationId)
