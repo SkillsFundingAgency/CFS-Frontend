@@ -58,6 +58,7 @@
                     <div data-bind="css: { 'validation-failed-block': !isNameValid() }">
                         <a validationanchor-for="@Model.EditScenarioViewModel.Name"></a>
                         <label asp-for="@Model.EditScenarioViewModel.Name">QA test name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                         <input data-bind="textInput: name, css:{ 'input-validation-error': !isNameValid() }" asp-for="@Model.EditScenarioViewModel.Name" class="form-control" type="text">
                     </div>
                 </div>
@@ -75,7 +76,7 @@
             <br />
             <div id="edit-test-scenario">
                 <div data-bind="visible: isIntellisenseLoading">Loading intellisense</div>
-                <strong>QA test scenario:</strong>
+                <strong>QA test scenario</strong>
                 <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Start typing to see common functions, hints and tips</span></h4>
                 <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: { language: 'gherkin', theme : 'gherkin', autoIndent: true, editorCreatingCallback: function(){registerMonacoProviders($root)}, editorCreatedCallback: function(){configureMonacoEditor($root)}}"></div>
 

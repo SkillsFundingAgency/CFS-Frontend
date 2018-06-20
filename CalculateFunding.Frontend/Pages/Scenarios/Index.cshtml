@@ -50,7 +50,7 @@
     <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.ScenarioResults, "scenarios QA tests", Model.SearchTerm)' />
+            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.ScenarioResults, "QA tests", Model.SearchTerm)' />
         </div>
 
         <div class="test-scenario-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
