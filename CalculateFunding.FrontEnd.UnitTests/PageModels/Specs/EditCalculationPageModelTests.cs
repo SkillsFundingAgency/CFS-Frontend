@@ -121,7 +121,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub1",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -133,7 +133,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub2",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -169,7 +169,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub3",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -692,7 +692,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub1",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -704,7 +704,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub2",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -740,7 +740,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub3",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -927,7 +927,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub1",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -939,7 +939,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub2",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
@@ -975,7 +975,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "sub3",
                         Group = new SelectListGroup()
                         {
-                             Name = "Sub Policies",
+                             Name = "Subpolicies",
                              Disabled = false,
                         },
                     },
