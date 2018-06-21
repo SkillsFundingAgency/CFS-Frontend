@@ -61,6 +61,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Approve and publish funding.
+        /// </summary>
+        public static string ApproveAndPublishFunding {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishFunding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calculate funding.
         /// </summary>
         public static string CalculateFunding {
@@ -160,7 +169,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edit Calculation.
+        ///   Looks up a localized string similar to Edit calculation.
         /// </summary>
         public static string EditCalculation {
             get {
@@ -196,7 +205,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Funding Approvals.
+        ///   Looks up a localized string similar to Funding approvals.
         /// </summary>
         public static string FundingApprovals {
             get {
@@ -241,7 +250,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Manage Policies.
+        ///   Looks up a localized string similar to Manage policies.
         /// </summary>
         public static string ManagePolicies {
             get {

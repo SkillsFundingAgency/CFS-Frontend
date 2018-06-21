@@ -142,7 +142,7 @@
     <value>Create subpolicy</value>
   </data>
   <data name="EditCalculation" xml:space="preserve">
-    <value>Edit Calculation</value>
+    <value>Edit calculation</value>
   </data>
   <data name="LoadDatasource" xml:space="preserve">
     <value>Load new data source file</value>
@@ -157,7 +157,7 @@
     <value>Manage data source files</value>
   </data>
   <data name="ManagePolicies" xml:space="preserve">
-    <value>Manage Policies</value>
+    <value>Manage policies</value>
   </data>
   <data name="ManageSpecifications" xml:space="preserve">
     <value>Specifications</value>
@@ -178,7 +178,7 @@
     <value>View QA test results</value>
   </data>
   <data name="FundingApprovals" xml:space="preserve">
-    <value>Funding Approvals</value>
+    <value>Funding approvals</value>
   </data>
   <data name="ChooseFundingSpecification" xml:space="preserve">
     <value>Choose funding specification</value>
@@ -203,5 +203,8 @@
   </data>
   <data name="EditPolicy" xml:space="preserve">
     <value>Edit policy</value>
+  </data>
+  <data name="ApproveAndPublishFunding" xml:space="preserve">
+    <value>Approve and publish funding</value>
   </data>
 </root>
