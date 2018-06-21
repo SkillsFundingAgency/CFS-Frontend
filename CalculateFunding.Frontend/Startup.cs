@@ -4,12 +4,17 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Frontend.Core.Middleware;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Modules;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -34,8 +39,22 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAuthentication(adOptions =>
+            {
+                adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddAzureAd(options => Configuration.Bind("AzureAd", options))
+            .AddCookie();
+
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddModule<ApiModule>(Configuration);
 
@@ -85,6 +104,8 @@
             });
 
             app.UseMiddleware<CorrelationIdMiddleware>();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
