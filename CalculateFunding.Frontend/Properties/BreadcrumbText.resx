@@ -207,4 +207,13 @@
   <data name="ApproveAndPublishFunding" xml:space="preserve">
     <value>Approve and publish funding</value>
   </data>
+  <data name="ViewCalculationResults" xml:space="preserve">
+    <value>View calculation results</value>
+  </data>
+  <data name="ViewProviderResults" xml:space="preserve">
+    <value>View provider results</value>
+  </data>
+  <data name="ViewResults" xml:space="preserve">
+    <value>View results</value>
+  </data>
 </root>

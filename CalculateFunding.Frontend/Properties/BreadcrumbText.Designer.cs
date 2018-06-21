@@ -322,11 +322,38 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View calculation results.
+        /// </summary>
+        public static string ViewCalculationResults {
+            get {
+                return ResourceManager.GetString("ViewCalculationResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View calculation versions.
         /// </summary>
         public static string ViewCalculationVersions {
             get {
                 return ResourceManager.GetString("ViewCalculationVersions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View provider results.
+        /// </summary>
+        public static string ViewProviderResults {
+            get {
+                return ResourceManager.GetString("ViewProviderResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View results.
+        /// </summary>
+        public static string ViewResults {
+            get {
+                return ResourceManager.GetString("ViewResults", resourceCulture);
             }
         }
     }

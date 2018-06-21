@@ -4,6 +4,7 @@
 @using CalculateFunding.Frontend.ViewModels.Common
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Properties
 
 @{
     ViewData["Title"] = "View provider results";
@@ -13,9 +14,9 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/results">View results</a></li>
-            <li>View provider results</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
+            <li>@BreadcrumbText.ViewProviderResults</li>
         </ol>
     </div>
 }

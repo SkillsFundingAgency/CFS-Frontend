@@ -1,6 +1,6 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Results.ProviderAllocationLinePageModel
-
+@using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "View provider allocations";
     Layout = "~/Pages/_Layout.cshtml";
@@ -9,8 +9,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="~/results/index">View results</a></li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
             <li>@Model.ViewModel.ProviderName</li>
         </ol>
     </div>
@@ -78,36 +78,36 @@
             </ul>
             <br />
             @if (!@Model.ViewModel.AllocationLineItems.IsNullOrEmpty())
-        {
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th style="width:85%" scope="col">Allocation Name</th>
-                        <th scope="col">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var result in Model.ViewModel.AllocationLineItems)
-                {
-                    <tr>
-                        <th scope="row">@result.AllocationLine</th>
-                        <td>@result.TotalFormatted</td>
-                    </tr>
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width:85%" scope="col">Allocation Name</th>
+                            <th scope="col">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in Model.ViewModel.AllocationLineItems)
+                        {
+                            <tr>
+                                <th scope="row">@result.AllocationLine</th>
+                                <td>@result.TotalFormatted</td>
+                            </tr>
+                        }
+
+                        <tr class=" bg-info">
+
+                            <th scope="row" class="spec-rel-grey-back"><strong>Total school budget share (excluding rates)</strong></th>
+                            <td class="spec-rel-grey-back"><strong>@Model.ViewModel.TotalFormatted</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
             }
+            else
+            {
+                <p><strong>Select a specification to view results</strong></p>
 
-                    <tr class=" bg-info">
-
-                        <th scope="row" class="spec-rel-grey-back"><strong>Total school budget share (excluding rates)</strong></th>
-                        <td class="spec-rel-grey-back"><strong>@Model.ViewModel.TotalFormatted</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-    }
-    else
-    {
-        <p><strong>Select a specification to view results</strong></p>
-
-}
+            }
         </div>
     </div>
 </div>
