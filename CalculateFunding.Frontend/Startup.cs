@@ -39,22 +39,24 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(adOptions =>
-            {
-                adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-            .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-            .AddCookie();
+            //services.AddAuthentication(adOptions =>
+            //{
+            //    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            //})
+            //.AddAzureAd(options => Configuration.Bind("AzureAd", options))
+            //.AddCookie();
 
-            services.AddMvc(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
+            //services.AddMvc(config =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //                     .RequireAuthenticatedUser()
+            //                     .Build();
+            //    config.Filters.Add(new AuthorizeFilter(policy));
 
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddModule<ApiModule>(Configuration);
 
@@ -105,7 +107,7 @@
 
             app.UseMiddleware<CorrelationIdMiddleware>();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
