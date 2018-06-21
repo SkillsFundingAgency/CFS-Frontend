@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend
 {
     using System;
+    using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Frontend.Core.Middleware;
@@ -88,13 +89,20 @@
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseStatusCodePagesWithRedirects("/errors/{0}");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler(a => {
+                    a.Run(ctx => {
+                        ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        return Task.CompletedTask;
+                    });
+                });
             }
 
             app.UseStaticFiles(new StaticFileOptions()
