@@ -1,16 +1,17 @@
 ﻿@page "{pageNumber?}"
 @model CalculateFunding.Frontend.Pages.Datasets.ManageDataIndexPageModel
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.Properties
 
 @{
-    ViewData["Title"] = "Manage Data";
+    ViewData["Title"] = "Manage data";
     Layout = "~/Pages/_Layout.cshtml";
 }
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
-            <li>Manage Data</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.ManageDatasets</li>
         </ol>
     </div>
 }

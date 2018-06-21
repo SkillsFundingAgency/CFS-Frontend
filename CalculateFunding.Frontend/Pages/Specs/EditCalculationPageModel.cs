@@ -166,7 +166,7 @@
             if (specification.Policies != null)
             {
                 var policiesGroup = new SelectListGroup { Name = "Policies" };
-                var subPoliciesGroup = new SelectListGroup { Name = "Sub Policies" };
+                var subPoliciesGroup = new SelectListGroup { Name = "Subpolicies" };
 
                 foreach (Policy policy in specification.Policies)
                 {

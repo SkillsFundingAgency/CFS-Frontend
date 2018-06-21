@@ -1,4 +1,6 @@
 ﻿@page
+@using CalculateFunding.Frontend.Properties
+
 @model CalculateFunding.Frontend.Pages.Approvals.IndexModel
 @{
     ViewData["Title"] = "Funding Approvals";
@@ -8,8 +10,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
-            <li>Funding approvals</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.FundingApprovals</li>
         </ol>
     </div>
 }

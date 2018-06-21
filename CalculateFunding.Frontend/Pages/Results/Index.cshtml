@@ -1,15 +1,16 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Results.IndexModel
+@using CalculateFunding.Frontend.Properties
 @{
-    ViewData["Title"] = "View Results";
+    ViewData["Title"] = "View results";
     Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="~/">Calculate Funding</a></li>
-            <li>View results</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.ViewResults</li>
         </ol>
     </div>
 }

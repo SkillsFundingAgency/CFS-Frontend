@@ -1,5 +1,6 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Results.ProviderScenarioResultsPageModel
+@using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "View test results for provider";
     Layout = "~/Pages/_Layout.cshtml";
@@ -8,8 +9,8 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="~/results/index">View results</a></li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
             <li>@Model.ProviderInfoModel.Name</li>
         </ol>
     </div>
@@ -83,7 +84,7 @@
             </span>
         </div>
     </div>
-   
+
 
     <div class="col-xs-12 view-provider-test-results">
         <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="TestSceanarioTabs" role="tablist">

@@ -3,6 +3,7 @@
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
 @using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "View calculation results";
     Layout = "~/Pages/_Layout.cshtml";
@@ -56,65 +57,65 @@
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/results">View results</a></li>
-            <li>View calculation results</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
+            <li>@BreadcrumbText.ViewCalculationResults</li>
         </ol>
     </div>
 }
 
-    <div class="row manage-calculations" id="view-calculation-results-container">
-        <partial name="_SearchFilterPartial" />
-        <partial name="_SearchErrorPartial" />
+<div class="row manage-calculations" id="view-calculation-results-container">
+    <partial name="_SearchFilterPartial" />
+    <partial name="_SearchErrorPartial" />
 
-        <div class="col-xs-12">
-            <div data-bind="visible: isResultsVisible">
-                <partial name="_SearchPagerPartial" model=' new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm)' />
-            </div>
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            <partial name="_SearchPagerPartial" model=' new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm)' />
+        </div>
 
-            <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
-                <thead>
+        <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
+            <thead>
+                <tr>
+                    <th>Calculation</th>
+                    <th>Status</th>
+                    <th>Specification</th>
+                    <th>Updated</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
+                <tr>
+                    <td><a data-bind="attr: {href: '/results/calculationproviderresults?calculationId=' + id }, text: name"></a></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: specificationName"></td>
+                    <td data-bind="text: lastUpdatedDateDisplay"></td>
+                    <td data-bind="text: calculationType"></td>
+                </tr>
+            </tbody>
+            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                @{
+                    int rowId = 0;
+                }
+                @foreach (var calculation in Model.SearchResults.Calculations)
+                {
                     <tr>
-                        <th>Calculation</th>
-                        <th>Status</th>
-                        <th>Specification</th>
-                        <th>Updated</th>
-                        <th>Type</th>
+                        <td id="static-results-name-@rowId"><a href="/results/calculationproviderresults?calculationId=@calculation.Id">@calculation.Name</a></td>
+                        <td id="static-results-status-@rowId">@calculation.Status</td>
+                        <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                        <td id="static-results-lastupdated-date-@rowId">@calculation.LastUpdatedDateDisplay</td>
+                        <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
                     </tr>
-                </thead>
-
-                <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
-                    <tr>
-                        <td><a data-bind="attr: {href: '/results/calculationproviderresults?calculationId=' + id }, text: name"></a></td>
-                        <td data-bind="text: status"></td>
-                        <td data-bind="text: specificationName"></td>
-                        <td data-bind="text: lastUpdatedDateDisplay"></td>
-                        <td data-bind="text: calculationType"></td>
-                    </tr>
-                </tbody>
-                <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
-                    @{
-                        int rowId = 0;
-                    }
-                    @foreach (var calculation in Model.SearchResults.Calculations)
-                    {
-                        <tr>
-                            <td id="static-results-name-@rowId"><a href="/results/calculationproviderresults?calculationId=@calculation.Id">@calculation.Name</a></td>
-                            <td id="static-results-status-@rowId">@calculation.Status</td>
-                            <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
-                            <td id="static-results-lastupdated-date-@rowId">@calculation.LastUpdatedDateDisplay</td>
-                            <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
-                        </tr>
-                        rowId++;
-                    }
-                </tbody>
-            </table>
-            <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
-                <img src="~/assets/images/loader.gif" alt="Loading" />
-                <p>Loading Calculations Results</p>
-            </div>
+                    rowId++;
+                }
+            </tbody>
+        </table>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Calculations Results</p>
         </div>
     </div>
+</div>
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
