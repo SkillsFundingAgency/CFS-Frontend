@@ -115,6 +115,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm selection.
+        /// </summary>
+        public static string ConfirmSelection {
+            get {
+                return ResourceManager.GetString("ConfirmSelection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create calculation specification.
         /// </summary>
         public static string CreateCalculation {

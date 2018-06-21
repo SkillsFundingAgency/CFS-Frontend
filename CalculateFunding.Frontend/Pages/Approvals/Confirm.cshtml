@@ -1,4 +1,5 @@
 ﻿@page
+@using CalculateFunding.Frontend.Properties
 @model CalculateFunding.Frontend.Pages.Approvals.ConfirmPageModel
 @{
     ViewData["Title"] = "Choose " + Model.SpecificationViewModel.Name + " for funding";
@@ -7,16 +8,16 @@
 
 
 @section FormBannerLeft{
-<h1 class="heading-large">Confirm selection: @Model.SpecificationViewModel.Name</h1>
+    <h1 class="heading-large">Confirm selection: @Model.SpecificationViewModel.Name</h1>
 }
 
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
-            <li><a href="/">Calculate Funding</a></li>
-            <li><a href="/approvals">Funding approvals</a></li>
-            <li><a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">Choose funding specification</a></li>
-            <li>Confirm selection</li>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
+            <li><a href="/approvals/choose?fundingPeriod=@Model.FundingPeriodId&fundingStream=@Model.FundingStreamId&operationId=@Model.SpecificationId">@BreadcrumbText.ChooseFundingSpecification</a></li>
+            <li>@BreadcrumbText.ConfirmSelection</li>
         </ol>
     </div>
 }
