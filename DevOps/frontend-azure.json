@@ -42,6 +42,30 @@
       "metadata": {
         "description": "Calculate Funding API Management Endpoint"
       }
+    },
+    "aadDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain name for ad application"
+      }
+    },
+    "aadTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Tenant id of ad application"
+      }
+    },
+    "aadClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Client id of ad application"
+      }
+    },
+    "aadInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "AD instance url for application"
+      }
     }
   },
   "variables": {
@@ -124,6 +148,26 @@
             {
               "name": "ApplicationInsightsOptions:InstrumentationKey",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "AzureAd:Instance",
+              "value": "[parameters('aadInstance')]"
+            },
+            {
+              "name": "AzureAd:CallbackPath",
+              "value": "/signin-oidc"
+            },
+            {
+              "name": "AzureAd:Domain",
+              "value": "[parameters('aadDomain')]"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "[parameters('aadTenantId')]"
+            },
+            {
+              "name": "AzureAd:ClientId",
+              "value": "[parameters('aadClientId')]"
             }
           ]
         }
