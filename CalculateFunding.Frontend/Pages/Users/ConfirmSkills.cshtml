@@ -1,0 +1,107 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Users.ConfirmSkillsModel
+@{
+    ViewData["Title"] = "ConfirmSkills";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <h1 class="heading-large">Calculate funding service: required knowledge and skills</h1>
+}
+
+
+<div id="main-container">
+    <div class="row">
+        <div class="col-sm-12 col-md-9">
+            <p>
+                You must have certain skills, knowledge and experience to use this service along with knowledge of specialist terms used.</a>
+            </p>
+            <p>
+                You must know the general principles on how the Education and Skills Funding Agency allocates funding to providers (schools, academies, apprenticeships and other educational and training establishments).
+            </p>
+            <p>
+                If you have any queries please contact your line manager.
+            </p>
+            <p>
+                <h2 class="heading-medium">
+                    Specifications
+                </h2>
+            </p>
+            <p>
+                Specifications contain the requirements for a funding calculation, including the policies, subpolicies, calculation steps, budget lines, providers in scope and outputs needed.
+            </p>
+            <p>
+                A specification is used for a set funding period and one or more funding streams. You should consider how you set up policies as these will be displayed to providers on their funding statement. Funding calculations will also be displayed on funding statements, and you can choose whether number calculations also appear there.
+            </p>
+            <p>
+                <h2 class="heading-medium">
+                    Calculations and QA tests
+                </h2>
+            </p>
+            <p>
+                You must have a schema set up the Calculate funding team for your particular policies and data source files to work in calculations
+            </p>
+            <p>
+                You must have knowledge of Visual Basic to create or edit calculations and knowledge of Gherkin to create QA tests.
+            </p>
+            <p>
+                Calculate funding uses Intellisense which will help you input functions and links to datasets.
+            </p>
+            <p>
+                <h2 class="heading-medium">
+                    Data source files and datasets
+                </h2>
+            </p>
+            <p>
+                You should only upload a data source file if you are confident that the data it contains and the data schema used are correct and relevant.
+            </p>
+            <p>
+                You should only map a data source file to a dataset for a specification if you are confident that the data schema and data source file version are correct.
+            </p>
+            <p>
+                <h2 class="heading-medium">
+                    Approvals
+                </h2>
+            </p>
+            <div>
+                Only if you have the authority to do so should you approve:<br />
+                <ul class="confirm-skills-list">
+                    <li>
+                        specifications
+                    </li>
+                    <li>
+                        calculations
+                    </li>
+                    <li>
+                        funding
+                    </li>
+                </ul>
+                You should also have the required authority in order to publish funding.
+            </div>
+            <p>
+                <h2 class="heading-medium">
+                    Confirmation
+                </h2>
+            </p>
+            <div>
+                By proceeding you confirm that you:<br />
+                <ul class="confirm-skills-list">
+                    <li>
+                        have the required skills, knowledge and experience to use the Calculate funding service
+                    </li>
+                    <li>
+                        will only approve or publish items if you have the authority to do so
+                    </li>
+                </ul>
+                You won't see this screen again unless you navigate here from the link on the homepage.
+            </div>
+
+            <form method="post" class="form">
+                <p class="form-submit-container"><button type="submit" class="button" id="save-button">Accept</button> <a href="https://www.gov.uk/government/organisations/education-and-skills-funding-agency" id="cancel-link">Cancel</a></p>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+

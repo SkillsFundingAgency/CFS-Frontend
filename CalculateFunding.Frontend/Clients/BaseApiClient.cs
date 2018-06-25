@@ -148,7 +148,6 @@
                 throw new ArgumentNullException(nameof(url));
             }
 
-
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}}", _clientKey, url);
             var response = await _httpClient.PostAsync(url, null, cancellationToken);
             if (response == null)

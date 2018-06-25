@@ -10,8 +10,10 @@
     using CalculateFunding.Frontend.Clients.ScenariosClient;
     using CalculateFunding.Frontend.Clients.SpecsClient;
     using CalculateFunding.Frontend.Clients.TestEngineClient;
+    using CalculateFunding.Frontend.Clients.UsersClient;
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Frontend.Interfaces.APiClient;
     using Microsoft.Extensions.DependencyInjection;
     using Polly;
 
@@ -97,6 +99,17 @@
                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
+            services.AddHttpClient(HttpClientKeys.Users,
+             c =>
+             {
+                 string apiBase = options.UsersPath ?? "users";
+
+                 SetDefaultApiOptions(c, options, apiBase);
+             })
+             .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+             .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+              .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+
             services
                .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
 
@@ -114,6 +127,9 @@
 
             services
                .AddScoped<ITestEngineApiClient, TestEngineApiClient>();
+
+            services
+              .AddScoped<IUsersApiClient, UsersApiClient>();
         }
 
         private static void SetDefaultApiOptions(HttpClient httpClient, ApiOptions options, string apiBase)

@@ -168,6 +168,10 @@
             {
               "name": "AzureAd:ClientId",
               "value": "[parameters('aadClientId')]"
+            },
+            {
+              "name": "AzureAd:IsEnabled",
+              "value": "false"
             }
           ]
         }

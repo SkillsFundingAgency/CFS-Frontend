@@ -1,13 +1,19 @@
 ﻿namespace CalculateFunding.Frontend
 {
     using System;
+    using System.Net;
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.UsersClient;
+    using CalculateFunding.Frontend.Clients.UsersClient.Models;
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.APiClient;
     using CalculateFunding.Frontend.Modules;
+    using CalculateFunding.Frontend.Options;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.AspNetCore.Authorization;
@@ -23,6 +29,8 @@
     public class Startup
     {
         private IHostingEnvironment _hostingEnvironment;
+
+        private bool _authenticationEnabled;
 
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
@@ -40,24 +48,33 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            //services.AddAuthentication(adOptions =>
-            //{
-            //    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            //})
-            //.AddAzureAd(options => Configuration.Bind("AzureAd", options))
-            //.AddCookie();
+            AzureAdOptions azureAdOptions = new AzureAdOptions();
+            Configuration.Bind("AzureAd", azureAdOptions);
+            _authenticationEnabled = azureAdOptions.IsEnabled;
 
-            //services.AddMvc(config =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                     .RequireAuthenticatedUser()
-            //                     .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
+            if (_authenticationEnabled)
+            {
+                services.AddAuthentication(adOptions =>
+                {
+                    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                })
+                .AddAzureAd(options => Configuration.Bind("AzureAd", options))
+                .AddCookie();
 
-            //}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                services.AddMvc(config =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                                     .RequireAuthenticatedUser()
+                                     .Build();
+                    config.Filters.Add(new AuthorizeFilter(policy));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            }
+            else
+            {
+                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            }
 
             services.AddModule<ApiModule>(Configuration);
 
@@ -115,7 +132,12 @@
 
             app.UseMiddleware<CorrelationIdMiddleware>();
 
-            //app.UseAuthentication();
+            if (_authenticationEnabled)
+            {
+                app.UseAuthentication();
+
+                app.UseMiddleware<SkillsCheckMiddleware>();
+            }
 
             app.UseMvc(routes =>
             {
