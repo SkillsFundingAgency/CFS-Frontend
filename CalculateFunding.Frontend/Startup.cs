@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend
 {
     using System;
+    using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Frontend.Core.Middleware;
@@ -39,22 +40,24 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(adOptions =>
-            {
-                adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-            .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-            .AddCookie();
+            //services.AddAuthentication(adOptions =>
+            //{
+            //    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            //})
+            //.AddAzureAd(options => Configuration.Bind("AzureAd", options))
+            //.AddCookie();
 
-            services.AddMvc(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
+            //services.AddMvc(config =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //                     .RequireAuthenticatedUser()
+            //                     .Build();
+            //    config.Filters.Add(new AuthorizeFilter(policy));
 
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddModule<ApiModule>(Configuration);
 
@@ -86,13 +89,20 @@
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseStatusCodePagesWithRedirects("/errors/{0}");
+
+            if (!env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler(a => {
+                    a.Run(ctx => {
+                        ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        return Task.CompletedTask;
+                    });
+                });
             }
 
             app.UseStaticFiles(new StaticFileOptions()
@@ -105,7 +115,7 @@
 
             app.UseMiddleware<CorrelationIdMiddleware>();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
