@@ -9,7 +9,7 @@ namespace CalculateFunding.Frontend.Clients.CommonModels
     {
         public static IActionResult IsSuccessOrReturnFailureResult<T>(this ApiResponse<T> apiResponse, string entityName)
         {
-            Guard.IsNullOrWhiteSpace(entityName, nameof(apiResponse));
+            Guard.IsNullOrWhiteSpace(entityName, nameof(entityName));
 
             if (apiResponse == null)
             {

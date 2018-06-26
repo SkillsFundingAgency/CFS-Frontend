@@ -1,5 +1,4 @@
-﻿/// <binding BeforeBuild='copy-assets, sass' ProjectOpened='watch-sass, ts:watch' />
-
+/// <binding ProjectOpened='watch-sass, ts:watch, sass, ts:builddev, copy-assets' />
 "use strict";
 
 var lodash = require("lodash"),
