@@ -1,0 +1,226 @@
+﻿@page
+@*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
+@model CalculateFunding.Frontend.Pages.Results.ViewProviderResultsPageModel
+@using CalculateFunding.Frontend.ViewModels.Common
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "View provider results";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results">@BreadcrumbText.ViewResults</a></li>
+            <li>@BreadcrumbText.ViewProviderResults</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">View provider results</h1>
+}
+@section BannerMiddle{
+    <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search provider" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-4 filter-field-heading">Provider type</div>
+            <div class="col-xs-4 filter-field-heading">Provider subtype</div>
+            <div class="col-xs-4 filter-field-heading">Local authority</div>
+        </div>
+        <div class="row withjs-show" data-bind="visible: searchPerformed">
+            <div class="col-xs-4">
+                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+            </div>
+
+        </div>
+    </form>
+}
+
+<div class="row providers-search" id="providers-search-container">
+    <partial name="_SearchFilterPartial" />
+    <partial name="_SearchErrorPartial" />
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            <partial name="_SearchPagerPartial_ProviderResults" model='new PagerPartialViewModel(Model.ProviderResults, "providers", Model.SearchTerm)' />
+        </div>
+        <div class="providers-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+            @{
+                int providerRow = 0;
+            }
+
+            @foreach (var provider in Model.ProviderResults.Providers)
+            {
+                <div class="provider-item-container" id="provider-item-result-@providerRow">
+                    <div class="provider-item-header">
+                        <h4 class="heading-small"><a href="/results/providerallocationline?providerId=@provider.Ukprn">@provider.Name</a></h4>
+                    </div>
+                    <div class="provider-item-property-container">
+                        <span class="provider-item-property provider-item-property-upin">
+                            UPIN:
+                            <strong>
+                                <span id="provider-item-upin-@providerRow">
+                                    @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
+                                </span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property provider-item-property-ukprn">
+                            UKPRN:
+                            <strong>
+                                <span id="provider-item-ukprn-@providerRow">
+                                    @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
+
+                                </span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property provider-item-property-urn">
+                            URN:
+                            <strong>
+                                <span id="provider-item-urn-@providerRow">
+                                    @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
+                                </span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property provider-item-property-estab-num">
+                            Establishment number:
+                            <strong>
+                                <span id="provider-item-establishmentnumber-@providerRow">
+                                    @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="provider-item-property-container">
+                        <span class="provider-item-property provider-item-property-providertype">
+                            Provider type:
+                            <strong>
+                                <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
+                            </strong>
+                        </span>
+                        <span class="provider-item-property provider-item-property-provider">
+                            &nbsp;Provider subtype:
+                            <strong>
+                                <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="provider-item-property-container">
+                        <span class="provider-item-property provider-item-property-local-authority">
+                            Local authority:
+                            <strong>
+                                <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="provider-item-property-container">
+                        <span class="provider-item-property provider-item-property-date-opened">
+                            Date Opened:
+                            <strong>
+                                <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+                providerRow++;
+            }
+        </div>
+        <div data-bind="visible: isResultsVisible">
+            <div class="providers-searchresult-container spacing-30 withjs-show" data-bind="foreach: providerSearchResults">
+                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index()">
+                    <div class="provider-item-header">
+                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/providerallocationline?providerId=' + ukprn }, text: name"></a></h4>
+                    </div>
+                    <p>
+                        <span class="provider-item-property">
+                            UPIN:&nbsp; <strong> <span data-bind="text: upin > 0 ? upin : 'No data found', attr:{  'id' : 'provider-item-upin-'+$index() }"></span> </strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;UKPRN:&nbsp;<strong> <span data-bind="text: ukprn > 0 ? ukprn : 'No data found', attr:{ 'id' : 'provider-item-ukprn-' +$index()}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;URN:&nbsp;<strong><span data-bind="text: urn > 0 ? urn : 'No data found', attr: {'id' : 'provider-item-urn-' +$index()}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Establishment number:&nbsp;<strong><span data-bind="text: establishmentNumber > 0 ? establishmentNumber : 'No data found', attr: {'id' : 'provider-item-establishmentnumber-' +$index()}"></span></strong>
+                        </span>
+                    </p>
+                    <div>
+                        <span class="provider-item-property">
+                            Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: {'id' : 'provider-item-providertype-'+$index()}"></span></strong>
+                        </span>
+                        <span class="provider-item-property">
+                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{'id' : 'provider-item-providersubtype-' +$index()}"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Local authority:&nbsp;<strong><span data-bind="text: localAuthority, attr: {'id' : 'provider-item-localauthority-'+$index()}"></span></strong>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="provider-item-property">
+                            Date Opened:&nbsp;<strong><span data-bind="text: dateOpenedDisplay, attr: {'id' :'provider-item-dateopened-'+$index()}"> </span></strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading search results</p>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.providers.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.results.listProviderResults.ProviderSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+        var providerResultsContainer = document.getElementById("providers-search-container");
+        if (providerResultsContainer) {
+            ko.applyBindings(vm, providerResultsContainer);
+        }
+        vm.performSearch();
+
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

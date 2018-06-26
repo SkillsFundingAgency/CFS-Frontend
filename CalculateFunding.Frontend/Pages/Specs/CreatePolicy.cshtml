@@ -1,0 +1,72 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreatePolicyPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Create policy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
+    <h1 class="hero-title">@BreadcrumbText.CreatePolicy</h1>
+    <p class="hero-text"> Create policy for @Model.SpecificationName</p>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId#spec-@Model.SpecificationId">@Model.FundingPeriodName</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.CreatePolicy</li>
+        </ol>
+    </div>
+}
+
+<div class="row">   
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div gds-validation-summary="All"></div>
+            <div>
+                <div gds-validationblock-for="CreatePolicyViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="CreatePolicyViewModel.Name"></a>
+                        <label asp-for="CreatePolicyViewModel.Name">Policy name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                        <input asp-for="CreatePolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div gds-validationblock-for="CreatePolicyViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="CreatePolicyViewModel.Description"></a>
+                        <label asp-for="CreatePolicyViewModel.Description">Description</label>
+                        <textarea asp-for="CreatePolicyViewModel.Description" rows="10" class="form-control" id="contents" title="Contents"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Create policy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
+
+        </form>
+
+    </div>
+</div>
+@section Scripts
+    {
+    @*<script type="text/javascript">
+            $(function () {
+                $('.summernote').summernote({
+                    height: 200
+                });
+
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+                    alert($('.summernote').summernote('code'));
+                    alert($('.summernote').val());
+                });
+            });
+        </script>*@
+}

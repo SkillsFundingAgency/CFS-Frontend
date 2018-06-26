@@ -1,0 +1,14 @@
+﻿@using System.Web
+@model CalculateFunding.Frontend.ViewModels.Common.PagerPartialViewModel
+
+<div data-bind="visible: !searchPerformed()" id="static-rowcount-container">
+    <div >
+        Showing <span id="startItemNumber">@Model.StartItemNumber</span>- <span id="endItemNumber">@Model.EndItemNumber of</span> <strong id="totalResults">@Model.TotalResults</strong> @Model.EntityName
+    </div>
+
+</div>
+
+<div class="withjs-show" data-bind="visible: searchPerformed" id="dynamic-rowcount-container">
+
+    Showing <span id="startItemNumber" data-bind="text: startItemNumber"></span>-<span id="endItemNumber" data-bind="text: endItemNumber"></span> of <strong id="totalResultsCount" data-bind="text: totalResults"></strong> @Model.EntityName
+</div>

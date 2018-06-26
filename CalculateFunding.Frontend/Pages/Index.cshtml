@@ -1,0 +1,65 @@
+﻿@page
+@using CalculateFunding.Frontend.Pages
+@model CalculateFunding.Frontend.Pages.IndexModel
+@using CalculateFunding.Frontend.Properties
+@{
+    Layout = "~/Pages/_Layout.cshtml";
+    ViewData["Title"] = "Homepage";
+
+}
+@section BreadCrumb{
+
+    <div class="spacing-15">
+
+    </div>
+}
+@section BannerLeft{
+    <h1 class="heading-large">@PageText.CalculateFunding</h1>
+    <p>@PageText.CFSubHeading</p>
+}
+
+<div class="row homepage-section-container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/specs" class="heading-small">Specifications</a>
+            </div>
+            <div>Create and manage the policy specifications used to calculate funding.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/datasets" class="heading-small">Manage data</a>
+            </div>
+            <div>Manage data source files or map them to datasets for a specification.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/scenarios" class="heading-small">Quality assurance tests</a>
+            </div>
+            <div>Design tests to check calculations and data.</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/calcs" class="heading-small">Calculations</a>
+            </div>
+            <div>View and edit calculations.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/results" class="heading-small">View results</a>
+            </div>
+            <div>View results for providers, calculations and quality assurance tests.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/approvals" class="heading-small">Funding approvals</a>
+            </div>
+            <div>Approve funding for providers and view how it's been calculated.</div>
+        </div>
+    </div>
+</div>
+
+
+

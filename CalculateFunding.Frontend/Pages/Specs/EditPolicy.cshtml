@@ -1,0 +1,55 @@
+﻿@page "{specificationId}/{policyId}"
+@model CalculateFunding.Frontend.Pages.Specs.EditPolicyPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Edit policy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
+            <li><a href="~/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.EditPolicy</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
+    <h1 class="hero-title">@BreadcrumbText.EditPolicy</h1>
+    <p class="hero-text"> Edit policy for @Model.SpecificationName</p>
+}
+
+<div class="row edit-policy-container">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form" id="edit-policy-form">
+            <div gds-validation-summary="All"></div>
+            <div>
+                <div gds-validationblock-for="EditPolicyViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="EditPolicyViewModel.Name"></a>
+                        <label asp-for="EditPolicyViewModel.Name">Policy name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                        <input asp-for="EditPolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditPolicyViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="EditPolicyViewModel.Description"></a>
+                        <label asp-for="EditPolicyViewModel.Description">Description</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Add to this to say what’s changed</span></h4>
+                        <textarea asp-for="EditPolicyViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Update policy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
+        </form>
+    </div>
+</div>

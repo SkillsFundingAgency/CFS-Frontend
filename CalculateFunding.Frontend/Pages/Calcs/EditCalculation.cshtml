@@ -1,0 +1,111 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.EditCalculationPageModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
+@{
+    ViewData["Title"] = "Edit Calculation";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-pre-text">@Model.SpecificationName </p>
+    <p class="hero-title">
+        @Model.Calculation.Name
+        <span class="flag flag--soon">@Model.Calculation.CalculationType</span>
+    </p>
+
+    <div class="inline-calculation-container">
+        <div class="inline-calculation-heading">
+            <span>Description</span>
+        </div>
+        <div class="inline-calculation-contents">
+            @Model.Calculation.Description
+        </div>
+    </div>
+
+}
+
+@section FormBannerRight{
+    <div class="bannerblue-container">
+        <div class="bannerblue-title">Status</div>
+        <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
+        <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
+        <div class="bannerblue-button-container" id="approve-button-container">
+            <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+        </div>
+    </div>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+            <li>@Model.Calculation.Name</li>
+        </ol>
+    </div>
+}
+<div class="row">
+    <div class="col-xs-12 edit-calculation" id="edit-calculation">
+        <strong>Calculation script</strong>
+        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+        <div>
+            <a href="/calcs/compare/@Model.Calculation.Id" id="view-previous-versions-button">View previous versions</a>
+        </div>
+
+        <div class="spacing-30">
+            <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+        </div>
+
+        <strong>Build output</strong>
+
+        <div class="build-output">
+            <div data-bind="text: buildOutput"></div>
+            <div data-bind="with: compilerResponse" id="compiler-response">
+                Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
+
+                <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                    <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="spacing-30" data-bind="visible: !calculationBuilt()">Your calculation's build output must be successful before you can save it.</div>
+        <div class="spacing-15">
+            <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+        </div>
+
+        <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult"></div>
+
+        <div>
+            <a href="/calcs" id="link-back">Back</a>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/editcalculation.js" type="text/javascript" asp-append-version="true"></script>
+
+    <partial name="_ApproveStatusButtonPartial" />
+
+    <script type="text/javascript">
+        var editCalculationElement = document.getElementById("edit-calculation");
+        if (editCalculationElement) {
+            var editViewModelOptions = {
+                calculationId: "@Model.Calculation.Id",
+                specificationId: "@Model.SpecificationId",
+                existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))"
+            };
+            var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
+            viewModel.loadIntellisenseContext();
+            ko.applyBindings(viewModel, editCalculationElement);
+
+            ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
+        }
+    </script>
+}

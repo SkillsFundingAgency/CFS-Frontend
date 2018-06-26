@@ -1,0 +1,151 @@
+﻿@page "{pageNumber?}"
+@model CalculateFunding.Frontend.Pages.Results.ViewCalculationResultsModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "View calculation results";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">View calculation results</h1>
+}
+
+@section BannerMiddle{
+    <form method="post" action="/results/viewcalculationresults" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+        <div class="row">
+            <div class="col-xs-9 filter-field-heading">Search calculations</div>
+            <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                </div>
+            </div>
+            <div class="withjs-show col-xs-3">
+                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select Allocation Line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
+            </div>
+        </div>
+        <div class="row spacing-15-top withjs-show">
+            <div class="col-xs-3 filter-field-heading">Funding period</div>
+            <div class="col-xs-3 filter-field-heading">Funding stream</div>
+            <div class="col-xs-3 filter-field-heading">Specification</div>
+            <div class="col-xs-3 filter-field-heading">Calculation status</div>
+        </div>
+        <div class="row withjs-show">
+            <div class="col-xs-3">
+                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all status', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
+            </div>
+
+        </div>
+    </form>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
+            <li>@BreadcrumbText.ViewCalculationResults</li>
+        </ol>
+    </div>
+}
+
+<div class="row manage-calculations" id="view-calculation-results-container">
+    <partial name="_SearchFilterPartial" />
+    <partial name="_SearchErrorPartial" />
+
+    <div class="col-xs-12">
+        <div data-bind="visible: isResultsVisible">
+            <partial name="_SearchPagerPartial" model=' new PagerPartialViewModel(Model.SearchResults, "calculations", Model.SearchTerm)' />
+        </div>
+
+        <table class="calculations-table table-striped" id="calculation-results-table" data-bind="visible: isResultsVisible">
+            <thead>
+                <tr>
+                    <th>Calculation</th>
+                    <th>Status</th>
+                    <th>Specification</th>
+                    <th>Updated</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
+                <tr>
+                    <td><a data-bind="attr: {href: '/results/calculationproviderresults?calculationId=' + id }, text: name"></a></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: specificationName"></td>
+                    <td data-bind="text: lastUpdatedDateDisplay"></td>
+                    <td data-bind="text: calculationType"></td>
+                </tr>
+            </tbody>
+            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                @{
+                    int rowId = 0;
+                }
+                @foreach (var calculation in Model.SearchResults.Calculations)
+                {
+                    <tr>
+                        <td id="static-results-name-@rowId"><a href="/results/calculationproviderresults?calculationId=@calculation.Id">@calculation.Name</a></td>
+                        <td id="static-results-status-@rowId">@calculation.Status</td>
+                        <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                        <td id="static-results-lastupdated-date-@rowId">@calculation.LastUpdatedDateDisplay</td>
+                        <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
+                    </tr>
+                    rowId++;
+                }
+            </tbody>
+        </table>
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading Calculations Results</p>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.calcuation-results.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.viewCalculationResults.CalculationSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("view-calculation-results-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+        vm.performSearch();
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

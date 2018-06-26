@@ -1,0 +1,240 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Specs.IndexModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.ViewModels.Common
+@using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Manage specification";
+}
+@section BreadCrumb{
+
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.Specifications</li>
+        </ol>
+    </div>
+}
+@section BannerLeft{
+    <!-- Breadcrumbs -->
+    <h1 class="hero-title">Specifications</h1>
+    <form method="post" action="/specs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+
+        <div class="input-group">
+            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+            <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        </div>
+    </form>
+}
+
+
+@section BannerRight{
+    <div class="banner-floating-link-container">
+        <a href="/specs/CreateSpecification">Create specification</a>
+    </div>
+}
+
+@if (Model.OperationType.HasValue)
+{
+    <partial name="_PageBannerOperationPartial" model="Model.PageBanner" />
+}
+
+<div class="row" id="manage-specifications-container">
+    <partial name="_SearchErrorPartial" />
+    <div class="col-xs-12">
+
+        <div class="table-filter-container" id="table-filter-header">
+            <div class="row">
+                <div class="col-xs-2">
+                    <div class="withjs-show">
+                        Funding period
+                        <select id="fundingPeriods" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+                    </div>
+                </div>
+
+                <div class="col-xs-3">
+                    <div class="withjs-show">
+                        Funding streams
+                        <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
+                    </div>
+                </div>
+
+                <div class="col-xs-2">
+                    <div class="withjs-show">
+                        Status
+                        <select id="status" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: statuses, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatuses, enable: canSelectFilters" multiple></select>
+                    </div>
+                </div>
+
+                <div class="col-xs-2">
+                    <div class="spacing-30-top withjs-show">
+                        <a href="#" data-bind="click: removeFilters">Clear filters</a>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="spacing-30-top text-right">
+                        <partial name="_SearchTableRowCountPartial" model='new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm)' />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="cf" id="specifications-table" data-bind="visible: isResultsVisible">
+            <thead>
+                <tr>
+                    <th>Specification</th>
+                    <th class="text-center">Last edited</th>
+                    <th class="text-center">Specification status</th>
+                    <th class="text-center">More</th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: specifications" class="withjs-show" id="dynamic-results-table-body">
+                <tr>
+                    <td>
+                        <span class="button-split-container">
+                            <span class="button-split-icon">
+                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }" ><i class="material-icons" title="Edit">edit</i></a>
+                            </span>
+                            <span class="button-split-text">
+                                <a data-bind="attr: {href: '/specs/policies/' + id }, text: name"></a>
+                            </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="datetime-split-container">
+                            <span class="datetime-split-date data-specification-lastupdated-date" data-bind="text: lastUpdatedDateFormatted"></span>
+                            <span class="datetime-split-time data-specification-lastupdated-time" data-bind="text: lastUpdatedTimeFormatted"></span>
+                        </span>
+                    </td>
+                    <td data-bind="text: status, css: $root.statusCssClass(status)"></td>
+                    <td class="expander-trigger-cell" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
+                </tr>
+                <tr class="expander-container">
+                    <td colspan="4" class="expander-container-background expander-container-padding-md">
+
+                        <div class="spacing-15-bottom">
+                            <span>Funding period:</span> <strong class="data-specification-fundingperiod" data-bind="text: fundingPeriodName"></strong>
+                        </div>
+                        <div class="spacing-15-bottom">
+                            <span>Funding streams:</span>
+                            <span data-bind="foreach: fundingStreamNames" class="inline-list"><strong data-bind="text: $data" class="inline-list-item data-specification-fundingstream"></strong> </span>
+                        </div>
+                        <div class="data-specification-description" data-bind="text: description"></div>
+
+                    </td>
+                </tr>
+            </tbody>
+            <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                @{
+                    int rowId = 0;
+                }
+
+                @foreach (var specification in Model.SearchResults.Specifications)
+                {
+                    <tr>
+                        <td>
+                            <span class="button-split-container">
+                                <span class="button-split-icon">
+                                    <a href="/specs/EditSpecification/@specification.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">edit</i></a>
+                                </span>
+                                <span class="button-split-text">
+                                    <a href="/specs/Policies/@specification.Id" class="data-static-specification-name">@specification.Name</a>
+                                </span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="datetime-split-container">
+                                <span class="datetime-split-date data-static-specification-lastupdated-date">@specification.LastUpdatedDateFormatted</span>
+                                <span class="datetime-split-time data-static-specification-lastupdated-time">@specification.LastUpdatedTimeFormatted</span>
+                            </span>
+                        </td>
+                        <td>@specification.Status</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="spacing-15-bottom">
+                                <span>Funding period:</span> <strong class="data-static-specification-fundingperiod">@specification.FundingPeriodName</strong>
+                            </div>
+                            <div class="spacing-15-bottom">
+                                <span>Funding streams:</span>
+                                <span class="inline-list">
+                                    @foreach (string fundingStreamName in specification.FundingStreamNames)
+                                    {
+                                        <strong class="inline-list-item data-static-specification-fundingstream">@fundingStreamName</strong>
+                                    }
+
+                                </span>
+                            </div>
+                            <div class="data-specification-description">@specification.Description.ReplaceLineBreaksForHtml()</div>
+
+                        </td>
+                    </tr>
+                    rowId++;
+                }
+            </tbody>
+        </table>
+
+        <div class="withjs-show search-loading-container spacing-30-top" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading specifications</p>
+        </div>
+
+        @if (!Model.SearchResults.Specifications.AnyWithNullCheck())
+        {
+            <div class="noresults-panel spacing-30">
+                <span class="noresults-panel-text">
+                    <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
+                </span>
+            </div>
+        }
+
+        <div class="noresults-panel spacing-30 withjs-show" data-bind="visible: specifications().length === 0">
+            <span class="noresults-panel-text">
+                <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
+            </span>
+        </div>
+
+        <partial name="_SearchTablePagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm)' />
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.specifications.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageSpecifications.SpecificationSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-specifications-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+
+        var initialResults = @Html.Raw(Model.InitialSearchResults);
+
+        vm.setInitialResults(initialResults);
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

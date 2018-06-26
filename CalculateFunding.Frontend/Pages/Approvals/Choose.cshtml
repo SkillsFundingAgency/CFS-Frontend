@@ -1,0 +1,112 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Approvals.ChoosePageModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.ViewModels.Approvals
+@{
+    ViewData["Title"] = "Choose funding specification";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
+            <li>@BreadcrumbText.ChooseFundingSpecification</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Choose funding specification</h1>
+}
+
+@if (Model.PageBannerOperation != null)
+{
+    <partial name="_PageBannerOperationPartial" model="Model.PageBannerOperation"></partial>
+}
+
+<div class="choose-container">
+    <form action="/approvals/choose" method="get">
+        <div class="table-filter-container">
+            <div class="row">
+                <div class="col-xs-2">
+                    Funding period
+                    <select asp-items="Model.FundingPeriods" name="fundingPeriod" id="fundingPeriod"></select>
+                </div>
+                <div class="col-xs-5">
+                    Funding stream
+                    <select asp-items="Model.FundingStreams" name="fundingStream" id="fundingStream">
+                        <option value="" selected></option>
+                    </select>
+                </div>
+                <div class="col-xs-1">
+                    <button type="submit" class="btn btn-primary" id="nojs-submit-button">Go</button>
+                    <script type="text/javascript">document.getElementById("nojs-submit-button").style.display = "none";</script>
+                </div>
+            </div>
+        </div>
+    </form>
+    <table class="cf">
+        <thead>
+            <tr>
+                <th class="min-width-md">Specification</th>
+                <th>Specification funding</th>
+                <th>Specification status</th>
+                <th>Provider QA coverage</th>
+                <th>QA tests passed</th>
+                <th>Calculations approved</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (ChooseApprovalSpecificationViewModel specification in Model.Specifications)
+            {
+                <tr>
+                    <td class="highlight-background"><span class="highlight-title">@specification.Name</span></td>
+                    <td class="highlight-background text-right"><span class="highlight-title">&pound;@specification.FundingAmountFormatted</span></td>
+                    <td rowspan="2" class="@specification.ApprovalStatusCssClass text-center"><strong>@specification.ApprovalStatus</strong></td>
+                    <td rowspan="2" class="text-center">@specification.ProviderQaCoverage%</td>
+                    <td rowspan="2" class="text-center">@specification.QaTestsPassed/@specification.QaTestsTotal</td>
+                    <td rowspan="2" class="text-center">@specification.CalculationsApproved/@specification.CalculationsTotal</td>
+                    <td rowspan="2" class="text-center">
+                        @if (specification.IsSelectedForFunding)
+                        {
+                            <a class="target-viewfunding" href="/approvals/viewfunding?specificationId=@specification.Id">View funding</a>
+
+                        }
+                        else if (specification.CanBeChosen)
+                        {
+                            <a class="btn btn-choose target-choose" href="/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId">Choose</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-disabled btn-choose" href="#" disabled>Choose</button>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @foreach (var fundingStream in specification.FundingStreams)
+                        {
+                            <div class="choose-funding-stream">@fundingStream.Name</div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Specifications.Any())
+    {
+        <div class="noresults-panel spacing-10">
+            <span class="noresults-panel-text">
+                <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ?  @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
+            </span>
+        </div>
+
+    }
+</div>
+
+@section scripts{ 
+    <script asp-src-include="~/js/approvals.choose.js" asp-append-version="true" type="text/javascript"></script>
+}

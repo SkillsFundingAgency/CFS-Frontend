@@ -1,0 +1,113 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Datasets.ListDatasetSchemasModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Data types";
+}
+
+@section BreadCrumb{
+
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
+            <li>@BreadcrumbText.ManagePolicies</li>
+        </ol>
+    </div>
+}
+@section BannerWhole {
+    <partial name="_SpecificationFullHeaderPartial" model="Model.Specification" />
+}
+
+<div class="row manage-policy">
+    <div class="col-xs-12 col-sm-9">
+        <div class="row view-dataset">
+
+            <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
+                <li class="nav-item">
+                    <a id="nav-policy-tab" href="/specs/policies/@Model.Specification.Id" role="tab" aria-selected="true">View policies</a>
+                </li>
+                <li class="nav-item active">
+
+                    <a id="nav-dataset-tab" href="#" role="tab" aria-selected="false">
+                        <span class="provider-datasets-warning-tab">
+                            <span>Datasets</span>
+                            @if (!Model.HasProviderDatasetsAssigned)
+                            {
+                                <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
+                            }
+                        </span>
+                    </a>
+                </li>
+            </ul>
+
+            <div>
+                @if (!Model.DatasetDefinitions.IsNullOrEmpty())
+                {
+                    @if (!Model.HasProviderDatasetsAssigned)
+                    {
+                        <div class="provider-datasets-warning-container spacing-15-bottom">
+                            <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
+                        </div>
+                    }
+
+                    @foreach (var dataDefinition in Model.DatasetDefinitions)
+                    {
+                        <div class="dataset-assigned-list">
+                            <p><strong class="schema-list-text">@dataDefinition.Name</strong></p>
+                            <div class="schema-list">
+                                @if (!dataDefinition.Datasets.IsNullOrEmpty())
+                                {
+                                    foreach (var dataset in dataDefinition.Datasets)
+                                    {
+                                        <h2 class="datasetschemaassigned-list-title-container">
+                                            <a name="dataset-@dataset.Id"></a>
+                                            <span>@dataset.Name</span>
+                                        </h2>
+                                        <p class="policy-description">
+                                            @dataset.Description
+                                        </p>
+                                        if (dataset.DatasetVersion == null)
+                                        {
+                                            @*<p>
+                                                    <a href="/datasets/AssignDatasetVersion/@dataDefinition.Id">No datasets are assigned, choose data type relationship</a>
+                                                </p>*@
+                                        }
+                                    }
+                                }
+                            </div>
+                            <hr />
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>
+                        <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">No datasets exist, create a dataset</a>
+                    </p>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="col-xs-12 col-sm-3">
+        <div class="rightcolumn-container">
+            <h2 class="rightcolumn-heading">@Model.Specification.Name options</h2>
+            @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())
+            {
+                <div>
+                    <a href="/specs/createSubPolicy/@Model.Specification.Id">Create subpolicy</a>
+                </div>
+                <div>
+                    <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
+                </div>
+            }
+            <div>
+                <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Create dataset</a>
+            </div>
+        </div>
+    </div>
+
+</div>

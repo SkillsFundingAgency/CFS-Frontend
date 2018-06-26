@@ -1,0 +1,82 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Datasets.SpecificationRelationshipsPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Specification relationships";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li><a href="~/datasets/datasetrelationships">@BreadcrumbText.DatasetRelationships</a></li>
+            <li><a href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">@Model.ViewModel.Specification.Name</a></li>
+            <li>@BreadcrumbText.SelectSourceDataset</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <p class="hero-title">@Model.ViewModel.Specification.Name</p>
+    <p class="hero-text">Create a dataset from a data source file.</p>
+}
+
+<div class="row spacing-15">
+    <div class="col-xs-12">
+
+        @if (Model.ShowSuccessMessage)
+        {
+            <div class="alert alert--success">
+                <span>You mapped the new data source successfully</span> <a id="dismiss-link" class="float-right" href="~/datasets/specificationrelationships/@Model.ViewModel.Specification.Id">Dismiss</a>
+            </div>
+        }
+
+        <p id="datasourceCount">@Model.ViewModel.GetCountPhrase()</p>
+
+        @{
+            int counter = 0;
+        }
+
+        @if (Model.ViewModel.Items.IsNullOrEmpty())
+        {
+            <p id="noDatasourceMappedMessage">No data source mapped - <a href="~/datasets/AssignDatasetSchema/@Model.ViewModel.Specification.Id"> @Model.ViewModel.Specification.Name</a>.</p>
+            <p id="noDatasourceMappedHowToMessage"><h4 class="heading-small no-margin">To map a datasource to a specification you must:</h4></p>
+            <p id="noDatasourceMappedHowToSteps">
+                1. Go to the specification and create a dataset. <br />
+                2. Return here and map a data source to dataset.
+            </p>
+        }
+        else
+        {
+            @foreach (var item in Model.ViewModel.Items)
+            {
+                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container">
+                    <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.DefinitionName</h2>
+                    <h4 class="heading-small no-margin specification-relationship-definition-name">@item.RelationName</h4>
+                    <p class="faded-text small no-margin specification-relationship-description">@item.RelationshipDescription</p>
+                    <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectsourcedataset?relationshipId=@item.RelationshipId">@item.LinkPhrase</a></p>
+                </div>
+
+                counter++;
+            }
+        }
+
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $('#dismiss-link').on('click', function (e) {
+            e.preventDefault();
+
+            $('.alert').hide();
+        });
+    </script>
+}
+
+
+

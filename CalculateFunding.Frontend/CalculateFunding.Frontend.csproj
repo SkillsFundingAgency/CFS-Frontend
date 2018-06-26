@@ -1,0 +1,184 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
+    <TypeScriptToolsVersion>2.7</TypeScriptToolsVersion>
+    <CodeAnalysisRuleSet>CalculateFunding.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="stylecop.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Scripts\approvals.choose.ts" />
+    <None Remove="Scripts\approvals.viewfunding.ts" />
+    <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
+    <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
+    <None Remove="Scripts\bindingHandler.multiselect.ts" />
+    <None Remove="Scripts\bootstrap-multiselect.d.ts" />
+    <None Remove="Scripts\calculationspec.create-edit.ts" />
+    <None Remove="Scripts\common.d.ts" />
+    <None Remove="Scripts\compare.ts" />
+    <None Remove="Scripts\component.approveStatusButton.ts" />
+    <None Remove="Scripts\confirm.funding-specification.ts" />
+    <None Remove="Scripts\dataset-relationships.ts" />
+    <None Remove="Scripts\createdataset.ts" />
+    <None Remove="Scripts\diffeditoroptions.d.ts" />
+    <None Remove="Scripts\edit.specification.ts" />
+    <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\policies.ts" />
+    <None Remove="Scripts\provider.completion.gherkin.ts" />
+    <None Remove="Scripts\provider.completion.vb.ts" />
+    <None Remove="Scripts\search.calcuation-results.ts" />
+    <None Remove="Scripts\search.calcuations.ts" />
+    <None Remove="Scripts\search.calculationProviderResults.ts" />
+    <None Remove="Scripts\search.datasets.ts" />
+    <None Remove="Scripts\search.providers.ts" />
+    <None Remove="Scripts\search.specifications.ts" />
+    <None Remove="Scripts\search.testScenarioResults.ts" />
+    <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\table.expander.sequential.ts" />
+    <None Remove="Scripts\table.expander.ts" />
+    <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
+    <None Remove="Scripts\Tests\list-provider-test-results.ts" />
+    <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.6.4" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />   
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.22" />
+    <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.1" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.6.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ViewModels\Preview\**" />
+    <Content Remove="ViewModels\Preview\**" />
+    <EmbeddedResource Remove="ViewModels\Preview\**" />
+    <None Remove="ViewModels\Preview\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\BreadcrumbText.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BreadcrumbText.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\ErrorMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ErrorMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\PageText.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PageText.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\ValidationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ValidationMessages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\BreadcrumbText.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>BreadcrumbText.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\ErrorMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErrorMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\PageText.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>PageText.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\ValidationMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\libs\js\monaco\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
+    <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
+    <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
+    <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
+    <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
+    <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
+    <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
+    <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
+    <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
+    <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
+    <TypeScriptCompile Include="Scripts\edit.specification.ts" />
+    <TypeScriptCompile Include="Scripts\policies.ts" />
+    <TypeScriptCompile Include="Scripts\search.specifications.ts" />
+    <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
+    <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
+    <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
+    <TypeScriptCompile Include="Scripts\search.datasets.ts" />
+    <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
+    <TypeScriptCompile Include="Scripts\search.calcuations.ts" />
+    <TypeScriptCompile Include="Scripts\editcalculation.ts" />
+    <TypeScriptCompile Include="Scripts\compare.ts" />
+    <TypeScriptCompile Include="Scripts\common.d.ts" />
+    <TypeScriptCompile Include="Scripts\search.providers.ts" />
+    <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
+    <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
+    <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\table.expander.sequential.ts" />
+    <TypeScriptCompile Include="Scripts\table.expander.ts" />
+    <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
+    <TypeScriptCompile Include="Scripts\search.providerTestResults.ts" />
+    <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Pages\Errors\404.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\Errors\500.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\Specs\EditCalculation.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTablePagerPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_SearchTableRowCountPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup>
+
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+
+  </PropertyGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties tsconfig_1tests_1json__JSONSchema="http://json.schemastore.org/tsconfig" /></VisualStudio></ProjectExtensions>
+</Project>

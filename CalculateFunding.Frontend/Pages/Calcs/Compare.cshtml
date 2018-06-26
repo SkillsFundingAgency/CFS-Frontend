@@ -1,0 +1,121 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.ComparePageModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
+@{
+    ViewData["Title"] = "Compare calculations";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section breadcrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+            <li><a href="/calcs/editCalculation/@Model.Calculation.Id">@BreadcrumbText.EditCalculation</a></li>
+            <li>@BreadcrumbText.CompareCalcuationVersions</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <h1 class="hero-title">@Model.Calculation.Name for @Model.Calculation.FundingPeriodName</h1>
+}
+
+@section FormBannerRight{
+
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <p class="what-is-title-nojs withjs-hide">What is @Model.Calculation.Name?</p>
+        <div class="inline-collapse-container">
+            <div class="inline-collapse-heading withjs-show">
+                <i class="inline-collapse-arrow"></i>
+                <span>What is @Model.Calculation.Name?</span>
+            </div>
+            <div class="inline-collapse-contents withjs-hide what-is-description">
+                @Model.Calculation.Description
+            </div>
+        </div>
+    </div>
+</div>
+
+<blockquote class="spacing-30">
+    Select 2 versions to compare:
+</blockquote>
+
+<div class="row compare-container">
+    <div class="col-md-12">
+        <form method="get" class="form" action="/calcs/diffcalculation/@Model.Calculation.Id" id="compare-calculations-form">
+            @if (Model.Calculations != null && Model.Calculations.Any())
+            {
+                <table class="compare-table table table-condensed" id="calculationVersions">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th>Status</th>
+                            <th>Version</th>
+                            <th>Updated</th>
+                            <th>Author</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rowCount = 0;
+                        }
+                        @foreach (var calculation in Model.Calculations)
+                        {
+                            <tr id="calculation-version-compare-row-@rowCount">
+                                <td class="calculation-select">
+                                    <div class="multiple-choice">
+                                        <input id="calculation-version-compare-checkbox-@rowCount" type="checkbox" class="calculation-version-compare-checkbox" name="Versions" value="@calculation.Version" />
+                                        <label></label>
+                                    </div>
+                                </td>
+                                <td class="calculation-status">
+                                    @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation.Status) ? "none" : calculation.Status.ToLower(); }                                    
+                                        <span class="calculation-status-@statusClass">@calculation.Status</span>
+                                 </td>
+                                <td class="calculation-version"><span class="calculation-version">@calculation.Version</span></td>
+                                <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
+                                <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>
+                            </tr>
+
+                            rowCount++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="warning" id="no-previous-versions-message">There are no previous versions for this calculation!</div>
+
+            }
+            <p class="form-submit-container"><button type="submit" class="button" id="compare-button">Compare calculations</button> </p>
+            <p><a href="/calcs/editCalculation/@Model.Calculation.Id" id="back-link">Back</a></p>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $('#compare-button').prop('disabled', true);
+
+        $('#calculationVersions').on('change', function (e) {
+            var checkboxes = $("#calculationVersions input[type='checkbox']");
+            var checkedItems = 0;
+            checkboxes.each(function (i, checkbox) {
+                if (checkbox.checked) {
+                    checkedItems++;
+                }
+            });
+            if (checkedItems == 2) {
+                $('#compare-button').prop('disabled', null);
+            }
+            else {
+                $('#compare-button').prop('disabled', true);
+            }
+        });
+    </script>
+}

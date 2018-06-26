@@ -1,0 +1,93 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.DiffCalculationModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
+@{
+    ViewData["Title"] = "Calculation comparision";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section breadcrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+            <li><a href="/calcs/editCalculation/@Model.CalculationId">@BreadcrumbText.EditCalculation</a></li>
+            <li><a href="/calcs/compare/@Model.CalculationId">@BreadcrumbText.CompareCalcuationVersions</a></li>
+            <li>@Model.CalculationName</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <h1 class="hero-title">@Model.CalculationName for @Model.CalculationPeriodName</h1>
+}
+
+@section FormBannerRight{
+
+}
+
+<form method="get" class="form diff-container" id="diff-container">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p class="what-is-title-nojs withjs-hide">What is @Model.CalculationName?</p>
+
+            <div class="inline-collapse-container">
+                <div class="inline-collapse-heading withjs-show">
+                    <i class="inline-collapse-arrow"></i>
+                    <span>What is @Model.CalculationName?</span>
+                </div>
+                <div class="inline-collapse-contents withjs-hide what-is-description">
+                    @Model.CalculationDescription
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row spacing-15">
+        <div class="col-xs-12">
+            <div class="diff-details-container">
+                <div class="diff-left diff-details-panel">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span>@Model.LeftCalcualationDiffModel.Author?.Name</span>
+                    <span>@Model.LeftCalcualationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString)</span>
+                    <span class="diff-left-status">@Model.LeftCalcualationDiffModel.Status</span>
+                </div>
+                <div class="diff-right diff-details-panel">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
+                    <span>@Model.RightCalculationDiffModel.Author?.Name</span>
+                    <span>@Model.RightCalculationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString) </span>
+                    <span class="diff-right-status"> @Model.RightCalculationDiffModel.Status</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="monaco-editor-diff-container">
+        <div data-bind="monacoDiff: {original: original, modified: modified, displayAsInline: displayAsInline}" class="monaco-editor-diff-editor" id="calculation-diff-viewer"></div>
+    </div>
+
+    <p><input type="checkbox" name="inLineCodeEditor" data-bind="checked: displayAsInline" value="true" id="inLineCodeEditor" /> <label for="inLineCodeEditor">Inline Code Editor</label></p>
+    <p><a href="/calcs/compare/@Model.CalculationId" id="back-link">Back</a></p>
+
+</form>
+
+@section Scripts{
+    <script src="~/assets/libs/js/knockout-latest.js"></script>
+    <script src="~/assets/libs/js/monaco/vs/loader.js"></script>
+    <script src="~/js/bindingHandler.monacoDiff.js"></script>
+    <script src="~/js/compare.js"></script>
+    <script>
+        var diffContainer = document.getElementById("diff-container");
+        if (diffContainer) {
+            var vm = new calculateFunding.compare.CompareViewModel();
+
+            vm.original("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.LeftCalcualationDiffModel.SourceCode))");
+            vm.modified("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.RightCalculationDiffModel.SourceCode))");
+            ko.applyBindings(vm, diffContainer);
+        }
+    </script>
+
+
+}

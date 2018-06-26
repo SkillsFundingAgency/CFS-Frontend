@@ -1,0 +1,212 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Results.ProviderScenarioResultsPageModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "View test results for provider";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/results/index">@BreadcrumbText.ViewResults</a></li>
+            <li>@Model.ProviderInfoModel.Name</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title no-margin">@Model.ProviderInfoModel.Name</h1>
+    <p class="hero-text no-margin">
+        <span>UPIN:&nbsp;<strong>@Model.ProviderInfoModel.Upin</strong>&nbsp;</span>
+        <span>UKPRN:&nbsp;<strong>@Model.ProviderInfoModel.Ukprn</strong>&nbsp;</span>
+        <span>URN:&nbsp;<strong>@Model.ProviderInfoModel.Urn</strong>&nbsp;</span>
+    </p>
+    <p class="hero-text">
+        <div>
+            <span>Local authority:&nbsp;<strong>@Model.ProviderInfoModel.LocalAuthority</strong></span>
+        </div>
+        <div>
+            <span>Provider type:&nbsp;<strong>@Model.ProviderInfoModel.ProviderType</strong></span>&nbsp;
+            <span>Provider subtype:&nbsp;<strong>@Model.ProviderInfoModel.ProviderSubtype</strong></span>
+        </div>
+        <div>
+            <span>Date opened:&nbsp;<strong>@Model.ProviderInfoModel.DateOpenedDisplay</strong>&nbsp;</span>
+        </div>
+    </p>
+
+}
+
+
+@section BannerMiddle{
+    <form method="get" class="filter-container spacing-15" id="filter-container" asp-antiforgery="false">
+        <input type="hidden" name="ProviderId" id="scenarioHiddenProviderId" value="@Model.ProviderId" />
+        <div class="row">
+            <div class="col-xs-3 filter-field-heading">Select a funding period</div>
+            <div class="col-xs-4 filter-field-heading">Select a specification</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter" id="select-spec-period" name="fundingPeriodId" data-bind="value: selectedFundingPeriod">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-4">
+                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" id="select-spec" name="specificationId" data-bind="value:selectedSpec">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-xs-1">
+                <button type="submit" class="button" id="search-button">Search</button>
+            </div>
+
+        </div>
+    </form>
+}
+
+
+<div class="row provider-test-scenario-searchresult-container" id="provider-scenario-results">
+
+    <div class="col-xs-12">
+        <div class="alert alert--info-grey">
+            <span class="testcoverage-item">
+                <span class="testcoverage-title">Pass:</span> <span class="testcoverage-value data-testcoverage-passed" data-bind="text: passed">@Model.Passed</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">Fail:</span> <span class="testcoverage-value data-testcoverage-failed" data-bind="text: failed">@Model.Failed</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">Ignored:</span> <span class="testcoverage-value data-testcoverage-ignored" data-bind="text: ignored">@Model.Ignored</span>
+            </span>
+            <span class="testcoverage-item alert-content-margin">
+                <span class="testcoverage-title">QA Coverage:</span> <span class="testcoverage-value data-testcoverage-testcoverage" data-bind="text: testCoverage() + '%'">@Model.TestCoverage%</span>
+            </span>
+        </div>
+    </div>
+
+
+    <div class="col-xs-12 view-provider-test-results">
+        <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="TestSceanarioTabs" role="tablist">
+            <li class="nav-item">
+                <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true" data-bind="attr: {'href' : allocationLineUrl }">Allocation line</a>
+            </li>
+            <li class="nav-item">
+                <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false" data-bind="attr: {'href' : calculationResultsUrl }">Calculation results</a>
+            </li>
+            <li class="nav-item active">
+                <a id="nav-test-results-tab" href="#" role="tab" aria-selected="true">Test results</a>
+            </li>
+
+        </ul>
+
+
+        @if (Model.TestScenarioSearchResults != null)
+        {
+            @if (!Model.TestScenarioSearchResults.TestScenarios.IsNullOrEmpty())
+            {
+                <table class="test-results-table" id="provider-scenario-results-table" data-bind="visible:!searchPerformed()">
+                    <thead>
+                        <tr>
+                            <th style="width:45%" scope="col">Test</th>
+                            <th style="width:30%" scope="col">Updated</th>
+                            <th style="width:25%" scope="col">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="visible: searchPerformed()" id="static-test-results-table-body">
+                        @{
+                            int rowId = 0;
+                        }
+                        @foreach (var result in Model.TestScenarioSearchResults.TestScenarios)
+                        {
+                            <tr>
+                                <td id="static-test-result-name-@rowId" scope="row">@result.TestScenarioName</td>
+                                <td id="static-test-result-updated-date-@rowId">@result.LastUpdatedDate</td>
+                                <td id="static-test-result-value-@rowId">@result.TestResult</td>
+                            </tr>
+                            rowId++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="no-test-results-for-spec" data-bind="visible:false">
+                    <strong>There are no results for given specification </strong>
+                </p>
+            }
+        }
+        else if (Model.TestScenarioSearchResults == null)
+        {
+            <p class="no-spec-selected-for-provider-search-static" data-bind="visible: !selectedSpec()">
+                <strong>Select a specification to view test results</strong>
+            </p>
+        }
+
+        <div class="provider-test-scenario-searchresult-container provider-test-scenario-searchresult-dynamic-container withjs-show">
+            <div class="view-policy view-provider-test-results">
+                <table class="table table-striped" data-bind="if: providerTestScenarios().length > 0">
+                    <thead>
+                        <tr>
+                            <th style="width:40%" scope="col">Test</th>
+                            <th style="width:30%" scope="col">Updated</th>
+                            <th style="width:30%" scope="col">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: providerTestScenarios">
+                        <tr>
+                            <td data-bind="text: testScenarioName" scope="row"></td>
+                            <td data-bind="text: lastUpdatedDateDisplay"></td>
+                            <td data-bind="text: testResult"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="no-test-results-for-spec-dynamic" data-bind="if: providerTestScenarios().length === 0 && selectedSpec">
+                    <strong>There are no results for given specification </strong>
+                </p>
+
+            </div>
+        </div>
+
+        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading test results</p>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.providerScenarioResults.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var vm = new calculateFunding.listProviderTestResults.ProviderTestSearchViewModel({"providerId": "@Model.ProviderInfoModel.Id", "fundingPeriodId": "@Model.FundingPeriodId" });
+
+        @if (!string.IsNullOrEmpty(Model.SpecificationId)) {
+
+            <text> vm.selectedSpec("@Model.SpecificationId"); </text>
+        }
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var testScenarioContainer = document.getElementById("provider-scenario-results");
+        if (testScenarioContainer) {
+            ko.applyBindings(vm, testScenarioContainer);
+        }
+    </script>
+
+    <script type="text/javascript">
+        $("#search-button").hide();
+
+        $('select#select-spec-period').change(function () {
+            $("#select-spec").val('');
+            $("#search-button").click();
+        });
+    </script>
+}

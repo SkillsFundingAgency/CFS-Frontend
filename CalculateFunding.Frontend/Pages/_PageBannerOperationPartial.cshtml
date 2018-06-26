@@ -1,0 +1,25 @@
+﻿@model CalculateFunding.Frontend.ViewModels.Common.PageBannerOperation
+
+<div class="notification-panel">
+    <span class="notification-panel-text">
+        <i class="material-icons">check</i> <span>@Model.EntityType&nbsp;</span>
+        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+        {
+            <a href="@Model.ActionUrl">@Model.EntityName</a>
+        }
+        else
+        {
+            <span>@Model.EntityName</span>
+        }
+
+        <span>&nbsp;@Model.OperationAction</span>
+    </span>
+    @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
+    {
+        <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
+    }
+    else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+    {
+        <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
+    }
+</div>

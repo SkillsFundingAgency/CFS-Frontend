@@ -1,0 +1,38 @@
+﻿@page
+@using CalculateFunding.Frontend.Properties
+
+@model CalculateFunding.Frontend.Pages.Approvals.IndexModel
+@{
+    ViewData["Title"] = "Funding Approvals";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.FundingApprovals</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Funding approvals</h1>
+}
+
+<div class="row homepage-section-container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/approvals/choose" class="heading-small">Choose funding specification</a>
+            </div>
+            <div>Select a specification for a funding period and a funding stream.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a href="/approvals/viewfunding" class="heading-small">Approve and publish funding</a>
+            </div>
+            <div>Approve funding for a chosen specification and publish it.</div>
+        </div>
+    </div>
+</div>

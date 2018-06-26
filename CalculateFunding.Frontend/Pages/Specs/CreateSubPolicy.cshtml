@@ -1,0 +1,65 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateSubPolicyPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Create subpolicy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <p class="hero-text">Funding Period: @Model.FundingPeriodName</p>
+    <h1 class="hero-title">Create subpolicy</h1>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
+            <li><a href="/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.CreateSubPolicy</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div gds-validation-summary="All"></div>
+            <div>
+                <div gds-validationblock-for="CreateSubPolicyViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateSubPolicyViewModel.Name"></a>
+                        <label asp-for="CreateSubPolicyViewModel.Name">Subpolicy name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                        <input asp-for="CreateSubPolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="CreateSubPolicyViewModel.ParentPolicyId">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateSubPolicyViewModel.ParentPolicyId"></a>
+                        <label asp-for="CreateSubPolicyViewModel.ParentPolicyId">Select policy</label>
+                        <select asp-items="@(Model.Policies)" asp-for="CreateSubPolicyViewModel.ParentPolicyId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="CreateSubPolicyViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateSubPolicyViewModel.Description"></a>
+                        <label asp-for="CreateSubPolicyViewModel.Description">Description</label>
+                        <textarea asp-for="CreateSubPolicyViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Save</button> <a href="/specs/policies/@Model.SpecificationId" id="cancel-link">Back</a></p>
+
+        </form>
+
+    </div>
+</div>

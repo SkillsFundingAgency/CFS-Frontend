@@ -1,0 +1,88 @@
+﻿@page "{fundingPeriodId?}"
+@model CalculateFunding.Frontend.Pages.Specs.CreateSpecificationPageModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Create specification";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section FormBannerLeft{
+    <h1 class="heading-large">Create specification</h1>
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li>@BreadcrumbText.CreateSpecification</li>
+        </ol>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div gds-validation-summary="All">
+            </div>
+            <div>
+                <div gds-validationblock-for="CreateSpecificationViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateSpecificationViewModel.Name"></a>
+                        <label asp-for="CreateSpecificationViewModel.Name">Specification name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                        <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a validationanchor-for="CreateSpecificationViewModel.FundingPeriodId"></a>
+
+                <div gds-validationblock-for="CreateSpecificationViewModel.FundingPeriodId">
+                    <div class="form-group">
+
+                        <label asp-for="CreateSpecificationViewModel.FundingPeriodId">Funding period</label>
+                        <select asp-items="@(Model.FundingPeriods)" asp-for="CreateSpecificationViewModel.FundingPeriodId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a validationanchor-for="CreateSpecificationViewModel.FundingStreamIds"></a>
+
+                <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamIds">
+                    <div class="form-group">
+
+                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding streams</label>                       
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select one or more funding streams</span></h4>
+                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="CreateSpecificationViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="CreateSpecificationViewModel.Description"></a>
+                        <label asp-for="CreateSpecificationViewModel.Description">Description</label>
+                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
+
+        </form>
+
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $("#CreateSpecificationViewModel-FundingStreamIds").select2();
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/assets/libs/css/select2.min.css" />
+}

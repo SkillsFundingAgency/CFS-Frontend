@@ -1,0 +1,109 @@
+﻿@page "{datasetid?}"
+@using CalculateFunding.Frontend.Properties
+@model CalculateFunding.Frontend.Pages.Datasets.UpdateDatasetPageModel
+
+@{
+    ViewData["Title"] = "Update datasource";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li><a href="/datasets/managedatasets">@BreadcrumbText.ManageDataSources</a></li>
+            <li>@BreadcrumbText.UpdateDataSource</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <h1 class="hero-title">Update data source file</h1>
+    <div class="grey-left-border">
+        <div class="hero-description">
+            <span class="hero-description-strong">@Model.DatasetVersion.Name</span> <span>(version @Model.DatasetVersion.Version)</span>
+        </div>
+        <div class="hero-text">
+            <span class="hero-spacing-right">@Model.DatasetVersion.Author.Name</span> <span>@Model.DatasetVersion.LastUpdatedDateDisplay</span>
+        </div>
+    </div>
+}
+
+
+
+<div class="row" id="dataset-form-controls">
+    <div data-bind="visible: isFormVisible" class="col-sm-9 col-md-6">
+        <form method="post" id="dataset-form" class="form">
+            <div class="validation-summary-errors" style="display:none;" data-valmsg-summary="true" data-bind="visible: isValidationSummaryVisible, attr:{'display': 'block'}">
+                <h3 class="heading-large">There is a problem</h3>
+                <p><strong>Check that you have answered the questions correctly</strong></p>
+                <ul data-bind="foreach: validationLinks">
+                    <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
+                </ul>
+            </div>
+
+
+            <div class="spacing-15-bottom">
+                <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
+                    <a validationanchor-for="UpdateViewModel.Filename"></a>
+                    <label asp-for="UpdateViewModel.Filename">Select data source file</label>
+                    <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Upload a csv, xls or xlsx file</span></h4>
+                    <div class="input-group">
+                        <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
+                        <span class="input-group-btn">
+                            <label class="btn btn-file file-button">
+                                Browse <input asp-for="UpdateViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;" id="browseButton">
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div data-bind="css: { 'validation-failed-block': !isDescriptionValid() }">
+                    <div class="form-group">
+                        <a validationanchor-for="DatasetVersion.Description"></a>
+                        <label asp-for="DatasetVersion.Description">Description </label>
+                        <textarea data-bind="textInput: description, css: { 'input-validation-error': !isDescriptionValid() }" id="description" asp-for="DatasetVersion.Description" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="spacing-15-bottom">
+                <div data-bind="css: { 'validation-failed-block': !isCommentValid() }">
+                    <div class="form-group">
+                        <a validationanchor-for="Comment"></a>
+                        <label asp-for="Comment">Change note</label>
+
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Say what's changed</span></h4>
+                        <textarea data-bind="textInput: comment, css: { 'input-validation-error': !isCommentValid() }" id="comment" asp-for="Comment" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <p class="form-submit-container"><button type="button" class="button" id="save-button" data-bind="click: saveDataset, enable: isUploadButtonEnabled">Update data source</button> <a href="/datasets" id="cancelLink">Back</a></p>
+    </div>
+
+    <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">
+        <p class="h4-heading"><strong>Dataset upload is progressing</strong></p>
+        <p>This may take a minute or so, please bare with us.</p>
+        <p data-bind="text: loadingMessage"></p>
+        <img src="~/assets/images/loader.gif" />
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/dataset.update.js" type="text/javascript" asp-append-version="true"></script>
+    <script type="text/javascript">
+        var createDatasetElement = document.getElementById("dataset-form-controls");
+        if (createDatasetElement) {
+
+            var options = {
+                datasetId: "@Model.DatasetVersion.Id",
+                description: @Html.Raw(Json.Serialize(Model.DatasetVersion.Description))
+            };
+            var viewModel = new calculateFunding.updateDataset.UpdateDatasetViewModel(options);
+            ko.applyBindings(viewModel, createDatasetElement);
+        }
+    </script>
+}

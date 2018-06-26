@@ -1,0 +1,66 @@
+﻿@page "{specificationId}/{subpolicyId}/{parentPolicyId}"
+@model CalculateFunding.Frontend.Pages.Specs.EditSubPolicyPageModel
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Edit subpolicy";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs?fundingPeriodId=@Model.FundingPeriodId">Specifications</a></li>
+            <li><a href="~/specs/policies/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>@BreadcrumbText.EditSubpolicy</li>
+        </ol>
+    </div>
+}
+
+@section FormBannerLeft{
+    <div class="hero-text">
+        <span class="hero-text-strong">@Model.SpecificationName</span>
+    </div>
+    <div class="hero-title">
+        <span class="hero-title">Edit subpolicy</span>
+    </div>
+}
+
+<div class="row edit-sub-policy-container">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form" id="edit-sub-policy-form">
+            <div gds-validation-summary="All"></div>
+            <div>
+                <div gds-validationblock-for="EditSubPolicyViewModel.Name">
+                    <div class="form-group">
+                        <a validationanchor-for="EditSubPolicyViewModel.Name"></a>
+                        <label asp-for="EditSubPolicyViewModel.Name">Subpolicy name</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                        <input asp-for="EditSubPolicyViewModel.Name" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditSubPolicyViewModel.ParentPolicyId">
+                    <div class="form-group">
+                        <a validationanchor-for="EditSubPolicyViewModel.ParentPolicyId"></a>
+                        <label asp-for="EditSubPolicyViewModel.ParentPolicyId">Policy</label>
+                        <select asp-items="@(Model.Policies)" asp-for="EditSubPolicyViewModel.ParentPolicyId" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div gds-validationblock-for="EditSubPolicyViewModel.Description">
+                    <div class="form-group">
+                        <a validationanchor-for="EditSubPolicyViewModel.Description"></a>
+                        <label asp-for="EditSubPolicyViewModel.Description">Description</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Add to this to say what’s changed</span></h4>
+                        <textarea asp-for="EditSubPolicyViewModel.Description" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <p class="form-submit-container"><button type="submit" class="button">Update subpolicy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
+        </form>
+    </div>
+</div>

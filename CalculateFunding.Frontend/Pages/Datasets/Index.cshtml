@@ -1,0 +1,40 @@
+﻿@page "{pageNumber?}"
+@model CalculateFunding.Frontend.Pages.Datasets.ManageDataIndexPageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using CalculateFunding.Frontend.Properties
+
+@{
+    ViewData["Title"] = "Manage data";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li>@BreadcrumbText.ManageDatasets</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Manage data</h1>
+    <p class="hero-text">Manage data source files or map them to datasets for a specification.</p>
+
+}
+
+<div class="row homepage-section-container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a id="manageDatasourcesLink" href="/datasets/managedatasets/" class="heading-small">Manage data source files</a>
+            </div>
+            <div id="manageDatasourcesDescription">Load a new data source file or download an existing one.</div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <div class="homepage-section-title">
+                <a id="mapDatasourcesToDatasetsLink" href="/datasets/datasetrelationships" class="heading-small">Map data source files to datasets for a specification</a>
+            </div>
+            <div id="mapDatasourcesToDatasetsDescription">Select the data source file a dataset uses.</div>
+        </div>
+    </div>
+</div>

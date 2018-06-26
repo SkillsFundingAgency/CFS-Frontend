@@ -1,0 +1,195 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "apiKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Calculate Funding API Management Key"
+      }
+    },
+    "apiEndpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "Calculate Funding API Management Endpoint"
+      }
+    },
+    "aadDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain name for ad application"
+      }
+    },
+    "aadTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Tenant id of ad application"
+      }
+    },
+    "aadClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Client id of ad application"
+      }
+    },
+    "aadInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "AD instance url for application"
+      }
+    }
+  },
+  "variables": {
+    "hostingPlanName": "[concat(resourceGroup().name, '-plan')]",
+    "webSiteName": "[concat(resourceGroup().name, '-web')]",
+    "applicationInsightsName": "[concat(resourceGroup().name, '-ai')]",
+    "databaseName": "sampledb"
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[variables('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "HostingPlan"
+      },
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[variables('webSiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('hostingPlanName')]",
+        "[variables('applicationInsightsName')]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName')))]": "empty",
+        "displayName": "Website"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "type": "siteextensions",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"
+          ],
+          "properties": {
+          }
+        }
+      ],
+      
+      "properties": {
+        "name": "[variables('webSiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "siteConfig": {
+          "AlwaysOn": true,
+	  "use32BitWorkerProcess": false,
+	  "http20Enabled": true,
+          "appSettings": [
+            {
+              "name": "ApiKey",
+              "value": "[parameters('apiKey')]"
+            },
+            {
+              "name": "ApiEndpoint",
+              "value": "[parameters('apiEndpoint')]"
+            },
+            {
+              "name": "ApiOptions:ApiKey",
+              "value": "[parameters('apiKey')]"
+            },
+            {
+              "name": "ApiOptions:ApiEndpoint",
+              "value": "[parameters('apiEndpoint')]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsOptions:InstrumentationKey",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "AzureAd:Instance",
+              "value": "[parameters('aadInstance')]"
+            },
+            {
+              "name": "AzureAd:CallbackPath",
+              "value": "/signin-oidc"
+            },
+            {
+              "name": "AzureAd:Domain",
+              "value": "[parameters('aadDomain')]"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "[parameters('aadTenantId')]"
+            },
+            {
+              "name": "AzureAd:ClientId",
+              "value": "[parameters('aadClientId')]"
+            },
+            {
+              "name": "AzureAd:IsEnabled",
+              "value": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('applicationInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[resourceGroup().location]",
+      "properties": { }
+    }
+  ],
+  "outputs": {
+    "siteUri": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Web/sites/', variables('webSiteName'))).hostnames[0]]"
+    }
+  }
+
+}
