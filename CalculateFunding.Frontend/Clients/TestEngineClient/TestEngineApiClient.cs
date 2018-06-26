@@ -25,7 +25,6 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
             return PostAsync<IEnumerable<ScenarioCompileError>, ScenarioCompileModel>("validate-test", compileModel);
         }
 
- 
         public async Task<PagedResult<TestScenarioSearchResultItem>> FindTestScenariosForProvider(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
@@ -47,7 +46,6 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
                 return null;
             }
         }
-
 
         public Task<ApiResponse<IEnumerable<TestScenarioResultCounts>>> GetTestResultCounts(TestScenarioResultCountsRequestModel testScenarioIdsModel)
         {

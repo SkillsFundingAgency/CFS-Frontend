@@ -12,6 +12,7 @@
     using CalculateFunding.Frontend.Clients.TestEngineClient;
     using CalculateFunding.Frontend.Clients.UsersClient;
     using CalculateFunding.Frontend.Core.Ioc;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.APiClient;
     using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +28,6 @@
 
         public override void Configure(IServiceCollection services)
         {
-            ApiOptions options = AddSettingAsOptions<ApiOptions>(services);
-
             TimeSpan[] retryTimeSpans = new[] { TimeSpan.FromMilliseconds(500), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5) };
             int numberOfExceptionsBeforeCircuitBreaker = 100;
             TimeSpan circuitBreakerFailurePeriod = TimeSpan.FromMinutes(1);
@@ -36,9 +35,9 @@
             services.AddHttpClient(HttpClientKeys.Calculations,
                 c =>
                 {
-                    string apiBase = options.CalcsPath ?? "calcs";
+                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("calcsClient");
 
-                    SetDefaultApiOptions(c, options, apiBase);
+                    SetDefaultApiOptions(c, opts);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -47,9 +46,9 @@
             services.AddHttpClient(HttpClientKeys.Results,
                 c =>
                 {
-                    string apiBase = options.ResultsPath ?? "results";
+                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("resultsClient");
 
-                    SetDefaultApiOptions(c, options, apiBase);
+                    SetDefaultApiOptions(c, opts);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -58,9 +57,9 @@
             services.AddHttpClient(HttpClientKeys.Specifications,
                 c =>
                 {
-                    string apiBase = options.SpecsPath ?? "specs";
+                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("specsClient");
 
-                    SetDefaultApiOptions(c, options, apiBase);
+                    SetDefaultApiOptions(c, opts);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -69,9 +68,9 @@
             services.AddHttpClient(HttpClientKeys.Datasets,
                 c =>
                 {
-                    string apiBase = options.DatasetsPath ?? "datasets";
+                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("datasetsClient");
 
-                    SetDefaultApiOptions(c, options, apiBase);
+                    SetDefaultApiOptions(c, opts);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -80,9 +79,9 @@
             services.AddHttpClient(HttpClientKeys.Scenarios,
                 c =>
                 {
-                    string apiBase = options.ScenariosPath ?? "scenarios";
+                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("scenariosClient");
 
-                    SetDefaultApiOptions(c, options, apiBase);
+                    SetDefaultApiOptions(c, opts);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -91,20 +90,20 @@
             services.AddHttpClient(HttpClientKeys.TestEngine,
                c =>
                {
-                   string apiBase = options.TestEnginePath ?? "tests";
+                   ApiOptions opts = GetConfigurationOptions<ApiOptions>("testEngineClient");
 
-                   SetDefaultApiOptions(c, options, apiBase);
+                   SetDefaultApiOptions(c, opts);
                })
-               .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-               .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services.AddHttpClient(HttpClientKeys.Users,
              c =>
              {
-                 string apiBase = options.UsersPath ?? "users";
+                 ApiOptions opts = GetConfigurationOptions<ApiOptions>("usersClient");
 
-                 SetDefaultApiOptions(c, options, apiBase);
+                 SetDefaultApiOptions(c, opts);
              })
              .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
              .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -142,6 +141,32 @@
 
             baseAddress += apiBase;
 
+            if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
+            {
+                baseAddress = $"{baseAddress}/";
+            }
+
+            httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
+            httpClient.DefaultRequestHeaders?.Add(OcpApimSubscriptionKey, options.ApiKey);
+            httpClient.DefaultRequestHeaders?.Add(SfaUsernameProperty, "testuser");
+            httpClient.DefaultRequestHeaders?.Add(SfaUserIdProperty, "b001af14-3754-4cb1-9980-359e850700a8");
+
+            httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+        }
+
+        private static void SetDefaultApiOptions(HttpClient httpClient, ApiOptions options)
+        {
+            Guard.ArgumentNotNull(httpClient, nameof(httpClient));
+            Guard.ArgumentNotNull(options, nameof(options));
+            
+            if (string.IsNullOrWhiteSpace(options.ApiEndpoint))
+            {
+                throw new InvalidOperationException("options EndPoint is null or empty string");
+            }
+
+            string baseAddress = options.ApiEndpoint;
             if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
             {
                 baseAddress = $"{baseAddress}/";
