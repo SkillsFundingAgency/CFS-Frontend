@@ -14,5 +14,15 @@
         {
             return services.AddOptions<T>(Configuration);
         }
+
+        protected T GetConfigurationOptions<T>(string configurationPrefix)
+           where T : class, new()
+        {
+            T optionsClass = new T();
+
+            Configuration.Bind(configurationPrefix, optionsClass);
+
+            return optionsClass;
+        }
     }
 }
