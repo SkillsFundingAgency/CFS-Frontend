@@ -2,6 +2,12 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environmentKey":{
+      "type": "string",
+      "metadata":{
+        "description":"The environment key for this particular environment eg t1dv"
+      }
+    },
     "skuName": {
       "type": "string",
       "defaultValue": "S1",
@@ -69,10 +75,9 @@
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(resourceGroup().name, '-plan')]",
-    "webSiteName": "[concat(resourceGroup().name, '-web')]",
-    "applicationInsightsName": "[concat(resourceGroup().name, '-ai')]",
-    "databaseName": "sampledb"
+    "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
+    "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
+    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]",
   },
   "resources": [
     {
