@@ -1,22 +1,29 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Datasets
 {
-    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Clients.DatasetsClient;
 
     public class ManageDatasetsPageModel : PageModel
     {
         private IDatasetSearchService _searchService;
+        private readonly IDatasetsApiClient _datasetApiClient;
 
-        public ManageDatasetsPageModel(IDatasetSearchService searchService)
+        public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient)
         {
             Guard.ArgumentNotNull(searchService, nameof(searchService));
 
             _searchService = searchService;
+            _datasetApiClient = datasetApiClient;
         }
 
         [BindProperty]
@@ -24,7 +31,11 @@
 
         public DatasetSearchResultViewModel SearchResults { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm)
+        public DatasetPageBannerOperationType? OperationType { get; set; }
+
+        public PageBannerOperation PageBanner { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, DatasetPageBannerOperationType? operationType = null, string operationId = null)
         {
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
@@ -40,6 +51,44 @@
             if (SearchResults == null)
             {
                 return new StatusCodeResult(500);
+            }
+
+            OperationType = operationType;
+
+            if (operationType.HasValue)
+            {
+                if (string.IsNullOrWhiteSpace(operationId))
+                {
+                    return new PreconditionFailedResult("Operation ID not provided");
+                }
+
+                ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
+
+                IActionResult errorResult = datasetVersionResponse.IsSuccessfulOrReturnFailureResult();
+
+                if (errorResult != null)
+                {
+                    return errorResult;
+                }
+
+                DatasetVersionResponse DatsetVersion = datasetVersionResponse.Content;
+
+                PageBanner = new PageBannerOperation()
+                {
+                    EntityName = DatsetVersion.Name,
+                    EntityType = "Data Source",
+                    OperationId = operationId,
+                };
+
+                switch (operationType)
+                {
+                    case DatasetPageBannerOperationType.DatasetCreated:
+                        PageBanner.OperationAction = "created";
+                        break;
+                    case DatasetPageBannerOperationType.DatasetUpdated:
+                        PageBanner.OperationAction = "updated";
+                        break;
+                }
             }
 
             return Page();

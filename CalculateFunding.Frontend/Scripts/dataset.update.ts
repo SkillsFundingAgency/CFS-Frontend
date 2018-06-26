@@ -226,7 +226,7 @@
 
             validationRequest.always((res: any, msg: string, xhr: JQueryXHR) => {
                 if (xhr.status === 204) {
-                    self.handleDatasetValidationSuccess();
+                    self.handleDatasetValidationSuccess(datasetId);
                 }
                 else if (xhr.status === 200 && res.message.length > 0) {
                     self.state("idle");
@@ -271,8 +271,8 @@
             this.invalidateUpload();
         }
 
-        private handleDatasetValidationSuccess(): void {
-            window.location.href = "/datasets/managedatasets";
+        private handleDatasetValidationSuccess(datasetId: String): void {
+            window.location.href = "/datasets/managedatasets?operationType=DatasetUpdated&operationId="+datasetId;
         }
 
         private handleDatasetValidationFailed(): void {
