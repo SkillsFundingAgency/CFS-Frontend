@@ -21,5 +21,6 @@
 
         public string TestEnginePath { get; set; }
 
+        public string UsersPath { get; set; }
     }
 }

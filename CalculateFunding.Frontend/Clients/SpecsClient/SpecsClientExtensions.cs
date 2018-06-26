@@ -1,6 +1,5 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient
