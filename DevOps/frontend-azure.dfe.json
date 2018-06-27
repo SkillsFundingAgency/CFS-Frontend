@@ -89,12 +89,12 @@
   "resources": [
     {
       "type": "Microsoft.Web/certificates",
-      "name": "variables('frontEndCertificateName')",
+      "name": "[variables('frontEndCertificateName')]",
       "apiVersion": "2016-03-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "keyVaultId": "[resourceId('Microsoft.KeyVaults/vaults', concat('kv-', parameters('environmentKey'), '-cfs'))]",
-        "keyVaultSecretName": "variables('frontEndCertificateName')",
+        "keyVaultSecretName": "[variables('frontEndCertificateName')]",
         "serverFarmId": "[variables('hostingPlanName')]"
       }
     },
