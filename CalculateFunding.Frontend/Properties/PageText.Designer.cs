@@ -97,11 +97,47 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Map data source files to datasets for a specification.
+        /// </summary>
+        public static string DatasetRelationships {
+            get {
+                return ResourceManager.GetString("DatasetRelationships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the data source file a dataset uses..
+        /// </summary>
+        public static string DatasetRelationshipsDescr {
+            get {
+                return ResourceManager.GetString("DatasetRelationshipsDescr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Funding streams.
         /// </summary>
         public static string FundingStreams {
             get {
                 return ResourceManager.GetString("FundingStreams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage data.
+        /// </summary>
+        public static string ManageDataset {
+            get {
+                return ResourceManager.GetString("ManageDataset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage data source files or map them to datasets for a specification..
+        /// </summary>
+        public static string ManageDatasetDescr {
+            get {
+                return ResourceManager.GetString("ManageDatasetDescr", resourceCulture);
             }
         }
         
@@ -120,6 +156,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string ManagePoliciesHeadingText {
             get {
                 return ResourceManager.GetString("ManagePoliciesHeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a dataset from a data source file..
+        /// </summary>
+        public static string SpecificationRelationshipDescr {
+            get {
+                return ResourceManager.GetString("SpecificationRelationshipDescr", resourceCulture);
             }
         }
     }
