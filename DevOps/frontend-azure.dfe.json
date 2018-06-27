@@ -95,7 +95,7 @@
       "properties": {
         "keyVaultId": "[resourceId('Microsoft.KeyVaults/vaults', concat('kv-', parameters('environmentKey'), '-cfs'))]",
         "keyVaultSecretName": "[variables('frontEndCertificateName')]",
-        "serverFarmId": "[variables('hostingPlanName')]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
       }
     },
     {
