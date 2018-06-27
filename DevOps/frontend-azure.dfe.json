@@ -88,17 +88,6 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Web/certificates",
-      "name": "[variables('frontEndCertificateName')]",
-      "apiVersion": "2016-03-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "keyVaultId": "[resourceId('Microsoft.KeyVaults/vaults', concat('kv-', parameters('environmentKey'), '-cfs'))]",
-        "keyVaultSecretName": "[variables('frontEndCertificateName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-      }
-    },
-    {
       "apiVersion": "2016-03-01",
       "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
@@ -243,14 +232,7 @@
               "value": "false"
             }
           ]
-        },
-        "hostNameSslStates": [
-          {
-            "name": "[parameters('frontendDomain')]",
-            "sslState": "SniEnabled",
-            "thumbprint": "[reference(resourceId('Microsoft.Web/certificates', variables('frontEndCertificateName'))).Thumbprint]",
-            "toUpdate": true
-          }]
+        }
       }
     },
     {
