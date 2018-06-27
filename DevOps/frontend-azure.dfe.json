@@ -77,7 +77,7 @@
   "variables": {
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
     "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
-    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]",
+    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]"
   },
   "resources": [
     {
@@ -144,7 +144,7 @@
             },
             {
               "name": "specsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/specs')]"
             },
             {
               "name": "calcsClient:ApiKey",
@@ -152,7 +152,7 @@
             },
             {
               "name": "calcsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/calcs')]"
             },
             {
               "name": "datasetsClient:ApiKey",
@@ -160,7 +160,7 @@
             },
             {
               "name": "datasetsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/datasets')]"
             },
             {
               "name": "resultsClient:ApiKey",
@@ -168,7 +168,7 @@
             },
             {
               "name": "resultsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/results')]"
             },
             {
               "name": "scenariosClient:ApiKey",
@@ -176,7 +176,7 @@
             },
             {
               "name": "scenariosClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/scenarios')]"
             },
             {
               "name": "testEngineClient:ApiKey",
@@ -184,7 +184,7 @@
             },
             {
               "name": "testEngineClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/testengine')]"
             },
             {
               "name": "usersClient:ApiKey",
@@ -192,7 +192,7 @@
             },
             {
               "name": "usersClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs/api/users')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
