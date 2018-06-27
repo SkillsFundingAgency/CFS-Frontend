@@ -2,10 +2,16 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "environmentKey":{
+    "environmentKey": {
       "type": "string",
-      "metadata":{
-        "description":"The environment key for this particular environment eg t1dv"
+      "metadata": {
+        "description": "The environment key for this particular environment eg t1dv"
+      }
+    },
+    "frontendDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "The domain name for the front end webserver"
       }
     },
     "skuName": {
@@ -77,9 +83,21 @@
   "variables": {
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
     "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
-    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]"
+    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]",
+    "frontEndCertificateName": "frontendcert"
   },
   "resources": [
+    {
+      "type": "Microsoft.Web/certificates",
+      "name": "variables('frontEndCertificateName')",
+      "apiVersion": "2016-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "keyVaultId": "[resourceId('Microsoft.KeyVaults/vaults', concat('kv-', parameters('environmentKey'), '-cfs'))]",
+        "keyVaultSecretName": "variables('frontEndCertificateName')",
+        "serverFarmId": "[variables('hostingPlanName')]"
+      }
+    },
     {
       "apiVersion": "2016-03-01",
       "name": "[variables('hostingPlanName')]",
@@ -111,24 +129,22 @@
       },
       "resources": [
         {
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2016-03-01",
           "name": "Microsoft.ApplicationInsights.AzureWebSites",
           "type": "siteextensions",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"
           ],
-          "properties": {
-          }
+          "properties": {}
         }
       ],
-      
       "properties": {
         "name": "[variables('webSiteName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
           "AlwaysOn": true,
-	  "use32BitWorkerProcess": false,
-	  "http20Enabled": true,
+          "use32BitWorkerProcess": false,
+          "http20Enabled": true,
           "appSettings": [
             {
               "name": "ApiKey",
@@ -227,7 +243,14 @@
               "value": "false"
             }
           ]
-        }
+        },
+        "hostNameSslStates": [
+          {
+            "name": "[parameters('frontendDomain')]",
+            "sslState": "SniEnabled",
+            "thumbprint": "[reference(resourceId('Microsoft.Web/certificates', variables('frontEndCertificateName'))).Thumbprint]",
+            "toUpdate": true
+          }]
       }
     },
     {
@@ -235,7 +258,7 @@
       "name": "[variables('applicationInsightsName')]",
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
-      "properties": { }
+      "properties": {}
     }
   ],
   "outputs": {
@@ -244,5 +267,4 @@
       "value": "[reference(concat('Microsoft.Web/sites/', variables('webSiteName'))).hostnames[0]]"
     }
   }
-
 }
