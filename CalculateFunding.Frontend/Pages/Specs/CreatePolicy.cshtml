@@ -24,7 +24,7 @@
     </div>
 }
 
-<div class="row">   
+<div class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
             <div gds-validation-summary="All"></div>
@@ -56,17 +56,5 @@
 </div>
 @section Scripts
     {
-    @*<script type="text/javascript">
-            $(function () {
-                $('.summernote').summernote({
-                    height: 200
-                });
-
-                $('form').on('submit', function (e) {
-                    e.preventDefault();
-                    alert($('.summernote').summernote('code'));
-                    alert($('.summernote').val());
-                });
-            });
-        </script>*@
+    <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }

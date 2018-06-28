@@ -54,7 +54,7 @@
                 <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamIds">
                     <div class="form-group">
 
-                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding streams</label>                       
+                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding streams</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select one or more funding streams</span></h4>
                         <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
                     </div>
@@ -81,6 +81,7 @@
     <script type="text/javascript">
         $("#CreateSpecificationViewModel-FundingStreamIds").select2();
     </script>
+    <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }
 
 @section styles{

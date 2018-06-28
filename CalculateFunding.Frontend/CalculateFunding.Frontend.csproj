@@ -44,6 +44,7 @@
     <None Remove="Scripts\search.specifications.ts" />
     <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\submit.disabler.ts" />
     <None Remove="Scripts\table.expander.sequential.ts" />
     <None Remove="Scripts\table.expander.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
@@ -150,6 +151,7 @@
     <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\submit.disabler.ts" />
     <TypeScriptCompile Include="Scripts\table.expander.sequential.ts" />
     <TypeScriptCompile Include="Scripts\table.expander.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
