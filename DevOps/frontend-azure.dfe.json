@@ -83,7 +83,7 @@
   "variables": {
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
     "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
-    "applicationInsightsName": "[concat('ai', parameters('environmentKey'), '-cfs')]",
+    "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs')]",
     "frontEndCertificateName": "frontendcert"
   },
   "resources": [
