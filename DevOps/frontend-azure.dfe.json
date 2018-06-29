@@ -134,6 +134,12 @@
           "AlwaysOn": true,
           "use32BitWorkerProcess": false,
           "http20Enabled": true,
+          "phpVersion": "",
+          "pythonVersion": "",
+          "nodeVersion": "",
+          "httpsOnly": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
           "appSettings": [
             {
               "name": "ApiKey",
@@ -229,7 +235,7 @@
             },
             {
               "name": "AzureAd:IsEnabled",
-              "value": "false"
+              "value": "true"
             }
           ]
         }
