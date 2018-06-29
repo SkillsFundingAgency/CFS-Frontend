@@ -66,6 +66,7 @@
                 {
                     var policy = new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
+                                     .RequireRole(azureAdOptions.Groups.Split(","))
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
 
