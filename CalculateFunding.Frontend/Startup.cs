@@ -108,7 +108,7 @@
         {
             app.UseStatusCodePagesWithRedirects("/errors/{0}");
 
-            if (!env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }

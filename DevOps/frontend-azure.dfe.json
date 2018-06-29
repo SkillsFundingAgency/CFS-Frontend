@@ -189,7 +189,7 @@
             },
             {
               "name": "testEngineClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/testengine')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/tests')]"
             },
             {
               "name": "usersClient:ApiKey",
