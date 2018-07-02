@@ -1,17 +1,12 @@
 ﻿namespace CalculateFunding.Frontend
 {
     using System;
-    using System.Net;
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
-    using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.UsersClient;
-    using CalculateFunding.Frontend.Clients.UsersClient.Models;
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.APiClient;
     using CalculateFunding.Frontend.Modules;
     using CalculateFunding.Frontend.Options;
     using Microsoft.AspNetCore.Authentication.Cookies;
@@ -66,7 +61,7 @@
                 {
                     var policy = new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
-                                     .RequireRole(azureAdOptions.Groups.Split(","))
+                                     .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
 
