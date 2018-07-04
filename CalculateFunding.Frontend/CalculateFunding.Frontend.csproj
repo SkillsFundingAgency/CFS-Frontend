@@ -44,6 +44,7 @@
     <None Remove="Scripts\search.specifications.ts" />
     <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\submit.disabler.ts" />
     <None Remove="Scripts\table.expander.sequential.ts" />
     <None Remove="Scripts\table.expander.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
@@ -60,7 +61,7 @@
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.6.4" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />   
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -150,6 +151,7 @@
     <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
     <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
     <TypeScriptCompile Include="Scripts\search.ts" />
+    <TypeScriptCompile Include="Scripts\submit.disabler.ts" />
     <TypeScriptCompile Include="Scripts\table.expander.sequential.ts" />
     <TypeScriptCompile Include="Scripts\table.expander.ts" />
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />

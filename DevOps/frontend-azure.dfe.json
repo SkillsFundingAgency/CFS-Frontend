@@ -2,6 +2,18 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environmentKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The environment key for this particular environment eg t1dv"
+      }
+    },
+    "frontendDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "The domain name for the front end webserver"
+      }
+    },
     "skuName": {
       "type": "string",
       "defaultValue": "S1",
@@ -69,10 +81,10 @@
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(resourceGroup().name, '-plan')]",
-    "webSiteName": "[concat(resourceGroup().name, '-web')]",
-    "applicationInsightsName": "[concat(resourceGroup().name, '-ai')]",
-    "databaseName": "sampledb"
+    "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
+    "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
+    "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs')]",
+    "frontEndCertificateName": "frontendcert"
   },
   "resources": [
     {
@@ -106,24 +118,22 @@
       },
       "resources": [
         {
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2016-03-01",
           "name": "Microsoft.ApplicationInsights.AzureWebSites",
           "type": "siteextensions",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"
           ],
-          "properties": {
-          }
+          "properties": {}
         }
       ],
-      
       "properties": {
         "name": "[variables('webSiteName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
           "AlwaysOn": true,
-	  "use32BitWorkerProcess": false,
-	  "http20Enabled": true,
+          "use32BitWorkerProcess": false,
+          "http20Enabled": true,
           "appSettings": [
             {
               "name": "ApiKey",
@@ -139,7 +149,7 @@
             },
             {
               "name": "specsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs.azurewebsites.net/api/specs')]"
             },
             {
               "name": "calcsClient:ApiKey",
@@ -147,7 +157,7 @@
             },
             {
               "name": "calcsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-calcs.azurewebsites.net/api/calcs')]"
             },
             {
               "name": "datasetsClient:ApiKey",
@@ -155,7 +165,7 @@
             },
             {
               "name": "datasetsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-datasets.azurewebsites.net/api/datasets')]"
             },
             {
               "name": "resultsClient:ApiKey",
@@ -163,7 +173,7 @@
             },
             {
               "name": "resultsClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-results.azurewebsites.net/api/results')]"
             },
             {
               "name": "scenariosClient:ApiKey",
@@ -171,7 +181,7 @@
             },
             {
               "name": "scenariosClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-scenarios.azurewebsites.net/api/scenarios')]"
             },
             {
               "name": "testEngineClient:ApiKey",
@@ -179,7 +189,7 @@
             },
             {
               "name": "testEngineClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/testengine')]"
             },
             {
               "name": "usersClient:ApiKey",
@@ -187,7 +197,7 @@
             },
             {
               "name": "usersClient:ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-users.azurewebsites.net/api/users')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -230,7 +240,7 @@
       "name": "[variables('applicationInsightsName')]",
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
-      "properties": { }
+      "properties": {}
     }
   ],
   "outputs": {
@@ -239,5 +249,4 @@
       "value": "[reference(concat('Microsoft.Web/sites/', variables('webSiteName'))).hostnames[0]]"
     }
   }
-
 }
