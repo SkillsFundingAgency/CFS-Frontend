@@ -19,6 +19,7 @@
             services.AddScoped<ITestScenarioResultsService, TestScenarioResultsService>();
             services.AddScoped<ICalculationProviderResultsSearchService, CalculationProviderResultsSearchService>();
             services.AddScoped<ISpecificationSearchService, SpecificationSearchService>();
+            services.AddScoped<IUserProfileService, UserProfileService>();
         }
     }
 }

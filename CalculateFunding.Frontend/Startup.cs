@@ -61,7 +61,7 @@
                 {
                     var policy = new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
-                                     .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
+                                     //.RequireClaim("groups", azureAdOptions.Groups?.Split(","))
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
 

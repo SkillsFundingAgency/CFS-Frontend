@@ -5,6 +5,7 @@
     using System.Net.Http.Headers;
     using CalculateFunding.Frontend.Clients;
     using CalculateFunding.Frontend.Clients.CalcsClient;
+    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
     using CalculateFunding.Frontend.Clients.ScenariosClient;
@@ -15,6 +16,7 @@
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.APiClient;
+    using CalculateFunding.Frontend.Interfaces.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Polly;
 
@@ -32,12 +34,15 @@
             int numberOfExceptionsBeforeCircuitBreaker = 100;
             TimeSpan circuitBreakerFailurePeriod = TimeSpan.FromMinutes(1);
 
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            
+
             services.AddHttpClient(HttpClientKeys.Calculations,
                 c =>
                 {
                     ApiOptions opts = GetConfigurationOptions<ApiOptions>("calcsClient");
 
-                    SetDefaultApiOptions(c, opts);
+                    SetDefaultApiOptions(c, opts, services);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -48,7 +53,7 @@
                 {
                     ApiOptions opts = GetConfigurationOptions<ApiOptions>("resultsClient");
 
-                    SetDefaultApiOptions(c, opts);
+                    SetDefaultApiOptions(c, opts, services);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -59,7 +64,7 @@
                 {
                     ApiOptions opts = GetConfigurationOptions<ApiOptions>("specsClient");
 
-                    SetDefaultApiOptions(c, opts);
+                    SetDefaultApiOptions(c, opts, services);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -70,7 +75,7 @@
                 {
                     ApiOptions opts = GetConfigurationOptions<ApiOptions>("datasetsClient");
 
-                    SetDefaultApiOptions(c, opts);
+                    SetDefaultApiOptions(c, opts, services);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -81,7 +86,7 @@
                 {
                     ApiOptions opts = GetConfigurationOptions<ApiOptions>("scenariosClient");
 
-                    SetDefaultApiOptions(c, opts);
+                    SetDefaultApiOptions(c, opts, services);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -92,7 +97,7 @@
                {
                    ApiOptions opts = GetConfigurationOptions<ApiOptions>("testEngineClient");
 
-                   SetDefaultApiOptions(c, opts);
+                   SetDefaultApiOptions(c, opts, services);
                })
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -103,7 +108,7 @@
              {
                  ApiOptions opts = GetConfigurationOptions<ApiOptions>("usersClient");
 
-                 SetDefaultApiOptions(c, opts);
+                 SetDefaultApiOptions(c, opts, services);
              })
              .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
              .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
@@ -156,11 +161,12 @@
             httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         }
 
-        private static void SetDefaultApiOptions(HttpClient httpClient, ApiOptions options)
+        private static void SetDefaultApiOptions(HttpClient httpClient, ApiOptions options, IServiceCollection services)
         {
             Guard.ArgumentNotNull(httpClient, nameof(httpClient));
             Guard.ArgumentNotNull(options, nameof(options));
-            
+            Guard.ArgumentNotNull(services, nameof(services));
+
             if (string.IsNullOrWhiteSpace(options.ApiEndpoint))
             {
                 throw new InvalidOperationException("options EndPoint is null or empty string");
@@ -172,10 +178,16 @@
                 baseAddress = $"{baseAddress}/";
             }
 
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            IUserProfileService userProfileService = serviceProvider.GetService<IUserProfileService>();
+
+            UserProfile userProfile = userProfileService.GetUser();
+
             httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
             httpClient.DefaultRequestHeaders?.Add(OcpApimSubscriptionKey, options.ApiKey);
-            httpClient.DefaultRequestHeaders?.Add(SfaUsernameProperty, "testuser");
-            httpClient.DefaultRequestHeaders?.Add(SfaUserIdProperty, "b001af14-3754-4cb1-9980-359e850700a8");
+            httpClient.DefaultRequestHeaders?.Add(SfaUsernameProperty, userProfile.Fullname);
+            httpClient.DefaultRequestHeaders?.Add(SfaUserIdProperty, userProfile.Id);
 
             httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));

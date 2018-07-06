@@ -1,4 +1,5 @@
 ﻿@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@inject CalculateFunding.Frontend.Interfaces.Services.IUserProfileService userProfileService
 @using Microsoft.AspNetCore.Hosting
 <!DOCTYPE html>
 <html lang="en">
@@ -43,15 +44,21 @@
                         <a href="/" id="proposition-name">Calculate Funding</a>
 
                         @*<ul id="proposition-links">
-                                <li><a href="layout.html">Layout</a></li>
-                                <li><a href="content.html">Content</a></li>
-                                <li><a href="elements.html">Components</a></li>
-                                <li><a href="developer_guide.html">Developer Guide</a></li>
-                            </ul>*@
+            <li><a href="layout.html">Layout</a></li>
+            <li><a href="content.html">Content</a></li>
+            <li><a href="elements.html">Components</a></li>
+            <li><a href="developer_guide.html">Developer Guide</a></li>
+        </ul>*@
+                        <div class="user-container">
+                            <i class="material-icons circle-icon">person</i> <span>@userProfileService.GetUser().Fullname</span>
+                        </div>
                     </nav>
+
                 </div>
             </div>
+            
         </div>
+    
 
     </header>
 
