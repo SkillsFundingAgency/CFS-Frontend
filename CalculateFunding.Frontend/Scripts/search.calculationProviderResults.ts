@@ -148,6 +148,7 @@
         upin: string;
         ukprn: string;
         urn: string;
+        providerId: string;
         establishmentNumber: string;
         providerType: string;
         providerSubtype: string;

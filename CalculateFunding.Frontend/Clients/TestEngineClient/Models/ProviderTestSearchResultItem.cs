@@ -17,6 +17,8 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient.Models
 
         public int? EstablishmentNumber { get; set; }
 
+        public string ProviderId { get; set; }
+
         public string ProviderType { get; set; }
 
         public string ProviderSubType { get; set; }

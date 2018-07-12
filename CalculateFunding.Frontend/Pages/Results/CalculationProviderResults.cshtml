@@ -96,7 +96,7 @@
                     <div class="provider-item-container" id="provider-item-result-@providerRow">
                         <div class="provider-item-header">
                             <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
-                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.Id&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
+                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
                         </div>
                         <div class="provider-item-property-container">
                             <span class="provider-item-property provider-item-property-last-updated">
@@ -113,7 +113,7 @@
                                 UPIN:
                                 <strong>
                                     <span id="provider-item-upin-@providerRow">
-                                        @(provider.Upin > 0 ? provider.Upin.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.Upin) ? provider.Upin.ToString() : "No data found")
                                     </span>
                                 </strong>
                             </span>
@@ -121,7 +121,7 @@
                                 UKPRN:
                                 <strong>
                                     <span id="provider-item-ukprn-@providerRow">
-                                        @(provider.Ukprn > 0 ? provider.Ukprn.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.Ukprn) ? provider.Ukprn.ToString() : "No data found")
 
                                     </span>
                                 </strong>
@@ -130,7 +130,7 @@
                                 URN:
                                 <strong>
                                     <span id="provider-item-urn-@providerRow">
-                                        @(provider.Urn > 0 ? provider.Urn.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.Urn) ? provider.Urn.ToString() : "No data found")
                                     </span>
                                 </strong>
                             </span>
@@ -138,7 +138,7 @@
                                 Establishment number:
                                 <strong>
                                     <span id="provider-item-establishmentnumber-@providerRow">
-                                        @(provider.EstablishmentNumber > 0 ? provider.EstablishmentNumber.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.EstablishmentNumber) ? provider.EstablishmentNumber.ToString() : "No data found")
                                     </span>
                                 </strong>
                             </span>
@@ -199,7 +199,7 @@
                 <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index()">
                     <div class="provider-item-header">
                         <strong><span class="float-right" data-bind="text: calculationResultDisplay"></span></strong>
-                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + ukprn + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationId=' + $root.specificationId }, text: name"></a></h4>
+                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationId=' + $root.specificationId }, text: name"></a></h4>
 
                     </div>
                     <p>
@@ -209,13 +209,13 @@
                     </p>
                     <p>
                         <span class="provider-item-property">
-                            UPIN:&nbsp; <strong> <span data-bind="text: upin > 0 ? upin : 'No data found', attr:{  'id' : 'provider-item-upin-'+$index() }"></span> </strong>
+                            UPIN:&nbsp; <strong> <span data-bind="text: upin != '' ? upin : 'No data found', attr:{  'id' : 'provider-item-upin-'+$index() }"></span> </strong>
                         </span>
                         <span class="provider-item-property">
-                            &nbsp;UKPRN:&nbsp;<strong> <span data-bind="text: ukprn > 0 ? ukprn : 'No data found', attr:{ 'id' : 'provider-item-ukprn-' +$index()}"></span></strong>
+                            &nbsp;UKPRN:&nbsp;<strong> <span data-bind="text: ukprn != '' ? ukprn : 'No data found', attr:{ 'id' : 'provider-item-ukprn-' +$index()}"></span></strong>
                         </span>
                         <span class="provider-item-property">
-                            &nbsp;URN:&nbsp;<strong><span data-bind="text: urn > 0 ? urn : 'No data found', attr: {'id' : 'provider-item-urn-' +$index()}"></span></strong>
+                            &nbsp;URN:&nbsp;<strong><span data-bind="text: urn != '' ? urn : 'No data found', attr: {'id' : 'provider-item-urn-' +$index()}"></span></strong>
                         </span>
                         <span class="provider-item-property">
                             &nbsp;Establishment number:&nbsp;<strong><span data-bind="text: establishmentNumber > 0 ? establishmentNumber : 'No data found', attr: {'id' : 'provider-item-establishmentnumber-' +$index()}"></span></strong>

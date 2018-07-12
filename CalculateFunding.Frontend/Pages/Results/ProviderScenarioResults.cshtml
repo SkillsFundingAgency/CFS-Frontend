@@ -183,7 +183,7 @@
     <script asp-src-include="~/js/search.providerScenarioResults.js" asp-append-version="true" type="text/javascript"></script>
 
     <script type="text/javascript">
-        var vm = new calculateFunding.listProviderTestResults.ProviderTestSearchViewModel({"providerId": "@Model.ProviderInfoModel.Id", "fundingPeriodId": "@Model.FundingPeriodId" });
+        var vm = new calculateFunding.listProviderTestResults.ProviderTestSearchViewModel({"providerId": "@Model.ProviderId", "fundingPeriodId": "@Model.FundingPeriodId" });
 
         @if (!string.IsNullOrEmpty(Model.SpecificationId)) {
 
