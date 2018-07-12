@@ -111,7 +111,7 @@
         establishmentNumber: string;
         providerType: string;
         providerSubtype: string;
-        localAuthority: string;
+        authority: string;
         dateOpened: Date;
         dateOpenedDisplay: string;
     }
