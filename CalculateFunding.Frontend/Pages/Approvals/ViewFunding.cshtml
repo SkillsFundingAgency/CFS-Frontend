@@ -74,7 +74,7 @@
             {
                 @foreach (PublishedProviderResultViewModel provider in Model.Results)
                 {
-                    <tr class="expander-trigger-container">
+                    <tr class="expander-trigger-container data-provider-container">
                         <td class="view-funding-provider-border">
                             <input type="checkbox" id="checkbox-provider-@provider.ProviderId" class="target-checkbox-provider" data-providerid="@provider.ProviderId" /> <label for="checkbox-provider-@provider.ProviderId" class="inline-table-label data-provider-name">@provider.ProviderName</label>
                         </td>
@@ -87,7 +87,7 @@
                                 <span class="datetime-split-date">@provider.LastUpdatedDateDisplay</span> <span>@provider.LastUpdatedTimeDisplay</span>
                             </span>
                         </td>
-                        <td>&pound;@provider.FundingAmountDisplay</td>
+                        <td class="data-provider-amount">&pound;@provider.FundingAmountDisplay</td>
                         <td class="expander-trigger-cell" data-providerid="@provider.ProviderId"><i class="material-icons">keyboard_arrow_down</i></td>
                     </tr>
                     <tr class="expander-container">
@@ -104,7 +104,7 @@
 
                     @foreach (PublishedFundingStreamResultViewModel fundingStream in provider.FundingStreamResults)
                     {
-                        <tr class="expander-container">
+                        <tr class="expander-container data-fundingstream-container">
                             <td colspan="2">
                                 <input type="checkbox" id="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="target-checkbox-fundingstream" data-providerid="@provider.ProviderId" data-fundingstreamid="@fundingStream.FundingStreamId" /> <label for="checkbox-fundingstream-@provider.ProviderId-@fundingStream.FundingStreamId" class="inline-table-label data-fundingstream-name">@fundingStream.FundingStreamName</label>
                             </td>
@@ -116,12 +116,12 @@
                                     <span class="datetime-split-date">@fundingStream.LastUpdatedDateDisplay</span> <span>@fundingStream.LastUpdatedTimeDisplay</span>
                                 </span>
                             </td>
-                            <td colspan="2">&pound;@fundingStream.FundingAmountDisplay</td>
+                            <td colspan="2" class="data-fundingstream-amount">&pound;@fundingStream.FundingAmountDisplay</td>
                         </tr>
 
                         @foreach (PublishedAllocationLineResultViewModel allocationLine in fundingStream.AllocationLineResults)
                         {
-                            <tr class="expander-container">
+                            <tr class="expander-container data-allocationline-container">
                                 <td colspan="2">
                                     <input type="checkbox" id="checkbox-allocationline-@provider.ProviderId-@fundingStream.FundingStreamId-@allocationLine.AllocationLineId" class="target-checkbox-allocationline" data-providerid="@provider.ProviderId" data-fundingstreamid="@fundingStream.FundingStreamId" data-allocationlineid="@allocationLine.AllocationLineId" data-status="@allocationLine.Status" /> <label for="checkbox-allocationline-@provider.ProviderId-@fundingStream.FundingStreamId-@allocationLine.AllocationLineId" class="inline-table-label data-allocationline-name">@allocationLine.AllocationLineName</label>
                                 </td>
@@ -152,7 +152,7 @@
                                         <span class="datetime-split-date">@allocationLine.LastUpdatedDateDisplay</span> <span>@allocationLine.LastUpdatedTimeDisplay</span>
                                     </span>
                                 </td>
-                                <td colspan="2">&pound;@allocationLine.FundingAmountDisplay</td>
+                                <td colspan="2" class="data-allocationline-amount">&pound;@allocationLine.FundingAmountDisplay</td>
                             </tr>
 
                         }
