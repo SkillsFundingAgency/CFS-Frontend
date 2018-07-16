@@ -12,7 +12,7 @@
         public providerSubType: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedProviderSubTypes: KnockoutObservableArray<string> = ko.observableArray([]);
 
-        public authority: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
+        public localAuthority: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedLocalAuthorities: KnockoutObservableArray<string> = ko.observableArray([]);
 
         constructor(options: IProviderSearchViewModelConstructorParameters) {
@@ -58,7 +58,7 @@
 
                 super.buildSelectedSearchFacets(facets, self.selectedProviderTypes(), self.providerType());
                 super.buildSelectedSearchFacets(facets, self.selectedProviderSubTypes(), self.providerSubType());
-                super.buildSelectedSearchFacets(facets, self.selectedLocalAuthorities(), self.authority());              
+                super.buildSelectedSearchFacets(facets, self.selectedLocalAuthorities(), self.localAuthority());              
 
                 return facets;
             }).extend({ throttle: 3 });
@@ -118,7 +118,7 @@
 
                 self.populateFacets("providerType", result.facets, self.providerType);
                 self.populateFacets("providerSubType", result.facets, self.providerSubType);
-                self.populateFacets("localAuthority", result.facets, self.authority);
+                self.populateFacets("localAuthority", result.facets, self.localAuthority);
             });
         }
 
@@ -130,7 +130,7 @@
                     selectedArray = this.selectedProviderTypes;
                 } else if (fieldName === "providerSubType") {
                     selectedArray = this.selectedProviderSubTypes;
-                } else if (fieldName === "authority") {
+                } else if (fieldName === "localAuthority") {
                     selectedArray = this.selectedLocalAuthorities;
                 }
 

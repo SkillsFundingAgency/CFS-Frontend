@@ -18,7 +18,6 @@
 
         public string ProviderSubType { get; set; }
 
-        [JsonProperty("authority")]
         public string LocalAuthority { get; set; }
 
         public string ProviderId { get; set; }
