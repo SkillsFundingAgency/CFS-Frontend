@@ -126,8 +126,6 @@
                 }
             });
 
-            app.UseMiddleware<CorrelationIdMiddleware>();
-
             if (_authenticationEnabled)
             {
                 app.UseAuthentication();
