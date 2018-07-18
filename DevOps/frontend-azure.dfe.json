@@ -84,6 +84,13 @@
       "metadata": {
         "description": "AD groups"
       }
+    },
+    "aadEnabled":{
+      "type": "string",
+      "metadata": {
+        "description" :"Enable authentication"
+      },
+      "defaultValue": "true"
     }
   },
   "variables": {
@@ -253,7 +260,7 @@
             },
             {
               "name": "AzureAd:IsEnabled",
-              "value": "true"
+              "value": "[parameters('aadEnabled')]"
             }
           ]
         }
