@@ -152,6 +152,13 @@
             return GetAsync<DownloadDatasourceModel>($"download-dataset-file?datasetId={datasetId}");
         }
 
+        public Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel)
+        {
+            Guard.ArgumentNotNull(requestModel, nameof(requestModel));
+
+            return PostAsync<DownloadDatasetSchemaResponse, DownloadDatasetSchemaRequest>("get-schema-download-url", requestModel);
+        }
+
         public Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId)
         {
             Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
