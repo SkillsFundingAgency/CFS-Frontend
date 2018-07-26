@@ -56,7 +56,7 @@
                         <input type="checkbox" id="selectAll"/> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
                     </div>
                 </th>
-                <th rowspan="2" class="valign-top">UKPRN</th>
+                <th rowspan="2" class="valign-top text-center">ID</th>
                 <th colspan="4" class="text-center valign-top">Allocation line statuses</th>
                 <th rowspan="2" class="funding-header valign-top">Specification funding</th>
                 <th rowspan="2"></th>
@@ -78,7 +78,7 @@
                         <td class="view-funding-provider-border">
                             <input type="checkbox" id="checkbox-provider-@provider.ProviderId" class="target-checkbox-provider" data-providerid="@provider.ProviderId" /> <label for="checkbox-provider-@provider.ProviderId" class="inline-table-label data-provider-name">@provider.ProviderName</label>
                         </td>
-                        <td>@provider.Ukprn</td>
+                        <td clsss="data-provider-id">@provider.ProviderId</td>
                         <td class="text-center @(provider.NumberHeld > 0 ? "status-held" : "")">@provider.NumberHeld/@provider.TotalAllocationLines</td>
                         <td class="text-center @(provider.NumberApproved > 0 ? "status-approved" : "")">@provider.NumberApproved/@provider.TotalAllocationLines</td>
                         <td class="text-center @(provider.NumberPublished > 0 ? "status-published" : "")">@provider.NumberPublished/@provider.TotalAllocationLines</td>

@@ -6,19 +6,21 @@
 
     public class ProviderSearchResultItemViewModel : ReferenceViewModel
     {
-        public int Upin { get; set; }
+        public string Upin { get; set; }
 
-        public int Ukprn { get; set; }
+        public string Ukprn { get; set; }
 
-        public int Urn { get; set; }
+        public string Urn { get; set; }
 
-        public int EstablishmentNumber { get; set; }
+        public string EstablishmentNumber { get; set; }
 
         public string ProviderType { get; set; }
 
         public string ProviderSubType { get; set; }
 
         public string LocalAuthority { get; set; }
+
+        public string ProviderId { get; set; }
 
         [JsonProperty("openDate")]
         public DateTime? DateOpened { get; set; }

@@ -6,7 +6,9 @@
   "exclude": [
     "wwwroot",
     "node_modules/typescript",
-    "node_modules/gulp-typescript"
+    "node_modules/gulp-typescript",
+    "node_modules/async-done",
+    "node_modules/concat-with-sourcemaps"
   ],
   "include": [
     "scripts/*.ts",

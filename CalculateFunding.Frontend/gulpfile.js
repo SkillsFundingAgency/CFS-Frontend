@@ -9,10 +9,7 @@ var lodash = require("lodash"),
     sass = require("gulp-sass"),
     uglify = require("gulp-uglify"),
     rev = require('gulp-rev'),
-    runSequence = require('run-sequence'),
     cache = require('gulp-cached');
-
-
 
 var debug = require('gulp-debug');
 
@@ -21,7 +18,6 @@ var tsProject = ts.createProject("tsconfig.json");
 var tsProjectTests = ts.createProject("tsconfig.tests.json");
 
 var sourcemaps = require('gulp-sourcemaps');
-var merge = require('merge2');
 
 var paths = {
     webroot: "./wwwroot/"
@@ -47,7 +43,7 @@ gulp.task("clean:css", function (cb) {
     rimraf(paths.minCssFolder, cb);
 });
 
-gulp.task("clean", ["clean:js", "clean:css"]);
+gulp.task("clean", gulp.series(["clean:js", "clean:css"]));
 
 gulp.task("min:js", function () {
 
@@ -56,8 +52,6 @@ gulp.task("min:js", function () {
         .pipe(rev())
         .pipe(gulp.dest(paths.minJsFolder));
 });
-
-gulp.task("min:css", ["min:maincss", "min:librarycss"]);
 
 gulp.task("min:maincss", function () {
     return gulp.src(paths.webroot + "assets/css/main.css")
@@ -81,9 +75,6 @@ gulp.task("min:librarycss", function () {
         .pipe(gulp.dest("."));
 });
 
-
-gulp.task("min", ["min:js", "min:css"]);
-
 gulp.task("sass", function () {
     return gulp.src('wwwroot/assets/scss/main.scss')
         .pipe(sass({
@@ -96,26 +87,14 @@ gulp.task("sass", function () {
 });
 
 gulp.task('watch-sass', function () {
-    gulp.watch('wwwroot/assets/scss/*.scss', ['sass']);
+    gulp.watch('wwwroot/assets/scss/*.scss', gulp.series(['sass']));
 });
 
-gulp.task('copy-assets', function () {
+gulp.task('copy-assets', function (cb) {
     var assets = {
         js: [
             './node_modules/bootstrap/dist/js/bootstrap.js',
-            //'./node_modules/summernote/dist/summernote.min.js',
             './node_modules/jquery/dist/jquery.min.js',
-            //'./node_modules/ace-builds/src-noconflict/ace.js',
-            //'./node_modules/ace-builds/src-noconflict/mode-csharp.js',
-            //'./node_modules/ace-builds/src-noconflict/mode-gherkin.js',
-            //'./node_modules/ace-builds/src-noconflict/mode-vbscript.js',
-            //'./node_modules/ace-builBds/src-noconflict/theme-twilight.js',
-            //'./node_modules/ace-builds/src-noconflict/keybinding-emacs.js',
-            //'./node_modules/ace-builds/src-noconflict/keybinding-vim.js',
-            //'./node_modules/ace-builds/src-noconflict/ext-language_tools.js',
-            //'./node_modules/ace-builds/src-noconflict/snippets/csharp.js',
-            //'./node_modules/ace-builds/src-noconflict/snippets/gherkin.js',
-            //'./node_modules/ace-builds/src-noconflict/snippets/vbscript.js',
             './node_modules/knockout/build/output/knockout-latest.js',
             './node_modules/knockout/build/output/knockout-latest.debug.js',
             './node_modules/select2/dist/js/select2.min.js',
@@ -125,10 +104,6 @@ gulp.task('copy-assets', function () {
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
-            //'./node_modules/summernote/dist/summernote.css',
-            //'./node_modules/summernote/dist/**/*.woff',
-            //'./node_modules/summernote/dist/**/*.eot',
-            //'./node_modules/summernote/dist/**/*.ttf',
             './node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css',
             './node_modules/select2/dist/css/select2.min.css',
             "./node_modules/jasmine-core/lib/jasmine-core/jasmine.css"
@@ -168,10 +143,12 @@ gulp.task('copy-assets', function () {
         var destinationPath = "./wwwroot/assets/libs/js/monaco/vs" + relativePath;
         gulp.src(filePath).pipe(gulp.dest(destinationPath));
     });
+
+    cb();
 });
 
 gulp.task('ts:watch', function () {
-    gulp.watch(paths.tsSource, ['ts:builddev']);
+    gulp.watch(paths.tsSource, gulp.series(['ts:builddev']));
 });
 
 var definitions = [
@@ -200,16 +177,11 @@ gulp.task("ts:builddev", function () {
     }
 
 
-    var tsResult =// tsProjectWatch.src()
+    var tsResult =
         gulp.src(src)
-        //gulp.src(merge(gulp.src(paths.tsSource).pipe(cache("tsbuilddev")), gulp.src(definitions)))
-            
-        //.pipe(gulp.src(definitions))
-        //.pipe(cache("tsbuilddev"))
-        .pipe(debug({title: "Typescript files"}))
-        .pipe(sourcemaps.init()) // This means sourcemaps will be generated
-        
-        //.pipe(debug({ title: "Passing to compiler" }))
+          
+            .pipe(debug({ title: "Typescript files" }))
+            .pipe(sourcemaps.init())
             .pipe(tsProjectWatch());
 
     return tsResult
@@ -240,6 +212,15 @@ gulp.task("ts:tests:release", function () {
         .pipe(gulp.dest('wwwroot/js/Tests'));
 });
 
-gulp.task("release", function (callback) {
-    runSequence("clean", "sass", "copy-assets", "ts:release", "min", "ts:tests:release", callback);
-});
+
+
+gulp.task("min:css", gulp.series(["min:maincss", "min:librarycss"]));
+gulp.task("min", gulp.series(["min:js", "min:css"]));
+
+gulp.task("release", gulp.series("clean", "sass", "copy-assets", "ts:release", "min", "ts:tests:release")
+);
+
+//gulp.task(
+//    'default',
+//    gulp.series('build', gulp.parallel('browser-sync', 'watch', 'karma-watch'))
+//);

@@ -3,9 +3,7 @@
     using System;
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Core.Logging;
-    using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Core.Telemetry;
-    using CalculateFunding.Frontend.Interfaces.Core.Logging;
     using CalculateFunding.Frontend.Options;
     using Microsoft.ApplicationInsights.Extensibility;
     using Microsoft.Extensions.Configuration;
@@ -16,13 +14,8 @@
 
     public class LoggingModule : ServiceCollectionModuleBase
     {
-        public static LoggerConfiguration GetLoggerConfiguration(ICorrelationIdProvider correlationIdProvider, ApplicationInsightsOptions options, string serviceName)
+        public static LoggerConfiguration GetLoggerConfiguration(ApplicationInsightsOptions options, string serviceName)
         {
-            if (correlationIdProvider == null)
-            {
-                throw new ArgumentNullException(nameof(correlationIdProvider));
-            }
-
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
@@ -36,9 +29,6 @@
             }
 
             return new LoggerConfiguration().Enrich.With(new ILogEventEnricher[]
-            {
-                new CorrelationIdLogEnricher(correlationIdProvider)
-            }).Enrich.With(new ILogEventEnricher[]
             {
                 new ServiceNameLogEnricher(serviceName)
             }).WriteTo.ApplicationInsightsTraces(
@@ -59,15 +49,9 @@
 
             services.AddSingleton<ApplicationInsightsOptions>(appInsightsOptions);
 
-            services.AddScoped<ICorrelationIdProvider, HttpContextCorrelationIdProvider>();
-
             string serviceName = "CalculateFunding.Frontend";
 
-            services.AddScoped<ILogger>(c => GetLoggerConfiguration(c.GetService<ICorrelationIdProvider>(), appInsightsOptions, serviceName).CreateLogger());
-
-            services.AddScoped<CorrelationIdMiddleware>();
-
-            services.AddScoped<ITelemetryInitializer, CorrelationIdTelemetryInitializer>();
+            services.AddSingleton<ILogger>(c => GetLoggerConfiguration(appInsightsOptions, serviceName).CreateLogger());
 
             ServiceNameTelemetryInitializer serviceNameEnricher = new ServiceNameTelemetryInitializer(serviceName);
 

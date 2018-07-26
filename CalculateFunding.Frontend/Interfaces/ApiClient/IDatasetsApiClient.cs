@@ -48,5 +48,7 @@
         Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId);
 
         Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId);
+
+        Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel);
     }
 }

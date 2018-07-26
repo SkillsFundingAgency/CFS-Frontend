@@ -15,5 +15,7 @@
         public string CallbackPath { get; set; }
 
         public bool IsEnabled { get; set; }
+
+        public string Groups { get; set; }
     }
 }
