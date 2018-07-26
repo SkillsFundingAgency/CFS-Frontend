@@ -78,6 +78,19 @@
       "metadata": {
         "description": "AD instance url for application"
       }
+    },
+    "aadGroups": {
+      "type": "string",
+      "metadata": {
+        "description": "AD groups"
+      }
+    },
+    "aadEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable authentication"
+      },
+      "defaultValue": "true"
     }
   },
   "variables": {
@@ -134,6 +147,20 @@
           "AlwaysOn": true,
           "use32BitWorkerProcess": false,
           "http20Enabled": true,
+          "phpVersion": "",
+          "pythonVersion": "",
+          "nodeVersion": "",
+          "httpsOnly": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "213.123.63.150"
+            },
+            {
+              "ipAddress": "86.188.174.157"
+            }
+          ],
           "appSettings": [
             {
               "name": "ApiKey",
@@ -189,7 +216,7 @@
             },
             {
               "name": "testEngineClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/testengine')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/tests')]"
             },
             {
               "name": "usersClient:ApiKey",
@@ -228,8 +255,12 @@
               "value": "[parameters('aadClientId')]"
             },
             {
+              "name": "AzureAd:Groups",
+              "value": "[parameters('aadGroups')]"
+            },
+            {
               "name": "AzureAd:IsEnabled",
-              "value": "false"
+              "value": "[parameters('aadEnabled')]"
             }
           ]
         }
