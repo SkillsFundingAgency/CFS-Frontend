@@ -159,6 +159,9 @@
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Pages\Errors\403.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Pages\Errors\404.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
