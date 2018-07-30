@@ -2,6 +2,7 @@
 using System.Linq;
 using Autofac.Core;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Options;
 using CalculateFunding.Frontend.Services;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -18,26 +20,33 @@ namespace CalculateFunding.Frontend.Controllers
     [AllowAnonymous]
     public class HealthCheckController : ControllerBase
     {
-        private const string HealthCheckKey = "Ocp-Apim-Health-Check-Key";
-        private HealthCheckOptions _options;
+        private const string HealthCheckHeaderName = "Ocp-Apim-Health-Check-Key";
+        private readonly HealthCheckOptions _options;
+        private readonly ILogger _logger;
 
-        public HealthCheckController(IOptions<HealthCheckOptions> options)
+        public HealthCheckController(IOptions<HealthCheckOptions> options, ILogger logger)
         {
+            Guard.ArgumentNotNull(options, nameof(options));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
             _options = options.Value;
+            _logger = logger;
         }
 
         public IActionResult Get()
         {
-            if (!this.Request.Headers.ContainsKey(HealthCheckKey))
+            if (!this.Request.Headers.ContainsKey(HealthCheckHeaderName))
             {
+                _logger.Warning("Request didn't contain health check header");
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
             else
             {
-                string healthCheckKeyValue = this.Request.Headers[HealthCheckKey];
+                string healthCheckHeaderValue = this.Request.Headers[HealthCheckHeaderName];
 
-                if (healthCheckKeyValue != _options.ApiKey)
+                if (healthCheckHeaderValue != _options.ApiKey)
                 {
+                    _logger.Warning("Health Check Request didn't contain correct health check header value '{healthCheckHeaderValue}'", healthCheckHeaderValue);
                     return StatusCode(StatusCodes.Status403Forbidden);
                 }
 
