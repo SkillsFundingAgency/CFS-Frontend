@@ -91,6 +91,12 @@
         "description" :"Enable authentication"
       },
       "defaultValue": "true"
+    },
+    "healthCheckKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Calculate Funding Frontend Health Check Key"
+      }
     }
   },
   "variables": {
@@ -261,6 +267,10 @@
             {
               "name": "AzureAd:IsEnabled",
               "value": "[parameters('aadEnabled')]"
+            },
+            {
+              "name": "healthCheck:ApiKey",
+              "value": "[parameters('healthCheckKey')]"
             }
           ]
         }
