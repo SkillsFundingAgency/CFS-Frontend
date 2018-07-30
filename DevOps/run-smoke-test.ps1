@@ -19,7 +19,7 @@ $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("sfa-userid", "8e9ad33b-9011-43be-a30c-eb6c8a6b7b49");
 $headers.Add("sfa-username", "vsts");
 $headers.Add("Accept", "application/json");
-$headers.Add("Ocp-Apim-Subscription-Key", $apiKey);
+$headers.Add("Ocp-Apim-Health-Check-Key", $apiKey);
 $headers.Add("sfa-correlationId", $correlationId);
 
 $stopTrying = $false
