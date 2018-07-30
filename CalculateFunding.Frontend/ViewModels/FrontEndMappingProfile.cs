@@ -120,7 +120,6 @@
                     destination.ParentPolicyId = source.ParentPolicyId;
                 });
 
-
             CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
@@ -162,6 +161,9 @@
                {
                    destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
                });
+
+            CreateMap<DatasetDefinitionSearchResultItem, DatasetDefinitionSearchResultItemViewModel>()
+               .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore());
 
             CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());

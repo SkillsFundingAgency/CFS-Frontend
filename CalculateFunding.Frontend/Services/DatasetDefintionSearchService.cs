@@ -5,31 +5,31 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Results;
+    using CalculateFunding.Frontend.ViewModels.Datasets;
     using Serilog;
 
-    public class CalculationProviderResultsSearchService : ICalculationProviderResultsSearchService
+    public class DatasetDefinitionSearchService : IDatasetDefinitionSearchService
     {
-        private IResultsApiClient _resultsClient;
+        private IDatasetsApiClient _datasetsClient;
         private IMapper _mapper;
         private ILogger _logger;
 
-        public CalculationProviderResultsSearchService(IResultsApiClient resultsApiClient, IMapper mapper, ILogger logger)
+        public DatasetDefinitionSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger)
         {
-            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
 
-            _resultsClient = resultsApiClient;
+            _datasetsClient = datasetsClient;
             _mapper = mapper;
             _logger = logger;
         }
 
-        public async Task<CalculationProviderResultSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
+        public async Task<DatasetDefinitionSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
@@ -45,22 +45,20 @@
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<CalculationProviderResultSearchResultItem> searchRequestResult = await _resultsClient.FindCalculationProviderResults(requestOptions);
-
+            PagedResult<DatasetDefinitionSearchResultItem> searchRequestResult = await _datasetsClient.FindDatasetDefinitions(requestOptions);
             if (searchRequestResult == null)
             {
-                _logger.Error("Find providers HTTP request failed");
+                _logger.Error("Find datasets HTTP request failed");
                 return null;
             }
 
-            CalculationProviderResultSearchResultViewModel result = new CalculationProviderResultSearchResultViewModel
+            DatasetDefinitionSearchResultViewModel result = new DatasetDefinitionSearchResultViewModel
             {
                 TotalResults = searchRequestResult.TotalItems,
                 CurrentPage = searchRequestResult.PageNumber,
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-
             if (searchRequestResult.Facets != null)
             {
                 foreach (SearchFacet facet in searchRequestResult.Facets)
@@ -71,15 +69,14 @@
 
             result.Facets = searchFacets.AsEnumerable();
 
-            List<CalculationProviderResultSearchResultItemViewModel> itemResults = new List<CalculationProviderResultSearchResultItemViewModel>();
+            List<DatasetDefinitionSearchResultItemViewModel> itemResults = new List<DatasetDefinitionSearchResultItemViewModel>();
 
-            foreach (CalculationProviderResultSearchResultItem searchresult in searchRequestResult.Items)
+            foreach (DatasetDefinitionSearchResultItem searchResult in searchRequestResult.Items)
             {
-                itemResults.Add(_mapper.Map<CalculationProviderResultSearchResultItemViewModel>(searchresult));
+                itemResults.Add(_mapper.Map<DatasetDefinitionSearchResultItemViewModel>(searchResult));
             }
 
-            result.CalculationProviderResults = itemResults.AsEnumerable();
-
+            result.DatasetDefinitions = itemResults.AsEnumerable();
             if (result.TotalResults == 0)
             {
                 result.StartItemNumber = 0;

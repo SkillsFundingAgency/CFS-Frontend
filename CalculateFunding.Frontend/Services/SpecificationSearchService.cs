@@ -34,8 +34,8 @@
         {
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
-                Page = 1,
-                PageSize = request.PageSize ?? 50,
+                Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
+                PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,

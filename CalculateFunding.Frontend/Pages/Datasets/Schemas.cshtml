@@ -1,0 +1,163 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Datasets.SchemasPageModel
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.ViewModels.Common
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+
+@{
+    ViewData["Title"] = "Download data schema template";
+}
+
+@section BreadCrumb{
+
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/datasets">@BreadcrumbText.ManageDatasets</a></li>
+            <li>@BreadcrumbText.DatasetSchemas</li>
+        </ol>
+    </div>
+}
+@section BannerLeft{
+    <!-- Breadcrumbs -->
+    <h1 class="hero-title">Download data schema template</h1>
+    <form method="get" action="/datasets/schemas" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="false">
+
+        <div class="input-group">
+            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data schema template" data-bind="textInput: searchTerm, enable: canSelectFilters" />
+            <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        </div>
+    </form>
+}
+
+@section BannerRight{
+    <div class="banner-floating-link-container">
+        <a href="/specs/CreateSpecification">Download change request form</a>
+    </div>
+}
+
+<div class="row" id="manage-datasetDefinitions-container">
+    <partial name="_SearchErrorPartial" />
+    <div class="col-xs-12">
+
+        <div class="text-right" id="table-filter-header">
+            <partial name="_SearchTableRowCountPartial" model='new PagerPartialViewModel(Model.SearchResults, "dataset schema", Model.SearchTerm)' />
+        </div>
+        <table class="cf" id="specifications-table" data-bind="visible: isResultsVisible">
+            <thead>
+                <tr>
+                    <th>Data schema template</th>
+                    <th class="text-center">Last updated</th>
+                    <th class="text-center">Download</th>
+                    <th class="text-center">More</th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: datasetDefinitions" class="withjs-show" id="dynamic-results-table-body">
+                <tr>
+                    <td>
+                        <span class="data-datasetDefinition-name" data-bind="text: name"></span>
+                    </td>
+                    <td>
+                        <span class="datetime-split-container">
+                            <span class="datetime-split-date data-datasetDefinition-lastupdated-date" data-bind="text: lastUpdatedDateFormatted"></span>
+                            <span class="datetime-split-time data-datasetDefinition-lastupdated-time" data-bind="text: lastUpdatedTimeFormatted"></span>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a data-bind="attr: { 'href' : '/api/datasets/download-dataset-schema/' + encodeURIComponent(name) }"><i class="material-icons">cloud_download</i></a>
+                    </td>
+                    <td class="expander-trigger-cell" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
+                </tr>
+                <tr class="highlight-background expander-container">
+                    <td colspan="4">
+                        <div class="spacing-15-bottom">
+                            <span>Provider Identifier:</span> <strong class="data-datasetDefinition-providerIdentifier" data-bind="text: providerIdentifier"></strong>
+                        </div>
+                        <div><strong>Description: </strong> <span class="data-datasetDefinition-description" data-bind="text: description"></span></div>
+
+                    </td>
+                </tr>
+            </tbody>
+            <noscript>
+                <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                    @{
+                        int rowId = 0;
+                    }
+
+                    @foreach (var schema in Model.SearchResults.DatasetDefinitions)
+                    {
+                        <tr>
+                            <td>
+                                @schema.Name
+                            </td>
+                            <td>
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-static-datasetDefinition-lastupdated-date">@schema.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-static-datasetDefinition-lastupdated-time">@schema.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Name" ><i class="material-icons">cloud_download</i></a></td>
+                            <td></td>
+                        </tr>
+                        <tr class="highlight-background">
+                            <td colspan="4">
+                                <div class="spacing-15-bottom">
+                                    <span>Provider Identifier:</span> <strong class="data-static-datasetDefinition-providerIdentifier">@schema.ProviderIdentifier</strong>
+                                </div>
+                                <div class="data-datasetDefinition-description"><strong>Description: </strong>@schema.Description.ReplaceLineBreaksForHtml()</div>
+
+                            </td>
+                        </tr>
+                        rowId++;
+                    }
+                </tbody>
+            </noscript>
+        </table>
+
+        <div class="withjs-show search-loading-container spacing-30-top" data-bind="visible: isLoading">
+            <img src="~/assets/images/loader.gif" alt="Loading" />
+            <p>Loading dataset schemas</p>
+        </div>
+
+        <partial name="_SearchTablePagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "datasets schemas", Model.SearchTerm)' />
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+    @*@if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>*@
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.datasetDefinitions.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var vm = new calculateFunding.datasetDefinitions.DatasetDefinitionSearchViewModel();
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-datasetDefinitions-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+
+        var initialResults = @Html.Raw(Model.InitialSearchResults);
+
+        vm.setInitialResults(initialResults);
+    </script>
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
+}

@@ -39,6 +39,7 @@
     <None Remove="Scripts\search.calcuation-results.ts" />
     <None Remove="Scripts\search.calcuations.ts" />
     <None Remove="Scripts\search.calculationProviderResults.ts" />
+    <None Remove="Scripts\search.datasetDefinitions.ts" />
     <None Remove="Scripts\search.datasets.ts" />
     <None Remove="Scripts\search.providers.ts" />
     <None Remove="Scripts\search.specifications.ts" />
@@ -137,6 +138,7 @@
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
+    <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
     <TypeScriptCompile Include="Scripts\search.specifications.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
     <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />

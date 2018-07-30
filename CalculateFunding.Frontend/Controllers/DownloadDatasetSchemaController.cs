@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/datasets/download-dataset-schema/{schemaName}")]
-        public async Task<IActionResult> Download(string schemaName)
+        public async Task<IActionResult> Download([FromRoute]string schemaName)
         {
             Guard.IsNullOrWhiteSpace(schemaName, nameof(schemaName));
 
