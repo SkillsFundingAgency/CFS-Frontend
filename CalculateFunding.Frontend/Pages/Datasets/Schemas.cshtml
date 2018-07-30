@@ -32,7 +32,7 @@
 
 @section BannerRight{
     <div class="banner-floating-link-container">
-        <a href="/specs/CreateSpecification">Download change request form</a>
+        <a href="#">Download change request form</a>
     </div>
 }
 
@@ -43,7 +43,7 @@
         <div class="text-right" id="table-filter-header">
             <partial name="_SearchTableRowCountPartial" model='new PagerPartialViewModel(Model.SearchResults, "dataset schema", Model.SearchTerm)' />
         </div>
-        <table class="cf" id="specifications-table" data-bind="visible: isResultsVisible">
+        <table class="cf" id="datasetDefinitions-table" data-bind="visible: isResultsVisible">
             <thead>
                 <tr>
                     <th>Data schema template</th>
