@@ -64,7 +64,7 @@
 
                 ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
 
-                IActionResult errorResult = datasetVersionResponse.IsSuccessfulOrReturnFailureResult();
+                IActionResult errorResult = datasetVersionResponse.IsSuccessOrReturnFailureResult("Dataset");
 
                 if (errorResult != null)
                 {
