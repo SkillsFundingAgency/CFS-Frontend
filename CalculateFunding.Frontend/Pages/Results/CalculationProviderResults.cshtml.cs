@@ -62,9 +62,9 @@
 
         public SpecificationSummaryViewModel Specification { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string calculationId, int? pageNumber, string searchTerm)
+        public Task<IActionResult> OnGetAsync(string calculationId, int? pageNumber, string searchTerm)
         {
-            return await Populate(calculationId, pageNumber, searchTerm);
+            return Populate(calculationId, pageNumber, searchTerm);
         }
 
         public async Task<IActionResult> OnPostAsync(string calculationId, int? pageNumber, string searchTerm)

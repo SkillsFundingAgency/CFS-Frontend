@@ -165,5 +165,28 @@
 
             return GetAsync<DatasetVersionResponse>($"get-currentdatasetversion-by-datasetid?datasetId={datasetId}");
         }
+
+        public async Task<PagedResult<DatasetDefinitionSearchResultItem>> FindDatasetDefinitions(SearchFilterRequest filterOptions)
+        {
+            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
+
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
+
+            ApiResponse<SearchResults<DatasetDefinitionSearchResultItem>> results = await PostAsync<SearchResults<DatasetDefinitionSearchResultItem>, SearchQueryRequest>("dataset-definitions-search", request);
+            if (results.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<DatasetDefinitionSearchResultItem> result = new SearchPagedResult<DatasetDefinitionSearchResultItem>(filterOptions, results.Content.TotalCount)
+                {
+                    Items = results.Content.Results,
+                    Facets = results.Content.Facets,
+                };
+
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

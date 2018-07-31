@@ -11,6 +11,7 @@
         {
             services.AddScoped<ICalculationSearchService, CalculationSearchService>();
             services.AddScoped<IDatasetSearchService, DatasetSearchService>();
+            services.AddScoped<IDatasetDefinitionSearchService, DatasetDefinitionSearchService>();
             services.AddScoped<IProviderSearchService, ProviderSearchService>();
             services.AddScoped<IDatasetRelationshipsSearchService, DatasetRelationshipsSearchService>();
             services.AddScoped<IScenarioSearchService, ScenarioSearchService>();

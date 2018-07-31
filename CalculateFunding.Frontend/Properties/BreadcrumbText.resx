@@ -219,4 +219,7 @@
   <data name="ViewResults" xml:space="preserve">
     <value>View results</value>
   </data>
+  <data name="DatasetSchemas" xml:space="preserve">
+    <value>Download data schema template</value>
+  </data>
 </root>

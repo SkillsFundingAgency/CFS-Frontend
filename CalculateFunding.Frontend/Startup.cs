@@ -89,6 +89,7 @@
             services.AddHttpContextAccessor();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.Configure<HealthCheckOptions>(Configuration.GetSection("healthCheck"));
 
             var builder = new ContainerBuilder();
 
@@ -102,7 +103,7 @@
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseStatusCodePagesWithRedirects("/errors/{0}");
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             if (env.IsDevelopment())
             {

@@ -23,6 +23,8 @@
         /// <returns>List of Calculations</returns>
         Task<PagedResult<DatasetSearchResultItem>> FindDatasets(SearchFilterRequest filterOptions);
 
+        Task<PagedResult<DatasetDefinitionSearchResultItem>> FindDatasetDefinitions(SearchFilterRequest filterOptions);
+
         Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId);
 
         Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds);
