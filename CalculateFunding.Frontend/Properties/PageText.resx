@@ -138,4 +138,19 @@
   <data name="ManagePoliciesHeadingText" xml:space="preserve">
     <value>Policies help design funding calculations to achieve specific outcomes</value>
   </data>
+  <data name="DatasetRelationships" xml:space="preserve">
+    <value>Map data source files to datasets for a specification</value>
+  </data>
+  <data name="DatasetRelationshipsDescr" xml:space="preserve">
+    <value>Select the data source file a dataset uses.</value>
+  </data>
+  <data name="ManageDataset" xml:space="preserve">
+    <value>Manage data</value>
+  </data>
+  <data name="ManageDatasetDescr" xml:space="preserve">
+    <value>Manage data source files or map them to datasets for a specification.</value>
+  </data>
+  <data name="SpecificationRelationshipDescr" xml:space="preserve">
+    <value>Create a dataset from a data source file.</value>
+  </data>
 </root>

@@ -85,10 +85,10 @@
         "description": "AD groups"
       }
     },
-    "aadEnabled":{
+    "aadEnabled": {
       "type": "string",
       "metadata": {
-        "description" :"Enable authentication"
+        "description": "Enable authentication"
       },
       "defaultValue": "true"
     },
