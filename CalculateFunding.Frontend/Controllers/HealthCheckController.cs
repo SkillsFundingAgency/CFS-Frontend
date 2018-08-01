@@ -55,6 +55,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             overallHealth.Services.Add(TryResolveService(typeof(ICalculationSearchService)));
             overallHealth.Services.Add(TryResolveService(typeof(IDatasetSearchService)));
+            overallHealth.Services.Add(TryResolveService(typeof(IDatasetDefinitionSearchService)));
             overallHealth.Services.Add(TryResolveService(typeof(IProviderSearchService)));
             overallHealth.Services.Add(TryResolveService(typeof(IDatasetRelationshipsSearchService)));
             overallHealth.Services.Add(TryResolveService(typeof(IScenarioSearchService)));
