@@ -70,13 +70,6 @@ namespace CalculateFunding.Frontend.Controllers
             return new JsonResult(overallHealth);
         }
 
-        [HttpGet]
-        [Route("healthcheckkey")]
-        public IActionResult RemoveThis()
-        {
-            return Content(_options.ApiKey);
-        }
-
         private ServiceHealth TryResolveService(Type serviceType)
         {
             var health = new ServiceHealth { Name = serviceType.GetFriendlyName(), HealthOk = false };
