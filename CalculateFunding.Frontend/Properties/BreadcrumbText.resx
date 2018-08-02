@@ -145,7 +145,7 @@
     <value>Edit calculation</value>
   </data>
   <data name="LoadDatasource" xml:space="preserve">
-    <value>Load new data source file</value>
+    <value>Load new data source</value>
   </data>
   <data name="ManageCalculations" xml:space="preserve">
     <value>Calculations</value>
