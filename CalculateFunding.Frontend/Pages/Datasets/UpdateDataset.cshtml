@@ -48,12 +48,12 @@
                 <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
                     <a validationanchor-for="UpdateViewModel.Filename"></a>
                     <label asp-for="UpdateViewModel.Filename">Select data source file</label>
-                    <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Upload a csv, xls or xlsx file</span></h4>
+                    <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Upload a xls or xlsx file</span></h4>
                     <div class="input-group">
                         <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
                         <span class="input-group-btn">
                             <label class="btn btn-file file-button">
-                                Browse <input asp-for="UpdateViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;" id="browseButton">
+                                Browse <input asp-for="UpdateViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".xls,.xlsx" style="display: none;" id="browseButton">
                             </label>
                         </span>
                     </div>
