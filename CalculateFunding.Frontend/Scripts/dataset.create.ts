@@ -290,7 +290,7 @@
         }
 
         private handleDatasetValidationSuccess(datasetId: string) {
-            window.location.href = "/managedatasets?operationType=DatasetCreated&operationId="+datasetId;
+            window.location.href = "/datasets/managedatasets?operationType=DatasetCreated&operationId="+datasetId;
         }
 
         private handleDatasetValidationFailed() {
