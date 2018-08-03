@@ -33,6 +33,14 @@
                 <ul data-bind="foreach: validationLinks">
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>
+                <div class="invalid-datasource-summary" style="display:none;" data-bind="visible: isInvalidDatasourceSummaryVisible, attr:{'display': 'block'}">
+                    <p><strong>It contains one or more of the following errors within first sheet:</strong></p>
+                    <ul>
+                        <li>There is no data</li>
+                        <li>There are merged cells</li>
+                    </ul>
+                    <p>Remove these errors before trying again</p>
+                </div>
             </div>
 
             <div>

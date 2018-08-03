@@ -2249,3 +2249,17 @@ table {
         bottom: 5px;
     }
 }
+
+.invalid-datasource-summary {
+
+    ul {
+        margin-left: 30px;
+        font-size: small;
+        font-weight: 300;
+
+        li {
+            list-style: disc;
+            color: #000;
+        }
+    }
+}

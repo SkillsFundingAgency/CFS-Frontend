@@ -13,6 +13,8 @@
 
         public isValidationSummaryVisible: KnockoutComputed<boolean>;
 
+        public isInvalidDatasourceSummaryVisible: KnockoutComputed<boolean>;
+
         public isUploadButtonEnabled: KnockoutComputed<boolean>;
 
         public state: KnockoutObservable<string> = ko.observable("idle");
@@ -25,11 +27,17 @@
 
         public isFileNameValid: KnockoutObservable<boolean> = ko.observable(true);
 
+        public isDataSourceValid: KnockoutObservable<boolean> = ko.observable(true);
+
         public validationLinks: KnockoutObservableArray<IValidationLink> = ko.observableArray([]);
 
         private datasetFile: any = null;
 
         private datasetId: string;
+
+        private failedUploadErrorMessage: string = "Check you have the right format and check your internet connectivity";
+
+        private invalidDataSourceFileLayoutMessage: string = "The data source file layout is invalid";
 
         constructor(options: IUpdateDatasetViewModelConstructorParameters) {
             let self = this;
@@ -68,6 +76,10 @@
                 return !(this.isFileNameValid() && this.isCommentValid() && this.isDescriptionValid());
             });
 
+            self.isInvalidDatasourceSummaryVisible = ko.computed(() => {
+                return !self.isDataSourceValid();
+            });
+
             self.isUploadButtonEnabled = ko.computed(() => {
 
                 let isEnabled = self.fileName() && true;
@@ -80,6 +92,7 @@
             this.isCommentValid(true);
             this.isDescriptionValid(true);
             this.isFileNameValid(true);
+            this.isDataSourceValid(true);
         }
 
         public fileSelect(): void {
@@ -232,22 +245,30 @@
                     self.state("idle");
                     self.handleValidationRequestFailed(res);
                 }
+                else if (res.status === 400) {
+                    self.state("idle");
+                    self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
+                }
                 else {
                     self.state("idle");
-                    self.handleDatasetValidationFailed();
+                    self.handleDatasetValidationFailed(self.failedUploadErrorMessage);
                 }
             });
         }
 
-        private invalidateUpload(): void {
+        private invalidateUpload(message: string = "", displayInvalidDatasourceSummary: boolean = false): void {
             this.resetValidation();
 
             this.validationLinks([]);
 
+            if (displayInvalidDatasourceSummary) {
+                this.isDataSourceValid(false);
+            }
+
             this.isFileNameValid(false);
             let link = {
                 href: "#field-CreateDatasetViewModel-Filename",
-                message: "Check you have the right format and check your internet connectivity",
+                message: message,
                 id: "validation-link-for-CreateDatasetViewModel-Filename"
             }
             this.validationLinks.push(link);
@@ -268,15 +289,15 @@
         }
 
         private handleBlobUploadFailed(): void {
-            this.invalidateUpload();
+            this.invalidateUpload(this.failedUploadErrorMessage);
         }
 
         private handleDatasetValidationSuccess(datasetId: String): void {
             window.location.href = "/datasets/managedatasets?operationType=DatasetUpdated&operationId="+datasetId;
         }
 
-        private handleDatasetValidationFailed(): void {
-            this.invalidateUpload();
+        private handleDatasetValidationFailed(message: string): void {
+            this.invalidateUpload(message, true);
         }
 
         private ConvertToFriendlySize(num: number): string {

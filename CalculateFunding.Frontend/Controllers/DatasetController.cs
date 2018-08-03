@@ -107,7 +107,7 @@
                 return BadRequest(ModelState);
             }
 
-            ApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
+            ValidatedApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
 
             if(apiResponse == null)
             {
@@ -118,7 +118,13 @@
             if (!apiResponse.StatusCode.IsSuccess())
             {
                 _logger.Warning("Failed to validate dataset with status code: {statusCode}", apiResponse.StatusCode);
-                return new InternalServerErrorResult($"Failed to validate dataset with status code: {(int)apiResponse.StatusCode}");
+
+                if (!apiResponse.ModelState.Values.IsNullOrEmpty())
+                {
+                    return new BadRequestObjectResult(apiResponse.ModelState.First().Value?.First());
+                }
+               
+                return new InternalServerErrorResult(apiResponse.Content?.Message);
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)
