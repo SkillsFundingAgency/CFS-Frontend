@@ -344,7 +344,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenCalculationFoundWithSearchResults_ReturnsPage()
+        public async Task OnGetAsync_GivenCalculationAndNullPageNumberFoundWithSearchResults_ReturnsPage()
         {
             //Arrange
             const string calculationId = "calc-id";
@@ -433,6 +433,108 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .Any()
                 .Should()
                 .BeTrue();
+
+            await
+            calculationProviderResultsSearchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(m => m.PageNumber == 1));
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_GivenCalculationAndAPageNumberFoundWithSearchResults_ReturnsPage()
+        {
+            //Arrange
+            const string calculationId = "calc-id";
+            const string specificationId = "spec-id";
+
+            Calculation calculation = new Calculation
+            {
+                Id = calculationId,
+                SpecificationId = specificationId
+            };
+
+            CalculationViewModel calculationViewModel = new CalculationViewModel
+            {
+                Id = calculationId,
+                SpecificationId = specificationId
+            };
+
+            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+           {
+                new DatasetSchemasAssigned
+                {
+                    IsSetAsProviderData = true
+                }
+            };
+
+            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+            datasetsApiClient
+                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .Returns(datasetSchemaResponse);
+
+            CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
+            {
+                CalculationProviderResults = new[] { new CalculationProviderResultSearchResultItemViewModel() }
+            };
+
+            ApiResponse<Calculation> CalculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, calculation);
+
+            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
+            calculationsApiClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(CalculationResponse);
+
+            IMapper mapper = CreateMapper();
+            mapper
+                .Map<CalculationViewModel>(Arg.Is(calculation))
+                .Returns(calculationViewModel);
+
+            ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
+            calculationProviderResultsSearchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(calculationProviderResultSearchResultViewModel);
+
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
+                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+
+            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            {
+                Id = specificationId,
+            };
+
+            specsApiClient
+                .GetSpecificationSummary(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(
+                calculationProviderResultsSearchService,
+                calculationsApiClient,
+                mapper: mapper,
+                datasetsApiClient: datasetsApiClient,
+                specsApiClient: specsApiClient);
+
+            //Act
+            IActionResult result = await pageModel.OnGetAsync(calculationId, 2, "");
+
+            //Assert
+            result
+                .Should()
+                .BeOfType<PageResult>();
+
+            pageModel
+                .CalculationProviderResults
+                .CalculationProviderResults
+                .Any()
+                .Should()
+                .BeTrue();
+
+            await
+            calculationProviderResultsSearchService
+                .Received(1)
+                .PerformSearch(Arg.Is<SearchRequestViewModel>(m => m.PageNumber == 2));
         }
 
         [TestMethod]
