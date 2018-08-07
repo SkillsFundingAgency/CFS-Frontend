@@ -121,7 +121,7 @@
 
                 if (!apiResponse.ModelState.Values.IsNullOrEmpty())
                 {
-                    return new BadRequestObjectResult(apiResponse.ModelState.First().Value?.First());
+                    return new BadRequestObjectResult(apiResponse.ModelState);
                 }
                
                 return new InternalServerErrorResult(apiResponse.Content?.Message);
