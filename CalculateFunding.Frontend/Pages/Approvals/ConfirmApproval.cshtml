@@ -1,0 +1,120 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Approvals.ConfirmApprovalModel
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Confirm Approval";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
+            <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
+            <li>@BreadcrumbText.ConfirmApproval</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Approve confirmation for the selected provider funding</h1>
+}
+
+    <div class="confirmapproval-page-container" id="confirmapproval-page-container">
+        <div id="confirmaapproval-details">
+            <table class="cf">
+                <thead>
+                    <tr>
+                        <th>Provider details</th>
+                        <th>Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Number of providers to approve</td>
+                        <td>@Model.ConfirmationDetails.NumberOfProviders</td>
+                    </tr>
+                    <tr>
+                        <td>Provider types selected</td>
+                        <td>
+                            @Html.Raw(string.Join(", ", Model.ConfirmationDetails.ProviderTypes))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Provider local authorities selected</td>
+                        <td>
+                            @Html.Raw(string.Join(", ", Model.ConfirmationDetails.LocalAuthorities))
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="cf">
+                <thead>
+                    <tr>
+                        <th>Specification Details</th>
+                        <th>Info</th>
+                        <th>Funding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Funding Period</td>
+                        <td>@Model.ConfirmationDetails.FundingPeriods</td>
+                    </tr>
+                    <tr>
+                        <td>Specification Selected</td>
+                        <td>@Model.ConfirmationDetails.SpecificationName</td>
+                    </tr>
+                    @for (int fsNum = 1; fsNum <= Model.ConfirmationDetails.FundingStreams.Count; fsNum++)
+                    {
+                        <tr>
+                            <td>Funding Stream @fsNum</td>
+                            <td>@Model.ConfirmationDetails.FundingStreams[fsNum].Name</td>
+                        </tr>
+                        <tr>
+                            <td>Allocation Lines</td>
+                            <td>
+                                @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
+                                {
+                                    <span>@allocationLine.Name</span>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
+                                {
+                                    <span class="bold">@allocationLine.Value</span>
+                                }
+                            </td>
+                        </tr>
+
+                    }
+                    <tr>
+                        <td><span class="bold">Total Funding being approved</span></td>
+                        <td></td>
+                        <td>
+                            <span class="bold">@Model.ConfirmationDetails.TotalFundingApproved</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="confirmapproval-confirmation">
+            <span>Once Approved:</span>
+            <ol>
+                <li>Funding values will be available to the profiling service</li>
+                <li>Funding values <span class="bold">will not</span> be published or paid to providers</li>
+            </ol>
+            <div>
+                <span class="noresults-panel-text">
+                    <i class="material-icons">error</i> Approved funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved.
+                </span>
+            </div>
+            <div id="confirmapproval-buttons">
+                <form method="post" action="/approvals/confirmapproval">
+                    <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" asp-page-handler="confirmapproval">Approve</button>
+                    <a href="/approvals/viewfunding">Back</a>
+                </form>
+            </div>
+        </div>
+    </div>

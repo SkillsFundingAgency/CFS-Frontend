@@ -1,5 +1,6 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Approvals.ViewFundingModel
+@using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
 @using CalculateFunding.Frontend.ViewModels.Approvals
 @{
@@ -182,8 +183,10 @@
 
     <script type="text/javascript">
         var testScenarioQueryUrl = "/api/specs/@Model.SelectedSpecificationId/providertestcounts";
-        var approveAllocationLineUrl = "/api/specs/@Model.SelectedSpecificationId/allocationlineapprovalstatus";
+        var approveAllocationLineUrl = "/approvals/confirmapproval";
         
         var viewFundingPageUrl = "/approvals/viewfunding?specificationId=@Model.SelectedSpecificationId";
+
+        var antiforgeryToken = '@this.HttpContext.GetAntiforgeryToken()';
     </script>
 }

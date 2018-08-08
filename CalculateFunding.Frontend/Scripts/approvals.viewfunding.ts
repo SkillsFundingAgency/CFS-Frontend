@@ -47,6 +47,7 @@ $("#publish").on("click", (e: JQuery.Event<HTMLButtonElement, null>) => {
 declare var testScenarioQueryUrl: string;
 declare var approveAllocationLineUrl: string;
 declare var viewFundingPageUrl: string;
+declare var antiforgeryToken: string;
 
 $("input.target-checkbox-allocationline").on("change", (e: JQuery.Event<HTMLButtonElement, null>) => {
     toggleButtonStatus();
@@ -55,21 +56,27 @@ $("input.target-checkbox-allocationline").on("change", (e: JQuery.Event<HTMLButt
 function updateApprovalStatus(allocationLines: Array<ISelectedProviderAllocationLine>, approvalStatus: ApprovalStatus) {
 
     let data = {
-        status: approvalStatus,
-        providers: allocationLines,
+        SpecificationId: $("#specificationId").val,
+        Filter: {
+            Status: approvalStatus,
+            Providers: allocationLines,
+        }
     };
 
     let query = $.ajax({
         url: approveAllocationLineUrl,
-        method: "PUT",
+        method: "POST",
         contentType: 'application/json',
         data: JSON.stringify(data),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("RequestVerificationToken", antiforgeryToken);
+        }
     });
 
     actionRunning = true;
     toggleButtonStatus();
 
-    query.fail(() => {
+    query.fail((ex) => {
         alert("Updating approval status failed");
         actionRunning = false;
         toggleButtonStatus();

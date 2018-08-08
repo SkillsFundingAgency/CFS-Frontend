@@ -115,6 +115,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm Approval.
+        /// </summary>
+        public static string ConfirmApproval {
+            get {
+                return ResourceManager.GetString("ConfirmApproval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm selection.
         /// </summary>
         public static string ConfirmSelection {

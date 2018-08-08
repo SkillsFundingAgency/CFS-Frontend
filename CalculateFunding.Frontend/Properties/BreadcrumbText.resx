@@ -222,4 +222,7 @@
   <data name="DatasetSchemas" xml:space="preserve">
     <value>Download data schema template</value>
   </data>
+  <data name="ConfirmApproval" xml:space="preserve">
+    <value>Confirm Approval</value>
+  </data>
 </root>
