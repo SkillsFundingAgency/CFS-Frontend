@@ -87,7 +87,7 @@
 
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
-                PageNumber = pageNumber ?? 0,
+                PageNumber = pageNumber ?? 1,
                 IncludeFacets = false,
                 SearchTerm = searchTerm,
                 Filters = new Dictionary<string, string[]> { { "calculationId", new[] { calculationId } } }

@@ -33,7 +33,7 @@
 
         Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset);
 
-        Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model);
+        Task<ValidatedApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model);
 
         Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId);
 

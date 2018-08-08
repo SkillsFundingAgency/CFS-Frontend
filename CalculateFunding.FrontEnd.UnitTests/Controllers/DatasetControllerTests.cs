@@ -167,12 +167,13 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [TestMethod]
-        public async Task ValidateDatasett_GivenViewModelButResponseIsBadRequest_ReturnsStatusCode400()
+        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequest_ReturnsStatusCode400()
         {
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
-            ApiResponse<ValidateDatasetResponseModel> response = new ApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+            response.ModelState = new Dictionary<string, IEnumerable<string>>();
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
@@ -189,9 +190,41 @@ namespace CalculateFunding.Frontend.Controllers
             // Assert
             result
                .Should()
-               .BeOfType<InternalServerErrorResult>()
-               .Which
-               .Value.Should().Be("Failed to validate dataset with status code: 400");
+               .BeOfType<InternalServerErrorResult>();
+
+            logger
+                .Received(1)
+                .Warning(Arg.Is("Failed to validate dataset with status code: {statusCode}"), Arg.Is(HttpStatusCode.BadRequest));
+        }
+
+        [TestMethod]
+        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequestAndHasModelState_ReturnsStatusCode400()
+        {
+            // Arrange
+            ValidateDatasetModel viewModel = new ValidateDatasetModel();
+
+            IDictionary<string, IEnumerable<string>> modelState = new Dictionary<string, IEnumerable<string>>();
+            modelState.Add("error", new List<string> { "an error occured" });
+
+            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+            response.ModelState = modelState;
+
+            IDatasetsApiClient apiClient = CreateApiClient();
+            apiClient
+                .ValidateDataset(Arg.Is(viewModel))
+                .Returns(response);
+
+            ILogger logger = CreateLogger();
+
+            DatasetController controller = CreateController(apiClient, logger);
+
+            // Act
+            IActionResult result = await controller.ValidateDataset(viewModel);
+
+            // Assert
+            result
+               .Should()
+               .BeOfType<BadRequestObjectResult>();
 
             logger
                 .Received(1)
@@ -204,7 +237,7 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
-            ApiResponse<ValidateDatasetResponseModel> response = new ApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.NoContent);
+            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.NoContent);
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient

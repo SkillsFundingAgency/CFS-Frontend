@@ -65,11 +65,11 @@
             return ValidatedPostAsync<NewDatasetVersionResponseModel, DatasetVersionUpdateModel>("dataset-version-update", dataset);
         }
 
-        public Task<ApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
+        public Task<ValidatedApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return PostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>("validate-dataset", model);
+            return ValidatedPostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>("validate-dataset", model);
         }
 
         public Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)

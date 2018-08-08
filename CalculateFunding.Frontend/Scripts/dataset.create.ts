@@ -16,6 +16,8 @@
 
         public isValidationSummaryVisible: KnockoutComputed<boolean>;
 
+        public isInvalidDatasourceSummaryVisible: KnockoutComputed<boolean>;
+
         public isUploadButtonEnabled: KnockoutComputed<boolean>;
 
         public state: KnockoutObservable<string> = ko.observable("idle");
@@ -30,11 +32,17 @@
 
         public isFileNameValid: KnockoutObservable<boolean> = ko.observable(true);
 
+        public isDataSourceValid: KnockoutObservable<boolean> = ko.observable(true);
+
         public validationLinks: KnockoutObservableArray<IValidationLink> = ko.observableArray([]);
 
         private datasetFile: any = null;
 
         private datasetId: string = "";
+
+        private failedUploadErrorMessage: string = "Check you have the right format and check your internet connectivity";
+
+        private invalidDataSourceFileLayoutMessage: string = "The data source file layout is invalid";
 
         private ConvertToFriendlySize(num: number) {
             if (num > 0) {
@@ -64,6 +72,10 @@
                 return !(this.isFileNameValid() && this.isDefinitionIdValid() && this.isNameValid() && this.isDefinitionIdValid());
             });
 
+            self.isInvalidDatasourceSummaryVisible = ko.computed(() => {
+                return !self.isDataSourceValid();
+            });
+
             self.isUploadButtonEnabled = ko.computed(() => {
 
                 let isEnabled = (this.dataDefinitionId().length > 0
@@ -80,20 +92,40 @@
             this.isDescriptionValid(true);
             this.isDefinitionIdValid(true);
             this.isFileNameValid(true);
+            this.isDataSourceValid(true);
         }
 
         public fileSelect() {
             let file = (<HTMLInputElement>event.target).files[0];
-            if (file) {
-                this.fileName(file.name);
-                this.datasetFile = file;
-            }
-            else {
-                this.fileName(null);
-                this.datasetFile = null;
-                this.isFileNameValid(false);
+            if (file && file.name) {
+                let validationResult = this.doFileSelectNameValidation(file.name);
+                if (validationResult.result) {
+                    this.fileName(file.name);
+                    this.datasetFile = file;
+                    this.isFileNameValid(true);
+                } else {
+                    this.fileName(null);
+                    this.datasetFile = null;
+                    this.isFileNameValid(false);
+                    let link = {
+                        href: "#field-CreateDatasetViewModel-Filename",
+                        message: validationResult.errorMessage,
+                        id: "validation-link-for-CreateDatasetViewModel-Filename"
+                    }
+                    this.validationLinks([]);
+                    this.validationLinks.push(link);
+                }
             }
         }
+
+        private doFileSelectNameValidation(filename: string) : IValidationResult {
+            let validExtensions = ["XLSX", "XLS"];
+            if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
+                return { result: false, errorMessage: "File type must be of XLSX or XLS",};
+            };
+            return { result: true, errorMessage: undefined }
+        }
+
 
         public saveDataset() {
             if (this.state() !== "idle")
@@ -250,22 +282,52 @@
                     self.state("idle");
                     self.handleValidationRequestFailed(res);
                 }
+                else if (res.status === 400) {
+                    self.state("idle");
+
+                    if ('typical-model-validation-error' in res.responseJSON) {
+                        let filteredErrors: Array<IModelValidationError> = [];
+                        for (var modelState in res.responseJSON)
+                        {
+                            if (modelState !== "typical-model-validation-error") {
+                                filteredErrors.push(({modelName: modelState, errorMessage: res.responseJSON[modelState]}) as any);
+                            }
+                        }
+                        for (var modelStateIndex in filteredErrors) {
+                            let modelState = filteredErrors[modelStateIndex];
+                            let link = {
+                                href: "#field-CreateDatasetViewModel-" + (modelState.modelName),
+                                message: modelState.errorMessage,
+                                id: "validation-link-for-CreateDatasetViewModel-" + (modelState.modelName)
+                            }
+                            this.validationLinks([]);
+                            this.validationLinks.push(link);
+                        }
+
+                        this.isFileNameValid(false);
+                    } else {
+                        self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
+                    }
+                }
                 else {
                     self.state("idle");
-                    self.handleDatasetValidationFailed();
+                    self.handleDatasetValidationFailed(self.failedUploadErrorMessage);
                 }
             });
         }
 
-        private invalidateUpload() {
+        private invalidateUpload(message: string = "", displayInvalidDatasourceSummary: boolean = false) {
             this.resetValidation();
 
             this.validationLinks([]);
-
+            if (displayInvalidDatasourceSummary) {
+                this.isDataSourceValid(false);
+            }
+            
             this.isFileNameValid(false);
             let link = {
                 href: "#field-CreateDatasetViewModel-Filename",
-                message: "Check you have the right format and check your internet connectivity",
+                message: message,
                 id: "validation-link-for-CreateDatasetViewModel-Filename"
             }
             this.validationLinks.push(link);
@@ -277,6 +339,7 @@
             this.validationLinks([]);
 
             this.isFileNameValid(false);
+            
             let link = {
                 href: response.fileUrl,
                 message: response.message,
@@ -286,15 +349,15 @@
         }
 
         private handleBlobUploadFailed() {
-            this.invalidateUpload();
+            this.invalidateUpload(this.failedUploadErrorMessage);
         }
 
         private handleDatasetValidationSuccess(datasetId: string) {
-            window.location.href = "/managedatasets?operationType=DatasetCreated&operationId="+datasetId;
+            window.location.href = "/datasets/managedatasets?operationType=DatasetCreated&operationId="+datasetId;
         }
 
-        private handleDatasetValidationFailed() {
-            this.invalidateUpload();
+        private handleDatasetValidationFailed(message: string) {
+            this.invalidateUpload(message, true);
         }
 
     }
@@ -330,5 +393,15 @@
     export interface IValidateDatasetResponse {
         message: string;
         fileUrl: string;
+    }
+
+    export interface IValidationResult {
+        result: boolean;
+        errorMessage: string;
+    }
+
+    export interface IModelValidationError {
+        modelName: string;
+        errorMessage: string;
     }
 }

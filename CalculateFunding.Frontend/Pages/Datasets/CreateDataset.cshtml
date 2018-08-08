@@ -33,6 +33,14 @@
                 <ul data-bind="foreach: validationLinks">
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>
+                <div class="invalid-datasource-summary" style="display:none;" data-bind="visible: isInvalidDatasourceSummaryVisible, attr:{'display': 'block'}">
+                    <p><strong>It contains one or more of the following errors within first sheet:</strong></p>
+                    <ul>
+                        <li>There is no data</li>
+                        <li>There are merged cells</li>
+                    </ul>
+                    <p>Remove these errors before trying again</p>
+                </div>
             </div>
 
             <div>
@@ -69,12 +77,12 @@
                 <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
                     <a validationanchor-for="CreateDatasetViewModel.Filename"></a>
                     <label asp-for="CreateDatasetViewModel.Filename">Select data source file</label>
-                    <h4 class="faded-text">Upload a csv, xls or xlsx file</h4>
+                    <h4 class="faded-text">Upload a xls or xlsx file</h4>
                     <div class="input-group">
                         <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
                         <span class="input-group-btn">
                             <label class="btn btn-file file-button">
-                                Browse <input asp-for="CreateDatasetViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".csv,.xls,.xlsx" style="display: none;" id="browseButton">
+                                Browse <input asp-for="CreateDatasetViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".xls,.xlsx" style="display: none;" id="browseButton">
                             </label>
                         </span>
                     </div>
