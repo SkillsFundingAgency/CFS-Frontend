@@ -8,12 +8,6 @@
         "description": "The environment key for this particular environment eg t1dv"
       }
     },
-    "frontendDomain": {
-      "type": "string",
-      "metadata": {
-        "description": "The domain name for the front end webserver"
-      }
-    },
     "skuName": {
       "type": "string",
       "defaultValue": "S1",
@@ -43,16 +37,46 @@
         "description": "Describes plan's instance count"
       }
     },
-    "apiKey": {
+    "ApiKeyCalcs": {
       "type": "string",
       "metadata": {
-        "description": "Calculate Funding API Management Key"
+        "description": "Api key for the Calcs Service"
       }
     },
-    "apiEndpoint": {
+    "ApiKeyDatasets": {
       "type": "string",
       "metadata": {
-        "description": "Calculate Funding API Management Endpoint"
+        "description": "Api key for the Datasets Service"
+      }
+    },
+    "ApiKeyResults": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Results Service"
+      }
+    },
+    "ApiKeyScenarios": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Scenarios Service"
+      }
+    },
+    "ApiKeySpecs": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Specs Service"
+      }
+    },
+    "ApiKeyTestEngine": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Test Engine Service"
+      }
+    },
+    "ApiKeyUsers": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Users Service"
       }
     },
     "aadDomain": {
@@ -169,16 +193,8 @@
           ],
           "appSettings": [
             {
-              "name": "ApiKey",
-              "value": "[parameters('apiKey')]"
-            },
-            {
-              "name": "ApiEndpoint",
-              "value": "[parameters('apiEndpoint')]"
-            },
-            {
               "name": "specsClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeySpecs')]"
             },
             {
               "name": "specsClient:ApiEndpoint",
@@ -186,7 +202,7 @@
             },
             {
               "name": "calcsClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyCalcs')]"
             },
             {
               "name": "calcsClient:ApiEndpoint",
@@ -194,7 +210,7 @@
             },
             {
               "name": "datasetsClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyDatasets')]"
             },
             {
               "name": "datasetsClient:ApiEndpoint",
@@ -202,7 +218,7 @@
             },
             {
               "name": "resultsClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyResults')]"
             },
             {
               "name": "resultsClient:ApiEndpoint",
@@ -210,7 +226,7 @@
             },
             {
               "name": "scenariosClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyScenarios')]"
             },
             {
               "name": "scenariosClient:ApiEndpoint",
@@ -218,7 +234,7 @@
             },
             {
               "name": "testEngineClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyTestEngine')]"
             },
             {
               "name": "testEngineClient:ApiEndpoint",
@@ -226,7 +242,7 @@
             },
             {
               "name": "usersClient:ApiKey",
-              "value": "[parameters('apiKey')]"
+              "value": "[parameters('apiKeyUsers')]"
             },
             {
               "name": "usersClient:ApiEndpoint",
