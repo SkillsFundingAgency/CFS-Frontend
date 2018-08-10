@@ -97,8 +97,33 @@
 
         public fileSelect(): void {
             let file = (<HTMLInputElement>event.target).files[0];
-            this.fileName(file.name);
-            this.datasetFile = file;
+            if (file && file.name) {
+                let validationResult = this.doFileSelectNameValidation(file.name);
+                if (validationResult.result) {
+                    this.fileName(file.name);
+                    this.datasetFile = file;
+                    this.isFileNameValid(true);
+                } else {
+                    this.fileName(null);
+                    this.datasetFile = null;
+                    this.isFileNameValid(false);
+                    let link = {
+                        href: "#field-CreateDatasetViewModel-Filename",
+                        message: validationResult.errorMessage,
+                        id: "validation-link-for-CreateDatasetViewModel-Filename"
+                    }
+                    this.validationLinks([]);
+                    this.validationLinks.push(link);
+                }
+            }
+        }
+
+        private doFileSelectNameValidation(filename: string): IValidationResult {
+            let validExtensions = ["XLSX", "XLS"];
+            if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
+                return { result: false, errorMessage: "File type must be of XLSX or XLS", };
+            };
+            return { result: true, errorMessage: undefined }
         }
 
         public saveDataset(): void {
@@ -247,6 +272,30 @@
                 }
                 else if (res.status === 400) {
                     self.state("idle");
+
+                    if ('typical-model-validation-error' in res.responseJSON) {
+                        let filteredErrors: Array<IModelValidationError> = [];
+                        for (var modelState in res.responseJSON) {
+                            if (modelState !== "typical-model-validation-error") {
+                                filteredErrors.push(({ modelName: modelState, errorMessage: res.responseJSON[modelState] }) as any);
+                            }
+                        }
+                        for (var modelStateIndex in filteredErrors) {
+                            let modelState = filteredErrors[modelStateIndex];
+                            let link = {
+                                href: "#field-CreateDatasetViewModel-" + (modelState.modelName),
+                                message: modelState.errorMessage,
+                                id: "validation-link-for-CreateDatasetViewModel-" + (modelState.modelName)
+                            }
+                            this.validationLinks([]);
+                            this.validationLinks.push(link);
+                        }
+
+                        this.isFileNameValid(false);
+                        return;
+                    } else {
+                        self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
+                    }
                     self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
                 }
                 else {
@@ -351,5 +400,15 @@
     export interface IValidateDatasetResponse {
         message: string;
         fileUrl: string;
+    }
+
+    export interface IValidationResult {
+        result: boolean;
+        errorMessage: string;
+    }
+
+    export interface IModelValidationError {
+        modelName: string;
+        errorMessage: string;
     }
 }
