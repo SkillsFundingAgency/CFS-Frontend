@@ -602,21 +602,42 @@ blockquote {
     }
 }
 
+.flex-container {
+    background-color: $turquoise;
+    color: #fff;
+    display: flex;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    align-content: space-between;
+    justify-content: space-between;
+    flex-flow: row wrap;
+
+    .flex-item {   
+         display: flex;
+    }
+}
+
+
+
 .notification-panel {
     background-color: $turquoise;
     color: #fff;
     font-size: 19px;
     padding: 20px 5px;
     margin-bottom: 20px;
-    display: flex;
     align-content: space-between;
     justify-content: space-between;
 
     .notification-panel-text {
         display: flex;
     }
-
-
+    
+    .notification-panel-subtext {
+        display: block;  
+        padding-left: 15px;     
+    }
+    
     i.material-icons {
         padding-left: 15px;
         padding-right: 5px;
@@ -632,6 +653,10 @@ blockquote {
     }
 }
 
+.notification-panel .notification-panel-subtext {
+    display: block;  
+    padding-left: 15px;     
+}
 .noresults-panel {
     background-color: $orange;
     color: #fff;

@@ -72,12 +72,14 @@
                 }
               
                 DatasetVersionResponse DatsetVersion = datasetVersionResponse.Content;
-
+              
                 PageBanner = new PageBannerOperation()
                 {
                     EntityName = DatsetVersion.Name,
                     EntityType = "Data Source",
-                    OperationId = operationId,    
+                    OperationId = operationId, 
+                    CurrentDataSourceRows =   DatsetVersion.CurrentDataSourceRows,
+                   // PreviousDataSourceRows =  DatsetVersion.PreviousDataSourceRows,
                 };
 
                 switch (operationType)

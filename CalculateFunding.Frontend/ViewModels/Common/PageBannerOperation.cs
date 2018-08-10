@@ -15,5 +15,10 @@
         public string ActionUrl { get; set; }
 
         public string SecondaryActionUrl { get; set; }
+
+        public string CurrentDataSourceRows { get; set; }
+
+        public string PreviousDataSourceRows { get; set; }
+
     }
 }
