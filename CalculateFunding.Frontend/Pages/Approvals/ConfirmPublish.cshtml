@@ -53,7 +53,7 @@
                                 }
                                 else
                                 {
-                                    @Html.Raw(string.Join(", ", Model.ConfirmationDetails.ProviderTypes))
+                                    @(string.Join(", ", Model.ConfirmationDetails.ProviderTypes))
                                 }
                             </td>
                         </tr>
@@ -66,7 +66,7 @@
                                 }
                                 else
                                 {
-                                    @Html.Raw(string.Join(", ", Model.ConfirmationDetails.LocalAuthorities))
+                                    @(string.Join(", ", Model.ConfirmationDetails.LocalAuthorities))
                                 }
                             </td>
                         </tr>
@@ -100,28 +100,25 @@
                             <td>Specification Selected</td>
                             <td colspan="2">@Model.ConfirmationDetails.SpecificationName</td>
                         </tr>
-                        @for (int fsNum = 0; fsNum < Model.ConfirmationDetails.FundingStreams.Count; fsNum++)
+                        @for (int fsNum = 0; fsNum < Model.ConfirmationDetails.FundingStreams.Count(); fsNum++)
                         {
                             <tr class="topborderonly">
                                 <td>Funding Stream @(fsNum + 1)</td>
-                                <td colspan="2">@Model.ConfirmationDetails.FundingStreams[fsNum].Name</td>
+                                <td colspan="2">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).Name</td>
                             </tr>
-                            <tr class="nobottomborder">
-                                <td class="allocation-line-text">Allocation Lines</td>
-                                <td>
-                                    @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
-                                    {
-                                        <span class="allocation-line-text">@allocationLine.Name</span>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
-                                    {
-                                        <span class="bold">@allocationLine.Value</span>
-                                    }
-                                </td>
-                            </tr>
-
+                            @for (int alNum = 0; alNum < Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.Count(); alNum++)
+                            {
+                                <tr class="nobottomborder">
+                                    <td class="allocation-line-text">@if (alNum == 0)
+                                    {<span>Allocation Lines</span>}</td>
+                                    <td>
+                                        <span class="allocation-line-text">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Name</span>
+                                    </td>
+                                    <td>
+                                        <span class="bold">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Value</span>
+                                    </td>
+                                </tr>
+                            }
                         }
                         <tr class="topborderonly">
                             <td><span class="bold">Total Funding being published</span></td>

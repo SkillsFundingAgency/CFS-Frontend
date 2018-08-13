@@ -6,6 +6,6 @@ namespace CalculateFunding.Frontend.ViewModels.Approvals
     {
         public string Name { get; set; }
 
-        public List<AllocationLineSummaryViewModel> AllocationLines { get; set; }
+        public IEnumerable<AllocationLineSummaryViewModel> AllocationLines { get; set; }
     }
 }

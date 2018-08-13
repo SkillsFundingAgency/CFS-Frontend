@@ -55,7 +55,7 @@ $("input.target-checkbox-allocationline").on("change", (e: JQuery.Event<HTMLButt
 });
 
 function createHiddenField(name: string, value: string) {
-    var field = document.createElement("input");
+    let field = document.createElement("input");
     field.setAttribute("type", "hidden");
     field.setAttribute("name", name);
     field.setAttribute("value", value);
@@ -65,7 +65,7 @@ function createHiddenField(name: string, value: string) {
 
 function confirmPublishApprovalStatus(allocationLines: Array<ISelectedProviderAllocationLine>, confirmationPageUrl: string) {
     // Submit a form to the confirmation page so we can post a potential large amount of data and change the current page in the browser
-    var f = document.createElement("form");
+    let f = document.createElement("form");
     f.setAttribute("method", "POST");
     f.setAttribute("action", confirmationPageUrl);
 

@@ -7,8 +7,8 @@ namespace CalculateFunding.Frontend.Extensions
     {
         public static string GetAntiforgeryToken(this HttpContext context)
         {
-            var antiforgery = (IAntiforgery)context.RequestServices.GetService(typeof(IAntiforgery));
-            var tokenSet = antiforgery.GetAndStoreTokens(context);
+            IAntiforgery antiforgery = (IAntiforgery)context.RequestServices.GetService(typeof(IAntiforgery));
+            AntiforgeryTokenSet tokenSet = antiforgery.GetAndStoreTokens(context);
             return tokenSet.RequestToken;
         }
     }

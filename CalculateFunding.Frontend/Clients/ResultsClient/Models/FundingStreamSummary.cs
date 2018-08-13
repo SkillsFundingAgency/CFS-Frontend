@@ -6,6 +6,6 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
     {
         public string Name { get; set; }
 
-        public List<AllocationLineSummary> AllocationLines { get; set; }
+        public IEnumerable<AllocationLineSummary> AllocationLines { get; set; }
     }
 }

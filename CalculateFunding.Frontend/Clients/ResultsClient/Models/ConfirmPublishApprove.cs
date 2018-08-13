@@ -6,13 +6,13 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
     {
         public int NumberOfProviders { get; set; }
 
-        public string[] ProviderTypes { get; set; }
+        public IEnumerable<string> ProviderTypes { get; set; }
 
-        public string[] LocalAuthorities { get; set; }
+        public IEnumerable<string> LocalAuthorities { get; set; }
 
         public string FundingPeriod { get; set; }
 
-        public List<FundingStreamSummary> FundingStreams { get; set; }
+        public IEnumerable<FundingStreamSummary> FundingStreams { get; set; }
 
         public decimal TotalFundingApproved { get; set; }
     }
