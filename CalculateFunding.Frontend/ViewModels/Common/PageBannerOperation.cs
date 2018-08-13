@@ -15,5 +15,7 @@
         public string ActionUrl { get; set; }
 
         public string SecondaryActionUrl { get; set; }
+
+        public BannerType BannerType { get; set; }
     }
 }
