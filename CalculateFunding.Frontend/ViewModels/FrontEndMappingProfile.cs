@@ -50,7 +50,8 @@
 
             CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
             CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
-            CreateMap<ConfirmPublishApprove, ConfirmPublishApproveViewModel>();
+            CreateMap<ConfirmPublishApprove, ConfirmPublishApproveViewModel>()
+                .ForMember(m => m.SpecificationName, opt => opt.Ignore());
         }
 
         private void MapResults()
