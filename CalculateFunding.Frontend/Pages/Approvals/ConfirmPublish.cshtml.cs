@@ -13,13 +13,13 @@ using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Pages.Approvals
 {
-    public class ConfirmApprovalModel : PageModel
+    public class ConfirmPublishModel : PageModel
     {
         private readonly IMapper _mapper;
         private readonly IResultsApiClient _resultsClient;
         private readonly ISpecsApiClient _specsClient;
 
-        public ConfirmApprovalModel(IResultsApiClient resultsClient, ISpecsApiClient specsClient, IMapper mapper)
+        public ConfirmPublishModel(IResultsApiClient resultsClient, ISpecsApiClient specsClient, IMapper mapper)
         {
             Guard.ArgumentNotNull(resultsClient, nameof(resultsClient));
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
@@ -45,7 +45,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
         public IActionResult OnGet()
         {
             // The page is not accessible via a GET request
-            ErrorMessage = "To confirm approval of funding please visit the Approve and Publish Funding page.";
+            ErrorMessage = "To confirm publishing of funding please visit the Approve and Publish Funding page.";
             return Page();
         }
 
@@ -64,12 +64,12 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             }
 
             PublishedAllocationLineResultStatusUpdateModel fetchItemsModel = BuildUpdateModel();
-            fetchItemsModel.Status = AllocationLineStatus.Held; // Only want results that can be approved
+            fetchItemsModel.Status = AllocationLineStatus.Approved; // Only want results that can be published
 
-            // Build another model for changing the status to approved when the 'Confirm Approval' button is pressed
+            // Build another model for changing the status to published when the 'Confirm Publish' button is pressed
             PublishedAllocationLineResultStatusUpdateViewModel updateModel = new PublishedAllocationLineResultStatusUpdateViewModel
             {
-                Status = AllocationLineStatusViewModel.Approved,
+                Status = AllocationLineStatusViewModel.Published,
                 Providers = AllocationLines
             };
             UpdateStatusModelJson = JsonConvert.SerializeObject(updateModel);

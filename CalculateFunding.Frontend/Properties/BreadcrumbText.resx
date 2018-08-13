@@ -225,4 +225,7 @@
   <data name="ConfirmApproval" xml:space="preserve">
     <value>Confirm Approval</value>
   </data>
+  <data name="ConfirmPublish" xml:space="preserve">
+    <value>Confirm Publish</value>
+  </data>
 </root>

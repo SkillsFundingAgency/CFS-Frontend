@@ -124,6 +124,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm Publish.
+        /// </summary>
+        public static string ConfirmPublish {
+            get {
+                return ResourceManager.GetString("ConfirmPublish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm selection.
         /// </summary>
         public static string ConfirmSelection {
@@ -241,7 +250,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load new data source file.
+        ///   Looks up a localized string similar to Load new data source.
         /// </summary>
         public static string LoadDatasource {
             get {

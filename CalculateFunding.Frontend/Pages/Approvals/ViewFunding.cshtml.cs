@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId, ViewFundingPageBannerOperation? operationType = null, int? updatedProviders = null, int? updatedAllocationLines = null)
+        public async Task<IActionResult> OnGetAsync(string specificationId, ViewFundingPageBannerOperation? confirmationStatus = null)
         {
             Task<ApiResponse<IEnumerable<SpecificationSummary>>> specificationsLookupTask = _specsClient.GetSpecificationsSelectedForFunding();
 
@@ -79,21 +79,31 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 //GenerateSampleRecords();
             }
 
-            if (operationType.HasValue)
+            if (confirmationStatus.HasValue)
             {
                 PageBannerOperation = new PageBannerOperation();
 
-                string providerPlural = updatedProviders > 1 ? "s" : string.Empty;
-                string allocationLinePlural = updatedProviders > 1 ? "s" : string.Empty;
-
-                if (operationType == ViewFundingPageBannerOperation.AllocationLineStatusPublished)
+                switch (confirmationStatus)
                 {
-                    PageBannerOperation.ActionText = $"{updatedAllocationLines} allocation line{allocationLinePlural} for {updatedProviders} provider{providerPlural} published";
+                    case ViewFundingPageBannerOperation.StatusChangedToPublished:
+                        PageBannerOperation.ActionText = "The status has successfully been transitioned to the Published state for the selected items.";
+                        PageBannerOperation.BannerType = BannerType.Success;
+                        break;
 
-                }
-                else if (operationType == ViewFundingPageBannerOperation.AllocationLineStatusApproved)
-                {
-                    PageBannerOperation.ActionText = $"{updatedAllocationLines} allocation line{allocationLinePlural} for {updatedProviders} provider{providerPlural} approved";
+                    case ViewFundingPageBannerOperation.StatusChangedToApproved:
+                        PageBannerOperation.ActionText = "The status has successfully been transitioned to the Approved state for the selected items.";
+                        PageBannerOperation.BannerType = BannerType.Success;
+                        break;
+
+                    case ViewFundingPageBannerOperation.FailedToChangeStatusToPublished:
+                        PageBannerOperation.ActionText = "There was an error setting the status of the items to Published.";
+                        PageBannerOperation.BannerType = BannerType.Error;
+                        break;
+
+                    case ViewFundingPageBannerOperation.FailedToChangeStatusToApproved:
+                        PageBannerOperation.ActionText = "There was an error setting the status of the items to Approved.";
+                        PageBannerOperation.BannerType = BannerType.Error;
+                        break;
                 }
             }
 

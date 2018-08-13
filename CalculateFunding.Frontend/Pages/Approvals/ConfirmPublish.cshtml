@@ -1,9 +1,9 @@
 ﻿@page
-@model CalculateFunding.Frontend.Pages.Approvals.ConfirmApprovalModel
+@model CalculateFunding.Frontend.Pages.Approvals.ConfirmPublishModel
 @using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
 @{
-    ViewData["Title"] = "Confirm Approval";
+    ViewData["Title"] = "Confirm Publish";
 }
 
 @section BreadCrumb{
@@ -12,16 +12,16 @@
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
             <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-            <li>@BreadcrumbText.ConfirmApproval</li>
+            <li>@BreadcrumbText.ConfirmPublish</li>
         </ol>
     </div>
 }
 
 @section BannerLeft{
-    <h1 class="hero-title">Approve confirmation for the selected provider funding</h1>
+    <h1 class="hero-title">Publish confirmation for the selected provider funding</h1>
 }
 
-<div class="confirmapproval-page-container" id="confirmapproval-page-container">
+<div class="confirmpublish-page-container" id="confirmpublish-page-container">
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <span class="error-message">@Model.ErrorMessage</span>
@@ -29,8 +29,8 @@
     }
     else
     {
-        <div class="confirmapproval-details">
-            <div class="confirmapproval-details-providers">
+        <div class="confirmpublish-details">
+            <div class="confirmpublish-details-providers">
                 <table>
                     <caption>You have selected:</caption>
                     <thead>
@@ -41,7 +41,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Number of providers to approve</td>
+                            <td>Number of providers to publish</td>
                             <td>@Model.ConfirmationDetails.NumberOfProviders</td>
                         </tr>
                         <tr>
@@ -73,7 +73,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="confirmapproval-details-specification">
+            <div class="confirmpublish-details-specification">
                 <table>
                     <thead>
                         <tr>
@@ -106,21 +106,25 @@
                                 <td>Funding Stream @(fsNum + 1)</td>
                                 <td colspan="2">@Model.ConfirmationDetails.FundingStreams[fsNum].Name</td>
                             </tr>
-                            @for (int alNum = 0; alNum < Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines.Count; alNum++)
-                            {
-                                <tr class="nobottomborder">
-                                    <td class="allocation-line-text">@if (alNum == 0) { <span>Allocation Lines</span> }</td>
-                                    <td>
-                                        <span class="allocation-line-text">@Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines[alNum].Name</span>
-                                    </td>
-                                    <td>
-                                        <span class="bold">@Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines[alNum].Value</span>
-                                    </td>
-                                </tr>
-                                }
+                            <tr class="nobottomborder">
+                                <td class="allocation-line-text">Allocation Lines</td>
+                                <td>
+                                    @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
+                                    {
+                                        <span class="allocation-line-text">@allocationLine.Name</span>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var allocationLine in @Model.ConfirmationDetails.FundingStreams[fsNum].AllocationLines)
+                                    {
+                                        <span class="bold">@allocationLine.Value</span>
+                                    }
+                                </td>
+                            </tr>
+
                         }
                         <tr class="topborderonly">
-                            <td><span class="bold">Total Funding being approved</span></td>
+                            <td><span class="bold">Total Funding being published</span></td>
                             <td></td>
                             <td>
                                 <span class="bold">@Model.ConfirmationDetails.TotalFundingApproved</span>
@@ -130,24 +134,25 @@
                 </table>
             </div>
         </div>
-        <div class="confirmapproval-confirmation">
-            <span>Once Approved:</span>
+        <div class="confirmpublish-confirmation">
+            <span>Once Published:</span>
             <ol>
                 <li>Funding values will be available to the profiling service</li>
-                <li>Funding values <strong>will not</strong> be published or paid to providers</li>
+                <li>Funding values <strong>will be</strong> available for providers to view via the ESFS</li>
+                <li>Funding values will be available to the payment service to be paid on the schedule date</li>
             </ol>
-            <div class="confirmapproval-warning">
-                <div class="confirmapproval-warning-icon">
+            <div class="confirmpublish-warning">
+                <div class="confirmpublishwarning-icon">
                     <i class="material-icons">error</i>
                 </div>
                 <div>
-                    <strong>Approved funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved.</strong>
+                    <strong>Published funding values can change when data or calculatations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved and republished.</strong>
                 </div>
             </div>
-            <div class="confirmapproval-buttons">
-                <button id="approve" class="button approvalstatus-button approvalstatus-button-approve">Confirm approval</button>
+            <div class="confirmpublish-buttons">
+                <button id="publish" class="button approvalstatus-button approvalstatus-button-approve">Confirm publish</button>
                 <a href="/approvals/viewfunding">Back</a>
-                <span id="wait-state-container" style="display:none"><img src="~/assets/images/loader.gif" /> Approving items</span>
+                <span id="wait-state-container" style="display:none"><img src="~/assets/images/loader.gif" /> Publishing items</span>
             </div>
         </div>
     }
@@ -158,7 +163,7 @@
     <script type="text/javascript" asp-src-include="~/js/approvals.confirm.js" asp-append-version="true"></script>
 
     <script type="text/javascript">
-        var setApprovedStatusUrl = "/api/specs/@Model.SpecificationId/allocationlineapprovalstatus";
+        var setPublishedStatusUrl = "/api/specs/@Model.SpecificationId/allocationlineapprovalstatus";
         var viewFundingUrl = "/approvals/viewfunding";
         var updateModelJson = '@Html.Raw(Model.UpdateStatusModelJson)';
         var antiforgeryToken = '@this.HttpContext.GetAntiforgeryToken()';

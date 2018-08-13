@@ -10,7 +10,7 @@ namespace CalculateFunding.Frontend.ViewModels.Approvals
 
         public string[] LocalAuthorities { get; set; }
 
-        public string FundingPeriods { get; set; }
+        public string FundingPeriod { get; set; }
 
         public string SpecificationName { get; set; }
 

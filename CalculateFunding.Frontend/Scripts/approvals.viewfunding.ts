@@ -21,7 +21,7 @@ $("#approve").on("click", (e: JQuery.Event<HTMLButtonElement, null>) => {
         selectedAllocationLines.push(allocationLine);
     });
 
-    updateApprovalStatus(selectedAllocationLines, ApprovalStatus.Approved);
+    confirmPublishApprovalStatus(selectedAllocationLines, approveConfirmationPageUrl);
 
     e.preventDefault();
 });
@@ -39,13 +39,14 @@ $("#publish").on("click", (e: JQuery.Event<HTMLButtonElement, null>) => {
         selectedAllocationLines.push(allocationLine);
     });
 
-    updateApprovalStatus(selectedAllocationLines, ApprovalStatus.Published);
+    confirmPublishApprovalStatus(selectedAllocationLines, publishConfirmationPagUrl);
 
     e.preventDefault();
 });
 
 declare var testScenarioQueryUrl: string;
-declare var approveAllocationLineUrl: string;
+declare var approveConfirmationPageUrl: string;
+declare var publishConfirmationPagUrl: string;
 declare var viewFundingPageUrl: string;
 declare var antiforgeryToken: string;
 
@@ -53,63 +54,31 @@ $("input.target-checkbox-allocationline").on("change", (e: JQuery.Event<HTMLButt
     toggleButtonStatus();
 });
 
-function updateApprovalStatus(allocationLines: Array<ISelectedProviderAllocationLine>, approvalStatus: ApprovalStatus) {
+function createHiddenField(name: string, value: string) {
+    var field = document.createElement("input");
+    field.setAttribute("type", "hidden");
+    field.setAttribute("name", name);
+    field.setAttribute("value", value);
 
-    let data = {
-        SpecificationId: $("#specificationId").val,
-        Filter: {
-            Status: approvalStatus,
-            Providers: allocationLines,
-        }
-    };
+    return field;
+}
 
-    let query = $.ajax({
-        url: approveAllocationLineUrl,
-        method: "POST",
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("RequestVerificationToken", antiforgeryToken);
-        }
-    });
+function confirmPublishApprovalStatus(allocationLines: Array<ISelectedProviderAllocationLine>, confirmationPageUrl: string) {
+    // Submit a form to the confirmation page so we can post a potential large amount of data and change the current page in the browser
+    var f = document.createElement("form");
+    f.setAttribute("method", "POST");
+    f.setAttribute("action", confirmationPageUrl);
 
-    actionRunning = true;
-    toggleButtonStatus();
+    f.appendChild(createHiddenField("SpecificationId", $("#specificationId").val().toString()));
+    f.appendChild(createHiddenField("__RequestVerificationToken", antiforgeryToken));
 
-    query.fail((ex) => {
-        alert("Updating approval status failed");
-        actionRunning = false;
-        toggleButtonStatus();
-    });
+    for (let i in allocationLines) {
+        f.appendChild(createHiddenField("AllocationLines[" + i + "][ProviderId]", allocationLines[i].providerId));
+        f.appendChild(createHiddenField("AllocationLines[" + i + "][AllocationLineId]", allocationLines[i].allocationLineId));
+    }
 
-    query.done((resultUntyped) => {
-        let result: IAllocationLineUpdateStatusResponse = resultUntyped;
-        if (result) {
-            if (typeof result.updatedAllocationLines === "undefined") {
-                throw new Error("updatedAllocationLines not defined in result");
-            }
-
-            if (typeof result.updatedProviders === "undefined") {
-                throw new Error("updatedProviders is not defined in result");
-            }
-
-            let operationType;
-
-            if (approvalStatus == ApprovalStatus.Approved) {
-                operationType = "AllocationLineStatusApproved";
-            }
-            else {
-                operationType = "AllocationLineStatusPublished";
-            }
-
-            window.location.href = viewFundingPageUrl + "&operationType=" + operationType + "&updatedProviders=" + result.updatedProviders + "&updatedAllocationLines=" + result.updatedAllocationLines;
-
-        }
-        else {
-            actionRunning = false;
-            toggleButtonStatus();
-        }
-    });
+    document.body.appendChild(f);
+    f.submit();
 }
 
 var approvalCacheElement: JQuery<HTMLElement> = null;
@@ -261,14 +230,4 @@ interface IResultCountResponse {
 interface ISelectedProviderAllocationLine {
     providerId: string;
     allocationLineId: string;
-}
-
-enum ApprovalStatus {
-    Approved = "Approved",
-    Published = "Published",
-}
-
-interface IAllocationLineUpdateStatusResponse {
-    updatedAllocationLines: number;
-    updatedProviders: number;
 }

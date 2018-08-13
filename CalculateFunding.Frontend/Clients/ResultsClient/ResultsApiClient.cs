@@ -110,7 +110,7 @@
 
         public async Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria)
         {
-            return await ValidatedPostAsync<ConfirmPublishApprove, PublishedAllocationLineResultStatusUpdateModel>($"api/results/get-confirmation-details-for-approve-publish-provider-results?specificationId={specificationId}", filterCriteria);
+            return await ValidatedPostAsync<ConfirmPublishApprove, PublishedAllocationLineResultStatusUpdateModel>($"get-confirmation-details-for-approve-publish-provider-results?specificationId={specificationId}", filterCriteria);
         }
 
         public Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
