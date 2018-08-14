@@ -77,18 +77,22 @@
                 {
                     EntityName = DatsetVersion.Name,
                     EntityType = "Data Source",
-                    OperationId = operationId, 
+                    OperationId = operationId,
+                    DisplayOperationActionSummary = true,
                     CurrentDataSourceRows =   DatsetVersion.CurrentDataSourceRows,
-                   // PreviousDataSourceRows =  DatsetVersion.PreviousDataSourceRows,
+                    PreviousDataSourceRows =  DatsetVersion.PreviousDataSourceRows,
+                    SecondaryActionUrl = $"/datasets/updatedataset?datasetId={operationId}",  
                 };
 
                 switch (operationType)
                 {
                     case DatasetPageBannerOperationType.DatasetCreated:
                         PageBanner.OperationAction = "created";
+                        PageBanner.OperationActionSummaryText = "A new data source with " +PageBanner.CurrentDataSourceRows + "data rows uploaded ";
                         break;
                     case DatasetPageBannerOperationType.DatasetUpdated:
                         PageBanner.OperationAction = "updated";
+                        PageBanner.OperationActionSummaryText = " A new version of a data source with "+ PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
                         break;
                 }
             }

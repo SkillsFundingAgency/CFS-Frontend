@@ -618,26 +618,32 @@ blockquote {
     }
 }
 
-
-
 .notification-panel {
     background-color: $turquoise;
     color: #fff;
     font-size: 19px;
-    padding: 20px 5px;
     margin-bottom: 20px;
-    align-content: space-between;
-    justify-content: space-between;
+
+    .notification-panel-firstline {
+        padding: 20px 5px;
+        align-content: space-between;
+        justify-content: space-between;
+        display: flex;
+    }
 
     .notification-panel-text {
         display: flex;
     }
     
-    .notification-panel-subtext {
-        display: block;  
-        font-size: 12px;
-        padding-left: 15px;     
+    .notification-panel-summary {
+        padding: 10px 5px;
+        display: flex;  
     }
+
+    .notification-panel-summary-text {
+        display: flex;  
+        padding-left: 15px;
+     }
     
     i.material-icons {
         padding-left: 15px;
@@ -684,10 +690,6 @@ blockquote {
     }
 }
 
-.notification-panel-subtext {
-    display: block;  
-    padding-left: 15px;     
-}
 .noresults-panel {
     background-color: $orange;
     color: #fff;

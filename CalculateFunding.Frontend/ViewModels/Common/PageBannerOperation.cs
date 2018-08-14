@@ -16,6 +16,10 @@
 
         public string SecondaryActionUrl { get; set; }
 
+        public bool DisplayOperationActionSummary { get; set; }
+
+        public string OperationActionSummaryText { get; set; }
+
         public string CurrentDataSourceRows { get; set; }
 
         public string PreviousDataSourceRows { get; set; }

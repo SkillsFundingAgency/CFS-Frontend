@@ -1,47 +1,45 @@
 ﻿@model CalculateFunding.Frontend.ViewModels.Common.PageBannerOperation
 
 <div class="notification-panel">
-    <span class="notification-panel-text">
-        <i class="material-icons">check</i>
+    <div class="notification-panel-firstline">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i>
+       
+            @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+            {
+                <a href="@Model.ActionUrl">@Model.EntityName</a>
+            }
+            else
+            {
+                <!--  <span>@Model.EntityName</span>-->
+                <a href="@Model.SecondaryActionUrl">@Model.EntityName  </a>
 
-        @if (!string.IsNullOrWhiteSpace(Model.EntityType) && !Model.EntityType.Equals("Data Source"))
-        {
-            <span>@Model.EntityType&nbsp;</span>
-        }
+            }
 
-        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
-        {
-            <a href="@Model.ActionUrl">@Model.EntityName</a>
-        }
-        else
-        {
-            <span>@Model.EntityName</span>
-        }
+            @if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType != "Data Source")
+            {
+                <span>&nbsp;@Model.OperationAction</span>
+            }
 
-        @if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType != "Data Source")
+        </span>
+        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
         {
-           <span>&nbsp;@Model.OperationAction</span>  
+            <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
         }
-    </span>
+        else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+        {
+            <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
+        }
+    </div>
 
-    @if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType == "Data Source" && Model.OperationAction.Equals("created"))
-    {    
-        <span class="notification-panel-subtext"> A new data source with @Model.CurrentDataSourceRows data rows uploaded </span>
-    }
-    else if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType == "Data Source" && Model.OperationAction.Equals("updated"))
+    @if (Model.DisplayOperationActionSummary)
     {
-        <span class="notification-panel-subtext">  A new version of a data source with @Model.CurrentDataSourceRows data rows uploaded, the previous version contained @Model.PreviousDataSourceRows data rows</span>
+        <div class="notification-panel-summary">
+             <span class="notification-panel-summary-text">  @Model.OperationActionSummaryText </span>                       
+        </div>
     }
-   
 
 
-    @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
-    {
-        <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
-    }
-    else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
-    {
-        <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
-    }
+
 </div>
  
