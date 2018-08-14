@@ -1,0 +1,167 @@
+﻿@page
+@model CalculateFunding.Frontend.Pages.Approvals.ConfirmApprovalModel
+@using CalculateFunding.Frontend.Extensions
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Confirm Approval";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
+            <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
+            <li>@BreadcrumbText.ConfirmApproval</li>
+        </ol>
+    </div>
+}
+
+@section BannerLeft{
+    <h1 class="hero-title">Approve confirmation for the selected provider funding</h1>
+}
+
+<div class="confirmapproval-page-container" id="confirmapproval-page-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <span class="error-message">@Model.ErrorMessage</span>
+
+    }
+    else
+    {
+        <div class="confirmapproval-details">
+            <div class="confirmapproval-details-providers">
+                <table>
+                    <caption>You have selected:</caption>
+                    <thead>
+                        <tr>
+                            <th class="fixed-width-300">Provider details</th>
+                            <th>Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Number of providers to approve</td>
+                            <td>@Model.ConfirmationDetails.NumberOfProviders</td>
+                        </tr>
+                        <tr>
+                            <td>Provider types selected</td>
+                            <td>
+                                @if (Model.ConfirmationDetails.NumberOfProviders == 0)
+                                {
+                                    <span>None</span>
+                                }
+                                else
+                                {
+                                    @(string.Join(", ", Model.ConfirmationDetails.ProviderTypes))
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Provider local authorities selected</td>
+                            <td>
+                                @if (Model.ConfirmationDetails.NumberOfProviders == 0)
+                                {
+                                    <span>None</span>
+                                }
+                                else
+                                {
+                                    @(string.Join(", ", Model.ConfirmationDetails.LocalAuthorities))
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="confirmapproval-details-specification">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="fixed-width-300">Specification Details</th>
+                            <th>Info</th>
+                            <th>Funding</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Funding Period</td>
+                            <td colspan="2">
+                                @if (Model.ConfirmationDetails.NumberOfProviders == 0)
+                                {
+                                    <span>None</span>
+                                }
+                                else
+                                {
+                                    @Model.ConfirmationDetails.FundingPeriod
+                                }
+                            </td>
+                        </tr>
+                        <tr class="nobottomborder">
+                            <td>Specification Selected</td>
+                            <td colspan="2">@Model.ConfirmationDetails.SpecificationName</td>
+                        </tr>
+                        @for (int fsNum = 0; fsNum < Model.ConfirmationDetails.FundingStreams.Count(); fsNum++)
+                        {
+                            <tr class="topborderonly">
+                                <td>Funding Stream @(fsNum + 1)</td>
+                                <td colspan="2">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).Name</td>
+                            </tr>
+                            @for (int alNum = 0; alNum < Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.Count(); alNum++)
+                            {
+                                <tr class="nobottomborder">
+                                    <td class="allocation-line-text">@if (alNum == 0) { <span>Allocation Lines</span> }</td>
+                                    <td>
+                                        <span class="allocation-line-text">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Name</span>
+                                    </td>
+                                    <td>
+                                        <span class="bold">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Value</span>
+                                    </td>
+                                </tr>
+                                }
+                        }
+                        <tr class="topborderonly">
+                            <td><span class="bold">Total Funding being approved</span></td>
+                            <td></td>
+                            <td>
+                                <span class="bold">@Model.ConfirmationDetails.TotalFundingApproved</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="confirmapproval-confirmation">
+            <span>Once Approved:</span>
+            <ol>
+                <li>Funding values will be available to the profiling service</li>
+                <li>Funding values <strong>will not</strong> be published or paid to providers</li>
+            </ol>
+            <div class="confirmapproval-warning">
+                <div class="confirmapproval-warning-icon">
+                    <i class="material-icons">error</i>
+                </div>
+                <div>
+                    <strong>Approved funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved.</strong>
+                </div>
+            </div>
+            <div class="confirmapproval-buttons">
+                <button id="approve" class="button approvalstatus-button approvalstatus-button-approve">Confirm approval</button>
+                <a href="/approvals/viewfunding">Back</a>
+                <span id="wait-state-container" style="display:none"><img src="~/assets/images/loader.gif" /> Approving items</span>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
+    <script type="text/javascript" asp-src-include="~/js/approvals.confirm.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        var setApprovedStatusUrl = "/api/specs/@Model.SpecificationId/allocationlineapprovalstatus";
+        var viewFundingUrl = "/approvals/viewfunding";
+        var updateModelJson = '@Html.Raw(Model.UpdateStatusModelJson)';
+        var antiforgeryToken = '@this.HttpContext.GetAntiforgeryToken()';
+
+    </script>
+}

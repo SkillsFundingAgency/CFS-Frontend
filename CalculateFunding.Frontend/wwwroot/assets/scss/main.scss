@@ -654,6 +654,36 @@ blockquote {
     }
 }
 
+.notification-panel-error {
+    border: 5px $error-colour solid;
+    color: #fff;
+    font-size: 19px;
+    padding: 20px 15px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-content: space-between;
+    justify-content: space-between;
+
+    .notification-panel-error-text {
+        color: $error-colour;
+        display: flex;
+    }
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        color: #fff;
+    }
+
+    .notification-panel-error-view {
+        margin-right: 10px;
+    }
+}
+
 .notification-panel-subtext {
     display: block;  
     padding-left: 15px;     
@@ -1791,6 +1821,127 @@ table {
     .approvalstatus-button-publish {
         margin-right: 30px;
         background-color: $grass-green;
+    }
+}
+
+table {
+    tr {
+        .fixed-width-300 {
+            width: 300px;
+        }
+    }
+
+    .nobottomborder {
+        border-bottom: 0px !important;
+    }
+
+    .topborderonly {
+        border-top: 1px solid #ccc !important;
+        border-bottom: 0px !important;
+    }
+}
+
+.confirmapproval-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmapproval-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmapproval-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-warning {
+        margin-top: 30px;
+
+        .confirmapproval-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmapproval-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
+    }
+}
+
+.confirmpublish-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc !important;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmpublish-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmpublish-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-warning {
+        margin-top: 30px;
+
+        .confirmpublish-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmpublish-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
     }
 }
 

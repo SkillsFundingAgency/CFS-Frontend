@@ -1,5 +1,6 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Approvals.ViewFundingModel
+@using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
 @using CalculateFunding.Frontend.ViewModels.Approvals
 @{
@@ -22,11 +23,22 @@
 
 @if (Model.PageBannerOperation != null)
 {
-    <div class="notification-panel">
-        <span class="notification-panel-text">
-            <i class="material-icons">check</i> @Model.PageBannerOperation.ActionText
-        </span>
-    </div>
+    @if (Model.PageBannerOperation.BannerType == ViewModels.Common.BannerType.Error)
+    {
+        <div class="notification-panel-error">
+            <span class="notification-panel-error-text">
+                <i class="material-icons">error</i> @Model.PageBannerOperation.ActionText
+            </span>
+        </div>
+    }
+    else
+    {
+        <div class="notification-panel">
+            <span class="notification-panel-text">
+                <i class="material-icons">check</i> @Model.PageBannerOperation.ActionText
+            </span>
+        </div>
+    }
 }
 
 <div class="viewfunding-page-container" id="viewfunding-page-container">
@@ -53,7 +65,7 @@
                 <th rowspan="2" class="valign-top">
                     <div>Provider name</div>
                     <div class="spacing-15-top">
-                        <input type="checkbox" id="selectAll"/> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
+                        <input type="checkbox" id="selectAll" /> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
                     </div>
                 </th>
                 <th rowspan="2" class="valign-top text-center">ID</th>
@@ -182,8 +194,10 @@
 
     <script type="text/javascript">
         var testScenarioQueryUrl = "/api/specs/@Model.SelectedSpecificationId/providertestcounts";
-        var approveAllocationLineUrl = "/api/specs/@Model.SelectedSpecificationId/allocationlineapprovalstatus";
-        
+        var approveConfirmationPageUrl = "/approvals/confirmapproval";
+        var publishConfirmationPagUrl = "/approvals/confirmpublish";
         var viewFundingPageUrl = "/approvals/viewfunding?specificationId=@Model.SelectedSpecificationId";
+
+        var antiforgeryToken = '@this.HttpContext.GetAntiforgeryToken()';
     </script>
 }

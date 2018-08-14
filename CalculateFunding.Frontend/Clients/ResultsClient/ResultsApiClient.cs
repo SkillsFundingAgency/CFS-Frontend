@@ -108,6 +108,11 @@
             return GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
         }
 
+        public async Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria)
+        {
+            return await ValidatedPostAsync<ConfirmPublishApprove, PublishedAllocationLineResultStatusUpdateModel>($"get-confirmation-details-for-approve-publish-provider-results?specificationId={specificationId}", filterCriteria);
+        }
+
         public Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));

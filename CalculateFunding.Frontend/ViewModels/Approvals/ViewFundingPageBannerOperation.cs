@@ -2,7 +2,9 @@
 {
     public enum ViewFundingPageBannerOperation
     {
-        AllocationLineStatusPublished,
-        AllocationLineStatusApproved,
+        StatusChangedToApproved,
+        FailedToChangeStatusToApproved,
+        StatusChangedToPublished,
+        FailedToChangeStatusToPublished
     }
 }

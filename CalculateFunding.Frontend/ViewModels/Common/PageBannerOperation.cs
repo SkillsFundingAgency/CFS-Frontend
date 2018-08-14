@@ -20,5 +20,7 @@
 
         public string PreviousDataSourceRows { get; set; }
 
+
+        public BannerType BannerType { get; set; }
     }
 }

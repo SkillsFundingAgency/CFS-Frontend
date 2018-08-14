@@ -47,6 +47,11 @@
 
             CreateMap<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateResponseViewModel>()
                 .ForMember(m => m.UpdatedProviders, opt => opt.MapFrom(f => f.UpdatedProviderIds));
+
+            CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
+            CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
+            CreateMap<ConfirmPublishApprove, ConfirmPublishApproveViewModel>()
+                .ForMember(m => m.SpecificationName, opt => opt.Ignore());
         }
 
         private void MapResults()
