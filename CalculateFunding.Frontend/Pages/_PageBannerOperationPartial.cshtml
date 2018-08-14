@@ -25,15 +25,12 @@
     </span>
 
     @if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType == "Data Source" && Model.OperationAction.Equals("created"))
-    {
-         <br/>
-        <div class="notification-panel-subtext"> A new data source with @Model.CurrentDataSourceRows data rows uploaded </div>
-
+    {    
+        <span class="notification-panel-subtext"> A new data source with @Model.CurrentDataSourceRows data rows uploaded </span>
     }
     else if (!string.IsNullOrWhiteSpace(Model.EntityType) && Model.EntityType == "Data Source" && Model.OperationAction.Equals("updated"))
     {
-         <br/>
-        <div class="notification-panel-subtext">  A new version of a data source with @Model.CurrentDataSourceRows data rows uploaded, the previous version contained @Model.PreviousDataSourceRows data rows</div>
+        <span class="notification-panel-subtext">  A new version of a data source with @Model.CurrentDataSourceRows data rows uploaded, the previous version contained @Model.PreviousDataSourceRows data rows</span>
     }
    
 

@@ -635,6 +635,7 @@ blockquote {
     
     .notification-panel-subtext {
         display: block;  
+        font-size: 12px;
         padding-left: 15px;     
     }
     
@@ -653,7 +654,7 @@ blockquote {
     }
 }
 
-.notification-panel .notification-panel-subtext {
+.notification-panel-subtext {
     display: block;  
     padding-left: 15px;     
 }
