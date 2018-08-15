@@ -42,7 +42,11 @@
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>
             </div>
-
+            <div class="validation-summary-errors invalid-datasource-summary" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
+                <h3><strong class="red">The data source file does not match the schema rules</strong></h3>
+                <p>Download this version with errors highlighted</p>
+                <p><a data-bind="attr: {href: linkToInvalidatedFile()}">Download file</a></p>
+            </div>
 
             <div class="spacing-15-bottom">
                 <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
@@ -85,7 +89,7 @@
 
     <div id="dataset-upload-wait-control" style="display:none; text-align:center" data-bind="visible: isLoadingVisible, attr:{'display': 'block'}" class="col-sm-9 col-md-6">
         <p class="h4-heading"><strong>Dataset upload is progressing</strong></p>
-        <p>This may take a minute or so, please bear with us.</p>
+        <p>This may take a minute or so, please bare with us.</p>
         <p data-bind="text: loadingMessage"></p>
         <img src="~/assets/images/loader.gif" />
     </div>

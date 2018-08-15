@@ -15,6 +15,10 @@
 
         public isInvalidDatasourceSummaryVisible: KnockoutComputed<boolean>;
 
+        public isInvalidSchemaSummaryVisible: KnockoutComputed<boolean>;
+
+        public linkToInvalidatedFile: KnockoutObservable<string> = ko.observable("");
+
         public isUploadButtonEnabled: KnockoutComputed<boolean>;
 
         public state: KnockoutObservable<string> = ko.observable("idle");
@@ -28,6 +32,8 @@
         public isFileNameValid: KnockoutObservable<boolean> = ko.observable(true);
 
         public isDataSourceValid: KnockoutObservable<boolean> = ko.observable(true);
+
+        public isUploadedDataSchemaValid: KnockoutObservable<boolean> = ko.observable(true);
 
         public validationLinks: KnockoutObservableArray<IValidationLink> = ko.observableArray([]);
 
@@ -80,6 +86,10 @@
                 return !self.isDataSourceValid();
             });
 
+            self.isInvalidSchemaSummaryVisible = ko.computed(() => {
+                return !this.isUploadedDataSchemaValid();
+            });
+
             self.isUploadButtonEnabled = ko.computed(() => {
 
                 let isEnabled = self.fileName() && true;
@@ -93,6 +103,7 @@
             this.isDescriptionValid(true);
             this.isFileNameValid(true);
             this.isDataSourceValid(true);
+            this.isUploadedDataSchemaValid(true);
         }
 
         public fileSelect(): void {
@@ -159,6 +170,12 @@
             });
         }
 
+        private addToRequestHeaderIfNotEmpty(request: any, key: string, value: string): void {
+            if (value || value.length !== 0 || value.trim()) {
+                request.setRequestHeader(key, value);
+            }
+        }
+
         private handleValidateFormSuccess(response: INewDatasetVersionResponseModel): void {
             let self = this;
 
@@ -178,14 +195,14 @@
                     return xhr;
                 },
                 beforeSend: function (request) {
-                    request.setRequestHeader("x-ms-blob-type", "BlockBlob");
-                    request.setRequestHeader("x-ms-meta-dataDefinitionId", response.definitionId);
-                    request.setRequestHeader("x-ms-meta-datasetId", response.datasetId);
-                    request.setRequestHeader("x-ms-meta-authorName", response.author.name);
-                    request.setRequestHeader("x-ms-meta-authorId", response.author.id);
-                    request.setRequestHeader("x-ms-meta-filename", response.filename);
-                    request.setRequestHeader("x-ms-meta-name", response.name);
-                    request.setRequestHeader("x-ms-meta-version", response.version.toString());
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-blob-type", "BlockBlob");
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-dataDefinitionId", response.definitionId);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-datasetId", response.datasetId);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-authorName", response.author.name);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-authorId", response.author.id);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-filename", response.filename);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-name", response.name);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-version", response.version.toString());
                 }
             });
 
@@ -293,7 +310,13 @@
 
                         this.isFileNameValid(false);
                         return;
-                    } else {
+                    }
+                    else if ('excel-validation-error' in res.responseJSON) {
+                        this.linkToInvalidatedFile(res.responseJSON.blobUrl);
+                        this.isUploadedDataSchemaValid(false);
+                        return;
+                    }
+                    else {
                         self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
                     }
                     self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);

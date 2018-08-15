@@ -42,6 +42,11 @@
                     <p>Remove these errors before trying again</p>
                 </div>
             </div>
+            <div class="validation-summary-errors invalid-datasource-summary" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
+                <h3><strong class="red">The data source file does not match the schema rules</strong></h3>
+                <p>Download this version with errors highlighted</p>
+                <p><a data-bind="attr: {href: linkToInvalidatedFile()}">Download file</a></p>
+            </div>
 
             <div>
                 <div data-bind="css: { 'validation-failed-block': !isDefinitionIdValid() }">
@@ -114,6 +119,6 @@
     </script>
 }
 
-@section styles{ 
+@section styles{
     <link rel="stylesheet" asp-href-include="~/assets/libs/css/select2.min.css" />
 }
