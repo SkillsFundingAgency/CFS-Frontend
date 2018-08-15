@@ -88,9 +88,10 @@
 
             self.isUploadButtonEnabled = ko.computed(() => {
 
-                let isEnabled = (this.dataDefinitionId().length > 0
-                    && this.description().length > 0
-                    && this.name().length > 0 &&
+                let isEnabled = (this.dataDefinitionId().length > 0 &&
+                    this.description().length > 0 &&
+                    this.name().length > 0 &&
+                    this.fileName() &&
                     this.fileName().length > 0);
 
                 return isEnabled;
@@ -129,10 +130,10 @@
             }
         }
 
-        private doFileSelectNameValidation(filename: string) : IValidationResult {
+        private doFileSelectNameValidation(filename: string): IValidationResult {
             let validExtensions = ["XLSX", "XLS"];
             if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
-                return { result: false, errorMessage: "File type must be of XLSX or XLS",};
+                return { result: false, errorMessage: "File type must be of XLSX or XLS", };
             };
             return { result: true, errorMessage: undefined }
         }
@@ -304,10 +305,9 @@
 
                     if ('typical-model-validation-error' in res.responseJSON) {
                         let filteredErrors: Array<IModelValidationError> = [];
-                        for (var modelState in res.responseJSON)
-                        {
+                        for (var modelState in res.responseJSON) {
                             if (modelState !== "typical-model-validation-error") {
-                                filteredErrors.push(({modelName: modelState, errorMessage: res.responseJSON[modelState]}) as any);
+                                filteredErrors.push(({ modelName: modelState, errorMessage: res.responseJSON[modelState] }) as any);
                             }
                         }
                         for (var modelStateIndex in filteredErrors) {
@@ -346,7 +346,7 @@
             if (displayInvalidDatasourceSummary) {
                 this.isDataSourceValid(false);
             }
-            
+
             this.isFileNameValid(false);
             let link = {
                 href: "#field-CreateDatasetViewModel-Filename",
@@ -362,7 +362,7 @@
             this.validationLinks([]);
 
             this.isFileNameValid(false);
-            
+
             let link = {
                 href: response.fileUrl,
                 message: response.message,
@@ -376,7 +376,7 @@
         }
 
         private handleDatasetValidationSuccess(datasetId: string) {
-            window.location.href = "/datasets/managedatasets?operationType=DatasetCreated&operationId="+datasetId;
+            window.location.href = "/datasets/managedatasets?operationType=DatasetCreated&operationId=" + datasetId;
         }
 
         private handleDatasetValidationFailed(message: string) {
