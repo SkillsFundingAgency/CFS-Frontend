@@ -83,6 +83,8 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             }
 
             this.ConfirmationDetails = _mapper.Map<ConfirmPublishApproveViewModel>(providerResultsResponse.Content);
+            this.ConfirmationDetails.ProviderTypesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.ProviderTypes);
+            this.ConfirmationDetails.LocalAuthoritiesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.LocalAuthorities);
 
             var specification = await _specsClient.GetSpecification(SpecificationId);
             this.ConfirmationDetails.SpecificationName = specification.Content.Name;

@@ -162,9 +162,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Approvals
             pageModel.ConfirmationDetails.Should().NotBeNull("confirmation details should be set");
             pageModel.ConfirmationDetails.FundingPeriod.Should().NotBeNullOrEmpty("FundingPeriod");
             pageModel.ConfirmationDetails.FundingStreams.Should().NotBeNullOrEmpty("FundingStreams");
-            pageModel.ConfirmationDetails.LocalAuthorities.Should().NotBeNullOrEmpty("LocalAuthorities");
+            pageModel.ConfirmationDetails.LocalAuthoritiesJson.Should().NotBeNullOrEmpty("LocalAuthorities");
             pageModel.ConfirmationDetails.NumberOfProviders.Should().BeGreaterThan(0, "NumberOfProviders");
-            pageModel.ConfirmationDetails.ProviderTypes.Should().NotBeNullOrEmpty("ProviderTypes");
+            pageModel.ConfirmationDetails.ProviderTypesJson.Should().NotBeNullOrEmpty("ProviderTypes");
             pageModel.ConfirmationDetails.SpecificationName.Should().NotBeNullOrEmpty("SpecificationName");
             pageModel.ConfirmationDetails.TotalFundingApproved.Should().BeGreaterThan(0.0M, "TotalFundingApproved");
         }

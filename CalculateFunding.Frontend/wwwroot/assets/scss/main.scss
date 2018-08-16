@@ -64,6 +64,10 @@ $glyph: 'glyphicons-halflings-regular';
     -moz-osx-font-smoothing: grayscale;
     /* Support for IE. */
     font-feature-settings: 'liga';
+
+    gov-blue {
+        color: $govuk-blue;
+    }
 }
 
 a.button:hover {
@@ -1800,8 +1804,8 @@ table {
 
 table {
     tr {
-        .fixed-width-300 {
-            width: 300px;
+        .fixed-width-330 {
+            width: 330px;
         }
     }
 
@@ -1828,7 +1832,7 @@ table {
 
     .allocation-line-text {
         color: $grey-1;
-        font-size: 16px;
+        font-size: 19px;
     }
 
     .confirmapproval-confirmation {
@@ -1880,7 +1884,7 @@ table {
 
     .allocation-line-text {
         color: $grey-1;
-        font-size: 16px;
+        font-size: 19px;
     }
 
     .confirmpublish-confirmation {
@@ -1916,6 +1920,21 @@ table {
         a {
             margin-left: 30px;
         }
+    }
+}
+
+.expander-control {
+    i, span {
+        vertical-align: top;
+    }
+
+    a {
+        cursor: pointer;
+        vertical-align: top;
+    }
+
+    .caption {
+        vertical-align: top;
     }
 }
 
