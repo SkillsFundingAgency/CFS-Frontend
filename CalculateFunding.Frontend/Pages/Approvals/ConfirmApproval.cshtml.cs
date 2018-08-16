@@ -83,12 +83,12 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 return Page();
             }
 
-            this.ConfirmationDetails = _mapper.Map<ConfirmPublishApproveViewModel>(providerResultsResponse.Content);
-            this.ConfirmationDetails.ProviderTypesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.ProviderTypes);
-            this.ConfirmationDetails.LocalAuthoritiesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.LocalAuthorities);
+            ConfirmationDetails = _mapper.Map<ConfirmPublishApproveViewModel>(providerResultsResponse.Content);
+            ConfirmationDetails.ProviderTypesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.ProviderTypes);
+            ConfirmationDetails.LocalAuthoritiesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.LocalAuthorities);
 
             ApiResponse<Specification> specification = await _specsClient.GetSpecification(SpecificationId);
-            this.ConfirmationDetails.SpecificationName = specification.Content.Name;
+            ConfirmationDetails.SpecificationName = specification.Content.Name;
 
             return Page();
         }
