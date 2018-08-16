@@ -12,7 +12,10 @@
             this.icon = ko.observable(this.collapsedIcon);
 
             this.text = ko.computed(() => {
-                if (this.items.length === 1) {
+                if (!this.items) {
+                    return '';
+                }
+                else if (this.items.length === 1) {
                     return this.items[0];
                 }
                 else if (this.expanded()) {
@@ -43,7 +46,12 @@
         }
 
         canExpand() {
-            return this.items.length > 1;
+            if (!this.items) {
+                return false;
+            }
+            else {
+                return this.items.length > 1;
+            }
         }
     }
 }

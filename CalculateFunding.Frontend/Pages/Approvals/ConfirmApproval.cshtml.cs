@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
@@ -86,7 +87,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             this.ConfirmationDetails.ProviderTypesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.ProviderTypes);
             this.ConfirmationDetails.LocalAuthoritiesJson = JsonConvert.SerializeObject(providerResultsResponse.Content.LocalAuthorities);
 
-            var specification = await _specsClient.GetSpecification(SpecificationId);
+            ApiResponse<Specification> specification = await _specsClient.GetSpecification(SpecificationId);
             this.ConfirmationDetails.SpecificationName = specification.Content.Name;
 
             return Page();
