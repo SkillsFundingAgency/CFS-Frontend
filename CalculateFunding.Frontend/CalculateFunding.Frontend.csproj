@@ -34,6 +34,7 @@
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
@@ -138,6 +139,7 @@
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
+    <TypeScriptCompile Include="Scripts\expander.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
     <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
     <TypeScriptCompile Include="Scripts\search.specifications.ts" />

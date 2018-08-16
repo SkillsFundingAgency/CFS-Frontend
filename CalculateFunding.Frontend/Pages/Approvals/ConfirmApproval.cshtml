@@ -17,8 +17,8 @@
     </div>
 }
 
-@section BannerLeft{
-    <h1 class="hero-title">Approve confirmation for the selected provider funding</h1>
+@section FormBannerLeft{
+    <h1 class="heading-large">Approve confirmation for the selected provider funding</h1>
 }
 
 <div class="confirmapproval-page-container" id="confirmapproval-page-container">
@@ -35,7 +35,7 @@
                     <caption>You have selected:</caption>
                     <thead>
                         <tr>
-                            <th class="fixed-width-300">Provider details</th>
+                            <th class="fixed-width-330">Provider details</th>
                             <th>Info</th>
                         </tr>
                     </thead>
@@ -44,30 +44,32 @@
                             <td>Number of providers to approve</td>
                             <td>@Model.ConfirmationDetails.NumberOfProviders</td>
                         </tr>
-                        <tr>
-                            <td>Provider types selected</td>
+                        <tr id="providerTypes" class="expander-control">
+                            <td class="caption">
+                                <!-- ko if: canExpand() -->
+                                <i class="material-icons gov-blue" data-bind="text: icon">arrow_right</i>
+                                <a data-bind="click: toggleExpand, enable: canExpand">Provider types selected</a>
+                                <!-- /ko -->
+                                <!-- ko if: !canExpand() -->
+                                <span>Provider types selected</span>
+                                <!-- /ko -->
+                            </td>
                             <td>
-                                @if (Model.ConfirmationDetails.NumberOfProviders == 0)
-                                {
-                                    <span>None</span>
-                                }
-                                else
-                                {
-                                    @(string.Join(", ", Model.ConfirmationDetails.ProviderTypes))
-                                }
+                                <span data-bind="html: text"></span>
                             </td>
                         </tr>
-                        <tr>
-                            <td>Provider local authorities selected</td>
+                        <tr id="localAuthorities" class="expander-control">
+                            <td class="caption">
+                                <!-- ko if: canExpand() -->
+                                <i class="material-icons gov-blue" data-bind="text: icon">arrow_right</i>
+                                <a data-bind="click: toggleExpand">Provider local authorities selected</a>
+                                <!-- /ko -->
+                                <!-- ko if: !canExpand() -->
+                                <span>Provider local authorities selected</span>
+                                <!-- /ko -->
+                            </td>
                             <td>
-                                @if (Model.ConfirmationDetails.NumberOfProviders == 0)
-                                {
-                                    <span>None</span>
-                                }
-                                else
-                                {
-                                    @(string.Join(", ", Model.ConfirmationDetails.LocalAuthorities))
-                                }
+                                <span data-bind="html: text"></span>
                             </td>
                         </tr>
                     </tbody>
@@ -77,7 +79,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="fixed-width-300">Specification Details</th>
+                            <th class="fixed-width-330">Specification Details</th>
                             <th>Info</th>
                             <th>Funding</th>
                         </tr>
@@ -109,21 +111,22 @@
                             @for (int alNum = 0; alNum < Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.Count(); alNum++)
                             {
                                 <tr class="nobottomborder">
-                                    <td class="allocation-line-text">@if (alNum == 0) { <span>Allocation Lines</span> }</td>
+                                    <td class="allocation-line-text">@if (alNum == 0)
+                                    {<span>Allocation Lines</span>}</td>
                                     <td>
                                         <span class="allocation-line-text">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Name</span>
                                     </td>
                                     <td>
-                                        <span class="bold">@Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Value</span>
+                                        <span>@String.Format("{0:c}", Model.ConfirmationDetails.FundingStreams.ElementAt(fsNum).AllocationLines.ElementAt(alNum).Value)</span>
                                     </td>
                                 </tr>
-                                }
+                            }
                         }
                         <tr class="topborderonly">
                             <td><span class="bold">Total Funding being approved</span></td>
                             <td></td>
                             <td>
-                                <span class="bold">@Model.ConfirmationDetails.TotalFundingApproved</span>
+                                <span class="bold">@String.Format("{0:c}", Model.ConfirmationDetails.TotalFundingApproved)</span>
                             </td>
                         </tr>
                     </tbody>
@@ -156,12 +159,23 @@
 @section scripts{
     <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/approvals.confirm.js" asp-append-version="true"></script>
+    <script type="text/javascript" asp-src-include="~/js/expander.js" asp-append-version="true"></script>
 
     <script type="text/javascript">
         var setApprovedStatusUrl = "/api/specs/@Model.SpecificationId/allocationlineapprovalstatus";
         var viewFundingUrl = "/approvals/viewfunding";
         var updateModelJson = '@Html.Raw(Model.UpdateStatusModelJson)';
         var antiforgeryToken = '@this.HttpContext.GetAntiforgeryToken()';
+
+        var providerTypesUI = document.getElementById('providerTypes');
+        var ptJson = @Html.Raw(Model.ConfirmationDetails.ProviderTypesJson);
+        var ptExpanderVM = new calculateFunding.controls.ExpanderViewModel(ptJson);
+        ko.applyBindings(ptExpanderVM, providerTypesUI);
+
+        var localAuthoritiesUI = document.getElementById('localAuthorities');
+        var laJson = @Html.Raw(Model.ConfirmationDetails.LocalAuthoritiesJson);
+        var laExpanderVM = new calculateFunding.controls.ExpanderViewModel(laJson);
+        ko.applyBindings(laExpanderVM, localAuthoritiesUI);
 
     </script>
 }
