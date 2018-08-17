@@ -119,9 +119,9 @@
                     this.datasetFile = null;
                     this.isFileNameValid(false);
                     let link = {
-                        href: "#field-CreateDatasetViewModel-Filename",
+                        href: "#field-UpdateViewModel-Filename",
                         message: validationResult.errorMessage,
-                        id: "validation-link-for-CreateDatasetViewModel-Filename"
+                        id: "validation-link-for-UpdateViewModel-Filename"
                     }
                     this.validationLinks([]);
                     this.validationLinks.push(link);
@@ -132,7 +132,7 @@
         private doFileSelectNameValidation(filename: string): IValidationResult {
             let validExtensions = ["XLSX", "XLS"];
             if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
-                return { result: false, errorMessage: "File type must be of XLSX or XLS", };
+                return { result: false, errorMessage: "The data source file type is invalid. Check that your file is an xls or xlsx file"};
             };
             return { result: true, errorMessage: undefined }
         }

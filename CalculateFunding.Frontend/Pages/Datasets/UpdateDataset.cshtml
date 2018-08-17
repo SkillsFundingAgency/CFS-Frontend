@@ -37,7 +37,6 @@
         <form method="post" id="dataset-form" class="form">
             <div class="validation-summary-errors" style="display:none;" data-valmsg-summary="true" data-bind="visible: isValidationSummaryVisible, attr:{'display': 'block'}">
                 <h3 class="heading-large">There is a problem</h3>
-                <p><strong>Check that you have answered the questions correctly</strong></p>
                 <ul data-bind="foreach: validationLinks">
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>

@@ -133,7 +133,7 @@
         private doFileSelectNameValidation(filename: string): IValidationResult {
             let validExtensions = ["XLSX", "XLS"];
             if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
-                return { result: false, errorMessage: "File type must be of XLSX or XLS", };
+                return { result: false, errorMessage: "The data source file type is invalid. Check that your file is an xls or xlsx file"};
             };
             return { result: true, errorMessage: undefined }
         }
