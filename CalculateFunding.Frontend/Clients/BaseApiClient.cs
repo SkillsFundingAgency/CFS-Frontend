@@ -56,19 +56,21 @@
 
             _logger.Debug("ApiClient GET: {clientKey}://{url}", _clientKey, url);
 
-            HttpResponseMessage response = await httpClient.GetAsync(url, cancellationToken);
-            if (response == null)
+            using (HttpResponseMessage response = await httpClient.GetAsync(url, cancellationToken))
             {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
-            }
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
 
-            if (response.IsSuccessStatusCode)
-            {
-                string bodyContent = await response.Content.ReadAsStringAsync();
-                return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(bodyContent, _serializerSettings));
-            }
+                if (response.IsSuccessStatusCode)
+                {
+                    string bodyContent = await response.Content.ReadAsStringAsync();
+                    return new ApiResponse<T>(response.StatusCode, JsonConvert.DeserializeObject<T>(bodyContent, _serializerSettings));
+                }
 
-            return new ApiResponse<T>(response.StatusCode);
+                return new ApiResponse<T>(response.StatusCode);
+            }
         }
 
         public async Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
@@ -82,19 +84,22 @@
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
-            var response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
-            if (response == null)
-            {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
-            }
 
-            if (response.IsSuccessStatusCode)
+            using (HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
             {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(responseBody, _serializerSettings));
-            }
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
 
-            return new ApiResponse<TResponse>(response.StatusCode);
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return new ApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(responseBody, _serializerSettings));
+                }
+
+                return new ApiResponse<TResponse>(response.StatusCode);
+            }
         }
 
         public async Task<ValidatedApiResponse<TResponse>> ValidatedPostAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken), TimeSpan? timeout = null)
@@ -147,13 +152,15 @@
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
-            var response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
-            if (response == null)
+            using (HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
             {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
-            }
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
 
-            return response.StatusCode;
+                return response.StatusCode;
+            }
         }
 
         public async Task<HttpStatusCode> PostAsync(string url, CancellationToken cancellationToken = default(CancellationToken))
@@ -166,13 +173,15 @@
             HttpClient httpClient = GetHttpClient();
 
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}}", _clientKey, url);
-            var response = await httpClient.PostAsync(url, null, cancellationToken);
-            if (response == null)
+            using (HttpResponseMessage response = await httpClient.PostAsync(url, null, cancellationToken))
             {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
-            }
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
 
-            return response.StatusCode;
+                return response.StatusCode;
+            }
         }
 
         public async Task<HttpStatusCode> PutAsync<TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
@@ -186,13 +195,15 @@
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient PUT: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
-            var response = await httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
-            if (response == null)
+            using (HttpResponseMessage response = await httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
             {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
-            }
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
 
-            return response.StatusCode;
+                return response.StatusCode;
+            }
         }
 
         public async Task<ValidatedApiResponse<TResponse>> ValidatedPutAsync<TResponse, TRequest>(string url, TRequest request, CancellationToken cancellationToken = default(CancellationToken))
@@ -208,25 +219,27 @@
 
             _logger.Debug($"ApiClient Validated POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
 
-            HttpResponseMessage response = await httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
-            if (response == null)
+            using (HttpResponseMessage response = await httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
             {
-                throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                if (response == null)
+                {
+                    throw new HttpRequestException($"Unable to connect to server. Url={httpClient.BaseAddress.AbsoluteUri}{url}");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ValidatedApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
+                }
+
+                ValidatedApiResponse<TResponse> apiResponse = new ValidatedApiResponse<TResponse>(response.StatusCode);
+
+                if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, IEnumerable<string>>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
+                }
+
+                return apiResponse;
             }
-
-            if (response.IsSuccessStatusCode)
-            {
-                return new ValidatedApiResponse<TResponse>(response.StatusCode, JsonConvert.DeserializeObject<TResponse>(await response.Content.ReadAsStringAsync(), _serializerSettings));
-            }
-
-            ValidatedApiResponse<TResponse> apiResponse = new ValidatedApiResponse<TResponse>(response.StatusCode);
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                apiResponse.ModelState = JsonConvert.DeserializeObject<IDictionary<string, IEnumerable<string>>>(await response.Content.ReadAsStringAsync(), _serializerSettings);
-            }
-
-            return apiResponse;
         }
 
         private HttpClient GetHttpClient()
