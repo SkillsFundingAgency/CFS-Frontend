@@ -109,7 +109,7 @@
 
             ValidatedApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
 
-            if(apiResponse == null)
+            if (apiResponse == null)
             {
                 _logger.Warning("Validate Dataset API response was null");
                 return new InternalServerErrorResult("Validate Dataset API response was null");
@@ -119,11 +119,11 @@
             {
                 _logger.Warning("Failed to validate dataset with status code: {statusCode}", apiResponse.StatusCode);
 
-                if (!apiResponse.ModelState.Values.IsNullOrEmpty())
+                if (apiResponse.StatusCode == HttpStatusCode.BadRequest && !apiResponse.ModelState.Values.IsNullOrEmpty())
                 {
                     return new BadRequestObjectResult(apiResponse.ModelState);
                 }
-               
+
                 return new InternalServerErrorResult(apiResponse.Content?.Message);
             }
 

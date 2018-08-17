@@ -69,7 +69,7 @@
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>("validate-dataset", model);
+            return ValidatedPostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>("validate-dataset", model, timeout: TimeSpan.FromSeconds(300));
         }
 
         public Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)
@@ -145,9 +145,9 @@
 
         public Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId)
         {
-            if(string.IsNullOrWhiteSpace(datasetId))
+            if (string.IsNullOrWhiteSpace(datasetId))
             {
-                throw new ArgumentNullException( nameof(datasetId), "Dataset Id for dataset download is null");
+                throw new ArgumentNullException(nameof(datasetId), "Dataset Id for dataset download is null");
             }
             return GetAsync<DownloadDatasourceModel>($"download-dataset-file?datasetId={datasetId}");
         }
