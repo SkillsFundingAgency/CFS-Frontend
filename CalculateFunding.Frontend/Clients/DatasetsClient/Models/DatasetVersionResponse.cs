@@ -23,8 +23,8 @@ namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 
         public Reference Author { get; set; }
 
-        public string CurrentDataSourceRows { get; set; }
+        public int CurrentDataSourceRows { get; set; }
 
-        public string PreviousDataSourceRows { get; set; }
+        public int PreviousDataSourceRows { get; set; }
     }
 }

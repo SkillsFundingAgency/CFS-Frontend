@@ -172,7 +172,7 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
-            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<DatasetCreateUpdateResponseModel> response = new ValidatedApiResponse<DatasetCreateUpdateResponseModel>(HttpStatusCode.BadRequest);
             response.ModelState = new Dictionary<string, IEnumerable<string>>();
 
             IDatasetsApiClient apiClient = CreateApiClient();
@@ -206,7 +206,7 @@ namespace CalculateFunding.Frontend.Controllers
             IDictionary<string, IEnumerable<string>> modelState = new Dictionary<string, IEnumerable<string>>();
             modelState.Add("error", new List<string> { "an error occured" });
 
-            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.BadRequest);
+            ValidatedApiResponse<DatasetCreateUpdateResponseModel> response = new ValidatedApiResponse<DatasetCreateUpdateResponseModel>(HttpStatusCode.BadRequest);
             response.ModelState = modelState;
 
             IDatasetsApiClient apiClient = CreateApiClient();
@@ -237,7 +237,7 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
-            ValidatedApiResponse<ValidateDatasetResponseModel> response = new ValidatedApiResponse<ValidateDatasetResponseModel>(HttpStatusCode.NoContent);
+            ValidatedApiResponse<DatasetCreateUpdateResponseModel> response = new ValidatedApiResponse<DatasetCreateUpdateResponseModel>(HttpStatusCode.NoContent);
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
