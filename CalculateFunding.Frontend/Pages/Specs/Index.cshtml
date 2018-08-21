@@ -121,10 +121,7 @@
                             <span>Funding streams:</span>
                             <span data-bind="foreach: fundingStreamNames" class="inline-list"><strong data-bind="text: $data" class="inline-list-item data-specification-fundingstream"></strong> </span>
                         </div>
-                        <div class="spacing-15-bottom" data-bind="text: description"></div>
-                        <div class="spacing-15-bottom">
-                            <span><a data-bind="attr: {href: '/specs/EditSpecification/' + id +'?returnPage=Specifications' }">Edit</a></span>
-                        </div>
+                        <div class="spacing-15-bottom" data-bind="text: description"></div>            
                     </td>
                 </tr>
             </tbody>
@@ -170,11 +167,7 @@
 
                                 </span>
                             </div>
-                            <div class="spacing-15-bottom">@specification.Description.ReplaceLineBreaksForHtml()</div>
-                            <div class="spacing-15-bottom">
-                                <span><a href="/specs/EditSpecification/@specification.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">Edit</i></a></span>
-                            </div>
-
+                            <div class="spacing-15-bottom">@specification.Description.ReplaceLineBreaksForHtml()</div>                 
                         </td>
                     </tr>
                     rowId++;
