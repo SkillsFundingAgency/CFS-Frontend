@@ -624,6 +624,13 @@ blockquote {
     font-size: 19px;
     margin-bottom: 20px;
 
+    .notification-panel-oneblock {
+        padding: 20px 5px;
+        align-content: space-between;
+        justify-content: space-between;
+        display: flex;
+    }
+    
     .notification-panel-firstline {
         padding: 20px 5px 0 5px;
         align-content: space-between;

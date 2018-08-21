@@ -87,7 +87,7 @@
                 switch (operationType)
                 {
                     case DatasetPageBannerOperationType.DatasetCreated:
-                        PageBanner.OperationActionSummaryText = "A new data source with " +PageBanner.CurrentDataSourceRows + "data rows uploaded ";
+                        PageBanner.OperationActionSummaryText = "A new data source with " +PageBanner.CurrentDataSourceRows + " data rows uploaded ";
                         break;
                     case DatasetPageBannerOperationType.DatasetUpdated:
                         PageBanner.OperationActionSummaryText = " A new version of a data source with "+ PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
