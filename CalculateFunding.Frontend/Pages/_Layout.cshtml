@@ -44,11 +44,11 @@
                         <a href="/" id="proposition-name">Calculate Funding</a>
 
                         @*<ul id="proposition-links">
-            <li><a href="layout.html">Layout</a></li>
-            <li><a href="content.html">Content</a></li>
-            <li><a href="elements.html">Components</a></li>
-            <li><a href="developer_guide.html">Developer Guide</a></li>
-        </ul>*@
+                                <li><a href="layout.html">Layout</a></li>
+                                <li><a href="content.html">Content</a></li>
+                                <li><a href="elements.html">Components</a></li>
+                                <li><a href="developer_guide.html">Developer Guide</a></li>
+                            </ul>*@
                         <div class="user-container">
                             <i class="material-icons circle-icon">person</i> <span>@userProfileService.GetUser().Fullname</span>
                         </div>
@@ -56,9 +56,9 @@
 
                 </div>
             </div>
-            
+
         </div>
-    
+
 
     </header>
 
@@ -145,6 +145,21 @@
     }
     else if (IsSectionDefined("BannerWhole"))
     {
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 spacing-15">
+                    <div class="govuk-beta-label">
+
+                        <strong class="phase-tag">Beta</strong>
+                        <span>
+                            Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer" href="https://www.smartsurvey.co.uk/s/cfsbeta/">help us improve the service</a>.
+
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <section class="banner-link-wrapper">
             <div class="container">
                 @if (IsSectionDefined("BreadCrumb"))

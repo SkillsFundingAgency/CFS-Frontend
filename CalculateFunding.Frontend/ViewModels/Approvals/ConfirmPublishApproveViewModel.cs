@@ -6,9 +6,9 @@ namespace CalculateFunding.Frontend.ViewModels.Approvals
     {
         public int NumberOfProviders { get; set; }
 
-        public IEnumerable<string> ProviderTypes { get; set; }
+        public string ProviderTypesJson { get; set; }
 
-        public IEnumerable<string> LocalAuthorities { get; set; }
+        public string LocalAuthoritiesJson { get; set; }
 
         public string FundingPeriod { get; set; }
 

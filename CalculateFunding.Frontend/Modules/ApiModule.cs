@@ -115,25 +115,25 @@
               .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services
-               .AddScoped<ICalculationsApiClient, CalculationsApiClient>();
+               .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
             services
-                .AddScoped<IResultsApiClient, ResultsApiClient>();
+                .AddSingleton<IResultsApiClient, ResultsApiClient>();
 
             services
-               .AddScoped<ISpecsApiClient, SpecsApiClient>();
+               .AddSingleton<ISpecsApiClient, SpecsApiClient>();
 
             services
-               .AddScoped<IDatasetsApiClient, DatasetsApiClient>();
+               .AddSingleton<IDatasetsApiClient, DatasetsApiClient>();
 
             services
-                .AddScoped<IScenariosApiClient, ScenariosApiClient>();
+                .AddSingleton<IScenariosApiClient, ScenariosApiClient>();
 
             services
-               .AddScoped<ITestEngineApiClient, TestEngineApiClient>();
+               .AddSingleton<ITestEngineApiClient, TestEngineApiClient>();
 
             services
-              .AddScoped<IUsersApiClient, UsersApiClient>();
+              .AddSingleton<IUsersApiClient, UsersApiClient>();
         }
 
         private static void SetDefaultApiOptions(HttpClient httpClient, ApiOptions options, string apiBase)

@@ -37,12 +37,15 @@
         <form method="post" id="dataset-form" class="form">
             <div class="validation-summary-errors" style="display:none;" data-valmsg-summary="true" data-bind="visible: isValidationSummaryVisible, attr:{'display': 'block'}">
                 <h3 class="heading-large">There is a problem</h3>
-                <p><strong>Check that you have answered the questions correctly</strong></p>
                 <ul data-bind="foreach: validationLinks">
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>
             </div>
-
+            <div class="validation-summary-errors invalid-datasource-summary" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
+                <h3><strong class="red">The data source file does not match the schema rules</strong></h3>
+                <p>Download this version with errors highlighted</p>
+                <p><a data-bind="attr: {href: linkToInvalidatedFile()}">Download file</a></p>
+            </div>
 
             <div class="spacing-15-bottom">
                 <div data-bind="css: { 'validation-failed-block': !isFileNameValid() }">
