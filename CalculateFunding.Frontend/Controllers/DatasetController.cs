@@ -107,7 +107,7 @@
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<DatasetCreateUpdateResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
+            ValidatedApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
 
             if (apiResponse == null)
             {

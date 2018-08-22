@@ -1,7 +1,8 @@
 ﻿@model CalculateFunding.Frontend.ViewModels.Common.PageBannerOperation
 
 <div class="notification-panel">
-    <div class="notification-panel-firstline">
+   
+    <div class="@( Model.DisplayOperationActionSummary? "notification-panel-firstline" : "notification-panel-oneblock" )">
         <span class="notification-panel-text">
             <i class="material-icons">check</i>
        

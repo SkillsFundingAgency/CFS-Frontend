@@ -11,8 +11,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.DatasetsClient;
-
+  
     public class ManageDatasetsPageModel : PageModel
     {
         private IDatasetSearchService _searchService;

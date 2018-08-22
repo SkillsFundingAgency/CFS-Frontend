@@ -65,7 +65,7 @@
             return ValidatedPostAsync<NewDatasetVersionResponseModel, DatasetVersionUpdateModel>("dataset-version-update", dataset);
         }
 
-        public Task<ValidatedApiResponse<DatasetCreateUpdateResponseModel>> ValidateDataset(ValidateDatasetModel model)
+        public Task<ValidatedApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
