@@ -40,11 +40,19 @@
                 <ul data-bind="foreach: validationLinks">
                     <li><a class="validation-summary-link" data-bind="attr: { 'href': href, 'id' : id }, text: message"></a></li>
                 </ul>
+                <div class="invalid-datasource-summary" style="display:none;" data-bind="visible: isInvalidDatasourceSummaryVisible, attr:{'display': 'block'}">
+                    <ul>
+                        <li>There is no data</li>
+                        <li>There are merged cells</li>
+                    </ul>
+                    <p>Remove these errors before trying again</p>
+                </div>
             </div>
-            <div class="validation-summary-errors invalid-datasource-summary" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
-                <h3><strong class="red">The data source file does not match the schema rules</strong></h3>
-                <p>Download this version with errors highlighted</p>
-                <p><a data-bind="attr: {href: linkToInvalidatedFile()}">Download file</a></p>
+            
+            <div class="validation-summary-errors" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
+                <h3><a id="validation-link-for-UpdateViewModel-Filename" class="validation-summary-link" href="#field-UpdateViewModel-Filename">The data source file does not match the schema rules</a></h3>
+                <p>Download this version with errors highlighted:</p>
+                <p><a class="a-unstyled" data-bind="attr: {href: linkToInvalidatedFile()}">Download file</a></p>
             </div>
 
             <div class="spacing-15-bottom">
@@ -53,7 +61,7 @@
                     <label asp-for="UpdateViewModel.Filename">Select data source file</label>
                     <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Upload a xls or xlsx file</span></h4>
                     <div class="input-group">
-                        <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() }" id="filename" />
+                        <input type="text" disabled class="form-control disabled-input" data-bind="value: fileName, css: { 'input-validation-error': !isFileNameValid() || !isUploadedDataSchemaValid()}" id="filename" />
                         <span class="input-group-btn">
                             <label class="btn btn-file file-button">
                                 Browse <input asp-for="UpdateViewModel.Filename" data-bind="event:{change: $root.fileSelect}" type="file" accept=".xls,.xlsx" style="display: none;" id="browseButton">

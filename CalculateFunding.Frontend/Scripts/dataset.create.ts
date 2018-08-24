@@ -115,6 +115,7 @@
                     this.fileName(file.name);
                     this.datasetFile = file;
                     this.isFileNameValid(true);
+                    this.isUploadedDataSchemaValid(true);
                 } else {
                     this.fileName(null);
                     this.datasetFile = null;

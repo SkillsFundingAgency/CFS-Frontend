@@ -114,6 +114,7 @@
                     this.fileName(file.name);
                     this.datasetFile = file;
                     this.isFileNameValid(true);
+                    this.isUploadedDataSchemaValid(true);
                 } else {
                     this.fileName(null);
                     this.datasetFile = null;
@@ -335,9 +336,9 @@
 
             this.isFileNameValid(false);
             let link = {
-                href: "#field-CreateDatasetViewModel-Filename",
+                href: "#field-UpdateViewModel-Filename",
                 message: message,
-                id: "validation-link-for-CreateDatasetViewModel-Filename"
+                id: "validation-link-for-UpdateViewModel-Filename"
             }
             this.validationLinks.push(link);
         }
