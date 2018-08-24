@@ -381,7 +381,11 @@
                     EntityName = "Test Dataset",
                     EntityType = "Data Source",
                     OperationId = "Dataset1",
-                    OperationAction = "updated",
+                    SecondaryActionUrl = "/datasets/updatedataset?datasetId=" + datasetId,
+                    DisplayOperationActionSummary = true,
+                     CurrentDataSourceRows= datasetVersionResponse.CurrentDataSourceRows,
+                     PreviousDataSourceRows= datasetVersionResponse.PreviousDataSourceRows,
+                    OperationActionSummaryText = "A new version of a data source with "+ datasetVersionResponse.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + datasetVersionResponse.PreviousDataSourceRows  + "  data rows",
                 });
         }
 
@@ -432,7 +436,11 @@
                     EntityName = "Test Dataset",
                     EntityType = "Data Source",
                     OperationId = "Dataset1",
-                    OperationAction = "created",
+                    SecondaryActionUrl = "/datasets/updatedataset?datasetId=" + datasetId,
+                    CurrentDataSourceRows = datasetVersionResponse.CurrentDataSourceRows,
+                    PreviousDataSourceRows = datasetVersionResponse.PreviousDataSourceRows,
+                    DisplayOperationActionSummary = true,
+                    OperationActionSummaryText= "A new data source with " + datasetVersionResponse.CurrentDataSourceRows +" data rows uploaded",
                 });
         }
 
@@ -450,6 +458,8 @@
                 Version = 1,
                 Definition = new Reference("1", "Test Definition"),
                 LastUpdatedDate = new DateTime(2018, 3, 5, 12, 34, 52),
+                CurrentDataSourceRows=10,
+                PreviousDataSourceRows=10,
             };
         }
 
