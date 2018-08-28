@@ -16,6 +16,7 @@
     {
         private IDatasetSearchService _searchService;
         private readonly IDatasetsApiClient _datasetApiClient;
+        private readonly int _milliseconddelay = 3000;
 
         public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient)
         {
@@ -45,13 +46,6 @@
 
             SearchTerm = searchTerm;
 
-            SearchResults = await _searchService.PerformSearch(searchRequest);
-
-            if (SearchResults == null)
-            {
-                return new StatusCodeResult(500);
-            }
-
             OperationType = operationType;
 
             if (operationType.HasValue)
@@ -61,6 +55,10 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
+                if (operationType.Equals(DatasetPageBannerOperationType.DatasetCreated))
+                {
+                    await Task.Delay(_milliseconddelay);
+                }
                 ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
 
                 IActionResult errorResult = datasetVersionResponse.IsSuccessOrReturnFailureResult("Dataset");
@@ -92,6 +90,13 @@
                         PageBanner.OperationActionSummaryText = "A new version of a data source with "+ PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
                         break;
                 }
+            }
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new StatusCodeResult(500);
             }
 
             return Page();
