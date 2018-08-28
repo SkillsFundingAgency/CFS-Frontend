@@ -1,25 +1,42 @@
 ﻿@model CalculateFunding.Frontend.ViewModels.Common.PageBannerOperation
 
 <div class="notification-panel">
-    <span class="notification-panel-text">
-        <i class="material-icons">check</i> <span>@Model.EntityType&nbsp;</span>
-        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
-        {
-            <a href="@Model.ActionUrl">@Model.EntityName</a>
-        }
-        else
-        {
-            <span>@Model.EntityName</span>
-        }
+   
+    <div class="@( Model.DisplayOperationActionSummary? "notification-panel-firstline" : "notification-panel-oneblock" )">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i>
+       
+            @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+            {
+                <a href="@Model.ActionUrl">@Model.EntityName</a>
+            }
+            else
+            {
+               <span>@Model.EntityName</span> 
+            }
 
-        <span>&nbsp;@Model.OperationAction</span>
-    </span>
-    @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
+            @if (!string.IsNullOrWhiteSpace(Model.EntityType))
+            {
+                <span>&nbsp;@Model.OperationAction</span>
+            }
+
+        </span>
+        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.SecondaryActionUrl))
+        {
+            <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+        {
+            <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
+        }
+    </div>
+
+    @if (Model.DisplayOperationActionSummary)
     {
-        <a href="@Model.SecondaryActionUrl" class="notification-panel-view">@Model.ActionText</a>
+        <div class="notification-panel-summary">
+             <span class="notification-panel-summary-text">  @Model.OperationActionSummaryText </span>                       
+        </div>
     }
-    else if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionUrl))
-    {
-        <a href="@Model.ActionUrl" class="notification-panel-view">@Model.ActionText</a>
-    }
+
 </div>
+ 

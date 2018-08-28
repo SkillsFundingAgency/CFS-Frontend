@@ -294,12 +294,8 @@
             });
 
             validationRequest.always((res: any, msg: string, xhr: JQueryXHR) => {
-                if (xhr.status === 204) {
+                if (xhr.status === 200) {
                     self.handleDatasetValidationSuccess(datasetId);
-                }
-                else if (xhr.status === 200 && res.message.length > 0) {
-                    self.state("idle");
-                    self.handleValidationRequestFailed(res);
                 }
                 else if (res.status === 400) {
                     self.state("idle");

@@ -124,7 +124,7 @@
                     return new BadRequestObjectResult(apiResponse.ModelState);
                 }
 
-                return new InternalServerErrorResult(apiResponse.Content?.Message);
+                return new InternalServerErrorResult("Validate Dataset API response failed with status code: {statusCode}" + apiResponse.StatusCode);
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)

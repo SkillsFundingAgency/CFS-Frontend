@@ -16,6 +16,15 @@
 
         public string SecondaryActionUrl { get; set; }
 
+        public bool DisplayOperationActionSummary { get; set; }
+
+        public string OperationActionSummaryText { get; set; }
+
+        public int CurrentDataSourceRows { get; set; }
+
+        public int PreviousDataSourceRows { get; set; }
+
+
         public BannerType BannerType { get; set; }
     }
 }

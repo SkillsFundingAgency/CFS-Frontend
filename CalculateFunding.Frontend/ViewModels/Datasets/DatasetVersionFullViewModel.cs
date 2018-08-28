@@ -22,5 +22,9 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
         public string Comment { get; set; }
 
         public ReferenceViewModel Author { get; set; }
+
+        public int CurrentDataSourceRows { get; set; }
+
+        public int PreviousDataSourceRows { get; set; }
     }
 }
