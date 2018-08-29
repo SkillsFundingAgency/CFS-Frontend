@@ -82,7 +82,7 @@
                     selectedArray = this.selectedProviderTypes;
                 } else if (fieldName === "providerSubType") {
                     selectedArray = this.selectedProviderSubTypes;
-                } else if (fieldName === "localAuthority") {
+                } else if (fieldName === "authority") {
                     selectedArray = this.selectedLocalAuthorities;
                 }
 
