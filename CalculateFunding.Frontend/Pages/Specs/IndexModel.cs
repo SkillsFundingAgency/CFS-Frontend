@@ -50,18 +50,6 @@
 
             SearchTerm = searchTerm;
 
-            SearchResults = await _searchService.PerformSearch(searchRequest);
-
-            if (SearchResults == null)
-            {
-                return new InternalServerErrorResult("Search results returned null from API call");
-            }
-
-            InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            });
-
             OperationType = operationType;
 
             if (operationType.HasValue)
@@ -71,10 +59,10 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
-
-
                 ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(operationId);
+
                 IActionResult errorResult = specificationResponse.IsSuccessfulOrReturnFailureResult();
+
                 if (errorResult != null)
                 {
                     return errorResult;
@@ -102,6 +90,18 @@
                         break;
                 }
             }
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new InternalServerErrorResult("There was an error retrieving Specifications from the Search Index.");
+            }
+
+            InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            });
 
             return Page();
         }

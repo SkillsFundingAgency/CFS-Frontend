@@ -112,12 +112,23 @@
                 PageBanner = new PageBannerOperation();
                 switch (operationType.Value)
                 {
+                    case PoliciesPageBannerOperationType.SpecificationCreated:
                     case PoliciesPageBannerOperationType.SpecificationUpdated:
                         PageBanner.EntityName = Specification.Name;
                         PageBanner.EntityType = "Specification";
                         PageBanner.OperationAction = "updated";
                         PageBanner.ActionText = "Edit";
                         PageBanner.ActionUrl = $"/specs/editspecification/{Specification.Id}&returnPage=ManagePolicies";
+
+                        if (operationType.Value == PoliciesPageBannerOperationType.SpecificationUpdated)
+                        {
+                            PageBanner.OperationAction = "updated";
+                        }
+                        else if (operationType.Value == PoliciesPageBannerOperationType.SpecificationCreated)
+                        {
+                            PageBanner.OperationAction = "created";
+                        }
+
                         break;
                     case PoliciesPageBannerOperationType.PolicyUpdated:
                     case PoliciesPageBannerOperationType.PolicyCreated:

@@ -363,7 +363,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be("/specs?operationType=SpecificationCreated&operationId=specId");
+                .Be("/specs/policies/specId?operationType=SpecificationCreated&operationId=specId");
         }
 
         private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null)

@@ -9,5 +9,6 @@
         PolicyCreated,
         SubpolicyCreated,
         CalculationCreated,
+        SpecificationCreated,
     }
 }

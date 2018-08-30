@@ -45,13 +45,6 @@
 
             SearchTerm = searchTerm;
 
-            SearchResults = await _searchService.PerformSearch(searchRequest);
-
-            if (SearchResults == null)
-            {
-                return new StatusCodeResult(500);
-            }
-
             OperationType = operationType;
 
             if (operationType.HasValue)
@@ -92,6 +85,13 @@
                         PageBanner.OperationActionSummaryText = "A new version of a data source with "+ PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
                         break;
                 }
+            }
+
+            SearchResults = await _searchService.PerformSearch(searchRequest);
+
+            if (SearchResults == null)
+            {
+                return new InternalServerErrorResult("There was an error retrieving data sources from the Search Index.");
             }
 
             return Page();
