@@ -247,9 +247,9 @@
             //Assert
             result
                 .Should()
-                .BeOfType<StatusCodeResult>();
+                .BeOfType<InternalServerErrorResult>();
 
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
+            InternalServerErrorResult statusCodeResult = result as InternalServerErrorResult;
 
             statusCodeResult
                 .StatusCode

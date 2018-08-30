@@ -65,7 +65,7 @@
             ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
             if (result.StatusCode.IsSuccess())
             {
-                return Redirect($"/specs?operationType=SpecificationCreated&operationId={result.Content.Id}");
+                return Redirect($"/specs/policies/{result.Content.Id}?operationType=SpecificationCreated&operationId={result.Content.Id}");
             }
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {

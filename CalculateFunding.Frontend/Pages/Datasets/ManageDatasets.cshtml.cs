@@ -16,7 +16,6 @@
     {
         private IDatasetSearchService _searchService;
         private readonly IDatasetsApiClient _datasetApiClient;
-        private readonly int _milliseconddelay = 3000;
 
         public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient)
         {
@@ -55,10 +54,6 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
-                if (operationType.Equals(DatasetPageBannerOperationType.DatasetCreated))
-                {
-                    await Task.Delay(_milliseconddelay);
-                }
                 ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
 
                 IActionResult errorResult = datasetVersionResponse.IsSuccessOrReturnFailureResult("Dataset");
@@ -96,7 +91,7 @@
 
             if (SearchResults == null)
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult("Search results returned null from API call");
             }
 
             return Page();

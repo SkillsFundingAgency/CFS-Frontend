@@ -19,7 +19,6 @@
     {
         private readonly ISpecificationSearchService _searchService;
         private readonly ISpecsApiClient _specsClient;
-        private readonly int _milliseconddelay = 3000;
 
         public IndexModel(ISpecificationSearchService specsSearchService, ISpecsApiClient specsClient)
         {
@@ -58,11 +57,6 @@
                 if (string.IsNullOrWhiteSpace(operationId))
                 {
                     return new PreconditionFailedResult("Operation ID not provided");
-                }
-
-                if(operationType.Equals(SpecificationPageBannerOperationType.SpecificationCreated))
-                {
-                    await Task.Delay(_milliseconddelay);
                 }
 
                 ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(operationId);
