@@ -95,7 +95,7 @@
 
             if (SearchResults == null)
             {
-                return new InternalServerErrorResult("Search results returned null from API call");
+                return new InternalServerErrorResult("There was an error retrieving Specifications from the Search Index.");
             }
 
             InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()

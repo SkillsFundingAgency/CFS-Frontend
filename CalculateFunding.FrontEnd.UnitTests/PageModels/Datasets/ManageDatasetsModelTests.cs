@@ -256,6 +256,11 @@
                 .Should()
                 .Be(500);
 
+            statusCodeResult
+                .Value
+                .Should()
+                .Equals("There was an error retrieving data sources from the Search Index.");
+
             await searchService
                 .Received(1)
                 .PerformSearch(Arg.Is<SearchRequestViewModel>(

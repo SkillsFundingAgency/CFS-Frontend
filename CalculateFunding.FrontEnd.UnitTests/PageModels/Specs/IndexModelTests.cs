@@ -272,7 +272,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Which
                 .Value
                 .Should()
-                .Be("Search results returned null from API call");
+                .Be("There was an error retrieving Specifications from the Search Index.");
 
             await searchService
                 .Received(1)

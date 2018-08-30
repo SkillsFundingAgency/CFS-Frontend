@@ -91,7 +91,7 @@
 
             if (SearchResults == null)
             {
-                return new InternalServerErrorResult("Search results returned null from API call");
+                return new InternalServerErrorResult("There was an error retrieving data sources from the Search Index.");
             }
 
             return Page();
