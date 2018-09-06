@@ -1827,6 +1827,11 @@ table {
         border-bottom: 1px solid #fff !important;
     }
 
+    table.cf tbody tr td.expander-container-group-identifier {
+        border-left-width: 2px !important;
+        border-left-color: $grey-1 !important;
+    }
+
     .approvalstatus-button {
         color: #fff;
         border-radius: 0;

@@ -21,11 +21,57 @@
         fundingPeriod: string;
         fundingStream: string;
 
-        results: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
+        pageNumber: KnockoutObservable<number> = ko.observable(0);
+        allPageNumbers: KnockoutObservableArray<number> = ko.observableArray([]);
+        itemsPerPage: number = 4;
+
+        allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
+        filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.computed(function () {
+            return this.allProviderResults();
+        }, this);
+        currentPageResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.computed(function () {
+            let startIndex = this.pageNumber() * this.itemsPerPage;
+            return this.filteredResults().slice(startIndex, startIndex + this.itemsPerPage);
+        }, this);
+
+        totalPages: KnockoutComputed<number> = ko.computed(function () {
+            let totalPages = Math.ceil(this.filteredResults().length / this.itemsPerPage);
+
+            this.allPageNumbers.removeAll();
+            for (let i = 0; i < totalPages; i++) {
+                this.allPageNumbers.push(i + 1);
+            }
+
+            return totalPages;
+        }, this);
+
+        hasPrevious: KnockoutComputed<boolean> = ko.computed(function () {
+            return this.pageNumber() !== 0;
+        }, this);
+
+        hasNext: KnockoutComputed<boolean> = ko.computed(function () {
+            return this.pageNumber() + 1 !== this.totalPages();
+        }, this);
+
+        viewPrevious() {
+            if (this.pageNumber() !== 0) {
+                this.pageNumber(this.pageNumber() - 1);
+            }
+        }
+
+        viewNext() {
+            if (this.pageNumber() < this.totalPages()) {
+                this.pageNumber(this.pageNumber() + 1);
+            }
+        }
+
+        viewPage(parentVM: ViewFundingViewModel, targetPage: number) {
+            return parentVM.pageNumber(targetPage - 1);
+        }
 
         canApprove: KnockoutComputed<boolean> = ko.computed(function () {
-            for (let i = 0; i < this.results().length; i++) {
-                let providerResult = this.results()[i];
+            for (let i = 0; i < this.allProviderResults().length; i++) {
+                let providerResult = this.allProviderResults()[i];
 
                 for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                     let allocationLineResult = providerResult.allocationLineResults()[j];
@@ -41,8 +87,8 @@
         approve() { alert('the approve button is not implemented yet'); }
 
         canPublish: KnockoutComputed<boolean> = ko.computed(function () {
-            for (let i = 0; i < this.results().length; i++) {
-                let providerResult = this.results()[i];
+            for (let i = 0; i < this.allProviderResults().length; i++) {
+                let providerResult = this.allProviderResults()[i];
 
                 for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                     let allocationLineResult = providerResult.allocationLineResults()[j];
@@ -63,57 +109,59 @@
             this.fundingPeriod = "Test Funding Period";
             this.fundingStream = "Test Funding Stream";
 
-            let pOne = new PublishedProviderResultViewModel();
-            pOne.authority = "Authority one";
-            pOne.fundingAmount = 1900000.23;
-            pOne.numberApproved = 1;
-            pOne.numberNew = 1;
-            pOne.numberPublished = 1;
-            pOne.numberUpdated = 1;
-            pOne.providerId = "ProvId1";
-            pOne.providerName = "Provider One";
-            pOne.totalAllocationLines = 4;
-            pOne.ukprn = "UKPRN1";
+            for (let i = 0; i < 10; i++) {
+                let provResult = new PublishedProviderResultViewModel();
+                provResult.authority = "Authority " + i;
+                provResult.fundingAmount = (Math.random() * 1000) + 1;
+                provResult.numberApproved = 1;
+                provResult.numberNew = 1;
+                provResult.numberPublished = 1;
+                provResult.numberUpdated = 1;
+                provResult.providerId = "ProvId" + i;
+                provResult.providerName = "Provider " + i;
+                provResult.totalAllocationLines = 4;
+                provResult.ukprn = "UKPRN" + i;
 
-            let aOne = new PublishedAllocationLineResultViewModel();
-            aOne.allocationLineId = "Alloc1";
-            aOne.allocationLineName = "Allocation Line 1";
-            aOne.fundingAmount = 123000;
-            aOne.status = AllocationLineStatus.New;
-            aOne.version = "0.1";
+                let aOne = new PublishedAllocationLineResultViewModel();
+                aOne.allocationLineId = provResult.providerId + "-Alloc1";
+                aOne.allocationLineName = "Allocation Line 1";
+                aOne.fundingAmount = (Math.random() *100) + 1;
+                aOne.status = AllocationLineStatus.New;
+                aOne.version = "0.1";
 
-            let aTwo = new PublishedAllocationLineResultViewModel();
-            aTwo.allocationLineId = "Alloc2";
-            aTwo.allocationLineName = "Allocation Line 2";
-            aTwo.fundingAmount = 96000;
-            aTwo.status = AllocationLineStatus.Approved;
-            aTwo.version = "0.2";
+                let aTwo = new PublishedAllocationLineResultViewModel();
+                aTwo.allocationLineId = provResult.providerId + "-Alloc2";
+                aTwo.allocationLineName = "Allocation Line 2";
+                aTwo.fundingAmount = (Math.random() * 100) + 1;
+                aTwo.status = AllocationLineStatus.Approved;
+                aTwo.version = "0.2";
 
-            let aThree = new PublishedAllocationLineResultViewModel();
-            aThree.allocationLineId = "Alloc3";
-            aThree.allocationLineName = "Allocation Line 3";
-            aThree.fundingAmount = 50000.23;
-            aThree.status = AllocationLineStatus.Updated;
-            aThree.version = "1.3";
+                let aThree = new PublishedAllocationLineResultViewModel();
+                aThree.allocationLineId = provResult.providerId + "-Alloc3";
+                aThree.allocationLineName = "Allocation Line 3";
+                aThree.fundingAmount = (Math.random() * 100) + 1;
+                aThree.status = AllocationLineStatus.Updated;
+                aThree.version = "1.3";
 
-            let aFour = new PublishedAllocationLineResultViewModel();
-            aFour.allocationLineId = "Alloc4";
-            aFour.allocationLineName = "Allocation Line 4";
-            aFour.fundingAmount = 1631000;
-            aFour.status = AllocationLineStatus.Published;
-            aFour.version = "2.0";
+                let aFour = new PublishedAllocationLineResultViewModel();
+                aFour.allocationLineId = provResult.providerId + "-Alloc4";
+                aFour.allocationLineName = "Allocation Line 4";
+                aFour.fundingAmount = (Math.random() * 100) + 1;
+                aFour.status = AllocationLineStatus.Published;
+                aFour.version = "2.0";
 
-            pOne.allocationLineResults.push(aOne);
-            pOne.allocationLineResults.push(aTwo);
-            pOne.allocationLineResults.push(aThree);
-            pOne.allocationLineResults.push(aFour);
-            this.results.push(pOne);
+                provResult.allocationLineResults.push(aOne);
+                provResult.allocationLineResults.push(aTwo);
+                provResult.allocationLineResults.push(aThree);
+                provResult.allocationLineResults.push(aFour);
+                this.allProviderResults.push(provResult);
+            }
         }
 
         selectAll: KnockoutComputed<boolean> = ko.computed({
             read: function () {
-                for (let i = 0; i < this.results().length; i++) {
-                    let providerResult = this.results()[i];
+                for (let i = 0; i < this.filteredResults().length; i++) {
+                    let providerResult = this.filteredResults()[i];
                     for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                         let allocationLineResult = providerResult.allocationLineResults()[j];
                         if (!allocationLineResult.isSelected()) {
@@ -125,7 +173,7 @@
                 return true;
             },
             write: function (newValue) {
-                ko.utils.arrayForEach(this.results(), function (providerResult: PublishedProviderResultViewModel) {
+                ko.utils.arrayForEach(this.filteredResults(), function (providerResult: PublishedProviderResultViewModel) {
                     ko.utils.arrayForEach(providerResult.allocationLineResults(), function (allocationLineResult: PublishedAllocationLineResultViewModel) {
                         allocationLineResult.isSelected(newValue);
                     })
