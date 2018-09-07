@@ -19,13 +19,13 @@
 
 @section BannerWhole {
     <div style="display: inline-block">
-        <h2 class="hero-title-level2"data-bind="text: fundingPeriod"></h2>
-        <h1 class="hero-title-skinny"data-bind="text: specificationName"></h1>
-        <h3 class="hero-title-level3"data-bind="text: fundingStream"></h3>
+        <h2 class="hero-title-level2" data-bind="text: fundingPeriod"></h2>
+        <h1 class="hero-title-skinny" data-bind="text: specificationName"></h1>
+        <h3 class="hero-title-level3" data-bind="text: fundingStream"></h3>
     </div>
     <div id="viewfunding-page-buttons" style="display: inline-block; vertical-align: middle;">
-        <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: approve">Approve</button>
-        <button id="publish" class="button approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: publish">Publish</button>
+        <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
+        <button id="publish" class="button approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: confirmPublish">Publish</button>
     </div>
 }
 
@@ -98,7 +98,7 @@
                 <th rowspan="2" class="valign-top">
                     <div>Provider name</div>
                     <div class="spacing-15-top">
-                        <input type="checkbox" id="selectAll" value="true" data-bind="checked: selectAll"/> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
+                        <input type="checkbox" id="selectAll" value="true" data-bind="checked: selectAll" /> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
                     </div>
                 </th>
                 <th rowspan="2" class="valign-top text-center">UKPRN</th>
@@ -130,8 +130,8 @@
             </tr>
             <tr class="expander-container">
                 <td colspan="9" class="expander-container-group-identifier">
-                    <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading results</span>
-                    <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading results</span>
+                    <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
+                    <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading test results</span>
                     <span class="inline-list qa-coverage-container" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'loaded'">
                         <span class="inline-list-item"><span class="highlight-title">QA test coverage:</span> <span class="data-qa-coverage" data-bind="text: qaTestResults() != null ? qaTestResults().testCoverage : ''"></span></span>
                         <span class="inline-list-item"><span class="highlight-title">QA test passes:</span> <span class="data-qa-passed" data-bind="text: qaTestResults() != null ? qaTestResults().passed : ''"></span>/<span class="data-qa-totaltests" data-bind="text: qaTestResults() != null ? qaTestResults().failed + qaTestResults().ignored + qaTestResults().passed : ''"></span></span>
@@ -187,12 +187,12 @@
         </tbody>
 
     </table>
-
+    
     <div class="pager">
         <ul class="pagination">
             <li data-bind="css: hasPrevious ? '' : 'disabled'"><a href="#" data-bind="click: viewPrevious">&laquo;</a></li>
             <!-- ko foreach: allPageNumbers -->
-            <li><a href="#" data-bind="text: $data, click: $parent.viewPage($root, $data), css: $parent.pageNumber() + 1 == $data ? 'active' : ''"></a></li>
+            <li><a href="#" data-bind="text: $data, click: function (){ $parent.viewPage($root, $data); }, css: $parent.pageNumber() + 1 == $data ? 'active' : ''"></a></li>
             <!-- /ko-->
             <li data-bind="css: hasNext ? '' : 'disabled'"><a href="#" data-bind="click:viewNext">&raquo;</a></li>
         </ul>
