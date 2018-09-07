@@ -56,7 +56,7 @@
 
         /** Is there a page after the current one */
         hasNext: KnockoutComputed<boolean> = ko.pureComputed(function () {
-            return this.pageNumber() + 1 !== this.totalPages();
+            return this.pageNumber() + 1 !== this.allPageNumbers().length;
         }, this);
 
         /** Move to the previous page */
