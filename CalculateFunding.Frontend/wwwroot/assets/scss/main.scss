@@ -168,6 +168,19 @@ blockquote {
     font-weight: bold;
 }
 
+.hero-title-skinny {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.hero-title-level2 {
+    font-size: 28px;
+}
+
+.hero-title-level3 {
+    font-size: 20px;
+}
+
 .hero-description {
     font-size: 24px;
     margin-bottom: 15px;
@@ -1812,6 +1825,11 @@ table {
 .viewfunding-page-container {
     table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
         border-bottom: 1px solid #fff !important;
+    }
+
+    table.cf tbody tr td.expander-container-group-identifier {
+        border-left-width: 2px !important;
+        border-left-color: $grey-1 !important;
     }
 
     .approvalstatus-button {

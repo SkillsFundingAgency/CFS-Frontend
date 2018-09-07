@@ -20,6 +20,7 @@
     <None Remove="Scripts\approvals.choose.ts" />
     <None Remove="Scripts\approvals.confirm.ts" />
     <None Remove="Scripts\approvals.viewfunding.ts" />
+    <None Remove="Scripts\approvals.viewfunding2.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
@@ -130,6 +131,7 @@
     <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
     <TypeScriptCompile Include="Scripts\approvals.confirm.ts" />
     <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
+    <TypeScriptCompile Include="Scripts\approvals.viewfunding2.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
