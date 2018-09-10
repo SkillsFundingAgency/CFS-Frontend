@@ -173,12 +173,8 @@ blockquote {
     font-weight: bold;
 }
 
-.hero-title-level2 {
-    font-size: 28px;
-}
-
-.hero-title-level3 {
-    font-size: 20px;
+.hero-description-skinny {
+    font-size: 24px;
 }
 
 .hero-description {
@@ -1822,6 +1818,42 @@ table {
     }
 }
 
+.viewfunding-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    .viewfunding-page-buttons {
+        display: flex;
+        align-items: center;
+        align-content: center;
+        width: 200px;
+        justify-content: flex-end;
+
+        .approvalstatus-button {
+            color: #fff;
+            border-radius: 0;
+            border: 1px solid #fff;
+            padding: 10px 30px;
+            transition: background-color ease-in-out 0.3s;
+        }
+
+        .approvalstatus-button:disabled {
+            background-color: $grey-2;
+            cursor: not-allowed;
+        }
+
+        .approvalstatus-button-approve {
+            margin-right: 15px;
+            background-color: $turquoise;
+        }
+
+        .approvalstatus-button-publish {
+            background-color: $grass-green;
+        }
+    }
+}
+
 .viewfunding-page-container {
     table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
         border-bottom: 1px solid #fff !important;
@@ -1832,6 +1864,7 @@ table {
         border-left-color: $grey-1 !important;
     }
 
+    /* todo: remove these once new view funding paging replaces current one*/
     .approvalstatus-button {
         color: #fff;
         border-radius: 0;
@@ -1853,6 +1886,56 @@ table {
     .approvalstatus-button-publish {
         margin-right: 30px;
         background-color: $grass-green;
+    }
+    /* end todo */
+
+    .affix {
+        top: 0;
+        z-index: 9999 !important;
+    }
+
+    .table-filter-container.affix {
+        width: 1141px;
+    }
+
+    table.cf > thead.affix {
+        top: 109px;
+        width: 1141px;
+        padding: 0;
+        z-index: 9999 !important;
+    }
+
+    table.cf > thead.affix > tr > th {
+        min-width: unset;
+        padding: 5px;
+    }
+
+    .affix + .container-fluid {
+        padding-top: 70px;
+    }
+
+    .provider-column {
+        width: 500px;
+    }
+
+    .ukprn-column {
+        width: 110px;
+    }
+
+    .allocation-line-column {
+        width: 340px;
+    }
+
+    .status-column {
+        width: 85px;
+    }
+
+    .funding-total-column {
+        width: 150px;
+    }
+
+    .expander-column {
+        width: 45px;
     }
 }
 

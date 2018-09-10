@@ -20,6 +20,8 @@
             this.currentPageResults.extend({ deferred: true });
         }
 
+        pageState: KnockoutObservable<string> = ko.observable("initial");
+
         specificationId: string;
         specificationName: string;
         fundingPeriod: string;
@@ -56,7 +58,7 @@
 
         /** Is there a page after the current one */
         hasNext: KnockoutComputed<boolean> = ko.pureComputed(function () {
-            return this.pageNumber() + 1 !== this.totalPages();
+            return this.pageNumber() + 1 !== this.allPageNumbers().length;
         }, this);
 
         /** Move to the previous page */
@@ -181,6 +183,7 @@
             }
 
             this.allProviderResults(tempArray);
+            this.pageState("main");
         }
 
         /** This provides a shortcut to evaluating the UI for performing the select all operation */
