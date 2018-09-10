@@ -20,6 +20,8 @@
             this.currentPageResults.extend({ deferred: true });
         }
 
+        pageState: KnockoutObservable<string> = ko.observable("initial");
+
         specificationId: string;
         specificationName: string;
         fundingPeriod: string;
@@ -181,6 +183,7 @@
             }
 
             this.allProviderResults(tempArray);
+            this.pageState("main");
         }
 
         /** This provides a shortcut to evaluating the UI for performing the select all operation */
