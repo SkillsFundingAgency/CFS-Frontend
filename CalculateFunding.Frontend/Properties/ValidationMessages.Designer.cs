@@ -61,6 +61,33 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select funding period.
+        /// </summary>
+        internal static string ApproveAndPublishFundingPeriodRequired {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishFundingPeriodRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select funding stream.
+        /// </summary>
+        internal static string ApproveAndPublishFundingStreamRequired {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishFundingStreamRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select specification.
+        /// </summary>
+        internal static string ApproveAndPublishSpecificationRequired {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishSpecificationRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select an allocation line.
         /// </summary>
         internal static string CalculationAllocationLineRequired {

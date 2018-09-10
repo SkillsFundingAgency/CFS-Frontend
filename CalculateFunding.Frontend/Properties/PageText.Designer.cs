@@ -61,6 +61,24 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Approve and publish funding.
+        /// </summary>
+        public static string ApproveAndPublishFunding {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishFunding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Approve and publish chosen specification.
+        /// </summary>
+        public static string ApproveAndPublishFundingDescr {
+            get {
+                return ResourceManager.GetString("ApproveAndPublishFundingDescr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Assign dataset schema for calculation specfication.
         /// </summary>
         public static string AssignDatasetSchemaText {

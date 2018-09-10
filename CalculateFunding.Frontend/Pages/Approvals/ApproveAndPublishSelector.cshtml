@@ -1,0 +1,84 @@
+﻿@page
+@using CalculateFunding.Frontend.Properties
+@model ApproveAndPublishSelectorPageModel
+@{
+    ViewData["Title"] = "Approve and publish funding";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/">@BreadcrumbText.FundingApprovals</a></li>
+            <li>@BreadcrumbText.ApproveAndPublishFunding</li>
+
+        </ol>
+    </div>
+}
+@section FormBannerLeft{
+    <h1 class="hero-title">@PageText.ApproveAndPublishFunding</h1>
+    <p class="hero-description">@PageText.ApproveAndPublishFundingDescr</p>
+}
+
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        <form method="post" class="form">
+            <div gds-validation-summary="All"></div>
+
+            <div>
+                <a validationanchor-for="ApproveAndPublishSelectorViewModel.FundingPeriodId"></a>
+
+                <div gds-validationblock-for="ApproveAndPublishSelectorViewModel.FundingPeriodId">
+                    <div class="form-group">
+                        <a validationanchor-for="ApproveAndPublishSelectorViewModel.FundingPeriodId"></a>
+                        <label asp-for="ApproveAndPublishSelectorViewModel.FundingPeriodId">Select funding period</label>
+                        <select asp-items="Model.FundingPeriods" gds-for="ApproveAndPublishSelectorViewModel.FundingPeriodId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div gds-validationblock-for="ApproveAndPublishSelectorViewModel.SpecificationId">
+                    <div class="form-group">
+                        <a validationanchor-for="ApproveAndPublishSelectorViewModel.SpecificationId"></a>
+                        <label asp-for="ApproveAndPublishSelectorViewModel.SpecificationId">Select specification</label>
+                        <select asp-items="Model.Specifications" gds-for="ApproveAndPublishSelectorViewModel.SpecificationId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div gds-validationblock-for="ApproveAndPublishSelectorViewModel.FundingStreamId">
+                    <div class="form-group">
+                        <a validationanchor-for="ApproveAndPublishSelectorViewModel.FundingStreamId"></a>
+                        <label asp-for="ApproveAndPublishSelectorViewModel.FundingStreamId">Select funding stream</label>
+                        <select asp-items="Model.FundingStreams" gds-for="ApproveAndPublishSelectorViewModel.FundingStreamId" class="form-control">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <p class="form-submit-container"><button type="submit" class="button" id="ViewFunding">View funding</button> </p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>    
+}
+
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/select2.min.css" />
+}

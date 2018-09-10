@@ -153,4 +153,10 @@
   <data name="SpecificationRelationshipDescr" xml:space="preserve">
     <value>Create a dataset from a data source file.</value>
   </data>
+  <data name="ApproveAndPublishFunding" xml:space="preserve">
+    <value>Approve and publish funding</value>
+  </data>
+  <data name="ApproveAndPublishFundingDescr" xml:space="preserve">
+    <value>Approve and publish chosen specification</value>
+  </data>
 </root>
