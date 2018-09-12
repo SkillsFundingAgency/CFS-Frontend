@@ -94,5 +94,7 @@
         Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
 
         Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId);
+
+	    Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId);
     }
 }
