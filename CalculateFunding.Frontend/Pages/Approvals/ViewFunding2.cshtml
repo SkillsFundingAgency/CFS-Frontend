@@ -38,6 +38,14 @@
 }
 
     <div class="viewfunding-page-container" id="viewfunding-page-container">
+        <div class="row view-funding-page-refresh-holder" style="display: none" data-bind="visible: isLoadingVisible">
+            <div class="col-xs-12 view-funding-page-refresh">
+                <p class="h4-heading"><strong>Refreshing funding values for providers</strong></p>
+                <p>Please wait, this may take several minutes.</p>
+                <img src="~/assets/images/loader.gif" />
+                <div><span data-bind="text: percentageCompleteOfCalculation" /></div>
+            </div>
+        </div>
         <div data-bind="visible: notificationMessage(), css: notificationStatus() === 'error' ? 'notification-panel-error' : 'notification-panel'">
             <span data-bind="css: notificationStatus() === 'error' ? 'notification-panel-error-text' : 'notification-panel-text'">
                 <i class="material-icons" data-bind="text: notificationStatus() === 'error' ? 'error' : 'check'">check</i> <span data-bind="text: notificationMessage"></span>
@@ -52,6 +60,15 @@
 
         </div>
         <div data-bind="visible: pageState() === 'main'">
+            <div class="row">
+                <div class="col-xs-12">
+                    <button class="float-right refresh-btn" type="button" data-bind="click: refreshFundingSnapshot">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        <span>Refresh funding</span>
+                    </button>
+
+                </div>
+            </div>
             <div class="table-filter-container" data-spy="affix" data-offset-top="300">
                 <div class="row">
                     <div class="col-xs-2">
@@ -415,8 +432,8 @@
             "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
             "approveAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
-            "publishAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus"
-        
+            "publishAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
+            "executeCalculationUrl": "/api/specs/execute-calculations?={specificationIds}"
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
         vfVM.loadResults();

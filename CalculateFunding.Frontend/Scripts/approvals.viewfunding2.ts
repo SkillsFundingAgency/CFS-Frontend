@@ -14,6 +14,11 @@
                 throw "Settings must contain the test scenario query url";
             }
 
+            else if (typeof settings.executeCalculationUrl !== "undefined" &&
+                settings.executeCalculationUrl === null) {
+                throw "Settings must contain the execute calculation url";
+            }
+
             this.settings = settings;
 
             // Defer updates on the array of items being bound to the page, so updates don't constantly to the UI and slow things down
@@ -22,9 +27,12 @@
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
         workingMessage: KnockoutObservable<string> = ko.observable(null);
+        isLoadingVisible: KnockoutObservable<boolean> = ko.observable(false);
 
         notificationMessage: KnockoutObservable<string> = ko.observable(null);
         notificationStatus: KnockoutObservable<string> = ko.observable();
+
+        percentageCompleteOfCalculation: KnockoutObservable<number> = ko.observable(0);
 
         specificationId: string;
         specificationName: string;
@@ -400,6 +408,90 @@
                     });
             }
         }
+
+        public refreshFundingSnapshot(): void {
+            this.isLoadingVisible(true);
+            let executeCalcRequest = $.ajax({
+                url: this.settings.executeCalculationUrl.replace("{specificationIds}", "abc123"),
+                dataType: "json",
+                method: "POST",
+                contentType: "application/json"
+            });
+
+            executeCalcRequest.fail((response) => {
+                alert("Something went wrong during refresh funding snapshot");
+            });
+
+            executeCalcRequest.done((response) => {
+                if (response.status === 200) {
+                    this.pollCalculationProgress();
+                }
+                else {
+                    throw new Error("Unexpected status returned");
+                }
+            });
+        }
+
+        private pollCalculationProgress() {
+            window.setTimeout(() => {
+                let checkRefreshStateResponse = $.ajax({
+                    url: "/api/specs/dmitrisendpoint?specificationIds=" + this.specificationId,
+                    dataType: "json",
+                    method: "POST",
+                    contentType: "application/json"
+                });
+
+                checkRefreshStateResponse.always((response) => {
+                    this.updateRefreshProgressInUI(
+                        this.dataToSpecificationExecutionStatus(
+                            this.dataToSpecificationExecutionStatus(response.data)));
+                });
+
+            },30);
+        }
+
+        private dataToSpecificationExecutionStatus(data: any) : SpecificationExecutionStatus {
+            return new SpecificationExecutionStatus(data.specificationId, data.percentageCompleted, data.calculationProgress);
+        }
+
+        private updateRefreshProgressInUI(specificationExecutionStatus: SpecificationExecutionStatus) {
+            if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.InProgress
+                || specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
+                alert("code to update refresh number");
+                this.percentageCompleteOfCalculation(specificationExecutionStatus.percentageCompleted);
+                this.pollCalculationProgress();
+            }
+            else if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.Error) {
+                alert("Error, something went wrong")
+            }
+            else if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.Finished) {
+                this.percentageCompleteOfCalculation(specificationExecutionStatus.percentageCompleted);
+                this.isLoadingVisible(false);
+                alert("Success");
+            }
+        }
+    }
+
+
+
+    /** Progression result for a specification */
+    class SpecificationExecutionStatus {
+        specificationId: string;
+        percentageCompleted: number;
+        calculationProgressStatus: CalculationProgressStatus;
+
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus) {
+            this.specificationId = specificationId;
+            this.percentageCompleted = percentageCompleted;
+            this.calculationProgressStatus = calculationProgressStatus;
+        }
+    }
+
+    enum CalculationProgressStatus {
+        NotStarted,
+        InProgress,
+        Error,
+        Finished
     }
 
     /** A published provider result */
@@ -489,6 +581,7 @@
         antiforgeryToken: string;
         approveAllocationLinesUrl: string;
         publishAllocationLinesUrl: string;
+        executeCalculationUrl: string;
     }
 
     /** The response of retrieving qa results */

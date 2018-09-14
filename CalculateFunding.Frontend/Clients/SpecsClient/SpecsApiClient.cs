@@ -247,5 +247,13 @@
             
             return PostAsync($"select-for-funding?specificationId={specificationId}");
         }
+
+	    public Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId)
+	    {
+			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+		    return PostAsync<SpecificationCalculationExecutionStatusModel, string>(
+			    $"execute-calculations?specificationIds={specificationId}", specificationId);
+	    }
     }
 }
