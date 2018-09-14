@@ -122,7 +122,9 @@
             });
 
             self.isViewFundingButtonEnabled = ko.computed(() => {
-                let isEnabled = (self.selectedFundingStream() !== undefined && self.selectedFundingStream().length > 0);
+                let isEnabled = (self.selectedFundingStream() !== undefined && self.selectedFundingStream().length > 0
+                    && self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().length > 0
+                    && self.selectedSpecification() !== undefined && self.selectedSpecification().length > 0);
 
                 return isEnabled;
             });
