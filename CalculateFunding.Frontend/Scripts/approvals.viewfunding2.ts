@@ -3,6 +3,19 @@
     export class ViewFundingViewModel {
         private settings: IViewFundingSettings;
 
+        public isViewFundingButtonEnabled: KnockoutComputed<boolean>;
+
+        public isLoadingVisible: KnockoutComputed<boolean>;
+
+        public state: KnockoutObservable<string> = ko.observable("idle");
+
+        /** Included to cater for Approve and Publish selector feature */
+        public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray(); 
+         
+        public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
+
+        public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
+ 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
                 throw "Settings must be provided to the view funding view model";
@@ -13,20 +26,89 @@
             else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
                 throw "Settings must contain the test scenario query url";
             }
+            else if(typeof settings.fundingPeriodUrl !== "undefined" && settings.fundingPeriodUrl === null) {
+                throw "Settings must contain the funding period query url";
+            } 
+            else if(typeof settings.fundingStreamsUrl !== "undefined" && settings.fundingStreamsUrl === null) {
+                throw "Settings must contain the fuding streams query url";
+            } 
+            else if(typeof settings.specificationsUrl !== "undefined" && settings.specificationsUrl === null){
+                throw "Settings must contain the specifications query url";
+            }
 
-            this.settings = settings;
-
+            let self = this;
+            self.settings = settings;
+            
             // Defer updates on the array of items being bound to the page, so updates don't constantly to the UI and slow things down
-            this.currentPageResults.extend({ deferred: true });
+            self.currentPageResults.extend({ deferred: true });
+
+            //Included for ApproveandPublishSelection 
+            
+            /** Request to get the funding periods */
+            self.pageState() == "initial";
+            let fundingPeriodRequest = $.ajax({
+                url: this.settings.fundingPeriodUrl,
+                dataType: "json",
+                method: "get",
+                contentType: "application/json",              
+            }).done(function (response)
+            {
+                let newPeriodArray = Array<FundingPeriodResponse>();
+                ko.utils.arrayForEach(response, function(item : any){
+                    var x = new FundingPeriodResponse(item.id, item.name);
+                    newPeriodArray.push(x) ;                  
+                });
+                self.FundingPeriods(newPeriodArray); 
+            }) 
+
+            this.selectedFundingPeriod.subscribe(function () {
+                if (self.selectedFundingPeriod !== null && self.selectedFundingPeriod() !== "Select") {
+
+                    /** Load Specifications in the specification dropdown */
+
+                    let getSpecificationForSelectedPeriodUrl = self.settings.specificationsUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
+
+                    let specificationRequest = $.ajax({
+                        url: getSpecificationForSelectedPeriodUrl,
+                        dataType: "json",
+                        method: "get",
+                        contentType: "application/json", 
+                    }).done(function (response)
+                        {
+                            let newSpecificationArray = Array<SpecificationResponse>();                       
+                            ko.utils.arrayForEach(response, function(item:any){
+                            var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
+                            newSpecificationArray.push(y);                  
+                        });
+                        self.Specifications(newSpecificationArray); 
+                    }) 
+                }
+            });  
+          
+            self.selectedSpecification.subscribe(function () {
+                if (self.selectedSpecification() !== undefined && self.selectedFundingPeriod() !== "Select") {       
+                    let newFundingStreamArray = Array<FundingStreamResponse>();
+                    let spec = ko.utils.arrayFirst(self.Specifications(), function (item: SpecificationResponse) {
+                        return (item.id === self.selectedSpecification());
+                    });
+                    self.FundingStreams(spec.fundingstreams);               
+                }
+            }); 
+
+            self.isViewFundingButtonEnabled = ko.computed(() =>{
+                let isEnabled = ( this.selectedFundingStream.length > 0 ); 
+                return isEnabled;            
+            });
+
         }
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
 
         specificationId: string;
-        specificationName: string;
-        fundingPeriod: string;
-        fundingStream: string;
-
+        selectedSpecification: KnockoutObservable<string> = ko.observable("");
+        selectedFundingPeriod: KnockoutObservable<string> = ko.observable("");
+        selectedFundingStream: KnockoutObservable<string> = ko.observable("");
+  
         pageNumber: KnockoutObservable<number> = ko.observable(0);
         itemsPerPage: number = 500;
 
@@ -125,9 +207,9 @@
         /** Load results given the initial filter criteria */
         loadResults() {
             this.specificationId = "abc1";
-            this.specificationName = "Selected Specification ABC";
-            this.fundingPeriod = "Test Funding Period";
-            this.fundingStream = "Test Funding Stream";
+            //this.selectedSpecification;
+           // this.fundingPeriod = "Test Funding Period";
+           // this.fundingStream = "Test Funding Stream";
 
             let tempArray: Array < PublishedProviderResultViewModel > =[];
 
@@ -248,6 +330,19 @@
                     });
             }
         }
+
+        /** On click of the button, validate form and search funding if valid */
+        public viewFunding(): void {
+            if(this.state() !== "idle")
+                return;
+
+            let data = {
+                fundingperiod: this.selectedFundingPeriod,
+                fundingstream: this.selectedFundingStream,
+                specification: this.selectedSpecification
+            }
+
+        }
     }
 
     /** A published provider result */
@@ -335,6 +430,9 @@
         testScenarioQueryUrl: string;
         viewFundingPageUrl: string;
         antiforgeryToken: string;
+        fundingPeriodUrl: string;
+        specificationsUrl: string;
+        fundingStreamsUrl: string;
     }
 
     /** The response of retrieving qa results */
@@ -344,4 +442,50 @@
         ignored: number;
         testCoverage: number;
     }
+   
+    /** Funding period dropdown options */
+    export class FundingPeriodResponse {
+        constructor(id:string, value:string)
+        {
+          this.id = id;
+          this.value = value;  
+        }
+        id: string;
+        value: string;
+    }
+
+   
+    /** Specification dropdown options  */
+    export class SpecificationResponse {
+        constructor(id: string, value: string, fundingStreams: Array<any>)
+        {
+            this.id = id;
+            this.value = value;
+            this.fundingstreams = fundingStreams; 
+        }
+        id: string;
+        value: string;
+        fundingstreams: Array<FundingStreamResponse>;
+    }
+
+   
+    /** Funding stream dropdown options  */
+
+    export class FundingStreamResponse{
+        constructor(id:string, name:string)
+        {
+          this.id = id;
+          this.name = name;  
+        }
+        id: string;
+        name: string;
+    }
+
+  
+     export interface IViewFundingSelectorModelState{
+        FundingPeriod: string;
+        Specification: string;
+        FundingStream: string;
+    }
+
 }

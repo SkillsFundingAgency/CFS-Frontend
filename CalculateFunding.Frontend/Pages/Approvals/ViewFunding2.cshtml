@@ -12,7 +12,7 @@
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
             <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-            <li data-bind="text: specificationName"></li>
+            <li data-bind="text: selectedSpecification"></li>
         </ol>
     </div>
 }
@@ -20,9 +20,9 @@
 @section BannerWhole {
     <div class="viewfunding-page-header spacing-15">
         <div>
-            <h2 class="hero-description-skinny" data-bind="text: fundingPeriod"></h2>
-            <h1 class="hero-title-skinny" data-bind="text: specificationName"></h1>
-            <h3 class="hero-text" data-bind="text: fundingStream"></h3>
+            <h2 class="hero-description-skinny" data-bind="text: selectedFundingPeriod"></h2>
+            <h1 class="hero-title-skinny" data-bind="text: selectedSpecification"></h1>
+            <h3 class="hero-text" data-bind="text: selectedFundingStream"></h3>
         </div>
         <div class="viewfunding-page-buttons">
             <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
@@ -33,52 +33,104 @@
 }
 
 <div class="viewfunding-page-container" id="viewfunding-page-container">
-    <div data-bind="visible: pageState() === 'initial'">
+    <div data-bind="visible: pageState() === 'initial'" class="row">
+        <div class="col-sm-9 col-md-6">
+            <div gds-validation-summary="All"></div>
 
-    </div>
-    <div data-bind="visible: pageState() === 'main'">
-        <div class="table-filter-container" data-spy="affix" data-offset-top="300">
-            <div class="row">
-                <div class="col-xs-2">
-                    <div class="bold">Allocation line</div>
-                    <div>
-                        <select id="allocationLineFilter">
-                            <option>Todo...</option>
-                        </select>
+            <div>
+                <a validationanchor-for="viewFundingVeiwModel.FundingPeriodId"></a>
+                <div gds-validationblock-for="viewFundingVeiwModel.FundingPeriodId">
+                    <label>Select funding period:</label>
+                    <div class="form-group">
+                        <select id="fundingperiod" data-bind="options: FundingPeriods, optionsText: 'value', optionsValue: 'id',  value:selectedFundingPeriod, optionsCaption: 'Select'"></select>
                     </div>
-                </div>
-                <div class="col-xs-2">
-                    <div class="bold">Provider Type</div>
-                    <div>
-                        <select id="providerTypeFilter">
-                            <option>Todo...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-xs-2">
-                    <div class="bold">Local Authority</div>
-                    <div>
-                        <select id="localAuthorityFilter">
-                            <option>Todo...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-xs-2">
-                    <div class="bold">Status</div>
-                    <div>
-                        <select id="statusFilter">
-                            <option>Todo...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-xs-2">
-                    <div><a href="#">Clear filters</a></div>
-                </div>
-                <div class="col-xs-2">
-                    <div>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <strong data-bind="text: filteredResults().length"></strong> providers</div>
                 </div>
             </div>
+
+            <div>
+                <div gds-validationblock-for="viewFundingVeiwModel.SpecificationId">
+                    <div class="form-group">
+                        <a validationanchor-for="viewFundingVeiwModel.SpecificationId"></a>
+                        <label >Select specification:</label>
+                        <div class="form-group">
+                            <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select'"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div gds-validationblock-for="viewFundingVeiwModel.FundingStreamId">
+                    <div class="form-group">
+                        <a validationanchor-for="viewFundingVeiwModel.FundingStreamId"></a>
+                        <label>Select funding stream:</label>
+                        <div class="form-group">
+                            <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select'"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <p class="form-submit-container"><button type="button" class="button" id="ViewFunding" data-bind="click: viewFunding, enable: isViewFundingButtonEnabled">View funding</button> </p>
+                </div>
+            </div>
+
+            <div id="view-funding-wait-control" style="display:none; text-align:center"  class="col-sm-9 col-md-6">
+                <p class="h4-heading"><strong>Search is progressing</strong></p>
+                <p>This may take a minute or so, please bear with us.</p>
+                 <img src="~/assets/images/loader.gif" />
+            </div>
         </div>
+    </div>
+        <div data-bind="visible: pageState() === 'main'">
+            <div class="table-filter-container" data-spy="affix" data-offset-top="300">
+                <div class="row">
+                    <div class="col-xs-2">
+                        <div class="bold">Allocation line</div>
+                        <div>
+                            <select id="allocationLineFilter">
+                                <option>Todo...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="bold">Provider Type</div>
+                        <div>
+                            <select id="providerTypeFilter">
+                                <option>Todo...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="bold">Local Authority</div>
+                        <div>
+                            <select id="localAuthorityFilter">
+                                <option>Todo...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="bold">Status</div>
+                        <div>
+                            <select id="statusFilter">
+                                <option>Todo...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div><a href="#">Clear filters</a></div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <strong data-bind="text: filteredResults().length"></strong> providers</div>
+                    </div>
+                </div>
+            </div>       
         <table class="cf">
             <thead data-spy="affix" data-offset-top="300">
                 <tr>
@@ -203,10 +255,12 @@
         var settings = {
             "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
             "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
-            "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()"
+            "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
+            "fundingPeriodUrl": "/api/specs/funding-periods", 
+            "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
+            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
-        vfVM.loadResults();
         ko.applyBindings(vfVM);
     </script>
 }

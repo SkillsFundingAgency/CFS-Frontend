@@ -21,7 +21,7 @@ namespace CalculateFunding.Frontend.Controllers
             _specsClient = specsApiClient;
         }
 
-        [Route("api/specifications-by-period/{periodId}")]
+        [Route("api/specifications-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsByFundingPeriod(string fundingPeriodId)
         {
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
@@ -35,7 +35,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult((int)apiResponse.StatusCode);
             }
 
-            if(apiResponse.Content == null)
+            if (apiResponse.Content == null)
             {
                 return new ObjectResult("List of Specifications was null")
                 {
@@ -51,7 +51,54 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(result);
+
         }
+
+        [Route("api/specs/funding-periods")]
+        public async Task<IActionResult> GetFundingPeriods()
+        {
+            ApiResponse<IEnumerable<Reference>> response = await _specsClient.GetFundingPeriods();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+
+        }
+
+        [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]  
+        public async Task<IActionResult> GetSpecificationsForFundingByPeriod(string fundingPeriodId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFundingByPeriod(fundingPeriodId);
+
+            if (apiResponse == null)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return new StatusCodeResult((int)apiResponse.StatusCode);
+            }
+
+            if (apiResponse.Content == null)
+            {
+                return new ObjectResult("List of Specifications was null")
+                {
+                    StatusCode = 500,
+                };
+            }
+
+            return Ok(apiResponse.Content.OrderBy(c => c.Name));
+
+        }
+
 
 
         [Route("api/specs/{specificationId}/status")]
@@ -91,5 +138,7 @@ namespace CalculateFunding.Frontend.Controllers
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
             }
         }
+
+        
     }
 }
