@@ -1939,6 +1939,127 @@ table {
     }
 }
 
+table {
+    tr {
+        .fixed-width-330 {
+            width: 330px;
+        }
+    }
+
+    .nobottomborder {
+        border-bottom: 0px !important;
+    }
+
+    .topborderonly {
+        border-top: 1px solid #ccc !important;
+        border-bottom: 0px !important;
+    }
+}
+
+.confirmapproval-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmapproval-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmapproval-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-warning {
+        margin-top: 30px;
+
+        .confirmapproval-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmapproval-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
+    }
+}
+
+.confirmpublish-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc !important;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmpublish-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmpublish-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-warning {
+        margin-top: 30px;
+
+        .confirmpublish-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmpublish-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
+    }
+}
+
 @import "_tablelayout.scss";
 @import "_pageheaders.scss";
 @import "_statusElements.scss";
