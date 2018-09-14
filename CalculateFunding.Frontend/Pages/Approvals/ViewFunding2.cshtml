@@ -35,41 +35,32 @@
 <div class="viewfunding-page-container" id="viewfunding-page-container">
     <div data-bind="visible: pageState() === 'initial'" class="row">
         <div class="col-sm-9 col-md-6">
-            <div gds-validation-summary="All"></div>
-
-            <div>
-                <a validationanchor-for="viewFundingVeiwModel.FundingPeriodId"></a>
-                <div gds-validationblock-for="viewFundingVeiwModel.FundingPeriodId">
+            <div >
+                <div class="form-group">
                     <label>Select funding period:</label>
                     <div class="form-group">
                         <select id="fundingperiod" data-bind="options: FundingPeriods, optionsText: 'value', optionsValue: 'id',  value:selectedFundingPeriod, optionsCaption: 'Select'"></select>
                     </div>
                 </div>
-            </div>
+             </div>
 
-            <div>
-                <div gds-validationblock-for="viewFundingVeiwModel.SpecificationId">
-                    <div class="form-group">
-                        <a validationanchor-for="viewFundingVeiwModel.SpecificationId"></a>
-                        <label >Select specification:</label>
+            <div data-bind="">
+                     <div class="form-group">
+                         <label >Select specification:</label>
                         <div class="form-group">
-                            <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select'"></select>
+                            <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
                         </div>
                     </div>
-                </div>
-            </div>
+             </div>
 
             <div>
-                <div gds-validationblock-for="viewFundingVeiwModel.FundingStreamId">
                     <div class="form-group">
-                        <a validationanchor-for="viewFundingVeiwModel.FundingStreamId"></a>
-                        <label>Select funding stream:</label>
+                         <label>Select funding stream:</label>
                         <div class="form-group">
-                            <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select'"></select>
+                            <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
                         </div>
                     </div>
-                </div>
-            </div>
+             </div>
 
             <div>
 

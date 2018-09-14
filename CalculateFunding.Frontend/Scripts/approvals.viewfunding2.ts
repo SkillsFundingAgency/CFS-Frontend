@@ -5,6 +5,10 @@
 
         public isViewFundingButtonEnabled: KnockoutComputed<boolean>;
 
+        public isSpecificationDropdownEnabled: KnockoutComputed<boolean>;
+
+        public isViewFundingStreamDropdownEnabled: KnockoutComputed<boolean>;
+
         public isLoadingVisible: KnockoutComputed<boolean>;
 
         public state: KnockoutObservable<string> = ko.observable("idle");
@@ -26,80 +30,102 @@
             else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
                 throw "Settings must contain the test scenario query url";
             }
-            else if(typeof settings.fundingPeriodUrl !== "undefined" && settings.fundingPeriodUrl === null) {
+            else if (typeof settings.fundingPeriodUrl !== "undefined" && settings.fundingPeriodUrl === null) {
                 throw "Settings must contain the funding period query url";
-            } 
-            else if(typeof settings.fundingStreamsUrl !== "undefined" && settings.fundingStreamsUrl === null) {
+            }
+            else if (typeof settings.fundingStreamsUrl !== "undefined" && settings.fundingStreamsUrl === null) {
                 throw "Settings must contain the fuding streams query url";
-            } 
-            else if(typeof settings.specificationsUrl !== "undefined" && settings.specificationsUrl === null){
+            }
+            else if (typeof settings.specificationsUrl !== "undefined" && settings.specificationsUrl === null) {
                 throw "Settings must contain the specifications query url";
             }
 
             let self = this;
+
             self.settings = settings;
-            
+
             // Defer updates on the array of items being bound to the page, so updates don't constantly to the UI and slow things down
             self.currentPageResults.extend({ deferred: true });
 
             //Included for ApproveandPublishSelection 
-            
+
             /** Request to get the funding periods */
             self.pageState() == "initial";
             let fundingPeriodRequest = $.ajax({
                 url: this.settings.fundingPeriodUrl,
                 dataType: "json",
                 method: "get",
-                contentType: "application/json",              
-            }).done(function (response)
-            {
+                contentType: "application/json",
+            }).done(function (response) {
                 let newPeriodArray = Array<FundingPeriodResponse>();
-                ko.utils.arrayForEach(response, function(item : any){
+
+                ko.utils.arrayForEach(response, function (item: any) {
+
                     var x = new FundingPeriodResponse(item.id, item.name);
-                    newPeriodArray.push(x) ;                  
+
+                    newPeriodArray.push(x);
                 });
-                self.FundingPeriods(newPeriodArray); 
-            }) 
+
+                self.FundingPeriods(newPeriodArray);
+            })
 
             this.selectedFundingPeriod.subscribe(function () {
-                if (self.selectedFundingPeriod !== null && self.selectedFundingPeriod() !== "Select") {
+                if (self.selectedFundingPeriod !== undefined && self.selectedFundingPeriod() !== "Select") {
 
                     /** Load Specifications in the specification dropdown */
-
                     let getSpecificationForSelectedPeriodUrl = self.settings.specificationsUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
 
                     let specificationRequest = $.ajax({
                         url: getSpecificationForSelectedPeriodUrl,
                         dataType: "json",
                         method: "get",
-                        contentType: "application/json", 
-                    }).done(function (response)
-                        {
-                            let newSpecificationArray = Array<SpecificationResponse>();                       
-                            ko.utils.arrayForEach(response, function(item:any){
-                            var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
-                            newSpecificationArray.push(y);                  
-                        });
-                        self.Specifications(newSpecificationArray); 
-                    }) 
-                }
-            });  
-          
-            self.selectedSpecification.subscribe(function () {
-                if (self.selectedSpecification() !== undefined && self.selectedFundingPeriod() !== "Select") {       
-                    let newFundingStreamArray = Array<FundingStreamResponse>();
-                    let spec = ko.utils.arrayFirst(self.Specifications(), function (item: SpecificationResponse) {
-                        return (item.id === self.selectedSpecification());
-                    });
-                    self.FundingStreams(spec.fundingstreams);               
-                }
-            }); 
+                        contentType: "application/json",
+                    }).done(function (response) {
+                        let newSpecificationArray = Array<SpecificationResponse>();
 
-            self.isViewFundingButtonEnabled = ko.computed(() =>{
-                let isEnabled = ( this.selectedFundingStream.length > 0 ); 
-                return isEnabled;            
+                        ko.utils.arrayForEach(response, function (item: any) {
+
+                            var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
+
+                            newSpecificationArray.push(y);
+                        });
+
+                        self.Specifications(newSpecificationArray);
+                    })
+                }  
             });
 
+            self.selectedSpecification.subscribe(function () {
+                if (self.selectedSpecification() !== undefined && self.selectedFundingPeriod() !== "Select") {
+
+                    let newFundingStreamArray = Array<FundingStreamResponse>();
+
+                    let spec = ko.utils.arrayFirst(self.Specifications(),
+                        function (item: SpecificationResponse) {
+                            return (item.id === self.selectedSpecification());
+                        });
+
+                    self.FundingStreams(spec.fundingstreams);
+                }               
+            });
+            
+            self.isSpecificationDropdownEnabled = ko.computed(() => {
+                let isEnabled = (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().length > 0);            
+
+                return isEnabled;
+            });
+
+            self.isViewFundingStreamDropdownEnabled = ko.computed(() => {
+                let isEnabled = (self.selectedSpecification() !== undefined && self.selectedSpecification().length > 0);
+
+                return isEnabled;             
+            });
+
+            self.isViewFundingButtonEnabled = ko.computed(() => {
+                let isEnabled = (self.selectedFundingStream() !== undefined && self.selectedFundingStream().length > 0);
+
+                return isEnabled;
+            });
         }
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
