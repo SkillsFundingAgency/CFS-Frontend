@@ -84,13 +84,13 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(result);
         }
 
-	    [Route("api/specs/{specificationId}/execute-calculations")]
+	    [Route("api/specs/{specificationId}/refresh-published-results")]
 	    [HttpPost]
-	    public async Task<IActionResult> ExecuteCalculations(string specificationId)
+	    public async Task<IActionResult> RefreshPublishedResults(string specificationId)
 	    {
 		    Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-		    ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.ExecuteCalculations(specificationId);
+		    ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.RefreshPublishedResults(specificationId);
 
 		    if (callResult.StatusCode == HttpStatusCode.OK)
 		    {
@@ -105,13 +105,13 @@ namespace CalculateFunding.Frontend.Controllers
 		    return new StatusCodeResult(500);
 	    }
 
-        [Route("api/specs/{specificationId}/check-calculation-execution-status")]
+        [Route("api/specs/{specificationId}/check-publish-result-status")]
         [HttpPost]
-        public async Task<IActionResult> CheckCalculationExecutionStatus(string specificationId)
+        public async Task<IActionResult> CheckPublishResultStatus(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.CheckCalculationExecutionProgress(specificationId);
+            ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.CheckPublishResultStatus(specificationId);
 
             if (callResult.StatusCode == HttpStatusCode.OK)
             {
