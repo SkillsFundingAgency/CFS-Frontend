@@ -95,8 +95,8 @@
 
         Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId);
 
-	    Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId);
+	    Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId);
 
-        Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckCalculationExecutionProgress(string specificationId);
+        Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId);
     }
 }

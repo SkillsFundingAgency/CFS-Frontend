@@ -13,10 +13,10 @@
             else if (typeof settings.testScenarioQueryUrl !== "undefined" && !settings.testScenarioQueryUrl) {
                 throw "Settings must contain the test scenario query url";
             }
-            else if (typeof settings.executeRefreshUrl !== "undefined" && !settings.executeRefreshUrl) {
+            else if (typeof settings.refreshPublishedResultsUrl !== "undefined" && !settings.refreshPublishedResultsUrl) {
                 throw "Settings must contain the execute refresh url";
             }
-            else if (typeof settings.checkRefreshUrl !== "undefined" && !settings.checkRefreshUrl) {
+            else if (typeof settings.checkPublishResultsStatusUrl !== "undefined" && !settings.checkPublishResultsStatusUrl) {
                 throw "Settings must contain the check refresh url";
             }
             else if (typeof settings.approveAllocationLinesUrl !== "undefined" && !settings.approveAllocationLinesUrl) {
@@ -426,7 +426,7 @@
             this.isWorkingVisible(true);
 
             let executeCalcRequest = $.ajax({
-                url: this.settings.executeRefreshUrl.replace("{specificationId}", this.specificationId),
+                url: this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.specificationId),
                 dataType: "json",
                 method: "POST",
                 contentType: "application/json"
@@ -445,7 +445,7 @@
         private pollCalculationProgress() {
             window.setTimeout(() => {
                 let checkRefreshStateResponse = $.ajax({
-                    url: this.settings.checkRefreshUrl.replace("{specificationId}", this.specificationId),
+                    url: this.settings.checkPublishResultsStatusUrl.replace("{specificationId}", this.specificationId),
                     dataType: "json",
                     method: "POST",
                     contentType: "application/json"
@@ -587,8 +587,8 @@
         viewFundingPageUrl: string;
         antiforgeryToken: string;
         approveAllocationLinesUrl: string;
-        executeRefreshUrl: string;
-        checkRefreshUrl: string;
+        refreshPublishedResultsUrl: string;
+        checkPublishResultsStatusUrl: string;
     }
 
     /** The response of retrieving qa results */

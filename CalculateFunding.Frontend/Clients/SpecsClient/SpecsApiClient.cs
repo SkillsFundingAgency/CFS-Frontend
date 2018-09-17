@@ -248,18 +248,18 @@
             return await PostAsync($"select-for-funding?specificationId={specificationId}");
         }
 
-	    public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId)
+	    public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId)
 	    {
 			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-		    return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"execute-calculations?specificationIds={specificationId}", specificationId);
+		    return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
 	    }
 
-        public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckCalculationExecutionProgress(string specificationId)
+        public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"check-calc-progress-for-spec?specificationId={specificationId}", specificationId);
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"check-publish-result-status?specificationId={specificationId}", specificationId);
         }
     }
 }

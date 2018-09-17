@@ -386,8 +386,8 @@
             "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
             "approveAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
-            "executeRefreshUrl": "/api/specs/{specificationId}/execute-calculations",
-            "checkRefreshUrl": "/api/specs/{specificationId}/check-calculation-execution-status"
+            "refreshPublishedResultsUrl": "/api/specs/{specificationId}/refresh-published-results",
+            "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status"
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
         vfVM.loadResults();
