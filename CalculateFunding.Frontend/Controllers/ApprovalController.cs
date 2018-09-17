@@ -84,14 +84,13 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(result);
         }
 
-	    [Route("api/specs/execute-calculations")]
+	    [Route("api/specs/{specificationId}/execute-calculations")]
 	    [HttpPost]
 	    public async Task<IActionResult> ExecuteCalculations(string specificationId)
 	    {
 		    Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-		    ApiResponse<SpecificationCalculationExecutionStatusModel> callResult =
-			    await _specsClient.ExecuteCalculations(specificationId);
+		    ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.ExecuteCalculations(specificationId);
 
 		    if (callResult.StatusCode == HttpStatusCode.OK)
 		    {
@@ -105,5 +104,26 @@ namespace CalculateFunding.Frontend.Controllers
 
 		    return new StatusCodeResult(500);
 	    }
-	}
+
+        [Route("api/specs/{specificationId}/check-calculation-execution-status")]
+        [HttpPost]
+        public async Task<IActionResult> CheckCalculationExecutionStatus(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.CheckCalculationExecutionProgress(specificationId);
+
+            if (callResult.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(callResult.Content);
+            }
+
+            if (callResult.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+    }
 }

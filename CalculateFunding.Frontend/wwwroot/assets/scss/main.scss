@@ -1864,6 +1864,10 @@ table {
         border-left-color: $grey-1 !important;
     }
 
+    table.cf tbody tr.expander-container-header {
+        background-color: $grey-4;
+    }
+
     /* todo: remove these once new view funding paging replaces current one*/
     .approvalstatus-button {
         color: #fff;
@@ -1899,7 +1903,7 @@ table {
     }
 
     table.cf > thead.affix {
-        top: 109px;
+        top: 0;
         width: 1141px;
         padding: 0;
         z-index: 9999 !important;

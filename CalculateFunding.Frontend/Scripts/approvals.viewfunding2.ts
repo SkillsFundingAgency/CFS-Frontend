@@ -13,10 +13,14 @@
             else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
                 throw "Settings must contain the test scenario query url";
             }
-
-            else if (typeof settings.executeCalculationUrl !== "undefined" &&
-                settings.executeCalculationUrl === null) {
-                throw "Settings must contain the execute calculation url";
+            else if (typeof settings.executeRefreshUrl !== "undefined" && settings.executeRefreshUrl === null) {
+                throw "Settings must contain the execute refresh url";
+            }
+            else if (typeof settings.checkdRefreshUrl !== "undefined" && settings.checkdRefreshUrl === null) {
+                throw "Settings must contain the check refresh url";
+            }
+            else if (typeof settings.approveAllocationLinesUrl !== "undefined" && settings.approveAllocationLinesUrl === null) {
+                throw "Settings must contain the approve allocation lines url";
             }
 
             this.settings = settings;
@@ -26,13 +30,13 @@
         }
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
+
         workingMessage: KnockoutObservable<string> = ko.observable(null);
-        isLoadingVisible: KnockoutObservable<boolean> = ko.observable(false);
+        isWorkingVisible: KnockoutObservable<boolean> = ko.observable(false);
+        workingPercentComplete: KnockoutObservable<number> = ko.observable(null);
 
         notificationMessage: KnockoutObservable<string> = ko.observable(null);
         notificationStatus: KnockoutObservable<string> = ko.observable();
-
-        percentageCompleteOfCalculation: KnockoutObservable<number> = ko.observable(0);
 
         specificationId: string;
         specificationName: string;
@@ -104,7 +108,7 @@
             let selectedItems = this.approvalDetails();
             let successMessage = "The status has successfully been transitioned to the Approved state for the selected items.";
             let failureMessage = "There was an error setting the status of the items to Approved.";
-            let changeStatusUrl = this.settings.approveAllocationLinesUrl;
+            let changeStatusUrl = this.settings.approveAllocationLinesUrl.replace("{specificationId}", this.specificationId);
 
             this.workingMessage("Approving items.");
 
@@ -116,10 +120,10 @@
                 selectedItems = this.publishDetails();
                 successMessage = "The status has successfully been transitioned to the Published state for the selected items.";
                 failureMessage = "There was an error setting the status of the items to Published.";
-                changeStatusUrl = this.settings.publishAllocationLinesUrl;
             }
 
-            this.pageState("working-" + this.pageState());
+            //this.pageState("working-" + this.pageState());
+            this.isWorkingVisible(true);
 
             for (let i = 0; i < selectedItems.allocationLines.length; i++) {
                 let selectedItem = selectedItems.allocationLines[i];
@@ -128,7 +132,7 @@
             }
 
             $.ajax({
-                url: changeStatusUrl.replace("{specificationId}", this.specificationId),
+                url: changeStatusUrl,
                 method: "PUT",
                 contentType: 'application/json',
                 data: JSON.stringify(updateModel),
@@ -164,9 +168,9 @@
                         return true;
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }, this);
 
         /** Show confirmation page for approval of selected allocation lines */
@@ -209,15 +213,18 @@
             this.notificationMessage(null);
         }
 
+        /** Approve the selected allocation lines */
         approve() {
             this.callChangeStatusEndpoint(StatusAction.Approve);
         }
 
+        /** Go back to the main view and clear any state from the confirmation pages */
         dismissConfirmPage() {
             this.approvalDetails(new ConfirmPublishApproveViewModel());
             this.publishDetails(new ConfirmPublishApproveViewModel());
 
             this.pageState("main");
+            this.isWorkingVisible(false);
         }
 
         /** Has the used selected at least one allocation line result that can be published */
@@ -233,9 +240,9 @@
                         return true;
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }, this);
 
         /** Show confirmation page for publish of selected allocation lines */
@@ -278,6 +285,7 @@
             this.notificationMessage(null);
         }
 
+        /** Publish the selected allocation lines */
         publish() {
             this.callChangeStatusEndpoint(StatusAction.Publish);
         }
@@ -409,84 +417,83 @@
             }
         }
 
-        public refreshFundingSnapshot(): void {
-            this.isLoadingVisible(true);
+        /**
+         * Request that the funding snapshot is refreshed
+         * As the process is asynchronous is sets up a poll mechanism to check on the progress
+         * */
+        refreshFundingSnapshot() {
+            this.workingMessage("Refreshing funding values for providers");
+            this.isWorkingVisible(true);
+
             let executeCalcRequest = $.ajax({
-                url: this.settings.executeCalculationUrl.replace("{specificationIds}", "abc123"),
+                url: this.settings.executeRefreshUrl.replace("{specificationId}", this.specificationId),
                 dataType: "json",
                 method: "POST",
                 contentType: "application/json"
-            });
-
-            executeCalcRequest.fail((response) => {
-                alert("Something went wrong during refresh funding snapshot");
-            });
-
-            executeCalcRequest.done((response) => {
-                if (response.status === 200) {
+            })
+                .done((response) => {
                     this.pollCalculationProgress();
-                }
-                else {
-                    throw new Error("Unexpected status returned");
-                }
-            });
+                })
+                .fail((response) => {
+                    this.notificationMessage("There was a problem starting the refresh.");
+                    this.notificationStatus("error");
+                    this.isWorkingVisible(false);
+                });
         }
 
+        /** Polls for the current status of a refresh operation */
         private pollCalculationProgress() {
             window.setTimeout(() => {
                 let checkRefreshStateResponse = $.ajax({
-                    url: "/api/specs/dmitrisendpoint?specificationIds=" + this.specificationId,
+                    url: this.settings.checkdRefreshUrl.replace("{specificationId}", this.specificationId),
                     dataType: "json",
                     method: "POST",
                     contentType: "application/json"
-                });
+                })
+                    .always((response) => {
+                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage);
 
-                checkRefreshStateResponse.always((response) => {
-                    this.updateRefreshProgressInUI(
-                        this.dataToSpecificationExecutionStatus(
-                            this.dataToSpecificationExecutionStatus(response.data)));
-                });
+                        if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
+                            || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
+                            // Update the percent complete
+                            this.workingPercentComplete(status.percentageCompleted);
+                            this.pollCalculationProgress();
+                        }
+                        else if (status.calculationProgressStatus === CalculationProgressStatus.Error) {
+                            // The refresh has failed
+                            this.notificationMessage("Unable to refresh allocation line funding values");
+                            this.notificationStatus("error");
+                            this.workingPercentComplete(null);
+                            this.isWorkingVisible(false);
+                        }
+                        else if (status.calculationProgressStatus === CalculationProgressStatus.Finished) {
+                            // Refresh has completed successfully so reload the data
+                            this.workingPercentComplete(null);
+                            this.isWorkingVisible(false);
+                            this.notificationMessage("Allocation line funding values refreshed successfully.");
+                            this.notificationStatus("success");
+                        }
+                    });
 
-            },30);
-        }
-
-        private dataToSpecificationExecutionStatus(data: any) : SpecificationExecutionStatus {
-            return new SpecificationExecutionStatus(data.specificationId, data.percentageCompleted, data.calculationProgress);
-        }
-
-        private updateRefreshProgressInUI(specificationExecutionStatus: SpecificationExecutionStatus) {
-            if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.InProgress
-                || specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
-                alert("code to update refresh number");
-                this.percentageCompleteOfCalculation(specificationExecutionStatus.percentageCompleted);
-                this.pollCalculationProgress();
-            }
-            else if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.Error) {
-                alert("Error, something went wrong")
-            }
-            else if (specificationExecutionStatus.calculationProgressStatus === CalculationProgressStatus.Finished) {
-                this.percentageCompleteOfCalculation(specificationExecutionStatus.percentageCompleted);
-                this.isLoadingVisible(false);
-                alert("Success");
-            }
+            }, 500);
         }
     }
 
-
-
-    /** Progression result for a specification */
+    /** Execution status for a specification */
     class SpecificationExecutionStatus {
         specificationId: string;
         percentageCompleted: number;
         calculationProgressStatus: CalculationProgressStatus;
+        errorMessage: string;
 
-        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus) {
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string) {
             this.specificationId = specificationId;
             this.percentageCompleted = percentageCompleted;
             this.calculationProgressStatus = calculationProgressStatus;
         }
     }
 
+    /** Possible states for a refresh funding operation */
     enum CalculationProgressStatus {
         NotStarted,
         InProgress,
@@ -580,8 +587,8 @@
         viewFundingPageUrl: string;
         antiforgeryToken: string;
         approveAllocationLinesUrl: string;
-        publishAllocationLinesUrl: string;
-        executeCalculationUrl: string;
+        executeRefreshUrl: string;
+        checkdRefreshUrl: string;
     }
 
     /** The response of retrieving qa results */
@@ -624,16 +631,20 @@
         }
     }
 
+    /** Possible actions for changing status of an allocation line */
     enum StatusAction {
-        Approve, Publish
+        Approve,
+        Publish
     }
 
+    /** Model submited to the backend to change the status of allocation lines */
     class PublishedAllocationLineResultStatusUpdateViewModel
     {
         Status: AllocationLineStatus;
         Providers: Array<PublishedAllocationLineResultStatusUpdateProviderViewModel> = [];
     }
 
+    /** Details of an allocation line that needs it status changing */
     class PublishedAllocationLineResultStatusUpdateProviderViewModel {
         ProviderId: string;
         AllocationLineId: string;

@@ -38,12 +38,12 @@
 }
 
     <div class="viewfunding-page-container" id="viewfunding-page-container">
-        <div class="row view-funding-page-refresh-holder" style="display: none" data-bind="visible: isLoadingVisible">
+        <div class="row view-funding-page-refresh-holder" style="display: none" data-bind="visible: isWorkingVisible">
             <div class="col-xs-12 view-funding-page-refresh">
-                <p class="h4-heading"><strong>Refreshing funding values for providers</strong></p>
+                <p class="h4-heading"><strong data-bind="text: workingMessage"></strong></p>
                 <p>Please wait, this may take several minutes.</p>
                 <img src="~/assets/images/loader.gif" />
-                <div><span data-bind="text: percentageCompleteOfCalculation" /></div>
+                <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete" /></div>
             </div>
         </div>
         <div data-bind="visible: notificationMessage(), css: notificationStatus() === 'error' ? 'notification-panel-error' : 'notification-panel'">
@@ -52,63 +52,17 @@
             </span>
         </div>
 
-        <div data-bind="visible: pageState().startsWith('working')" class="search-loading-container">
-            <span><img src="~/assets/images/loader.gif" /></span>
-            <p data-bind="text: workingMessage"></p>
-        </div>
         <div data-bind="visible: pageState() === 'initial'">
 
         </div>
         <div data-bind="visible: pageState() === 'main'">
-            <div class="row">
+            <div class="row spacing-10-bottom">
                 <div class="col-xs-12">
                     <button class="float-right refresh-btn" type="button" data-bind="click: refreshFundingSnapshot">
                         <span class="glyphicon glyphicon-refresh"></span>
                         <span>Refresh funding</span>
                     </button>
 
-                </div>
-            </div>
-            <div class="table-filter-container" data-spy="affix" data-offset-top="300">
-                <div class="row">
-                    <div class="col-xs-2">
-                        <div class="bold">Allocation line</div>
-                        <div>
-                            <select id="allocationLineFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Provider Type</div>
-                        <div>
-                            <select id="providerTypeFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Local Authority</div>
-                        <div>
-                            <select id="localAuthorityFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Status</div>
-                        <div>
-                            <select id="statusFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div><a href="#">Clear filters</a></div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <strong data-bind="text: filteredResults().length"></strong> providers</div>
-                    </div>
                 </div>
             </div>
             <table class="cf">
@@ -147,7 +101,7 @@
                         <td class="data-provider-amount funding-total-column">&pound;<span data-bind="text:fundingAmountDisplay"></span></td>
                         <td class="expander-trigger-cell expander-column" data-bind="click: function () { calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
                     </tr>
-                    <tr class="expander-container">
+                    <tr class="expander-container expander-container-header">
                         <td colspan="9" class="expander-container-group-identifier">
                             <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
                             <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading test results</span>
@@ -158,7 +112,7 @@
                             <span class="inline-list-item"><span class="highlight-title">Local authority:</span> <span data-bind="text: authority"></span></span>
                         </td>
                     </tr>
-                    <tr class="expander-container">
+                    <tr class="expander-container expander-container-header">
                         <td class="bold expander-container-group-identifier">Allocation lines</td>
                         <td class="bold">Version</td>
                         <td class="bold text-center" colspan="4">Allocation line statuses</td>
@@ -432,8 +386,8 @@
             "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
             "approveAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
-            "publishAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
-            "executeCalculationUrl": "/api/specs/execute-calculations?={specificationIds}"
+            "executeRefreshUrl": "/api/specs/{specificationId}/execute-calculations",
+            "checkdRefreshUrl": "/api/specs/{specificationId}/check-calculation-execution-status"
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
         vfVM.loadResults();

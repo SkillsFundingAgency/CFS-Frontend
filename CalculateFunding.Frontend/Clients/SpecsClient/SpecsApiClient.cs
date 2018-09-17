@@ -233,27 +233,33 @@
             }
         }
 
-        public Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
+        public async Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"specification-edit-status?specificationId={specificationId}", model);
+            return await ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"specification-edit-status?specificationId={specificationId}", model);
         }
 
-        public Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
+        public async Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             
-            return PostAsync($"select-for-funding?specificationId={specificationId}");
+            return await PostAsync($"select-for-funding?specificationId={specificationId}");
         }
 
-	    public Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId)
+	    public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> ExecuteCalculations(string specificationId)
 	    {
 			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-		    return PostAsync<SpecificationCalculationExecutionStatusModel, string>(
-			    $"execute-calculations?specificationIds={specificationId}", specificationId);
+		    return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"execute-calculations?specificationIds={specificationId}", specificationId);
 	    }
+
+        public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckCalculationExecutionProgress(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"check-calc-progress-for-spec?specificationId={specificationId}", specificationId);
+        }
     }
 }
