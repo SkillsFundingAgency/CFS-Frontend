@@ -7,19 +7,19 @@
             if (typeof settings !== "undefined" && settings === null) {
                 throw "Settings must be provided to the view funding view model";
             }
-            else if (typeof settings.antiforgeryToken !== "undefined" && settings.antiforgeryToken === null) {
+            else if (typeof settings.antiforgeryToken !== "undefined" && !settings.antiforgeryToken) {
                 throw "Settings must contain the antiforgeryToken";
             }
-            else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
+            else if (typeof settings.testScenarioQueryUrl !== "undefined" && !settings.testScenarioQueryUrl) {
                 throw "Settings must contain the test scenario query url";
             }
-            else if (typeof settings.executeRefreshUrl !== "undefined" && settings.executeRefreshUrl === null) {
+            else if (typeof settings.executeRefreshUrl !== "undefined" && !settings.executeRefreshUrl) {
                 throw "Settings must contain the execute refresh url";
             }
-            else if (typeof settings.checkdRefreshUrl !== "undefined" && settings.checkdRefreshUrl === null) {
+            else if (typeof settings.checkRefreshUrl !== "undefined" && !settings.checkRefreshUrl) {
                 throw "Settings must contain the check refresh url";
             }
-            else if (typeof settings.approveAllocationLinesUrl !== "undefined" && settings.approveAllocationLinesUrl === null) {
+            else if (typeof settings.approveAllocationLinesUrl !== "undefined" && !settings.approveAllocationLinesUrl) {
                 throw "Settings must contain the approve allocation lines url";
             }
 
@@ -445,7 +445,7 @@
         private pollCalculationProgress() {
             window.setTimeout(() => {
                 let checkRefreshStateResponse = $.ajax({
-                    url: this.settings.checkdRefreshUrl.replace("{specificationId}", this.specificationId),
+                    url: this.settings.checkRefreshUrl.replace("{specificationId}", this.specificationId),
                     dataType: "json",
                     method: "POST",
                     contentType: "application/json"
@@ -588,7 +588,7 @@
         antiforgeryToken: string;
         approveAllocationLinesUrl: string;
         executeRefreshUrl: string;
-        checkdRefreshUrl: string;
+        checkRefreshUrl: string;
     }
 
     /** The response of retrieving qa results */
