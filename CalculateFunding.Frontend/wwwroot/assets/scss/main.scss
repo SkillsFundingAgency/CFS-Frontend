@@ -1867,7 +1867,6 @@ table {
     table.cf tbody tr.expander-container-header {
         background-color: $grey-4;
     }
-
     /* todo: remove these once new view funding paging replaces current one*/
     .approvalstatus-button {
         color: #fff;
@@ -1892,7 +1891,6 @@ table {
         background-color: $grass-green;
     }
     /* end todo */
-
     .affix {
         top: 0;
         z-index: 9999 !important;
@@ -1947,6 +1945,10 @@ table {
         background-color: black;
         padding-top: 5px;
         padding-bottom: 5px;
+
+        i.material-icons {
+            vertical-align: middle;
+        }
     }
 
     .view-funding-page-refresh-holder {
@@ -1967,6 +1969,29 @@ table {
         top: 50%;
         padding-top: 30px;
         padding-bottom: 30px;
+    }
+
+    .pager {
+        li > a {
+            border-radius: 0;
+        }
+
+        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {
+            background-color: $govuk-blue;
+        }
+
+        .pagination > li > a, .pagination > li > span {
+            color: $govuk-blue;
+        }
+
+        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus{
+            color: white;
+        }
+
+        i.material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+        }
     }
 }
 
