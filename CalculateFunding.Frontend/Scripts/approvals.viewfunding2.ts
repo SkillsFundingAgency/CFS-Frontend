@@ -45,6 +45,7 @@
 
         pageNumber: KnockoutObservable<number> = ko.observable(0);
         itemsPerPage: number = 500;
+        limitVisiblePageNumbers: number = 5;
 
         allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
@@ -65,6 +66,20 @@
             }
 
             return pageNumbers;
+        }, this);
+
+        visiblePageNumbers: KnockoutComputed<Array<number>> = ko.pureComputed(function () {
+            let firstPage: number = this.pageNumber() - 2;
+
+            if (firstPage + this.limitVisiblePageNumbers > this.allPageNumbers().length) {
+                firstPage = this.allPageNumbers().length - this.limitVisiblePageNumbers;
+            }
+
+            if (firstPage < 0) {
+                firstPage = 0;
+            }
+
+            return this.allPageNumbers().slice(firstPage, firstPage + this.limitVisiblePageNumbers);
         }, this);
 
         /** Is there a page previous to the current one */

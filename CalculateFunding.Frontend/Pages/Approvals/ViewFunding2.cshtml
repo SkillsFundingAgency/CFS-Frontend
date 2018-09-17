@@ -59,7 +59,7 @@
             <div class="row spacing-10-bottom">
                 <div class="col-xs-12">
                     <button class="float-right refresh-btn" type="button" data-bind="click: refreshFundingSnapshot">
-                        <span class="glyphicon glyphicon-refresh"></span>
+                        <i class="material-icons">refresh</i>
                         <span>Refresh funding</span>
                     </button>
 
@@ -163,11 +163,13 @@
 
             <div class="pager">
                 <ul class="pagination">
-                    <li data-bind="css: hasPrevious() ? '' : 'disabled'"><a href="#" data-bind="click: viewPrevious">&laquo;</a></li>
-                    <!-- ko foreach: allPageNumbers -->
+                    <li data-bind="css: hasPrevious() ? '' : 'disabled'"><a href="#" data-bind="click: function () { $root.viewPage($root, 1); }" title="View First Page"><i class="material-icons">first_page</i></a></li>
+                    <li data-bind="css: hasPrevious() ? '' : 'disabled'"><a href="#" data-bind="click: viewPrevious" title="View Previous Page"><i class="material-icons">chevron_left</i></a></li>
+                    <!-- ko foreach: visiblePageNumbers -->
                     <li data-bind="css: $parent.pageNumber() + 1 == $data ? 'active' : ''"><a href="#" data-bind="text: $data, click: function (){ $parent.viewPage($root, $data); }"></a></li>
                     <!-- /ko-->
-                    <li data-bind="css: hasNext() ? '' : 'disabled'"><a href="#" data-bind="click:viewNext">&raquo;</a></li>
+                    <li data-bind="css: hasNext() ? '' : 'disabled'"><a href="#" data-bind="click:viewNext" title="View Next Page"><i class="material-icons">chevron_right</i></a></li>
+                    <li data-bind="css: hasNext() ? '' : 'disabled'"><a href="#" data-bind="click:function () { $root.viewPage($root, $root.allPageNumbers().length); }" title="View Last Page"><i class="material-icons">last_page</i></a></li>
                 </ul>
             </div>
 
