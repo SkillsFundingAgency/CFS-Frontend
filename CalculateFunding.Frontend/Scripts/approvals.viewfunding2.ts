@@ -30,6 +30,9 @@
             else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
                 throw "Settings must contain the test scenario query url";
             }
+            else if (typeof settings.viewFundingPageUrl !== undefined && settings.viewFundingPageUrl === null) {
+                throw "Settings must contain the view funding page query url";
+            }
             else if (typeof settings.fundingPeriodUrl !== "undefined" && settings.fundingPeriodUrl === null) {
                 throw "Settings must contain the funding period query url";
             }
@@ -70,8 +73,7 @@
             })
 
             this.selectedFundingPeriod.subscribe(function () {
-                if (self.selectedFundingPeriod !== undefined && self.selectedFundingPeriod() !== "Select") {
-
+                if (self.selectedFundingPeriod !== undefined && self.selectedFundingPeriod() !== "Select") {                   
                     /** Load Specifications in the specification dropdown */
                     let getSpecificationForSelectedPeriodUrl = self.settings.specificationsUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
 
@@ -106,7 +108,9 @@
                         });
 
                     self.FundingStreams(spec.fundingstreams);
-                }               
+                } else {
+                    self.FundingStreams([]);
+                }              
             });
             
             self.isSpecificationDropdownEnabled = ko.computed(() => {
@@ -120,6 +124,7 @@
 
                 return isEnabled;             
             });
+    
 
             self.isViewFundingButtonEnabled = ko.computed(() => {
                 let isEnabled = (self.selectedFundingStream() !== undefined && self.selectedFundingStream().length > 0
@@ -128,11 +133,14 @@
 
                 return isEnabled;
             });
-        }
+         }
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
 
         specificationId: string;
+        selectedSpecValue: KnockoutObservable<string> = ko.observable("");
+        selectedFundingPeriodValue: KnockoutObservable<string> = ko.observable("");
+        selectedFundingStreamValue: KnockoutObservable<string> = ko.observable("");
         selectedSpecification: KnockoutObservable<string> = ko.observable("");
         selectedFundingPeriod: KnockoutObservable<string> = ko.observable("");
         selectedFundingStream: KnockoutObservable<string> = ko.observable("");
@@ -233,7 +241,9 @@
         confirmPublish() { alert('the publish button is not implemented yet'); }
 
         /** Load results given the initial filter criteria */
-        loadResults() {
+        loadResults(response: any) {
+
+
             this.specificationId = "abc1";
             //this.selectedSpecification;
            // this.fundingPeriod = "Test Funding Period";
@@ -351,7 +361,6 @@
                         providerResult.qaTestResults(resultTyped);
 
                         providerResult.qaTestResultsRequestStatus('loaded');
-
                     })
                     .fail(() => {
                         providerResult.qaTestResultsRequestStatus('failed');
@@ -363,15 +372,109 @@
         public viewFunding(): void {
             if(this.state() !== "idle")
                 return;
+            let self = this;
+          
+            let viewfundingPageUrl = self.settings.viewFundingPageUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
+            viewfundingPageUrl = viewfundingPageUrl.replace("{specificationId}", self.selectedSpecification());
+            viewfundingPageUrl = viewfundingPageUrl.replace("{fundingstreamId}", self.selectedFundingStream());
 
-            let data = {
-                fundingperiod: this.selectedFundingPeriod,
-                fundingstream: this.selectedFundingStream,
-                specification: this.selectedSpecification
-            }
+            let viewFundingRequest = $.ajax({             
+                url: viewfundingPageUrl ,
+                dataType : "json",
+                method: "GET",
+                contentType: "application/json"
+            });
 
+            self.state("Loading");
+
+            viewFundingRequest.done((response) => {
+                if (response) {
+                    console.log(response);
+                    let viewFundingResponse: KnockoutObservableArray<PublishedProviderResultViewModel> = response;
+                    self.handlevfSuccess(viewFundingResponse);
+                }
+            });
         }
+
+        public handlevfSuccess(response: any) {
+
+            //var self = this;
+            //self. = ko.observableArray();
+
+            //to be implemented
+            if (response !== null && response !== undefined) {
+                let publishedProviderArray: Array<IProviderResultsResponse> = response;
+                let providers: Array<PublishedProviderResultViewModel> = [];
+
+                for (let p in publishedProviderArray) {
+                    let provider: IProviderResultsResponse = publishedProviderArray[p];
+
+                    let providerObservable: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
+                    // Here we need to go and set the provider properties
+                    providerObservable.providerId = provider.providerId;
+                    providerObservable.fundingAmount = provider.fundingAmount;                 
+                    providerObservable.numberApproved = provider.numberApproved;
+                    providerObservable.numberNew = provider.numberHeld;
+                    providerObservable.numberPublished = provider.numberPublished;
+                    providerObservable.totalAllocationLines = provider.totalAllocationLines;
+                    //providerObservable.numberUpdated = provider.
+                    //providerObservable.fundingAmountDisplay = provider.fundingAmount;
+                    //providerObservable.isSelected = provider
+                    providerObservable.numberUpdated = 0;
+                   // providerObservable.isSelected(provider.d = provider) = true;
+
+                    for (let f in provider.fundingStreamResults) {
+                        let fundingStream: IFundingStreamResultResponse = provider.fundingStreamResults[f];
+                       
+                        for (let a in fundingStream.allocationLineResults) {
+                            let allocationLine: IAllocationLineResultsResponse = fundingStream.allocationLineResults[a];
+
+                            let allocationLineObservable: PublishedAllocationLineResultViewModel = new PublishedAllocationLineResultViewModel();
+
+                            // set the properties 
+                            allocationLineObservable.allocationLineId = allocationLine.allocationLineId;
+                            allocationLineObservable.allocationLineName = allocationLine.allocationLineName;
+                            allocationLineObservable.fundingAmount = allocationLine.fundingAmount;
+                            allocationLineObservable.lastUpdated = allocationLine.lastUpdated;
+                            allocationLineObservable.status = allocationLine.status;
+                            //allocationLineObservable.fundingAmountDisplay = allocationLine.
+
+
+                            providerObservable.allocationLineResults.push(allocationLineObservable);
+                        }                        
+                    }
+                    providers.push(providerObservable)
+                }
+                this.allProviderResults(providers); 
+            }
+        }
+
+
+        
+
+
+        //public allocationLineResults(fundingStreamVM: FundingStreamResultViewModel) {
+
+        //    fundingStreamVM.foreach(items : PublishedAllocationLineResultViewModel in fundingStreamVM) 
+        //    {
+        //        let publishAllocResultVM = new PublishedAllocationLineResultViewModel();
+        //        publishAllocResultVM.allocationLineId = items.allocationLineId;
+        //        publishAllocResultVM.allocationLineName = items.allocationLineName;
+        //        publishAllocResultVM.fundingAmount = items.fundingAmount;
+        //        // publishAllocResultVM.fundingAmountDisplay = item.fundingAmountDisplay();
+        //        publishAllocResultVM.isSelected = items.isSelected;
+        //        publishAllocResultVM.status = items.status;
+        //        publishAllocResultVM.version = items.version;
+        //        publishAllocResultVM.lastUpdated = items.lastUpdated;
+        //    }
+            
+        //}
+
+    
+
     }
+
+   
 
     /** A published provider result */
     class PublishedProviderResultViewModel {
@@ -435,6 +538,7 @@
         allocationLineName: string;
         status: AllocationLineStatus;
         fundingAmount: number;
+        lastUpdated: string;
 
         get fundingAmountDisplay(): string {
             return (Number(this.fundingAmount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
@@ -444,6 +548,43 @@
 
         isSelected: KnockoutObservable<boolean> = ko.observable(false);
     }
+
+
+    export interface IFundingStreamResultResponse {
+        allocationLineResults: Array<IAllocationLineResultsResponse>;
+        fundingStreamName: string;
+        fundingStreamId: string;
+        fundingAmount: number;
+        lastUpdated: string;
+        numberHeld: number;
+        numberApproved: number;
+        numberPublished: number;
+        totalAllocationLines: number;
+    }
+
+    export interface IAllocationLineResultsResponse {
+        allocationLineId: string;
+        allocationLineName: string;
+        fundingAmount: number;
+        status: number;
+        lastUpdated: string;
+    }
+
+    export interface IProviderResultsResponse {
+        fundingStreamResults: Array<IFundingStreamResultResponse>
+        specificationId: string;
+        providerName: string;
+        providerId: string;
+        ukprn: string;
+        fundingAmount: number;
+        totalAllocationLines: number;
+        numberHeld: number;
+        numberApproved: number;
+        numberPublished: number;
+        lastUpdated: string;
+    }
+
+
 
     /** The allowable statuses of an allocation line */
     export enum AllocationLineStatus {

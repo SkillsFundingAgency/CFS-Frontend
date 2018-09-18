@@ -12,8 +12,7 @@
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
             <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-            <li data-bind="text: selectedSpecification"></li>
-        </ol>
+         </ol>
     </div>
 }
 
@@ -24,7 +23,7 @@
             <h1 class="hero-title-skinny" data-bind="text: selectedSpecification"></h1>
             <h3 class="hero-text" data-bind="text: selectedFundingStream"></h3>
         </div>
-        <div class="viewfunding-page-buttons">
+        <div class="viewfunding-page-buttons" hidden="hidden">
             <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
             <button id="publish" class="btn approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: confirmPublish">Publish</button>
         </div>
@@ -63,7 +62,7 @@
              </div>
 
             <div>
-
+                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span>Only one funding stream can be approved or published at a time</span></h4>
             </div>
 
             <div class="row">
@@ -245,7 +244,7 @@
     <script type="text/javascript">
         var settings = {
             "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
-            "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
+            "viewFundingPageUrl": "/api/results/get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingstreamId={fundingstreamId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
             "fundingPeriodUrl": "/api/specs/funding-periods", 
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
