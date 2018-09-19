@@ -1864,6 +1864,9 @@ table {
         border-left-color: $grey-1 !important;
     }
 
+    table.cf tbody tr.expander-container-header {
+        background-color: $grey-4;
+    }
     /* todo: remove these once new view funding paging replaces current one*/
     .approvalstatus-button {
         color: #fff;
@@ -1888,7 +1891,6 @@ table {
         background-color: $grass-green;
     }
     /* end todo */
-
     .affix {
         top: 0;
         z-index: 9999 !important;
@@ -1899,7 +1901,7 @@ table {
     }
 
     table.cf > thead.affix {
-        top: 109px;
+        top: 0;
         width: 1141px;
         padding: 0;
         z-index: 9999 !important;
@@ -1936,6 +1938,181 @@ table {
 
     .expander-column {
         width: 45px;
+    }
+
+    button.refresh-btn {
+        color: white;
+        background-color: black;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+        i.material-icons {
+            vertical-align: middle;
+        }
+    }
+
+    .view-funding-page-refresh-holder {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.4);
+        padding: 0;
+        margin: 0;
+        z-index: 9999999999;
+    }
+
+    .view-funding-page-refresh {
+        text-align: center;
+        background-color: white;
+        top: 50%;
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+
+    .pager {
+        li > a {
+            border-radius: 0;
+        }
+
+        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {
+            background-color: $govuk-blue;
+        }
+
+        .pagination > li > a, .pagination > li > span {
+            color: $govuk-blue;
+        }
+
+        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus{
+            color: white;
+        }
+
+        i.material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+        }
+    }
+}
+
+table {
+    tr {
+        .fixed-width-330 {
+            width: 330px;
+        }
+    }
+
+    .nobottomborder {
+        border-bottom: 0px !important;
+    }
+
+    .topborderonly {
+        border-top: 1px solid #ccc !important;
+        border-bottom: 0px !important;
+    }
+}
+
+.confirmapproval-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmapproval-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmapproval-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmapproval-warning {
+        margin-top: 30px;
+
+        .confirmapproval-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmapproval-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
+    }
+}
+
+.confirmpublish-page-container {
+    table {
+        caption {
+            font-weight: 900;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc !important;
+        }
+    }
+
+    .allocation-line-text {
+        color: $grey-1;
+        font-size: 16px;
+    }
+
+    .confirmpublish-confirmation {
+        margin-top: 30px;
+
+        li {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 10px;
+        }
+    }
+
+    .confirmpublish-details-providers {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-details-specification {
+        margin-top: 30px;
+    }
+
+    .confirmpublish-warning {
+        margin-top: 30px;
+
+        .confirmpublish-warning-icon {
+            float: left;
+            margin-right: 10px;
+        }
+    }
+
+    .confirmpublish-buttons {
+        margin-top: 30px;
+
+        a {
+            margin-left: 30px;
+        }
     }
 }
 

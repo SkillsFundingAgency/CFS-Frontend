@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -51,7 +52,6 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(result);
-
         }
 
         [Route("api/specs/funding-periods")]
@@ -138,7 +138,5 @@ namespace CalculateFunding.Frontend.Controllers
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
             }
         }
-
-        
-    }
+	}
 }

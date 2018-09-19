@@ -20,7 +20,16 @@
         public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor context)
            : base(httpClientFactory, HttpClientKeys.Specifications, logger)
         {
-            _cancellationToken = context.HttpContext.RequestAborted;
+            if (context != null)
+            {
+                if (context.HttpContext != null)
+                {
+                    if (context.HttpContext.RequestAborted != default(CancellationToken))
+                    {
+                        _cancellationToken = context.HttpContext.RequestAborted;
+                    }
+                }
+            }
         }
 
         public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
@@ -239,19 +248,33 @@
             }
         }
 
-        public Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
+        public async Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"specification-edit-status?specificationId={specificationId}", model);
+            return await ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"specification-edit-status?specificationId={specificationId}", model);
         }
 
-        public Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
+        public async Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             
-            return PostAsync($"select-for-funding?specificationId={specificationId}");
+            return await PostAsync($"select-for-funding?specificationId={specificationId}");
+        }
+
+	    public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId)
+	    {
+			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+		    return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
+	    }
+
+        public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"check-publish-result-status?specificationId={specificationId}", specificationId);
         }
     }
 }

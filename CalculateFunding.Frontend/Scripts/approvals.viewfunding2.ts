@@ -24,11 +24,20 @@
             if (typeof settings !== "undefined" && settings === null) {
                 throw "Settings must be provided to the view funding view model";
             }
-            else if (typeof settings.antiforgeryToken !== "undefined" && settings.antiforgeryToken === null) {
+            else if (typeof settings.antiforgeryToken !== "undefined" && !settings.antiforgeryToken) {
                 throw "Settings must contain the antiforgeryToken";
             }
-            else if (typeof settings.testScenarioQueryUrl !== "undefined" && settings.testScenarioQueryUrl === null) {
+            else if (typeof settings.testScenarioQueryUrl !== "undefined" && !settings.testScenarioQueryUrl) {
                 throw "Settings must contain the test scenario query url";
+            }
+            else if (typeof settings.refreshPublishedResultsUrl !== "undefined" && !settings.refreshPublishedResultsUrl) {
+                throw "Settings must contain the execute refresh url";
+            }
+            else if (typeof settings.checkPublishResultsStatusUrl !== "undefined" && !settings.checkPublishResultsStatusUrl) {
+                throw "Settings must contain the check refresh url";
+            }
+            else if (typeof settings.approveAllocationLinesUrl !== "undefined" && !settings.approveAllocationLinesUrl) {
+                throw "Settings must contain the approve allocation lines url";
             }
             else if (typeof settings.viewFundingPageUrl !== undefined && settings.viewFundingPageUrl === null) {
                 throw "Settings must contain the view funding page query url";
@@ -137,6 +146,13 @@
 
         pageState: KnockoutObservable<string> = ko.observable("initial");
 
+        workingMessage: KnockoutObservable<string> = ko.observable(null);
+        isWorkingVisible: KnockoutObservable<boolean> = ko.observable(false);
+        workingPercentComplete: KnockoutObservable<number> = ko.observable(null);
+
+        notificationMessage: KnockoutObservable<string> = ko.observable(null);
+        notificationStatus: KnockoutObservable<string> = ko.observable();
+
         specificationId: string;
         selectedSpecValue: KnockoutObservable<string> = ko.observable("");
         selectedFundingPeriodValue: KnockoutObservable<string> = ko.observable("");
@@ -147,6 +163,7 @@
   
         pageNumber: KnockoutObservable<number> = ko.observable(0);
         itemsPerPage: number = 500;
+        limitVisiblePageNumbers: number = 5;
 
         allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
@@ -167,6 +184,20 @@
             }
 
             return pageNumbers;
+        }, this);
+
+        visiblePageNumbers: KnockoutComputed<Array<number>> = ko.pureComputed(function () {
+            let firstPage: number = this.pageNumber() - 2;
+
+            if (firstPage + this.limitVisiblePageNumbers > this.allPageNumbers().length) {
+                firstPage = this.allPageNumbers().length - this.limitVisiblePageNumbers;
+            }
+
+            if (firstPage < 0) {
+                firstPage = 0;
+            }
+
+            return this.allPageNumbers().slice(firstPage, firstPage + this.limitVisiblePageNumbers);
         }, this);
 
         /** Is there a page previous to the current one */
@@ -198,6 +229,65 @@
             return parentVM.pageNumber(targetPage - 1);
         }
 
+        approvalDetails: KnockoutObservable<ConfirmPublishApproveViewModel> = ko.observable(new ConfirmPublishApproveViewModel());
+
+        publishDetails: KnockoutObservable<ConfirmPublishApproveViewModel> = ko.observable(new ConfirmPublishApproveViewModel());
+
+        /** Call the endpoint to change the status of selected allocation lines */
+        private callChangeStatusEndpoint(action: StatusAction) {
+            let updateModel = new PublishedAllocationLineResultStatusUpdateViewModel();
+            updateModel.Status = AllocationLineStatus.Approved;
+
+            let selectedItems = this.approvalDetails();
+            let successMessage = "The status has successfully been transitioned to the Approved state for the selected items.";
+            let failureMessage = "There was an error setting the status of the items to Approved.";
+            let changeStatusUrl = this.settings.approveAllocationLinesUrl.replace("{specificationId}", this.specificationId);
+
+            this.workingMessage("Approving items.");
+
+            if (action === StatusAction.Publish) {
+                this.workingMessage("Publishing items.");
+
+                // Change the variables if the action is publish
+                updateModel.Status = AllocationLineStatus.Published;
+                selectedItems = this.publishDetails();
+                successMessage = "The status has successfully been transitioned to the Published state for the selected items.";
+                failureMessage = "There was an error setting the status of the items to Published.";
+            }
+
+            //this.pageState("working-" + this.pageState());
+            this.isWorkingVisible(true);
+
+            for (let i = 0; i < selectedItems.allocationLines.length; i++) {
+                let selectedItem = selectedItems.allocationLines[i];
+
+                updateModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(selectedItem.providerId, selectedItem.allocationLineId));
+            }
+
+            $.ajax({
+                url: changeStatusUrl,
+                method: "PUT",
+                contentType: 'application/json',
+                data: JSON.stringify(updateModel),
+                headers: {
+                    RequestVerificationToken: this.settings.antiforgeryToken
+                }
+            })
+                .done((result) => {
+                    this.notificationMessage(successMessage);
+                    this.notificationStatus('success');
+
+                    // Once set need to reload the page to get new data and reset selection
+                    this.viewFunding();
+                })
+                .fail((ex) => {
+                    this.notificationMessage(failureMessage);
+                    this.notificationStatus('error');
+
+                    this.dismissConfirmPage();
+                })
+        }
+
         /** Has the used selected at least one allocation line result that can be approved */
         canApprove: KnockoutComputed<boolean> = ko.computed(function () {
             let providerResults = this.allProviderResults();
@@ -207,17 +297,68 @@
                 for (let j = 0; j < allocationResults.length; j++) {
                     let allocationLineResult = allocationResults[j];
 
-                    if (allocationLineResult.isSelected() && allocationLineResult.status === AllocationLineStatus.New) {
+                    if (allocationLineResult.isSelected() && allocationLineResult.status === AllocationLineStatus.Held) {
                         return true;
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }, this);
 
         /** Show confirmation page for approval of selected allocation lines */
-        confirmApprove() { alert('the approve button is not implemented yet'); }
+        confirmApprove() {
+            let approveVM = new ConfirmPublishApproveViewModel();
+            let selectedProviders: Array<string> = [];
+            let selectedAuthorities: Array<string> = [];
+
+            for (let i = 0; i < this.allProviderResults().length; i++) {
+                let providerResult = this.allProviderResults()[i];
+                let providerHasSelectedAllocations: boolean;
+
+                for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
+                    let allocationResult = providerResult.allocationLineResults()[j];
+
+                    if (allocationResult.isSelected() && allocationResult.status === AllocationLineStatus.Held) {
+                        approveVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
+
+                        approveVM.totalFundingApproved += allocationResult.fundingAmount;
+
+                        providerHasSelectedAllocations = true;
+                    }
+                }
+
+                if (providerHasSelectedAllocations) {
+                    selectedProviders.push(providerResult.providerName);
+
+                    if (selectedAuthorities.indexOf(providerResult.authority) === -1) {
+                        selectedAuthorities.push(providerResult.authority);
+                    }
+                }
+            }
+
+            approveVM.numberOfProviders = selectedProviders.length;
+            approveVM.localAuthorities = new calculateFunding.controls.ExpanderViewModel(selectedAuthorities);
+            approveVM.providerTypes = new calculateFunding.controls.ExpanderViewModel(selectedProviders);
+
+            this.approvalDetails(approveVM);
+            this.pageState("confirmApproval");
+            this.notificationMessage(null);
+        }
+
+        /** Approve the selected allocation lines */
+        approve() {
+            this.callChangeStatusEndpoint(StatusAction.Approve);
+        }
+
+        /** Go back to the main view and clear any state from the confirmation pages */
+        dismissConfirmPage() {
+            this.approvalDetails(new ConfirmPublishApproveViewModel());
+            this.publishDetails(new ConfirmPublishApproveViewModel());
+
+            this.pageState("main");
+            this.isWorkingVisible(false);
+        }
 
         /** Has the used selected at least one allocation line result that can be published */
         canPublish: KnockoutComputed<boolean> = ko.pureComputed(function () {
@@ -232,13 +373,55 @@
                         return true;
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }, this);
 
         /** Show confirmation page for publish of selected allocation lines */
-        confirmPublish() { alert('the publish button is not implemented yet'); }
+        confirmPublish() {
+            let publishVM = new ConfirmPublishApproveViewModel();
+            let selectedProviders: Array<string> = [];
+            let selectedAuthorities: Array<string> = [];
+
+            for (let i = 0; i < this.allProviderResults().length; i++) {
+                let providerResult = this.allProviderResults()[i];
+                let providerHasSelectedAllocations: boolean;
+
+                for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
+                    let allocationResult = providerResult.allocationLineResults()[j];
+
+                    if (allocationResult.isSelected() && (allocationResult.status === AllocationLineStatus.Approved || allocationResult.status === AllocationLineStatus.Updated)) {
+                        publishVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
+
+                        publishVM.totalFundingApproved += allocationResult.fundingAmount;
+
+                        providerHasSelectedAllocations = true;
+                    }
+                }
+
+                if (providerHasSelectedAllocations) {
+                    selectedProviders.push(providerResult.providerName);
+
+                    if (selectedAuthorities.indexOf(providerResult.authority) === -1) {
+                        selectedAuthorities.push(providerResult.authority);
+                    }
+                }
+            }
+
+            publishVM.numberOfProviders = selectedProviders.length;
+            publishVM.localAuthorities = new calculateFunding.controls.ExpanderViewModel(selectedAuthorities);
+            publishVM.providerTypes = new calculateFunding.controls.ExpanderViewModel(selectedProviders);
+
+            this.publishDetails(publishVM);
+            this.pageState("confirmPublish");
+            this.notificationMessage(null);
+        }
+
+        /** Publish the selected allocation lines */
+        publish() {
+            this.callChangeStatusEndpoint(StatusAction.Publish);
+        }
 
         /** Load results given the initial filter criteria */
         loadResults(response: any) {
@@ -249,7 +432,7 @@
            // this.fundingPeriod = "Test Funding Period";
            // this.fundingStream = "Test Funding Stream";
 
-            let tempArray: Array < PublishedProviderResultViewModel > =[];
+            let tempArray: Array<PublishedProviderResultViewModel> = [];
 
             for (let i = 0; i < 20000; i++) {
                 let provResult = new PublishedProviderResultViewModel();
@@ -267,8 +450,8 @@
                 let aOne = new PublishedAllocationLineResultViewModel();
                 aOne.allocationLineId = provResult.providerId + "-Alloc1";
                 aOne.allocationLineName = "Allocation Line 1";
-                aOne.fundingAmount = (Math.random() *100) + 1;
-                aOne.status = AllocationLineStatus.New;
+                aOne.fundingAmount = (Math.random() * 100) + 1;
+                aOne.status = AllocationLineStatus.Held;
                 aOne.version = "0.1";
 
                 let aTwo = new PublishedAllocationLineResultViewModel();
@@ -368,19 +551,80 @@
             }
         }
 
+        /**
+         * Request that the funding snapshot is refreshed
+         * As the process is asynchronous is sets up a poll mechanism to check on the progress
+         * */
+        refreshFundingSnapshot() {
+            this.workingMessage("Refreshing funding values for providers");
+            this.isWorkingVisible(true);
+
+            let executeCalcRequest = $.ajax({
+                url: this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.specificationId),
+                dataType: "json",
+                method: "POST",
+                contentType: "application/json"
+            })
+                .done((response) => {
+                    this.pollCalculationProgress();
+                })
+                .fail((response) => {
+                    this.notificationMessage("There was a problem starting the refresh.");
+                    this.notificationStatus("error");
+                    this.isWorkingVisible(false);
+                });
+        }
+
+        /** Polls for the current status of a refresh operation */
+        private pollCalculationProgress() {
+            window.setTimeout(() => {
+                let checkRefreshStateResponse = $.ajax({
+                    url: this.settings.checkPublishResultsStatusUrl.replace("{specificationId}", this.specificationId),
+                    dataType: "json",
+                    method: "POST",
+                    contentType: "application/json"
+                })
+                    .always((response) => {
+                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage);
+
+                        if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
+                            || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
+                            // Update the percent complete
+                            this.workingPercentComplete(status.percentageCompleted);
+                            this.pollCalculationProgress();
+                        }
+                        else if (status.calculationProgressStatus === CalculationProgressStatus.Error) {
+                            // The refresh has failed
+                            this.notificationMessage("Unable to refresh allocation line funding values");
+                            this.notificationStatus("error");
+                            this.workingPercentComplete(null);
+                            this.isWorkingVisible(false);
+                        }
+                        else if (status.calculationProgressStatus === CalculationProgressStatus.Finished) {
+                            // Refresh has completed successfully so reload the data
+                            this.workingPercentComplete(null);
+                            this.isWorkingVisible(false);
+                            this.notificationMessage("Allocation line funding values refreshed successfully.");
+                            this.notificationStatus("success");
+                        }
+                    });
+
+            }, 500);
+        }
+
         /** On click of the button, map the response and load results */
         public viewFunding(): void {
-            if(this.state() !== "idle")
+            if (this.state() !== "idle")
                 return;
             let self = this;
-          
+
             let viewfundingPageUrl = self.settings.viewFundingPageUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
             viewfundingPageUrl = viewfundingPageUrl.replace("{specificationId}", self.selectedSpecification());
             viewfundingPageUrl = viewfundingPageUrl.replace("{fundingstreamId}", self.selectedFundingStream());
 
-            let viewFundingRequest = $.ajax({             
-                url: viewfundingPageUrl ,
-                dataType : "json",
+            let viewFundingRequest = $.ajax({
+                url: viewfundingPageUrl,
+                dataType: "json",
                 method: "GET",
                 contentType: "application/json"
             });
@@ -399,7 +643,7 @@
 
         public handlevfSuccess(response: any) {
 
-           //There are some attributes that still need to be mapped
+            //There are some attributes that still need to be mapped
 
             if (response !== null && response !== undefined) {
                 let publishedProviderArray: Array<IProviderResultsResponse> = response;
@@ -412,16 +656,16 @@
                     // Here we need to go and set the provider properties
                     providerObservable.providerId = provider.providerId;
                     providerObservable.providerName = provider.providerName;
-                    providerObservable.fundingAmount = provider.fundingAmount;                 
+                    providerObservable.fundingAmount = provider.fundingAmount;
                     providerObservable.numberApproved = provider.numberApproved;
                     providerObservable.numberNew = provider.numberHeld;
                     providerObservable.numberPublished = provider.numberPublished;
                     providerObservable.totalAllocationLines = provider.totalAllocationLines;
                     providerObservable.numberUpdated = 0;
-                    
+
                     for (let f in provider.fundingStreamResults) {
                         let fundingStream: IFundingStreamResultResponse = provider.fundingStreamResults[f];
-                       
+
                         for (let a in fundingStream.allocationLineResults) {
                             let allocationLine: IAllocationLineResultsResponse = fundingStream.allocationLineResults[a];
 
@@ -439,17 +683,39 @@
                             providerObservable.authority = allocationLine.authority;
 
                             providerObservable.allocationLineResults.push(allocationLineObservable);
-                        }                        
+                        }
                     }
                     providers.push(providerObservable)
                 }
-                this.allProviderResults(providers); 
+                this.allProviderResults(providers);
             }
         }
-   
-
     }
 
+    /** Execution status for a specification */
+    class SpecificationExecutionStatus {
+        specificationId: string;
+        percentageCompleted: number;
+        calculationProgressStatus: CalculationProgressStatus;
+        errorMessage: string;
+
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string) {
+            this.specificationId = specificationId;
+            this.percentageCompleted = percentageCompleted;
+            this.calculationProgressStatus = calculationProgressStatus;
+        }
+    }
+
+    /** Possible states for a refresh funding operation */
+    enum CalculationProgressStatus {
+        NotStarted,
+        InProgress,
+        Error,
+        Finished
+    }
+     
+
+       
    
 
     /** A published provider result */
@@ -568,10 +834,10 @@
 
     /** The allowable statuses of an allocation line */
     export enum AllocationLineStatus {
-        New,
+        Held,
         Approved,
-        Updated,
-        Published
+        Published,
+        Updated
     }
 
     /** The settings */
@@ -579,6 +845,9 @@
         testScenarioQueryUrl: string;
         viewFundingPageUrl: string;
         antiforgeryToken: string;
+        approveAllocationLinesUrl: string;
+        refreshPublishedResultsUrl: string;
+        checkPublishResultsStatusUrl: string;
         fundingPeriodUrl: string;
         specificationsUrl: string;
         fundingStreamsUrl: string;
@@ -590,6 +859,62 @@
         failed: number;
         ignored: number;
         testCoverage: number;
+    }
+
+    /** A summary of the data to be approved or published */
+    class ConfirmPublishApproveViewModel {
+        numberOfProviders: number;
+        providerTypes: calculateFunding.controls.ExpanderViewModel = new calculateFunding.controls.ExpanderViewModel([]);
+        localAuthorities: calculateFunding.controls.ExpanderViewModel = new calculateFunding.controls.ExpanderViewModel([]);
+        allocationLines: Array<AllocationLineSummaryViewModel> = [];
+        totalFundingApproved: number = 0;
+
+        get totalFundingApprovedDisplay(): string {
+            return "£" + (Number(this.totalFundingApproved)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        }
+    }
+
+    /** A summary of a selected allocation line */
+    class AllocationLineSummaryViewModel {
+        providerId: string;
+        allocationLineId: string;
+        name: string;
+        value: number;
+
+        constructor(providerId: string, allocationLineId: string, name: string, value: number) {
+            this.providerId = providerId;
+            this.allocationLineId = allocationLineId;
+            this.name = name;
+            this.value = value;
+        }
+
+        get valueDisplay(): string {
+            return "£" + (Number(this.value)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        }
+    }
+
+    /** Possible actions for changing status of an allocation line */
+    enum StatusAction {
+        Approve,
+        Publish
+    }
+
+    /** Model submited to the backend to change the status of allocation lines */
+    class PublishedAllocationLineResultStatusUpdateViewModel
+    {
+        Status: AllocationLineStatus;
+        Providers: Array<PublishedAllocationLineResultStatusUpdateProviderViewModel> = [];
+    }
+
+    /** Details of an allocation line that needs it status changing */
+    class PublishedAllocationLineResultStatusUpdateProviderViewModel {
+        ProviderId: string;
+        AllocationLineId: string;
+
+        constructor(providerId: string, allocationLineId: string) {
+            this.ProviderId = providerId;
+            this.AllocationLineId = allocationLineId;
+        }
     }
    
     /** Funding period dropdown options */

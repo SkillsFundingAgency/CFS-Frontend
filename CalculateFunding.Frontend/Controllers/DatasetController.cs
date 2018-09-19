@@ -3,6 +3,7 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using AutoMapper;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -16,11 +17,17 @@
     {
         private readonly IDatasetsApiClient _datasetApiClient;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
-        public DatasetController(IDatasetsApiClient datasetApiClient, ILogger logger)
+        public DatasetController(IDatasetsApiClient datasetApiClient, ILogger logger, IMapper mapper)
         {
+            Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+
             _datasetApiClient = datasetApiClient;
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -107,7 +114,7 @@
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<ValidateDatasetResponseModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
+            ValidatedApiResponse<DatasetValidationStatusModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
 
             if (apiResponse == null)
             {
@@ -127,12 +134,35 @@
                 return new InternalServerErrorResult("Validate Dataset API response failed with status code: {statusCode}" + apiResponse.StatusCode);
             }
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)
+            DatasetValidationStatusViewModel result = _mapper.Map<DatasetValidationStatusViewModel>(apiResponse.Content);
+
+            return new OkObjectResult(result);
+        }
+
+        [HttpGet]
+        [Route("api/dataset-validate-status/{operationId}")]
+        public async Task<IActionResult> GetDatasetValidateStatus([FromRoute]string operationId)
+        {
+            if (string.IsNullOrWhiteSpace(operationId))
             {
-                return Ok(apiResponse.Content);
+                return new BadRequestObjectResult("Missing operationId");
             }
 
-            return new NoContentResult();
+            ApiResponse<DatasetValidationStatusModel> statusResponse = await _datasetApiClient.GetDatasetValidateStatus(operationId);
+            if (statusResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new NotFoundObjectResult("Validation status not found");
+            }
+            else if (statusResponse.StatusCode == HttpStatusCode.OK)
+            {
+                DatasetValidationStatusViewModel result = _mapper.Map<DatasetValidationStatusViewModel>(statusResponse.Content);
+                return new OkObjectResult(result);
+            }
+            else
+            {
+                _logger.Error($"{nameof(GetDatasetValidateStatus)} returned unexpected HTTP status {statusResponse.StatusCode}");
+                return new InternalServerErrorResult("Unable to query Validate Status");
+            }
         }
     }
 }

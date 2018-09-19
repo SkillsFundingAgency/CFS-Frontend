@@ -96,6 +96,9 @@
         Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId);
 
         Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFundingByPeriod(string fundingPeriodId);
+        
+	    Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId);
 
+        Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId);
     }
 }

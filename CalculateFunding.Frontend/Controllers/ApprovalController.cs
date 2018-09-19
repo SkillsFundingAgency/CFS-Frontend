@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
@@ -13,15 +15,18 @@ namespace CalculateFunding.Frontend.Controllers
     public class ApprovalController : Controller
     {
         private readonly IResultsApiClient _resultsClient;
+        private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
 
-        public ApprovalController(IResultsApiClient resultsApiClient, IMapper mapper)
+        public ApprovalController(IResultsApiClient resultsApiClient, ISpecsApiClient specsClient, IMapper mapper)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
 
             _resultsClient = resultsApiClient;
             _mapper = mapper;
+	        _specsClient = specsClient;
         }
 
         [Route("api/specs/{specificationId}/allocationlineapprovalstatus")]
@@ -79,6 +84,48 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(result);
         }
 
+	    [Route("api/specs/{specificationId}/refresh-published-results")]
+	    [HttpPost]
+	    public async Task<IActionResult> RefreshPublishedResults(string specificationId)
+	    {
+		    Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+		    ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.RefreshPublishedResults(specificationId);
+
+		    if (callResult.StatusCode == HttpStatusCode.OK)
+		    {
+			    return new OkObjectResult(callResult.Content);
+		    }
+
+		    if (callResult.StatusCode == HttpStatusCode.BadRequest)
+		    {
+			    return new BadRequestResult();
+		    }
+
+		    return new StatusCodeResult(500);
+	    }
+
+        [Route("api/specs/{specificationId}/check-publish-result-status")]
+        [HttpPost]
+        public async Task<IActionResult> CheckPublishResultStatus(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.CheckPublishResultStatus(specificationId);
+
+            if (callResult.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(callResult.Content);
+            }
+
+            if (callResult.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
 
 
         [Route("/api/results/get-published-provider-results-for-funding-stream")]
@@ -98,6 +145,4 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(publishedProviderResponse.Content);
         }
     }
-
-
 }
