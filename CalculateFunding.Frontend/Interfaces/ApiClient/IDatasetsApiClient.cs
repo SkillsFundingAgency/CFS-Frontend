@@ -33,7 +33,7 @@
 
         Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset);
 
-        Task<ValidatedApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model);
+        Task<ValidatedApiResponse<DatasetValidationStatusModel>> ValidateDataset(ValidateDatasetModel model);
 
         Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId);
 
@@ -52,5 +52,7 @@
         Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId);
 
         Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel);
+
+        Task<ApiResponse<DatasetValidationStatusModel>> GetDatasetValidateStatus(string operationId);
     }
 }

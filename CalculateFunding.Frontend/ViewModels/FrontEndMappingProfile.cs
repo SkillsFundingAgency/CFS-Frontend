@@ -194,6 +194,10 @@
                {
                    destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
                });
+
+            CreateMap<DatasetValidationStatusModel, DatasetValidationStatusViewModel>();
+            CreateMap<DatasetCreateUpdateResponseModel, DatasetCreateUpdateResponseViewModel>();
+            CreateMap<DatasetValidationStatusOperation, DatasetValidationStatusOperationViewModel>();
         }
         private void MapTestEngine()
         {

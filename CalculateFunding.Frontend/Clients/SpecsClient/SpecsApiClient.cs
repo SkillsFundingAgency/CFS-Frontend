@@ -20,7 +20,16 @@
         public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor context)
            : base(httpClientFactory, HttpClientKeys.Specifications, logger)
         {
-            _cancellationToken = context.HttpContext.RequestAborted;
+            if (context != null)
+            {
+                if (context.HttpContext != null)
+                {
+                    if (context.HttpContext.RequestAborted != default(CancellationToken))
+                    {
+                        _cancellationToken = context.HttpContext.RequestAborted;
+                    }
+                }
+            }
         }
 
         public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()

@@ -46,54 +46,54 @@
             }
         }
 
-        public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
+        public async Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
         {
-            return GetAsync<IEnumerable<DatasetDefinition>>("get-data-definitions");
+            return await GetAsync<IEnumerable<DatasetDefinition>>("get-data-definitions");
         }
 
-        public Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> CreateDataset(CreateNewDatasetModel dataset)
-        {
-            Guard.ArgumentNotNull(dataset, nameof(dataset));
-
-            return ValidatedPostAsync<NewDatasetVersionResponseModel, CreateNewDatasetModel>("create-new-dataset", dataset);
-        }
-
-        public Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset)
+        public async Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> CreateDataset(CreateNewDatasetModel dataset)
         {
             Guard.ArgumentNotNull(dataset, nameof(dataset));
 
-            return ValidatedPostAsync<NewDatasetVersionResponseModel, DatasetVersionUpdateModel>("dataset-version-update", dataset);
+            return await ValidatedPostAsync<NewDatasetVersionResponseModel, CreateNewDatasetModel>("create-new-dataset", dataset);
         }
 
-        public Task<ValidatedApiResponse<ValidateDatasetResponseModel>> ValidateDataset(ValidateDatasetModel model)
+        public async Task<ValidatedApiResponse<NewDatasetVersionResponseModel>> UpdateDatasetVersion(DatasetVersionUpdateModel dataset)
+        {
+            Guard.ArgumentNotNull(dataset, nameof(dataset));
+
+            return await ValidatedPostAsync<NewDatasetVersionResponseModel, DatasetVersionUpdateModel>("dataset-version-update", dataset);
+        }
+
+        public async Task<ValidatedApiResponse<DatasetValidationStatusModel>> ValidateDataset(ValidateDatasetModel model)
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return ValidatedPostAsync<ValidateDatasetResponseModel, ValidateDatasetModel>("validate-dataset", model, timeout: TimeSpan.FromSeconds(300));
+            return await ValidatedPostAsync<DatasetValidationStatusModel, ValidateDatasetModel>("validate-dataset", model, timeout: TimeSpan.FromSeconds(300));
         }
 
-        public Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)
+        public async Task<HttpStatusCode> AssignDatasetSchema(AssignDatasetSchemaModel datasetSchema)
         {
             Guard.ArgumentNotNull(datasetSchema, nameof(datasetSchema));
 
-            return PostAsync("create-definitionspecification-relationship", datasetSchema);
+            return await PostAsync("create-definitionspecification-relationship", datasetSchema);
         }
 
-        public Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId)
+        public async Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> GetAssignedDatasetSchemasForSpecification(string specificationId)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
-            return GetAsync<IEnumerable<DatasetSchemasAssigned>>($"get-definitions-relationships?specificationId={specificationId}");
+            return await GetAsync<IEnumerable<DatasetSchemasAssigned>>($"get-definitions-relationships?specificationId={specificationId}");
         }
 
-        public Task<ApiResponse<DatasetSchemasAssigned>> GetAssignedDatasetSchemasForSpecificationAndRelationshipName(string specificationId, string relationshipName)
+        public async Task<ApiResponse<DatasetSchemasAssigned>> GetAssignedDatasetSchemasForSpecificationAndRelationshipName(string specificationId, string relationshipName)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
-            return GetAsync<DatasetSchemasAssigned>($"get-definition-relationship-by-specificationid-name?specificationId={specificationId}&name={relationshipName}");
+            return await GetAsync<DatasetSchemasAssigned>($"get-definition-relationship-by-specificationid-name?specificationId={specificationId}&name={relationshipName}");
         }
 
-        public Task<ApiResponse<DefinitionSpecificationRelationship>> GetDefinitionSpecificationRelationshipById(string relationshipId)
+        public async Task<ApiResponse<DefinitionSpecificationRelationship>> GetDefinitionSpecificationRelationshipById(string relationshipId)
         {
             DefinitionSpecificationRelationship result = new DefinitionSpecificationRelationship()
             {
@@ -104,66 +104,66 @@
                 Specification = new Reference("SpecificationID", "SpecificationName"),
             };
 
-            return Task.FromResult(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK, result));
+            return await Task.FromResult(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK, result));
         }
 
-        public Task<ApiResponse<SelectDataSourceModel>> GetDatasourcesByRelationshipId(string relationshipId)
+        public async Task<ApiResponse<SelectDataSourceModel>> GetDatasourcesByRelationshipId(string relationshipId)
         {
             Guard.ArgumentNotNull(relationshipId, nameof(relationshipId));
 
-            return GetAsync<SelectDataSourceModel>($"get-datasources-by-relationshipid?relationshipId={relationshipId}");
+            return await GetAsync<SelectDataSourceModel>($"get-datasources-by-relationshipid?relationshipId={relationshipId}");
         }
 
-        public Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion)
+        public async Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion)
         {
             Guard.ArgumentNotNull(datasetVersion, nameof(datasetVersion));
 
-            return PostAsync("assign-datasource-to-relationship", datasetVersion);
+            return await PostAsync("assign-datasource-to-relationship", datasetVersion);
         }
 
-        public Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>> GetDatasetSpecificationRelationshipsBySpecificationId(string specificationId)
+        public async Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>> GetDatasetSpecificationRelationshipsBySpecificationId(string specificationId)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
-            return GetAsync<IEnumerable<DatasetSpecificationRelationshipModel>>($"get-relationships-by-specificationId?specificationId={specificationId}");
+            return await GetAsync<IEnumerable<DatasetSpecificationRelationshipModel>>($"get-relationships-by-specificationId?specificationId={specificationId}");
         }
 
-        public Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId)
+        public async Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId)
         {
-            return GetAsync<DatasetDefinition>($"get-dataset-definition-by-id?datasetDefinitionId={datasetDefinitionId}");
+            return await GetAsync<DatasetDefinition>($"get-dataset-definition-by-id?datasetDefinitionId={datasetDefinitionId}");
         }
 
-        public Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds)
+        public async Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDatasetDefinitionsByIds(IEnumerable<string> datasetDefinitionIds)
         {
             if (datasetDefinitionIds.IsNullOrEmpty())
             {
-                return Task.FromResult(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, Enumerable.Empty<DatasetDefinition>()));
+                return await Task.FromResult(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, Enumerable.Empty<DatasetDefinition>()));
             }
 
-            return PostAsync<IEnumerable<DatasetDefinition>, IEnumerable<string>>("get-dataset-definitions-by-ids", datasetDefinitionIds);
+            return await PostAsync<IEnumerable<DatasetDefinition>, IEnumerable<string>>("get-dataset-definitions-by-ids", datasetDefinitionIds);
         }
 
-        public Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId)
+        public async Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId)
         {
             if (string.IsNullOrWhiteSpace(datasetId))
             {
                 throw new ArgumentNullException(nameof(datasetId), "Dataset Id for dataset download is null");
             }
-            return GetAsync<DownloadDatasourceModel>($"download-dataset-file?datasetId={datasetId}");
+            return await GetAsync<DownloadDatasourceModel>($"download-dataset-file?datasetId={datasetId}");
         }
 
-        public Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel)
+        public async Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel)
         {
             Guard.ArgumentNotNull(requestModel, nameof(requestModel));
 
-            return PostAsync<DownloadDatasetSchemaResponse, DownloadDatasetSchemaRequest>("get-schema-download-url", requestModel);
+            return await PostAsync<DownloadDatasetSchemaResponse, DownloadDatasetSchemaRequest>("get-schema-download-url", requestModel);
         }
 
-        public Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId)
+        public async Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId)
         {
             Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
 
-            return GetAsync<DatasetVersionResponse>($"get-currentdatasetversion-by-datasetid?datasetId={datasetId}");
+            return await GetAsync<DatasetVersionResponse>($"get-currentdatasetversion-by-datasetid?datasetId={datasetId}");
         }
 
         public async Task<PagedResult<DatasetDefinitionSearchResultItem>> FindDatasetDefinitions(SearchFilterRequest filterOptions)
@@ -187,6 +187,13 @@
             {
                 return null;
             }
+        }
+
+        public async Task<ApiResponse<DatasetValidationStatusModel>> GetDatasetValidateStatus(string operationId)
+        {
+            Guard.IsNullOrWhiteSpace(operationId, nameof(operationId));
+
+            return await GetAsync<DatasetValidationStatusModel>($"get-dataset-validate-status?operationId={operationId}");
         }
     }
 }

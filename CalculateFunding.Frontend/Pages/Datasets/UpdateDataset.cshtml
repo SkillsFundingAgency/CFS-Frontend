@@ -48,7 +48,7 @@
                     <p>Remove these errors before trying again</p>
                 </div>
             </div>
-            
+
             <div class="validation-summary-errors" style="display:none" data-bind="visible: isInvalidSchemaSummaryVisible, attr{:'display':'block'">
                 <h3><a id="validation-link-for-UpdateViewModel-Filename" class="validation-summary-link" href="#field-UpdateViewModel-Filename">The data source file does not match the schema rules</a></h3>
                 <p>Download this version with errors highlighted:</p>
@@ -82,7 +82,7 @@
             <div class="spacing-15-bottom">
                 <div data-bind="css: { 'validation-failed-block': !isCommentValid() }">
                     <div class="form-group">
-                        <a validationanchor-for="Comment"></a>
+                        <a validationanchor-for="Comment" id="validation-link-for-Comment"></a>
                         <label asp-for="Comment">Change note</label>
 
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Say what's changed</span></h4>
@@ -104,6 +104,7 @@
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/dataset.common.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/dataset.update.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var createDatasetElement = document.getElementById("dataset-form-controls");

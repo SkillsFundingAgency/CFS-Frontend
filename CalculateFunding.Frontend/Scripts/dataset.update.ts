@@ -1,51 +1,16 @@
-﻿namespace calculateFunding.updateDataset {
+﻿/// <reference path="dataset.common.ts" />
 
-    export class UpdateDatasetViewModel {
+namespace calculateFunding.updateDataset {
+
+    export class UpdateDatasetViewModel extends calculateFunding.datasets.DatasetCommonViewModel {
         public comment: KnockoutObservable<string> = ko.observable("");
-
-        public fileName: KnockoutObservable<string> = ko.observable("");
-
-        public description: KnockoutObservable<string> = ko.observable("");
-
-        public isLoadingVisible: KnockoutComputed<boolean>;
-
-        public isFormVisible: KnockoutComputed<boolean>;
-
-        public isValidationSummaryVisible: KnockoutComputed<boolean>;
-
-        public isInvalidDatasourceSummaryVisible: KnockoutComputed<boolean>;
-
-        public isInvalidSchemaSummaryVisible: KnockoutComputed<boolean>;
-
-        public linkToInvalidatedFile: KnockoutObservable<string> = ko.observable("");
-
-        public isUploadButtonEnabled: KnockoutComputed<boolean>;
-
-        public state: KnockoutObservable<string> = ko.observable("idle");
-
-        public loadingMessage: KnockoutObservable<string> = ko.observable();
 
         public isCommentValid: KnockoutObservable<boolean> = ko.observable(true);
 
-        public isDescriptionValid: KnockoutObservable<boolean> = ko.observable(true);
-
-        public isFileNameValid: KnockoutObservable<boolean> = ko.observable(true);
-
-        public isDataSourceValid: KnockoutObservable<boolean> = ko.observable(true);
-
-        public isUploadedDataSchemaValid: KnockoutObservable<boolean> = ko.observable(true);
-
-        public validationLinks: KnockoutObservableArray<IValidationLink> = ko.observableArray([]);
-
-        private datasetFile: any = null;
-
         private datasetId: string;
 
-        private failedUploadErrorMessage: string = "Check you have the right format and check your internet connectivity";
-
-        private invalidDataSourceFileLayoutMessage: string = "The data source file layout is invalid";
-
         constructor(options: IUpdateDatasetViewModelConstructorParameters) {
+            super("UpdateDatasetViewModel");
             let self = this;
 
             if (typeof options === "undefined") {
@@ -70,26 +35,6 @@
 
             this.datasetId = options.datasetId;
 
-            self.isLoadingVisible = ko.pureComputed(() => {
-                return self.state() === "loading";
-            });
-
-            self.isFormVisible = ko.pureComputed(() => {
-                return self.state() === "idle";
-            });
-
-            self.isValidationSummaryVisible = ko.pureComputed(() => {
-                return !(this.isFileNameValid() && this.isCommentValid() && this.isDescriptionValid());
-            });
-
-            self.isInvalidDatasourceSummaryVisible = ko.computed(() => {
-                return !self.isDataSourceValid();
-            });
-
-            self.isInvalidSchemaSummaryVisible = ko.computed(() => {
-                return !this.isUploadedDataSchemaValid();
-            });
-
             self.isUploadButtonEnabled = ko.computed(() => {
 
                 let isEnabled = self.fileName() && true;
@@ -98,7 +43,7 @@
             });
         }
 
-        private resetValidation(): void {
+        protected resetValidation(): void {
             this.isCommentValid(true);
             this.isDescriptionValid(true);
             this.isFileNameValid(true);
@@ -106,41 +51,11 @@
             this.isUploadedDataSchemaValid(true);
         }
 
-        public fileSelect(): void {
-            let file = (<HTMLInputElement>event.target).files[0];
-            if (file && file.name) {
-                let validationResult = this.doFileSelectNameValidation(file.name);
-                if (validationResult.result) {
-                    this.fileName(file.name);
-                    this.datasetFile = file;
-                    this.isFileNameValid(true);
-                    this.isUploadedDataSchemaValid(true);
-                } else {
-                    this.fileName(null);
-                    this.datasetFile = null;
-                    this.isFileNameValid(false);
-                    let link = {
-                        href: "#field-UpdateViewModel-Filename",
-                        message: validationResult.errorMessage,
-                        id: "validation-link-for-UpdateViewModel-Filename"
-                    }
-                    this.validationLinks([]);
-                    this.validationLinks.push(link);
-                }
-            }
-        }
-
-        private doFileSelectNameValidation(filename: string): IValidationResult {
-            let validExtensions = ["XLSX", "XLS"];
-            if (filename && !validExtensions.some((value) => value === filename.split('.').pop().toUpperCase())) {
-                return { result: false, errorMessage: "The data source file type is invalid. Check that your file is an xls or xlsx file"};
-            };
-            return { result: true, errorMessage: undefined }
-        }
-
         public saveDataset(): void {
             if (this.state() !== "idle")
                 return;
+
+            this.resetValidation();
 
             let data = {
                 filename: this.fileName(),
@@ -210,16 +125,22 @@
             blobRequest.done((blobResponse, msg, xhr) => {
                 if (xhr.status === 201) {
 
-                    self.handleBlobUploadSuccess(response.datasetId, response.filename, response.version);
+                    let data = {
+                        datasetId: response.datasetId,
+                        filename: response.filename,
+                        version: response.version,
+                        description: self.description(),
+                        comment: self.comment(),
+                    };
+
+                    self.handleBlobUploadSuccess(data);
                 }
             });
 
             blobRequest.fail(() => {
                 self.state("idle");
-
             });
         }
-
 
         private handleValidateFormFailed(modelState: ICreateNewDatasetModelState): void {
 
@@ -230,9 +151,9 @@
             if (modelState.Name && modelState.Name.length > 0) {
                 this.isCommentValid(false);
                 let link = {
-                    href: "#field-CreateDatasetViewModel-Comment",
+                    href: "#field-Comment",
                     message: modelState.Name[0],
-                    id: "validation-link-for-CreateDatasetViewModel-Comment"
+                    id: "validation-link-for-Comment"
 
                 }
                 this.validationLinks.push(link);
@@ -241,9 +162,9 @@
             if (modelState.Description && modelState.Description.length > 0) {
                 this.isDescriptionValid(false);
                 let link = {
-                    href: "#field-CreateDatasetViewModel-Description",
+                    href: "#field-UpdateDatasetViewModel-Description",
                     message: modelState.Description[0],
-                    id: "validation-link-for-CreateDatasetViewModel-Description"
+                    id: "validation-link-for-UpdateDatasetViewModel-Description"
                 }
                 this.validationLinks.push(link);
             }
@@ -251,99 +172,15 @@
             if (modelState.Filename && modelState.Filename.length > 0) {
                 this.isFileNameValid(false);
                 let link = {
-                    href: "#field-CreateDatasetViewModel-Filename",
+                    href: "#field-UpdateDatasetViewModel-Filename",
                     message: modelState.Filename[0],
-                    id: "validation-link-for-CreateDatasetViewModel-Filename"
+                    id: "validation-link-for-UpdateDatasetViewModel-Filename"
                 }
                 this.validationLinks.push(link);
             }
         }
 
-        private handleBlobUploadSuccess(datasetId: string, filename: string, version: number): void {
-            let self = this;
-
-            self.loadingMessage("Validating dataset..");
-
-            let data = {
-                datasetId: datasetId,
-                filename: filename,
-                version: version,
-                description: self.description(),
-                comment: self.comment(),
-            };
-
-            let validationRequest = $.ajax({
-                url: "/api/datasets/validate-dataset",
-                data: JSON.stringify(data),
-                dataType: "json",
-                method: "POST",
-                contentType: "application/json",
-            });
-
-            validationRequest.always((res: any, msg: string, xhr: JQueryXHR) => {
-                if (xhr.status === 200) {
-                    self.handleDatasetValidationSuccess(datasetId);
-                }
-                else if (res.status === 400) {
-                    self.state("idle");
-
-                    if ('typical-model-validation-error' in res.responseJSON) {
-                        let filteredErrors: Array<IModelValidationError> = [];
-                        for (var modelState in res.responseJSON) {
-                            if (modelState !== "typical-model-validation-error") {
-                                filteredErrors.push(({ modelName: modelState, errorMessage: res.responseJSON[modelState] }) as any);
-                            }
-                        }
-                        for (var modelStateIndex in filteredErrors) {
-                            let modelState = filteredErrors[modelStateIndex];
-                            let link = {
-                                href: "#field-CreateDatasetViewModel-" + (modelState.modelName),
-                                message: modelState.errorMessage,
-                                id: "validation-link-for-CreateDatasetViewModel-" + (modelState.modelName)
-                            }
-                            this.validationLinks([]);
-                            this.validationLinks.push(link);
-                        }
-
-                        this.isFileNameValid(false);
-                        return;
-                    }
-                    else if ('excel-validation-error' in res.responseJSON) {
-                        this.linkToInvalidatedFile(res.responseJSON.blobUrl);
-                        this.isUploadedDataSchemaValid(false);
-                        return;
-                    }
-                    else {
-                        self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
-                    }
-                    self.handleDatasetValidationFailed(self.invalidDataSourceFileLayoutMessage);
-                }
-                else {
-                    self.state("idle");
-                    self.handleDatasetValidationFailed(self.failedUploadErrorMessage);
-                }
-            });
-        }
-
-        private invalidateUpload(message: string = "", displayInvalidDatasourceSummary: boolean = false): void {
-            this.resetValidation();
-
-            this.validationLinks([]);
-
-            if (displayInvalidDatasourceSummary) {
-                this.isDataSourceValid(false);
-            }
-
-            this.isFileNameValid(false);
-            let link = {
-                href: "#field-UpdateViewModel-Filename",
-                message: message,
-                id: "validation-link-for-UpdateViewModel-Filename"
-            }
-            this.validationLinks.push(link);
-        }
-
-        private handleValidationRequestFailed(response: IValidateDatasetResponse): void {
+        protected handleValidationRequestFailed(response: IValidateDatasetResponse): void {
             this.resetValidation();
 
             this.validationLinks([]);
@@ -352,34 +189,13 @@
             let link = {
                 href: response.fileUrl,
                 message: response.message,
-                id: "validation-link-for-CreateDatasetViewModel-Filename"
+                id: "validation-link-for-UpdateDatasetViewModel-Filename"
             }
             this.validationLinks.push(link);
         }
 
-        private handleBlobUploadFailed(): void {
-            this.invalidateUpload(this.failedUploadErrorMessage);
-        }
-
-        private handleDatasetValidationSuccess(datasetId: String): void {
+        protected handleDatasetValidationSuccess(datasetId: string): void {
             window.location.href = "/datasets/managedatasets?operationType=DatasetUpdated&operationId="+datasetId;
-        }
-
-        private handleDatasetValidationFailed(message: string): void {
-            this.invalidateUpload(message, true);
-        }
-
-        private ConvertToFriendlySize(num: number): string {
-            if (num > 0) {
-                if (num < 1024) { return num.toFixed(2) + " Bytes" }
-                if (num < 1048576) { return (num / 1024).toFixed(2) + " KB" }
-                if (num < 1073741824) { return (num / 1024 / 1024).toFixed(2) + " MB" }
-                if (num < 1099511600000) { return (num / 1024 / 1024 / 1024).toFixed(2) + " GB" }
-
-                return (num / 1024 / 1024 / 1024 / 1024).toFixed(2) + " TB";
-            }
-
-            return num.toString();
         }
     }
 
@@ -422,10 +238,6 @@
         fileUrl: string;
     }
 
-    export interface IValidationResult {
-        result: boolean;
-        errorMessage: string;
-    }
 
     export interface IModelValidationError {
         modelName: string;

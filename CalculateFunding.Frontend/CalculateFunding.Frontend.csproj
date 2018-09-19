@@ -32,6 +32,7 @@
     <None Remove="Scripts\confirm.funding-specification.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
+    <None Remove="Scripts\dataset.common.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
@@ -140,6 +141,7 @@
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
+    <TypeScriptCompile Include="Scripts\dataset.common.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\expander.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
