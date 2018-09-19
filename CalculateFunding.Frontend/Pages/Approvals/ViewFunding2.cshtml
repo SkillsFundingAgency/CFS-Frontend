@@ -11,55 +11,45 @@
         <ol>
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
-            <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-         </ol>
+            <li><a href="/approvals/viewfunding2">@BreadcrumbText.ApproveAndPublishFunding</a></li>
+        </ol>
     </div>
 }
+@section Bannerleft{
+        <h1 class="hero-title">Approve and publish funding</h1>
+        <h2 class="hero-description">You can approve and publish the chosen specification</h2>
+ }
 
-@section BannerWhole {
-    <div class="viewfunding-page-header spacing-15">
-        <div>
-            <h2 class="hero-description-skinny" data-bind="text: selectedFundingPeriod"></h2>
-            <h1 class="hero-title-skinny" data-bind="text: selectedSpecification"></h1>
-            <h3 class="hero-text" data-bind="text: selectedFundingStream"></h3>
-        </div>
-        <div class="viewfunding-page-buttons" hidden="hidden">
-            <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
-            <button id="publish" class="btn approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: confirmPublish">Publish</button>
-        </div>
-
-    </div>
-}
 
 <div class="viewfunding-page-container" id="viewfunding-page-container">
     <div data-bind="visible: pageState() === 'initial'" class="row">
         <div class="col-sm-9 col-md-6">
-            <div >
+            <div>
                 <div class="form-group">
                     <label>Select funding period:</label>
                     <div class="form-group">
                         <select id="fundingperiod" data-bind="options: FundingPeriods, optionsText: 'value', optionsValue: 'id',  value:selectedFundingPeriod, optionsCaption: 'Select'"></select>
                     </div>
                 </div>
-             </div>
+            </div>
 
             <div data-bind="">
-                     <div class="form-group">
-                         <label >Select specification:</label>
-                        <div class="form-group">
-                            <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
-                        </div>
+                <div class="form-group">
+                    <label>Select specification:</label>
+                    <div class="form-group">
+                        <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
                     </div>
-             </div>
+                </div>
+            </div>
 
             <div>
+                <div class="form-group">
+                    <label>Select funding stream:</label>
                     <div class="form-group">
-                         <label>Select funding stream:</label>
-                        <div class="form-group">
-                            <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
-                        </div>
+                        <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
                     </div>
-             </div>
+                </div>
+            </div>
 
             <div>
                 <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span>Only one funding stream can be approved or published at a time</span></h4>
@@ -71,56 +61,56 @@
                 </div>
             </div>
 
-            <div id="view-funding-wait-control" style="display:none; text-align:center"  class="col-sm-9 col-md-6">
+            <div id="view-funding-wait-control" style="display:none; text-align:center" class="col-sm-9 col-md-6">
                 <p class="h4-heading"><strong>Search is progressing</strong></p>
                 <p>This may take a minute or so, please bear with us.</p>
-                 <img src="~/assets/images/loader.gif" />
+                <img src="~/assets/images/loader.gif" />
             </div>
         </div>
     </div>
-        <div data-bind="visible: pageState() === 'main'">
-            <div class="table-filter-container" data-spy="affix" data-offset-top="300">
-                <div class="row">
-                    <div class="col-xs-2">
-                        <div class="bold">Allocation line</div>
-                        <div>
-                            <select id="allocationLineFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Provider Type</div>
-                        <div>
-                            <select id="providerTypeFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Local Authority</div>
-                        <div>
-                            <select id="localAuthorityFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="bold">Status</div>
-                        <div>
-                            <select id="statusFilter">
-                                <option>Todo...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div><a href="#">Clear filters</a></div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <strong data-bind="text: filteredResults().length"></strong> providers</div>
+    <div data-bind="visible: pageState() === 'main'">
+        <div class="table-filter-container" data-spy="affix" data-offset-top="300">
+            <div class="row">
+                <div class="col-xs-2">
+                    <div class="bold">Allocation line</div>
+                    <div>
+                        <select id="allocationLineFilter">
+                            <option>Todo...</option>
+                        </select>
                     </div>
                 </div>
-            </div>       
+                <div class="col-xs-2">
+                    <div class="bold">Provider Type</div>
+                    <div>
+                        <select id="providerTypeFilter">
+                            <option>Todo...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="bold">Local Authority</div>
+                    <div>
+                        <select id="localAuthorityFilter">
+                            <option>Todo...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="bold">Status</div>
+                    <div>
+                        <select id="statusFilter">
+                            <option>Todo...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div><a href="#">Clear filters</a></div>
+                </div>
+                <div class="col-xs-2">
+                    <div>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <strong data-bind="text: filteredResults().length"></strong> providers</div>
+                </div>
+            </div>
+        </div>
         <table class="cf">
             <thead data-spy="affix" data-offset-top="300">
                 <tr>
@@ -147,7 +137,7 @@
                 <!-- ko foreach: currentPageResults -->
                 <tr class="expander-trigger-container data-provider-container provider-column">
                     <td class="view-funding-provider-border expander-container-group-identifier">
-                        <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerId" class="inline-table-label data-provider-name"></label>
+                        <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
                     </td>
                     <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
                     <td class="text-center status-column" data-bind="css: { 'status-new': numberNew > 0 }"><span data-bind="text: numberNew"></span>/<span data-bind="text: totalAllocationLines"></span></td>
@@ -246,7 +236,7 @@
             "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
             "viewFundingPageUrl": "/api/results/get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingstreamId={fundingstreamId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
-            "fundingPeriodUrl": "/api/specs/funding-periods", 
+            "fundingPeriodUrl": "/api/specs/funding-periods",
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
             "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
         };

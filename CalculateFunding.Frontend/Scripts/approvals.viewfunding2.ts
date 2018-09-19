@@ -73,7 +73,7 @@
             })
 
             this.selectedFundingPeriod.subscribe(function () {
-                if (self.selectedFundingPeriod !== undefined && self.selectedFundingPeriod() !== "Select") {                   
+                if (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod() !== "Select") {                   
                     /** Load Specifications in the specification dropdown */
                     let getSpecificationForSelectedPeriodUrl = self.settings.specificationsUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod());
 
@@ -368,7 +368,7 @@
             }
         }
 
-        /** On click of the button, validate form and search funding if valid */
+        /** On click of the button, map the response and load results */
         public viewFunding(): void {
             if(this.state() !== "idle")
                 return;
@@ -392,16 +392,15 @@
                     console.log(response);
                     let viewFundingResponse: KnockoutObservableArray<PublishedProviderResultViewModel> = response;
                     self.handlevfSuccess(viewFundingResponse);
+                    self.pageState("main");
                 }
             });
         }
 
         public handlevfSuccess(response: any) {
 
-            //var self = this;
-            //self. = ko.observableArray();
+           //There are some attributes that still need to be mapped
 
-            //to be implemented
             if (response !== null && response !== undefined) {
                 let publishedProviderArray: Array<IProviderResultsResponse> = response;
                 let providers: Array<PublishedProviderResultViewModel> = [];
@@ -412,17 +411,14 @@
                     let providerObservable: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
                     // Here we need to go and set the provider properties
                     providerObservable.providerId = provider.providerId;
+                    providerObservable.providerName = provider.providerName;
                     providerObservable.fundingAmount = provider.fundingAmount;                 
                     providerObservable.numberApproved = provider.numberApproved;
                     providerObservable.numberNew = provider.numberHeld;
                     providerObservable.numberPublished = provider.numberPublished;
                     providerObservable.totalAllocationLines = provider.totalAllocationLines;
-                    //providerObservable.numberUpdated = provider.
-                    //providerObservable.fundingAmountDisplay = provider.fundingAmount;
-                    //providerObservable.isSelected = provider
                     providerObservable.numberUpdated = 0;
-                   // providerObservable.isSelected(provider.d = provider) = true;
-
+                    
                     for (let f in provider.fundingStreamResults) {
                         let fundingStream: IFundingStreamResultResponse = provider.fundingStreamResults[f];
                        
@@ -437,8 +433,10 @@
                             allocationLineObservable.fundingAmount = allocationLine.fundingAmount;
                             allocationLineObservable.lastUpdated = allocationLine.lastUpdated;
                             allocationLineObservable.status = allocationLine.status;
-                            //allocationLineObservable.fundingAmountDisplay = allocationLine.
+                            allocationLineObservable.version = "1.0" //allocationLine.
 
+                            // bit of contention here
+                            providerObservable.authority = allocationLine.authority;
 
                             providerObservable.allocationLineResults.push(allocationLineObservable);
                         }                        
@@ -448,29 +446,7 @@
                 this.allProviderResults(providers); 
             }
         }
-
-
-        
-
-
-        //public allocationLineResults(fundingStreamVM: FundingStreamResultViewModel) {
-
-        //    fundingStreamVM.foreach(items : PublishedAllocationLineResultViewModel in fundingStreamVM) 
-        //    {
-        //        let publishAllocResultVM = new PublishedAllocationLineResultViewModel();
-        //        publishAllocResultVM.allocationLineId = items.allocationLineId;
-        //        publishAllocResultVM.allocationLineName = items.allocationLineName;
-        //        publishAllocResultVM.fundingAmount = items.fundingAmount;
-        //        // publishAllocResultVM.fundingAmountDisplay = item.fundingAmountDisplay();
-        //        publishAllocResultVM.isSelected = items.isSelected;
-        //        publishAllocResultVM.status = items.status;
-        //        publishAllocResultVM.version = items.version;
-        //        publishAllocResultVM.lastUpdated = items.lastUpdated;
-        //    }
-            
-        //}
-
-    
+   
 
     }
 
@@ -539,6 +515,7 @@
         status: AllocationLineStatus;
         fundingAmount: number;
         lastUpdated: string;
+        authority: string;
 
         get fundingAmountDisplay(): string {
             return (Number(this.fundingAmount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
@@ -568,6 +545,7 @@
         fundingAmount: number;
         status: number;
         lastUpdated: string;
+        authority: string;
     }
 
     export interface IProviderResultsResponse {
@@ -581,7 +559,9 @@
         numberHeld: number;
         numberApproved: number;
         numberPublished: number;
+        numberUpdated: number;
         lastUpdated: string;
+        authority: string;
     }
 
 

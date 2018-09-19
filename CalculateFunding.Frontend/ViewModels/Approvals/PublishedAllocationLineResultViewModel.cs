@@ -13,6 +13,8 @@ namespace CalculateFunding.Frontend.ViewModels.Approvals
 
         public DateTimeOffset LastUpdated { get; set; }
 
+        public string Authority { get; set; }
+
         public string LastUpdatedDateDisplay
         {
             get
