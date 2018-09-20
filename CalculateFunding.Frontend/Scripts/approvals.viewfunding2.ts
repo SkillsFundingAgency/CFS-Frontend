@@ -329,10 +329,9 @@
 
                     this.notificationStatus('success');
 
-                    // Once set need to reload the page to get new data and reset selection
+                    // Once set need to reload the page to get new data and reset selection    
                     this.state("idle");
-
-                    this.viewFunding();
+                    this.viewFunding();                
                 })
                 .fail((ex) => {
                     this.notificationMessage(failureMessage);
@@ -511,73 +510,7 @@
 
             this.callChangeStatusEndpoint(StatusAction.Publish);
         }
-
-        ///** Load results given the initial filter criteria  */
-        /** retained just in case if we have to test using test data */
-        //loadResults(response: any) {
-
-        //    this.specificationId = "abc1";
-        //    //this.selectedSpecification;
-        //    // this.fundingPeriod = "Test Funding Period";
-        //    // this.fundingStream = "Test Funding Stream";
-
-        //    let tempArray: Array<PublishedProviderResultViewModel> = [];
-
-        //    for (let i = 0; i < 20000; i++) {
-        //        let provResult = new PublishedProviderResultViewModel();
-        //        provResult.authority = "Authority " + i;
-        //        provResult.fundingAmount = (Math.random() * 1000) + 1;
-        //        provResult.numberApproved = 1;
-        //        provResult.numberNew = 1;
-        //        provResult.numberPublished = 1;
-        //        provResult.numberUpdated = 1;
-        //        provResult.providerId = "ProvId" + i;
-        //        provResult.providerName = "Provider " + i;
-        //        provResult.totalAllocationLines = 4;
-        //        provResult.ukprn = "UKPRN" + i;
-
-        //        let aOne = new PublishedAllocationLineResultViewModel();
-        //        aOne.allocationLineId = provResult.providerId + "-Alloc1";
-        //        aOne.allocationLineName = "Allocation Line 1";
-        //        aOne.fundingAmount = (Math.random() * 100) + 1;
-        //        aOne.status = AllocationLineStatus.Held;
-        //        aOne.version = "0.1";
-
-        //        let aTwo = new PublishedAllocationLineResultViewModel();
-        //        aTwo.allocationLineId = provResult.providerId + "-Alloc2";
-        //        aTwo.allocationLineName = "Allocation Line 2";
-        //        aTwo.fundingAmount = (Math.random() * 100) + 1;
-        //        aTwo.status = AllocationLineStatus.Approved;
-        //        aTwo.version = "0.2";
-
-        //        let aThree = new PublishedAllocationLineResultViewModel();
-        //        aThree.allocationLineId = provResult.providerId + "-Alloc3";
-        //        aThree.allocationLineName = "Allocation Line 3";
-        //        aThree.fundingAmount = (Math.random() * 100) + 1;
-        //        aThree.status = AllocationLineStatus.Updated;
-        //        aThree.version = "1.3";
-
-        //        let aFour = new PublishedAllocationLineResultViewModel();
-        //        aFour.allocationLineId = provResult.providerId + "-Alloc4";
-        //        aFour.allocationLineName = "Allocation Line 4";
-        //        aFour.fundingAmount = (Math.random() * 100) + 1;
-        //        aFour.status = AllocationLineStatus.Published;
-        //        aFour.version = "2.0";
-
-        //        let tempArray2: Array<PublishedAllocationLineResultViewModel> = [];
-        //        tempArray2.push(aOne);
-        //        tempArray2.push(aTwo);
-        //        tempArray2.push(aThree);
-        //        tempArray2.push(aFour);
-        //        provResult.allocationLineResults(tempArray2);
-
-        //        tempArray.push(provResult);
-        //    }
-
-        //    this.allProviderResults(tempArray);
-        //    this.pageState("main");
-        //}
-
+      
         /** This provides a shortcut to evaluating the UI for performing the select all operation */
         private executingSelectAll: KnockoutObservable<boolean> = ko.observable(false);
 
@@ -667,8 +600,10 @@
 
             this.isWorkingVisible(true);
 
+            let refreshPublishedResultsUrl = this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.selectedSpecification().id);
+
             let executeCalcRequest = $.ajax({
-                url: this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.selectedSpecification().id),
+                url: refreshPublishedResultsUrl,
                 dataType: "json",
                 method: "POST",
                 contentType: "application/json"
@@ -757,14 +692,14 @@
 
                     let viewFundingResponse: KnockoutObservableArray<PublishedProviderResultViewModel> = response;
 
-                    self.handlevfSuccess(viewFundingResponse);
+                    self.bindViewFundingResponseToModel(viewFundingResponse);
 
                     self.pageState("main");
                 }
             });
         }
 
-        public handlevfSuccess(response: any) {
+        public bindViewFundingResponseToModel(response: any) {
 
             if (response !== null && response !== undefined) {
 

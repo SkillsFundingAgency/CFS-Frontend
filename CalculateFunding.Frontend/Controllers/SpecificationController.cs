@@ -76,26 +76,15 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFundingByPeriod(fundingPeriodId);
 
-            if (apiResponse == null)
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-                return new StatusCodeResult(500);
+                return Ok(apiResponse.Content.OrderBy(c => c.Name));
             }
-
-            if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            else if(apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                return new StatusCodeResult((int)apiResponse.StatusCode);
+                return new BadRequestResult();             
             }
-
-            if (apiResponse.Content == null)
-            {
-                return new ObjectResult("List of Specifications was null")
-                {
-                    StatusCode = 500,
-                };
-            }
-
-            return Ok(apiResponse.Content.OrderBy(c => c.Name));
-
+            return new StatusCodeResult(500);  
         }
 
 
