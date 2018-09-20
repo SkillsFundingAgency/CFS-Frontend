@@ -12,17 +12,24 @@
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
             <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-            <li data-bind="text: specificationName"></li>
+            <li data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown', visible: pageState() === 'main'"></li>
         </ol>
     </div>
 }
 
 @section BannerWhole {
     <div class="viewfunding-page-header spacing-15">
+        <div data-bind="visible: pageState() === 'initial'">
+            <div>
+                <h1 class="hero-title">Approve and Publish funding</h1>
+                <h2 class="hero-description"> You can approve and publish the chosen specification.</h2>
+            </div>
+             
+        </div>
         <div data-bind="visible: pageState() === 'main'">
-            <h2 class="hero-description-skinny" data-bind="text: fundingPeriod"></h2>
-            <h1 class="hero-title-skinny" data-bind="text: specificationName"></h1>
-            <h3 class="hero-text" data-bind="text: fundingStream"></h3>
+            <h2 class="hero-description-skinny" data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></h2>
+            <h1 class="hero-title-skinny" data-bind="text: selectedSpecification()? selectedSpecification().value : 'unknown'"></h1>
+            <h3 class="hero-text" data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></h3>
         </div>
         <div data-bind="visible: pageState() === 'main'" class="viewfunding-page-buttons">
             <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
@@ -52,13 +59,58 @@
             </span>
         </div>
 
-        <div data-bind="visible: pageState() === 'initial'">
+        <div data-bind="visible: pageState() === 'initial'" class="row">
+            <div class="col-sm-9 col-md-6">
+                <div>
+                    <div class="form-group">
+                        <label>Select funding period:</label>
+                        <div class="form-group">
+                            <select id="fundingperiod" data-bind="options: FundingPeriods, value:selectedFundingPeriod, optionsText: 'value', optionsCaption:'Select'"></select>
+                        </div>
+                    </div>
+                </div>
 
+                <div data-bind="">
+                    <div class="form-group">
+                        <label>Select specification:</label>
+                        <div class="form-group">
+                            <select id="specification" data-bind="options: Specifications, value:selectedSpecification, optionsText: 'value', optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-group">
+                        <label>Select funding stream:</label>
+                        <div class="form-group">
+                            <select id="fundingstreams" data-bind="options: FundingStreams, value:selectedFundingStream, optionsText: 'name', optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span>Only one funding stream can be approved or published at a time</span></h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="form-submit-container"><button type="button" class="button" id="ViewFunding" data-bind="click: viewFunding, enable: isViewFundingButtonEnabled">View funding</button> </p>
+                    </div>
+                </div>
+
+                <div id="view-funding-wait-control" style="display:none; text-align:center" class="col-sm-9 col-md-6">
+                    <p class="h4-heading"><strong>Search is progressing</strong></p>
+                    <p>This may take a minute or so, please bear with us.</p>
+                    <img src="~/assets/images/loader.gif" />
+                </div>
+            </div>
         </div>
+
+         
         <div data-bind="visible: pageState() === 'main'">
             <div class="row spacing-10-bottom">
                 <div class="col-xs-12">
-                    <button class="float-right refresh-btn" type="button" data-bind="click: refreshFundingSnapshot">
+                    <button class="float-right refresh-btn" type="button" data-bind="click: refreshFundingSnapshot" disabled="disabled">
                         <i class="material-icons">refresh</i>
                         <span>Refresh funding</span>
                     </button>
@@ -91,7 +143,7 @@
                     <!-- ko foreach: currentPageResults -->
                     <tr class="expander-trigger-container data-provider-container provider-column">
                         <td class="view-funding-provider-border expander-container-group-identifier">
-                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerId" class="inline-table-label data-provider-name"></label>
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
                         </td>
                         <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-new': numberNew > 0 }"><span data-bind="text: numberNew"></span>/<span data-bind="text: totalAllocationLines"></span></td>
@@ -212,15 +264,15 @@
                         <tbody>
                             <tr>
                                 <td>Funding Period</td>
-                                <td colspan="2"><span data-bind="text: fundingPeriod"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingPeriod"></span></td>
                             </tr>
                             <tr class="nobottomborder">
                                 <td>Specification Selected</td>
-                                <td colspan="2"><span data-bind="text: specificationName"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedSpecification"></span></td>
                             </tr>
                             <tr class="topborderonly">
                                 <td>Funding Stream</td>
-                                <td colspan="2"><span data-bind="text: fundingStream"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingStream"></span></td>
                             </tr>
                             <!-- ko foreach: approvalDetails().allocationLines -->
                             <tr class="nobottomborder">
@@ -301,15 +353,15 @@
                         <tbody>
                             <tr>
                                 <td>Funding Period</td>
-                                <td colspan="2"><span data-bind="text: fundingPeriod"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="nobottomborder">
                                 <td>Specification Selected</td>
-                                <td colspan="2"><span data-bind="text: specificationName"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="topborderonly">
                                 <td>Funding Stream</td>
-                                <td colspan="2"><span data-bind="text: fundingStream"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
                             </tr>
                             <!-- ko foreach: publishDetails().allocationLines -->
                             <tr class="nobottomborder">
@@ -385,14 +437,16 @@
     <script type="text/javascript">
         var settings = {
             "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
-            "viewFundingPageUrl": "/approvals/viewfunding?specificationId={specificationId}",
+            "viewFundingPageUrl": "/api/results/get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingstreamId={fundingstreamId}",
             "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
             "approveAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
             "refreshPublishedResultsUrl": "/api/specs/{specificationId}/refresh-published-results",
-            "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status"
+            "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status",
+            "fundingPeriodUrl": "/api/specs/funding-periods",
+            "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
+            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
-        vfVM.loadResults();
         ko.applyBindings(vfVM);
     </script>
 }

@@ -33,6 +33,8 @@
 
         Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId);
 
+        Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string fundingPeriod, string specificationId, string fundingStreamId);
+
         Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria);
 
         Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel);

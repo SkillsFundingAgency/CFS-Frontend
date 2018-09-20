@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
     public class PublishedAllocationLineResult
@@ -16,5 +12,7 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
         public AllocationLineStatus Status { get; set; }
 
         public DateTimeOffset? LastUpdated { get; set; }
+
+        public string Authority { get; set; }
     }
 }

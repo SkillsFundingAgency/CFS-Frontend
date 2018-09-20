@@ -42,6 +42,11 @@
             return GetAsync<IEnumerable<SpecificationSummary>>("specifications-selected-for-funding", _cancellationToken);
         }
 
+        public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFundingByPeriod(string fundingPeriodId)
+        {
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-selected-for-funding-by-period?fundingPeriodId={fundingPeriodId}", _cancellationToken);
+        }
+
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
             return GetAsync<IEnumerable<SpecificationSummary>>("specification-summaries", _cancellationToken);
