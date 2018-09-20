@@ -12,7 +12,7 @@
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
             <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
-            <li data-bind="text: selectedSpecification, visible: pageState() === 'main'"></li>
+            <li data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown', visible: pageState() === 'main'"></li>
         </ol>
     </div>
 }
@@ -20,13 +20,16 @@
 @section BannerWhole {
     <div class="viewfunding-page-header spacing-15">
         <div data-bind="visible: pageState() === 'initial'">
-
-            content
+            <div>
+                <h1 class="hero-title">Approve and Publish funding</h1>
+                <h2 class="hero-description"> You can approve and publish the chosen specification.</h2>
+            </div>
+             
         </div>
         <div data-bind="visible: pageState() === 'main'">
-            <h2 class="hero-description-skinny" data-bind="text: selectedFundingPeriod"></h2>
-            <h1 class="hero-title-skinny" data-bind="text: selectedSpecification"></h1>
-            <h3 class="hero-text" data-bind="text: selectedFundingStream"></h3>
+            <h2 class="hero-description-skinny" data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></h2>
+            <h1 class="hero-title-skinny" data-bind="text: selectedSpecification()? selectedSpecification().value : 'unknown'"></h1>
+            <h3 class="hero-text" data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></h3>
         </div>
         <div data-bind="visible: pageState() === 'main'" class="viewfunding-page-buttons">
             <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
@@ -62,7 +65,7 @@
                     <div class="form-group">
                         <label>Select funding period:</label>
                         <div class="form-group">
-                            <select id="fundingperiod" data-bind="options: FundingPeriods, optionsText: 'value', optionsValue: 'id',  value:selectedFundingPeriod, optionsCaption: 'Select'"></select>
+                            <select id="fundingperiod" data-bind="options: FundingPeriods, value:selectedFundingPeriod, optionsText: 'value', optionsCaption:'Select'"></select>
                         </div>
                     </div>
                 </div>
@@ -71,7 +74,7 @@
                     <div class="form-group">
                         <label>Select specification:</label>
                         <div class="form-group">
-                            <select id="specification" data-bind="options: Specifications, optionsText: 'value', optionsValue: 'id', value:selectedSpecification, optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
+                            <select id="specification" data-bind="options: Specifications, value:selectedSpecification, optionsText: 'value', optionsCaption: 'Select', enable: isSpecificationDropdownEnabled "></select>
                         </div>
                     </div>
                 </div>
@@ -80,7 +83,7 @@
                     <div class="form-group">
                         <label>Select funding stream:</label>
                         <div class="form-group">
-                            <select id="fundingstreams" data-bind="options: FundingStreams, optionsText: 'name', optionsValue: 'id', value:selectedFundingStream,  optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
+                            <select id="fundingstreams" data-bind="options: FundingStreams, value:selectedFundingStream, optionsText: 'name', optionsCaption: 'Select', enable: isViewFundingStreamDropdownEnabled"></select>
                         </div>
                     </div>
                 </div>
@@ -350,15 +353,15 @@
                         <tbody>
                             <tr>
                                 <td>Funding Period</td>
-                                <td colspan="2"><span data-bind="text: selectedFundingPeriod"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="nobottomborder">
                                 <td>Specification Selected</td>
-                                <td colspan="2"><span data-bind="text: selectedSpecification"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="topborderonly">
                                 <td>Funding Stream</td>
-                                <td colspan="2"><span data-bind="text: selectedFundingStream"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
                             </tr>
                             <!-- ko foreach: publishDetails().allocationLines -->
                             <tr class="nobottomborder">
