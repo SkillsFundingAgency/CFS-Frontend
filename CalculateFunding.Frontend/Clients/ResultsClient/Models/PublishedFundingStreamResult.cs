@@ -19,6 +19,8 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 
         public int NumberApproved { get; set; }
 
+        public int NumberUpdated { get; set; }
+
         public int NumberPublished { get; set; }
 
         public int TotalAllocationLines { get; set; }

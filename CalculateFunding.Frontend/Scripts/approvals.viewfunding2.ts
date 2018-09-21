@@ -182,7 +182,7 @@
 
             self.isViewFundingStreamDropdownEnabled = ko.computed(() => {
 
-                let isEnabled = (self.selectedSpecification() !== undefined && self.selectedSpecification().value !== "Select");
+                let isEnabled = (self.selectedSpecification() !== undefined && self.isSpecificationDropdownEnabled() && self.selectedFundingPeriod().value !== "Select");
 
                 return isEnabled;
             });
@@ -722,13 +722,13 @@
 
                     providerObservable.numberApproved = provider.numberApproved;
 
+                    providerObservable.numberUpdated = provider.numberUpdated;
+
                     providerObservable.numberNew = provider.numberHeld;
 
                     providerObservable.numberPublished = provider.numberPublished;
 
                     providerObservable.totalAllocationLines = provider.totalAllocationLines;
-
-                    providerObservable.numberUpdated = 0;
 
                     for (let f in provider.fundingStreamResults) {
 
@@ -914,6 +914,8 @@
         numberHeld: number;
 
         numberApproved: number;
+
+        numberUpdated: number;
 
         numberPublished: number;
 
