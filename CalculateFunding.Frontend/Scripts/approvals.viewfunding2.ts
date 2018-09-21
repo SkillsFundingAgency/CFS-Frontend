@@ -99,6 +99,9 @@
             // Defer updates on the array of items being bound to the page, so updates don't constantly to the UI and slow things down
             self.currentPageResults.extend({ deferred: true });
 
+            self.canApprove.extend({ deferred: true });
+            self.canPublish.extend({ deferred: true });
+
             self.pageState() == "initial";
 
             /**ApproveandPublishSelection section */
