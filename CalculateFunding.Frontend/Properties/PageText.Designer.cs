@@ -178,7 +178,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create a dataset from a data source file..
+        ///   Looks up a localized string similar to Map a data source to this specification.
         /// </summary>
         public static string SpecificationRelationshipDescr {
             get {
