@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
@@ -129,13 +130,13 @@ namespace CalculateFunding.Frontend.Controllers
 
 
         [Route("/api/results/get-published-provider-results-for-funding-stream")]
-         public async Task<IActionResult> GetPublishedProviderResultsForFundingStream([FromQuery]string fundingPeriodId, [FromQuery]string specificationId, [FromQuery] string fundingStreamId)
+        public async Task<IActionResult> GetPublishedProviderResultsForFundingStream([FromQuery]string fundingPeriodId, [FromQuery]string specificationId, [FromQuery] string fundingStreamId, CancellationToken cancellationToken)
         {
             Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<PublishedProviderResult>> publishedProviderResponse = await _resultsClient.GetPublishedProviderResults(fundingPeriodId, specificationId, fundingStreamId);
+            ApiResponse<IEnumerable<PublishedProviderResult>> publishedProviderResponse = await _resultsClient.GetPublishedProviderResults(fundingPeriodId, specificationId, fundingStreamId, cancellationToken);
             IActionResult errorResult = publishedProviderResponse.IsSuccessOrReturnFailureResult("Getting published provider results for funding stream");
             if (errorResult != null)
             {
