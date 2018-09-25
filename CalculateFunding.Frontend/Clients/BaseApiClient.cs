@@ -53,6 +53,7 @@
             }
 
             HttpClient httpClient = GetHttpClient();
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
 
             _logger.Debug("ApiClient GET: {clientKey}://{url}", _clientKey, url);
 
