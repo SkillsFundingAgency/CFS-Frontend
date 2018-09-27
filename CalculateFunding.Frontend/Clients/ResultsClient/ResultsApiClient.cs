@@ -20,12 +20,12 @@
         {
         }
 
-        public Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ApiResponse<ProviderResults>> GetProviderResults(string providerId, string specificationId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return GetAsync<ProviderResults>($"get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
+            return await GetAsync<ProviderResults>($"get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
         }
 
         public async Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions)
@@ -52,9 +52,9 @@
             }
         }
 
-        public Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId)
+        public async Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId)
         {
-            return GetAsync<IEnumerable<string>>($"get-provider-specs?providerId={providerId}");
+            return await GetAsync<IEnumerable<string>>($"get-provider-specs?providerId={providerId}");
         }
 
         public async Task<ApiResponse<Provider>> GetProviderByProviderId(string providerId)
@@ -96,25 +96,25 @@
             }
         }
 
-        public Task<ApiResponse<IEnumerable<FundingCalculationResultsTotals>>> GetFundingCalculationResultsTotals(SpecificationIdsRequestModel specificationIds)
+        public async Task<ApiResponse<IEnumerable<FundingCalculationResultsTotals>>> GetFundingCalculationResultsTotals(SpecificationIdsRequestModel specificationIds)
         {
             Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
 
-            return PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"get-calculation-result-totals-for-specifications", specificationIds);
+            return await PostAsync<IEnumerable<FundingCalculationResultsTotals>, SpecificationIdsRequestModel>($"get-calculation-result-totals-for-specifications", specificationIds);
         }
 
-        public Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId)
+        public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string specificationId)
         {
-            return GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
+            return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
         }
 
-        public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>>GetPublishedProviderResults(string fundingPeriodId, string specificationId, string fundingStreamId)
+        public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>>GetPublishedProviderResults(string fundingPeriodId, string specificationId, string fundingStreamId, CancellationToken cancellationToken)
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingStreamId={fundingStreamId}");
+            return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingStreamId={fundingStreamId}", cancellationToken);
         }
 
         public async Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria)
@@ -122,12 +122,12 @@
             return await ValidatedPostAsync<ConfirmPublishApprove, PublishedAllocationLineResultStatusUpdateModel>($"get-confirmation-details-for-approve-publish-provider-results?specificationId={specificationId}", filterCriteria);
         }
 
-        public Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
+        public async Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(updateModel, nameof(updateModel));
 
-            return ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
+            return await ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
         }
     }
 }

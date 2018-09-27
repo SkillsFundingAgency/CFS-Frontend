@@ -65,6 +65,11 @@
 
             // Defer updates on the array of items being bound to the page, so updates don't constantly to the UI and slow things down
             self.currentPageResults.extend({ deferred: true });
+
+            // Defer updates on functions that determine whether the approve and publish buttons are enabled, so updates don't constantly to the UI and slow things down
+            self.canApprove.extend({ deferred: true });
+            self.canPublish.extend({ deferred: true });
+
             self.pageState() == "initial";
 
             /**ApproveandPublishSelection section */
@@ -203,10 +208,9 @@
         approvalDetails: KnockoutObservable<ConfirmPublishApproveViewModel> = ko.observable(new ConfirmPublishApproveViewModel());
         publishDetails: KnockoutObservable<ConfirmPublishApproveViewModel> = ko.observable(new ConfirmPublishApproveViewModel());
 
-        /** Call the endpoint to change the status of selected allocation lines */
+        /** Creates the units of work to change the status of selected allocation lines */
         private callChangeStatusEndpoint(action: StatusAction) {
-            let updateModel = new PublishedAllocationLineResultStatusUpdateViewModel();
-            updateModel.Status = AllocationLineStatus.Approved;
+
             let selectedItems = this.approvalDetails();
             let successMessage = "The status has successfully been transitioned to the Approved state for the selected items.";
             let failureMessage = "There was an error setting the status of the items to Approved.";
@@ -215,38 +219,72 @@
 
             if (action === StatusAction.Publish) {
                 this.workingMessage("Publishing items.");
-                // Change the variables if the action is publish
-                updateModel.Status = AllocationLineStatus.Published;
+
                 selectedItems = this.publishDetails();
                 successMessage = "The status has successfully been transitioned to the Published state for the selected items.";
                 failureMessage = "There was an error setting the status of the items to Published.";
             }
 
-            //this.pageState("working-" + this.pageState());
             this.isWorkingVisible(true);
-            for (let i = 0; i < selectedItems.allocationLines.length; i++) {
-                let selectedItem = selectedItems.allocationLines[i];
-                updateModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(selectedItem.providerId, selectedItem.allocationLineId));
+
+            let batchSize: number = 250;
+            let tasks: Array<PublishedAllocationLineResultStatusUpdateViewModel> = [];
+
+            let numBatches: number = Math.ceil(selectedItems.allocationLines.length / batchSize);
+
+            for (let j = 0; j < numBatches; j++) {
+                let updateModel = new PublishedAllocationLineResultStatusUpdateViewModel();
+                updateModel.Status = AllocationLineStatus.Approved;
+                if (action === StatusAction.Publish) {
+                    // Change the variables if the action is publish
+                    updateModel.Status = AllocationLineStatus.Published;
+                }
+
+                let start = j * batchSize;
+                
+                for (let i = start; i < start + batchSize; i++) {
+                    let selectedItem = selectedItems.allocationLines[i];
+                    if (selectedItem === undefined) {
+                        break;
+                    }
+
+                    updateModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(selectedItem.providerId, selectedItem.allocationLineId));
+                }
+
+                tasks.push(updateModel);
             }
+
+            this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);            
+        }
+
+        /** Execute a unit of work by calling the change status endpoint */
+        private executeStatusChange(tasks: Array<PublishedAllocationLineResultStatusUpdateViewModel>, currentTask: number, changeStatusUrl: string, successMessage: string, failureMessage: string) {
+            if (currentTask >= tasks.length) {
+                this.isWorkingVisible(false);
+                this.notificationMessage(successMessage);
+                this.notificationStatus('success');
+
+                // Once finished need to reload the page to get new data and reset selection    
+                this.state("idle");
+                this.viewFunding();
+
+                return;
+            }
+
+            let self = this;
 
             $.ajax({
                 url: changeStatusUrl,
                 method: "PUT",
                 contentType: 'application/json',
-                data: JSON.stringify(updateModel),
+                data: JSON.stringify(tasks[currentTask]),
                 headers: {
-                    RequestVerificationToken: this.settings.antiforgeryToken
+                    RequestVerificationToken: self.settings.antiforgeryToken
                 }
             })
                 .done((result) => {
-                    this.isWorkingVisible(false);
-                    this.notificationMessage(successMessage);
-                    this.notificationStatus('success');
-
-                    // Once set need to reload the page to get new data and reset selection    
-                    this.state("idle");
-                    this.viewFunding();   
-                 })
+                    self.executeStatusChange(tasks, currentTask + 1, changeStatusUrl, successMessage, failureMessage);
+                })
                 .fail((ex) => {
                     this.notificationMessage(failureMessage);
                     this.notificationStatus('error');
@@ -283,6 +321,19 @@
                         approveVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
                         approveVM.totalFundingApproved += allocationResult.fundingAmount;
                         providerHasSelectedAllocations = true;
+
+                        let foundRollup = ko.utils.arrayFirst(approveVM.allocationLinesRollup, function (item) {
+                            return item.name === allocationResult.allocationLineName;
+                        });
+
+                        if (!foundRollup) {
+                            foundRollup = new AllocationLineRollupViewModel();
+                            foundRollup.name = allocationResult.allocationLineName;
+                            foundRollup.value = 0;
+                            approveVM.allocationLinesRollup.push(foundRollup);
+                        }
+
+                        foundRollup.value += allocationResult.fundingAmount;
                     }
                 }
                 if (providerHasSelectedAllocations) {
@@ -342,6 +393,19 @@
                         publishVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
                         publishVM.totalFundingApproved += allocationResult.fundingAmount;
                         providerHasSelectedAllocations = true;
+
+                        let foundRollup = ko.utils.arrayFirst(publishVM.allocationLinesRollup, function (item) {
+                            return item.name === allocationResult.allocationLineName;
+                        });
+
+                        if (!foundRollup) {
+                            foundRollup = new AllocationLineRollupViewModel();
+                            foundRollup.name = allocationResult.allocationLineName;
+                            foundRollup.value = 0;
+                            publishVM.allocationLinesRollup.push(foundRollup);
+                        }
+
+                        foundRollup.value += allocationResult.fundingAmount;
                     }
                 }
                 if (providerHasSelectedAllocations) {
@@ -484,7 +548,9 @@
             if (this.state() !== "idle")
                 return;
             let self = this;
-          
+            self.pageState("main");
+            self.isWorkingVisible(true);
+            self.workingMessage("Loading funding values for providers");
             let viewfundingPageUrl = self.settings.viewFundingPageUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id);
             viewfundingPageUrl = viewfundingPageUrl.replace("{specificationId}", self.selectedSpecification().id);
             viewfundingPageUrl = viewfundingPageUrl.replace("{fundingstreamId}", self.selectedFundingStream().id);
@@ -498,8 +564,8 @@
             //self.state("Loading");
             viewFundingRequest.done((response) => {
                 if (response) {
-                    self.workingMessage("Approve and publish funding screen is rendered");
-                    self.isWorkingVisible(true);
+                    //self.workingMessage("Approve and publish funding screen is rendered");
+                    //self.isWorkingVisible(true);
                     self.pageState("main");
                     let viewFundingResponse: KnockoutObservableArray<PublishedProviderResultViewModel> = response;
                     self.bindViewFundingResponseToModel(viewFundingResponse);
@@ -509,7 +575,8 @@
             });
 
             viewFundingRequest.fail((response) => {
-                self.notificationMessage("There was a problem loading the funding for provider, try again.");
+                self.pageState("initial");
+                self.notificationMessage("There was a problem loading the funding for specification, try again.");
                 self.notificationStatus("error");
                 self.isWorkingVisible(false);
                 self.state("idle");
@@ -727,6 +794,8 @@
         get totalFundingApprovedDisplay(): string {
             return "£" + (Number(this.totalFundingApproved)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
         }
+
+        allocationLinesRollup: Array<AllocationLineRollupViewModel> = [];
     }
 
     /** A summary of a selected allocation line */
@@ -741,6 +810,16 @@
             this.name = name;
             this.value = value;
         }
+
+        get valueDisplay(): string {
+
+            return "£" + (Number(this.value)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        }
+    }
+
+    class AllocationLineRollupViewModel {
+        name: string;
+        value: number;
 
         get valueDisplay(): string {
             return "£" + (Number(this.value)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });

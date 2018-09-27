@@ -50,7 +50,7 @@
                 <p class="h4-heading"><strong data-bind="text: workingMessage"></strong></p>
                 <p>Please wait, this may take several minutes.</p>
                 <img src="~/assets/images/loader.gif" />
-                <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete" /></div>
+                <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete"></span></div>
             </div>
         </div>
         <div data-bind="visible: notificationMessage(), css: notificationStatus() === 'error' ? 'notification-panel-error' : 'notification-panel'">
@@ -236,8 +236,8 @@
                                 <td>Number of providers to approve</td>
                                 <td><span data-bind="text: approvalDetails().numberOfProviders"></span></td>
                             </tr>
-                            <tr data-bind="template: { name: 'list-expander-template', data: approvalDetails().providerTypes }" class="expander-control"></tr>
-                            <tr data-bind="template: { name: 'list-expander-template', data: approvalDetails().localAuthorities }" class="expander-control"></tr>
+                            <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: approvalDetails().providerTypes } }" class="expander-control"></tr>
+                            <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: approvalDetails().localAuthorities } }" class="expander-control"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -253,17 +253,17 @@
                         <tbody>
                             <tr>
                                 <td>Funding Period</td>
-                                <td colspan="2"><span data-bind="text: selectedFundingPeriod"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="nobottomborder">
                                 <td>Specification Selected</td>
-                                <td colspan="2"><span data-bind="text: selectedSpecification"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
                             </tr>
                             <tr class="topborderonly">
                                 <td>Funding Stream</td>
-                                <td colspan="2"><span data-bind="text: selectedFundingStream"></span></td>
+                                <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
                             </tr>
-                            <!-- ko foreach: approvalDetails().allocationLines -->
+                            <!-- ko foreach: approvalDetails().allocationLinesRollup -->
                             <tr class="nobottomborder">
                                 <td class="allocation-line-text">
                                     <!-- ko if: $index === 0 -->
@@ -325,8 +325,8 @@
                                 <td>Number of providers to publish</td>
                                 <td><span data-bind="text: publishDetails().numberOfProviders"></span></td>
                             </tr>
-                            <tr data-bind="template: { name: 'list-expander-template', data: publishDetails().providerTypes }" class="expander-control"></tr>
-                            <tr data-bind="template: { name: 'list-expander-template', data: publishDetails().localAuthorities }" class="expander-control"></tr>
+                            <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: publishDetails().providerTypes } }" class="expander-control"></tr>
+                            <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: publishDetails().localAuthorities } }" class="expander-control"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -352,7 +352,7 @@
                                 <td>Funding Stream</td>
                                 <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
                             </tr>
-                            <!-- ko foreach: publishDetails().allocationLines -->
+                            <!-- ko foreach: publishDetails().allocationLinesRollup -->
                             <tr class="nobottomborder">
                                 <td class="allocation-line-text">
                                     <!-- ko if: $index === 0 -->
@@ -404,16 +404,16 @@
 
 <script type="text/html" id="list-expander-template">
     <td class="caption">
-        <!-- ko if: canExpand() -->
-        <i class="material-icons gov-blue" data-bind="text: icon">arrow_right</i>
-        <a data-bind="click: toggleExpand">Provider local authorities selected</a>
+        <!-- ko if: $data.list.canExpand() -->
+        <i class="material-icons gov-blue" data-bind="text: $data.list.icon"></i>
+        <a data-bind="click: $data.list.toggleExpand, text: $data.title"></a>
         <!-- /ko -->
-        <!-- ko if: !canExpand() -->
-        <span>Provider local authorities selected</span>
+        <!-- ko if: !$data.list.canExpand() -->
+        <span data-bind="text: $data.title"></span>
         <!-- /ko -->
     </td>
     <td>
-        <span data-bind="html: text"></span>
+        <span data-bind="html: $data.list.text"></span>
     </td>
 </script>
 
