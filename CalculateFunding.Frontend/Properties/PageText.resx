@@ -151,7 +151,7 @@
     <value>Manage data source files or map them to datasets for a specification.</value>
   </data>
   <data name="SpecificationRelationshipDescr" xml:space="preserve">
-    <value>Create a dataset from a data source file.</value>
+    <value>Map a data source to this specification</value>
   </data>
   <data name="ApproveAndPublishFunding" xml:space="preserve">
     <value>Approve and publish funding</value>
