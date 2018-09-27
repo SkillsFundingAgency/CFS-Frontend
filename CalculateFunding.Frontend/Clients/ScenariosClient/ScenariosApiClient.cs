@@ -7,13 +7,13 @@
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class ScenariosApiClient : BaseApiClient, IScenariosApiClient
     {
-
-        public ScenariosApiClient(IHttpClientFactory httpClientFactory,  ILogger logger)
-           : base(httpClientFactory, HttpClientKeys.Scenarios, logger)
+        public ScenariosApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+           : base(httpClientFactory, HttpClientKeys.Scenarios, logger, contextAccessor)
         {
         }
 

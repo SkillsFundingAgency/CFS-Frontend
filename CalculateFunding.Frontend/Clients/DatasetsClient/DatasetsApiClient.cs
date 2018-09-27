@@ -11,15 +11,17 @@
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class DatasetsApiClient : BaseApiClient, IDatasetsApiClient
     {
         public DatasetsApiClient(
             IHttpClientFactory httpClientFactory,
-            ILogger logger
+            ILogger logger,
+            IHttpContextAccessor contextAccessor
             )
-            : base(httpClientFactory, HttpClientKeys.Datasets, logger)
+            : base(httpClientFactory, HttpClientKeys.Datasets, logger, contextAccessor)
         {
         }
 

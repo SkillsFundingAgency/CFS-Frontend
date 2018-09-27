@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -15,53 +14,41 @@
 
     public class SpecsApiClient : BaseApiClient, ISpecsApiClient
     {
-        private readonly CancellationToken _cancellationToken;
-
-        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor context)
-           : base(httpClientFactory, HttpClientKeys.Specifications, logger)
+        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+           : base(httpClientFactory, HttpClientKeys.Specifications, logger, contextAccessor)
         {
-            if (context != null)
-            {
-                if (context.HttpContext != null)
-                {
-                    if (context.HttpContext.RequestAborted != default(CancellationToken))
-                    {
-                        _cancellationToken = context.HttpContext.RequestAborted;
-                    }
-                }
-            }
         }
 
         public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
         {
-            return GetAsync<IEnumerable<Specification>>("specifications", _cancellationToken);
+            return GetAsync<IEnumerable<Specification>>("specifications");
         }
 
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFunding()
         {
-            return GetAsync<IEnumerable<SpecificationSummary>>("specifications-selected-for-funding", _cancellationToken);
+            return GetAsync<IEnumerable<SpecificationSummary>>("specifications-selected-for-funding");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFundingByPeriod(string fundingPeriodId)
         {
-            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-selected-for-funding-by-period?fundingPeriodId={fundingPeriodId}", _cancellationToken);
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-selected-for-funding-by-period?fundingPeriodId={fundingPeriodId}");
         }
 
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
-            return GetAsync<IEnumerable<SpecificationSummary>>("specification-summaries", _cancellationToken);
+            return GetAsync<IEnumerable<SpecificationSummary>>("specification-summaries");
         }
 
         public Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId)
         {
-            return GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-year?fundingPeriodId={fundingPeriodId}", _cancellationToken);
+            return GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-year?fundingPeriodId={fundingPeriodId}");
         }
 
         public Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
         {
             Guard.IsNullOrWhiteSpace(specificationName, nameof(specificationName));
 
-            return GetAsync<Specification>($"specification-by-name?specificationName={specificationName}", _cancellationToken);
+            return GetAsync<Specification>($"specification-by-name?specificationName={specificationName}");
         }
 
         public Task<ApiResponse<Specification>> GetSpecification(string specificationId)
@@ -134,7 +121,7 @@
         {
             Guard.ArgumentNotNull(updatedPolicy, nameof(updatedPolicy));
 
-            return ValidatedPutAsync<Policy, EditPolicyModel>($"policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy); 
+            return ValidatedPutAsync<Policy, EditPolicyModel>($"policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy);
         }
 
         public Task<ApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation)
@@ -183,7 +170,7 @@
 
             PolicyByNameRequestModel model = new PolicyByNameRequestModel { SpecificationId = specificationId, Name = policyName };
 
-            return PostAsync<Policy, PolicyByNameRequestModel>("policy-by-name", model, _cancellationToken);
+            return PostAsync<Policy, PolicyByNameRequestModel>("policy-by-name", model);
         }
 
         public Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
@@ -193,7 +180,7 @@
 
             CalculationByNameRequestModel model = new CalculationByNameRequestModel { SpecificationId = specificationId, Name = calculationName };
 
-            return PostAsync<Calculation, CalculationByNameRequestModel>("calculation-by-name", model, _cancellationToken);
+            return PostAsync<Calculation, CalculationByNameRequestModel>("calculation-by-name", model);
         }
 
         public Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId)
@@ -258,16 +245,16 @@
         public async Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            
+
             return await PostAsync($"select-for-funding?specificationId={specificationId}");
         }
 
-	    public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId)
-	    {
-			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+        public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-		    return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
-	    }
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
+        }
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
         {

@@ -10,13 +10,14 @@
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class ResultsApiClient : BaseApiClient, IResultsApiClient
     {
 
-        public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger)
-            : base(httpClientFactory, HttpClientKeys.Results, logger)
+        public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+            : base(httpClientFactory, HttpClientKeys.Results, logger, contextAccessor)
         {
         }
 
@@ -108,13 +109,13 @@
             return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
         }
 
-        public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>>GetPublishedProviderResults(string fundingPeriodId, string specificationId, string fundingStreamId, CancellationToken cancellationToken)
+        public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string periodId, string specificationId, string fundingStreamId)
         {
-            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(periodId, nameof(periodId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingStreamId={fundingStreamId}", cancellationToken);
+            return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-funding-stream?fundingPeriodId={periodId}&specificationId={specificationId}&fundingStreamId={fundingStreamId}");
         }
 
         public async Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria)

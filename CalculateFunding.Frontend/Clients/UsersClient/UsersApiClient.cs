@@ -1,21 +1,19 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.UsersClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.APiClient;
+using Microsoft.AspNetCore.Http;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Clients.UsersClient
 {
     public class UsersApiClient : BaseApiClient, IUsersApiClient
     {
-        public UsersApiClient(IHttpClientFactory httpClientFactory, ILogger logger)
-           : base(httpClientFactory, HttpClientKeys.Users, logger)
+        public UsersApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+           : base(httpClientFactory, HttpClientKeys.Users, logger, contextAccessor)
         {
         }
 

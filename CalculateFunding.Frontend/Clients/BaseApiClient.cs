@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
+    using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using Serilog;
@@ -20,8 +21,9 @@
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public BaseApiClient(IHttpClientFactory httpClientFactory, string clientKey, ILogger logger)
+        public BaseApiClient(IHttpClientFactory httpClientFactory, string clientKey, ILogger logger, IHttpContextAccessor contextAccessor)
         {
             Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
             Guard.IsNullOrWhiteSpace(clientKey, nameof(clientKey));
@@ -35,6 +37,7 @@
             HttpClient httpClient = GetHttpClient();
 
             _logger.Debug("AbstractApiClient created with Client Key: {clientkey} with base address: {baseAddress}", clientKey, httpClient.BaseAddress);
+            _contextAccessor = contextAccessor;
         }
 
         protected ILogger Logger
@@ -56,6 +59,11 @@
             httpClient.Timeout = TimeSpan.FromMinutes(5);
 
             _logger.Debug("ApiClient GET: {clientKey}://{url}", _clientKey, url);
+
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
 
             using (HttpResponseMessage response = await httpClient.GetAsync(url, cancellationToken))
             {
@@ -86,6 +94,11 @@
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name} => {typeof(TResponse).Name})", _clientKey, url);
 
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
+
             using (HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
             {
                 if (response == null)
@@ -114,6 +127,11 @@
             if (timeout.HasValue)
             {
                 httpClient.Timeout = timeout.Value;
+            }
+
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
             }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
@@ -151,6 +169,11 @@
 
             HttpClient httpClient = GetHttpClient();
 
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
+
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
             using (HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken))
@@ -173,6 +196,11 @@
 
             HttpClient httpClient = GetHttpClient();
 
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
+
             _logger.Debug($"ApiClient POST: {{clientKey}}://{{url}}", _clientKey, url);
             using (HttpResponseMessage response = await httpClient.PostAsync(url, null, cancellationToken))
             {
@@ -193,6 +221,11 @@
             }
 
             HttpClient httpClient = GetHttpClient();
+
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             _logger.Debug($"ApiClient PUT: {{clientKey}}://{{url}} ({typeof(TRequest).Name})", _clientKey, url);
@@ -215,6 +248,11 @@
             }
 
             HttpClient httpClient = GetHttpClient();
+
+            if (cancellationToken == default(CancellationToken))
+            {
+                cancellationToken = CurrentCancellationToken();
+            }
 
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
 
@@ -245,7 +283,24 @@
 
         private HttpClient GetHttpClient()
         {
+
             return _httpClientFactory.CreateClient(_clientKey);
+        }
+
+        private CancellationToken CurrentCancellationToken()
+        {
+            if (_contextAccessor != null)
+            {
+                if (_contextAccessor.HttpContext != null)
+                {
+                    if (_contextAccessor.HttpContext.RequestAborted != default(CancellationToken))
+                    {
+                        return _contextAccessor.HttpContext.RequestAborted;
+                    }
+                }
+            }
+
+            return default(CancellationToken);
         }
     }
 }

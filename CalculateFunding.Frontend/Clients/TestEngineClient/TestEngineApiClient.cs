@@ -6,6 +6,7 @@ using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TestEngineClient
@@ -13,8 +14,8 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
     public class TestEngineApiClient : BaseApiClient, ITestEngineApiClient
     {
 
-        public TestEngineApiClient(IHttpClientFactory httpClientFactory, ILogger logger)
-              : base(httpClientFactory, HttpClientKeys.TestEngine, logger)
+        public TestEngineApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+              : base(httpClientFactory, HttpClientKeys.TestEngine, logger, contextAccessor)
         {
         }
 

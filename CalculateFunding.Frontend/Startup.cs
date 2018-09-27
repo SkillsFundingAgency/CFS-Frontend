@@ -111,8 +111,10 @@
             }
             else
             {
-                app.UseExceptionHandler(a => {
-                    a.Run(ctx => {
+                app.UseExceptionHandler(a =>
+                {
+                    a.Run(ctx =>
+                    {
                         ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
                         return Task.CompletedTask;
                     });

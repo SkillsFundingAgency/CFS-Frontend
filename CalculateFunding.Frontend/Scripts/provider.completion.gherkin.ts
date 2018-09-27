@@ -78,14 +78,19 @@ namespace calculateFunding.providers {
 
                             results.push(completionItem);
                         }
+
+                        return results;
                     }
 
-                    let aDatasetComparisonWithValueRegex = new RegExp(/(\s)+the(\s)+dataset(\s)+'(([a-zA-Z0-9 ])+)+'(\s)+field(\s)+'$/);
+                    let aDatasetComparisonWithValueRegex = new RegExp(/(\s)+the(\s)+dataset(\s)+('[a-zA-Z0-9-_ ]+')(\s)+field(\s)+'$/);
                     if (aDatasetComparisonWithValueRegex.test(lineContentsSoFar)) {
                         let datasetNameRegex = aDatasetComparisonWithValueRegex.exec(lineContentsSoFar);
 
-                        // Dataset name in 4th index of regex expression. If the regex changes above in aDatasetComparisonWithValueRegex, then change the index
-                        let currentDataset: IDataset = self.datasets[datasetNameRegex[4]];
+                        // Dataset name in 4th index of regex expression. It has single quotes surrounding it. If the regex changes above in aDatasetComparisonWithValueRegex, then change the index
+                        var datasetName = datasetNameRegex[4];
+                        datasetName = datasetName.substr(1, datasetName.length - 2);
+
+                        let currentDataset: IDataset = self.datasets[datasetName];
 
                         if (currentDataset) {
                             for (let i: number = 0; i < currentDataset.fields.length; i++) {
@@ -107,6 +112,8 @@ namespace calculateFunding.providers {
                                 results.push(completionItem);
                             }
                         }
+
+                        return results;
                     }
 
                     let calculationResultRegex = new RegExp(/(the)(\s)+(result)(\s)+(for)(\s)+'$/);

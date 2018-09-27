@@ -8,14 +8,16 @@
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class CalculationsApiClient : BaseApiClient, ICalculationsApiClient
     {
         public CalculationsApiClient(
             IHttpClientFactory httpClientFactory,
-            ILogger logger)
-            : base(httpClientFactory, HttpClientKeys.Calculations, logger)
+            ILogger logger,
+            IHttpContextAccessor contextAccessor)
+            : base(httpClientFactory, HttpClientKeys.Calculations, logger, contextAccessor)
         {
         }
 
