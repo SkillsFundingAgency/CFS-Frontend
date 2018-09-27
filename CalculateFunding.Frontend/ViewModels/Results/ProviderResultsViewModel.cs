@@ -33,7 +33,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string TotalDescription { get; set; }
 
-        public double Total
+        public double? Total
         {
             get
             {
@@ -50,7 +50,14 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         {
             get
             {
-                return Total.ToString("C", new CultureInfo("en-GB"));
+                if (Total.HasValue)
+                {
+                    return Total.Value.ToString("C", new CultureInfo("en-GB"));
+                }
+                else
+                {
+                    return Properties.PageText.ExcludedText;
+                }
             }
         }
 

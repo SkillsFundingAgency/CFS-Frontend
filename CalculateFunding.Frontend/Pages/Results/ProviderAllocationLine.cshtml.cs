@@ -40,7 +40,7 @@
                 new AllocationLineResult
                 {
                     AllocationLine = m.AllocationLine.Name,
-                    SubTotal = m.Value.HasValue ? m.Value.Value : 0
+                    SubTotal = m.Value
                 }
             );
         }

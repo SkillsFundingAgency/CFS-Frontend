@@ -103,7 +103,7 @@
                                 Updated:
                                 <strong>
                                     <span id="provider-item-last-updated-@providerRow">
-                                        @Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")
+                                        @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)
                                     </span>
                                 </strong>
                             </span>
@@ -204,7 +204,7 @@
                     </div>
                     <p>
                         <span class="provider-item-property">
-                            Updated: <strong><span data-bind="text: lastUpdatedDateDisplay"></span></strong>
+                            Updated: <strong><span>@Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)</span></strong>
                         </span>
                     </p>
                     <p>

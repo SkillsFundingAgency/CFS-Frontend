@@ -6,7 +6,7 @@
     {
         public DateTimeOffset? LastUpdatedDate { get; set; }
 
-        public Decimal CalculationResult { get; set; }
+        public Decimal? CalculationResult { get; set; }
 
         public string CalculationType { get; set; }
     }

@@ -8,20 +8,27 @@
     {
         public CalculationSpecificationType CalculationType { get; set; }
 
-        public Decimal CalculationResult { get; set; }
+        public Decimal? CalculationResult { get; set; }
 
         public string CalculationResultDisplay
         {
             get
             {
-                switch (CalculationType)
+                if (CalculationResult.HasValue)
                 {
-                    case CalculationSpecificationType.Funding:
-                        return CalculationResult.AsFormattedMoney();
-                    case CalculationSpecificationType.Number:
-                        return CalculationResult.AsFormattedNumber();
-                    default:
-                        throw new InvalidOperationException("Unknown calculation type");
+                    switch (CalculationType)
+                    {
+                        case CalculationSpecificationType.Funding:
+                            return CalculationResult.Value.AsFormattedMoney();
+                        case CalculationSpecificationType.Number:
+                            return CalculationResult.Value.AsFormattedNumber();
+                        default:
+                            throw new InvalidOperationException("Unknown calculation type");
+                    }
+                }
+                else
+                {
+                    return Properties.PageText.ExcludedText;
                 }
             }
         }

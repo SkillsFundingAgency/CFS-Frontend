@@ -159,4 +159,7 @@
   <data name="ApproveAndPublishFundingDescr" xml:space="preserve">
     <value>Approve and publish chosen specification</value>
   </data>
+  <data name="ExcludedText" xml:space="preserve">
+    <value>Excluded</value>
+  </data>
 </root>

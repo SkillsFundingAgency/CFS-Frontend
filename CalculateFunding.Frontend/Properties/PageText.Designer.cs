@@ -133,6 +133,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Excluded.
+        /// </summary>
+        public static string ExcludedText {
+            get {
+                return ResourceManager.GetString("ExcludedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Funding streams.
         /// </summary>
         public static string FundingStreams {

@@ -9,20 +9,27 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public CalculationSpecificationType CalculationType { get; set; }
 
-        public decimal SubTotal { get; set; }
+        public decimal? SubTotal { get; set; }
 
         public string TotalFormatted
         {
             get
             {
-                switch (CalculationType)
+                if (SubTotal.HasValue)
                 {
-                    case CalculationSpecificationType.Funding:
-                        return SubTotal.AsFormattedMoney();
-                    case CalculationSpecificationType.Number:
-                        return SubTotal.AsFormattedNumber();
-                    default:
-                        throw new InvalidOperationException("Unknown calculation type");
+                    switch (CalculationType)
+                    {
+                        case CalculationSpecificationType.Funding:
+                            return SubTotal.Value.AsFormattedMoney();
+                        case CalculationSpecificationType.Number:
+                            return SubTotal.Value.AsFormattedNumber();
+                        default:
+                            throw new InvalidOperationException("Unknown calculation type");
+                    }
+                }
+                else
+                {
+                    return Properties.PageText.ExcludedText;
                 }
             }
         }

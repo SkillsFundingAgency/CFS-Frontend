@@ -11,8 +11,8 @@ namespace CalculateFunding.Frontend.Pages.Results
     public class ProviderCalcsResultsPageModel : ProviderResultsBasePageModel
     {
         public ProviderCalcsResultsPageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
-            : base (resultsApiClient, mapper, specsApiClient, logger)
-        {}
+            : base(resultsApiClient, mapper, specsApiClient, logger)
+        { }
 
         public override void PopulateResults(ApiResponse<ProviderResults> providerResponse)
         {
@@ -20,7 +20,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                          new CalculationItemResult
                          {
                              Calculation = m.Calculation.Name,
-                             SubTotal = m.Value.HasValue ? m.Value.Value : 0,
+                             SubTotal = m.Value,
                              CalculationType = m.CalculationType
                          }
                      );
