@@ -1867,30 +1867,7 @@ table {
     table.cf tbody tr.expander-container-header {
         background-color: $grey-4;
     }
-    /* todo: remove these once new view funding paging replaces current one*/
-    .approvalstatus-button {
-        color: #fff;
-        border-radius: 0;
-        border: 1px solid #fff;
-        padding: 10px 30px;
-        transition: background-color ease-in-out 0.3s;
-    }
-
-    .approvalstatus-button:disabled {
-        background-color: $grey-2;
-        cursor: not-allowed;
-    }
-
-    .approvalstatus-button-approve {
-        margin-right: 15px;
-        background-color: $turquoise;
-    }
-
-    .approvalstatus-button-publish {
-        margin-right: 30px;
-        background-color: $grass-green;
-    }
-    /* end todo */
+    
     .affix {
         top: 0;
         z-index: 9999 !important;
@@ -1945,6 +1922,7 @@ table {
         background-color: black;
         padding-top: 5px;
         padding-bottom: 5px;
+        border: 0;
 
         i.material-icons {
             vertical-align: middle;
