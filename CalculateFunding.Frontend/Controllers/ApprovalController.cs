@@ -5,6 +5,7 @@ using AutoMapper;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
@@ -96,13 +97,16 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return new OkObjectResult(callResult.Content);
             }
-
-            if (callResult.StatusCode == HttpStatusCode.BadRequest)
+            else if (callResult.StatusCode == HttpStatusCode.NoContent)
+            {
+                return new NoContentResult();
+            }
+            else if (callResult.StatusCode == HttpStatusCode.BadRequest)
             {
                 return new BadRequestResult();
             }
 
-            return new StatusCodeResult(500);
+            return new InternalServerErrorResult($"Unexpected status from API call: '{callResult.StatusCode}'");
         }
 
         [Route("api/specs/{specificationId}/check-publish-result-status")]
