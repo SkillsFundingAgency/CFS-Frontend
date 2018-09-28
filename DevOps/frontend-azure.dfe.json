@@ -10,7 +10,7 @@
     },
     "skuName": {
       "type": "string",
-      "defaultValue": "S1",
+      "defaultValue": "P1v2",
       "allowedValues": [
         "F1",
         "D1",
@@ -23,7 +23,8 @@
         "P1",
         "P2",
         "P3",
-        "P4"
+        "P4",
+        "P3v2"
       ],
       "metadata": {
         "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
@@ -34,7 +35,28 @@
       "defaultValue": 1,
       "minValue": 1,
       "metadata": {
-        "description": "Describes plan's instance count"
+        "description": "Describes API plan's instance count"
+      }
+    },
+    "skuTier":{
+      "type": "string",
+      "defaultValue": "PremiumV2",
+      "metadata": {
+        "description": "Tier for API hosting plan"
+      }
+    },
+    "skuSize":{
+      "type": "string",
+      "defaultValue": "P1v2",
+      "metadata": {
+        "description": "Size for API hosting plan"
+      }
+    },
+    "skuFamily":{
+      "type": "string",
+      "defaultValue": "Pv2",
+      "metadata": {
+        "description": "Family for API hosting plan"
       }
     },
     "ApiKeyCalcs": {
@@ -140,7 +162,10 @@
       },
       "sku": {
         "name": "[parameters('skuName')]",
-        "capacity": "[parameters('skuCapacity')]"
+        "capacity": "[parameters('skuCapacity')]",
+        "tier": "[parameters('skuTier')]",
+        "size": "[parameters('skuSize')]",
+        "family": "[parameters('skuFamily')]"
       },
       "properties": {
         "name": "[variables('hostingPlanName')]"
