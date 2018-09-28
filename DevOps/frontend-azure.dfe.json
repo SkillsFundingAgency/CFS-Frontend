@@ -24,7 +24,9 @@
         "P2",
         "P3",
         "P4",
-        "P3v2"
+        "P3v2",
+        "P2v2",
+        "P1v2"
       ],
       "metadata": {
         "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
