@@ -7,8 +7,8 @@
         public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray();
         public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
         public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
-        public selectedFundingPeriod: KnockoutObservable<SpecificationResponse> = ko.observable();
-        public selectedSpecification: KnockoutObservable<FundingPeriodResponse> = ko.observable();
+        public selectedFundingPeriod: KnockoutObservable<FundingPeriodResponse> = ko.observable();
+        public selectedSpecification: KnockoutObservable<SpecificationResponse> = ko.observable();
         public selectedFundingStream: KnockoutObservable<FundingStreamResponse> = ko.observable();
         public pageState: KnockoutObservable<string> = ko.observable("initial");
         public workingMessage: KnockoutObservable<string> = ko.observable(null);
@@ -88,6 +88,18 @@
                                 newSpecificationArray.push(y);
                             });
                             self.Specifications(newSpecificationArray);
+
+                            // If query string contains a specification id then try and pre-select it
+                            let givenSpec: string = self.getQueryStringValue("specificationId");
+                            if (givenSpec) {
+                                let foundItem = ko.utils.arrayFirst(newSpecificationArray, function (item) {
+                                    return item.id == givenSpec;
+                                });
+
+                                if (foundItem) {
+                                    self.selectedSpecification(foundItem);
+                                }
+                            }
                         })
                         .fail((response) => {
                             self.notificationMessage("There was a problem retreiving the Specifications, please try again.");
@@ -107,7 +119,7 @@
                         function (item: SpecificationResponse) {
                             return (item.id === self.selectedSpecification().id);
                         });
-                    self.FundingStreams(spec.fundingstreams);
+                    self.FundingStreams(spec.fundingstreams);                    
                 }
                 else {
                     self.FundingStreams([]);
@@ -616,12 +628,28 @@
                         newPeriodArray.push(x);
                     });
                     self.FundingPeriods(newPeriodArray);
+
+                    // If the query string contains a funding period then try and pre-select it
+                    let givenPeriod:string = self.getQueryStringValue("fundingPeriodId");
+                    if (givenPeriod) {
+                        let foundItem = ko.utils.arrayFirst(newPeriodArray, function (item) {
+                            return item.id == givenPeriod;
+                        });
+
+                        if (foundItem) {
+                            self.selectedFundingPeriod(foundItem);
+                        }
+                    }
                 })
                 .fail((response) => {
                     self.notificationMessage("There was a problem retreiving the funding periods, please try again");
                     self.notificationStatus("error");
                 })
         }
+
+        private getQueryStringValue(key:string) {
+            return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+        }  
     }
 
     /** Execution status for a specification */
