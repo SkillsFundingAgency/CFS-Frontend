@@ -129,7 +129,6 @@ gulp.task('copy-assets', function (cb) {
         "editor/editor.main.js",
         "editor/editor.main.css",
         "editor/editor.main.nls.js",
-        "editor/standalone/browser/quickOpen/symbol-sprite.svg"
     ];
 
     monacoSourceFiles.forEach(function (value) {
