@@ -50,10 +50,6 @@
 
             CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
             CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
-            CreateMap<ConfirmPublishApprove, ConfirmPublishApproveViewModel>()
-                .ForMember(m => m.SpecificationName, opt => opt.Ignore())
-                .ForMember(m => m.LocalAuthoritiesJson, opt => opt.Ignore())
-                .ForMember(m => m.ProviderTypesJson, opt => opt.Ignore());
         }
 
         private void MapResults()

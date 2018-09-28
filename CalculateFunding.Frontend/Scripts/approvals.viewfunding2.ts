@@ -2,31 +2,26 @@
     /** Main view model that the page will be bound to */
     export class ViewFundingViewModel {
         private settings: IViewFundingSettings;
-        public isViewFundingButtonEnabled: KnockoutComputed<boolean>;
-        public isSpecificationDropdownEnabled: KnockoutComputed<boolean>;
-        public isViewFundingStreamDropdownEnabled: KnockoutComputed<boolean>;
         public isLoadingVisible: KnockoutComputed<boolean>;
-        public state: KnockoutObservable<string> = ko.observable("idle");
 
-        /** Included to cater for Approve and Publish selector feature */
         public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray();
         public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
         public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
-        selectedFundingPeriod: KnockoutObservable<SpecificationResponse> = ko.observable();
-        selectedSpecification: KnockoutObservable<FundingPeriodResponse> = ko.observable();
-        selectedFundingStream: KnockoutObservable<FundingStreamResponse> = ko.observable();
-        pageState: KnockoutObservable<string> = ko.observable("initial");
-        workingMessage: KnockoutObservable<string> = ko.observable(null);
-        isWorkingVisible: KnockoutObservable<boolean> = ko.observable(false);
-        workingPercentComplete: KnockoutObservable<number> = ko.observable(null);
-        notificationMessage: KnockoutObservable<string> = ko.observable(null);
-        notificationStatus: KnockoutObservable<string> = ko.observable();
-        specificationId: string;
-        selectedSpecValue: KnockoutObservable<string> = ko.observable("");
-        pageNumber: KnockoutObservable<number> = ko.observable(0);
-        itemsPerPage: number = 500;
-        limitVisiblePageNumbers: number = 5;
-        allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
+        public selectedFundingPeriod: KnockoutObservable<SpecificationResponse> = ko.observable();
+        public selectedSpecification: KnockoutObservable<FundingPeriodResponse> = ko.observable();
+        public selectedFundingStream: KnockoutObservable<FundingStreamResponse> = ko.observable();
+        public pageState: KnockoutObservable<string> = ko.observable("initial");
+        public workingMessage: KnockoutObservable<string> = ko.observable(null);
+        public isWorkingVisible: KnockoutObservable<boolean> = ko.observable(false);
+        public workingPercentComplete: KnockoutObservable<number> = ko.observable(null);
+        public notificationMessage: KnockoutObservable<string> = ko.observable(null);
+        public notificationStatus: KnockoutObservable<string> = ko.observable();
+        public selectedSpecValue: KnockoutObservable<string> = ko.observable("");
+        public pageNumber: KnockoutObservable<number> = ko.observable(0);
+        public itemsPerPage: number = 500;
+        public limitVisiblePageNumbers: number = 5;
+        public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
+        public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -47,16 +42,16 @@
             else if (typeof settings.approveAllocationLinesUrl !== "undefined" && !settings.approveAllocationLinesUrl) {
                 throw "Settings must contain the approve allocation lines url";
             }
-            else if (typeof settings.viewFundingPageUrl !== undefined && settings.viewFundingPageUrl === null) {
+            else if (typeof settings.viewFundingPageUrl !== undefined && !settings.viewFundingPageUrl) {
                 throw "Settings must contain the view funding page query url";
             }
-            else if (typeof settings.fundingPeriodUrl !== "undefined" && settings.fundingPeriodUrl === null) {
+            else if (typeof settings.fundingPeriodUrl !== "undefined" && !settings.fundingPeriodUrl) {
                 throw "Settings must contain the funding period query url";
             }
-            else if (typeof settings.fundingStreamsUrl !== "undefined" && settings.fundingStreamsUrl === null) {
+            else if (typeof settings.fundingStreamsUrl !== "undefined" && !settings.fundingStreamsUrl) {
                 throw "Settings must contain the fuding streams query url";
             }
-            else if (typeof settings.specificationsUrl !== "undefined" && settings.specificationsUrl === null) {
+            else if (typeof settings.specificationsUrl !== "undefined" && !settings.specificationsUrl) {
                 throw "Settings must contain the specifications query url";
             }
 
@@ -72,25 +67,10 @@
 
             self.pageState() == "initial";
 
-            /**ApproveandPublishSelection section */
             /** Request to get the funding periods */
-            let fundingPeriodRequest = $.ajax({
-                url: this.settings.fundingPeriodUrl,
-                dataType: "json",
-                method: "get",
-                contentType: "application/json",
-            }).done(function (response) {
-                let newPeriodArray = Array<FundingPeriodResponse>();
-                ko.utils.arrayForEach(response, function (item: any) {
-                    var x = new FundingPeriodResponse(item.id, item.name);
-                    newPeriodArray.push(x);
-                });
-                self.FundingPeriods(newPeriodArray);
-            }).fail((response) => {
-                self.notificationMessage("There was a problem retreiving funding periods,try again");
-                self.notificationStatus("error");
-             })
+            this.loadFundingPeriods();
 
+            /** When a funding period is selected then load the specifications for that funding period */
             this.selectedFundingPeriod.subscribe(function () {
                 if (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().value !== "Select") {
                     /** Load Specifications in the specification dropdown */
@@ -100,21 +80,26 @@
                         dataType: "json",
                         method: "get",
                         contentType: "application/json",
-                    }).done(function (response) {
-                        let newSpecificationArray = Array<SpecificationResponse>();
-                        ko.utils.arrayForEach(response, function (item: any) {
-                            var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
-                            newSpecificationArray.push(y);
-                        });
-                        self.Specifications(newSpecificationArray);
-                        }).fail((response) => {
-                            self.notificationMessage("There was a problem retreiving Specifications, try again.");
+                    })
+                        .done(function (response) {
+                            let newSpecificationArray = Array<SpecificationResponse>();
+                            ko.utils.arrayForEach(response, function (item: any) {
+                                var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
+                                newSpecificationArray.push(y);
+                            });
+                            self.Specifications(newSpecificationArray);
+                        })
+                        .fail((response) => {
+                            self.notificationMessage("There was a problem retreiving the Specifications, please try again.");
                             self.notificationStatus("error");
-                         })
+                        });
+                }
+                else {
+                    self.Specifications([]);
                 }
             });
 
-
+            /** When a specification is selected then load the funding streams for that specification */
             self.selectedSpecification.subscribe(function () {
                 if (self.selectedSpecification() !== undefined && self.selectedFundingPeriod().value !== "Select") {
                     let newFundingStreamArray = Array<FundingStreamResponse>();
@@ -123,26 +108,10 @@
                             return (item.id === self.selectedSpecification().id);
                         });
                     self.FundingStreams(spec.fundingstreams);
-                } else {
+                }
+                else {
                     self.FundingStreams([]);
                 }
-            });
-
-            self.isSpecificationDropdownEnabled = ko.computed(() => {
-                let isEnabled = (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().value !== "Select");
-                return isEnabled;
-            });
-
-            self.isViewFundingStreamDropdownEnabled = ko.computed(() => {
-                let isEnabled = (self.selectedSpecification() !== undefined && self.isSpecificationDropdownEnabled() && self.selectedFundingPeriod().value !== "Select");
-                return isEnabled;
-            });
-
-            self.isViewFundingButtonEnabled = ko.computed(() => {
-                let isEnabled = (self.selectedFundingStream() !== undefined && self.selectedFundingStream().name !== "Select"  
-                    && self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().value !== "Select"
-                    && self.selectedSpecification() !== undefined && self.selectedSpecification().value !== "Select");
-                return isEnabled;
             });
         }
 
@@ -265,7 +234,7 @@
                 this.notificationStatus('success');
 
                 // Once finished need to reload the page to get new data and reset selection    
-                this.state("idle");
+                this.dataLoadState("idle");
                 this.viewFunding();
 
                 return;
@@ -466,7 +435,7 @@
 
             if (!providerResult.qaTestResults()) {
                 providerResult.qaTestResultsRequestStatus('loading');
-                let getQAResultsUrl = parentVM.settings.testScenarioQueryUrl.replace("{specificationId}", parentVM.specificationId);
+                let getQAResultsUrl = parentVM.settings.testScenarioQueryUrl.replace("{specificationId}", parentVM.selectedSpecification().id);
                 let query = $.ajax({
                     url: getQAResultsUrl + "/" + providerResult.providerId,
                     method: 'GET',
@@ -543,14 +512,17 @@
             }, 500);
         }
 
-        /** On click of the button, map the response and load results */
+        /** When the View Funding button is pressed, then load the funding results for the criteria and display them */
         public viewFunding(): void {
-            if (this.state() !== "idle")
+            if (this.dataLoadState() !== "idle") {
                 return;
+            }
+
             let self = this;
             self.pageState("main");
-            self.isWorkingVisible(true);
             self.workingMessage("Loading funding values for providers");
+            self.isWorkingVisible(true);
+
             let viewfundingPageUrl = self.settings.viewFundingPageUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id);
             viewfundingPageUrl = viewfundingPageUrl.replace("{specificationId}", self.selectedSpecification().id);
             viewfundingPageUrl = viewfundingPageUrl.replace("{fundingstreamId}", self.selectedFundingStream().id);
@@ -561,68 +533,94 @@
                 contentType: "application/json"
             });
 
-            //self.state("Loading");
             viewFundingRequest.done((response) => {
                 if (response) {
-                    //self.workingMessage("Approve and publish funding screen is rendered");
-                    //self.isWorkingVisible(true);
                     self.pageState("main");
-                    let viewFundingResponse: KnockoutObservableArray<PublishedProviderResultViewModel> = response;
-                    self.bindViewFundingResponseToModel(viewFundingResponse);
-                    self.isWorkingVisible(false);
-
+                    self.bindViewFundingResponseToModel(response);
                 }
+                else {
+                    self.pageState("initial");
+                    self.notificationMessage("There was a problem loading the funding for the specification, please try again.");
+                    self.notificationStatus("error");
+                }
+
+                self.isWorkingVisible(false);
+                self.dataLoadState("idle");
             });
 
             viewFundingRequest.fail((response) => {
                 self.pageState("initial");
-                self.notificationMessage("There was a problem loading the funding for specification, try again.");
+                self.notificationMessage("There was a problem loading the funding for the specification, please try again.");
                 self.notificationStatus("error");
                 self.isWorkingVisible(false);
-                self.state("idle");
+                self.dataLoadState("idle");
             });
         }
 
         public bindViewFundingResponseToModel(response: any) {
             if (response !== null && response !== undefined) {
-                let publishedProviderArray: Array<IProviderResultsResponse> = response;
+                let receivedProviders: Array<IProviderResultsResponse> = response;
                 let providers: Array<PublishedProviderResultViewModel> = [];
-                for (let p in publishedProviderArray) {
-                    let provider: IProviderResultsResponse = publishedProviderArray[p];
-                    let providerObservable: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
+
+                for (let p: number = 0; p < receivedProviders.length; p++) {
+                    let receivedProvider: IProviderResultsResponse = receivedProviders[p];
+                    let newProvider: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
 
                     // Here we need to go and set the provider properties
-                    providerObservable.providerId = provider.providerId;
-                    providerObservable.providerName = provider.providerName;
-                    providerObservable.fundingAmount = provider.fundingAmount;
-                    providerObservable.numberApproved = provider.numberApproved;
-                    providerObservable.numberUpdated = provider.numberUpdated;
-                    providerObservable.numberNew = provider.numberHeld;
-                    providerObservable.numberPublished = provider.numberPublished;
-                    providerObservable.totalAllocationLines = provider.totalAllocationLines;
+                    newProvider.providerId = receivedProvider.providerId;
+                    newProvider.providerName = receivedProvider.providerName;
+                    newProvider.fundingAmount = receivedProvider.fundingAmount;
+                    newProvider.numberApproved = receivedProvider.numberApproved;
+                    newProvider.numberUpdated = receivedProvider.numberUpdated;
+                    newProvider.numberNew = receivedProvider.numberHeld;
+                    newProvider.numberPublished = receivedProvider.numberPublished;
+                    newProvider.totalAllocationLines = receivedProvider.totalAllocationLines;
 
-                    for (let f in provider.fundingStreamResults) {
-                        let fundingStream: IFundingStreamResultResponse = provider.fundingStreamResults[f];
-                        for (let a in fundingStream.allocationLineResults) {
-                            let allocationLine: IAllocationLineResultsResponse = fundingStream.allocationLineResults[a];
-                            let allocationLineObservable: PublishedAllocationLineResultViewModel = new PublishedAllocationLineResultViewModel();
+                    for (let fs: number = 0; fs < receivedProvider.fundingStreamResults.length; fs++) {
+                        let fundingStream: IFundingStreamResultResponse = receivedProvider.fundingStreamResults[fs];
+                        for (let a: number = 0; a < fundingStream.allocationLineResults.length; a++) {
+                            let receivedAllocationLine: IAllocationLineResultsResponse = fundingStream.allocationLineResults[a];
+                            let newAllocationLine: PublishedAllocationLineResultViewModel = new PublishedAllocationLineResultViewModel();
 
                             // set the properties 
-                            allocationLineObservable.allocationLineId = allocationLine.allocationLineId;
-                            allocationLineObservable.allocationLineName = allocationLine.allocationLineName;
-                            allocationLineObservable.fundingAmount = allocationLine.fundingAmount;
-                            allocationLineObservable.lastUpdated = allocationLine.lastUpdated;
-                            allocationLineObservable.status = allocationLine.status;
-                            allocationLineObservable.version = "1.0" //allocationLine.
+                            newAllocationLine.allocationLineId = receivedAllocationLine.allocationLineId;
+                            newAllocationLine.allocationLineName = receivedAllocationLine.allocationLineName;
+                            newAllocationLine.fundingAmount = receivedAllocationLine.fundingAmount;
+                            newAllocationLine.lastUpdated = receivedAllocationLine.lastUpdated;
+                            newAllocationLine.status = receivedAllocationLine.status;
+                            newAllocationLine.version = "n/a" //allocationLine.
 
-                            providerObservable.authority = allocationLine.authority;
-                            providerObservable.allocationLineResults.push(allocationLineObservable);
+                            newProvider.authority = receivedAllocationLine.authority;
+                            newProvider.allocationLineResults.push(newAllocationLine);
                         }
                     }
-                    providers.push(providerObservable)
+                    providers.push(newProvider)
                 }
                 this.allProviderResults(providers);
             }
+        }
+
+        public loadFundingPeriods() {
+            let self = this;
+
+            let fundingPeriodRequest = $.ajax({
+                url: this.settings.fundingPeriodUrl,
+                dataType: "json",
+                method: "get",
+                contentType: "application/json",
+            })
+                .done(function (response) {
+                    let newPeriodArray = Array<FundingPeriodResponse>();
+                    ko.utils.arrayForEach(response, function (item: any) {
+                        var x = new FundingPeriodResponse(item.id, item.name);
+                        newPeriodArray.push(x);
+                    });
+                    self.FundingPeriods(newPeriodArray);
+                })
+                .fail((response) => {
+                    self.notificationMessage("There was a problem retreiving the funding periods, please try again");
+                    self.notificationStatus("error");
+                })
         }
     }
 
@@ -817,6 +815,7 @@
         }
     }
 
+    /** Details for rollup of a set of allocation lines */
     class AllocationLineRollupViewModel {
         name: string;
         value: number;
