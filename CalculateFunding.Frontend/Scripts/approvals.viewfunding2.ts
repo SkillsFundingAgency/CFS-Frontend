@@ -247,7 +247,7 @@
 
                 // Once finished need to reload the page to get new data and reset selection    
                 this.dataLoadState("idle");
-                this.viewFunding();
+                this.loadProviderResults();
 
                 return;
             }
@@ -469,8 +469,10 @@
          * As the process is asynchronous is sets up a poll mechanism to check on the progress
          * */
         refreshFundingSnapshot() {
+            this.notificationMessage('');
             this.workingMessage("Refreshing funding values for providers");
             this.isWorkingVisible(true);
+
             let refreshPublishedResultsUrl = this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.selectedSpecification().id);
             let executeCalcRequest = $.ajax({
                 url: refreshPublishedResultsUrl,
@@ -498,7 +500,15 @@
                     contentType: "application/json"
                 })
                     .always((response) => {
+                        if (!response) {
+                            this.notificationMessage("Unable to find status details for requested refresh");
+                            this.notificationStatus("error");
+                            this.workingPercentComplete(null);
+                            this.isWorkingVisible(false);
+                        }
+
                         let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage);
+
                         if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
                             || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
                             // Update the percent complete
@@ -507,7 +517,7 @@
                         }
                         else if (status.calculationProgressStatus === CalculationProgressStatus.Error) {
                             // The refresh has failed
-                            this.notificationMessage("Unable to refresh allocation line funding values");
+                            this.notificationMessage("There was an error refreshing the allocation line funding values - " + status.errorMessage);
                             this.notificationStatus("error");
                             this.workingPercentComplete(null);
                             this.isWorkingVisible(false);
@@ -518,22 +528,30 @@
                             this.isWorkingVisible(false);
                             this.notificationMessage("Allocation line funding values refreshed successfully.");
                             this.notificationStatus("success");
+                            this.loadProviderResults();
                         }
                     });
 
-            }, 500);
+            }, 5000);
         }
 
         /** When the View Funding button is pressed, then load the funding results for the criteria and display them */
         public viewFunding(): void {
+            this.pageState("main");
+            this.notificationMessage('');
+            this.loadProviderResults();
+        }
+
+        /** Load the provider results from the back-end */
+        private loadProviderResults() {
             if (this.dataLoadState() !== "idle") {
                 return;
             }
 
             let self = this;
-            self.pageState("main");
             self.workingMessage("Loading funding values for providers");
             self.isWorkingVisible(true);
+            self.allProviderResults([]);
 
             let viewfundingPageUrl = self.settings.viewFundingPageUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id);
             viewfundingPageUrl = viewfundingPageUrl.replace("{specificationId}", self.selectedSpecification().id);
@@ -567,9 +585,9 @@
                 self.isWorkingVisible(false);
                 self.dataLoadState("idle");
             });
-        }
+        };
 
-        public bindViewFundingResponseToModel(response: any) {
+        private bindViewFundingResponseToModel(response: any) {
             if (response !== null && response !== undefined) {
                 let receivedProviders: Array<IProviderResultsResponse> = response;
                 let providers: Array<PublishedProviderResultViewModel> = [];
@@ -663,6 +681,7 @@
             this.specificationId = specificationId;
             this.percentageCompleted = percentageCompleted;
             this.calculationProgressStatus = calculationProgressStatus;
+            this.errorMessage = errorMessage;
         }
     }
 

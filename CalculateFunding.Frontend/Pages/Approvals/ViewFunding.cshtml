@@ -50,7 +50,7 @@
                 <p class="h4-heading"><strong data-bind="text: workingMessage"></strong></p>
                 <p>Please wait, this may take several minutes.</p>
                 <img src="~/assets/images/loader.gif" />
-                <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete"></span></div>
+                <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete"></span>%</div>
             </div>
         </div>
         <div data-bind="visible: notificationMessage(), css: notificationStatus() === 'error' ? 'notification-panel-error' : 'notification-panel'">
