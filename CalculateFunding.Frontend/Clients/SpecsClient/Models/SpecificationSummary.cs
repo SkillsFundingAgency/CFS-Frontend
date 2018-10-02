@@ -1,5 +1,6 @@
 ﻿using CalculateFunding.Frontend.Clients.CommonModels;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
@@ -20,5 +21,8 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 
         [JsonProperty("isSelectedForFunding")]
         public bool IsSelectedForFunding { get; set; }
+
+        [JsonProperty("publishedResultsRefreshedAt")]
+        public DateTimeOffset? PublishedResultsRefreshedAt { get; set; }
     }
 }
