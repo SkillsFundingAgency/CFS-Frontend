@@ -122,8 +122,8 @@
                     <tr>
                         <th rowspan="2" class="valign-top provider-column">
                             <div>Provider name</div>
-                            <div class="spacing-15-top">
-                                <input type="checkbox" id="selectAll" value="true" data-bind="checked: selectAll" title="Select All"/> <label for="selectAll" class="inline-table-label select-all-label target-selectall">Select all</label>
+                            <div class="spacing-15-top total-selected-text">
+                                <input type="checkbox" id="selectAll" value="true" data-bind="checked: selectAll" title="Select All"/> <span data-bind="text: numberAllocationLinesSelected"></span>/<span data-bind="text: totalNumberAllocationLines"></span> selected
                             </div>
                         </th>
                         <th rowspan="2" class="valign-top text-center ukprn-column">UKPRN</th>
@@ -173,7 +173,7 @@
                     <!-- ko foreach: allocationLineResults -->
                     <tr class="expander-container data-allocationline-container">
                         <td class="expander-container-group-identifier">
-                            <input type="checkbox" data-bind="attr: { id: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, checked: isSelected" class="target-checkbox-allocationline" /> <label data-bind="attr: { for: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, text: allocationLineName" class="inline-table-label data-allocationline-name"></label>
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, checked: isSelected, event: { change: function(data) { $root.allocationLineResultChecked(data, $root) } }" class="target-checkbox-allocationline" /> <label data-bind="attr: { for: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, text: allocationLineName" class="inline-table-label data-allocationline-name"></label>
                         </td>
                         <td>
                             <span data-bind="text: version"></span>

@@ -21,6 +21,7 @@
         public limitVisiblePageNumbers: number = 5;
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
+        public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -63,6 +64,7 @@
             // Defer updates on functions that determine whether the approve and publish buttons are enabled, so updates don't constantly to the UI and slow things down
             self.canApprove.extend({ deferred: true });
             self.canPublish.extend({ deferred: true });
+            self.numberAllocationLinesSelected.extend({ deferred: true });
 
             self.pageState() == "initial";
 
@@ -124,7 +126,23 @@
                     self.FundingStreams([]);
                 }
             });
+
         }
+
+        numberAllocationLinesSelected: KnockoutComputed<number> = ko.pureComputed(function () {
+            let providerResults = this.allProviderResults();
+            let count = 0;
+            for (let i = 0; i < providerResults.length; i++) {
+                let allocationResults = providerResults[i].allocationLineResults();
+                for (let j = 0; j < allocationResults.length; j++) {
+                    let allocationLineResult = allocationResults[j];
+                    if (allocationLineResult.isSelected()) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }, this);
 
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
             return this.allProviderResults();
@@ -593,6 +611,8 @@
                 let receivedProviders: Array<IProviderResultsResponse> = response;
                 let providers: Array<PublishedProviderResultViewModel> = [];
 
+                let numberAllocationLines = 0;
+
                 for (let p: number = 0; p < receivedProviders.length; p++) {
                     let receivedProvider: IProviderResultsResponse = receivedProviders[p];
                     let newProvider: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
@@ -623,11 +643,15 @@
 
                             newProvider.authority = receivedAllocationLine.authority;
                             newProvider.allocationLineResults.push(newAllocationLine);
+
+                            numberAllocationLines++;
                         }
                     }
                     providers.push(newProvider)
                 }
+
                 this.allProviderResults(providers);
+                this.totalNumberAllocationLines(numberAllocationLines);
             }
         }
 

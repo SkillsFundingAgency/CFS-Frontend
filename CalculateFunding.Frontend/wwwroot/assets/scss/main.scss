@@ -1862,6 +1862,11 @@ table {
         text-decoration: none;
     }
 
+    .total-selected-text {
+        font-size: 16px;
+        font-weight: 400;
+    }
+
     table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
         border-bottom: 1px solid #fff !important;
     }
