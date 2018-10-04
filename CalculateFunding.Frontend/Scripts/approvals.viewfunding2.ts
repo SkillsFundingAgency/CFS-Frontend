@@ -85,8 +85,8 @@
                         .done(function (response) {
                             let newSpecificationArray = Array<SpecificationResponse>();
                             ko.utils.arrayForEach(response, function (item: any) {
-                                var y = new SpecificationResponse(item.id, item.name, item.publishedResultsRefreshedAt, item.fundingStreams);
-                                newSpecificationArray.push(y);
+                                let specResponse = new SpecificationResponse(item.id, item.name, item.publishedResultsRefreshedAt, item.fundingStreams);
+                                newSpecificationArray.push(specResponse);
                             });
                             self.Specifications(newSpecificationArray);
 
@@ -667,8 +667,8 @@
                 .done(function (response) {
                     let newPeriodArray = Array<FundingPeriodResponse>();
                     ko.utils.arrayForEach(response, function (item: any) {
-                        var x = new FundingPeriodResponse(item.id, item.name);
-                        newPeriodArray.push(x);
+                        let fpPeriodResponse = new FundingPeriodResponse(item.id, item.name);
+                        newPeriodArray.push(fpPeriodResponse);
                     });
                     self.FundingPeriods(newPeriodArray);
 
