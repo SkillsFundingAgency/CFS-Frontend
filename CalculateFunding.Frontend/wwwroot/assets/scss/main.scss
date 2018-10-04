@@ -1855,6 +1855,18 @@ table {
 }
 
 .viewfunding-page-container {
+    .nav-tabs > li.active a {
+        background-color: $grey-3;
+        color: black;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .total-selected-text {
+        font-size: 16px;
+        font-weight: 400;
+    }
+
     table.cf tbody tr.expander-trigger-row-open td.view-funding-provider-border {
         border-bottom: 1px solid #fff !important;
     }
@@ -1873,8 +1885,13 @@ table {
         z-index: 9999 !important;
     }
 
-    .table-filter-container.affix {
-        width: 1141px;
+    .table-filter-container {
+        margin: 0;
+
+        .total-count {
+            text-align: right;
+            padding: 0;
+        }
     }
 
     table.cf > thead.affix {
