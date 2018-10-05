@@ -9,6 +9,7 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
     {
         Held,
         Approved,
-        Published
+        Published,
+        Updated
     }
 }
