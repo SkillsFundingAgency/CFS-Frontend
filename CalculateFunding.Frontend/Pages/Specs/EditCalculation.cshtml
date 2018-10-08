@@ -4,12 +4,15 @@
 
 @{
     ViewData["Title"] = "Create calculation specification for policy";
-    Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section FormBannerLeft{
     <p class="hero-text">Funding Period: @Model.Specification.FundingPeriod.Name</p>
     <h1 class="hero-title">Edit calculation specification for policy</h1>
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BreadCrumb{

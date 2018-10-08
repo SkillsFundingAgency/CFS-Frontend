@@ -35,6 +35,7 @@
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\expander.ts" />
+    <None Remove="Scripts\navbar.ts" />
     <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
@@ -140,6 +141,7 @@
     <TypeScriptCompile Include="Scripts\dataset.common.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\expander.ts" />
+    <TypeScriptCompile Include="Scripts\navbar.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
     <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
     <TypeScriptCompile Include="Scripts\search.specifications.ts" />
@@ -171,6 +173,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\Errors\500.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\Shared\_Layout.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\Specs\EditCalculation.cshtml">

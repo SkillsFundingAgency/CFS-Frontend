@@ -4,13 +4,16 @@
 
 @{
     ViewData["Title"] = "Create policy";
-    Layout = "~/Pages/_Layout.cshtml";
 }
 
 @section FormBannerLeft{
     <p class="hero-description">Funding Period: @Model.FundingPeriodName</p>
     <h1 class="hero-title">@BreadcrumbText.CreatePolicy</h1>
     <p class="hero-description"> Create policy for @Model.SpecificationName</p>
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BreadCrumb{

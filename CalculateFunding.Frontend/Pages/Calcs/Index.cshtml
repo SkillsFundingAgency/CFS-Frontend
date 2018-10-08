@@ -6,7 +6,10 @@
 @using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "Manage the Calculations";
-    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BannerLeft{
@@ -112,13 +115,13 @@
                 }
                 @foreach (var calculation in Model.SearchResults.Calculations)
                 {
-                <tr>
-                    <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
-                    <td id="static-results-status-@rowId">@calculation.Status</td>
-                    <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
-                    <td id="static-results-periodName-@rowId">@calculation.FundingPeriodName</td>
-                    <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
-                </tr>
+                    <tr>
+                        <td id="static-results-name-@rowId"><a href="/calcs/editCalculation/@calculation.Id">@calculation.Name</a></td>
+                        <td id="static-results-status-@rowId">@calculation.Status</td>
+                        <td id="static-results-specificationName-@rowId">@calculation.SpecificationName</td>
+                        <td id="static-results-periodName-@rowId">@calculation.FundingPeriodName</td>
+                        <td id="static-results-calculationType-@rowId">@calculation.CalculationType</td>
+                    </tr>
                     rowId++;
                 }
             </tbody>

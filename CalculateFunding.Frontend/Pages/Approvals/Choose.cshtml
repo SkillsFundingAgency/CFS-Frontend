@@ -6,6 +6,10 @@
     ViewData["Title"] = "Choose funding specification";
 }
 
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
+
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
@@ -100,13 +104,13 @@
     {
         <div class="noresults-panel spacing-10">
             <span class="noresults-panel-text">
-                <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ?  @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
+                <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ? @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
             </span>
         </div>
 
     }
 </div>
 
-@section scripts{ 
+@section scripts{
     <script asp-src-include="~/js/approvals.choose.js" asp-append-version="true" type="text/javascript"></script>
 }

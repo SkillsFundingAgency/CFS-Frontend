@@ -196,6 +196,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Datasets.
+        /// </summary>
+        public static string Datasets {
+            get {
+                return ResourceManager.GetString("Datasets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Download data schema template.
         /// </summary>
         public static string DatasetSchemas {

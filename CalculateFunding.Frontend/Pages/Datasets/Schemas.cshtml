@@ -8,6 +8,10 @@
     ViewData["Title"] = "Download data schema template";
 }
 
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
+
 @section BreadCrumb{
 
     <div class="breadcrumbs">
@@ -97,7 +101,7 @@
                                     <span class="datetime-split-time data-static-datasetDefinition-lastupdated-time">@schema.LastUpdatedTimeFormatted</span>
                                 </span>
                             </td>
-                            <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Name" ><i class="material-icons">cloud_download</i></a></td>
+                            <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Name"><i class="material-icons">cloud_download</i></a></td>
                             <td></td>
                         </tr>
                         <tr class="highlight-background">
@@ -127,14 +131,14 @@
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
     @*@if (!hostingEnv.IsDevelopment())
-    {
-        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
-    }
-    else
-    {
-        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
-    }
-    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>*@
+        {
+            <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+        }
+        else
+        {
+            <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+        }
+        <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>*@
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
     <script asp-src-include="~/js/search.datasetDefinitions.js" asp-append-version="true" type="text/javascript"></script>

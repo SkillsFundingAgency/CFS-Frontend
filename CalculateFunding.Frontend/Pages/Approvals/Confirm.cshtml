@@ -3,9 +3,11 @@
 @model CalculateFunding.Frontend.Pages.Approvals.ConfirmPageModel
 @{
     ViewData["Title"] = "Choose " + Model.SpecificationViewModel.Name + " for funding";
-    Layout = "~/Pages/_Layout.cshtml";
 }
 
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
 
 @section FormBannerLeft{
     <h1 class="heading-large">Confirm selection: @Model.SpecificationViewModel.Name</h1>
