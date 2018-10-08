@@ -133,6 +133,28 @@
         </div>
     </section>
     }
+    else if (IsSectionDefined("BannerWholeBlue"))
+    {
+    <section class="banner-container">
+        <div class="container">
+            <hr class="navbar-separator" />
+            @if (IsSectionDefined("BreadCrumb"))
+                {
+            <div class="row">
+                <div class="col-xs-12">
+                    @RenderSection("BreadCrumb", false)
+                </div>
+            </div>
+
+                }
+            <div class="row">
+                <div class="col-xs-12">
+                    @RenderSection("BannerWholeBlue")
+                </div>
+            </div>
+        </div>
+    </section>
+    }
     <main role="main">
         <div class="container">
             @RenderBody()
