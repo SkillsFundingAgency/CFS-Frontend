@@ -4,7 +4,11 @@
 
 @{
     ViewData["Title"] = "Choose data";
-    Layout = "~/Pages/_Layout.cshtml";
+    ViewData["ActiveNavBarArea"] = "specs";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BreadCrumb{

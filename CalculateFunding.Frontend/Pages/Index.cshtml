@@ -1,9 +1,7 @@
 ﻿@page
-@using CalculateFunding.Frontend.Pages
 @model CalculateFunding.Frontend.Pages.IndexModel
 @using CalculateFunding.Frontend.Properties
 @{
-    Layout = "~/Pages/_Layout.cshtml";
     ViewData["Title"] = "Homepage";
 
 }
@@ -18,23 +16,23 @@
     <p class="hero-description">@PageText.CFSubHeading</p>
 }
 
-<div class="row homepage-section-container">
+<div class="homepage-section-container">
     <div class="row">
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/specs" class="heading-small">Specifications</a>
+                <a href="/specs" class="heading-medium">Specifications</a>
             </div>
             <div>Create and manage the policy specifications used to calculate funding.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/datasets" class="heading-small">Manage data</a>
+                <a href="/datasets" class="heading-medium">Manage data</a>
             </div>
             <div>Manage data source files or map them to datasets for a specification.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/scenarios" class="heading-small">Quality assurance tests</a>
+                <a href="/scenarios" class="heading-medium">Quality assurance tests</a>
             </div>
             <div>Design tests to check calculations and data.</div>
         </div>
@@ -42,24 +40,31 @@
     <div class="row">
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/calcs" class="heading-small">Calculations</a>
+                <a href="/calcs" class="heading-medium">Calculations</a>
             </div>
             <div>View and edit calculations.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/results" class="heading-small">View results</a>
+                <a href="/results" class="heading-medium">View results</a>
             </div>
             <div>View results for providers, calculations and quality assurance tests.</div>
         </div>
         <div class="col-xs-12 col-sm-4">
             <div class="homepage-section-title">
-                <a href="/approvals" class="heading-small">Funding approvals</a>
+                <a href="/approvals" class="heading-medium">Funding approvals</a>
             </div>
             <div>Approve funding for providers and view how it's been calculated.</div>
         </div>
     </div>
 </div>
 
+<div class="row home-page-survey">
+    <div class="col-xs-12 govuk-beta-label">
+        <span>
+            Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer" href="https://www.smartsurvey.co.uk/s/cfsbeta/">help us improve the service</a>.
 
+        </span>
+    </div>
+</div>
 

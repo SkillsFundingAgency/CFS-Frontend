@@ -228,4 +228,7 @@
   <data name="ConfirmPublish" xml:space="preserve">
     <value>Confirm Publish</value>
   </data>
+  <data name="Datasets" xml:space="preserve">
+    <value>Datasets</value>
+  </data>
 </root>

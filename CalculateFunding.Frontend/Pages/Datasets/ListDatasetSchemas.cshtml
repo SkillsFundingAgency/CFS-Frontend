@@ -3,6 +3,11 @@
 @using CalculateFunding.Frontend.Properties
 @{
     ViewData["Title"] = "Data types";
+    ViewData["ActiveNavBarArea"] = "specs";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BreadCrumb{
@@ -10,8 +15,9 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/specs?fundingPeriodId=@Model.Specification.FundingPeriod.Id#spec-@Model.Specification.Id">@Model.Specification.FundingPeriod.Name</a></li>
-            <li>@BreadcrumbText.ManagePolicies</li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="~/specs/policies/@Model.Specification.Id">@Model.Specification.Name</a></li>
+            <li>@BreadcrumbText.Datasets</li>
         </ol>
     </div>
 }

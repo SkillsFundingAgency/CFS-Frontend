@@ -4,7 +4,10 @@
 @using CalculateFunding.Frontend.Helpers
 @{
     ViewData["Title"] = "Compare calculations";
-    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section breadcrumb{
@@ -74,9 +77,9 @@
                                     </div>
                                 </td>
                                 <td class="calculation-status">
-                                    @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation.Status) ? "none" : calculation.Status.ToLower(); }                                    
-                                        <span class="calculation-status-@statusClass">@calculation.Status</span>
-                                 </td>
+                                    @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation.Status) ? "none" : calculation.Status.ToLower(); }
+                                    <span class="calculation-status-@statusClass">@calculation.Status</span>
+                                </td>
                                 <td class="calculation-version"><span class="calculation-version">@calculation.Version</span></td>
                                 <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
                                 <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>
