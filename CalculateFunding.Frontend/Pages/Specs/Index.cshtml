@@ -8,6 +8,11 @@
 @{
     ViewData["Title"] = "Manage specification";
 }
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
+
 @section BreadCrumb{
 
     <div class="breadcrumbs">
@@ -95,7 +100,7 @@
                     <td>
                         <span class="button-split-container">
                             <span class="button-split-icon">
-                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }" ><i class="material-icons" title="Edit">edit</i></a>
+                                <a data-bind="attr: {href: '/specs/EditSpecification/' + id + '?returnPage=Specifications' }"><i class="material-icons" title="Edit">edit</i></a>
                             </span>
                             <span class="button-split-text">
                                 <a data-bind="attr: {href: '/specs/policies/' + id }, text: name"></a>
@@ -121,7 +126,7 @@
                             <span>Funding streams:</span>
                             <span data-bind="foreach: fundingStreamNames" class="inline-list"><strong data-bind="text: $data" class="inline-list-item data-specification-fundingstream"></strong> </span>
                         </div>
-                        <div class="spacing-15-bottom" data-bind="text: description"></div>            
+                        <div class="spacing-15-bottom" data-bind="text: description"></div>
                     </td>
                 </tr>
             </tbody>
@@ -167,7 +172,7 @@
 
                                 </span>
                             </div>
-                            <div class="spacing-15-bottom">@specification.Description.ReplaceLineBreaksForHtml()</div>                 
+                            <div class="spacing-15-bottom">@specification.Description.ReplaceLineBreaksForHtml()</div>
                         </td>
                     </tr>
                     rowId++;

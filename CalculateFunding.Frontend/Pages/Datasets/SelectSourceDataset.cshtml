@@ -4,7 +4,10 @@
 
 @{
     ViewData["Title"] = "Select source dataset";
-    Layout = "~/Pages/_Layout.cshtml";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
 }
 
 @section BreadCrumb{
@@ -19,7 +22,7 @@
     </div>
 }
 
-@section FormBannerLeft{
+@section BannerWhole{
     <p class="hero-description">@Model.ViewModel.SpecificationName</p>
     <h1 class="hero-title">@Model.ViewModel.RelationshipName</h1>
 }

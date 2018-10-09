@@ -16,12 +16,12 @@
         public workingPercentComplete: KnockoutObservable<number> = ko.observable(null);
         public notificationMessage: KnockoutObservable<string> = ko.observable(null);
         public notificationStatus: KnockoutObservable<string> = ko.observable();
-        public selectedSpecValue: KnockoutObservable<string> = ko.observable("");
         public pageNumber: KnockoutObservable<number> = ko.observable(0);
         public itemsPerPage: number = 500;
         public limitVisiblePageNumbers: number = 5;
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
+        public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -64,6 +64,7 @@
             // Defer updates on functions that determine whether the approve and publish buttons are enabled, so updates don't constantly to the UI and slow things down
             self.canApprove.extend({ deferred: true });
             self.canPublish.extend({ deferred: true });
+            self.numberAllocationLinesSelected.extend({ deferred: true });
 
             self.pageState() == "initial";
 
@@ -84,8 +85,8 @@
                         .done(function (response) {
                             let newSpecificationArray = Array<SpecificationResponse>();
                             ko.utils.arrayForEach(response, function (item: any) {
-                                var y = new SpecificationResponse(item.id, item.name, item.fundingStreams);
-                                newSpecificationArray.push(y);
+                                let specResponse = new SpecificationResponse(item.id, item.name, item.publishedResultsRefreshedAt, item.fundingStreams);
+                                newSpecificationArray.push(specResponse);
                             });
                             self.Specifications(newSpecificationArray);
 
@@ -125,7 +126,23 @@
                     self.FundingStreams([]);
                 }
             });
+
         }
+
+        numberAllocationLinesSelected: KnockoutComputed<number> = ko.pureComputed(function () {
+            let providerResults = this.allProviderResults();
+            let count = 0;
+            for (let i = 0; i < providerResults.length; i++) {
+                let allocationResults = providerResults[i].allocationLineResults();
+                for (let j = 0; j < allocationResults.length; j++) {
+                    let allocationLineResult = allocationResults[j];
+                    if (allocationLineResult.isSelected()) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }, this);
 
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
             return this.allProviderResults();
@@ -507,7 +524,7 @@
                             this.isWorkingVisible(false);
                         }
 
-                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage);
+                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage, response.publishedResultsRefreshedAt);
 
                         if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
                             || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
@@ -529,6 +546,8 @@
                             this.notificationMessage("Allocation line funding values refreshed successfully.");
                             this.notificationStatus("success");
                             this.loadProviderResults();
+
+                            this.selectedSpecification().publishedResultsRefreshedAt(status.publishedResultsRefreshedAt)
                         }
                     });
 
@@ -592,6 +611,8 @@
                 let receivedProviders: Array<IProviderResultsResponse> = response;
                 let providers: Array<PublishedProviderResultViewModel> = [];
 
+                let numberAllocationLines = 0;
+
                 for (let p: number = 0; p < receivedProviders.length; p++) {
                     let receivedProvider: IProviderResultsResponse = receivedProviders[p];
                     let newProvider: PublishedProviderResultViewModel = new PublishedProviderResultViewModel();
@@ -622,11 +643,15 @@
 
                             newProvider.authority = receivedAllocationLine.authority;
                             newProvider.allocationLineResults.push(newAllocationLine);
+
+                            numberAllocationLines++;
                         }
                     }
                     providers.push(newProvider)
                 }
+
                 this.allProviderResults(providers);
+                this.totalNumberAllocationLines(numberAllocationLines);
             }
         }
 
@@ -642,8 +667,8 @@
                 .done(function (response) {
                     let newPeriodArray = Array<FundingPeriodResponse>();
                     ko.utils.arrayForEach(response, function (item: any) {
-                        var x = new FundingPeriodResponse(item.id, item.name);
-                        newPeriodArray.push(x);
+                        let fpPeriodResponse = new FundingPeriodResponse(item.id, item.name);
+                        newPeriodArray.push(fpPeriodResponse);
                     });
                     self.FundingPeriods(newPeriodArray);
 
@@ -676,12 +701,14 @@
         percentageCompleted: number;
         calculationProgressStatus: CalculationProgressStatus;
         errorMessage: string;
+        publishedResultsRefreshedAt: Date;
 
-        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string) {
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string, publishedResultsRefreshedAt: Date) {
             this.specificationId = specificationId;
             this.percentageCompleted = percentageCompleted;
             this.calculationProgressStatus = calculationProgressStatus;
             this.errorMessage = errorMessage;
+            this.publishedResultsRefreshedAt = publishedResultsRefreshedAt;
         }
     }
 
@@ -907,14 +934,27 @@
 
     /** Specification dropdown options  */
     export class SpecificationResponse {
-        constructor(id: string, value: string, fundingStreams: Array<any>) {
+        constructor(id: string, value: string, publishedResultsRefreshedAt: Date, fundingStreams: Array<any>) {
             this.id = id;
             this.value = value;
+            this.publishedResultsRefreshedAt(publishedResultsRefreshedAt);
             this.fundingstreams = fundingStreams;
         }
         id: string;
         value: string;
         fundingstreams: Array<FundingStreamResponse>;
+        publishedResultsRefreshedAt: KnockoutObservable<Date> = ko.observable();
+
+        publishedResultsRefreshedAtDisplay: KnockoutComputed<string> = ko.computed(function () {
+            if (this.publishedResultsRefreshedAt()) {
+                let date: Date = new Date(this.publishedResultsRefreshedAt());
+                let dateOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+                return date.toLocaleString('en-GB', dateOptions);
+            }
+            else {
+                return 'Not available';
+            }
+        }, this);
     }
 
     /** Funding stream dropdown options  */

@@ -5,5 +5,6 @@
         Held,
         Approved,
         Published,
+        Updated
     }
 }
