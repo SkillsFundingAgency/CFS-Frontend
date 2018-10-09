@@ -297,7 +297,7 @@
                 let allocationResults = providerResults[i].allocationLineResults();
                 for (let j = 0; j < allocationResults.length; j++) {
                     let allocationLineResult = allocationResults[j];
-                    if (allocationLineResult.isSelected() && allocationLineResult.status === AllocationLineStatus.Held) {
+                    if (allocationLineResult.isSelected() && (allocationLineResult.status === AllocationLineStatus.Held || allocationLineResult.status === AllocationLineStatus.Updated)) {
                         return true;
                     }
                 }
@@ -315,7 +315,7 @@
                 let providerHasSelectedAllocations: boolean;
                 for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                     let allocationResult = providerResult.allocationLineResults()[j];
-                    if (allocationResult.isSelected() && allocationResult.status === AllocationLineStatus.Held) {
+                    if (allocationResult.isSelected() && (allocationResult.status === AllocationLineStatus.Held || allocationResult.status === AllocationLineStatus.Updated)) {
                         approveVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
                         approveVM.totalFundingApproved += allocationResult.fundingAmount;
                         providerHasSelectedAllocations = true;
@@ -369,7 +369,7 @@
                 let allocationResults = providerResults[i].allocationLineResults();
                 for (let j = 0; j < allocationResults.length; j++) {
                     let allocationLineResult = allocationResults[j];
-                    if (allocationLineResult.isSelected() && (allocationLineResult.status === AllocationLineStatus.Approved || allocationLineResult.status === AllocationLineStatus.Updated)) {
+                    if (allocationLineResult.isSelected() && allocationLineResult.status === AllocationLineStatus.Approved) {
                         return true;
                     }
                 }
@@ -387,7 +387,7 @@
                 let providerHasSelectedAllocations: boolean;
                 for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                     let allocationResult = providerResult.allocationLineResults()[j];
-                    if (allocationResult.isSelected() && (allocationResult.status === AllocationLineStatus.Approved || allocationResult.status === AllocationLineStatus.Updated)) {
+                    if (allocationResult.isSelected() && allocationResult.status === AllocationLineStatus.Approved) {
                         publishVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
                         publishVM.totalFundingApproved += allocationResult.fundingAmount;
                         providerHasSelectedAllocations = true;
