@@ -92,9 +92,9 @@
     else if (IsSectionDefined("FormBannerLeft"))
     {
     <section class="form-banner-container">
+        <hr class="navbar-separator" />
         <div class="container">
             <div class="row">
-                <hr class="navbar-separator" />
                 <div class="col-xs-9">
                     <div class="form-banner-container-left">
                         @RenderSection("BreadCrumb", false)
@@ -114,8 +114,8 @@
     else if (IsSectionDefined("BannerWhole"))
     {
     <section class="form-banner-container">
+        <hr class="navbar-separator" />
         <div class="container">
-            <hr class="navbar-separator" />
             @if (IsSectionDefined("BreadCrumb"))
                 {
             <div class="row">
@@ -137,7 +137,6 @@
     {
     <section class="banner-container">
         <div class="container">
-            <hr class="navbar-separator" />
             @if (IsSectionDefined("BreadCrumb"))
                 {
             <div class="row">

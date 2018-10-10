@@ -973,7 +973,6 @@ blockquote {
 }
 
 .bannerblue-container {
-    border-top: 5px solid $govuk-blue;
     padding-top: 5px;
 
     .bannerblue-title {
@@ -987,7 +986,7 @@ blockquote {
 
     .bannerblue-lastmodifiedby,
     .bannerblue-lastmodified {
-        color: $grey-2;
+        color: #6f777b;
     }
 
     .bannerblue-lastmodified {
