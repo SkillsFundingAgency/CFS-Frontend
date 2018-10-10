@@ -104,7 +104,7 @@ namespace calculateFunding.createNewDataset {
                     self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-authorId", response.author.id);
                     self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-filename", response.filename);
                     self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-name", response.name);
-                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-description", response.description);
+                    self.addToRequestHeaderIfNotEmpty(request, "x-ms-meta-description", encodeURI(response.description));
                 }
             });
 
@@ -122,7 +122,6 @@ namespace calculateFunding.createNewDataset {
 
             blobRequest.fail(() => {
                 self.state("idle");
-
             });
         }
 
