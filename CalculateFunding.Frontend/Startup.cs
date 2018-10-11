@@ -59,7 +59,7 @@
 
                 services.AddMvc(config =>
                 {
-                    var policy = new AuthorizationPolicyBuilder()
+                    AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
                                      .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
                                      .Build();
@@ -71,6 +71,12 @@
             {
                 services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             }
+
+            services.AddAntiforgery(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
 
             services.AddModule<ApiModule>(Configuration);
 
@@ -91,7 +97,7 @@
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<HealthCheckOptions>(Configuration.GetSection("healthCheck"));
 
-            var builder = new ContainerBuilder();
+            ContainerBuilder builder = new ContainerBuilder();
 
             builder.Populate(services);
 

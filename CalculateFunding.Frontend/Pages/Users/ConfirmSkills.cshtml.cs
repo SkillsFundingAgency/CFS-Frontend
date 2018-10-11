@@ -49,7 +49,9 @@ namespace CalculateFunding.Frontend.Pages.Users
         {
             CookieOptions option = new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(3)
+                Expires = DateTime.Now.AddYears(3),
+                Secure = true,
+                HttpOnly = true
             };
 
             Response.Cookies.Append(UserContstants.SkillsConfirmationCookieName, "true", option);
