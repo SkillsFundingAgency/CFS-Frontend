@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System.Net;
+using Microsoft.AspNetCore.Html;
 
 namespace CalculateFunding.Frontend.Helpers
 {
@@ -17,6 +18,7 @@ namespace CalculateFunding.Frontend.Helpers
             // When initially saving a document, it is only \n so replace this after to catch it first render before app pool reset
             result = result.Replace("\n", "<br/>");
 
+            result = WebUtility.HtmlEncode(result);
             return new HtmlString(result);
         }
     }
