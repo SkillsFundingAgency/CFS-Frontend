@@ -214,10 +214,12 @@
           "clientAffinityEnabled": false,
           "ipSecurityRestrictions": [
             {
-              "ipAddress": "213.123.63.150"
+              "ipAddress": "213.123.63.150",
+              "name" : "DfE London Proxy"
             },
             {
-              "ipAddress": "86.188.174.157"
+              "ipAddress": "86.188.174.157",
+              "name" : "DfE Sheffield Proxy"
             }
           ],
           "appSettings": [

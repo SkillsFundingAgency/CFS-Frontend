@@ -103,6 +103,14 @@
 
             ApplicationContainer = builder.Build();
 
+            services.AddHsts((options) =>
+            {
+                options.ExcludedHosts.Add("localhost");
+                options.Preload = false;
+                options.IncludeSubDomains = true;
+                options.MaxAge = new TimeSpan(365, 0, 0, 0, 0);
+            });
+
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
