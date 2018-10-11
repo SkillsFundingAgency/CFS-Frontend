@@ -200,6 +200,7 @@
       "properties": {
         "name": "[variables('webSiteName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "clientAffinityEnabled": false,
         "siteConfig": {
           "AlwaysOn": true,
           "use32BitWorkerProcess": false,
