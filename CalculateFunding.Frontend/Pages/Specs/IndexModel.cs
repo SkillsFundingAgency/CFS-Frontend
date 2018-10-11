@@ -101,6 +101,7 @@
             InitialSearchResults = JsonConvert.SerializeObject(SearchResults, Formatting.Indented, new JsonSerializerSettings()
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml
             });
 
             return Page();
