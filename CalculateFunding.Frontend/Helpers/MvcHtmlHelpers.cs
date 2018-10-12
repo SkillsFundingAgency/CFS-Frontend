@@ -12,13 +12,14 @@ namespace CalculateFunding.Frontend.Helpers
                 return new HtmlString("");
             }
 
+            string result = WebUtility.HtmlEncode(input);
+
             // Replace windows new line first
-            string result = input.Replace("\r\n", "<br/>");
+            result = result.Replace("\r\n", "<br/>");
 
             // When initially saving a document, it is only \n so replace this after to catch it first render before app pool reset
             result = result.Replace("\n", "<br/>");
 
-            result = WebUtility.HtmlEncode(result);
             return new HtmlString(result);
         }
     }
