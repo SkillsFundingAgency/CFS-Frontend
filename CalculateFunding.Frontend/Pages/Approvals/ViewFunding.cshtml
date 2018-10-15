@@ -451,6 +451,7 @@
             "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}"
         };
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
+        vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
         ko.applyBindings(vfVM);
     </script>
 }

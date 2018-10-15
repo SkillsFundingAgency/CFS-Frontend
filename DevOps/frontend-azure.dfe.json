@@ -145,6 +145,13 @@
       "metadata": {
         "description": "Calculate Funding Frontend Health Check Key"
       }
+    },
+    "publishButtonEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the publish button on the view funding page"
+      },
+      "defaultValue": "true"
     }
   },
   "variables": {
@@ -318,6 +325,10 @@
             {
               "name": "healthCheck:ApiKey",
               "value": "[parameters('healthCheckKey')]"
+            },
+            {
+              "name": "features:publishButtonEnabled",
+              "value": "[parameters('publishButtonEnabled')]"
             }
           ]
         }

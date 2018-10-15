@@ -22,6 +22,7 @@
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
+        public isPublishButtonEnabled: boolean;
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -364,6 +365,11 @@
 
         /** Has the used selected at least one allocation line result that can be published */
         canPublish: KnockoutComputed<boolean> = ko.pureComputed(function () {
+            // Disable the publish button if configured so (Story #62313)
+            if (!this.isPublishButtonEnabled) {
+                return false;
+            }
+
             let providerResults = this.allProviderResults();
             for (let i = 0; i < providerResults.length; i++) {
                 let allocationResults = providerResults[i].allocationLineResults();
