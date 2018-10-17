@@ -41,6 +41,10 @@ namespace calculateFunding.editCalculation {
                 throw new Error("specificationId not provided in options");
             }
 
+            if (!options.calculationName) {
+                throw new Error("calculation name not provided in options");
+            }
+
             this.options = options;
 
             this.initialCodeContents = options.existingSourceCode;
@@ -200,26 +204,28 @@ namespace calculateFunding.editCalculation {
                         for (let m in calculationType.methods) {
                             let currentMethod: calculateFunding.common.IMethodInformationResponse = calculationType.methods[m];
 
-                            let functionInformation: calculateFunding.providers.ILocalFunction = new calculateFunding.providers.VisualBasicSub({
-                                label: currentMethod.name,
-                                description: currentMethod.description,
-                                returnType: currentMethod.returnType,
-                                parameters: [],
-                                friendlyName: currentMethod.friendlyName,
-                            });
+                            if (currentMethod.friendlyName !== self.options.calculationName) {
+                                let functionInformation: calculateFunding.providers.ILocalFunction = new calculateFunding.providers.VisualBasicSub({
+                                    label: currentMethod.name,
+                                    description: currentMethod.description,
+                                    returnType: currentMethod.returnType,
+                                    parameters: [],
+                                    friendlyName: currentMethod.friendlyName,
+                                });
 
-                            for (let p in currentMethod.parameters) {
-                                let parameter = currentMethod.parameters[p];
-                                let parameterInformation: calculateFunding.providers.IFunctionParameter = {
-                                    name: parameter.name,
-                                    description: parameter.description,
-                                    type: parameter.type,
-                                };
+                                for (let p in currentMethod.parameters) {
+                                    let parameter = currentMethod.parameters[p];
+                                    let parameterInformation: calculateFunding.providers.IFunctionParameter = {
+                                        name: parameter.name,
+                                        description: parameter.description,
+                                        type: parameter.type,
+                                    };
 
-                                functionInformation.parameters.push(parameterInformation);
+                                    functionInformation.parameters.push(parameterInformation);
+                                }
+
+                                functions[functionInformation.label.toLowerCase()] = functionInformation;
                             }
-
-                            functions[functionInformation.label.toLowerCase()] = functionInformation;
                         }
                     }
 
@@ -273,6 +279,7 @@ namespace calculateFunding.editCalculation {
         calculationId: string,
         specificationId: string,
         existingSourceCode: string,
+        calculationName: string
     }
 
     export interface IPreviewCompileResultReponse {
