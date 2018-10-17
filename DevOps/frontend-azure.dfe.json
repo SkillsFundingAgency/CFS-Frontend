@@ -40,21 +40,21 @@
         "description": "Describes API plan's instance count"
       }
     },
-    "skuTier":{
+    "skuTier": {
       "type": "string",
       "defaultValue": "PremiumV2",
       "metadata": {
         "description": "Tier for API hosting plan"
       }
     },
-    "skuSize":{
+    "skuSize": {
       "type": "string",
       "defaultValue": "P1v2",
       "metadata": {
         "description": "Size for API hosting plan"
       }
     },
-    "skuFamily":{
+    "skuFamily": {
       "type": "string",
       "defaultValue": "Pv2",
       "metadata": {
@@ -150,6 +150,13 @@
       "type": "string",
       "metadata": {
         "description": "Enable the publish button on the view funding page"
+      },
+      "defaultValue": "true"
+    },
+    "allocationLineMajorMinorVersioningEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the major minor versioning"
       },
       "defaultValue": "true"
     }
@@ -329,6 +336,10 @@
             {
               "name": "features:publishButtonEnabled",
               "value": "[parameters('publishButtonEnabled')]"
+            },
+            {
+              "name": "features:allocationLineMajorMinorVersioningEnabled",
+              "value": "[parameters('allocationLineMajorMinorVersioningEnabled')]"
             }
           ]
         }

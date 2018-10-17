@@ -1,4 +1,4 @@
-﻿namespace calculateFunding.approvals.two {
+﻿namespace calculateFunding.approvals {
     /** Main view model that the page will be bound to */
     export class ViewFundingViewModel {
         private settings: IViewFundingSettings;
@@ -18,6 +18,7 @@
         public notificationStatus: KnockoutObservable<string> = ko.observable();
         public pageNumber: KnockoutObservable<number> = ko.observable(0);
         public itemsPerPage: number = 500;
+        public updatedCount: KnockoutObservable<number> = ko.observable(0);
         public limitVisiblePageNumbers: number = 5;
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
@@ -121,7 +122,7 @@
                         function (item: SpecificationResponse) {
                             return (item.id === self.selectedSpecification().id);
                         });
-                    self.FundingStreams(spec.fundingstreams);
+                    self.FundingStreams(spec.fundingstreams);                    
                 }
                 else {
                     self.FundingStreams([]);
@@ -240,7 +241,7 @@
                 }
 
                 let start = j * batchSize;
-
+                
                 for (let i = start; i < start + batchSize; i++) {
                     let selectedItem = selectedItems.allocationLines[i];
                     if (selectedItem === undefined) {
@@ -253,7 +254,7 @@
                 tasks.push(updateModel);
             }
 
-            this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);
+            this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);            
         }
 
         /** Execute a unit of work by calling the change status endpoint */
@@ -347,6 +348,7 @@
             approveVM.providerTypes = new calculateFunding.controls.ExpanderViewModel(selectedProviders);
             this.approvalDetails(approveVM);
             this.pageState("confirmApproval");
+            this.notificationStatus("");
             this.notificationMessage(null);
         }
 
@@ -363,9 +365,8 @@
             this.isWorkingVisible(false);
         }
 
-        // Has the used selected at least one allocation line result that can be published
-
-        canPublish: KnockoutComputed<boolean > = ko.pureComputed(function () {
+        /** Has the used selected at least one allocation line result that can be published */
+        canPublish: KnockoutComputed<boolean> = ko.pureComputed(function () {
             // Disable the publish button if configured so (Story #62313)
             if (!this.isPublishButtonEnabled) {
                 return false;
@@ -425,6 +426,7 @@
             publishVM.providerTypes = new calculateFunding.controls.ExpanderViewModel(selectedProviders);
             this.publishDetails(publishVM);
             this.pageState("confirmPublish");
+            this.notificationStatus("");
             this.notificationMessage(null);
         }
 
@@ -432,7 +434,7 @@
         publish() {
             this.callChangeStatusEndpoint(StatusAction.Publish);
         }
-
+      
         /** This provides a shortcut to evaluating the UI for performing the select all operation */
         private executingSelectAll: KnockoutObservable<boolean> = ko.observable(false);
 
@@ -496,6 +498,7 @@
             this.notificationMessage('');
             this.workingMessage("Refreshing funding values for providers");
             this.isWorkingVisible(true);
+            this.notificationStatus("");
 
             let refreshPublishedResultsUrl = this.settings.refreshPublishedResultsUrl.replace("{specificationId}", this.selectedSpecification().id);
             let executeCalcRequest = $.ajax({
@@ -508,8 +511,8 @@
                     this.pollCalculationProgress();
                 })
                 .fail((response) => {
-                    this.notificationMessage("There was a problem starting the refresh.");
-                    this.notificationStatus("error");
+                   // this.notificationMessage("There was a problem starting the refresh.");
+                    this.notificationStatus("refreshError");
                     this.isWorkingVisible(false);
                 });
         }
@@ -531,7 +534,7 @@
                             this.isWorkingVisible(false);
                         }
 
-                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage, response.publishedResultsRefreshedAt);
+                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage, response.publishedResultsRefreshedAt, response.approvedCount, response.publishedCount, response.updatedCount);
 
                         if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
                             || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
@@ -541,17 +544,26 @@
                         }
                         else if (status.calculationProgressStatus === CalculationProgressStatus.Error) {
                             // The refresh has failed
-                            this.notificationMessage("There was an error refreshing the allocation line funding values - " + status.errorMessage);
-                            this.notificationStatus("error");
+                            //this.notificationMessage("There was an error refreshing the allocation line funding values - " + status.errorMessage);
+                            this.notificationStatus("refreshError");
                             this.workingPercentComplete(null);
                             this.isWorkingVisible(false);
                         }
                         else if (status.calculationProgressStatus === CalculationProgressStatus.Finished) {
                             // Refresh has completed successfully so reload the data
+                            let message = "";
+
+                            if (!status.hasChanges) {
+                                this.notificationStatus("refreshNotUpdated");
+                                message = "Allocation line funding values refreshed successfully, no values have changed";
+                            }
+                            else {
+                                this.notificationStatus("refreshUpdated");
+                                this.updatedCount(response.updatedCount);
+                            }
                             this.workingPercentComplete(null);
                             this.isWorkingVisible(false);
-                            this.notificationMessage("Allocation line funding values refreshed successfully.");
-                            this.notificationStatus("success");
+
                             this.loadProviderResults();
 
                             this.selectedSpecification().publishedResultsRefreshedAt(status.publishedResultsRefreshedAt)
@@ -646,7 +658,7 @@
                             newAllocationLine.fundingAmount = receivedAllocationLine.fundingAmount;
                             newAllocationLine.lastUpdated = receivedAllocationLine.lastUpdated;
                             newAllocationLine.status = receivedAllocationLine.status;
-                            newAllocationLine.version = "n/a" //allocationLine.
+                            newAllocationLine.version = receivedAllocationLine.version;
 
                             newProvider.authority = receivedAllocationLine.authority;
                             newProvider.allocationLineResults.push(newAllocationLine);
@@ -680,7 +692,7 @@
                     self.FundingPeriods(newPeriodArray);
 
                     // If the query string contains a funding period then try and pre-select it
-                    let givenPeriod: string = self.getQueryStringValue("fundingPeriodId");
+                    let givenPeriod:string = self.getQueryStringValue("fundingPeriodId");
                     if (givenPeriod) {
                         let foundItem = ko.utils.arrayFirst(newPeriodArray, function (item) {
                             return item.id == givenPeriod;
@@ -697,9 +709,9 @@
                 })
         }
 
-        private getQueryStringValue(key: string) {
+        private getQueryStringValue(key:string) {
             return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
-        }
+        }  
     }
 
     /** Execution status for a specification */
@@ -709,13 +721,21 @@
         calculationProgressStatus: CalculationProgressStatus;
         errorMessage: string;
         publishedResultsRefreshedAt: Date;
+        approvedCount: number;
+        publishedCount: number;
+        updatedCount: number;
+        hasChanges: boolean;
 
-        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string, publishedResultsRefreshedAt: Date) {
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string, publishedResultsRefreshedAt: Date, approvedCount: number, publishedCount: number, updatedCount: number) {
             this.specificationId = specificationId;
             this.percentageCompleted = percentageCompleted;
             this.calculationProgressStatus = calculationProgressStatus;
             this.errorMessage = errorMessage;
             this.publishedResultsRefreshedAt = publishedResultsRefreshedAt;
+            this.approvedCount = approvedCount;
+            this.updatedCount = updatedCount;
+            this.publishedCount = publishedCount;
+            this.hasChanges = (approvedCount + updatedCount + publishedCount) > 0;
         }
     }
 
@@ -726,7 +746,7 @@
         Error,
         Finished
     }
-
+    
     /** A published provider result */
     class PublishedProviderResultViewModel {
         providerName: string;
@@ -816,6 +836,7 @@
         status: number;
         lastUpdated: string;
         authority: string;
+        version: string;
     }
 
     export interface IProviderResultsResponse {
