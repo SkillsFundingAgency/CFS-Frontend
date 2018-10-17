@@ -159,6 +159,20 @@
         "description": "Enable the major minor versioning"
       },
       "defaultValue": "true"
+    },
+    "aadAuthIssuer": {
+      "type": "string",
+      "metadata": {
+        "description": "The issuer for the platform level auth AAD provider"
+      },
+      "defaultValue": "https://sts.windows.net/1a92889b-8ea1-4a16-8132-347814051567/"
+    },
+    "enablePlatformAuth": {
+      "type": "bool",
+      "metadata": {
+        "description": "Should platform authentication be enabled"
+      },
+      "defaultValue": false
     }
   },
   "variables": {
@@ -169,7 +183,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2016-03-01",
+      "apiVersion": "2016-09-01",
       "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
@@ -188,7 +202,7 @@
       }
     },
     {
-      "apiVersion": "2016-03-01",
+      "apiVersion": "2016-08-01",
       "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
@@ -202,13 +216,51 @@
       },
       "resources": [
         {
-          "apiVersion": "2016-03-01",
+          "apiVersion": "2016-08-01",
           "name": "Microsoft.ApplicationInsights.AzureWebSites",
           "type": "siteextensions",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"
           ],
           "properties": {}
+        },
+        {
+          "name": "authSettings",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
+          "properties":{
+            "enabled": "[parameters('enablePlatformAuth')]",
+            "unauthenticatedClientAction": 0,
+            "tokenStoreEnabled": true,
+            "defaultProvider": 0,
+            "clientId": "[parameters('aadClientId')]",
+            "issuer": "[parameters('aadAuthIssuer')]",
+            "allowedAudiences": null,
+            "isAadAutoProvisioned": false
+          }
+        },
+        {
+          "name": "[concat(variables('webSiteName'), '/web')]",
+          "type": "Microsoft.Web/sites/config",
+          "apiVersion": "2016-08-01",
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
+          "properties":{
+            "ipSecurityRestrictions": [
+              {
+                "ipAddress": "213.123.63.150",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE London Proxy",
+                "priority": 100
+              },
+              {
+                "ipAddress": "86.188.174.157",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy",
+                "priority": 200
+              }
+            ]
+          }
         }
       ],
       "properties": {
@@ -226,16 +278,6 @@
           "minTlsVersion": "1.2",
           "ftpsState": "Disabled",
           "clientAffinityEnabled": false,
-          "ipSecurityRestrictions": [
-            {
-              "ipAddress": "213.123.63.150",
-              "name" : "DfE London Proxy"
-            },
-            {
-              "ipAddress": "86.188.174.157",
-              "name" : "DfE Sheffield Proxy"
-            }
-          ],
           "appSettings": [
             {
               "name": "specsClient:ApiKey",
