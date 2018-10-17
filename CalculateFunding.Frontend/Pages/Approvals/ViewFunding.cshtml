@@ -57,7 +57,28 @@
             <div data-bind="visible: workingPercentComplete()"><span data-bind="text: workingPercentComplete"></span>%</div>
         </div>
     </div>
-    <div data-bind="visible: notificationMessage(), css: notificationStatus() === 'error' ? 'notification-panel-error' : 'notification-panel'">
+    @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
+    {
+        <div data-bind="visible: notificationStatus() === 'refreshNotUpdated'" class="notification-panel">
+            <div class="notification-panel-summary">
+                <i class="material-icons">check</i> <span>Allocation line funding values refreshed successfully, no values have changed</span>
+            </div>
+        </div>
+
+        <div data-bind="visible: notificationStatus() === 'refreshError'" class="notification-panel-updated-error">
+            <div class="notification-panel-error-text">
+                <h4 class="material-icons-content-container"><i class="material-icons">error</i> <span><strong>Unable to refresh allocation line funding variables</strong></span></h4><br /><span class="notification-panel-error-content"><a data-bind="click: refreshFundingSnapshot">Try again</a> in a few minutes (or) log an incident on <a href="#">My Service Desk</a></span>
+            </div>
+        </div>
+
+        <div data-bind="visible: notificationStatus() === 'refreshUpdated'" class="notification-panel-updated">
+            <div class="notification-panel-updated-text">
+                <h4 class="material-icons-content-container"><i class="material-icons">check</i> <span><strong>Allocation line funding values refreshed successfully</strong></span></h4><br /><span class="notification-panel-updated-info-text"><span data-bind="text: updatedCount()"></span> Allocation line funding values updated</span> <span class="notification-panel-updated-info-text-small">you need to approve the funding allocation line total before publish</span>
+            </div>
+        </div>
+    }
+
+    <div data-bind="visible: notificationMessage(), css: notificationStatus()===  'error' ? 'notification-panel-error' : 'notification-panel'">
         <span data-bind="css: notificationStatus() === 'error' ? 'notification-panel-error-text' : 'notification-panel-summary'">
             <i class="material-icons" data-bind="text: notificationStatus() === 'error' ? 'error' : 'check'">check</i> <span data-bind="text: notificationMessage"></span>
         </span>
@@ -143,77 +164,154 @@
                 </tr>
             </thead>
 
-            <tbody>
-                <!-- ko foreach: currentPageResults -->
-                <tr class="expander-trigger-container data-provider-container provider-column">
-                    <td class="expander-container-group-identifier">
-                        <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
-                    </td>
-                    <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
-                    <td class="text-center status-column" data-bind="css: { 'status-held': numberNew > 0 }"><span data-bind="text: numberNew"></span>/<span data-bind="text: totalAllocationLines"></span></td>
-                    <td class="text-center status-column" data-bind="css: { 'status-approved': numberApproved > 0 }"><span data-bind="text: numberApproved"></span>/<span data-bind="text: totalAllocationLines"></span></td>
-                    <td class="text-center status-column" data-bind="css: { 'status-updated': numberUpdated > 0 }"><span data-bind="text: numberUpdated"></span>/<span data-bind="text: totalAllocationLines"></span></td>
-                    <td class="text-center status-column" data-bind="css: { 'status-published': numberPublished > 0 }"><span data-bind="text: numberPublished"></span>/<span data-bind="text: totalAllocationLines"></span></td>
-                    <td class="data-provider-amount funding-total-column">&pound;<span data-bind="text:fundingAmountDisplay"></span></td>
-                    <td class="expander-trigger-cell expander-column" data-bind="click: function () { calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
-                </tr>
-                <tr class="expander-container expander-container-header">
-                    <td colspan="9" class="expander-container-group-identifier">
-                        <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
-                        <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading test results</span>
-                        <span class="inline-list qa-coverage-container" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'loaded'">
-                            <span class="inline-list-item"><span>QA test coverage:</span> <span class="data-qa-coverage" data-bind="text: qaTestResults() != null ? qaTestResults().testCoverage : ''"></span>%</span>
-                            <span class="inline-list-item"><span>QA test passes:</span> <span class="data-qa-passed" data-bind="text: qaTestResults() != null ? qaTestResults().passed : ''"></span>/<span class="data-qa-totaltests" data-bind="text: qaTestResults() != null ? qaTestResults().failed + qaTestResults().ignored + qaTestResults().passed : ''"></span></span>
-                        </span>
-                        <span class="inline-list-item"><span>Local authority:</span> <span data-bind="text: authority"></span></span>
-                    </td>
-                </tr>
-                <tr class="expander-container expander-container-header">
-                    <td class="bold expander-container-group-identifier">Allocation lines</td>
-                    <td class="bold">Version</td>
-                    <td class="bold text-center" colspan="4">Allocation line statuses</td>
-                    <td class="bold" colspan="2">Allocation line value</td>
-                </tr>
-                <!-- ko foreach: allocationLineResults -->
-                <tr class="expander-container data-allocationline-container">
-                    <td class="expander-container-group-identifier">
-                        <input type="checkbox" data-bind="attr: { id: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, checked: isSelected, event: { change: function(data) { $root.allocationLineResultChecked(data, $root) } }" class="target-checkbox-allocationline" /> <label data-bind="attr: { for: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, text: allocationLineName" class="inline-table-label data-allocationline-name"></label>
-                    </td>
-                    <td>
-                        <span data-bind="text: version"></span>
-                    </td>
+            @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
+            {
+                <tbody>
+                    <!-- ko foreach: currentPageResults -->
+                    <tr class="expander-trigger-container data-provider-container provider-column">
+                        <td class="expander-container-group-identifier">
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
+                        </td>
+                        <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-held': numberNew > 0 }"><span data-bind="text: numberNew"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-approved': numberApproved > 0 }"><span data-bind="text: numberApproved"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-updated': numberUpdated > 0 }"><span data-bind="text: numberUpdated"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-published': numberPublished > 0 }"><span data-bind="text: numberPublished"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="data-provider-amount funding-total-column">&pound;<span data-bind="text:fundingAmountDisplay"></span></td>
+                        <td class="expander-trigger-cell expander-column" data-bind="click: function () { calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
+                    </tr>
+                    <tr class="expander-container expander-container-header">
+                        <td colspan="9" class="expander-container-group-identifier">
+                            <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
+                            <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading test results</span>
+                            <span class="inline-list qa-coverage-container" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'loaded'">
+                                <span class="inline-list-item"><span>QA test coverage:</span> <span class="data-qa-coverage" data-bind="text: qaTestResults() != null ? qaTestResults().testCoverage : ''"></span>%</span>
+                                <span class="inline-list-item"><span>QA test passes:</span> <span class="data-qa-passed" data-bind="text: qaTestResults() != null ? qaTestResults().passed : ''"></span>/<span class="data-qa-totaltests" data-bind="text: qaTestResults() != null ? qaTestResults().failed + qaTestResults().ignored + qaTestResults().passed : ''"></span></span>
+                            </span>
+                            <span class="inline-list-item"><span>Local authority:</span> <span data-bind="text: authority"></span></span>
+                        </td>
+                    </tr>
+                    <tr class="expander-container expander-container-header">
+                        <td class="bold expander-container-group-identifier">Allocation lines</td>
+                        <td class="bold">Version</td>
+                        <td class="bold text-center" colspan="4">Allocation line statuses</td>
+                        <td class="bold" colspan="2">Allocation line value</td>
+                    </tr>
+                    <!-- ko foreach: allocationLineResults -->
+                    <tr class="expander-container data-allocationline-container">
+                        <td class="expander-container-group-identifier">
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, checked: isSelected, event: { change: function(data) { $root.allocationLineResultChecked(data, $root) } }" class="target-checkbox-allocationline" /> <label data-bind="attr: { for: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, text: allocationLineName" class="inline-table-label data-allocationline-name"></label>
+                        </td>
+                        <td>
+                            <span data-bind="text: version"></span>
+                        </td>
 
-                    <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Held -->
-                    <td class="status-new text-center border-right-hidden">New</td>
-                    <td class="border-right-hidden"></td>
-                    <td class="border-right-hidden"></td>
-                    <td></td>
-                    <!-- /ko -->
-                    <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Approved -->
-                    <td class="border-right-hidden"></td>
-                    <td class="text-center status-approved border-right-hidden">Approved</td>
-                    <td class="border-right-hidden"></td>
-                    <td></td>
-                    <!-- /ko -->
-                    <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Updated -->
-                    <td class="border-right-hidden"></td>
-                    <td class="border-right-hidden"></td>
-                    <td class="text-center status-updated border-right-hidden">Updated</td>
-                    <td></td>
-                    <!-- /ko -->
-                    <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Published -->
-                    <td class="border-right-hidden"></td>
-                    <td class="border-right-hidden"></td>
-                    <td class="border-right-hidden"></td>
-                    <td class="text-center status-published">Published</td>
-                    <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Held -->
+                        <td class="status-new text-center border-right-hidden">New</td>
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Approved -->
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-approved border-right-hidden">Approved</td>
+                        <td class="border-right-hidden"></td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Updated -->
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-updated border-right-hidden">Updated</td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Published -->
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-published">Published</td>
+                        <!-- /ko -->
 
-                    <td colspan="2" class="data-allocationline-amount">&pound;<span data-bind="text: fundingAmountDisplay"></span></td>
-                </tr>
-                <!-- /ko -->
-                <tr class="expander-container data-allocationline-container"><td colspan="8" class="no-border-both"></td></tr>
-                <!-- /ko -->
-            </tbody>
+                        <td colspan="2" class="data-allocationline-amount">&pound;<span data-bind="text: fundingAmountDisplay"></span></td>
+                    </tr>
+                    <!-- /ko -->
+                    <tr class="expander-container data-allocationline-container"><td colspan="8" class="no-border-both"></td></tr>
+                    <!-- /ko -->
+                </tbody>
+            }
+            else
+            {
+                <tbody>
+                    <!-- ko foreach: currentPageResults -->
+                    <tr class="expander-trigger-container data-provider-container provider-column">
+                        <td class="expander-container-group-identifier">
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
+                        </td>
+                        <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-held': numberNew > 0 }"><span data-bind="text: numberNew"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-approved': numberApproved > 0 }"><span data-bind="text: numberApproved"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-updated': numberUpdated > 0 }"><span data-bind="text: numberUpdated"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="text-center status-column" data-bind="css: { 'status-published': numberPublished > 0 }"><span data-bind="text: numberPublished"></span>/<span data-bind="text: totalAllocationLines"></span></td>
+                        <td class="data-provider-amount funding-total-column">&pound;<span data-bind="text:fundingAmountDisplay"></span></td>
+                        <td class="expander-trigger-cell expander-column" data-bind="click: function () { calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
+                    </tr>
+                    <tr class="expander-container expander-container-header">
+                        <td colspan="9" class="expander-container-group-identifier">
+                            <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
+                            <span class="qa-coverage-loading-failed" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'failed'">Error loading test results</span>
+                            <span class="inline-list qa-coverage-container" style="display: none" data-bind="visible: qaTestResultsRequestStatus() === 'loaded'">
+                                <span class="inline-list-item"><span>QA test coverage:</span> <span class="data-qa-coverage" data-bind="text: qaTestResults() != null ? qaTestResults().testCoverage : ''"></span>%</span>
+                                <span class="inline-list-item"><span>QA test passes:</span> <span class="data-qa-passed" data-bind="text: qaTestResults() != null ? qaTestResults().passed : ''"></span>/<span class="data-qa-totaltests" data-bind="text: qaTestResults() != null ? qaTestResults().failed + qaTestResults().ignored + qaTestResults().passed : ''"></span></span>
+                            </span>
+                            <span class="inline-list-item"><span>Local authority:</span> <span data-bind="text: authority"></span></span>
+                        </td>
+                    </tr>
+                    <tr class="expander-container expander-container-header">
+                        <td class="bold expander-container-group-identifier">Allocation lines</td>
+                        <td class="bold">Version</td>
+                        <td class="bold text-center" colspan="4">Allocation line statuses</td>
+                        <td class="bold" colspan="2">Allocation line value</td>
+                    </tr>
+                    <!-- ko foreach: allocationLineResults -->
+                    <tr class="expander-container data-allocationline-container">
+                        <td class="expander-container-group-identifier">
+                            <input type="checkbox" data-bind="attr: { id: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, checked: isSelected, event: { change: function(data) { $root.allocationLineResultChecked(data, $root) } }" class="target-checkbox-allocationline" /> <label data-bind="attr: { for: 'checkbox-allocationline-' + $parent.providerId + '-' + allocationLineId }, text: allocationLineName" class="inline-table-label data-allocationline-name"></label>
+                        </td>
+                        <td>
+                            <span data-bind="text: version"></span>
+                        </td>
+
+                        <!-- ko if: status === calculateFunding.approvals.two.AllocationLineStatus.Held -->
+                        <td class="status-new text-center border-right-hidden">New</td>
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.two.AllocationLineStatus.Approved -->
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-approved border-right-hidden">Approved</td>
+                        <td class="border-right-hidden"></td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.two.AllocationLineStatus.Updated -->
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-updated border-right-hidden">Updated</td>
+                        <td></td>
+                        <!-- /ko -->
+                        <!-- ko if: status === calculateFunding.approvals.two.AllocationLineStatus.Published -->
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="border-right-hidden"></td>
+                        <td class="text-center status-published">Published</td>
+                        <!-- /ko -->
+
+                        <td colspan="2" class="data-allocationline-amount">&pound;<span data-bind="text: fundingAmountDisplay"></span></td>
+                    </tr>
+                    <!-- /ko -->
+                    <tr class="expander-container data-allocationline-container"><td colspan="8" class="no-border-both"></td></tr>
+                    <!-- /ko -->
+                </tbody>
+            }
 
         </table>
 
@@ -434,11 +532,20 @@
 
 @section scripts{
     <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
-    <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding2.js" asp-append-version="true"></script>
+    @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
+    {
+        <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding.js" asp-append-version="true"></script>
+    }
+    else
+    {
+        <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding2.js" asp-append-version="true"></script>
+    }
     <script type="text/javascript" asp-src-include="~/js/table.expander.sequential.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/expander.js" asp-append-version="true"></script>
 
-    <script type="text/javascript">
+    @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
+    {
+        <script type="text/javascript">
         var settings = {
             "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
             "viewFundingPageUrl": "/api/results/get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingstreamId={fundingstreamId}",
@@ -450,8 +557,32 @@
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
             "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}"
         };
-        var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
-        vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
-        ko.applyBindings(vfVM);
-    </script>
+
+            var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
+            vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
+            ko.applyBindings(vfVM);
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+        var settings = {
+            "testScenarioQueryUrl": "/api/specs/{specificationId}/providertestcounts",
+            "viewFundingPageUrl": "/api/results/get-published-provider-results-for-funding-stream?fundingPeriodId={fundingPeriodId}&specificationId={specificationId}&fundingstreamId={fundingstreamId}",
+            "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
+            "approveAllocationLinesUrl": "/api/specs/{specificationId}/allocationlineapprovalstatus",
+            "refreshPublishedResultsUrl": "/api/specs/{specificationId}/refresh-published-results",
+            "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status",
+            "fundingPeriodUrl": "/api/specs/funding-periods",
+            "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
+            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}"
+        };
+
+            var vfVM = new calculateFunding.approvals.two.ViewFundingViewModel(settings);
+            vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
+            ko.applyBindings(vfVM);
+        </script>
+
+    }
+
 }

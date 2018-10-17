@@ -14,5 +14,7 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
         public DateTimeOffset? LastUpdated { get; set; }
 
         public string Authority { get; set; }
+
+        public string Version { get; set; }
     }
 }

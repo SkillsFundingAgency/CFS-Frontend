@@ -760,6 +760,61 @@ blockquote {
     }
 }
 
+.notification-panel-updated {
+    border: 2px solid $turquoise;
+    font-size: 19px;
+    margin-bottom: 20px;
+    padding: 10px 5px 20px 5px;
+
+    .notification-panel-updated-text {
+        color: $turquoise;
+    }
+
+    .notification-panel-updated-info-text {
+        color: $orange;
+        margin-left: 45px;
+    }
+
+    .notification-panel-updated-info-text-small {
+        color: #000;
+        font-size: 16px;
+    }
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+}
+
+.notification-panel-updated-error {
+    border: 2px solid $error-colour;
+    font-size: 19px;
+    margin-bottom: 20px;
+    padding: 10px 5px 20px 5px;
+
+    .notification-panel-error-text {
+        color: $error-colour;
+    }
+
+    .notification-panel-error-content {
+        margin-left: 45px;
+        color: #000;
+        font-size: 16px;
+    }
+
+    i.material-icons {
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+        color: #005ea5;
+        cursor:pointer;
+    }
+}
+
 .notification-panel-error {
     border: 5px $error-colour solid;
     color: #fff;
