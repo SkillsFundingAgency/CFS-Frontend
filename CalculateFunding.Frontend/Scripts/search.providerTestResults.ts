@@ -44,7 +44,6 @@
                 self.testScenarioId = options.testScenarioId;
                 self.fundingPeriodId = options.fundingPeriodId;
                 self.specificationId = options.specificationId;
-                
 
                 self.selectedSearchFilters = ko.computed(() => {
                     return [
@@ -63,7 +62,6 @@
                 return facets;
             }).extend({ throttle: 3 });
 
-            
             this.canPerformSearch = ko.pureComputed(() => {
                 return self.state() === "idle";
             });
