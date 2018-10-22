@@ -5,6 +5,7 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
@@ -14,9 +15,12 @@
 
     public class SpecsApiClient : BaseApiClient, ISpecsApiClient
     {
-        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
+        private readonly IFeatureToggle _featureToggle;
+
+        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor, IFeatureToggle featureToggle)
            : base(httpClientFactory, HttpClientKeys.Specifications, logger, contextAccessor)
         {
+            _featureToggle = featureToggle;
         }
 
         public Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
@@ -253,7 +257,14 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
+            if (_featureToggle.IsAllocationLineMajorMinorVersioningEnabled())
+            {
+                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
+            }
+            else
+            {
+                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
+            }
         }
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
