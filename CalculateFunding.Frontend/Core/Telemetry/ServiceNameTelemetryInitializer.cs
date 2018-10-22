@@ -17,9 +17,9 @@
 
         public void Initialize(ITelemetry telemetry)
         {
-            if (!telemetry.Context.Properties.ContainsKey(LoggingConstants.ServiceNamePropertiesName))
+            if (!telemetry.Context.GlobalProperties.ContainsKey(LoggingConstants.ServiceNamePropertiesName))
             {
-                telemetry.Context.Properties.Add(LoggingConstants.ServiceNamePropertiesName, _serviceName);
+                telemetry.Context.GlobalProperties.Add(LoggingConstants.ServiceNamePropertiesName, _serviceName);
             }
         }
     }

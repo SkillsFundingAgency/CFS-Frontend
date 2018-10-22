@@ -23,7 +23,7 @@
     "@types/jquery": "^3.3.0",
     "@types/knockout": "^3.4.52",
     "@types/requirejs": "^2.1.31",
-    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp": "^4.0.0",
     "gulp-cached": "^1.1.1",
     "gulp-concat": "^2.6.1",
     "gulp-cssmin": "^0.2.0",
