@@ -45,7 +45,7 @@
         {
             AzureAdOptions azureAdOptions = new AzureAdOptions();
             Configuration.Bind("AzureAd", azureAdOptions);
-            _authenticationEnabled = azureAdOptions.IsEnabled;
+			_authenticationEnabled = azureAdOptions.IsEnabled;
 
             if (_authenticationEnabled)
             {

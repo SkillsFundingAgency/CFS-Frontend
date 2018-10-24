@@ -13,7 +13,9 @@ namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 
         public string ProviderId { get; set; }
 
-        public string Ukprn { get; set; }
+		public string ProviderType { get; set; }
+
+		public string Ukprn { get; set; }
 
         public decimal FundingAmount{ get; set; }
 

@@ -3,7 +3,7 @@
     export class ViewFundingViewModel {
         private settings: IViewFundingSettings;
         public isLoadingVisible: KnockoutComputed<boolean>;
-
+        
         public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray();
         public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
         public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
@@ -24,6 +24,8 @@
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
         public isPublishButtonEnabled: boolean;
+        public isPublishAndApprovePageFiltersEnabled: boolean;
+        public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -122,20 +124,19 @@
                         function (item: SpecificationResponse) {
                             return (item.id === self.selectedSpecification().id);
                         });
-                    self.FundingStreams(spec.fundingstreams);                    
+                    self.FundingStreams(spec.fundingstreams);
                 }
                 else {
                     self.FundingStreams([]);
                 }
             });
-
         }
 
         numberAllocationLinesSelected: KnockoutComputed<number> = ko.pureComputed(function () {
             let providerResults = this.allProviderResults();
             let count = 0;
             for (let i = 0; i < providerResults.length; i++) {
-                let allocationResults = providerResults[i].allocationLineResults();
+                let allocationResults = providerResults[i].allocationLineResults();   
                 for (let j = 0; j < allocationResults.length; j++) {
                     let allocationLineResult = allocationResults[j];
                     if (allocationLineResult.isSelected()) {
@@ -147,7 +148,14 @@
         }, this);
 
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
-            return this.allProviderResults();
+            let allResultsRaw: Array<PublishedProviderResultViewModel> = this.allProviderResults();
+            if (this.isPublishAndApprovePageFiltersEnabled) {
+                this.pageNumber(0);
+                if (this.approveSearchModel.allSearchFacets && this.approveSearchModel.allSearchFacets().length != 0) {
+                    return this.approveSearchModel.filterResults(allResultsRaw);
+                }
+            }
+            return allResultsRaw;
         }, this);
 
         currentPageResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
@@ -241,7 +249,7 @@
                 }
 
                 let start = j * batchSize;
-                
+
                 for (let i = start; i < start + batchSize; i++) {
                     let selectedItem = selectedItems.allocationLines[i];
                     if (selectedItem === undefined) {
@@ -254,7 +262,7 @@
                 tasks.push(updateModel);
             }
 
-            this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);            
+            this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);
         }
 
         /** Execute a unit of work by calling the change status endpoint */
@@ -434,7 +442,7 @@
         publish() {
             this.callChangeStatusEndpoint(StatusAction.Publish);
         }
-      
+
         /** This provides a shortcut to evaluating the UI for performing the select all operation */
         private executingSelectAll: KnockoutObservable<boolean> = ko.observable(false);
 
@@ -511,7 +519,7 @@
                     this.pollCalculationProgress();
                 })
                 .fail((response) => {
-                   // this.notificationMessage("There was a problem starting the refresh.");
+                    // this.notificationMessage("There was a problem starting the refresh.");
                     this.notificationStatus("refreshError");
                     this.isWorkingVisible(false);
                 });
@@ -639,6 +647,7 @@
                     // Here we need to go and set the provider properties
                     newProvider.providerId = receivedProvider.providerId;
                     newProvider.providerName = receivedProvider.providerName;
+                    newProvider.providerType = receivedProvider.providerType;
                     newProvider.fundingAmount = receivedProvider.fundingAmount;
                     newProvider.numberApproved = receivedProvider.numberApproved;
                     newProvider.numberUpdated = receivedProvider.numberUpdated;
@@ -658,17 +667,17 @@
                             newAllocationLine.fundingAmount = receivedAllocationLine.fundingAmount;
                             newAllocationLine.lastUpdated = receivedAllocationLine.lastUpdated;
                             newAllocationLine.status = receivedAllocationLine.status;
+                            newAllocationLine.statusAsString = AllocationLineStatus[receivedAllocationLine.status];
                             newAllocationLine.version = receivedAllocationLine.version;
 
                             newProvider.authority = receivedAllocationLine.authority;
                             newProvider.allocationLineResults.push(newAllocationLine);
-
                             numberAllocationLines++;
                         }
                     }
-                    providers.push(newProvider)
+                    providers.push(newProvider);
                 }
-
+                this.approveSearchModel.reflectSelectableFilters(providers);
                 this.allProviderResults(providers);
                 this.totalNumberAllocationLines(numberAllocationLines);
             }
@@ -711,7 +720,7 @@
 
         private getQueryStringValue(key:string) {
             return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
-        }  
+        }
     }
 
     /** Execution status for a specification */
@@ -746,11 +755,12 @@
         Error,
         Finished
     }
-    
+
     /** A published provider result */
-    class PublishedProviderResultViewModel {
+    export class PublishedProviderResultViewModel {
         providerName: string;
         providerId: string;
+        providerType: string
         ukprn: string;
         authority: string;
         fundingAmount: number;
@@ -801,10 +811,11 @@
     }
 
     /** A published allocation line result */
-    class PublishedAllocationLineResultViewModel {
+    export class PublishedAllocationLineResultViewModel {
         allocationLineId: string;
         allocationLineName: string;
         status: AllocationLineStatus;
+        statusAsString: string
         fundingAmount: number;
         lastUpdated: string;
         authority: string;
@@ -843,6 +854,7 @@
         fundingStreamResults: Array<IFundingStreamResultResponse>
         specificationId: string;
         providerName: string;
+        providerType:string
         providerId: string;
         ukprn: string;
         fundingAmount: number;

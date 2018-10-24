@@ -22,7 +22,9 @@
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
-        public isPublishButtonEnabled: boolean;
+        public isPublishButtonEnabled: boolean
+        public isPublishAndApprovePageFiltersEnabled: boolean;
+        public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -146,7 +148,14 @@
         }, this);
 
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
-            return this.allProviderResults();
+            let allResultsRaw: Array<PublishedProviderResultViewModel> = this.allProviderResults();
+            if (this.isPublishAndApprovePageFiltersEnabled) {
+                this.pageNumber(0);
+                if (this.approveSearchModel.allSearchFacets && this.approveSearchModel.allSearchFacets().length != 0) {
+                    return this.approveSearchModel.filterResults(allResultsRaw);
+                }
+            }
+            return allResultsRaw;
         }, this);
 
         currentPageResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
@@ -627,6 +636,7 @@
                     // Here we need to go and set the provider properties
                     newProvider.providerId = receivedProvider.providerId;
                     newProvider.providerName = receivedProvider.providerName;
+                    newProvider.providerType = receivedProvider.providerType;
                     newProvider.fundingAmount = receivedProvider.fundingAmount;
                     newProvider.numberApproved = receivedProvider.numberApproved;
                     newProvider.numberUpdated = receivedProvider.numberUpdated;
@@ -646,6 +656,7 @@
                             newAllocationLine.fundingAmount = receivedAllocationLine.fundingAmount;
                             newAllocationLine.lastUpdated = receivedAllocationLine.lastUpdated;
                             newAllocationLine.status = receivedAllocationLine.status;
+                            newAllocationLine.statusAsString = AllocationLineStatus[receivedAllocationLine.status];
                             newAllocationLine.version = "n/a" //allocationLine.
 
                             newProvider.authority = receivedAllocationLine.authority;
@@ -657,6 +668,7 @@
                     providers.push(newProvider)
                 }
 
+                this.approveSearchModel.reflectSelectableFilters(providers);
                 this.allProviderResults(providers);
                 this.totalNumberAllocationLines(numberAllocationLines);
             }
@@ -731,6 +743,7 @@
     class PublishedProviderResultViewModel {
         providerName: string;
         providerId: string;
+        providerType: string;
         ukprn: string;
         authority: string;
         fundingAmount: number;
@@ -781,10 +794,11 @@
     }
 
     /** A published allocation line result */
-    class PublishedAllocationLineResultViewModel {
+    export class PublishedAllocationLineResultViewModel {
         allocationLineId: string;
         allocationLineName: string;
         status: AllocationLineStatus;
+        statusAsString: string;
         fundingAmount: number;
         lastUpdated: string;
         authority: string;
@@ -822,6 +836,7 @@
         fundingStreamResults: Array<IFundingStreamResultResponse>
         specificationId: string;
         providerName: string;
+        providerType: string
         providerId: string;
         ukprn: string;
         fundingAmount: number;

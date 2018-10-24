@@ -153,6 +153,13 @@
       },
       "defaultValue": "true"
     },
+    "publishAndApprovePageFiltersEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the filtering on publish and approve page"
+      },
+      "defaultValue": "true"
+    },
     "allocationLineMajorMinorVersioningEnabled": {
       "type": "string",
       "metadata": {
@@ -382,6 +389,10 @@
             {
               "name": "features:allocationLineMajorMinorVersioningEnabled",
               "value": "[parameters('allocationLineMajorMinorVersioningEnabled')]"
+            },
+            {
+              "name": "features:publishAndApprovePageFiltersEnabled",
+              "value": "[parameters('publishAndApprovePageFiltersEnabled')]"
             }
           ]
         }

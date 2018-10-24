@@ -136,12 +136,55 @@
                 </ul>
             </div>
         </div>
-        <div class="row table-filter-container">
-            <div class="col-xs-9"></div>
-            <div class="col-xs-3 total-count">
-                Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <span class="bold" data-bind="text: filteredResults().length"></span> providers
+            <div class="row table-filter-container">
+                @if (Model.ShouldFiltersBeEnabled)
+                {
+                    <div class="col-xs-2">
+                        <div class="withjs-show">
+                            Provider type
+                            <select id="providerType" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: false}, options: approveSearchModel.selectableProviderTypes, optionsText: 'displayName', optionsValue: 'name', selectedOptions: approveSearchModel.selectedProviderTypes, enable: true" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-2">
+                        <div class="withjs-show">
+                            Allocation Line
+                            <select id="allocationLine" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: false}, options: approveSearchModel.selectableAllocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: approveSearchModel.selectedAllocationLines, enable: true" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-2">
+                        <div class="withjs-show">
+                            Local Authority
+                            <select id="localAuthority" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: false}, options: approveSearchModel.selectableLocalAuthorities, optionsText: 'displayName', optionsValue: 'name', selectedOptions: approveSearchModel.selectedLocalAuthorities, enable: true" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-2">
+                        <div class="withjs-show">
+                            Status
+                            <select id="status" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: false}, options: approveSearchModel.selectableStatuses, optionsText: 'displayName', optionsValue: 'name', selectedOptions: approveSearchModel.selectedStatuses, enable: true" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-2">
+                        <div class="spacing-30-top withjs-show">
+                            <a href="#" data-bind="click: approveSearchModel.removeFilters()">Clear filters</a>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-2 total-count">
+                        Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <span class="bold" data-bind="text: filteredResults().length"></span> providers
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-9"></div>
+                    <div class="col-xs-3 total-count">
+                        Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <span class="bold" data-bind="text: filteredResults().length"></span> providers
+                    </div>
+                }
             </div>
-        </div>
         <table class="cf">
             <thead data-spy="affix" data-offset-top="300">
                 <tr>
@@ -333,185 +376,185 @@
             </span>
         </div>
     </div>
-    <div data-bind="visible: pageState() === 'confirmApproval'" class="confirmapproval-page-container">
-        <div class="confirmapproval-details">
-            <div class="confirmapproval-details-providers">
-                <table>
-                    <caption>You have selected:</caption>
-                    <thead>
-                        <tr>
-                            <th class="fixed-width-330">Provider details</th>
-                            <th>Info</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Number of providers to approve</td>
-                            <td><span data-bind="text: approvalDetails().numberOfProviders"></span></td>
-                        </tr>
-                        <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: approvalDetails().providerTypes } }" class="expander-control"></tr>
-                        <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: approvalDetails().localAuthorities } }" class="expander-control"></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="confirmapproval-details-specification">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="fixed-width-330">Specification Details</th>
-                            <th>Info</th>
-                            <th>Funding</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Funding Period</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="nobottomborder">
-                            <td>Specification Selected</td>
-                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="topborderonly">
-                            <td>Funding Stream</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
-                        </tr>
-                        <!-- ko foreach: approvalDetails().allocationLinesRollup -->
-                        <tr class="nobottomborder">
-                            <td class="allocation-line-text">
-                                <!-- ko if: $index === 0 -->
-                                <span>Allocation Lines</span>}
-                                <!-- /ko -->
-                            </td>
-                            <td>
-                                <span class="allocation-line-text" data-bind="text: name"></span>
-                            </td>
-                            <td>
-                                <span data-bind="text: valueDisplay"></span>
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                        <tr class="topborderonly">
-                            <td><span class="bold">Total Funding being approved</span></td>
-                            <td></td>
-                            <td>
-                                <span class="bold" data-bind="text: approvalDetails().totalFundingApprovedDisplay"></span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<div data-bind="visible: pageState() === 'confirmApproval'" class="confirmapproval-page-container">
+    <div class="confirmapproval-details">
+        <div class="confirmapproval-details-providers">
+            <table>
+                <caption>You have selected:</caption>
+                <thead>
+                    <tr>
+                        <th class="fixed-width-330">Provider details</th>
+                        <th>Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Number of providers to approve</td>
+                        <td><span data-bind="text: approvalDetails().numberOfProviders"></span></td>
+                    </tr>
+                    <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: approvalDetails().providerTypes } }" class="expander-control"></tr>
+                    <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: approvalDetails().localAuthorities } }" class="expander-control"></tr>
+                </tbody>
+            </table>
         </div>
-        <div class="confirmapproval-confirmation">
-            <span>Once Approved:</span>
-            <ol>
-                <li>Funding values will be available to the profiling service</li>
-                <li>Funding values <strong>will not</strong> be published or paid to providers</li>
-            </ol>
-            <div class="confirmapproval-warning">
-                <div class="confirmapproval-warning-icon">
-                    <i class="material-icons">error</i>
-                </div>
-                <div>
-                    <strong>Approved funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved.</strong>
-                </div>
-            </div>
-            <div class="confirmapproval-buttons">
-                <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" data-bind="click: approve">Confirm approval</button>
-                <a href="#" data-bind="click: dismissConfirmPage">Back</a>
-            </div>
+        <div class="confirmapproval-details-specification">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="fixed-width-330">Specification Details</th>
+                        <th>Info</th>
+                        <th>Funding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Funding Period</td>
+                        <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
+                    </tr>
+                    <tr class="nobottomborder">
+                        <td>Specification Selected</td>
+                        <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
+                    </tr>
+                    <tr class="topborderonly">
+                        <td>Funding Stream</td>
+                        <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                    </tr>
+                    <!-- ko foreach: approvalDetails().allocationLinesRollup -->
+                    <tr class="nobottomborder">
+                        <td class="allocation-line-text">
+                            <!-- ko if: $index === 0 -->
+                            <span>Allocation Lines</span>}
+                            <!-- /ko -->
+                        </td>
+                        <td>
+                            <span class="allocation-line-text" data-bind="text: name"></span>
+                        </td>
+                        <td>
+                            <span data-bind="text: valueDisplay"></span>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                    <tr class="topborderonly">
+                        <td><span class="bold">Total Funding being approved</span></td>
+                        <td></td>
+                        <td>
+                            <span class="bold" data-bind="text: approvalDetails().totalFundingApprovedDisplay"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    <div data-bind="visible: pageState() === 'confirmPublish'" class="confirmpublish-page-container" id="confirmpublish-page-container">
-        <div class="confirmpublish-details">
-            <div class="confirmpublish-details-providers">
-                <table>
-                    <caption>You have selected:</caption>
-                    <thead>
-                        <tr>
-                            <th class="fixed-width-330">Provider details</th>
-                            <th>Info</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Number of providers to publish</td>
-                            <td><span data-bind="text: publishDetails().numberOfProviders"></span></td>
-                        </tr>
-                        <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: publishDetails().providerTypes } }" class="expander-control"></tr>
-                        <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: publishDetails().localAuthorities } }" class="expander-control"></tr>
-                    </tbody>
-                </table>
+    <div class="confirmapproval-confirmation">
+        <span>Once Approved:</span>
+        <ol>
+            <li>Funding values will be available to the profiling service</li>
+            <li>Funding values <strong>will not</strong> be published or paid to providers</li>
+        </ol>
+        <div class="confirmapproval-warning">
+            <div class="confirmapproval-warning-icon">
+                <i class="material-icons">error</i>
             </div>
-            <div class="confirmpublish-details-specification">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="fixed-width-330">Specification Details</th>
-                            <th>Info</th>
-                            <th>Funding</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Funding Period</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="nobottomborder">
-                            <td>Specification Selected</td>
-                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="topborderonly">
-                            <td>Funding Stream</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
-                        </tr>
-                        <!-- ko foreach: publishDetails().allocationLinesRollup -->
-                        <tr class="nobottomborder">
-                            <td class="allocation-line-text">
-                                <!-- ko if: $index === 0 -->
-                                <span>Allocation Lines</span>}
-                                <!-- /ko -->
-                            </td>
-                            <td>
-                                <span class="allocation-line-text" data-bind="text: name"></span>
-                            </td>
-                            <td>
-                                <span data-bind="text: valueDisplay"></span>
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                        <tr class="topborderonly">
-                            <td><span class="bold">Total Funding being approved</span></td>
-                            <td></td>
-                            <td>
-                                <span class="bold" data-bind="text: publishDetails().totalFundingApprovedDisplay"></span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div>
+                <strong>Approved funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved.</strong>
             </div>
         </div>
-        <div class="confirmpublish-confirmation">
-            <span>Once Published:</span>
-            <ol>
-                <li>Funding values will be available to the profiling service</li>
-                <li>Funding values <strong>will be</strong> available for providers to view via the ESFS</li>
-                <li>Funding values will be available to the payment service to be paid on the schedule date</li>
-            </ol>
-            <div class="confirmpublish-warning">
-                <div class="confirmpublish-warning-icon">
-                    <i class="material-icons">error</i>
-                </div>
-                <div>
-                    <strong>Published funding values can change when data or calculatations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved and republished.</strong>
-                </div>
-            </div>
-            <div class="confirmpublish-buttons">
-                <button id="publish" data-bind="click: publish" class="button approvalstatus-button approvalstatus-button-approve">Confirm publish</button>
-                <a href="#" data-bind="click: dismissConfirmPage">Back</a>
-            </div>
+        <div class="confirmapproval-buttons">
+            <button id="approve" class="button approvalstatus-button approvalstatus-button-approve" data-bind="click: approve">Confirm approval</button>
+            <a href="#" data-bind="click: dismissConfirmPage">Back</a>
         </div>
     </div>
+</div>
+<div data-bind="visible: pageState() === 'confirmPublish'" class="confirmpublish-page-container" id="confirmpublish-page-container">
+    <div class="confirmpublish-details">
+        <div class="confirmpublish-details-providers">
+            <table>
+                <caption>You have selected:</caption>
+                <thead>
+                    <tr>
+                        <th class="fixed-width-330">Provider details</th>
+                        <th>Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Number of providers to publish</td>
+                        <td><span data-bind="text: publishDetails().numberOfProviders"></span></td>
+                    </tr>
+                    <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: publishDetails().providerTypes } }" class="expander-control"></tr>
+                    <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider local authorities selected', list: publishDetails().localAuthorities } }" class="expander-control"></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="confirmpublish-details-specification">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="fixed-width-330">Specification Details</th>
+                        <th>Info</th>
+                        <th>Funding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Funding Period</td>
+                        <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
+                    </tr>
+                    <tr class="nobottomborder">
+                        <td>Specification Selected</td>
+                        <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
+                    </tr>
+                    <tr class="topborderonly">
+                        <td>Funding Stream</td>
+                        <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                    </tr>
+                    <!-- ko foreach: publishDetails().allocationLinesRollup -->
+                    <tr class="nobottomborder">
+                        <td class="allocation-line-text">
+                            <!-- ko if: $index === 0 -->
+                            <span>Allocation Lines</span>}
+                            <!-- /ko -->
+                        </td>
+                        <td>
+                            <span class="allocation-line-text" data-bind="text: name"></span>
+                        </td>
+                        <td>
+                            <span data-bind="text: valueDisplay"></span>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                    <tr class="topborderonly">
+                        <td><span class="bold">Total Funding being approved</span></td>
+                        <td></td>
+                        <td>
+                            <span class="bold" data-bind="text: publishDetails().totalFundingApprovedDisplay"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="confirmpublish-confirmation">
+        <span>Once Published:</span>
+        <ol>
+            <li>Funding values will be available to the profiling service</li>
+            <li>Funding values <strong>will be</strong> available for providers to view via the ESFS</li>
+            <li>Funding values will be available to the payment service to be paid on the schedule date</li>
+        </ol>
+        <div class="confirmpublish-warning">
+            <div class="confirmpublish-warning-icon">
+                <i class="material-icons">error</i>
+            </div>
+            <div>
+                <strong>Published funding values can change when data or calculatations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved and republished.</strong>
+            </div>
+        </div>
+        <div class="confirmpublish-buttons">
+            <button id="publish" data-bind="click: publish" class="button approvalstatus-button approvalstatus-button-approve">Confirm publish</button>
+            <a href="#" data-bind="click: dismissConfirmPage">Back</a>
+        </div>
+    </div>
+</div>
 
 </div>
 
@@ -540,8 +583,12 @@
     {
         <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding2.js" asp-append-version="true"></script>
     }
+    <script asp-src-include="~/js/search.approveAndPublish.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript" asp-src-include="~/js/table.expander.sequential.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/expander.js" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
     @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
     {
@@ -560,6 +607,7 @@
 
             var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
+            vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
         </script>
     }
@@ -580,6 +628,7 @@
 
             var vfVM = new calculateFunding.approvals.two.ViewFundingViewModel(settings);
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
+            vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
         </script>
 

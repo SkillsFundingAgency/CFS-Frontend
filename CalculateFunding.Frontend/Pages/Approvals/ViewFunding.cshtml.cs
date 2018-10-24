@@ -10,14 +10,18 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public bool ShouldAllocationLineMajorMinorVersioningEnabled { get; private set; }
 
-        public ViewFundingModel(IFeatureToggle features)
-        {
-            Guard.ArgumentNotNull(features, nameof(features));
+		public bool ShouldFiltersBeEnabled { get; private set; }
 
-            ShouldPublishButtonBeEnabled = features.IsPublishButtonEnabled().ToString().ToLowerInvariant();
+		public ViewFundingModel(IFeatureToggle features)
+		{
+			Guard.ArgumentNotNull(features, nameof(features));
 
-            ShouldAllocationLineMajorMinorVersioningEnabled = features.IsAllocationLineMajorMinorVersioningEnabled();
-        }
+			ShouldPublishButtonBeEnabled = features.IsPublishButtonEnabled().ToString().ToLowerInvariant();
+
+			ShouldAllocationLineMajorMinorVersioningEnabled = features.IsAllocationLineMajorMinorVersioningEnabled();
+
+			ShouldFiltersBeEnabled = features.IsPublishAndApprovePageFiltersEnabled();
+		}
 
         public void OnGet()
         {
