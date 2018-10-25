@@ -15,7 +15,6 @@
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.APiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Polly;
@@ -35,7 +34,7 @@
             TimeSpan circuitBreakerFailurePeriod = TimeSpan.FromMinutes(1);
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
-            
+
 
             services.AddHttpClient(HttpClientKeys.Calculations,
                 c =>

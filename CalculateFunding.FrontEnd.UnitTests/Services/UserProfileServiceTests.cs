@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .BeEmpty();
 
             userProfile
-               .Username
+               .UPN
                .Should()
                .BeEmpty();
 
@@ -101,7 +101,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Be("any-id");
 
             userProfile
-               .Username
+               .UPN
                .Should()
                .Be("Joe.bloggs@justatest.naf");
 

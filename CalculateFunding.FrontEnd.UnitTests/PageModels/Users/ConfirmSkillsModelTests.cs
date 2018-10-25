@@ -1,5 +1,13 @@
-﻿using CalculateFunding.Frontend.Constants;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+﻿using System;
+using System.Net;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Threading.Tasks;
+using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.UsersClient.Models;
+using CalculateFunding.Frontend.Constants;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Users;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -8,11 +16,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System;
-using System.Net;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
 {
@@ -56,7 +59,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
             });
 
             httpContext.Request.Cookies = cookies;
-            
+
             ConfirmSkillsModel pageModel = CreatePageModel();
             pageModel.PageContext = new PageContext
             {
@@ -80,10 +83,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
         public void OnPostAsync_GivenCookieDoesNotAlreadyExistsAndCallingConfirmSkillsReturnsBadRequest_ReturnsInternalServerError()
         {
             //Arrange
+            const string upn = "user1@testdata.com";
             IIdentity identity = Substitute.For<IIdentity>();
             identity
                 .Name
-                .Returns("user1@testdata.com");
+                .Returns(upn);
 
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
 
@@ -92,12 +96,26 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
                 .User
                 .Returns(claimsPrincipal);
 
+            UserProfile userProfile = new UserProfile()
+            {
+                Firstname = "First",
+                Lastname = "Last",
+                Id = "123",
+                UPN = upn
+            };
+
+            IUserProfileService userProfileService = CreateUserProfileService();
+
+            userProfileService
+                .GetUser()
+                .Returns(userProfile);
+
             IUsersApiClient apiClient = CreateUsersApiClient();
             apiClient
-                .ConfirmSkills(Arg.Is("user1@testdata.com"))
-                .Returns(HttpStatusCode.BadRequest);
+                .ConfirmSkills(Arg.Is("123"), Arg.Is<UserConfirmModel>(u => u.Username == upn && u.Name == userProfile.Fullname))
+                .Returns(new ValidatedApiResponse<User>(HttpStatusCode.BadRequest, (User)null));
 
-            ConfirmSkillsModel pageModel = CreatePageModel(apiClient);
+            ConfirmSkillsModel pageModel = CreatePageModel(apiClient, userProfileService);
             pageModel.PageContext = new PageContext
             {
                 HttpContext = httpContext
@@ -120,10 +138,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
         public async Task OnPostAsync_GivenCookieDoesNotAlreadyExistsAndCallingConfirmSkillsReturnsNoContent_SetsCookieReturnsRedirectResult()
         {
             //Arrange
+            const string upn = "user1@testdata.com";
             IIdentity identity = Substitute.For<IIdentity>();
             identity
                 .Name
-                .Returns("user1@testdata.com");
+                .Returns(upn);
 
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
 
@@ -132,12 +151,30 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
                 .User
                 .Returns(claimsPrincipal);
 
+            UserConfirmModel userConfirmModel = new UserConfirmModel();
+
+            User user = new User();
+
+            UserProfile userProfile = new UserProfile()
+            {
+                Firstname = "First",
+                Lastname = "Last",
+                Id = "123",
+                UPN = upn
+            };
+
+            IUserProfileService userProfileService = CreateUserProfileService();
+
+            userProfileService
+                .GetUser()
+                .Returns(userProfile);
+
             IUsersApiClient apiClient = CreateUsersApiClient();
             apiClient
-                .ConfirmSkills(Arg.Is("user1@testdata.com"))
-                .Returns(HttpStatusCode.NoContent);
+                .ConfirmSkills(Arg.Is("123"), Arg.Is<UserConfirmModel>(u => u.Username == upn && u.Name == userProfile.Fullname))
+                .Returns(new ValidatedApiResponse<User>(HttpStatusCode.OK, user));
 
-            ConfirmSkillsModel pageModel = CreatePageModel(apiClient);
+            ConfirmSkillsModel pageModel = CreatePageModel(apiClient, userProfileService);
             pageModel.PageContext = new PageContext
             {
                 HttpContext = httpContext
@@ -156,14 +193,23 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
                .Be("/");
         }
 
-        static ConfirmSkillsModel CreatePageModel(IUsersApiClient usersApiClient = null)
+        static ConfirmSkillsModel CreatePageModel(
+            IUsersApiClient usersApiClient = null,
+            IUserProfileService userProfileService = null)
         {
-            return new ConfirmSkillsModel(usersApiClient ?? CreateUsersApiClient());
+            return new ConfirmSkillsModel(
+                usersApiClient ?? CreateUsersApiClient(),
+                userProfileService ?? CreateUserProfileService());
         }
 
         static IUsersApiClient CreateUsersApiClient()
         {
             return Substitute.For<IUsersApiClient>();
+        }
+
+        static IUserProfileService CreateUserProfileService()
+        {
+            return Substitute.For<IUserProfileService>();
         }
     }
 }

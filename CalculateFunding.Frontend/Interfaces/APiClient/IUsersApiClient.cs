@@ -1,14 +1,13 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using System.Threading.Tasks;
+using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.UsersClient.Models;
-using System.Net;
-using System.Threading.Tasks;
 
-namespace CalculateFunding.Frontend.Interfaces.APiClient
+namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     public interface IUsersApiClient
     {
-        Task<ApiResponse<User>> GetUserByUsername(string username);
+        Task<ApiResponse<User>> GetUserByUserId(string userId);
 
-        Task<HttpStatusCode> ConfirmSkills(string username);
+        Task<ValidatedApiResponse<User>> ConfirmSkills(string userId, UserConfirmModel userConfirmModel);
     }
 }

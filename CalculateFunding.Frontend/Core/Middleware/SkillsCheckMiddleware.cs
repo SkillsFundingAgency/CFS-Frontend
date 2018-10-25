@@ -6,7 +6,8 @@
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.UsersClient.Models;
     using CalculateFunding.Frontend.Constants;
-    using CalculateFunding.Frontend.Interfaces.APiClient;
+    using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -29,7 +30,9 @@
                 {
                     IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
 
-                    ApiResponse<User> apiResponse = await usersApiClient.GetUserByUsername(context.User.Identity.Name);
+                    UserProfile profile = context.User.GetUserProfile();
+
+                    ApiResponse<User> apiResponse = await usersApiClient.GetUserByUserId(profile.Id);
 
                     if (apiResponse.StatusCode != HttpStatusCode.OK || !apiResponse.Content.HasConfirmedSkills)
                     {

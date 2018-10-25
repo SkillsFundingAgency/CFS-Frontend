@@ -1,10 +1,9 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.UsersClient.Models;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
@@ -17,18 +16,18 @@ namespace CalculateFunding.Frontend.Clients.UsersClient
         {
         }
 
-        public Task<ApiResponse<User>> GetUserByUsername(string username)
+        public async Task<ApiResponse<User>> GetUserByUserId(string userId)
         {
-            Guard.IsNullOrWhiteSpace(username, nameof(username));
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
 
-            return GetAsync<User>($"get-user-by-username?username={username}");
+            return await GetAsync<User>($"get-user-by-userid?userId={userId}");
         }
 
-        public Task<HttpStatusCode> ConfirmSkills(string username)
+        public async Task<ValidatedApiResponse<User>> ConfirmSkills(string userId, UserConfirmModel userConfirmModel)
         {
-            Guard.IsNullOrWhiteSpace(username, nameof(username));
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
 
-            return PostAsync($"confirm-skills?username={username}");
+            return await ValidatedPostAsync<User, UserConfirmModel>($"confirm-skills?userId={userId}", userConfirmModel);
         }
     }
 }

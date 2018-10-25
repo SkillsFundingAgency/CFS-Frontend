@@ -1,21 +1,30 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
-using CalculateFunding.Frontend.Interfaces.APiClient;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.UsersClient.Models;
+using CalculateFunding.Frontend.Constants;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
-using Microsoft.AspNetCore.Http;
-using CalculateFunding.Frontend.Constants;
 
 namespace CalculateFunding.Frontend.Pages.Users
 {
     public class ConfirmSkillsModel : PageModel
     {
         private readonly IUsersApiClient _usersApiClient;
+        private readonly IUserProfileService _userProfileService;
 
-        public ConfirmSkillsModel(IUsersApiClient usersApiClient)
+        public ConfirmSkillsModel(IUsersApiClient usersApiClient, IUserProfileService userProfileService)
         {
+            Guard.ArgumentNotNull(usersApiClient, nameof(usersApiClient));
+            Guard.ArgumentNotNull(userProfileService, nameof(userProfileService));
+
             _usersApiClient = usersApiClient;
+            _userProfileService = userProfileService;
         }
 
         public Task<IActionResult> OnGetAsync()
@@ -25,15 +34,23 @@ namespace CalculateFunding.Frontend.Pages.Users
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (this.HttpContext.User?.Identity?.Name != null) {
-
+            if (this.HttpContext.User?.Identity?.Name != null)
+            {
                 string userName = this.HttpContext.User.Identity.Name;
 
                 if (!Request.Cookies.ContainsKey(UserContstants.SkillsConfirmationCookieName))
                 {
-                    HttpStatusCode statusCode = await _usersApiClient.ConfirmSkills(userName);
+                    UserProfile userProfile = _userProfileService.GetUser();
 
-                    if (statusCode != HttpStatusCode.NoContent)
+                    UserConfirmModel confirmSkillsModel = new UserConfirmModel()
+                    {
+                        Name = userProfile.Fullname,
+                        Username = userName,
+                    };
+
+                    ValidatedApiResponse<User> confirmResult = await _usersApiClient.ConfirmSkills(userProfile.Id, confirmSkillsModel);
+
+                    if (confirmResult.StatusCode != HttpStatusCode.OK)
                     {
                         throw new InvalidOperationException($"Failed to confirm skills for {userName}");
                     }
