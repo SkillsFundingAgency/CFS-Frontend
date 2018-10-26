@@ -121,6 +121,12 @@
         "description": "Client id of ad application"
       }
     },
+    "aadClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Client secret of ad application"
+      }
+    },
     "aadInstance": {
       "type": "string",
       "metadata": {
@@ -242,9 +248,11 @@
             "tokenStoreEnabled": true,
             "defaultProvider": 0,
             "clientId": "[parameters('aadClientId')]",
+            "clientSecret": "[parameters('aadClientSecret')]",
             "issuer": "[parameters('aadAuthIssuer')]",
             "allowedAudiences": null,
-            "isAadAutoProvisioned": false
+            "isAadAutoProvisioned": false,
+            "additionalLoginParams": [ "response_type=code id_token", "resource=https://graph.microsoft.com"]
           }
         },
         {
