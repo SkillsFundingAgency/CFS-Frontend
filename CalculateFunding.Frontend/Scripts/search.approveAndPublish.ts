@@ -114,8 +114,19 @@
                                         return sa === a.allocationLineName;
                                     }));
                                 }
-                                return isStatusFound && isAllocationFound;
+                            let allocationLineMeetsFilterCriteria = isStatusFound && isAllocationFound;
+                            if (allocationLineMeetsFilterCriteria) {
+                                a.isFilteredOut(false);
+                            }
+                            else {
+                                a.isFilteredOut(true);
+                            }
+                                return allocationLineMeetsFilterCriteria;
                             });
+                    } else {
+                        p.allocationLineResults().forEach(function (al) {
+                            al.isFilteredOut(false);
+                        })
                     }
 
                     if (!filteredAllocationLines || filteredAllocationLines.length == 0) {
@@ -144,8 +155,13 @@
                     }
                     return (authorityFilterMatched && providerTypeFilterMatched);
                 });
+            } else {
+                publishedProviderResults.forEach(function (p) {
+                    p.allocationLineResults().forEach(function (al) {
+                        al.isFilteredOut(false);
+                    })
+                });
             }
-
             return filteredResultsRaw;
         };
 

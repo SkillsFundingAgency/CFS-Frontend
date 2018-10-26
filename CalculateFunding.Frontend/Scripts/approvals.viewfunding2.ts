@@ -22,7 +22,7 @@
         public allProviderResults: KnockoutObservableArray<PublishedProviderResultViewModel> = ko.observableArray([]);
         public dataLoadState: KnockoutObservable<string> = ko.observable("idle");
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
-        public isPublishButtonEnabled: boolean
+        public isPublishButtonEnabled: boolean;
         public isPublishAndApprovePageFiltersEnabled: boolean;
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
 
@@ -149,6 +149,7 @@
 
         filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
             let allResultsRaw: Array<PublishedProviderResultViewModel> = this.allProviderResults();
+            this.collapseAllAllocationLines();
             if (this.isPublishAndApprovePageFiltersEnabled) {
                 this.pageNumber(0);
                 if (this.approveSearchModel.allSearchFacets && this.approveSearchModel.allSearchFacets().length != 0) {
@@ -157,6 +158,12 @@
             }
             return allResultsRaw;
         }, this);
+
+        collapseAllAllocationLines(): void {
+            $(".expander-container").hide();
+            $(".expander-trigger-row-open").removeClass("expander-trigger-row-open");
+            $(".expander-trigger-cell-open").removeClass("expander-trigger-cell-open");
+        }
 
         currentPageResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
             let startIndex = this.pageNumber() * this.itemsPerPage;
@@ -307,7 +314,7 @@
                 let allocationResults = providerResults[i].allocationLineResults();
                 for (let j = 0; j < allocationResults.length; j++) {
                     let allocationLineResult = allocationResults[j];
-                    if (allocationLineResult.isSelected() && (allocationLineResult.status === AllocationLineStatus.Held || allocationLineResult.status === AllocationLineStatus.Updated)) {
+                    if (allocationLineResult.isSelected() && (allocationLineResult.status === AllocationLineStatus.New || allocationLineResult.status === AllocationLineStatus.Updated)) {
                         return true;
                     }
                 }
@@ -325,7 +332,7 @@
                 let providerHasSelectedAllocations: boolean;
                 for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
                     let allocationResult = providerResult.allocationLineResults()[j];
-                    if (allocationResult.isSelected() && (allocationResult.status === AllocationLineStatus.Held || allocationResult.status === AllocationLineStatus.Updated)) {
+                    if (allocationResult.isSelected() && (allocationResult.status === AllocationLineStatus.New || allocationResult.status === AllocationLineStatus.Updated)) {
                         approveVM.allocationLines.push(new AllocationLineSummaryViewModel(providerResult.providerId, allocationResult.allocationLineId, allocationResult.allocationLineName, allocationResult.fundingAmount));
                         approveVM.totalFundingApproved += allocationResult.fundingAmount;
                         providerHasSelectedAllocations = true;
@@ -374,7 +381,7 @@
 
         // Has the used selected at least one allocation line result that can be published
 
-        canPublish: KnockoutComputed<boolean > = ko.pureComputed(function () {
+        canPublish: KnockoutComputed<boolean> = ko.pureComputed(function () {
             // Disable the publish button if configured so (Story #62313)
             if (!this.isPublishButtonEnabled) {
                 return false;
@@ -452,8 +459,9 @@
                 let filteredResults = this.filteredResults();
                 for (let i = 0; i < filteredResults.length; i++) {
                     let providerResult = filteredResults[i];
-                    for (let j = 0; j < providerResult.allocationLineResults().length; j++) {
-                        let allocationLineResult = providerResult.allocationLineResults()[j];
+                    let allocationLineResultsFiltered = providerResult.allocationLineResultsFiltered();
+                    for (let j = 0; j < allocationLineResultsFiltered.length; j++) {
+                        let allocationLineResult = allocationLineResultsFiltered[j];
                         if (!allocationLineResult.isSelected()) {
                             return false;
                         }
@@ -637,12 +645,6 @@
                     newProvider.providerId = receivedProvider.providerId;
                     newProvider.providerName = receivedProvider.providerName;
                     newProvider.providerType = receivedProvider.providerType;
-                    newProvider.fundingAmount = receivedProvider.fundingAmount;
-                    newProvider.numberApproved = receivedProvider.numberApproved;
-                    newProvider.numberUpdated = receivedProvider.numberUpdated;
-                    newProvider.numberNew = receivedProvider.numberHeld;
-                    newProvider.numberPublished = receivedProvider.numberPublished;
-                    newProvider.totalAllocationLines = receivedProvider.totalAllocationLines;
 
                     for (let fs: number = 0; fs < receivedProvider.fundingStreamResults.length; fs++) {
                         let fundingStream: IFundingStreamResultResponse = receivedProvider.fundingStreamResults[fs];
@@ -740,30 +742,68 @@
     }
 
     /** A published provider result */
-    class PublishedProviderResultViewModel {
+    export class PublishedProviderResultViewModel {
         providerName: string;
         providerId: string;
         providerType: string;
         ukprn: string;
         authority: string;
-        fundingAmount: number;
+        fundingAmount: KnockoutComputed<number>;
         get fundingAmountDisplay(): string {
 
-            return (Number(this.fundingAmount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+            return (Number(this.fundingAmount())).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
         }
 
-        totalAllocationLines: number;
-        numberNew: number;
-        numberApproved: number;
-        numberUpdated: number;
-        numberPublished: number;
+        totalAllocationLines: KnockoutComputed<Number>;
+        numberNew: KnockoutComputed<number>;
+        numberApproved: KnockoutComputed<number>
+        numberUpdated: KnockoutComputed<number>;
+        numberPublished: KnockoutComputed<number>;
         testCoveragePercent: number;
         testsPassed: number;
         testsTotal: number;
 
         allocationLineResults: KnockoutObservableArray<PublishedAllocationLineResultViewModel> = ko.observableArray([]);
+        allocationLineResultsFiltered: KnockoutComputed<Array<PublishedAllocationLineResultViewModel>> = ko.pureComputed(function () {
+            return ko.utils.arrayFilter(this.allocationLineResults(), function (p) {
+                return !p.isFilteredOut();
+            })
+        }, this);
         qaTestResults: KnockoutObservable<IQAResultResponse> = ko.observable(null);
         qaTestResultsRequestStatus: KnockoutObservable<string> = ko.observable(null);
+
+        constructor() {
+            let self = this;
+            this.allocationLineResults.extend({ deferred: true });
+            this.numberNew = ko.computed(function () {
+                return PublishedProviderResultViewModel.getTotalForStatus(self.allocationLineResultsFiltered(), AllocationLineStatus.New);
+            });
+            this.numberUpdated = ko.computed(function () {
+                return PublishedProviderResultViewModel.getTotalForStatus(self.allocationLineResultsFiltered(), AllocationLineStatus.Updated)
+            });
+            this.numberPublished = ko.computed(function () {
+                return PublishedProviderResultViewModel.getTotalForStatus(self.allocationLineResultsFiltered(), AllocationLineStatus.Published)
+            });
+            this.numberApproved = ko.computed(function () {
+                return PublishedProviderResultViewModel.getTotalForStatus(self.allocationLineResultsFiltered(), AllocationLineStatus.Approved)
+            });
+            this.totalAllocationLines = ko.computed(function () {
+                return self.allocationLineResultsFiltered().length;
+            });
+            this.fundingAmount = ko.computed(function () {
+                let totalFunding: number = 0;
+                ko.utils.arrayForEach(self.allocationLineResultsFiltered(), function (al: PublishedAllocationLineResultViewModel) {
+                    totalFunding += al.fundingAmount;
+                })
+                return totalFunding;
+            });
+        }
+
+        private static getTotalForStatus(allocationLineResultsFiltered: PublishedAllocationLineResultViewModel[], status: AllocationLineStatus) {
+            return allocationLineResultsFiltered.filter(function (al) {
+                return al.status === status;
+            }).length
+        }
 
         /** 
          *  Are all allocation lines in the provider currently selected.
@@ -790,7 +830,7 @@
                     }
                 }
             }
-        }, this.allocationLineResults);
+        }, this.allocationLineResultsFiltered);
     }
 
     /** A published allocation line result */
@@ -807,6 +847,7 @@
         }
         version: string;
         isSelected: KnockoutObservable<boolean> = ko.observable(false);
+        isFilteredOut: KnockoutObservable<boolean> = ko.observable(false);
     }
 
 
@@ -836,7 +877,7 @@
         fundingStreamResults: Array<IFundingStreamResultResponse>
         specificationId: string;
         providerName: string;
-        providerType: string
+        providerType: string;
         providerId: string;
         ukprn: string;
         fundingAmount: number;
@@ -851,7 +892,7 @@
 
     /** The allowable statuses of an allocation line */
     export enum AllocationLineStatus {
-        Held,
+        New,
         Approved,
         Published,
         Updated
