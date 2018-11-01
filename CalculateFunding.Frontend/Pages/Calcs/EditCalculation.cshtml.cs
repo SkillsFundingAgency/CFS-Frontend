@@ -3,6 +3,7 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
@@ -18,16 +19,21 @@
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
 
-        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
+        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(features, nameof(features));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
+
+            ShouldAggregateSupportForCalculationsBeEnabled = features.IsAggregateSupportInCalculationsEnabled();
         }
+
+        public bool ShouldAggregateSupportForCalculationsBeEnabled { get; private set; }
 
         public CalculationViewModel Calculation { get; set; }
 

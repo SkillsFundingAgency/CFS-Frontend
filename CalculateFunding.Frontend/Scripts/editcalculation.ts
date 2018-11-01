@@ -50,6 +50,8 @@ namespace calculateFunding.editCalculation {
             this.initialCodeContents = options.existingSourceCode;
             this.sourceCode(options.existingSourceCode);
 
+            this.codeContext.setAggregateFeatureEnabled(options.aggregatesFeatureEnabled.toLowerCase() === "true");
+
             let self = this;
 
             this.canBuildCalculation = ko.computed(() => {
@@ -250,7 +252,8 @@ namespace calculateFunding.editCalculation {
                 friendlyName: property.friendlyName,
                 description: property.description,
                 type: property.type,
-                items: {}
+                items: {},
+                isAggregable: property.isAggregable
             };
 
             let typeInformation = ko.utils.arrayFirst(types, (item: common.ITypeInformationResponse) => {
@@ -279,7 +282,8 @@ namespace calculateFunding.editCalculation {
         calculationId: string,
         specificationId: string,
         existingSourceCode: string,
-        calculationName: string
+        calculationName: string,
+        aggregatesFeatureEnabled:string
     }
 
     export interface IPreviewCompileResultReponse {

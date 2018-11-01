@@ -6,6 +6,7 @@ namespace calculateFunding.providers {
     export class VisualBasicIntellisenseProvider {
         private contextVariables: IVariableContainer = {};
         private contextFunctions: ILocalFunctionContainer = {};
+        private aggregatesFeatureEnabled: boolean;
 
         private variableAllowedNowPrefixes: Array<string> = [
             // If and If with brackets and spaces, but not matching End If - regex not supported in IE11
@@ -50,14 +51,23 @@ namespace calculateFunding.providers {
             "CUInt\\(",
             "CULng\\(",
             "CUShort\\(",
+            "Sum\\(",
+            "Avg\\(",
+            "Min\\(",
+            "Max\\(",
         ];
 
         public setContextVariables(variables: IVariableContainer) {
+            delete variables["aggregations"];
             this.contextVariables = variables;
         }
 
         public setLocalFunctions(functions: ILocalFunctionContainer) {
             this.contextFunctions = functions;
+        }
+
+        public setAggregateFeatureEnabled(isEnabled: boolean = false) {
+            this.aggregatesFeatureEnabled = isEnabled;
         }
 
         public getCompletionProvider(): monaco.languages.CompletionItemProvider {
@@ -188,48 +198,28 @@ namespace calculateFunding.providers {
                         let whitespaceRegex = new RegExp(/(\s)?/);
 
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
-                            for (let key in self.contextVariables) {
-                                let variable = self.contextVariables[key];
-                                let variableItem: monaco.languages.CompletionItem = {
-                                    label: variable.name,
-                                    kind: monaco.languages.CompletionItemKind.Field,
-                                    detail: variable.type,
-                                };
 
-                                let description = "";
-                                let friendlyName = "";
+                            let variable: IVariable;
+                            let isAggregableFunctionDeclared = (self.aggregatesFeatureEnabled === true && VisualBasicIntellisenseProvider.IsAggregableFunctionDeclared(lineContentsSoFar));
 
-                                if (typeof variable.description !== "undefined") {
-                                    description = variable.description;
+                            if (isAggregableFunctionDeclared === true) {
+
+                                variable = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
+                               
+                                results.push(self.CreateCompletionItem(variable));
+                            }
+                            else {
+                                for (let key in self.contextVariables) {
+
+                                    variable = self.contextVariables[key];
+
+                                    results.push(self.CreateCompletionItem(variable));
                                 }
-
-                                if (typeof variable.friendlyName !== "undefined") {
-                                    friendlyName = variable.friendlyName;
-                                }
-
-                                if (description || friendlyName) {
-                                    let documentationValue = "";
-
-                                    if (friendlyName) {
-                                        documentationValue = "**" + friendlyName + "**";
-                                    }
-
-                                    if (description) {
-                                        if (documentationValue) {
-                                            documentationValue = documentationValue + "\r\n\r\n";
-                                        }
-                                        documentationValue = documentationValue + description;
-                                    }
-
-                                    variableItem.documentation = {
-                                        value: documentationValue,
-                                        isTrusted: true,
-                                    };
-                                }
-
-                                results.push(variableItem);
                             }
 
+                            if (isAggregableFunctionDeclared === true) {
+                                return results;
+                            }
 
                             let codeWithNoComments = VisualBasicIntellisenseProvider.ProcessSourceToRemoveComments(model.getValueInRange(new monaco.Range(1, 1, position.lineNumber, position.column)));
                             console.log("Code with no comments: ", codeWithNoComments);
@@ -324,6 +314,48 @@ namespace calculateFunding.providers {
                     return item;
                 }
             };
+        }
+
+        public CreateCompletionItem(variable: IVariable): monaco.languages.CompletionItem {
+
+            let variableItem: monaco.languages.CompletionItem = {
+                label: variable.name,
+                kind: monaco.languages.CompletionItemKind.Field,
+                detail: variable.type,
+            };
+
+            let description = "";
+            let friendlyName = "";
+
+            if (typeof variable.description !== "undefined") {
+                description = variable.description;
+            }
+
+            if (typeof variable.friendlyName !== "undefined") {
+                friendlyName = variable.friendlyName;
+            }
+
+            if (description || friendlyName) {
+                let documentationValue = "";
+
+                if (friendlyName) {
+                    documentationValue = "**" + friendlyName + "**";
+                }
+
+                if (description) {
+                    if (documentationValue) {
+                        documentationValue = documentationValue + "\r\n\r\n";
+                    }
+                    documentationValue = documentationValue + description;
+                }
+
+                variableItem.documentation = {
+                    value: documentationValue,
+                    isTrusted: true,
+                };
+            }
+
+            return variableItem;
         }
 
         public getHoverProvider(): monaco.languages.HoverProvider {
@@ -670,6 +702,59 @@ namespace calculateFunding.providers {
             return null;
         }
 
+        public static IsAggregableFunctionDeclared(path: string): boolean {
+
+            if (!path) {
+                return false;
+            }
+
+            let pathRegex = "( Min|Avg|Max|Sum\\()";
+
+            let regex = new RegExp(pathRegex);
+            
+            let match = regex.exec(path);
+
+            if (match) {
+                return true
+            }
+
+            return false;
+        }
+
+        public static GetVariableForAggregatePath(path: string, variables: IVariableContainer): IVariable {
+            let clonedVariableContainer = Object.assign({}, variables) as IVariableContainer;
+            let clonedVariable = clonedVariableContainer["datasets"];
+
+            let datasets = VisualBasicIntellisenseProvider.GetVariablesForPath("Datasets", clonedVariableContainer);
+
+            if (datasets && datasets.length > 0) {
+                for (let i in datasets) {
+                    let datasetVariable: IVariable = datasets[i];
+                    let fields = VisualBasicIntellisenseProvider.GetVariablesForPath("Datasets." + datasetVariable.name, clonedVariableContainer);
+
+                    let filteredVariables: IVariableContainer = {};
+
+                    let hasAggregateFields = false;
+
+                    for (let f in fields) {
+                        let fieldVariable: IVariable = fields[f];
+                        if (fieldVariable.isAggregable.toLowerCase() == "true") {
+                            hasAggregateFields = true;
+                            filteredVariables[fieldVariable.name.toLowerCase()] = fieldVariable;
+                        }
+                    }
+
+                    if (!hasAggregateFields) {
+                        delete clonedVariableContainer["datasets"].items[datasetVariable.name.toLowerCase()];
+                    }
+                    else {
+                        datasetVariable.items = filteredVariables;
+                    }
+                }
+            }
+
+            return clonedVariable;
+        }
     }
 
     export interface IVariableContainer {
@@ -682,6 +767,7 @@ namespace calculateFunding.providers {
         type: string;
         description?: string;
         items?: IVariableContainer;
+        isAggregable: string;
     }
 
     export interface IDefaultTypes {
