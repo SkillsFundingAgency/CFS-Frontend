@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="withjs-show col-xs-3">
-                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select allocation line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
+                <select id="allocationLines" class="facet-select" data-bind="multiselect2: {nonSelectedText: 'Select allocation line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
             </div>
         </div>
         <div class="row spacing-15-top withjs-show">
@@ -40,16 +40,16 @@
         </div>
         <div class="row withjs-show">
             <div class="col-xs-3">
-                <select id="fundingPeriods" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+                <select id="fundingPeriods" class="facet-select" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
+                <select id="fundingStreams" class="facet-select" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+                <select id="specifications" class="facet-select" data-bind="multiselect2: {nonSelectedText: 'Select specification', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
             </div>
             <div class="col-xs-3">
-                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all statuses', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
+                <select id="calculationStatus" class="facet-select" data-bind="multiselect2: {nonSelectedText: 'Show all statuses', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
             </div>
 
         </div>

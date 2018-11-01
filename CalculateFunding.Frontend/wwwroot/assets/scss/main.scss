@@ -1838,10 +1838,15 @@ table {
 .multiselect-container {
     border-radius: 0;
     font-size: 16px;
-
+   
     label {
         padding: 5px;
     }
+}
+
+.facet-select + div > ul{
+    max-height: 300px;
+    overflow: auto;
 }
 
 .filter-selected-container {

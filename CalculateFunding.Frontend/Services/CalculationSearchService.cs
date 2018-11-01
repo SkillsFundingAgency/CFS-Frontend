@@ -39,6 +39,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
+                FacetCount = request.FacetCount
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

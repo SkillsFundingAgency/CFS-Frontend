@@ -11,5 +11,7 @@
         public IDictionary<string, string[]> Filters { get; set; }
 
         public IEnumerable<string> SearchFields { get; set; }
+
+        public int FacetCount { get; set; }
     }
 }

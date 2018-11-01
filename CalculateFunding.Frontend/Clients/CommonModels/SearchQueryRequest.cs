@@ -13,6 +13,8 @@
 
         public bool IncludeFacets { get; set; }
 
+        public int FacetCount { get; set; }
+
         public IDictionary<string, string[]> Filters { get; set; }
 
         public static SearchQueryRequest FromSearchFilterRequest(SearchFilterRequest filterOptions)
@@ -26,6 +28,7 @@
                 SearchTerm = filterOptions.SearchTerm,
                 IncludeFacets = filterOptions.IncludeFacets,
                 Filters = filterOptions.Filters,
+                FacetCount = filterOptions.FacetCount
             };
 
             return result;
