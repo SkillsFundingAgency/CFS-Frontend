@@ -173,6 +173,13 @@
       },
       "defaultValue": "true"
     },
+    "EnableDatasetAggregations": {
+      "defaultValue": false,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to enable dataset aggregations"
+      }
+    },
     "aadAuthIssuer": {
       "type": "string",
       "metadata": {
@@ -401,6 +408,10 @@
             {
               "name": "features:publishAndApprovePageFiltersEnabled",
               "value": "[parameters('publishAndApprovePageFiltersEnabled')]"
+            },
+            {
+              "name": "features:aggregateSupportInCalculationsEnabled",
+              "value": "[parameters('EnableDatasetAggregations')]"
             }
           ]
         }
