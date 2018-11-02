@@ -132,18 +132,26 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                type: "",
+                isAggregable: "false",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false" }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} } }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }
@@ -164,18 +172,28 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                isAggregable: "false",
+                type: "",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false"
+                    }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }
@@ -195,18 +213,28 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                isAggregable: "false",
+                type: "",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false"
+                    }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }
@@ -226,18 +254,28 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                isAggregable: "false",
+                type: "",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false"
+                    }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }
@@ -257,18 +295,28 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                isAggregable: "false",
+                type: "",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false"
+                    }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }
@@ -286,18 +334,27 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         var container = {
             "providers": {
                 name: "Providers",
+                friendlyName: "Providers",
+                isAggregable: "false",
+                type: "",
                 items: {
-                    urn: { name: "URN" }
+                    urn: {
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false" }
                 }
             },
             "datasets": {
                 name: "Datasets",
+                friendlyName: "Datasets",
+                isAggregable: "false",
+                type: "",
                 items: {
                     ds1: {
-                        name: "ds1", items: { f1: { name: "f1", isAggregable: "true" }, f2: { name: "f2", isAggregable: "false" }, f3: { name: "f3", isAggregable: "true" } }
+                        name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
-                        name: "ds2", items: { f11: { name: "f11", isAggregable: "false" }, f2: { name: "f22", isAggregable: "false" }, f3: { name: "f33", isAggregable: "false" } }
+                        name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
             }

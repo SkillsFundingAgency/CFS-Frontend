@@ -202,7 +202,7 @@ namespace calculateFunding.providers {
                         }
 
                         let whitespaceRegex = new RegExp(/(\s)?/);
-                        
+
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
                             let variable: IVariable;
@@ -211,7 +211,7 @@ namespace calculateFunding.providers {
                             if (isAggregableFunctionDeclared === true) {
 
                                 variable = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
-                               
+
                                 results.push(self.CreateCompletionItem(variable));
                             }
                             else {
@@ -309,47 +309,6 @@ namespace calculateFunding.providers {
                                 results.push(localFunctionItem);
                             }
 
-                            if (asWithWhitespaceRegex.test(lineContentsSoFar)) {
-                                for (let i in self.contextDefaultTypes) {
-                                    let defaultType: IDefaultType = self.contextDefaultTypes[i];
-
-                                    let defaultTypeItem: monaco.languages.CompletionItem = {
-                                        label: defaultType.label,
-                                        kind: monaco.languages.CompletionItemKind.Keyword,
-                                        detail: defaultType.description
-                                    };
-
-                                    let description = "";
-                                    let friendlyName = defaultType.label;
-
-                                    if (typeof defaultType.description !== "undefined") {
-                                        description = defaultType.description;
-                                    }
-
-                                    if (description || friendlyName) {
-                                        let documentationValue = "";
-
-                                        if (friendlyName) {
-                                            documentationValue = "**" + friendlyName + "**";
-                                        }
-
-                                        if (description) {
-                                            if (documentationValue) {
-                                                documentationValue = documentationValue + "\r\n\r\n";
-                                            }
-                                            documentationValue = documentationValue + description;
-                                        }
-
-                                        defaultTypeItem.documentation = {
-                                            value: documentationValue,
-                                            isTrusted: true,
-                                        };
-                                    }
-
-                                    results.push(defaultTypeItem);
-                                }
-                            }
-
                             let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
 
                             if (defaultTypeCompletionItems) {
@@ -439,7 +398,7 @@ namespace calculateFunding.providers {
                     if (defaultDataTypes) {
                         return defaultDataTypes;
                     }
-                   
+
                     return null;
                 }
             }
@@ -866,7 +825,7 @@ namespace calculateFunding.providers {
             let pathRegex = "( Min|Avg|Max|Sum\\()";
 
             let regex = new RegExp(pathRegex);
-            
+
             let match = regex.exec(path);
 
             if (match) {
