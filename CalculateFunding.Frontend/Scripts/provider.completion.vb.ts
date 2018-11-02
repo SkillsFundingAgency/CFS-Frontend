@@ -6,6 +6,8 @@ namespace calculateFunding.providers {
     export class VisualBasicIntellisenseProvider {
         private contextVariables: IVariableContainer = {};
         private contextFunctions: ILocalFunctionContainer = {};
+        private contextDefaultTypes: IDefaultTypeContainer = {};
+
         private aggregatesFeatureEnabled: boolean;
 
         private variableAllowedNowPrefixes: Array<string> = [
@@ -64,6 +66,10 @@ namespace calculateFunding.providers {
 
         public setLocalFunctions(functions: ILocalFunctionContainer) {
             this.contextFunctions = functions;
+        }
+
+        public setDefaultTypes(defaultTypes: IDefaultTypeContainer) {
+            this.contextDefaultTypes = defaultTypes;
         }
 
         public setAggregateFeatureEnabled(isEnabled: boolean = false) {
@@ -196,7 +202,7 @@ namespace calculateFunding.providers {
                         }
 
                         let whitespaceRegex = new RegExp(/(\s)?/);
-
+                        
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
                             let variable: IVariable;
@@ -218,6 +224,12 @@ namespace calculateFunding.providers {
                             }
 
                             if (isAggregableFunctionDeclared === true) {
+                                let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
+
+                                if (defaultTypeCompletionItems) {
+                                    results.push.apply(results, defaultTypeCompletionItems)
+                                }
+
                                 return results;
                             }
 
@@ -296,6 +308,54 @@ namespace calculateFunding.providers {
 
                                 results.push(localFunctionItem);
                             }
+
+                            if (asWithWhitespaceRegex.test(lineContentsSoFar)) {
+                                for (let i in self.contextDefaultTypes) {
+                                    let defaultType: IDefaultType = self.contextDefaultTypes[i];
+
+                                    let defaultTypeItem: monaco.languages.CompletionItem = {
+                                        label: defaultType.label,
+                                        kind: monaco.languages.CompletionItemKind.Keyword,
+                                        detail: defaultType.description
+                                    };
+
+                                    let description = "";
+                                    let friendlyName = defaultType.label;
+
+                                    if (typeof defaultType.description !== "undefined") {
+                                        description = defaultType.description;
+                                    }
+
+                                    if (description || friendlyName) {
+                                        let documentationValue = "";
+
+                                        if (friendlyName) {
+                                            documentationValue = "**" + friendlyName + "**";
+                                        }
+
+                                        if (description) {
+                                            if (documentationValue) {
+                                                documentationValue = documentationValue + "\r\n\r\n";
+                                            }
+                                            documentationValue = documentationValue + description;
+                                        }
+
+                                        defaultTypeItem.documentation = {
+                                            value: documentationValue,
+                                            isTrusted: true,
+                                        };
+                                    }
+
+                                    results.push(defaultTypeItem);
+                                }
+                            }
+
+                            let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
+
+                            if (defaultTypeCompletionItems) {
+                                results.push.apply(results, defaultTypeCompletionItems)
+                            }
+
                         }
                     }
 
@@ -375,11 +435,56 @@ namespace calculateFunding.providers {
                         return variableLocalFunction;
                     }
 
+                    let defaultDataTypes: monaco.languages.Hover = VisualBasicIntellisenseProvider.getHoverDescriptionForDefaultType(model, position, self.contextDefaultTypes);
+                    if (defaultDataTypes) {
+                        return defaultDataTypes;
+                    }
+                   
                     return null;
                 }
             }
 
             return hoverProvider;
+        }
+
+        public static getHoverDescriptionForDefaultType(model: monaco.editor.IReadOnlyModel, position: monaco.Position, dataTypes: IDefaultTypeContainer): monaco.languages.Hover {
+
+            let word = model.getWordAtPosition(position).word
+
+            if (dataTypes[word.toLowerCase()]) {
+
+                let foundDefaultType = dataTypes[word.toLowerCase()];
+
+                let documentationValue = "Type: " + foundDefaultType.label;
+
+                let description = "";
+
+                if (typeof foundDefaultType.description !== "undefined") {
+                    description = foundDefaultType.description;
+                }
+
+                if (description) {
+                    if (documentationValue) {
+                        documentationValue = documentationValue + "\r\n\r\n";
+                    }
+
+                    documentationValue = documentationValue + description;
+                }
+
+                let hover: monaco.languages.Hover = {
+                    contents: [
+                        {
+                            value: documentationValue,
+                            isTrusted: true,
+                        }
+                    ],
+                    range: null,
+                }
+
+                return hover;
+            }
+
+            return null;
         }
 
         public static getHoverDescriptionForLocalFunction(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, functions: ILocalFunctionContainer): monaco.languages.Hover {
@@ -700,6 +805,56 @@ namespace calculateFunding.providers {
             }
 
             return null;
+        }
+
+        public static GetDefaultDataTypesCompletionItems(path: string, defaultDataTypes: IDefaultTypeContainer): Array<monaco.languages.CompletionItem> {
+
+            let asWithWhitespaceRegex = new RegExp(/(\s)as(\s)/i);
+
+            let items: Array<monaco.languages.CompletionItem> = [];
+
+            if (asWithWhitespaceRegex.test(path)) {
+                for (let i in defaultDataTypes) {
+                    let defaultType: IDefaultType = defaultDataTypes[i];
+
+                    let defaultTypeItem: monaco.languages.CompletionItem = {
+                        label: defaultType.label,
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        detail: defaultType.description
+                    };
+
+                    let description = "";
+                    let friendlyName = defaultType.label;
+
+                    if (typeof defaultType.description !== "undefined") {
+                        description = defaultType.description;
+                    }
+
+                    if (description || friendlyName) {
+                        let documentationValue = "";
+
+                        if (friendlyName) {
+                            documentationValue = "**" + friendlyName + "**";
+                        }
+
+                        if (description) {
+                            if (documentationValue) {
+                                documentationValue = documentationValue + "\r\n\r\n";
+                            }
+                            documentationValue = documentationValue + description;
+                        }
+
+                        defaultTypeItem.documentation = {
+                            value: documentationValue,
+                            isTrusted: true,
+                        };
+                    }
+
+                    items.push(defaultTypeItem);
+                }
+            }
+
+            return items;
         }
 
         public static IsAggregableFunctionDeclared(path: string): boolean {

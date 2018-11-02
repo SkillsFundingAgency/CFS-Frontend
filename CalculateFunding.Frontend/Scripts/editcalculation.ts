@@ -199,6 +199,9 @@ namespace calculateFunding.editCalculation {
                     let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
                         return item.name === "Calculations";
                     });
+                    let dataTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
+                        return item.type === "DefaultType";
+                    });
 
                     if (calculationType) {
 
@@ -231,6 +234,20 @@ namespace calculateFunding.editCalculation {
                         }
                     }
 
+                    let defaultTypes: providers.IDefaultTypeContainer = {};
+
+                    if (dataTypes) {
+                        for (let dt in dataTypes) {
+                            let defaultType: providers.IDefaultType = {
+                                label: dataTypes[dt].name,
+                                description: dataTypes[dt].description,
+                                items: {}
+                            }
+
+                            defaultTypes[dataTypes[dt].name.toLowerCase()] = defaultType;
+                        }
+                    }
+
                     // Variables
                     for (let v in calculationType.properties) {
                         let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
@@ -241,7 +258,7 @@ namespace calculateFunding.editCalculation {
 
                     self.codeContext.setContextVariables(variables);
                     self.codeContext.setLocalFunctions(functions);
-
+                    self.codeContext.setDefaultTypes(defaultTypes);
                 });
             }
         }

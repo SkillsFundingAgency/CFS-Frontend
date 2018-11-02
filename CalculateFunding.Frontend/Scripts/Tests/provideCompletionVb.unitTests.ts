@@ -311,4 +311,28 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
             expect(variables[2].name === "f33").toBeTruthy();
         });
     });
+
+    describe("when (as) is not specified ", function () {
+        var container = {
+            "string": { label: "String", items: {} },
+            "boolean": { label: "Boolean", items: {} },
+            "integer": { label: "Integer", items: {}  },
+        };
+        it("then returns empty completion item", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems("Dim s ", container);
+            expect(items).toEqual([]);
+        });
+    });
+
+    describe("when (as) is specified ", function () {
+        var container = {
+            "string": { label: "String", items: {} },
+            "boolean": { label: "Boolean", items: {} },
+            "integer": { label: "Integer", items: {} },
+        };
+        it("then returns completion item", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems("Dim s as ", container);
+            expect(items.length).toEqual(3);
+        });
+    });
 });
