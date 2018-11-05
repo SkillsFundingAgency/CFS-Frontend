@@ -374,7 +374,7 @@
             </ul>
         </div>
 
-        <div data-bind="visible: allProviderResults().length == 0" class="noresults-panel spacing-30">
+        <div data-bind="visible: !isWorkingVisible() && allProviderResults().length == 0" class="noresults-panel spacing-30">
             <span class="noresults-panel-text">
                 <i class="material-icons">error</i> There are no results to display for the selected Funding Period, Specification and Funding Stream.
             </span>

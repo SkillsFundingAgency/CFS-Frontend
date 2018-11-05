@@ -50,6 +50,8 @@ namespace calculateFunding.editCalculation {
             this.initialCodeContents = options.existingSourceCode;
             this.sourceCode(options.existingSourceCode);
 
+            this.codeContext.setAggregateFeatureEnabled(options.aggregatesFeatureEnabled.toLowerCase() === "true");
+
             let self = this;
 
             this.canBuildCalculation = ko.computed(() => {
@@ -197,6 +199,9 @@ namespace calculateFunding.editCalculation {
                     let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
                         return item.name === "Calculations";
                     });
+                    let dataTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
+                        return item.type === "DefaultType";
+                    });
 
                     if (calculationType) {
 
@@ -229,6 +234,20 @@ namespace calculateFunding.editCalculation {
                         }
                     }
 
+                    let defaultTypes: providers.IDefaultTypeContainer = {};
+
+                    if (dataTypes) {
+                        for (let dt in dataTypes) {
+                            let defaultType: providers.IDefaultType = {
+                                label: dataTypes[dt].name,
+                                description: dataTypes[dt].description,
+                                items: {}
+                            }
+
+                            defaultTypes[dataTypes[dt].name.toLowerCase()] = defaultType;
+                        }
+                    }
+
                     // Variables
                     for (let v in calculationType.properties) {
                         let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
@@ -239,7 +258,7 @@ namespace calculateFunding.editCalculation {
 
                     self.codeContext.setContextVariables(variables);
                     self.codeContext.setLocalFunctions(functions);
-
+                    self.codeContext.setDefaultTypes(defaultTypes);
                 });
             }
         }
@@ -250,7 +269,8 @@ namespace calculateFunding.editCalculation {
                 friendlyName: property.friendlyName,
                 description: property.description,
                 type: property.type,
-                items: {}
+                items: {},
+                isAggregable: property.isAggregable
             };
 
             let typeInformation = ko.utils.arrayFirst(types, (item: common.ITypeInformationResponse) => {
@@ -279,7 +299,8 @@ namespace calculateFunding.editCalculation {
         calculationId: string,
         specificationId: string,
         existingSourceCode: string,
-        calculationName: string
+        calculationName: string,
+        aggregatesFeatureEnabled:string
     }
 
     export interface IPreviewCompileResultReponse {

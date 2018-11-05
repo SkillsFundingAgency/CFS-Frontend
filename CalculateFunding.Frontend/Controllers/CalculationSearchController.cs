@@ -23,6 +23,8 @@
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
+            request.FacetCount = 50;
+
             CalculationSearchResultViewModel result = await _calculationSearchService.PerformSearch(request);
             if (result != null)
             {

@@ -3,6 +3,7 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
@@ -21,18 +22,23 @@
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(features, nameof(features));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
+
+            ShouldAggregateSupportForCalculationsBeEnabled = features.IsAggregateSupportInCalculationsEnabled();
         }
+
+        public bool ShouldAggregateSupportForCalculationsBeEnabled { get; private set; }
 
         public CalculationViewModel Calculation { get; set; }
 

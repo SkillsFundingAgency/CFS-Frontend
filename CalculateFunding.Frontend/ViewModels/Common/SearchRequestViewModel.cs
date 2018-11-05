@@ -13,5 +13,7 @@
         public IDictionary<string, string[]> Filters { get; set; }
 
         public int? PageSize { get; set; }
+
+        public int FacetCount { get; set; } = 10;
     }
 }

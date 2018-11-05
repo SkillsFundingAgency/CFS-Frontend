@@ -12,6 +12,8 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 
         public string Type { get; set; }
 
+        public string IsAggregable { get; set; }
+
         public IEnumerable<PropertyInformation> Children { get; set; }
     }
 }

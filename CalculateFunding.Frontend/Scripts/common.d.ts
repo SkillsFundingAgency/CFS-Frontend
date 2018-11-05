@@ -66,6 +66,7 @@
         friendlyName: string;
         description: string;
         type: string;
+        isAggregable: string;
         children: Array<IPropertyInformationResponse>;
     }
 
