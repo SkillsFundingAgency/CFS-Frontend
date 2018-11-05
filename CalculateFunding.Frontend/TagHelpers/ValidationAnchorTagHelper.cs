@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.TagHelpers
 {
     using System;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
@@ -27,8 +27,8 @@
             Guard.ArgumentNotNull(context, nameof(context));
             Guard.ArgumentNotNull(output, nameof(output));
 
-            var fullName = NameAndIdProvider.GetFullHtmlFieldName(ViewContext, For.Name);
-            var elementId = NameAndIdProvider.CreateSanitizedId(ViewContext, fullName, TagHelperConstants.ValidationAnchorSeparator);
+            string fullName = NameAndIdProvider.GetFullHtmlFieldName(ViewContext, For.Name);
+            string elementId = NameAndIdProvider.CreateSanitizedId(ViewContext, fullName, TagHelperConstants.ValidationAnchorSeparator);
 
             if (string.IsNullOrWhiteSpace(elementId))
             {

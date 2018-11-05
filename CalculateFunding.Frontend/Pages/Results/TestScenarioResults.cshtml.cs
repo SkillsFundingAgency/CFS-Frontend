@@ -1,9 +1,14 @@
 namespace CalculateFunding.Frontend.Pages.Results
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -14,11 +19,6 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using Serilog;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
 
     public class TestScenarioResultsPageModel : PageModel
     {
@@ -82,7 +82,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             FundingPeriodId = fundingPeriodId;
 
-            SearchResults =  testScenarioResultsTask.Result;
+            SearchResults = testScenarioResultsTask.Result;
             if (SearchResults == null)
             {
                 return new ObjectResult("Search result was null")
@@ -105,7 +105,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
             ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
-            if(periodsResponse == null)
+            if (periodsResponse == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: response was null");
             }

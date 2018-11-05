@@ -22,7 +22,7 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            bool hasConfirmedSkills = context.Request.Cookies.ContainsKey(UserContstants.SkillsConfirmationCookieName);
+            bool hasConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
 
             if (context.User.Identity.IsAuthenticated)
             {

@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.TagHelpers
 {
     using System;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
     using Microsoft.AspNetCore.Html;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -94,7 +94,7 @@
                 throw new ArgumentNullException(nameof(viewContext));
             }
 
-            var viewData = viewContext.ViewData;
+            ViewDataDictionary viewData = viewContext.ViewData;
             if (!viewContext.ClientValidationEnabled && viewData.ModelState.IsValid)
             {
                 // Client-side validation is not enabled to add to the generated element and element will be empty.
@@ -102,7 +102,7 @@
             }
 
             if (excludePropertyErrors &&
-                (!viewData.ModelState.TryGetValue(viewData.TemplateInfo.HtmlFieldPrefix, out var entryForModel) ||
+                (!viewData.ModelState.TryGetValue(viewData.TemplateInfo.HtmlFieldPrefix, out ModelStateEntry entryForModel) ||
                  entryForModel.Errors.Count == 0))
             {
                 // Client-side validation (if enabled) will not affect the generated element and element will be empty.
@@ -127,27 +127,27 @@
 
             // If excludePropertyErrors is true, describe any validation issue with the current model in a single item.
             // Otherwise, list individual property errors.
-            var isHtmlSummaryModified = false;
+            bool isHtmlSummaryModified = false;
 
-            var htmlSummary = new TagBuilder("ul");
+            TagBuilder htmlSummary = new TagBuilder("ul");
 
-            foreach (var modelStateValuePair in viewData.ModelState)
+            foreach (System.Collections.Generic.KeyValuePair<string, ModelStateEntry> modelStateValuePair in viewData.ModelState)
             {
                 ModelStateEntry modelState = modelStateValuePair.Value;
 
                 string fieldNameSanitisedId = modelState.Errors.Count > 0 ? NameAndIdProvider.CreateSanitizedId(viewContext, modelStateValuePair.Key, TagHelperConstants.ValidationAnchorSeparator) : string.Empty;
 
                 // Perf: Avoid allocations
-                for (var i = 0; i < modelState.Errors.Count; i++)
+                for (int i = 0; i < modelState.Errors.Count; i++)
                 {
-                    var modelError = modelState.Errors[i];
-                    var errorText = ValidationHelpers.GetModelErrorMessageOrDefault(modelError);
+                    ModelError modelError = modelState.Errors[i];
+                    string errorText = ValidationHelpers.GetModelErrorMessageOrDefault(modelError);
 
                     if (!string.IsNullOrEmpty(errorText))
                     {
-                        var listItem = new TagBuilder("li");
+                        TagBuilder listItem = new TagBuilder("li");
 
-                        var anchorTag = new TagBuilder("a");
+                        TagBuilder anchorTag = new TagBuilder("a");
                         anchorTag.InnerHtml.SetContent(errorText);
                         anchorTag.AddCssClass("validation-summary-link");
 
@@ -167,7 +167,7 @@
                 htmlSummary.InnerHtml.AppendLine();
             }
 
-            var tagBuilder = new TagBuilder("div");
+            TagBuilder tagBuilder = new TagBuilder("div");
 
             if (viewData.ModelState.IsValid)
             {
@@ -177,7 +177,7 @@
             {
                 tagBuilder.AddCssClass(HtmlHelper.ValidationSummaryCssClassName);
 
-                var heading = new TagBuilder("h3");
+                TagBuilder heading = new TagBuilder("h3");
                 heading.InnerHtml.Append("There is a problem");
                 heading.AddCssClass("heading-large");
 

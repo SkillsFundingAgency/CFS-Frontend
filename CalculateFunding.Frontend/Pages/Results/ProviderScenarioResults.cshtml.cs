@@ -1,10 +1,15 @@
 namespace CalculateFunding.Frontend.Pages.Results
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -14,11 +19,6 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Serilog;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
 
     public class ProviderScenarioResultsPageModel : PageModel
     {
@@ -131,14 +131,14 @@ namespace CalculateFunding.Frontend.Pages.Results
             if (!string.IsNullOrWhiteSpace(specificationId))
             {
                 TestScenarioSearchResults = await _testScenarioSearchService.PerformSearch(searchRequest);
-                if(TestScenarioSearchResults != null)
+                if (TestScenarioSearchResults != null)
                 {
-                    Passed = TestScenarioSearchResults.TestScenarios.Where(c=>c.TestResult == "Passed").Count();
+                    Passed = TestScenarioSearchResults.TestScenarios.Where(c => c.TestResult == "Passed").Count();
                     Failed = TestScenarioSearchResults.TestScenarios.Where(c => c.TestResult == "Failed").Count();
                     Ignored = TestScenarioSearchResults.TestScenarios.Where(c => c.TestResult == "Ignored").Count();
 
                     int totalRecords = Passed + Failed + Ignored;
-                    if(totalRecords > 0)
+                    if (totalRecords > 0)
                     {
                         TestCoverage = Math.Round((decimal)(Passed + Failed) / totalRecords * 100, 1);
                     }
@@ -150,13 +150,13 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            var fundingPeriods = periodsResponse.Content;
+            IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
@@ -173,7 +173,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateSpecifications(string providerId, string specificationId = null)
         {
-            var specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
+            ApiResponse<IEnumerable<string>> specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {

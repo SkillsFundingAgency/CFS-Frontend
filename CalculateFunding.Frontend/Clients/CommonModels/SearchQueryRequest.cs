@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     using System.Collections.Generic;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
 
     internal class SearchQueryRequest
     {

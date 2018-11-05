@@ -1,14 +1,14 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }   
+            }
 
             CreateScenarioModel createScenario = _mapper.Map<CreateScenarioModel>(vm);
             createScenario.SpecificationId = specificationId;
@@ -91,15 +91,15 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return Ok(result.Content);
             }
-           else
+            else
             {
                 HttpStatusCode statusCode = result.StatusCode;
 
                 _logger.Error("An error occurred while updating scenario. Status code from backend={statusCode} for specification {specificationId}", statusCode, specificationId);
 
                 throw new InvalidOperationException($"An error occurred while updating scenario. Status code={result.StatusCode}");
-            }         
+            }
         }
-        
+
     }
 }

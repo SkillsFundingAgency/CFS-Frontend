@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CommonModels
 {
     using System;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
 
     public class SearchPagedResult<T> : PagedResult<T>
     {

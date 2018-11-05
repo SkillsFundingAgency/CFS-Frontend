@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
@@ -12,9 +17,6 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Pages.Approvals
 {
@@ -25,6 +27,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
         private readonly IResultsApiClient _resultsClient;
         private readonly ITestEngineApiClient _testEngineClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
@@ -42,19 +45,22 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             ICalculationsApiClient calcsClient,
             IResultsApiClient resultsClient,
             ITestEngineApiClient testEngineClient,
-            IMapper mapper)
+            IMapper mapper,
+            IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(calcsClient, nameof(calcsClient));
             Guard.ArgumentNotNull(resultsClient, nameof(resultsClient));
             Guard.ArgumentNotNull(testEngineClient, nameof(testEngineClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsApiClient;
             _calcsClient = calcsClient;
             _resultsClient = resultsClient;
             _testEngineClient = testEngineClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriod, string fundingStream, ChoosePageBannerOperationType? operationType = null, string operationId = null)
@@ -89,7 +95,8 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 return errorResult;
             }
 
-            FundingStreams = fundingStreamsLookupTask.Result.Content.Select(s => new SelectListItem()
+            IEnumerable<FundingStream> trimmedFundingStreams = await _authorizationHelper.SecurityTrimList(User, fundingStreamsLookupTask.Result.Content, FundingStreamActionTypes.CanChooseFunding);
+            FundingStreams = trimmedFundingStreams.Select(s => new SelectListItem()
             {
                 Text = s.Name,
                 Value = s.Id,
@@ -111,7 +118,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             if (!string.IsNullOrWhiteSpace(fundingPeriod) && !string.IsNullOrWhiteSpace(fundingStream))
             {
                 errorResult = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
-                if(errorResult != null)
+                if (errorResult != null)
                 {
                     return errorResult;
                 }

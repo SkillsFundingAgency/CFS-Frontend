@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Autofac.Core;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Options;
 using CalculateFunding.Frontend.Services;
@@ -73,10 +73,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         private ServiceHealth TryResolveService(Type serviceType)
         {
-            var health = new ServiceHealth { Name = serviceType.GetFriendlyName(), HealthOk = false };
+            ServiceHealth health = new ServiceHealth { Name = serviceType.GetFriendlyName(), HealthOk = false };
             try
             {
-                var service = this.HttpContext.RequestServices.GetService(serviceType);
+                object service = this.HttpContext.RequestServices.GetService(serviceType);
                 health.HealthOk = true;
             }
             catch (DependencyResolutionException drEx)

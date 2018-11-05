@@ -1,8 +1,14 @@
 namespace CalculateFunding.Frontend.Pages.Scenarios
 {
+    // using Serilog;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -10,12 +16,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
-   // using Serilog;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
 
     public class IndexModel : PageModel
     {
@@ -26,7 +26,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         public IndexModel(ISpecsApiClient specsClient, IScenarioSearchService scenariosSearchService)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
-            Guard.ArgumentNotNull(scenariosSearchService, nameof(scenariosSearchService)); 
+            Guard.ArgumentNotNull(scenariosSearchService, nameof(scenariosSearchService));
 
             _specsClient = specsClient;
             _scenarioSearchservice = scenariosSearchService;
@@ -43,10 +43,10 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         [BindProperty]
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
-        public ScenarioSearchResultViewModel ScenarioResults { get; set; }   
+        public ScenarioSearchResultViewModel ScenarioResults { get; set; }
 
         //public async Task<IActionResult> OnGet(int? pageNumber, string searchTerm)
-        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, string fundingPeriodId= null, string specificationId=null )
+        public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, string fundingPeriodId = null, string specificationId = null)
         {
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
@@ -59,7 +59,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
             SearchTerm = searchTerm;
 
             await PopulateFundingPeriods();
-           
+
             ScenarioResults = await _scenarioSearchservice.PerformSearch(searchRequest);
 
             if (ScenarioResults == null)
@@ -76,7 +76,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
-                fundingPeriodId = FundingPeriods.First().Value;             
+                fundingPeriodId = FundingPeriods.First().Value;
             }
 
             FundingPeriodId = fundingPeriodId;
@@ -87,7 +87,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode.Equals(HttpStatusCode.OK) && periodsResponse.Content != null)
             {
@@ -116,7 +116,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 throw new InvalidOperationException($"Unable to retreive Specification information: Status Code = {apiResponse.StatusCode}");
             }
 
-            var specifications = apiResponse.Content.Where(m => m.FundingPeriod.Id == fundingPeriodId);
+            IEnumerable<SpecificationSummary> specifications = apiResponse.Content.Where(m => m.FundingPeriod.Id == fundingPeriodId);
 
             Specifications = specifications.Select(m => new SelectListItem
             {
@@ -125,7 +125,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
             }).ToList();
         }
 
-            private ScenarioSearchResultViewModel GetSearchResults()
+        private ScenarioSearchResultViewModel GetSearchResults()
         {
             ScenarioSearchResultItemViewModel t1 = new ScenarioSearchResultItemViewModel
             {
@@ -147,11 +147,11 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 Status = "Draft",
                 LastUpdatedDateDisplay = "7 Jan 2018"
 
-            };   
+            };
 
             ScenarioSearchResultViewModel results = new ScenarioSearchResultViewModel()
             {
-                Scenarios = new List<ScenarioSearchResultItemViewModel>{ t1, t2}.AsEnumerable()
+                Scenarios = new List<ScenarioSearchResultItemViewModel> { t1, t2 }.AsEnumerable()
             };
 
             return results;

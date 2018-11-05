@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Specs;
+using CalculateFunding.Frontend.UnitTests.Helpers;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
@@ -509,6 +512,53 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             await specsClient
                 .Received(0)
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId));
+        }
+
+        [TestMethod]
+        public async Task EditCalculationPageModel_OnGetAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
+        {
+            // Arrange
+            const string specificationId = "spec1";
+            const string calculationId = "calculationId";
+
+            CalculationCurrentVersion calculation = new CalculationCurrentVersion()
+            {
+                Id = calculationId,
+                Name = "Calculation Name",
+                AllocationLine = new Reference("al1", "Allocation Line"),
+                CalculationType = CalculationType.Funding,
+                Description = "Calculation Description",
+                IsPublic = false,
+                PolicyId = "policyId",
+                PolicyName = "Policy Name"
+            };
+
+            Specification specification = CreateSpecification(specificationId);
+
+            ISpecsApiClient specsClient = CreateSpecsClient();
+
+            specsClient
+                .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
+                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, calculation));
+
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            EditCalculationPageModel pageModel = CreatePageModel(specsClient, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(specificationId, calculationId);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<ForbidResult>();
         }
 
         [TestMethod]
@@ -1050,16 +1100,67 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be("Name was not provided");
         }
 
+        [TestMethod]
+        public async Task EditCalculationPageModel_OnPostAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
+        {
+            // Arrange
+            const string specificationId = "spec1";
+            const string calculationId = "calculationId";
+
+            CalculationCurrentVersion calculation = new CalculationCurrentVersion()
+            {
+                Id = calculationId,
+                Name = "Calculation Name",
+                AllocationLine = new Reference("al1", "Allocation Line"),
+                CalculationType = CalculationType.Funding,
+                Description = "Calculation Description",
+                IsPublic = false,
+                PolicyId = "policyId",
+                PolicyName = "Policy Name"
+            };
+
+            Specification specification = CreateSpecification(specificationId);
+
+            ISpecsApiClient specsClient = CreateSpecsClient();
+
+            specsClient
+                .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
+                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, calculation));
+
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            EditCalculationPageModel pageModel = CreatePageModel(specsClient, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(specificationId, calculationId);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<ForbidResult>();
+        }
+
         public static EditCalculationPageModel CreatePageModel(
             ISpecsApiClient specsClient = null,
-           ILogger logger = null,
-           IMapper mapper = null
-            )
+            ILogger logger = null,
+            IMapper mapper = null,
+            IAuthorizationHelper authorizationHelper = null)
         {
-            return new EditCalculationPageModel(
+            EditCalculationPageModel pageModel = new EditCalculationPageModel(
                 specsClient ?? CreateSpecsClient(),
                 logger ?? CreateLogger(),
-                mapper ?? MappingHelper.CreateFrontEndMapper());
+                mapper ?? MappingHelper.CreateFrontEndMapper(),
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
+            return pageModel;
         }
 
         private static ISpecsApiClient CreateSpecsClient()
@@ -1071,5 +1172,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         {
             return Substitute.For<ILogger>();
         }
+
     }
 }

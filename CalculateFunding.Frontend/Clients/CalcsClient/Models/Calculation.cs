@@ -1,11 +1,12 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
     using System;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using Newtonsoft.Json;
 
-    public class Calculation : Reference
+    public class Calculation : Reference, ISpecificationAuthorizationEntity
     {
         public string SpecificationId { get; set; }
 
@@ -28,5 +29,10 @@
         public CalculationSpecificationType CalculationType { get; set; }
 
         public PublishStatus PublishStatus { get; set; }
+
+        public string GetSpecificationId()
+        {
+            return SpecificationId;
+        }
     }
 }

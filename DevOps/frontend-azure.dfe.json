@@ -193,6 +193,19 @@
         "description": "Should platform authentication be enabled"
       },
       "defaultValue": false
+    },
+    "enableRoleBasedAccess": {
+      "type": "bool",
+      "metadata": {
+        "description": "Should role based access be enabled"
+      },
+      "defaultValue": false
+    },
+    "adminGroupId": {
+      "type": "string",
+      "metadata": {
+        "description": "The id of the AAD group containing admin users"
+      }
     }
   },
   "variables": {
@@ -412,6 +425,14 @@
             {
               "name": "features:aggregateSupportInCalculationsEnabled",
               "value": "[parameters('EnableDatasetAggregations')]"
+            },
+            {
+              "name": "features:roleBasedAccessEnabled",
+              "value": "[parameters('enableRoleBasedAccess')]"
+            },
+            {
+              "name": "permissionOptions:AdminGroupId",
+              "value": "[parameters('adminGroupId')]"
             }
           ]
         }

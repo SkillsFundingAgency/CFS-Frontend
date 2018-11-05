@@ -1,14 +1,14 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.ViewModels.Common;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.ViewModels.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -58,7 +58,8 @@ namespace CalculateFunding.Frontend.Controllers
         {
             ApiResponse<IEnumerable<Reference>> response = await _specsClient.GetFundingPeriods();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
 
                 return Ok(response.Content);
             }
@@ -69,7 +70,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         }
 
-        [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]  
+        [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsForFundingByPeriod(string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
@@ -80,11 +81,11 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
             }
-            else if(apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            else if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                return new BadRequestResult();             
+                return new BadRequestResult();
             }
-            return new StatusCodeResult(500);  
+            return new StatusCodeResult(500);
         }
 
 
@@ -126,5 +127,5 @@ namespace CalculateFunding.Frontend.Controllers
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
             }
         }
-	}
+    }
 }

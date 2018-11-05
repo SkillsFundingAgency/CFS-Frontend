@@ -5,6 +5,8 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
@@ -19,11 +21,17 @@
     {
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CreateSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        public CreateSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _specsClient = specsClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         [BindProperty]
@@ -49,6 +57,11 @@
 
             Specification specification = await GetSpecification(specificationId);
 
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (specification != null)
             {
                 FundingPeriodName = specification.FundingPeriod.Name;
@@ -67,6 +80,13 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            Specification specification = await GetSpecification(specificationId);
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (!string.IsNullOrWhiteSpace(CreateSubPolicyViewModel.Name))
             {
                 ApiResponse<Policy> existingPolicyResponse = await _specsClient.GetPolicyBySpecificationIdAndPolicyName(specificationId, CreateSubPolicyViewModel.Name);
@@ -79,8 +99,6 @@
 
             if (!ModelState.IsValid)
             {
-                Specification specification = await GetSpecification(specificationId);
-
                 SpecificationName = specification.Name;
 
                 SpecificationId = specificationId;

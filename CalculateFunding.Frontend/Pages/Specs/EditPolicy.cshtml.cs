@@ -4,6 +4,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -19,16 +21,19 @@ namespace CalculateFunding.Frontend.Pages.Specs
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper, ILogger logger)
+        public EditPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _mapper = mapper;
             _logger = logger;
+            _authorizationHelper = authorizationHelper;
         }
 
         [BindProperty]
@@ -44,17 +49,20 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         private string PolicyId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync( string specificationId, string policyId)
+        public async Task<IActionResult> OnGetAsync(string specificationId, string policyId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            
             Guard.IsNullOrWhiteSpace(policyId, nameof(policyId));
 
             SpecificationId = specificationId;
-
             PolicyId = policyId;
 
             Specification specification = await GetSpecification(specificationId);
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
 
             if (specification != null)
             {
@@ -66,38 +74,43 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 foreach (Policy policy in specification.Policies)
                 {
-                     if(policy.Id == policyId)
+                    if (policy.Id == policyId)
                     {
                         this.EditPolicyViewModel = _mapper.Map<EditPolicyViewModel>(policy);
                         break;
-                    }                
+                    }
                 }
                 return Page();
             }
             else
             {
                 throw new InvalidOperationException($"Unable to retreive specification");
-            }       
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(string specificationId, string policyId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            Specification specification = await GetSpecification(specificationId);
+
+            if (specification == null)
+            {
+                throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
+            }
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (!ModelState.IsValid)
             {
-                Specification specification = await GetSpecification(specificationId);
- 
-                if (specification == null)
-                {
-                    throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
-                }
-
                 SpecificationName = specification.Name;
 
                 SpecificationId = specificationId;
 
-                return Page();              
+                return Page();
             }
 
             EditPolicyModel updatePolicy = _mapper.Map<EditPolicyModel>(EditPolicyViewModel);
@@ -114,8 +127,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
             {
                 updatePolicyResult.AddValidationResultErrors(ModelState);
 
-                Specification specification = await GetSpecification(specificationId);
-
                 if (specification != null)
                 {
                     SpecificationName = specification.Name;
@@ -123,7 +134,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                     FundingPeriodId = specification.FundingPeriod.Id;
                 }
 
-                return Page();           
+                return Page();
             }
             else
             {

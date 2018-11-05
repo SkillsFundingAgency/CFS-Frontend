@@ -1,10 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
-    using CalculateFunding.Frontend.Helpers;
+    using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
 
     public class TestScenarioResultController : Controller
     {

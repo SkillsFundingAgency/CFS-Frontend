@@ -5,6 +5,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -21,16 +23,19 @@ namespace CalculateFunding.Frontend.Pages.Specs
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper, ILogger logger)
+        public EditSubPolicyPageModel(ISpecsApiClient specsClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _mapper = mapper;
             _logger = logger;
+            _authorizationHelper = authorizationHelper;
         }
 
         [BindProperty]
@@ -51,13 +56,10 @@ namespace CalculateFunding.Frontend.Pages.Specs
         public async Task<IActionResult> OnGetAsync(string specificationId, string subPolicyId, string parentPolicyId)
         {
             Guard.IsNullOrWhiteSpace(subPolicyId, nameof(subPolicyId));
-
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-
             Guard.IsNullOrWhiteSpace(parentPolicyId, nameof(parentPolicyId));
 
             SpecificationId = specificationId;
-
             ParentPolicyId = parentPolicyId;
 
             (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
@@ -67,6 +69,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
 
             Specification specification = specificationQuery.specification;
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             PopulateSpecificationProperites(specification);
 
             foreach (Policy policy in specification.Policies)
@@ -101,14 +109,19 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
+            if (specificationQuery.error != null)
+            {
+                return specificationQuery.error;
+            }
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationQuery.specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (!ModelState.IsValid)
             {
-                (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
-                if (specificationQuery.error != null)
-                {
-                    return specificationQuery.error;
-                }
-
                 PopulateSpecificationProperites(specificationQuery.specification);
 
                 return Page();
@@ -127,12 +140,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
             else if (updateSubPolicyResult.StatusCode == HttpStatusCode.BadRequest)
             {
                 updateSubPolicyResult.AddValidationResultErrors(ModelState);
-
-                (Specification specification, IActionResult error) specificationQuery = await GetSpecification(specificationId);
-                if (specificationQuery.error != null)
-                {
-                    return specificationQuery.error;
-                }
 
                 Specification specification = specificationQuery.specification;
 

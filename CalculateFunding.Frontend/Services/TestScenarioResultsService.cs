@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
@@ -76,7 +76,7 @@ namespace CalculateFunding.Frontend.Services
             await TaskHelper.WhenAllAndThrow(scenarioSearchResultsTask, specificationsLookupTask);
 
             ScenarioSearchResultViewModel scenarioSearchResults = scenarioSearchResultsTask.Result;
-            if(scenarioSearchResults == null)
+            if (scenarioSearchResults == null)
             {
                 _logger.Warning("Scenario Search Results response was null");
                 throw new InvalidOperationException("Scenario Search Results response was null");
@@ -105,7 +105,7 @@ namespace CalculateFunding.Frontend.Services
             TestScenarioResultViewModel result = _mapper.Map<TestScenarioResultViewModel>(scenarioSearchResults);
 
             List<ReferenceViewModel> specifications = new List<ReferenceViewModel>();
-            foreach (SpecificationSummary specification in specificationsApiResponse.Content.OrderBy(s=>s.Name))
+            foreach (SpecificationSummary specification in specificationsApiResponse.Content.OrderBy(s => s.Name))
             {
                 specifications.Add(new ReferenceViewModel(specification.Id, specification.Name));
             }

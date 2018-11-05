@@ -4,11 +4,12 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -17,7 +18,6 @@
     using CalculateFunding.Frontend.ViewModels.TestEngine;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
     public class ViewProviderTestResultsPageModel : PageModel
     {
@@ -93,7 +93,7 @@
                 return new InternalServerErrorResult("Provider Results returned null");
             }
 
-            if ( countTask.Result == null)
+            if (countTask.Result == null)
             {
                 return new InternalServerErrorResult("Count Task result was null");
             }

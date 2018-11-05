@@ -1,19 +1,19 @@
 namespace CalculateFunding.Frontend.Pages.Scenarios
 {
+    using System.Net;
+    using System.Text.Encodings.Web;
+    using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Serilog;
-    using System.Net;
-    using System.Threading.Tasks;
-    using System.Text.Encodings.Web;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Extensions;
 
     public class EditTestScenarioPageModel : PageModel
     {

@@ -1,19 +1,19 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
@@ -109,8 +109,8 @@ namespace CalculateFunding.Frontend.Pages.Results
                 }
                 else
                 {
-                    _logger.Warning("There were no providers for the given specification Id " +specificationId);
-                }               
+                    _logger.Warning("There were no providers for the given specification Id " + specificationId);
+                }
             }
         }
 
@@ -118,13 +118,13 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
 
-            if(periodsResponse.StatusCode != HttpStatusCode.OK )
+            if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            var fundingPeriods = periodsResponse.Content;
+            IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
@@ -141,7 +141,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateSpecifications(string providerId, string specificationId = null)
         {
-            var specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
+            ApiResponse<IEnumerable<string>> specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {

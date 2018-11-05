@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Core.Telemetry
 {
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Core.Logging;
-    using CalculateFunding.Frontend.Helpers;
     using Microsoft.ApplicationInsights.Channel;
     using Microsoft.ApplicationInsights.Extensibility;
 

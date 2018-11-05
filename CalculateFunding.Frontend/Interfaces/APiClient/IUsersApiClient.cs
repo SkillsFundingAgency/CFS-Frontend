@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.UsersClient.Models;
 
@@ -9,5 +10,9 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<ApiResponse<User>> GetUserByUserId(string userId);
 
         Task<ValidatedApiResponse<User>> ConfirmSkills(string userId, UserConfirmModel userConfirmModel);
+
+        Task<ApiResponse<IEnumerable<FundingStreamPermission>>> GetFundingStreamPermissionsForUser(string userId);
+
+        Task<ApiResponse<FundingStreamPermission>> GetEffectivePermissionsForUser(string userId, string specificationId);
     }
 }

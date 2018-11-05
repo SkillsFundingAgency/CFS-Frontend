@@ -4,16 +4,18 @@
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.FeatureToggles;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;
+    using CalculateFunding.Frontend.UnitTests.Helpers;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using Castle.Core.Logging;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,15 +29,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         public async Task OnGet_WhenCalculationDoesNotExistThenNotFoundReturned()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
 
             string calculationId = "5";
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -50,10 +48,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
 
             string calculationId = "5";
 
@@ -64,7 +59,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 SpecificationId = "54",
             }));
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(calcsClient: calcsClient, mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -81,8 +76,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
 
             const string calculationId = "5";
             const string specificationId = "specId";
@@ -96,7 +89,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 SourceCode = "Test Source Code"
             };
 
-            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -109,7 +102,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
             Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
             {
@@ -121,7 +114,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(System.Net.HttpStatusCode.OK, specificationSummary));
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -157,9 +150,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
-
+            
             string calculationId = "5";
 
             Calculation calcsCalculation = new Calculation()
@@ -171,7 +162,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Number
             };
 
-            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -184,9 +175,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -210,8 +201,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
 
             string calculationId = "5";
 
@@ -224,7 +213,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
             };
 
-            Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion()
+            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -237,9 +226,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -260,15 +249,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         public async Task OnGet_WhenCalculationIdNotProvidedThenBadResultReturned()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            ILogger logger = Substitute.For<ILogger>();
 
             string calculationId = null;
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(mapper: mapper);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -290,19 +275,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         public async Task OnGet_WhenIsAggregateSupportInCalculationsEnabled_SetsPropertyToTrue()
         {
             // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
             featureToggle
                 .IsAggregateSupportInCalculationsEnabled()
                 .Returns(true);
 
-            ILogger logger = Substitute.For<ILogger>();
-
             string calculationId = null;
 
-            EditCalculationPageModel pageModel = new EditCalculationPageModel(specsClient, calcsClient, mapper, featureToggle);
+            EditCalculationPageModel pageModel = CreatePageModel(features: featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -312,6 +292,103 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .ShouldAggregateSupportForCalculationsBeEnabled
                 .Should()
                 .BeTrue();
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenUserDoesNotHaveEditCalculationsPermission_ThenReturnsForbidResult()
+        {
+            // Arrange
+            string calculationId = "5";
+            Calculation calcsCalculation = new Calculation()
+            {
+                SpecificationId = "abc123"
+            };
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .GetCalculationById(calculationId)
+                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+
+            IAuthorizationHelper mockAuthHelper = Substitute.For<IAuthorizationHelper>();
+            mockAuthHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditCalculations)).Returns(false);
+
+            EditCalculationPageModel pageModel = CreatePageModel(calcsClient: calcsClient, authorizationHelper: mockAuthHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGet("5");
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenUserDoesNotHaveEditCalculationsPermission_ThenReturn403()
+        {
+            // Arrange
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            string calculationId = "5";
+
+            Calculation calcsCalculation = new Calculation()
+            {
+                SpecificationId = "abc123"
+            };
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .GetCalculationById(calculationId)
+                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditCalculations))
+                .Returns(false);
+
+            EditCalculationPageModel pageModel = CreatePageModel(calcsClient: calcsClient, mapper: mapper, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGet(calculationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        private static EditCalculationPageModel CreatePageModel(
+            ISpecsApiClient specsClient = null,
+            ICalculationsApiClient calcsClient = null,
+            IMapper mapper = null,
+            IFeatureToggle features = null,
+            IAuthorizationHelper authorizationHelper = null)
+        {
+            EditCalculationPageModel pageModel = new EditCalculationPageModel(
+                specsClient ?? CreateSpecsApiClient(),
+                calcsClient ?? CreateCalcsApiClient(),
+                mapper ?? CreateMapper(),
+                features ?? CreateFeatureToggle(),
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditCalculations));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
+            return pageModel;
+        }
+
+        private static ISpecsApiClient CreateSpecsApiClient()
+        {
+            return Substitute.For<ISpecsApiClient>();
+        }
+
+        private static ICalculationsApiClient CreateCalcsApiClient()
+        {
+            return Substitute.For<ICalculationsApiClient>();
+        }
+
+        private static IMapper CreateMapper()
+        {
+            return Substitute.For<IMapper>();
+        }
+
+        private static IFeatureToggle CreateFeatureToggle()
+        {
+            return Substitute.For<IFeatureToggle>();
         }
     }
 }
