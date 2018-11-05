@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Users
 
             IRequestCookieCollection cookies = new RequestCookieCollection(new System.Collections.Generic.Dictionary<string, string>
             {
-                { UserContstants.SkillsConfirmationCookieName, "true" }
+                { UserConstants.SkillsConfirmationCookieName, "true" }
             });
 
             httpContext.Request.Cookies = cookies;

@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Specs;

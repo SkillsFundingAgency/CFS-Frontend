@@ -6,6 +6,8 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -19,16 +21,18 @@
     public class CreateSpecificationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
-
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CreateSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        public CreateSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
@@ -62,6 +66,11 @@
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
 
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification.FundingStreamIds, FundingStreamActionTypes.CanCreateSpecification))
+            {
+                return new ForbidResult();
+            }
+
             ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
             if (result.StatusCode.IsSuccess())
             {
@@ -83,11 +92,11 @@
 
         private async Task PopulateFundingStreams()
         {
-            var fundingStreamsResponse = await _specsClient.GetFundingStreams();
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = await _specsClient.GetFundingStreams();
 
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
-                var fundingStreams = fundingStreamsResponse.Content;
+                IEnumerable<FundingStream> fundingStreams = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
 
                 FundingStreams = fundingStreams.Select(m => new SelectListItem
                 {
@@ -107,7 +116,7 @@
 
             if (fundingPeriodsResponse.StatusCode == HttpStatusCode.OK && !fundingPeriodsResponse.Content.IsNullOrEmpty())
             {
-                var fundingPeriods = fundingPeriodsResponse.Content;
+                IEnumerable<Reference> fundingPeriods = fundingPeriodsResponse.Content;
 
                 FundingPeriods = fundingPeriods.Select(m => new SelectListItem
                 {

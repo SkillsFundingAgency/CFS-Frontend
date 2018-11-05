@@ -3,6 +3,7 @@
     using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients;
     using CalculateFunding.Frontend.Clients.CalcsClient;
     using CalculateFunding.Frontend.Clients.CommonModels;
@@ -13,7 +14,6 @@
     using CalculateFunding.Frontend.Clients.TestEngineClient;
     using CalculateFunding.Frontend.Clients.UsersClient;
     using CalculateFunding.Frontend.Core.Ioc;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using Microsoft.Extensions.DependencyInjection;

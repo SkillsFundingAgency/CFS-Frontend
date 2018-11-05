@@ -1,17 +1,17 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Datasets
 {
+    using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using System.Threading.Tasks;
-  
+
     public class ManageDatasetsPageModel : PageModel
     {
         private IDatasetSearchService _searchService;
@@ -62,27 +62,27 @@
                 {
                     return errorResult;
                 }
-              
+
                 DatasetVersionResponse DatsetVersion = datasetVersionResponse.Content;
-              
+
                 PageBanner = new PageBannerOperation()
                 {
                     EntityName = DatsetVersion.Name,
                     EntityType = "Data Source",
                     OperationId = operationId,
                     DisplayOperationActionSummary = true,
-                    CurrentDataSourceRows =   DatsetVersion.CurrentDataSourceRows,
-                    PreviousDataSourceRows =  DatsetVersion.PreviousDataSourceRows,
-                    SecondaryActionUrl = $"/datasets/updatedataset?datasetId={operationId}",  
+                    CurrentDataSourceRows = DatsetVersion.CurrentDataSourceRows,
+                    PreviousDataSourceRows = DatsetVersion.PreviousDataSourceRows,
+                    SecondaryActionUrl = $"/datasets/updatedataset?datasetId={operationId}",
                 };
 
                 switch (operationType)
                 {
                     case DatasetPageBannerOperationType.DatasetCreated:
-                        PageBanner.OperationActionSummaryText = "A new data source with " +PageBanner.CurrentDataSourceRows + " data rows uploaded";
+                        PageBanner.OperationActionSummaryText = "A new data source with " + PageBanner.CurrentDataSourceRows + " data rows uploaded";
                         break;
                     case DatasetPageBannerOperationType.DatasetUpdated:
-                        PageBanner.OperationActionSummaryText = "A new version of a data source with "+ PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
+                        PageBanner.OperationActionSummaryText = "A new version of a data source with " + PageBanner.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + PageBanner.PreviousDataSourceRows + "  data rows";
                         break;
                 }
             }

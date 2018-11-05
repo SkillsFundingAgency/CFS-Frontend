@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Clients.CommonModels

@@ -2,10 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using Newtonsoft.Json;
 
-    public class Specification : Reference
+    public class Specification : Reference, ISpecificationAuthorizationEntity
     {
         public Specification()
         {
@@ -30,5 +31,9 @@
         [JsonProperty("isSelectedForFunding")]
         public bool IsSelectedForFunding { get; set; }
 
+        public string GetSpecificationId()
+        {
+            return Id;
+        }
     }
 }

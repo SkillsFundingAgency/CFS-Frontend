@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Specs;
+using CalculateFunding.Frontend.UnitTests.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
@@ -387,7 +391,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(fundingStreams);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper, authorizationHelper);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(specificationId);
@@ -462,7 +474,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(fundingStreams);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper, authorizationHelper);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(specificationId);
@@ -488,6 +508,29 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
+        {
+            // Arrange
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification { Id = specificationId }));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(specificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
         }
 
         [TestMethod]
@@ -640,7 +683,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(fundingStreams);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: apiClient, authorizationHelper: authorizationHelper);
 
             pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
@@ -823,9 +874,36 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
         }
 
-        private static EditSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null)
+        [TestMethod]
+        public async Task OnPostAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
         {
-            return new EditSpecificationPageModel(specsClient ?? CreateApiClient(), mapper ?? CreateMapper());
+            // Arrange
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification { Id = specificationId }));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(specificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        private static EditSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        {
+            EditSpecificationPageModel pageModel = new EditSpecificationPageModel(specsClient ?? CreateApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
+
+            return pageModel;
         }
 
         private static ISpecsApiClient CreateApiClient()

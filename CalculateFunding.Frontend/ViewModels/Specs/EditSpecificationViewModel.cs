@@ -2,9 +2,10 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Properties;
 
-    public class EditSpecificationViewModel
+    public class EditSpecificationViewModel : ISpecificationAuthorizationEntity
     {
         public string Id { get; set; }
 
@@ -27,5 +28,10 @@
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingPeriodRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string FundingPeriodId { get; set; }
+
+        public string GetSpecificationId()
+        {
+            return Id;
+        }
     }
 }

@@ -1,21 +1,21 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Results
 {
+    using System;
+    using System.Linq;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
-    using System;
-    using System.Linq;
 
     public class ProviderAllocationLinePageModel : ProviderResultsBasePageModel
     {
         private ILogger _logger;
 
         public ProviderAllocationLinePageModel(IResultsApiClient resultsApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
-            :base(resultsApiClient, mapper, specsApiClient, logger)
+            : base(resultsApiClient, mapper, specsApiClient, logger)
         {
             _logger = logger;
         }
@@ -24,7 +24,7 @@
         {
             Guard.ArgumentNotNull(providerResponse, nameof(providerResponse));
 
-            if(providerResponse.Content == null)
+            if (providerResponse.Content == null)
             {
                 _logger.Error("Provider result content is null");
                 throw new InvalidOperationException("Provider result content is null");

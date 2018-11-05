@@ -4,6 +4,10 @@
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using CalculateFunding.Common.Identity.Authorization;
+    using CalculateFunding.Common.Identity.Authorization.Repositories;
+    using CalculateFunding.Common.Utility;
+    using CalculateFunding.Frontend.Clients;
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
@@ -45,7 +49,7 @@
         {
             AzureAdOptions azureAdOptions = new AzureAdOptions();
             Configuration.Bind("AzureAd", azureAdOptions);
-			_authenticationEnabled = azureAdOptions.IsEnabled;
+            _authenticationEnabled = azureAdOptions.IsEnabled;
 
             if (_authenticationEnabled)
             {
@@ -56,6 +60,20 @@
                 })
                 .AddAzureAd(options => Configuration.Bind("AzureAd", options))
                 .AddCookie();
+
+                services.AddAuthorization();
+
+                services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
+                services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
+
+                services.AddSingleton<IPermissionsRepository, PermissionsRepository>();
+                services.Configure<PermissionOptions>(options =>
+                {
+                    Configuration.GetSection("permissionOptions").Bind(options);
+                    options.HttpClientName = HttpClientKeys.Users;
+                });
+
+                services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
 
                 services.AddMvc(config =>
                 {
@@ -69,6 +87,13 @@
             }
             else
             {
+                services.AddAuthorization();
+
+                services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
+
+                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
+                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
+
                 services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             }
 

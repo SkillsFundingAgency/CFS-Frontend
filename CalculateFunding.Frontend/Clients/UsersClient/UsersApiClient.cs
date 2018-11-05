@@ -1,8 +1,9 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.UsersClient.Models;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Http;
 using Serilog;
@@ -28,6 +29,21 @@ namespace CalculateFunding.Frontend.Clients.UsersClient
             Guard.IsNullOrWhiteSpace(userId, nameof(userId));
 
             return await ValidatedPostAsync<User, UserConfirmModel>($"confirm-skills?userId={userId}", userConfirmModel);
+        }
+
+        public async Task<ApiResponse<IEnumerable<FundingStreamPermission>>> GetFundingStreamPermissionsForUser(string userId)
+        {
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+
+            return await GetAsync<IEnumerable<FundingStreamPermission>>($"{userId}/permissions");
+        }
+
+        public async Task<ApiResponse<FundingStreamPermission>> GetEffectivePermissionsForUser(string userId, string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            return await GetAsync<FundingStreamPermission>($"{userId}/effectivepermissions/{specificationId}");
         }
     }
 }

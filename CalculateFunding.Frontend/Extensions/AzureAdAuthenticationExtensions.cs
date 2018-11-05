@@ -1,10 +1,10 @@
-﻿using CalculateFunding.Frontend.Helpers;
+﻿using System;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
 
 namespace CalculateFunding.Frontend.Extensions
 {
@@ -27,8 +27,10 @@ namespace CalculateFunding.Frontend.Extensions
 
             public ConfigureAzureOptions(IOptions<AzureAdOptions> azureOptions)
             {
-                if(azureOptions.Value != null)
+                if (azureOptions.Value != null)
+                {
                     _azureOptions = azureOptions.Value;
+                }
             }
 
             public void Configure(string name, OpenIdConnectOptions options)

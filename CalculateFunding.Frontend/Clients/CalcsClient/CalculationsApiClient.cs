@@ -4,9 +4,9 @@
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.AspNetCore.Http;
     using Serilog;

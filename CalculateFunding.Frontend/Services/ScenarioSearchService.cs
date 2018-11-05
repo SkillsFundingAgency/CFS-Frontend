@@ -1,16 +1,16 @@
 ﻿namespace CalculateFunding.Frontend.Services
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Serilog;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     public class ScenarioSearchService : IScenarioSearchService
     {

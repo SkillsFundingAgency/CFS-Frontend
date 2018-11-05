@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Microsoft.AspNetCore.Mvc;
@@ -53,7 +53,7 @@
 
         [Route("api/specs/{specificationId}/calculations/{calculationId}/compilePreview")]
         [HttpPost]
-        public async Task<IActionResult> CompilePreview([FromRoute]string specificationId,[FromRoute] string calculationId, [FromBody]PreviewCompileRequestViewModel vm)
+        public async Task<IActionResult> CompilePreview([FromRoute]string specificationId, [FromRoute] string calculationId, [FromBody]PreviewCompileRequestViewModel vm)
         {
             if (!ModelState.IsValid)
             {
@@ -83,7 +83,7 @@
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<IEnumerable<TypeInformation>> response = await _calcClient.GetCodeContextForSpecification(specificationId);
-            if(response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }

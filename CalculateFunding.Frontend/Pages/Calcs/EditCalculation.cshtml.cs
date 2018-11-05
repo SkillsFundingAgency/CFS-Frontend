@@ -3,6 +3,8 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Helpers;
@@ -17,16 +19,19 @@
         private ISpecsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
+        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public CalculationViewModel Calculation { get; set; }
@@ -52,7 +57,12 @@
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
-           
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanEditCalculations))
+            {
+                return new ForbidResult();
+            }
+
             ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {

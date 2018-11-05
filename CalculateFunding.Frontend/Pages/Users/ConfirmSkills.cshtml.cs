@@ -38,7 +38,7 @@ namespace CalculateFunding.Frontend.Pages.Users
             {
                 string userName = this.HttpContext.User.Identity.Name;
 
-                if (!Request.Cookies.ContainsKey(UserContstants.SkillsConfirmationCookieName))
+                if (!Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName))
                 {
                     UserProfile userProfile = _userProfileService.GetUser();
 
@@ -71,7 +71,7 @@ namespace CalculateFunding.Frontend.Pages.Users
                 HttpOnly = true
             };
 
-            Response.Cookies.Append(UserContstants.SkillsConfirmationCookieName, "true", option);
+            Response.Cookies.Append(UserConstants.SkillsConfirmationCookieName, "true", option);
         }
     }
 }

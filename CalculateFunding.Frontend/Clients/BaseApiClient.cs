@@ -7,8 +7,8 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Helpers;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;

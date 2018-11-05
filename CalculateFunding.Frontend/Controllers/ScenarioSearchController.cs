@@ -1,11 +1,11 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
-    using CalculateFunding.Frontend.Helpers;
+    using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
 
     public class ScenarioSearchController : Controller
     {
@@ -26,7 +26,7 @@
 
             ScenarioSearchResultViewModel result = await _scenarioSearchService.PerformSearch(request);
 
-            if(result != null)
+            if (result != null)
             {
                 return Ok(result);
             }

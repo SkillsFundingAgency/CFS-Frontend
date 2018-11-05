@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -21,14 +23,17 @@ namespace CalculateFunding.Frontend.Pages.Specs
     {
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        public EditSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public IEnumerable<SelectListItem> FundingPeriods { get; set; }
@@ -46,6 +51,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content != null)
             {
+                if (!await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanEditSpecification))
+                {
+                    return new ForbidResult();
+                }
+
                 EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
                 EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
                 EditSpecificationViewModel.OriginalFundingStreams = string.Join(",", EditSpecificationViewModel.FundingStreamIds);
@@ -63,6 +73,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
+            if (!await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (!string.IsNullOrWhiteSpace(EditSpecificationViewModel.Name) && EditSpecificationViewModel.Name != EditSpecificationViewModel.OriginalSpecificationName)
             {
                 ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(EditSpecificationViewModel.Name);
@@ -91,9 +106,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
             EditSpecificationModel specification = _mapper.Map<EditSpecificationModel>(EditSpecificationViewModel);
 
             HttpStatusCode editResult = await _specsClient.UpdateSpecification(specificationId, specification);
-            if(editResult == HttpStatusCode.OK)
+            if (editResult == HttpStatusCode.OK)
             {
-                if(returnPage == EditSpecificationRedirectAction.ManagePolicies)
+                if (returnPage == EditSpecificationRedirectAction.ManagePolicies)
                 {
                     return Redirect($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
                 }
@@ -110,7 +125,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         private async Task PopulateFundingStreams(IEnumerable<string> fundingStreamIds)
         {
-            var fundingStreamsResponse = await _specsClient.GetFundingStreams();
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = await _specsClient.GetFundingStreams();
 
             if (fundingStreamsResponse == null)
             {
@@ -119,7 +134,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
-                IEnumerable<SelectListItem> fundingStreams = fundingStreamsResponse.Content.Select(m => new SelectListItem
+                IEnumerable<FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
+
+                IEnumerable <SelectListItem> fundingStreams = trimmedResults.Select(m => new SelectListItem
                 {
                     Value = m.Id,
                     Text = m.Name,
@@ -144,7 +161,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (fundingPeriodsResponse.StatusCode == HttpStatusCode.OK && !fundingPeriodsResponse.Content.IsNullOrEmpty())
             {
-                var fundingPeriods = fundingPeriodsResponse.Content;
+                IEnumerable<Reference> fundingPeriods = fundingPeriodsResponse.Content;
 
                 FundingPeriods = fundingPeriods.Select(m => new SelectListItem
                 {

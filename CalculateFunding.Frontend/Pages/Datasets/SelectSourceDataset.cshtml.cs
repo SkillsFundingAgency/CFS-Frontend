@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -16,15 +18,19 @@
 
     public class SelectSourceDatasetPageModel : PageModel
     {
-        private IDatasetsApiClient _datasetClient;
+        private readonly IDatasetsApiClient _datasetClient;
         private readonly ILogger _logger;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public SelectSourceDatasetPageModel(IDatasetsApiClient datasetClient, ILogger logger)
+        public SelectSourceDatasetPageModel(IDatasetsApiClient datasetClient, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(datasetClient, nameof(datasetClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _datasetClient = datasetClient;
             _logger = logger;
+            _authorizationHelper = authorizationHelper;
         }
 
         public SelectDataSourceViewModel ViewModel { get; set; }
@@ -33,10 +39,25 @@
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            SelectDataSourceViewModel viewModel = await PopulateViewModel(relationshipId);
+            ApiResponse<SelectDataSourceModel> sourcesResponse = await _datasetClient.GetDatasourcesByRelationshipId(relationshipId);
+
+            if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
+            {
+                _logger.Error($"Failed to fetch data sources with status code {sourcesResponse.StatusCode.ToString()}");
+                return NotFound();
+            }
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets))
+            {
+                return new ForbidResult();
+            }
+
+            SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
 
             if (viewModel == null)
+            {
                 return new StatusCodeResult(500);
+            }
 
             ViewModel = viewModel;
 
@@ -47,14 +68,29 @@
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
+            ApiResponse<SelectDataSourceModel> sourcesResponse = await _datasetClient.GetDatasourcesByRelationshipId(relationshipId);
+
+            if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
+            {
+                _logger.Error($"Failed to fetch data sources with status code {sourcesResponse.StatusCode.ToString()}");
+                return NotFound();
+            }
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets))
+            {
+                return new ForbidResult();
+            }
+
             if (string.IsNullOrWhiteSpace(datasetVersion))
             {
                 this.ModelState.AddModelError($"{nameof(ViewModel)}.{nameof(datasetVersion)}", "");
 
-                SelectDataSourceViewModel viewModel = await PopulateViewModel(relationshipId);
+                SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
 
                 if (viewModel == null)
+                {
                     return new StatusCodeResult(500);
+                }
 
                 ViewModel = viewModel;
 
@@ -87,18 +123,8 @@
             return new StatusCodeResult(500);
         }
 
-        private async Task<SelectDataSourceViewModel> PopulateViewModel(string relationshipId)
+        private SelectDataSourceViewModel PopulateViewModel(SelectDataSourceModel selectDatasourceModel)
         {
-            ApiResponse<SelectDataSourceModel> sourcesResponse = await _datasetClient.GetDatasourcesByRelationshipId(relationshipId);
-
-            if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
-            {
-                _logger.Error($"Failed to fetch data sources with status code {sourcesResponse.StatusCode.ToString()}");
-                return null;
-            }
-
-            SelectDataSourceModel selectDatasourceModel = sourcesResponse.Content;
-
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel
             {
                 SpecificationId = selectDatasourceModel.SpecificationId,
@@ -113,7 +139,7 @@
 
             if (!selectDatasourceModel.Datasets.IsNullOrEmpty())
             {
-                foreach(DatasetVersionsModel datasetVersionModel in selectDatasourceModel.Datasets)
+                foreach (DatasetVersionsModel datasetVersionModel in selectDatasourceModel.Datasets)
                 {
                     datasets.Add(new DatasetVersionsViewModel
                     {

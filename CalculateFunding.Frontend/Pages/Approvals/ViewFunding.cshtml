@@ -126,7 +126,7 @@
             <div class="col-xs-12">
                 <div class="float-right" style="display:inline">
                     <span>Last refreshed on: </span><span data-bind="text: selectedSpecification() ? selectedSpecification().publishedResultsRefreshedAtDisplay() : 'Not available'"></span>
-                    <button class="refresh-btn" type="button" data-bind="click: refreshFundingSnapshot">
+                    <button class="refresh-btn" type="button" data-bind="click: refreshFundingSnapshot, enable: canRefreshFunding">
                         <i class="material-icons">refresh</i>
                         <span>Refresh funding</span>
                     </button>
@@ -606,7 +606,8 @@
             "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status",
             "fundingPeriodUrl": "/api/specs/funding-periods",
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
-            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}"
+            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
+            "permissionsUrl": "/api/users/effectivepermissions/{specificationId}"
         };
 
             var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
@@ -627,7 +628,8 @@
             "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status",
             "fundingPeriodUrl": "/api/specs/funding-periods",
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
-            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}"
+            "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
+            "permissionsUrl": "/api/users/effectivepermissions/{specificationId}"
         };
 
             var vfVM = new calculateFunding.approvals.two.ViewFundingViewModel(settings);

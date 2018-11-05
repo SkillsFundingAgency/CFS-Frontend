@@ -6,6 +6,8 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
@@ -21,13 +23,19 @@
     {
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
         private static readonly IEnumerable<string> _calculationTypes = new[] { CalculationSpecificationType.Funding.ToString(), CalculationSpecificationType.Number.ToString() };
 
-        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _specsClient = specsClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         [BindProperty]
@@ -63,6 +71,11 @@
 
             Specification specification = await GetSpecification(specificationId);
 
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (specification != null)
             {
                 FundingPeriodName = specification.FundingPeriod.Name;
@@ -77,10 +90,10 @@
             return Page();
         }
 
-        async Task<IActionResult> PopulateForm(Specification specification)
+        private async Task<IActionResult> PopulateForm(Specification specification)
         {
             IActionResult populateResult = await PopulateAllocationLines(specification.Id);
-            if(populateResult != null)
+            if (populateResult != null)
             {
                 return populateResult;
             }
@@ -101,6 +114,13 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            Specification specification = await GetSpecification(specificationId);
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
             if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
             {
                 ApiResponse<Calculation> existingCalculationResponse = await _specsClient.GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
@@ -118,8 +138,6 @@
 
             if (!ModelState.IsValid)
             {
-                Specification specification = await GetSpecification(specificationId);
-
                 SpecificationName = specification.Name;
 
                 SpecificationId = specificationId;
@@ -167,8 +185,8 @@
 
             if (specification.Policies != null)
             {
-                var policiesGroup = new SelectListGroup { Name = "Policies" };
-                var subPoliciesGroup = new SelectListGroup { Name = "Subpolicies" };
+                SelectListGroup policiesGroup = new SelectListGroup { Name = "Policies" };
+                SelectListGroup subPoliciesGroup = new SelectListGroup { Name = "Subpolicies" };
 
                 foreach (Policy policy in specification.Policies)
                 {

@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
@@ -38,10 +38,10 @@
 
         async private Task PopulateDefinitions()
         {
-            var definitionsResponse = await _datasetApiClient.GetDataDefinitions();
+            Clients.CommonModels.ApiResponse<IEnumerable<Clients.DatasetsClient.Models.DatasetDefinition>> definitionsResponse = await _datasetApiClient.GetDataDefinitions();
             if (definitionsResponse.StatusCode == HttpStatusCode.OK)
             {
-                var defintions = definitionsResponse.Content;
+                IEnumerable<Clients.DatasetsClient.Models.DatasetDefinition> defintions = definitionsResponse.Content;
 
                 DatasetDefinitions = defintions.Select(m => new GdsSelectListItem
                 {

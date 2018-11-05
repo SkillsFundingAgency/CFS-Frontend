@@ -1,17 +1,21 @@
-﻿using CalculateFunding.Frontend.Interfaces.ApiClient;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Pages.Datasets;
+using CalculateFunding.Frontend.UnitTests.Helpers;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
-using CalculateFunding.Frontend.Pages.Datasets;
-using System;
-using System.Threading.Tasks;
-using FluentAssertions;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Linq;
 
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
@@ -38,10 +42,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenRelationshipIdButGettingSourceModelReturnedInternalServerError_Returns500()
+        public async Task OnGetAsync_GivenRelationshipIdButGettingSourceModelReturnedInternalServerError_Returns404()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError);
+            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
@@ -58,14 +63,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             //Assert
             result
                 .Should()
-                .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
-                .Should()
-                .Be(500);
+                .BeOfType<NotFoundResult>();
 
             logger
                 .Received(1)
@@ -73,7 +71,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenRelationshipIdAndGettingSourceModelReturnsOkButNullContent_Returns500()
+        public async Task OnGetAsync_GivenRelationshipIdAndGettingSourceModelReturnsOkButNullContent_Returns404()
         {
             // Arrange
             ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK);
@@ -93,14 +91,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             //Assert
             result
                 .Should()
-                .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
-                .Should()
-                .Be(500);
+                .BeOfType<NotFoundResult>();
 
             logger
                 .Received(1)
@@ -176,11 +167,42 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         }
 
         [TestMethod]
+        public async Task OnGetAsync_GivenUserDoesNotHaveMapDatasetsPermission_Returns403()
+        {
+            // Arrange
+            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+            datasetsApiClient
+                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .Returns(sourcesResponse);
+
+            ILogger logger = CreateLogger();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
+                .Returns(false);
+
+            SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger, authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(relationshipId);
+
+            //Assert
+            result
+                .Should()
+                .BeOfType<ForbidResult>();
+        }
+
+        [TestMethod]
         public void OnPostAsync_GivenNullOrEmptyDatasetIdAndNullOrEmptyRelationshipId_ThrowsArgumentNullException()
         {
             // Arrange
             SelectSourceDatasetPageModel pageModel = CreatePageModel();
-            
+
             // Act
             Func<Task> test = async () => await pageModel.OnPostAsync(null, "", null);
 
@@ -191,10 +213,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         }
 
         [TestMethod]
-        public async Task OnPostAsync_GivenDatasetVersionIsNullAndGettingRelationshipReturnsInternalServerError_Returns500()
+        public async Task OnPostAsync_GivenDatasetVersionIsNullAndGettingRelationshipReturnsInternalServerError_Returns404()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError);
+            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
@@ -211,14 +234,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             //Assert
             result
                 .Should()
-                .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
-                .Should()
-                .Be(500);
+                .BeOfType<NotFoundResult>();
 
             logger
                 .Received(1)
@@ -255,7 +271,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenDatasetVersionIsInvalid_Returns500()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK);
+            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
@@ -316,7 +333,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenValidDatsetVersionButSavingIsUnsuccessful_Returns500()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK);
+            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
@@ -332,7 +350,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger);
 
             // Act
-            IActionResult result = await pageModel.OnPostAsync(relationshipId, specificationId, $"{datasetId}_2" );
+            IActionResult result = await pageModel.OnPostAsync(relationshipId, specificationId, $"{datasetId}_2");
 
             //Assert
             result
@@ -355,7 +373,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenValidDatsetVersionAndSavingIsUnsuccessful_ReturnsRedirect()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK);
+            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
@@ -386,12 +405,42 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Be($"/datasets/specificationrelationships?specificationId={specificationId}&wasSuccess=true");
         }
 
-        private static SelectSourceDatasetPageModel CreatePageModel(IDatasetsApiClient datasetClient = null, 
-            ILogger logger = null)
+        [TestMethod]
+        public async Task OnPostAsync_GivenUserDoesNotHaveMapDatasetsPermission_Returns403()
         {
-            SelectSourceDatasetPageModel pageModel = new SelectSourceDatasetPageModel(datasetClient ?? CreateDatasetsApiClient(), logger ?? CreateLogger());
+            // Arrange
+            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
 
-            pageModel.PageContext = new PageContext();
+            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+            datasetsApiClient
+                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .Returns(sourcesResponse);
+
+            ILogger logger = CreateLogger();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
+                .Returns(false);
+
+            SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger, authorizationHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(relationshipId, specificationId);
+
+            //Assert
+            result
+                .Should()
+                .BeOfType<ForbidResult>();
+        }
+
+        private static SelectSourceDatasetPageModel CreatePageModel(IDatasetsApiClient datasetClient = null, ILogger logger = null, IAuthorizationHelper authorizationHelper = null)
+        {
+            SelectSourceDatasetPageModel pageModel = new SelectSourceDatasetPageModel(datasetClient ?? CreateDatasetsApiClient(), logger ?? CreateLogger(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanMapDatasets));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
 
             return pageModel;
         }

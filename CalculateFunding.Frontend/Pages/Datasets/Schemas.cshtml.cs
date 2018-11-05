@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;

@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Common
 {
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.Utility;
 
     public class PagerPartialViewModel
     {

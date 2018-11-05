@@ -1,20 +1,24 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Specs;
+using CalculateFunding.Frontend.UnitTests.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
@@ -109,7 +113,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .BeAssignableTo<InternalServerErrorResult>();
         }
 
-
         [TestMethod]
         public async Task OnGetAsync_GivenSpecificationFound_PopulatesFormReturnsPage()
         {
@@ -196,6 +199,24 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Any()
                 .Should()
                 .BeTrue();
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnsForbidResult()
+        {
+            // Arrange
+            IAuthorizationHelper mockAuthHelper = Substitute.For<IAuthorizationHelper>();
+            mockAuthHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            CreateCalculationPageModel pageModel = CreatePageModel(authorizationHelper: mockAuthHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnGetAsync(specificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
         }
 
         [TestMethod]
@@ -524,6 +545,24 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .ThrowExactly<InvalidOperationException>();
         }
 
+        [TestMethod]
+        public async Task OnPost_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnsForbidResult()
+        {
+            // Arrange
+            IAuthorizationHelper mockAuthHelper = Substitute.For<IAuthorizationHelper>();
+            mockAuthHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            CreateCalculationPageModel pageModel = CreatePageModel(authorizationHelper: mockAuthHelper);
+
+            // Act
+            IActionResult result = await pageModel.OnPostAsync(specificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
         static Specification CreateSpecification()
         {
             return new Specification
@@ -557,9 +596,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             };
         }
 
-        static CreateCalculationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null)
+        static CreateCalculationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
-            return new CreateCalculationPageModel(specsClient ?? CreateSpecsApiClient(), mapper ?? CreateMapper());
+            CreateCalculationPageModel pageModel = new CreateCalculationPageModel(specsClient ?? CreateSpecsApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
+            return pageModel;
         }
 
         static ISpecsApiClient CreateSpecsApiClient()

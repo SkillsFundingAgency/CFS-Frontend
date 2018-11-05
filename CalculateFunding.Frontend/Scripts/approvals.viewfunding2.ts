@@ -25,6 +25,7 @@
         public isPublishButtonEnabled: boolean;
         public isPublishAndApprovePageFiltersEnabled: boolean;
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
+        public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
 
         constructor(settings: IViewFundingSettings) {
             if (typeof settings !== "undefined" && settings === null) {
@@ -56,6 +57,9 @@
             }
             else if (typeof settings.specificationsUrl !== "undefined" && !settings.specificationsUrl) {
                 throw "Settings must contain the specifications query url";
+            }
+            else if (typeof settings.permissionsUrl !== "undefined" && !settings.permissionsUrl) {
+                throw "Settings must contain the permissions query url";
             }
 
             let self = this;
@@ -309,6 +313,10 @@
 
         /** Has the used selected at least one allocation line result that can be approved */
         canApprove: KnockoutComputed<boolean> = ko.computed(function () {
+            if (!this.permissions().canApprove) {
+                return false;
+            }
+
             let providerResults = this.allProviderResults();
             for (let i = 0; i < providerResults.length; i++) {
                 let allocationResults = providerResults[i].allocationLineResults();
@@ -382,8 +390,8 @@
         // Has the used selected at least one allocation line result that can be published
 
         canPublish: KnockoutComputed<boolean> = ko.pureComputed(function () {
-            // Disable the publish button if configured so (Story #62313)
-            if (!this.isPublishButtonEnabled) {
+            // Disable the publish button if the user doesn't have permissions or is not enabled (Story #62313)
+            if (!this.isPublishButtonEnabled || !this.permissions().canPublish) {
                 return false;
             }
 
@@ -505,6 +513,11 @@
             }
         }
 
+        /** Is the refresh button enabled */
+        canRefreshFunding: KnockoutComputed<boolean> = ko.pureComputed(function () {
+            return this.permissions().canRefresh;
+        }, this);
+
         /**
          * Request that the funding snapshot is refreshed
          * As the process is asynchronous is sets up a poll mechanism to check on the progress
@@ -583,6 +596,41 @@
             this.pageState("main");
             this.notificationMessage('');
             this.loadProviderResults();
+
+            this.loadUserPermissions();
+        }
+
+        /** Load the permissions the user has to control what actions are available */
+        private loadUserPermissions() {
+            let self = this;
+            self.workingMessage("Loading user permissions");
+            self.isWorkingVisible(true);
+
+            let permissionsUrl = self.settings.permissionsUrl.replace("{specificationId}", self.selectedSpecification().id);
+            let permissionsRequest = $.ajax({
+                url: permissionsUrl,
+                dataType: "json",
+                method: "GET",
+                contentType: "application/json"
+            })
+                .done((response) => {
+                    if (response) {
+                        self.permissions(new SpecificationPermissions(response.canRefreshFunding, response.canApproveFunding, response.canPublishFunding));
+                    }
+                    else {
+                        self.notificationMessage("There was a problem loading your permissions for the specification.");
+                        self.notificationStatus("error");
+                    }
+
+                    self.pageState("main");
+                    self.isWorkingVisible(false);
+                })
+                .fail((ex) => {
+                    self.notificationMessage("There was a problem loading your permissions for the specification.");
+                    self.notificationStatus("error");
+                    self.pageState("main");
+                    self.isWorkingVisible(false);
+                });
         }
 
         /** Load the provider results from the back-end */
@@ -909,6 +957,7 @@
         fundingPeriodUrl: string;
         specificationsUrl: string;
         fundingStreamsUrl: string;
+        permissionsUrl: string;
     }
 
     /** The response of retrieving qa results */
@@ -1028,5 +1077,18 @@
         }
         id: string;
         name: string;
+    }
+
+    /** Permissions for the specification */
+    class SpecificationPermissions {
+        constructor(canRefresh: boolean, canApprove: boolean, canPublish: boolean) {
+            this.canRefresh = canRefresh;
+            this.canApprove = canApprove;
+            this.canPublish = canPublish;
+        }
+
+        canRefresh: boolean;
+        canApprove: boolean;
+        canPublish: boolean;
     }
 }
