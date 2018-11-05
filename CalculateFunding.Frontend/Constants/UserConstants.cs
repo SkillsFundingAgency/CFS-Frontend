@@ -2,6 +2,6 @@
 {
     public static class UserConstants
     {
-        public const string SkillsConfirmationCookieName = "cf-skills-confirmation";
+        public const string SkillsConfirmationCookieName = "cfs-skills-confirmation";
     }
 }

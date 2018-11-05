@@ -66,7 +66,7 @@ namespace CalculateFunding.Frontend.Pages.Users
         {
             CookieOptions option = new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(3),
+                Expires = DateTime.Now.AddDays(1),
                 Secure = true,
                 HttpOnly = true
             };
