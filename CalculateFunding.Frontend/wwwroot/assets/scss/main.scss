@@ -578,11 +578,41 @@ blockquote {
     }
 }
 
-.policy-spec-what {
-    .inline-collapse-container {
-        .inline-collapse-heading {
-            color: #000;
-            text-decoration: underline;
+
+
+.edit-policy-container {
+    .data-policy-description-firstline, .data-subpolicy-description-firstline {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .policy-spec-what {
+        .inline-collapse-container {
+            .inline-collapse-heading {
+                color: #000;
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .edit-policy-table {
+        table-layout: fixed;
+
+        .theader-name {
+            width: 35%;
+        }
+
+        .theader-description {
+            width: 100%;
+        }
+
+        .theader-last-edited {
+            width: 145px;
+        }
+
+        .theader-icon-holder {
+            width: 45px;
         }
     }
 }
