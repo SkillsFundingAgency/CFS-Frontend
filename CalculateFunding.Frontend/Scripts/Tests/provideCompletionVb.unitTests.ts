@@ -392,4 +392,48 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
             expect(items.length).toEqual(3);
         });
     });
+
+    describe("when line is not empty ", function () {
+        var container = {
+            "if": { label: "If" },
+            "elseif": { label: "ElseIf" },
+            "endif": { label: "EndIf" },
+            "then": { label: "Then" },
+            "if-then": { label: "If-Then" },
+            "if-then-else": { label: "If-Then-Else" },
+            "if-then-elseif-else": { label: "If-Then-ElseIf-Then" }
+        };
+        it("then it does not display if statements in completion items", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetKeywordsCompletionItems("Dim s =", container);
+            expect(items.length).toEqual(0);
+        });
+    });
+
+    describe("when line is empty ", function () {
+        var container = {
+            "if": { label: "If" },
+            "elseif": { label: "ElseIf" },
+            "endif": { label: "EndIf" },
+            "then": { label: "Then" },
+            "if-then": { label: "If-Then" },
+            "if-then-else": { label: "If-Then-Else" },
+            "if-then-elseif-else": { label: "If-Then-ElseIf-Then" }
+        };
+        it("then it does display if statements in completion items", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetKeywordsCompletionItems("  ", container);
+            expect(items.length).toEqual(7);
+        });
+       it("then if-then inserts correct text", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetKeywordsCompletionItems("  ", container);
+            expect(items[4].insertText === "If <condition> Then\n\r\n\rEnd If").toBeTruthy();
+        });
+        it("then if-then-else inserts correct text", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetKeywordsCompletionItems("  ", container);
+            expect(items[5].insertText === "If <condition> Then\n\r\n\rElse\n\r\n\rEnd If").toBeTruthy();
+        });
+        it("then if-then-else inserts correct text", function () {
+            var items = calculateFunding.providers.VisualBasicIntellisenseProvider.GetKeywordsCompletionItems("  ", container);
+            expect(items[6].insertText === "If <condition> Then\n\r\n\rElseIf <condition> Then\n\r\n\rElse\n\r\n\rEnd If").toBeTruthy();
+        });
+    });
 });

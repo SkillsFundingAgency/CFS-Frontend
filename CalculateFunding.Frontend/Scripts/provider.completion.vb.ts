@@ -7,6 +7,7 @@ namespace calculateFunding.providers {
         private contextVariables: IVariableContainer = {};
         private contextFunctions: ILocalFunctionContainer = {};
         private contextDefaultTypes: IDefaultTypeContainer = {};
+        private contextKeywords: IKeywordsContainer = {};
 
         private aggregatesFeatureEnabled: boolean;
 
@@ -70,6 +71,10 @@ namespace calculateFunding.providers {
 
         public setDefaultTypes(defaultTypes: IDefaultTypeContainer) {
             this.contextDefaultTypes = defaultTypes;
+        }
+
+        public setKeywords(keywords: IKeywordsContainer) {
+            this.contextKeywords = keywords;
         }
 
         public setAggregateFeatureEnabled(isEnabled: boolean = false) {
@@ -313,6 +318,12 @@ namespace calculateFunding.providers {
 
                             if (defaultTypeCompletionItems) {
                                 results.push.apply(results, defaultTypeCompletionItems)
+                            }
+
+                            let keywordCompletionItems = VisualBasicIntellisenseProvider.GetKeywordsCompletionItems(lineContentsSoFar, self.contextKeywords);
+
+                            if (keywordCompletionItems) {
+                                results.push.apply(results, keywordCompletionItems)
                             }
 
                         }
@@ -816,6 +827,37 @@ namespace calculateFunding.providers {
             return items;
         }
 
+        public static GetKeywordsCompletionItems(path: string, keywords: IKeywordsContainer): Array<monaco.languages.CompletionItem> {
+        
+            let items: Array<monaco.languages.CompletionItem> = [];
+
+            if (path.trim() === "" || path.trim().toLowerCase() == "i") {
+                for (let k in keywords) {
+                    let keyword: IKeyword = keywords[k];
+
+                    let keywordItem: monaco.languages.CompletionItem = {
+                        label: keyword.label,
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        detail: keyword.label
+                    };
+
+                    if (keyword.label === "If-Then-ElseIf-Then") {
+                        keywordItem.insertText = "If <condition> Then\n\r\n\rElseIf <condition> Then\n\r\n\rElse\n\r\n\rEnd If";
+                    }
+                    else if (keyword.label === "If-Then-Else") {
+                        keywordItem.insertText = "If <condition> Then\n\r\n\rElse\n\r\n\rEnd If";
+                    }
+                    else if (keyword.label === "If-Then") {
+                        keywordItem.insertText = "If <condition> Then\n\r\n\rEnd If";
+                    }
+
+                    items.push(keywordItem);
+                }
+            }
+
+            return items;
+        }
+
         public static IsAggregableFunctionDeclared(path: string): boolean {
 
             if (!path) {
@@ -882,6 +924,14 @@ namespace calculateFunding.providers {
         description?: string;
         items?: IVariableContainer;
         isAggregable: string;
+    }
+
+    export interface IKeyword {
+        label: string;
+    }
+
+    export interface IKeywordsContainer {
+        [key: string]: IKeyword
     }
 
     export interface IDefaultTypes {
