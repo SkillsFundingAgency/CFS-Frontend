@@ -203,6 +203,10 @@ namespace calculateFunding.editCalculation {
                         return item.type === "DefaultType";
                     });
 
+                    let keywordList: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
+                        return item.type === "Keyword";
+                    });
+
                     if (calculationType) {
 
                         // Local Functions
@@ -248,6 +252,18 @@ namespace calculateFunding.editCalculation {
                         }
                     }
 
+                    let keywords: providers.IKeywordsContainer = {};
+
+                    if (keywordList) {
+                        for (let kw in keywordList) {
+                            let keyword: providers.IKeyword = {
+                                label: keywordList[kw].name
+                            }
+
+                            keywords[keywordList[kw].name] = keyword;
+                        }
+                    }
+
                     // Variables
                     for (let v in calculationType.properties) {
                         let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
@@ -259,6 +275,7 @@ namespace calculateFunding.editCalculation {
                     self.codeContext.setContextVariables(variables);
                     self.codeContext.setLocalFunctions(functions);
                     self.codeContext.setDefaultTypes(defaultTypes);
+                    self.codeContext.setKeywords(keywords);
                 });
             }
         }
