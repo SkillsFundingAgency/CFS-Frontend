@@ -54,10 +54,8 @@
 
             this.canApprove = ko.pureComputed(() => {
                 if (typeof options.canApprove !== "undefined") {
-                    if (options.canApprove) {
-                        if (!options.canApprove()) {
-                            return false;
-                        }
+                    if (!options.canApprove) {
+                        return false;
                     }
                 }
                 return this.publishStatus() !== PublishStatus.Approved && this.state() === ControlState.Idle;

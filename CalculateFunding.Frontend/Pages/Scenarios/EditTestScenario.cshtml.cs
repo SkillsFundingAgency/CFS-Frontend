@@ -4,11 +4,13 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Microsoft.AspNetCore.Mvc;
@@ -21,19 +23,22 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         private IScenariosApiClient _scenariosClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, ILogger logger)
+        public EditTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
 
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _scenariosClient = scenariosApiClient;
             _mapper = mapper;
             _logger = logger;
+            _authorizationHelper = authorizationHelper;
         }
 
         public string TestScenarioId { get; set; }
@@ -43,6 +48,8 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         public string SpecificationName { get; set; }
 
         public ScenarioEditViewModel EditScenarioViewModel { get; set; }
+
+        public string DoesUserHavePermissionToSave { get; private set; }
 
         public async Task<IActionResult> OnGetAsync(string testScenarioId)
         {
@@ -55,6 +62,8 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 _logger.Warning("Test scenario response is null");
                 return new NotFoundObjectResult("Test Scenario not found");
             }
+
+            DoesUserHavePermissionToSave = (await _authorizationHelper.DoesUserHavePermission(User, scenario, SpecificationActionTypes.CanEditQaTests)).ToString().ToLowerInvariant();
 
             SpecificationSummary specResponse = await GetSpecification(scenario.SpecificationId);
             if (specResponse == null)

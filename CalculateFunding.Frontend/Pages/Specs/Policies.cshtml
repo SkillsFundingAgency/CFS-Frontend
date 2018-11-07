@@ -60,7 +60,7 @@
         </a>
     </li>
     <li class="nav-item-right" id="approve-status">
-        <approve-status-button params="publishStatus : '@Model.Specification.PublishStatus', stateChangeUrl : '/api/specs/@Model.Specification.Id/status'"></approve-status-button>
+        <approve-status-button params="publishStatus : '@Model.Specification.PublishStatus', stateChangeUrl : '/api/specs/@Model.Specification.Id/status', canApprove : @Model.DoesUserHavePermissionToApprove"></approve-status-button>
     </li>
 </ul>
 <div class="row">

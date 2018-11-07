@@ -50,6 +50,8 @@
 
         public string SpecificationName { get; set; }
 
+        public string DoesUserHavePermissionToApproveOrEdit { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
@@ -64,10 +66,7 @@
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanEditCalculations))
-            {
-                return new ForbidResult();
-            }
+            this.DoesUserHavePermissionToApproveOrEdit = (await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
             ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)

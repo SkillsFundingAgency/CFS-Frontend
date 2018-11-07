@@ -1,8 +1,11 @@
 namespace CalculateFunding.Frontend.Pages.Scenarios
 {
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Microsoft.AspNetCore.Mvc;
@@ -19,12 +22,19 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         private readonly ISpecsApiClient _specsClient;
         private readonly IScenariosApiClient _scenariosClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CreateTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper)
+        public CreateTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _specsClient = specsClient;
             _scenariosClient = scenariosApiClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         [BindProperty]
@@ -37,7 +47,6 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
             await PopulateSpecifications();
 
             return Page();
-
         }
 
         public async Task PopulateSpecifications()
@@ -49,7 +58,9 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 throw new InvalidOperationException($"Unable to retreive Specification information: Status Code = {apiResponse.StatusCode}");
             }
 
-            Specifications = apiResponse.Content.OrderBy(s => s.Name).Select(m => new SelectListItem
+            IEnumerable<SpecificationSummary> trimmedSpecs = await _authorizationHelper.SecurityTrimList(User, apiResponse.Content, SpecificationActionTypes.CanCreateQaTests);
+
+            Specifications = trimmedSpecs.OrderBy(s => s.Name).Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name

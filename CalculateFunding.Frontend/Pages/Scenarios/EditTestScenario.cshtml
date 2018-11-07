@@ -133,7 +133,8 @@
     <script asp-src-include="~/js/edittestscenario.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var editTestScenarioElement = document.getElementById("edit-test-scenario");
-        var vm = new calculateFunding.editTestScenario.EditTestScenarioViewModel({ "name": "@Html.Raw(Model.EditScenarioViewModel.Name)", "description": "@Html.Raw(Model.EditScenarioViewModel.Description)" , "sourceCode": "@Html.Raw(Model.EditScenarioViewModel.Gherkin)", "specificationId": "@Html.Raw(Model.SpecificationId)", "scenarioId": "@Html.Raw(Model.TestScenarioId)" });
+        var vm = new calculateFunding.editTestScenario.EditTestScenarioViewModel({ "name": "@Html.Raw(Model.EditScenarioViewModel.Name)", "description": "@Html.Raw(Model.EditScenarioViewModel.Description)", "sourceCode": "@Html.Raw(Model.EditScenarioViewModel.Gherkin)", "specificationId": "@Html.Raw(Model.SpecificationId)", "scenarioId": "@Html.Raw(Model.TestScenarioId)" });
+        vm.doesUserHavePermissionToSave(@Model.DoesUserHavePermissionToSave);
         if (editTestScenarioElement) {
             ko.applyBindings(vm, editTestScenarioElement);
         }
