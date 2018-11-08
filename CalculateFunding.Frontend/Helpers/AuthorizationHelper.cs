@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.Identity.Authorization;
@@ -10,6 +11,7 @@ using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Helpers
 {
@@ -17,14 +19,17 @@ namespace CalculateFunding.Frontend.Helpers
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
+        private readonly ILogger _logger;
 
-        public AuthorizationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient)
+        public AuthorizationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient, ILogger logger)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
             Guard.ArgumentNotNull(usersClient, nameof(usersClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
 
             _authorizationService = authorizationService;
             _usersClient = usersClient;
+            _logger = logger;
         }
 
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired)
@@ -41,6 +46,12 @@ namespace CalculateFunding.Frontend.Helpers
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
             ApiResponse<IEnumerable<Clients.UsersClient.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+
+            if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                return false;
+            }
 
             IEnumerable<Clients.UsersClient.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
 
@@ -67,6 +78,12 @@ namespace CalculateFunding.Frontend.Helpers
 
             ApiResponse<IEnumerable<Clients.UsersClient.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
 
+            if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                return Enumerable.Empty<FundingStream>();
+            }
+
             IEnumerable<Clients.UsersClient.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
 
             if (permissionRequired == FundingStreamActionTypes.CanCreateSpecification)
@@ -91,6 +108,12 @@ namespace CalculateFunding.Frontend.Helpers
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
             ApiResponse<IEnumerable<Clients.UsersClient.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+
+            if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                return Enumerable.Empty<SpecificationSummary>();
+            }
 
             IEnumerable<Clients.UsersClient.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
 
@@ -118,6 +141,8 @@ namespace CalculateFunding.Frontend.Helpers
             ApiResponse<Clients.UsersClient.Models.FundingStreamPermission> response = await _usersClient.GetEffectivePermissionsForUser(userId, specificationId);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
+                _logger.Error("Failed to get effective permissions for user ({user}) - {statuscode}", user.Identity.Name, response.StatusCode);
+
                 return new Clients.UsersClient.Models.FundingStreamPermission
                 {
                     CanAdministerFundingStream = false,
