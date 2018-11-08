@@ -54,7 +54,7 @@
 
             this.canApprove = ko.pureComputed(() => {
                 if (typeof options.canApprove !== "undefined") {
-                    if (!options.canApprove) {
+                    if (!options.canApprove()) {
                         return false;
                     }
                 }

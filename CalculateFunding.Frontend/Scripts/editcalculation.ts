@@ -32,6 +32,8 @@ namespace calculateFunding.editCalculation {
 
         private codeContext: calculateFunding.providers.VisualBasicIntellisenseProvider = new calculateFunding.providers.VisualBasicIntellisenseProvider();
 
+        public doesUserHavePermissionToApproveOrEdit: KnockoutObservable<boolean> = ko.observable(false);
+
         constructor(options: IEditCalculationViewModelOptions) {
             if (!options.calculationId) {
                 throw new Error("calculationId not provided in options");
@@ -67,6 +69,11 @@ namespace calculateFunding.editCalculation {
             });
 
             this.canSaveCalculation = ko.computed(() => {
+                // Does the user have permission
+                if (!self.doesUserHavePermissionToApproveOrEdit()) {
+                    return false;
+                }
+
                 // Has the user entered source code
                 if (!self.successfulCompileSourceCode()) {
                     return false;
@@ -86,6 +93,11 @@ namespace calculateFunding.editCalculation {
             });
 
             this.canApproveCalculation = ko.pureComputed(() => {
+                // Does the user have permission
+                if (!self.doesUserHavePermissionToApproveOrEdit()) {
+                    return false;
+                }
+
                 // Code must be the same as when the page loads - otherwise the user needs to save and then come back to the page
                 if (self.initialCodeContents === self.sourceCode()) {
                     return true;

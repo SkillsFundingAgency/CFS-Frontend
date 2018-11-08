@@ -295,13 +295,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGet_WhenUserDoesNotHaveEditCalculationsPermission_ThenReturnsForbidResult()
+        public async Task OnGet_WhenUserDoesHaveEditCalculationsPermission_ThenDoesUserHavePermissionToApproveOrEditIsTrue()
         {
             // Arrange
             string calculationId = "5";
             Calculation calcsCalculation = new Calculation()
             {
-                SpecificationId = "abc123"
+                SpecificationId = "abc123",
+                CalculationSpecification = new Reference { Id = "cs345", Name = "calc name" }
             };
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -309,20 +310,22 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
 
-            IAuthorizationHelper mockAuthHelper = Substitute.For<IAuthorizationHelper>();
-            mockAuthHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditCalculations)).Returns(false);
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditCalculations))
+                .Returns(true);
 
-            EditCalculationPageModel pageModel = CreatePageModel(calcsClient: calcsClient, authorizationHelper: mockAuthHelper);
+            EditCalculationPageModel pageModel = CreatePageModel(calcsClient: calcsClient, authorizationHelper: authorizationHelper);
 
             // Act
             IActionResult result = await pageModel.OnGet("5");
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            pageModel.DoesUserHavePermissionToApproveOrEdit.Should().Be("true");
         }
 
         [TestMethod]
-        public async Task OnGet_WhenUserDoesNotHaveEditCalculationsPermission_ThenReturn403()
+        public async Task OnGet_WhenUserDoesNotHaveEditCalculationsPermission_ThenDoesUserHavePermissionToApproveOrEditIsFalse()
         {
             // Arrange
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
@@ -331,7 +334,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Calculation calcsCalculation = new Calculation()
             {
-                SpecificationId = "abc123"
+                SpecificationId = "abc123",
+                CalculationSpecification = new Reference { Id = "cs345", Name = "calc name" }
             };
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -350,7 +354,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IActionResult result = await pageModel.OnGet(calculationId);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            pageModel.DoesUserHavePermissionToApproveOrEdit.Should().Be("false");
         }
 
         private static EditCalculationPageModel CreatePageModel(

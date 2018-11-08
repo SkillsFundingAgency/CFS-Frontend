@@ -66,7 +66,7 @@
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            this.DoesUserHavePermissionToApproveOrEdit = (await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
+            this.DoesUserHavePermissionToApproveOrEdit = (await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanEditCalculations)).ToString().ToLowerInvariant();
 
             ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)

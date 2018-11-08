@@ -108,6 +108,7 @@
             };
             var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
             viewModel.loadIntellisenseContext();
+            viewModel.doesUserHavePermissionToApproveOrEdit(@Model.DoesUserHavePermissionToApproveOrEdit);
             ko.applyBindings(viewModel, editCalculationElement);
 
             ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
