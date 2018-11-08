@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using Serilog;
 
 namespace CalculateFunding.Frontend.UnitTests.Helpers
 {
@@ -38,13 +39,19 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
 
             // Assert
             result.Should().BeTrue();
+        }
+
+        private static AuthorizationHelper CreateAuthenticationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient)
+        {
+            ILogger logger = Substitute.For<ILogger>();
+            return new AuthorizationHelper(authorizationService, usersClient, logger);
         }
 
         [TestMethod]
@@ -69,7 +76,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
@@ -100,7 +107,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
@@ -136,7 +143,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
@@ -172,7 +179,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
@@ -208,7 +215,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
@@ -245,7 +252,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
@@ -281,7 +288,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
@@ -317,7 +324,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
@@ -351,7 +358,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
@@ -385,7 +392,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
                 .GetFundingStreamPermissionsForUser(userId)
                 .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = new AuthorizationHelper(authorizationService, usersClient);
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
             IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
