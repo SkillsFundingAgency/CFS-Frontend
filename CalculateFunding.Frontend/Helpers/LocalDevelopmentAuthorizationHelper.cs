@@ -39,6 +39,14 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(fundingStreams);
         }
 
+        public async Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications, SpecificationActionTypes permissionRequired)
+        {
+            Guard.ArgumentNotNull(user, nameof(user));
+            Guard.ArgumentNotNull(specifications, nameof(specifications));
+
+            return await Task.FromResult(specifications);
+        }
+
         public async Task<Clients.UsersClient.Models.FundingStreamPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));

@@ -5,11 +5,13 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Specs;
@@ -23,18 +25,21 @@
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public PoliciesModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, ILogger logger, IMapper mapper)
+        public PoliciesModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _datasetsClient = datasetsClient;
             _logger = logger;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public SpecificationViewModel Specification { get; set; }
@@ -42,6 +47,8 @@
         public bool HasProviderDatasetsAssigned { get; set; }
 
         public PageBannerOperation PageBanner { get; set; }
+
+        public string DoesUserHavePermissionToApprove { get; set; }
 
         public async Task<IActionResult> OnGet(string specificationId, PoliciesPageBannerOperationType? operationType, string operationId)
         {
@@ -97,6 +104,8 @@
                     StatusCode = 500
                 };
             }
+
+            this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
             this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
 

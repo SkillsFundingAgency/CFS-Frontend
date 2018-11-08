@@ -17,6 +17,9 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.UnitTests.Helpers;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using System.Security.Claims;
 
 namespace CalculateFunding.Frontend.PageModels.Specs
 {
@@ -675,6 +678,78 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Be("Operation ID not provided");
         }
 
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenUserHasApproveSpecificationPermission_ThenDoesUserHavePermissionToApproveIsTrue()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
+
+            string specificationId = "spec123";
+
+            Specification specification = new Specification()
+            {
+                Id = specificationId,
+                Name = "Test Specification",
+                FundingPeriod = new Reference("1617", "2016/2017"),
+                Description = "Test Description",
+                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), }
+            };
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
+
+            // Assert
+            policiesModel.DoesUserHavePermissionToApprove.Should().Be("true");
+        }
+
+        [TestMethod]
+        public async Task PoliciesPageModel_OnGet_WhenUserDoesNotHaveApproveSpecificationPermission_ThenDoesUserHavePermissionToApproveIsFalse()
+        {
+            // Arrange
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+
+            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient, authorizationHelper: authorizationHelper);
+
+            string specificationId = "spec123";
+
+            Specification specification = new Specification()
+            {
+                Id = specificationId,
+                Name = "Test Specification",
+                FundingPeriod = new Reference("1617", "2016/2017"),
+                Description = "Test Description",
+                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), }
+            };
+
+            specsApiClient.GetSpecification(Arg.Any<string>())
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            datasetsApiClient
+               .GetAssignedDatasetSchemasForSpecification(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanApproveSpecification))
+                .Returns(false);
+
+            // Act
+            IActionResult result = await policiesModel.OnGet(specificationId, null, null);
+
+            // Assert
+            policiesModel.DoesUserHavePermissionToApprove.Should().Be("false");
+        }
+
         private static Specification CreateSpecificationForBannerChecks(string specificationId)
         {
             return new Specification()
@@ -747,15 +822,16 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         private PoliciesModel GetPoliciesModel(
             ISpecsApiClient specsApiClient = null,
             IDatasetsApiClient datasetsApiClient = null,
-            ILogger logger = null
+            ILogger logger = null,
+            IAuthorizationHelper authorizationHelper = null
             )
         {
             return new PoliciesModel(
                 specsApiClient ?? CreateSpecsApiClient(),
                 datasetsApiClient ?? CreateDatasetsApiClient(),
                 logger ?? CreateLogger(),
-                MappingHelper.CreateFrontEndMapper()
-                );
+                MappingHelper.CreateFrontEndMapper(),
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanApproveSpecification));
         }
 
         private static ISpecsApiClient CreateSpecsApiClient()

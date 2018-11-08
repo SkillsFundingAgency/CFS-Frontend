@@ -1,9 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
 {
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
     using System;
 
-    public class TestScenario : Reference
+    public class TestScenario : Reference, ISpecificationAuthorizationEntity
     {
         public string Description { get; set; }
 
@@ -22,5 +23,10 @@
         public string Gherkin { get; set; }
 
         public string SpecificationId { get; set; }
+
+        public string GetSpecificationId()
+        {
+            return SpecificationId;
+        }
     }
 }

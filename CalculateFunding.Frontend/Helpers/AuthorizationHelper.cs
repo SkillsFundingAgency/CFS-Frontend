@@ -83,6 +83,31 @@ namespace CalculateFunding.Frontend.Helpers
             return fundingStreams.Where(fs => allowedFundingStreamIds.Contains(fs.Id));
         }
 
+        public async Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications, SpecificationActionTypes permissionRequired)
+        {
+            Guard.ArgumentNotNull(user, nameof(user));
+            Guard.ArgumentNotNull(specifications, nameof(specifications));
+
+            string userId = VerifyObjectIdentifierClaimTypePresent(user);
+
+            ApiResponse<IEnumerable<Clients.UsersClient.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+
+            IEnumerable<Clients.UsersClient.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
+
+            if (permissionRequired == SpecificationActionTypes.CanCreateQaTests)
+            {
+                allowedFundingStreams = allowedFundingStreams.Where(p => p.CanCreateQaTests);
+            }
+            else
+            {
+                throw new NotSupportedException($"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
+            }
+
+            IEnumerable<string> allowedFundingStreamIds = allowedFundingStreams.Select(p => p.FundingStreamId);
+
+            return specifications.Where(s => !s.FundingStreams.Select(fs => fs.Id).Except(allowedFundingStreamIds).Any());
+        }
+
         public async Task<Clients.UsersClient.Models.FundingStreamPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));

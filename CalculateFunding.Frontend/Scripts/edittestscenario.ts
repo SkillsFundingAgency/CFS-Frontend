@@ -78,6 +78,8 @@ namespace calculateFunding.editTestScenario {
 
         public hasGherkinEdited: KnockoutObservable<boolean> = ko.observable();
 
+        public doesUserHavePermissionToSave: KnockoutObservable<boolean> = ko.observable(false);
+
         constructor(options: IEditTestScenarioViewModelConstructorParameters) {
   
             if (typeof options === "undefined" ) {
@@ -139,8 +141,11 @@ namespace calculateFunding.editTestScenario {
             });
 
             this.canSaveTestScenario = ko.computed(() => {
-               
-                if (this.state() !== "idle") {
+                if (!self.doesUserHavePermissionToSave()) {
+                    return false;
+                }
+
+                if (self.state() !== "idle") {
                     return false;
                 }
                 else if (self.name() !== self.initialName() || self.description() !== self.initialDescription() || (self.sourceCode() !== self.initialSourceCode() && self.successfulValidationSourceCode())) {

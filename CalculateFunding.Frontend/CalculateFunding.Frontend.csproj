@@ -64,7 +64,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="CalculateFunding.Common" Version="1.5.0" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.4" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.5" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.1" />
@@ -171,6 +171,9 @@
     <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Pages\Errors\401.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Pages\Errors\403.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
