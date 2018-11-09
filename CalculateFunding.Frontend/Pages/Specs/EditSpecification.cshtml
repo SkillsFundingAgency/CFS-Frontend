@@ -27,6 +27,7 @@
 <div class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
+            <input asp-for="EditSpecificationViewModel.Id" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalSpecificationName" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalFundingStreams" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalFundingPeriodId" type="hidden" />
