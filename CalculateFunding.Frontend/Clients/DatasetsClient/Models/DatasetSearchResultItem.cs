@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
     using System;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using Newtonsoft.Json;
 
     public class DatasetSearchResultItem : Reference

@@ -5,20 +5,21 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class SpecsApiClient : BaseApiClient, ISpecsApiClient
     {
         private readonly IFeatureToggle _featureToggle;
 
-        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor, IFeatureToggle featureToggle)
-           : base(httpClientFactory, HttpClientKeys.Specifications, logger, contextAccessor)
+        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider, IFeatureToggle featureToggle)
+           : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Specifications, logger, cancellationTokenProvider)
         {
             _featureToggle = featureToggle;
         }

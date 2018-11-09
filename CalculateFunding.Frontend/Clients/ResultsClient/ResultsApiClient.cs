@@ -5,19 +5,20 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class ResultsApiClient : BaseApiClient, IResultsApiClient
     {
 
-        public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
-            : base(httpClientFactory, HttpClientKeys.Results, logger, contextAccessor)
+        public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
+            : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Results, logger, cancellationTokenProvider)
         {
         }
 

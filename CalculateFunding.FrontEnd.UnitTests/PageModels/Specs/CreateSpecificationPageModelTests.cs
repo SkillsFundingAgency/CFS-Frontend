@@ -1,6 +1,12 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -12,12 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 {
@@ -139,7 +139,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 new Reference { Id = "fp1", Name = "funding" }
             };
 
-            IEnumerable<FundingStream> fundingStreams= new[]
+            IEnumerable<FundingStream> fundingStreams = new[]
             {
                 new FundingStream { Id = "fp1", Name = "funding" }
             };
@@ -405,7 +405,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             {
                 Name = specName,
                 Description = "description",
-                FundingStreamIds = new[] {"fs1"},
+                FundingStreamIds = new[] { "fs1" },
                 FundingPeriodId = "fp1"
             };
 

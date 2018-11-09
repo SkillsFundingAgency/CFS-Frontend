@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
 using System.Collections.Generic;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CalculateFunding.Frontend.ViewModels.Results;

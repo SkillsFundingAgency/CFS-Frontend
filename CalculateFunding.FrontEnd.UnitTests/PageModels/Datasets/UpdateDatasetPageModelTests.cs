@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets

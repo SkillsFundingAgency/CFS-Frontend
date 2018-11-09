@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
     using System.Collections.Generic;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
 
     public class DatasetSchemaListForSpecification : Reference
     {

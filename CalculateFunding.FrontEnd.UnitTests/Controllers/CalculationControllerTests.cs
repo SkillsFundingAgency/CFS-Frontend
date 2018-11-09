@@ -11,7 +11,7 @@ namespace CalculateFunding.Frontend.Controllers
     using AutoMapper;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.UnitTests.Helpers;

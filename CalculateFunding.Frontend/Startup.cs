@@ -4,10 +4,10 @@
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.Identity.Authorization;
     using CalculateFunding.Common.Identity.Authorization.Repositories;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients;
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
@@ -70,7 +70,7 @@
                 services.Configure<PermissionOptions>(options =>
                 {
                     Configuration.GetSection("permissionOptions").Bind(options);
-                    options.HttpClientName = HttpClientKeys.Users;
+                    options.HttpClientName = Common.ApiClient.HttpClientKeys.Users;
                 });
 
                 services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
@@ -119,6 +119,7 @@
             services.AddModule<FeaturesModule>(Configuration);
 
             services.AddHttpContextAccessor();
+            services.AddSingleton<ICancellationTokenProvider, HttpContextCancellationProvider>();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<HealthCheckOptions>(Configuration.GetSection("healthCheck"));

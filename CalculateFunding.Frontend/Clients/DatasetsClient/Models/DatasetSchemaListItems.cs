@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using Newtonsoft.Json;
 
     public class DatasetSchemaListItems : Reference

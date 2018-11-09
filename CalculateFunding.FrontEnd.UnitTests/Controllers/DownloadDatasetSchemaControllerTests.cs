@@ -7,7 +7,7 @@
     using Microsoft.AspNetCore.Mvc;
     using FluentAssertions;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using System.Net;
     using System;
     using CalculateFunding.Frontend.Controllers;

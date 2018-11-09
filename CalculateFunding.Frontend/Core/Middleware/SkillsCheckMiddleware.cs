@@ -3,11 +3,11 @@
     using System;
     using System.Net;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.UsersClient.Models;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Users.Models;
     using CalculateFunding.Frontend.Constants;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 

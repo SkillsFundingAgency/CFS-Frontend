@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Results;

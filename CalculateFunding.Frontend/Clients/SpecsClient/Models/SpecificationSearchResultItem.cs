@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {

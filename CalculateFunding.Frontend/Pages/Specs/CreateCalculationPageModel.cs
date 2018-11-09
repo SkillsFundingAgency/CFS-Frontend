@@ -8,7 +8,7 @@
     using AutoMapper;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;

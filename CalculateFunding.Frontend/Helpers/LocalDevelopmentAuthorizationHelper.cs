@@ -5,6 +5,7 @@ using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CalculateFunding.Frontend.Helpers
@@ -52,12 +53,12 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(specifications);
         }
 
-        public async Task<Clients.UsersClient.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
+        public async Task<Common.ApiClient.Users.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await Task.FromResult(new Clients.UsersClient.Models.EffectiveSpecificationPermission
+            return await Task.FromResult(new Common.ApiClient.Users.Models.EffectiveSpecificationPermission
             {
                 CanAdministerFundingStream = true,
                 CanApproveFunding = true,
@@ -70,7 +71,9 @@ namespace CalculateFunding.Frontend.Helpers
                 CanEditSpecification = true,
                 CanMapDatasets = true,
                 CanPublishFunding = true,
-                CanRefreshFunding = true
+                CanRefreshFunding = true,
+                SpecificationId = specificationId,
+                UserId = user.GetUserProfile()?.Id,
             });
         }
     }

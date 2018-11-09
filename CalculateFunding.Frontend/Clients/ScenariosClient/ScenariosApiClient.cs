@@ -3,17 +3,18 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class ScenariosApiClient : BaseApiClient, IScenariosApiClient
     {
-        public ScenariosApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
-           : base(httpClientFactory, HttpClientKeys.Scenarios, logger, contextAccessor)
+        public ScenariosApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
+           : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Scenarios, logger, cancellationTokenProvider)
         {
         }
 

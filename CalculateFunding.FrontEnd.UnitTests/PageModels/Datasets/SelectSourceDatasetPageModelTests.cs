@@ -4,7 +4,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;

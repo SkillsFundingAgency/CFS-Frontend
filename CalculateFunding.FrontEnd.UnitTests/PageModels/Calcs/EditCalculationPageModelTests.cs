@@ -10,7 +10,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;

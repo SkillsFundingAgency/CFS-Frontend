@@ -1,4 +1,4 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using CalculateFunding.Common.ApiClient.Models;
 using Newtonsoft.Json;
 using System;
 

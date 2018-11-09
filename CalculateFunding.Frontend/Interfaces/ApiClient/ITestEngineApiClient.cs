@@ -1,7 +1,7 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {

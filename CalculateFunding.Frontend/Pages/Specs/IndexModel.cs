@@ -1,9 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Specs
 {
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CommonModels;
-    using CalculateFunding.Frontend.Clients.SpecsClient;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -61,7 +60,7 @@
 
                 ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(operationId);
 
-                IActionResult errorResult = specificationResponse.IsSuccessfulOrReturnFailureResult();
+                IActionResult errorResult = specificationResponse.IsSuccessOrReturnFailureResult("Specification");
 
                 if (errorResult != null)
                 {

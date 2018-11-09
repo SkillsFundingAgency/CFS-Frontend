@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
     public interface ISpecsApiClient
@@ -96,8 +96,8 @@
         Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId);
 
         Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFundingByPeriod(string fundingPeriodId);
-        
-	    Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId);
+
+        Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId);
 
         Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId);
     }

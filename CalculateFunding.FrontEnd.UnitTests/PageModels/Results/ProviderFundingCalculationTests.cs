@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.PageModels.Results
 {
     using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;

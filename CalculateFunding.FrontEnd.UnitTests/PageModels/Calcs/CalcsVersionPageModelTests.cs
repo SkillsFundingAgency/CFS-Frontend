@@ -10,7 +10,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;

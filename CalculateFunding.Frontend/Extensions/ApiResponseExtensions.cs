@@ -3,7 +3,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CalculateFunding.Frontend.Clients.CommonModels
+namespace CalculateFunding.Common.ApiClient.Models
 {
     public static class ApiResponseExtensions
     {

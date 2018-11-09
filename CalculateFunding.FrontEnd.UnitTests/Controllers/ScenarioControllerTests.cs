@@ -2,8 +2,8 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;

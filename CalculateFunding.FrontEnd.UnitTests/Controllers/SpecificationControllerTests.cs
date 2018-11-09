@@ -1,5 +1,9 @@
-﻿using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using System;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -8,10 +12,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {

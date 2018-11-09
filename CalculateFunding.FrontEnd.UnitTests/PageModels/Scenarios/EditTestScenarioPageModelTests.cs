@@ -8,7 +8,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Scenarios
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;

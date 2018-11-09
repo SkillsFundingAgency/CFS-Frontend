@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using System;
 
     public class CalculationSearchResultItem : Reference

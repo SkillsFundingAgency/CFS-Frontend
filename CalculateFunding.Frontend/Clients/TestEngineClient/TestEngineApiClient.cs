@@ -2,11 +2,12 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient;
+using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
-using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TestEngineClient
@@ -14,8 +15,8 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
     public class TestEngineApiClient : BaseApiClient, ITestEngineApiClient
     {
 
-        public TestEngineApiClient(IHttpClientFactory httpClientFactory, ILogger logger, IHttpContextAccessor contextAccessor)
-              : base(httpClientFactory, HttpClientKeys.TestEngine, logger, contextAccessor)
+        public TestEngineApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
+              : base(httpClientFactory, Common.ApiClient.HttpClientKeys.TestEngine, logger, cancellationTokenProvider)
         {
         }
 
@@ -97,6 +98,11 @@ namespace CalculateFunding.Frontend.Clients.TestEngineClient
         public Task<ApiResponse<ResultCounts>> GetTestScenarioCountsForProviderForSpecification(string specificationId, string providerId)
         {
             return GetAsync<ResultCounts>($"get-testscenario-result-counts-for-specification-for-provider?specificationId={specificationId}&providerId={providerId}");
+        }
+
+        public bool Equals(TestEngineApiClient other)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

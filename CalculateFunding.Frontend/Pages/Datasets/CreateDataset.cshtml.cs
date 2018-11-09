@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -38,7 +39,7 @@
 
         async private Task PopulateDefinitions()
         {
-            Clients.CommonModels.ApiResponse<IEnumerable<Clients.DatasetsClient.Models.DatasetDefinition>> definitionsResponse = await _datasetApiClient.GetDataDefinitions();
+            ApiResponse<IEnumerable<Clients.DatasetsClient.Models.DatasetDefinition>> definitionsResponse = await _datasetApiClient.GetDataDefinitions();
             if (definitionsResponse.StatusCode == HttpStatusCode.OK)
             {
                 IEnumerable<Clients.DatasetsClient.Models.DatasetDefinition> defintions = definitionsResponse.Content;

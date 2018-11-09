@@ -4,11 +4,12 @@
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class CalculationsApiClient : BaseApiClient, ICalculationsApiClient
@@ -16,8 +17,8 @@
         public CalculationsApiClient(
             IHttpClientFactory httpClientFactory,
             ILogger logger,
-            IHttpContextAccessor contextAccessor)
-            : base(httpClientFactory, HttpClientKeys.Calculations, logger, contextAccessor)
+            ICancellationTokenProvider cancellationTokenProvider)
+            : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Calculations, logger, cancellationTokenProvider)
         {
         }
 

@@ -6,12 +6,12 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients;
-    using CalculateFunding.Frontend.Clients.CommonModels;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Http;
     using Serilog;
 
     public class DatasetsApiClient : BaseApiClient, IDatasetsApiClient
@@ -19,9 +19,9 @@
         public DatasetsApiClient(
             IHttpClientFactory httpClientFactory,
             ILogger logger,
-            IHttpContextAccessor contextAccessor
+            ICancellationTokenProvider cancellationTokenProvider
             )
-            : base(httpClientFactory, HttpClientKeys.Datasets, logger, contextAccessor)
+            : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Datasets, logger, cancellationTokenProvider)
         {
         }
 

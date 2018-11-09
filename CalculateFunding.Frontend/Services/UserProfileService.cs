@@ -1,4 +1,4 @@
-﻿using CalculateFunding.Frontend.Clients.CommonModels;
+﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.AspNetCore.Http;

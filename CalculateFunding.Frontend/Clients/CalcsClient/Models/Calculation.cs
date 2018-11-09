@@ -2,7 +2,7 @@
 {
     using System;
     using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using Newtonsoft.Json;
 

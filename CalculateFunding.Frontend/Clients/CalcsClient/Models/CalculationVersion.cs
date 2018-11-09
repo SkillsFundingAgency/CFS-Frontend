@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 {
     using System;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using Newtonsoft.Json;
 
     public class CalculationVersion

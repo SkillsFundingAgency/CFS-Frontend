@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
-using CalculateFunding.Frontend.Clients.CommonModels;
+using CalculateFunding.Common.ApiClient.Models;
 
 namespace CalculateFunding.Frontend.Extensions
 {

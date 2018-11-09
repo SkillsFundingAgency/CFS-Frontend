@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using Newtonsoft.Json;
 
     public class Specification : Reference, ISpecificationAuthorizationEntity

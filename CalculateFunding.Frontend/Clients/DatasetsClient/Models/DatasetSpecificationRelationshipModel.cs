@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
 
     public class DatasetSpecificationRelationshipModel : Reference
     {

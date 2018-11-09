@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using System.Threading.Tasks;
 

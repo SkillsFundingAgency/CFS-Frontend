@@ -8,7 +8,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Datasets;

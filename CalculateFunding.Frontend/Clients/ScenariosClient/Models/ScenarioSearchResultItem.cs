@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
 {
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using System;
     using System.Collections.Generic;
 

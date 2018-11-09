@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.CommonModels;
-using CalculateFunding.Frontend.Clients.UsersClient.Models;
 using CalculateFunding.Frontend.Constants;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

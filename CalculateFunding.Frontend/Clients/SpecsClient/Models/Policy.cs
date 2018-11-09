@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Common.ApiClient.Models;
     using Newtonsoft.Json;
 
     public class Policy : Reference
