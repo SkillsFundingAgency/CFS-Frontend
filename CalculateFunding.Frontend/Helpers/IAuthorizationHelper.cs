@@ -10,12 +10,14 @@ namespace CalculateFunding.Frontend.Helpers
     {
         Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired);
 
+        Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired);
+
         Task<bool> DoesUserHavePermission(ClaimsPrincipal user, IEnumerable<string> fundingStreamIds, FundingStreamActionTypes permissionRequired);
 
         Task<IEnumerable<FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired);
 
         Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications, SpecificationActionTypes permissionRequired);
 
-        Task<Clients.UsersClient.Models.FundingStreamPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId);
+        Task<Clients.UsersClient.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId);
     }
 }

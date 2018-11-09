@@ -17,6 +17,22 @@ namespace CalculateFunding.Frontend.Helpers
 {
     public class AuthorizationHelper : IAuthorizationHelper
     {
+        private class SpecificationAuthorizationEntity : ISpecificationAuthorizationEntity
+        {
+            private string _specificationId;
+
+            public SpecificationAuthorizationEntity(string specificationId)
+            {
+                Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+                _specificationId = specificationId;
+            }
+
+            public string GetSpecificationId()
+            {
+                return _specificationId;
+            }
+        }
+
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
         private readonly ILogger _logger;
@@ -36,6 +52,12 @@ namespace CalculateFunding.Frontend.Helpers
         {
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specification, new SpecificationRequirement(permissionRequired));
             return authorizationResult.Succeeded;
+        }
+
+        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
+        {
+            SpecificationAuthorizationEntity entity = new SpecificationAuthorizationEntity(specificationId);
+            return await DoesUserHavePermission(user, entity, permissionRequired);
         }
 
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, IEnumerable<string> fundingStreamIds, FundingStreamActionTypes permissionRequired)
@@ -131,19 +153,19 @@ namespace CalculateFunding.Frontend.Helpers
             return specifications.Where(s => !s.FundingStreams.Select(fs => fs.Id).Except(allowedFundingStreamIds).Any());
         }
 
-        public async Task<Clients.UsersClient.Models.FundingStreamPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
+        public async Task<Clients.UsersClient.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
-            ApiResponse<Clients.UsersClient.Models.FundingStreamPermission> response = await _usersClient.GetEffectivePermissionsForUser(userId, specificationId);
+            ApiResponse<Clients.UsersClient.Models.EffectiveSpecificationPermission> response = await _usersClient.GetEffectivePermissionsForUser(userId, specificationId);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 _logger.Error("Failed to get effective permissions for user ({user}) - {statuscode}", user.Identity.Name, response.StatusCode);
 
-                return new Clients.UsersClient.Models.FundingStreamPermission
+                return new Clients.UsersClient.Models.EffectiveSpecificationPermission
                 {
                     CanAdministerFundingStream = false,
                     CanApproveFunding = false,

@@ -23,7 +23,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            FundingStreamPermission effectivePermissions = await _authorizationHelper.GetEffectivePermissionsForUser(User, specificationId);
+            EffectiveSpecificationPermission effectivePermissions = await _authorizationHelper.GetEffectivePermissionsForUser(User, specificationId);
 
             return Ok(effectivePermissions);
         }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +17,22 @@ namespace CalculateFunding.Frontend.Controllers
     public class SpecificationController : Controller
     {
         private readonly ISpecsApiClient _specsClient;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public SpecificationController(ISpecsApiClient specsApiClient)
+        public SpecificationController(ISpecsApiClient specsApiClient, IAuthorizationHelper authorizationHelper)
         {
+            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _specsClient = specsApiClient;
+            _authorizationHelper = authorizationHelper;
         }
 
         [Route("api/specifications-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsByFundingPeriod(string fundingPeriodId)
         {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
             if (apiResponse == null)
             {
@@ -95,8 +104,12 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
+            {
+                return new ForbidResult();
+            }
 
             ValidatedApiResponse<PublishStatusResult> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
 
@@ -112,9 +125,14 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/{specificationId}/selectforfunding")]
         [HttpPost]
-        public async Task<IActionResult> SelectSpecificationForfunding(string specificationId)
+        public async Task<IActionResult> SelectSpecificationForFunding(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanChooseFunding))
+            {
+                return new ForbidResult();
+            }
 
             HttpStatusCode statusCode = await _specsClient.SelectSpecificationForFunding(specificationId);
 

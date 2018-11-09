@@ -1,4 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -13,12 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 {
@@ -29,7 +29,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         private const string specName = "spec name";
 
         [TestMethod]
-        public void OnGetAsync_GivenNuullOrEmptySpecificationId_ThrowsArgumentException()
+        public void OnGetAsync_GivenNullOrEmptySpecificationId_ThrowsArgumentException()
         {
             //Arrange
             EditSpecificationPageModel pageModel = CreatePageModel();
@@ -252,7 +252,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public void OnGetAsync_GivenToPopulayeFundingPeriodsIsOKButFundingStreamsReturnsBadRequest_ThrowsInvalidOperationException()
+        public void OnGetAsync_GivenToPopulateFundingPeriodsIsOKButFundingStreamsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
             Specification specification = new Specification();
@@ -299,7 +299,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public void OnGetAsync_GivenToPopulayeFundingPeriodsIsOKButFundingStreamsReturnsOKButNullContent_ThrowsInvalidOperationException()
+        public void OnGetAsync_GivenToPopulateFundingPeriodsIsOKButFundingStreamsReturnsOKButNullContent_ThrowsInvalidOperationException()
         {
             //Arrange
             Specification specification = new Specification();
@@ -534,6 +534,125 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
+        public async Task OnGetAsync_WhenUserDoesNotHaveCreateSpecPermissionOnExistingFundingStream_ThenExistingFundingStreamsAvailableForList()
+        {
+            // Arrange
+            Specification specification = new Specification
+            {
+                Id = specificationId,
+                Name = "Test Spec",
+                FundingStreams = new List<FundingStream>
+                {
+                    new FundingStream { Id = "fs1", Name = "FS One" },
+                    new FundingStream { Id = "fs2", Name = "FS Two" }
+                },
+                FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
+            };
+
+            IEnumerable<Reference> fundingPeriods = new[]
+            {
+                new Reference { Id = "fp1", Name = "Funding Period 1" },
+                new Reference { Id = "fp2", Name = "Funding Period 2" }
+            };
+
+            IEnumerable<FundingStream> fundingStreams = new[]
+            {
+                new FundingStream { Id = "fs1", Name = "FS One" },
+                new FundingStream { Id = "fs2", Name = "FS Two" }
+            };
+
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            specsClient
+                .GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+
+            specsClient
+                .GetFundingStreams()
+                .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(Enumerable.Empty<FundingStream>());
+
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
+
+            // Act
+            await pageModel.OnGetAsync(specificationId);
+
+            // Assert
+            pageModel.FundingStreams.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_WhenUserDoesNotHaveCreateSpecPermissionOnAllExistingFundingStream_ThenExistingFundingStreamsAvailableForList()
+        {
+            // Arrange
+            Specification specification = new Specification
+            {
+                Id = specificationId,
+                Name = "Test Spec",
+                FundingStreams = new List<FundingStream>
+                {
+                    new FundingStream { Id = "fs1", Name = "FS One" },
+                    new FundingStream { Id = "fs2", Name = "FS Two" }
+                },
+                FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
+            };
+
+            IEnumerable<Reference> fundingPeriods = new[]
+            {
+                new Reference { Id = "fp1", Name = "Funding Period 1" },
+                new Reference { Id = "fp2", Name = "Funding Period 2" }
+            };
+
+            IEnumerable<FundingStream> fundingStreams = new[]
+            {
+                new FundingStream { Id = "fs1", Name = "FS One" },
+                new FundingStream { Id = "fs2", Name = "FS Two" }
+            };
+
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            specsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            specsClient
+                .GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+
+            specsClient
+                .GetFundingStreams()
+                .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(new List<FundingStream>
+                {
+                    new FundingStream { Id = "fs1", Name = "FS One" }
+                });
+
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
+
+            // Act
+            await pageModel.OnGetAsync(specificationId);
+
+            // Assert
+            pageModel.FundingStreams.Should().HaveCount(2);
+        }
+
+        [TestMethod]
         public void OnPostAsync_GivenNameAlreadyExistsAndPopulateFundingPeriodsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
@@ -659,8 +778,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             };
 
             IEnumerable<FundingStream> fundingStreams = new[]
-           {
-                new FundingStream { Id = "fp1", Name = "funding" }
+            {
+                new FundingStream { Id = "fs1", Name = "funding stream" }
             };
 
             ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
@@ -695,7 +814,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
-                Name = specName
+                Name = specName,
+                FundingStreamIds = new List<string> { "fs1"}
             };
 
             pageModel.PageContext = new PageContext();

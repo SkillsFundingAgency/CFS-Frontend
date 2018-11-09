@@ -35,7 +35,6 @@ namespace CalculateFunding.Frontend.UnitTests
             // Assert
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             ResolveType<ApprovalController>(serviceProvider).Should().NotBeNull(nameof(ApprovalController));
-            ResolveType<AssignDatasetSchemaController>(serviceProvider).Should().NotBeNull(nameof(AssignDatasetSchemaController));
             ResolveType<CalculationController>(serviceProvider).Should().NotBeNull(nameof(CalculationController));
             ResolveType<CalculationSearchController>(serviceProvider).Should().NotBeNull(nameof(CalculationSearchController));
             ResolveType<DatasetController>(serviceProvider).Should().NotBeNull(nameof(DatasetController));

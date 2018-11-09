@@ -44,5 +44,11 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             return authHelper;
         }
 
+        internal static IAuthorizationHelper CreateAuthorizationHelperSubstitute(string specificationId, SpecificationActionTypes permissionRequired)
+        {
+            IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
+            authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(permissionRequired)).Returns(true);
+            return authHelper;
+        }
     }
 }
