@@ -4,9 +4,11 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.CommonModels;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Microsoft.AspNetCore.Mvc;
@@ -15,14 +17,17 @@
     {
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper)
+        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _calcClient = calcClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         [HttpPost]
@@ -32,6 +37,11 @@
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
+            {
+                return new ForbidResult();
+            }
 
             if (!ModelState.IsValid)
             {
@@ -95,11 +105,15 @@
 
         [Route("api/specs/{specificationId}/calculations/{calculationId}/status")]
         [HttpPut]
-        public async Task<IActionResult> EditCalculationStatus([FromRoute]string calculationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        public async Task<IActionResult> EditCalculationStatus([FromRoute]string specificationId, [FromRoute]string calculationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
-
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
+            {
+                return new ForbidResult();
+            }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
 

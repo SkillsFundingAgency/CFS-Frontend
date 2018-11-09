@@ -134,15 +134,18 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
+                // Need to make sure existing funding stream ids on the spec are still included on the list to display in the list as the security trimmed list is based on Create permission not Edit
+                IEnumerable<FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fundingStreamIds.Contains(fs.Id));
                 IEnumerable<FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
 
-                IEnumerable <SelectListItem> fundingStreams = trimmedResults.Select(m => new SelectListItem
+                IEnumerable<FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new FundingStreamComparer());
+                IEnumerable <SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
                 {
                     Value = m.Id,
                     Text = m.Name,
                 }).ToList();
 
-                FundingStreams = new MultiSelectList(fundingStreams, "Value", "Text", fundingStreamIds);
+                FundingStreams = new MultiSelectList(fundingStreamListItems, "Value", "Text", fundingStreamIds);
             }
             else
             {

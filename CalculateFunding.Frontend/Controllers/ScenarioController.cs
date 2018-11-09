@@ -2,9 +2,11 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +19,19 @@ namespace CalculateFunding.Frontend.Controllers
         private IScenariosApiClient _scenariosClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public ScenarioController(IScenariosApiClient scenariosClient, IMapper mapper, ILogger logger)
+        public ScenarioController(IScenariosApiClient scenariosClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(scenariosClient, nameof(scenariosClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _scenariosClient = scenariosClient;
             _mapper = mapper;
             _logger = logger;
+            _authorizationHelper = authorizationHelper;
         }
 
         [HttpPost]
@@ -35,6 +40,11 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanCreateQaTests))
+            {
+                return new ForbidResult();
+            }
 
             if (!ModelState.IsValid)
             {
@@ -75,6 +85,11 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditQaTests))
+            {
+                return new ForbidResult();
+            }
 
             if (!ModelState.IsValid)
             {

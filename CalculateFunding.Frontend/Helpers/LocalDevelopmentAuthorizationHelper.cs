@@ -26,6 +26,11 @@ namespace CalculateFunding.Frontend.Helpers
             return authorizationResult.Succeeded;
         }
 
+        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
+        {
+            return await Task.FromResult(true);
+        }
+
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, IEnumerable<string> fundingStreamIds, FundingStreamActionTypes permissionRequired)
         {
             return await Task.FromResult(true);
@@ -47,12 +52,12 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(specifications);
         }
 
-        public async Task<Clients.UsersClient.Models.FundingStreamPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
+        public async Task<Clients.UsersClient.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await Task.FromResult(new Clients.UsersClient.Models.FundingStreamPermission
+            return await Task.FromResult(new Clients.UsersClient.Models.EffectiveSpecificationPermission
             {
                 CanAdministerFundingStream = true,
                 CanApproveFunding = true,

@@ -2,11 +2,13 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.CommonModels;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +20,19 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IResultsApiClient _resultsClient;
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public ApprovalController(IResultsApiClient resultsApiClient, ISpecsApiClient specsClient, IMapper mapper)
+        public ApprovalController(IResultsApiClient resultsApiClient, ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _resultsClient = resultsApiClient;
             _mapper = mapper;
             _specsClient = specsClient;
+            _authorizationHelper = authorizationHelper;
         }
 
         [Route("api/specs/{specificationId}/allocationlineapprovalstatus")]
@@ -39,6 +44,12 @@ namespace CalculateFunding.Frontend.Controllers
             if (allocationLines.Status != AllocationLineStatusViewModel.Approved && allocationLines.Status != AllocationLineStatusViewModel.Published)
             {
                 ModelState.AddModelError(nameof(allocationLines.Status), "The status provided is not a valid destination status");
+            }
+
+            SpecificationActionTypes permissionRequired = allocationLines.Status == AllocationLineStatusViewModel.Approved ? SpecificationActionTypes.CanApproveFunding : SpecificationActionTypes.CanPublishFunding;
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, permissionRequired))
+            {
+                return new ForbidResult();
             }
 
             if (!ModelState.IsValid)
@@ -91,6 +102,11 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanRefreshFunding))
+            {
+                return new ForbidResult();
+            }
+
             ApiResponse<SpecificationCalculationExecutionStatusModel> callResult = await _specsClient.RefreshPublishedResults(specificationId);
 
             if (callResult.StatusCode == HttpStatusCode.OK)
@@ -129,8 +145,6 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new StatusCodeResult(500);
         }
-
-
 
         [Route("/api/results/get-published-provider-results-for-funding-stream")]
         public async Task<IActionResult> GetPublishedProviderResultsForFundingStream([FromQuery]string fundingPeriodId, [FromQuery]string specificationId, [FromQuery] string fundingStreamId)
