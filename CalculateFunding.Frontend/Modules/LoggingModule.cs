@@ -47,7 +47,7 @@
 
             Configuration.Bind("ApplicationInsightsOptions", appInsightsOptions);
 
-            services.AddSingleton<ApplicationInsightsOptions>(appInsightsOptions);
+            services.AddSingleton(appInsightsOptions);
 
             string serviceName = "CalculateFunding.Frontend";
 
