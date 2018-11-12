@@ -1,11 +1,14 @@
 ﻿namespace CalculateFunding.Frontend.Core.Ioc
 {
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
     public abstract class ServiceCollectionModuleBase
     {
         public IConfiguration Configuration { get; set; }
+
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         public abstract void Configure(IServiceCollection services);
 

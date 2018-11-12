@@ -5,22 +5,14 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Common.ApiClient.Interfaces;
-    using CalculateFunding.Common.Identity.Authorization;
-    using CalculateFunding.Common.Identity.Authorization.Repositories;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Core.Middleware;
-    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Modules;
     using CalculateFunding.Frontend.Options;
-    using Microsoft.AspNetCore.Authentication.Cookies;
-    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +20,6 @@
     public class Startup
     {
         private IHostingEnvironment _hostingEnvironment;
-
-        private bool _authenticationEnabled;
 
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
@@ -47,55 +37,7 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            AzureAdOptions azureAdOptions = new AzureAdOptions();
-            Configuration.Bind("AzureAd", azureAdOptions);
-            _authenticationEnabled = azureAdOptions.IsEnabled;
-
-            if (_authenticationEnabled)
-            {
-                services.AddAuthentication(adOptions =>
-                {
-                    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                })
-                .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-                .AddCookie();
-
-                services.AddAuthorization();
-
-                services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
-                services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
-
-                services.AddSingleton<IPermissionsRepository, PermissionsRepository>();
-                services.Configure<PermissionOptions>(options =>
-                {
-                    Configuration.GetSection("permissionOptions").Bind(options);
-                    options.HttpClientName = Common.ApiClient.HttpClientKeys.Users;
-                });
-
-                services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-
-                services.AddMvc(config =>
-                {
-                    AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
-                                     .RequireAuthenticatedUser()
-                                     .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
-                                     .Build();
-                    config.Filters.Add(new AuthorizeFilter(policy));
-
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            }
-            else
-            {
-                services.AddAuthorization();
-
-                services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
-
-                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
-                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
-
-                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            }
+            services.AddModule<AuthModule>(Configuration, _hostingEnvironment);
 
             services.AddAntiforgery(options =>
             {
@@ -160,6 +102,10 @@
                         return Task.CompletedTask;
                     });
                 });
+
+                app.UseAuthentication();
+
+                app.UseMiddleware<SkillsCheckMiddleware>();
             }
 
             app.UseStaticFiles(new StaticFileOptions()
@@ -169,14 +115,7 @@
                     ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=3600");
                 }
             });
-
-            if (_authenticationEnabled)
-            {
-                app.UseAuthentication();
-
-                app.UseMiddleware<SkillsCheckMiddleware>();
-            }
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
