@@ -6,11 +6,13 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
+    using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -23,16 +25,19 @@
         private readonly ISpecsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public AssignDatasetSchemaPageModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, IMapper mapper)
+        public AssignDatasetSchemaPageModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(specsClient, nameof(mapper));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _datasetsClient = datasetsClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
         }
 
         public string SpecificationId { get; set; }
@@ -74,17 +79,16 @@
                 {
                     throw new InvalidOperationException(message: $"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
                 }
-                else
+
+                if (!await _authorizationHelper.DoesUserHavePermission(User, specContent, SpecificationActionTypes.CanEditSpecification))
                 {
-                    SpecificationName = specContent.Name;
-
-                    SpecificationDescription = specContent.Description;
-
-                    FundingPeriodId = specContent.FundingPeriod.Id;
-
-                    FundingPeriodName = specContent.FundingPeriod.Name;
-
+                    return new ForbidResult();
                 }
+
+                SpecificationName = specContent.Name;
+                SpecificationDescription = specContent.Description;
+                FundingPeriodId = specContent.FundingPeriod.Id;
+                FundingPeriodName = specContent.FundingPeriod.Name;
 
                 ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
 
