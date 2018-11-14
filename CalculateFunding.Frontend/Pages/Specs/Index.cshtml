@@ -54,8 +54,8 @@
             <div class="row">
                 <div class="col-xs-2">
                     <div class="withjs-show">
-                        Funding period
-                        <select id="fundingPeriods" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+                        <label for="fundingPeriods">Funding period</label>
+                        <select id="fundingPeriods" data-bind="multiselect2: multiSelectConfigOptions, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
@@ -235,6 +235,15 @@
         var initialResults = @Html.Raw(Model.InitialSearchResults);
 
         vm.setInitialResults(initialResults);
+
+        var fundingPeriodsMultiselectConfig = {
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"></button>',
+                nonSelectedText: 'Show all',
+                buttonWidth: '100%',
+                disableIfEmpty: true
+            }
+        };
     </script>
 }
 

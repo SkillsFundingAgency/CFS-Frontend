@@ -12,6 +12,17 @@
         public fundingStreams: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedFundingStreams: KnockoutObservableArray<string> = ko.observableArray([]);
 
+        public multiSelectConfigOptions = {
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"><span class="multiselect-selected-text">Show all</span> <b class="caret"></b></button>',
+                ul: '<ul class="multiselect-container dropdown-menu" role="listbox"></ul>',
+                li: '<li><a href="javascript:void(0);" role="option"><label></label></a></li>'
+            },
+            nonSelectedText: 'Show all',
+            buttonWidth: '100%',
+            disableIfEmpty: true
+        };
+
         // Callback when search has been performed, used for ajax and initial page load
         private searchCompleted: (resultUntyped: any) => void;
 
