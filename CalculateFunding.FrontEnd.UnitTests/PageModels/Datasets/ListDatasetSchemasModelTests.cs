@@ -119,6 +119,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                             Id = datasetSchemasAssigned[0].Id,
                             Name= datasetSchemasAssigned[0].Name,
                             Description = datasetSchemasAssigned[0].Description,
+                            IsSetAsProviderData = false
                          }
                     },
                 },
@@ -134,6 +135,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                             Id = datasetSchemasAssigned[1].Id,
                             Name= datasetSchemasAssigned[1].Name,
                             Description = datasetSchemasAssigned[1].Description,
+                            IsSetAsProviderData = false,
                          }
                     },
                 },
@@ -148,12 +150,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                         Id = datasetSchemasAssigned[2].Id,
                         Name= datasetSchemasAssigned[2].Name,
                         Description = datasetSchemasAssigned[2].Description,
+                        IsSetAsProviderData = false
                      },
                      new AssignedDatasetViewModel()
                      {
                         Id = datasetSchemasAssigned[3].Id,
                         Name= datasetSchemasAssigned[3].Name,
                         Description = datasetSchemasAssigned[3].Description,
+                        IsSetAsProviderData = false
                      }
                 },
                 },
@@ -169,6 +173,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                         Id = datasetSchemasAssigned[4].Id,
                         Name= datasetSchemasAssigned[4].Name,
                         Description = datasetSchemasAssigned[4].Description,
+                        IsSetAsProviderData = true
                      }
                 },
                 }

@@ -2055,7 +2055,7 @@ table {
     table.cf tbody tr.expander-container-header {
         background-color: $grey-4;
     }
-    
+
     .affix {
         top: 0;
         z-index: 9999 !important;
@@ -2155,7 +2155,7 @@ table {
             color: $govuk-blue;
         }
 
-        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus{
+        .pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {
             color: white;
         }
 
@@ -2166,13 +2166,13 @@ table {
     }
 }
 
+
 table {
     tr {
         .fixed-width-330 {
             width: 330px;
         }
     }
-
     .nobottomborder {
         border-bottom: 0px !important;
     }
@@ -2786,4 +2786,21 @@ table {
 .a-unstyled {
     text-decoration: underline !important;
     color: #005ea5 !important;
+}
+
+.datasets-mapping-link {
+    margin-bottom: 15px;
+    float: right;
+}
+
+.fixed-width-30 {
+    width: 30px;
+}
+
+.datsets-provider-data-notification-text{
+    font-size: 12px;
+}
+
+.datsets-provider-data-notification-icon{
+    margin-left: 20px;
 }
