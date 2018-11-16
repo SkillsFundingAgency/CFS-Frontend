@@ -27,9 +27,9 @@
     <h1 class="hero-title">Specifications</h1>
     <form method="post" action="/specs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
 
-        <div class="input-group">
-            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-            <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div class="input-group" role="search">
+            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search specifications" />
+            <div class="input-group-addon"><button class="search-button" title="Search" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
         </div>
     </form>
 }
@@ -54,22 +54,22 @@
             <div class="row">
                 <div class="col-xs-2">
                     <div class="withjs-show">
-                        Funding period
-                        <select id="fundingPeriods" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+                        <span>Funding period</span>
+                        <select id="fundingPeriods" data-bind="multiselect2: multiSelectConfigOptions, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
                 <div class="col-xs-3">
                     <div class="withjs-show">
-                        Funding streams
-                        <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
+                        <span>Funding streams</span>
+                        <select id="fundingStreams" data-bind="multiselect2: multiSelectConfigOptions, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
                 <div class="col-xs-2">
                     <div class="withjs-show">
-                        Status
-                        <select id="status" data-bind="multiselect2: {nonSelectedText: 'Show all', buttonWidth: '100%', disableIfEmpty: true}, options: statuses, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatuses, enable: canSelectFilters" multiple></select>
+                        <span>Status</span>
+                        <select id="status" data-bind="multiselect2: multiSelectConfigOptions, options: statuses, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatuses, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
@@ -235,6 +235,7 @@
         var initialResults = @Html.Raw(Model.InitialSearchResults);
 
         vm.setInitialResults(initialResults);
+
     </script>
 }
 

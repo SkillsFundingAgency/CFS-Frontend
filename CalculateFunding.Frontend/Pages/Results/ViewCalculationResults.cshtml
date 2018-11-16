@@ -18,41 +18,42 @@
 
 @section BannerMiddle{
     <form method="post" action="/results/viewcalculationresults" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
-        <div class="row">
-            <div class="col-xs-9 filter-field-heading">Search calculations</div>
-            <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div role="search">
+            <div class="row">
+                <div class="col-xs-9 filter-field-heading">Search calculations</div>
+                <div class="col-xs-3 filter-field-heading withjs-show">Allocation Line</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-9">
+                    <div class="input-group">
+                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search calculations" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search calculations" />
+                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                    </div>
+                </div>
+                <div class="withjs-show col-xs-3">
+                    <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select Allocation Line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
                 </div>
             </div>
-            <div class="withjs-show col-xs-3">
-                <select id="allocationLines" data-bind="multiselect2: {nonSelectedText: 'Select Allocation Line', buttonWidth: '100%', disableIfEmpty: true}, options: allocationLines, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedAllocationLines, enable: canSelectFilters" multiple></select>
+            <div class="row spacing-15-top withjs-show">
+                <div class="col-xs-3 filter-field-heading">Funding period</div>
+                <div class="col-xs-3 filter-field-heading">Funding stream</div>
+                <div class="col-xs-3 filter-field-heading">Specification</div>
+                <div class="col-xs-3 filter-field-heading">Calculation status</div>
             </div>
-        </div>
-        <div class="row spacing-15-top withjs-show">
-            <div class="col-xs-3 filter-field-heading">Funding period</div>
-            <div class="col-xs-3 filter-field-heading">Funding stream</div>
-            <div class="col-xs-3 filter-field-heading">Specification</div>
-            <div class="col-xs-3 filter-field-heading">Calculation status</div>
-        </div>
-        <div class="row withjs-show">
-            <div class="col-xs-3">
-                <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+            <div class="row withjs-show">
+                <div class="col-xs-3">
+                    <select id="periods" data-bind="multiselect2: {nonSelectedText: 'Select funding period', buttonWidth: '100%', disableIfEmpty: true}, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all status', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
+                </div>
             </div>
-            <div class="col-xs-3">
-                <select id="fundingStreams" data-bind="multiselect2: {nonSelectedText: 'Select funding stream', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-3">
-                <select id="specifications" data-bind="multiselect2: {nonSelectedText: 'Select specification name', buttonWidth: '100%', disableIfEmpty: true}, options: specifications, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedSpecifications, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-3">
-                <select id="calculationStatus" data-bind="multiselect2: {nonSelectedText: 'Show all status', buttonWidth: '100%', disableIfEmpty: true}, options: calculationStatus, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedCalculationStatus, enable: canSelectFilters" multiple></select>
-            </div>
-
         </div>
     </form>
 }

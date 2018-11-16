@@ -29,33 +29,34 @@
 }
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
-        <div class="row">
-            <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search provider" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div role="search">
+            <div class="row">
+                <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-9">
+                    <div class="input-group">
+                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search providers" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search providers" />
+                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-4 filter-field-heading">Provider type</div>
-            <div class="col-xs-4 filter-field-heading">Provider subtype</div>
-            <div class="col-xs-4 filter-field-heading">Local authority</div>
-        </div>
-        <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-4">
-                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+            <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
+                <div class="col-xs-4 filter-field-heading">Provider type</div>
+                <div class="col-xs-4 filter-field-heading">Provider subtype</div>
+                <div class="col-xs-4 filter-field-heading">Local authority</div>
             </div>
-            <div class="col-xs-4">
-                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+            <div class="row withjs-show" data-bind="visible: searchPerformed">
+                <div class="col-xs-4">
+                    <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-4">
+                    <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-4">
+                    <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: localAuthority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+                </div>
             </div>
-            <div class="col-xs-4">
-                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: localAuthority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
-            </div>
-
         </div>
     </form>
 }

@@ -20,31 +20,33 @@
 
 @section BannerMiddle{
     <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
-        <div class="row">
-            <div class="col-xs-9 filter-field-heading"></div>
-            <div class="col-xs-3 filter-field-heading withjs-show"></div>
-        </div>
-        <div class="row">
-            <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div role="search">
+            <div class="row">
+                <div class="col-xs-9 filter-field-heading"></div>
+                <div class="col-xs-3 filter-field-heading withjs-show"></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-9">
+                    <div class="input-group">
+                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search data source files" />
+                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Load new data source file</a>
                 </div>
             </div>
-            <div class="col-xs-3">
-                <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Load new data source file</a>
+            <div class="row withjs-show" data-bind="visible: searchPerformed">
+                <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter data source files</div>
             </div>
-        </div>
-        <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter data source files</div>
-        </div>
-        <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-5 filter-field-heading">Data schema</div>
+            <div class="row withjs-show" data-bind="visible: searchPerformed">
+                <div class="col-xs-5 filter-field-heading">Data schema</div>
 
-        </div>
-        <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
-                <select id="dataschema" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="row withjs-show" data-bind="visible: searchPerformed">
+                <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
+                    <select id="dataschema" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+                </div>
             </div>
         </div>
     </form>

@@ -19,20 +19,22 @@
 
 @section BannerMiddle{
     <form method="post" action="/datasets/datasetrelationships" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
-        <div class="row">
-            <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div role="search">
+            <div class="row">
+                <div class="col-xs-9">
+                    <div class="input-group">
+                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search specificiations"/>
+                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-3 spacing-30-top filter-field-heading">Funding period</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-3">
-                <select data-bind="event: { change: fundingPeriodChanged }, value: selectedFundingPeriod" asp-items="@(Model.FundingPeriods)" class="form-control spec-mgr-control" id="select-spec-period" name="fundingPeriodId"></select>
+            <div class="row">
+                <div class="col-xs-3 spacing-30-top filter-field-heading">Funding period</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3">
+                    <select data-bind="event: { change: fundingPeriodChanged }, value: selectedFundingPeriod" asp-items="@(Model.FundingPeriods)" class="form-control spec-mgr-control" id="select-spec-period" name="fundingPeriodId"></select>
+                </div>
             </div>
         </div>
     </form>

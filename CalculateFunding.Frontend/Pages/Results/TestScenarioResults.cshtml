@@ -27,33 +27,31 @@
 
 @section BannerMiddle{
     <form method="get" class="filter-container spacing-15" id="filter-container" asp-antiforgery="false" data-bind="submit: performSearch">
-
-        <div class="row">
-            <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search QA tests" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+        <div role="search">
+            <div class="row">
+                <div class="col-xs-9">
+                    <div class="input-group">
+                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search QA tests" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search QA tests" />
+                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row spacing-15-top withjs-show">
-            <div class="col-xs-3 filter-field-heading">Funding period</div>
-            <div class="col-xs-4 filter-field-heading">Specification</div>
-        </div>
-        <div class="row row withjs-show">
-            <div class="col-xs-3">
-                <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter" data-bind="value: selectedFundingPeriodId">
-                    <option></option>
-                </select>
+            <div class="row spacing-15-top withjs-show">
+                <div class="col-xs-3 filter-field-heading">Funding period</div>
+                <div class="col-xs-4 filter-field-heading">Specification</div>
             </div>
-            <div class="col-xs-4">
-                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" data-bind="value: selectedSpecificationId, options: specifications, optionsText: 'name', optionsValue: 'id', optionsCaption: ''">
-                    <option></option>
-                </select>
-            </div>
-            <div class="col-xs-1">
-                <button type="submit" class="button" data-bind="visible: false" id="search-button">Search</button>
+            <div class="row row withjs-show">
+                <div class="col-xs-3">
+                    <select asp-items="@(Model.FundingPeriods)" asp-for="@Model.FundingPeriodId" class="form-control filter" data-bind="value: selectedFundingPeriodId">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="col-xs-4">
+                    <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" data-bind="value: selectedSpecificationId, options: specifications, optionsText: 'name', optionsValue: 'id', optionsCaption: ''">
+                        <option></option>
+                    </select>
+                </div>
             </div>
         </div>
     </form>

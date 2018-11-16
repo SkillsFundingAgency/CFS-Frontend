@@ -1,15 +1,15 @@
 ﻿<script type="text/template" id="componenttemplate-approvestatus-button">
     <div class="btn-group">
-        <button type="button" class="btn btn-status btn-status-text" data-bind="css : buttonCssClass, enable: !isLoading()">
+        <button type="button" class="btn btn-status btn-status-text" data-bind="css : buttonCssClass, enable: !isLoading()" aria-label="Approval Status">
             <span data-bind="text: publishStatus, visible: state() === 'idle'"></span>
             <span data-bind="visible: state() === 'loading'"><i class="material-icons">timer</i> Loading</span>
         </button>
-        <button type="button" class="btn dropdown-toggle btn-status" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="css : buttonCssClass, enable: canApprove">
+        <button type="button" class="btn dropdown-toggle btn-status" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Select Approval Status" data-bind="css : buttonCssClass, enable: canApprove">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-publishstatus">
-            <li class="dropdown-approved"><a href="#" data-bind="click: approve">Approved</a></li>
+        <ul class="dropdown-menu dropdown-menu-publishstatus" role="listbox" aria-label="Select Approval Status">
+            <li class="dropdown-approved" role="option"><a href="#" data-bind="click: approve">Approved</a></li>
         </ul>
     </div>
 
@@ -21,5 +21,13 @@
     ko.components.register('approve-status-button', {
         viewModel: calculateFunding.components.approveStatusButton.ApproveStatusButtonViewModel,
         template: $('#componenttemplate-approvestatus-button').text()
+    });
+
+    $('.dropdown-toggle').on('shown.bs.dropdown', function () {
+        $(this).attr('aria-expanded', 'true');
+    });
+
+    $('.dropdown-toggle').on('hidden.bs.dropdown', function () {
+        $(this).attr('aria-expanded', 'false');
     });
 </script>
