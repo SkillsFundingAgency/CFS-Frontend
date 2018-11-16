@@ -34,9 +34,9 @@
         </div>
         <div class="row">
             <div class="col-xs-9">
-                <div class="input-group">
-                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search tests" data-bind="textInput: searchTerm, enable: canSelectFilters" />
-                    <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
+                <div class="input-group" role="search">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search tests" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search tests" />
+                    <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
                 </div>
             </div>
             <div class="col-xs-3">
