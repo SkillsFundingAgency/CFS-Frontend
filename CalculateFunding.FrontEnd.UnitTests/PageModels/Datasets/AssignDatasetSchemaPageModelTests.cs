@@ -7,14 +7,17 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Datasets;
+    using CalculateFunding.Frontend.UnitTests.Helpers;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -45,7 +48,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .GetSpecification(Arg.Any<string>())
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, expectedSpecification));
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             // Act
             IActionResult result = await datasetSchemaPageModel.OnGet(expectedSpecificationId);
@@ -82,7 +85,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Name = "APT Final Baselines current year"
             };
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
             .GetSpecificationSummary(expectedSpecificationId)
@@ -144,7 +147,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             Specification expectedSpecification = null;
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
             .GetSpecification(expectedSpecificationId)
@@ -197,7 +200,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             SpecificationSummary expectedSpecification = null;
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
             .GetSpecificationSummary(expectedSpecificationId)
@@ -257,7 +260,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Name = "APT Final Baselines current year"
             };
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
             .GetSpecificationSummary(expectedSpecificationId)
@@ -310,7 +313,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             };
 
            // InvalidOperationException expectedException = null;
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
             .GetSpecificationSummary(expectedSpecificationId)
@@ -356,7 +359,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Name = "APT Final Baselines current year"
             };
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = new AssignDatasetSchemaPageModel(specsClient, datasetClient, mapper);
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
                 .GetSpecificationSummary(expectedSpecificationId)
@@ -395,6 +398,62 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             datasetDefinition[0].Text.Should().Be(d1.Name);
             datasetDefinition[1].Value.Should().Be(d2.Id);
             datasetDefinition[1].Text.Should().Be(d2.Name);
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturn403()
+        {
+            // Arrange
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+
+            string expectedSpecificationId = "spec123";
+
+            SpecificationSummary expectedSpecification = new SpecificationSummary();
+
+            specsClient
+                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(false);
+
+            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
+
+            // Act
+            IActionResult result = await datasetSchemaPageModel.OnGet(expectedSpecificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        private static AssignDatasetSchemaPageModel CreatePageModel(ISpecsApiClient specsClient = null, IDatasetsApiClient datasetsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        {
+            AssignDatasetSchemaPageModel pageModel = new AssignDatasetSchemaPageModel(
+                specsClient ?? CreateApiClient(),
+                datasetsClient ?? CreateDatasetsApiClient(),
+                mapper ?? CreateMapper(), 
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(Common.Identity.Authorization.Models.SpecificationActionTypes.CanEditSpecification));
+
+            pageModel.PageContext = TestAuthHelper.CreatePageContext();
+
+            return pageModel;
+        }
+
+        private static ISpecsApiClient CreateApiClient()
+        {
+            return Substitute.For<ISpecsApiClient>();
+        }
+
+        private static IDatasetsApiClient CreateDatasetsApiClient()
+        {
+            return Substitute.For<IDatasetsApiClient>();
+        }
+
+        private static IMapper CreateMapper()
+        {
+            return Substitute.For<IMapper>();
         }
     }
 }
