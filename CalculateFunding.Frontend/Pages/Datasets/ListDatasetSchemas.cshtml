@@ -22,16 +22,29 @@
     </div>
 }
 @section BannerWholeBlue {
-    <partial name="_SpecificationFullHeaderPartial" model="Model.Specification" />
+    <partial name="_SpecificationHeaderPartial" model="Model.Specification" />
 }
 
 <div class="row manage-policy">
-    <div class="col-xs-12 col-sm-9">
+    <div class="col-xs-12 col-sm-12">
         <div class="row view-dataset">
-
+            <div class="row">
+                <div class="col-xs-12 policy-spec-what ">
+                    <p class="withjs-hide">What is @Model.Specification.Name?</p>
+                    <div class="inline-collapse-container spacing-15-bottom">
+                        <div class="inline-collapse-heading withjs-show">
+                            <i class="inline-collapse-arrow"></i>
+                            <span>What is @Model.Specification.Name?</span>
+                        </div>
+                        <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                            @Model.Specification.Description.ReplaceLineBreaksForHtml()
+                        </div>
+                    </div>
+                </div>
+            </div>
             <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
                 <li class="nav-item">
-                    <a id="nav-policy-tab" href="/specs/policies/@Model.Specification.Id" role="tab" aria-selected="true">View policies</a>
+                    <a id="nav-policy-tab" href="/specs/policies/@Model.Specification.Id" role="tab" aria-selected="true">Policy structure</a>
                 </li>
                 <li class="nav-item active">
 
@@ -46,7 +59,6 @@
                     </a>
                 </li>
             </ul>
-
             <div>
                 @if (!Model.DatasetDefinitions.IsNullOrEmpty())
                 {
@@ -56,35 +68,73 @@
                             <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
                         </div>
                     }
-
-                    @foreach (var dataDefinition in Model.DatasetDefinitions)
+                    else
                     {
-                        <div class="dataset-assigned-list">
-                            <p><strong class="schema-list-text">@dataDefinition.Name</strong></p>
-                            <div class="schema-list">
-                                @if (!dataDefinition.Datasets.IsNullOrEmpty())
+                        <div class="datasets-mapping-link">
+                            <a href="/datasets/specificationrelationships?specificationId=@Model.Specification.Id">Map data source file to data set</a>
+                        </div>
+                        <table class="cf" id="datasets-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%">Datasets name</th>
+                                    <th colspan="2">Data schema</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="static-results-table-body">
+                                @{
+                                    int rowId = 0;
+                                }
+
+                                @foreach (var datasetDefinition in Model.DatasetDefinitions)
                                 {
-                                    foreach (var dataset in dataDefinition.Datasets)
+                                    foreach (var dataset in datasetDefinition.Datasets)
                                     {
-                                        <h2 class="datasetschemaassigned-list-title-container">
-                                            <a name="dataset-@dataset.Id"></a>
-                                            <span>@dataset.Name</span>
-                                        </h2>
-                                        <p class="policy-description">
-                                            @dataset.Description
-                                        </p>
-                                        if (dataset.DatasetVersion == null)
-                                        {
-                                            @*<p>
-                                                    <a href="/datasets/AssignDatasetVersion/@dataDefinition.Id">No datasets are assigned, choose data type relationship</a>
-                                                </p>*@
-                                        }
+                                        <tr>
+                                            <td>
+                                                <span class="button-split-container">
+                                                    @*Hidden for now until we have edit datasets available*@
+                                                    @*<span class="button-split-icon">
+                                                <a href="/datasets/EditDataset/@dataset.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">edit</i>@dataset.Name</a>
+                                                @if (dataset.IsSetAsProviderData)
+                                                {
+                                                    <span class="datsets-provider-data-notification-icon"> &#9679; <span class="datsets-provider-data-notification-text">Provider data </span></span>
+                                                }
+                                            </span>*@
+                                                    <span class="button-split-text">
+                                                        <span>@dataset.Name </span>
+                                                        @if (dataset.IsSetAsProviderData)
+                                                        {
+                                                            <span class="datsets-provider-data-notification-icon"> &#9679; <span class="datsets-provider-data-notification-text">Provider data </span></span>
+                                                        }
+                                                    </span>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>@datasetDefinition.Name</span>
+                                            </td>
+                                            <td class="expander-trigger-cell fixed-width-30" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
+                                        </tr>
+
+                                        <tr class="expander-container">
+                                            <td colspan="3" class="expander-container-background expander-container-padding-md">
+
+                                                <div class="spacing-15-bottom">
+                                                    <p><strong>Dataset description:</strong></p>
+                                                    <p class="data-specification-fundingperiod">@dataset.Description</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        rowId++;
                                     }
                                 }
-                            </div>
-                            <hr />
-                        </div>
+                            </tbody>
+                        </table>
+
                     }
+
+
+
                 }
                 else
                 {
@@ -98,22 +148,9 @@
         </div>
 
     </div>
-    <div class="col-xs-12 col-sm-3">
-        <div class="rightcolumn-container">
-            <h2 class="rightcolumn-heading">@Model.Specification.Name options</h2>
-            @if (Model.Specification.Policies != null && Model.Specification.Policies.Any())
-            {
-                <div>
-                    <a href="/specs/createSubPolicy/@Model.Specification.Id">Create subpolicy</a>
-                </div>
-                <div>
-                    <a href="/specs/createcalculation/@Model.Specification.Id">Create calculation specification</a>
-                </div>
-            }
-            <div>
-                <a href="/datasets/AssignDatasetSchema/@Model.Specification.Id">Create dataset</a>
-            </div>
-        </div>
-    </div>
-
 </div>
+
+@section scripts{
+   
+    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
+}

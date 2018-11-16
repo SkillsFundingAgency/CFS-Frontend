@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C79EA133-9D5A-46C4-B58B-C70BE743AB5F}"
 	ProjectSection(SolutionItems) = preProject
 		app_offline.htm = app_offline.htm
-		DevOps\frontend-azure.json = DevOps\frontend-azure.json
+		DevOps\frontend-azure.dfe.json = DevOps\frontend-azure.dfe.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D048BD50-CFBB-42BF-8B43-301401018421}"

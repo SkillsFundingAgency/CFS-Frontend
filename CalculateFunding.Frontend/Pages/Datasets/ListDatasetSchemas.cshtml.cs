@@ -103,6 +103,7 @@
                     Id = datasetSchema.Id,
                     Name = datasetSchema.Name,
                     Description = datasetSchema.Description,
+                    IsSetAsProviderData = datasetSchema.IsSetAsProviderData
                 };
 
                 datasets[datasetSchema.DatasetDefinition.Id].Add(dataset);

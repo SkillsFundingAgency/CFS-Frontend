@@ -7,5 +7,7 @@
         public string Description { get; set; }
 
         public ReferenceViewModel DatasetVersion { get; set; }
+
+        public bool IsSetAsProviderData { get; set; }
     }
 }

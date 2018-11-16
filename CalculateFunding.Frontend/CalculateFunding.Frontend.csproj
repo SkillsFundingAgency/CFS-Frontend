@@ -197,6 +197,9 @@
     <Content Update="Pages\_SearchTableRowCountPartial.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Pages\_SpecificationHeaderPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup>
