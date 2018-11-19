@@ -69,5 +69,12 @@
         /// <param name="request">Request including Specification IDS</param>
         /// <returns></returns>
         Task<ApiResponse<IEnumerable<CalculationStatusCounts>>> GetCalculationStatusCounts(SpecificationIdsRequestModel request);
+
+		/// <summary>
+		/// Get calculation for a given a calculation specification id
+		/// </summary>
+		/// <param name="calculationSpecificationId">Calculation specification id</param>
+		/// <returns></returns>
+		Task<ApiResponse<Calculation>> GetCalculationByCalculationSpecificationId(string calculationSpecificationId);
     }
 }

@@ -27,6 +27,12 @@
             return GetAsync<Calculation>($"calculation-current-version?calculationId={calculationId}");
         }
 
+	    public Task<ApiResponse<Calculation>> GetCalculationByCalculationSpecificationId(string calculationSpecificationId)
+	    {
+		    return GetAsync<Calculation>(
+			    $"{calculationSpecificationId}/calculation");
+	    }
+
         public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));

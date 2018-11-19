@@ -1,7 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
     using System;
-    using System.Collections.Generic;
+    using System.Net;
+	using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
@@ -126,5 +127,22 @@
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
         }
-    }
+
+	    [Route("api/specs/redirectToCalc/{calculationSpecificationId}")]
+	    public async Task<IActionResult> RedirectToEditCalc(string calculationSpecificationId)
+	    {
+		    Guard.IsNullOrWhiteSpace(calculationSpecificationId, nameof(calculationSpecificationId));
+
+		    ApiResponse<Calculation> apiResponse = await _calcClient.GetCalculationByCalculationSpecificationId(calculationSpecificationId);
+
+		    if (apiResponse.StatusCode == HttpStatusCode.OK)
+		    {
+			    return Redirect($"/calcs/editCalculation/{apiResponse.Content.Id}");
+		    }
+
+		    string errorMessage =
+			    $"Could not redirect for calculationSpecificationId: {calculationSpecificationId}, as the search for calculation returned status code: {apiResponse.StatusCode.ToString()}";
+		    throw new ApplicationException(errorMessage);
+	    }
+	}
 }

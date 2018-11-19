@@ -380,7 +380,88 @@ namespace CalculateFunding.Frontend.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+		[TestMethod]
+		public void RedirectToEditCalc_WhenAParameterIsNull_ShouldThrowException()
+		{
+			// Arrange
+			ICalculationsApiClient mockCalculationApiClient = Substitute.For<ICalculationsApiClient>();
+			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
+			IMapper mockMapper = Substitute.For<IMapper>();
+
+			CalculationController controller = new CalculationController(mockCalculationApiClient, mockMapper, mockAuthorizationHelper);
+
+			// Act
+			Func<Task<IActionResult>> redirectToEditCalc = async () => await controller.RedirectToEditCalc(null);
+
+			// Assert
+			redirectToEditCalc.Should().Throw<ArgumentException>();
+		}
+
+		[TestMethod]
+		public async Task RedirectToEditCalc_WhenValidRequestAndCalculationIsFound_ShouldRedirectToEditCalculationPage()
+		{
+			// Arrange
+			const string calculationSpecificationId = "calcSpecId";
+			const string calculationIdReturned = "Calc55";
+
+			Calculation calculationReturned = new Calculation()
+			{
+				Id = calculationIdReturned
+			};
+			ValidatedApiResponse<Calculation> apiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, calculationReturned);
+
+			ICalculationsApiClient mockCalculationApiClient = Substitute.For<ICalculationsApiClient>();
+			mockCalculationApiClient
+				.GetCalculationByCalculationSpecificationId(calculationSpecificationId)
+				.Returns(apiResponse);
+
+			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
+			IMapper mockMapper = Substitute.For<IMapper>();
+
+			CalculationController controller = new CalculationController(mockCalculationApiClient, mockMapper, mockAuthorizationHelper);
+
+			// Act
+			IActionResult actionResult = await controller.RedirectToEditCalc(calculationSpecificationId);
+
+			// Assert
+			actionResult
+				.Should()
+				.BeOfType<RedirectResult>();
+
+			RedirectResult redirectResult = actionResult as RedirectResult;
+			redirectResult
+				.Url
+				.Should()
+				.EndWith($"calcs/editCalculation/{calculationIdReturned}");
+		}
+
+		[TestMethod]
+		public void RedirectToEditCalc_WhenValidRequestButCalculationNotFoundResult_ShouldThrowException()
+		{
+			// Arrange
+			const string calculationSpecificationId = "calcSpecId";
+
+			ValidatedApiResponse<Calculation> apiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.NotFound);
+
+			ICalculationsApiClient calculationsApiClient = Substitute.For<ICalculationsApiClient>();
+			calculationsApiClient
+				.GetCalculationByCalculationSpecificationId(calculationSpecificationId)
+				.Returns(apiResponse);
+
+			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
+			IMapper mockMapper = Substitute.For<IMapper>();
+
+			CalculationController controller = new CalculationController(calculationsApiClient, mockMapper, mockAuthorizationHelper);
+
+			// Act
+			Func<Task<IActionResult>> redirectToEditCalc = async () => await controller.RedirectToEditCalc(calculationSpecificationId);
+
+			// Assert
+			redirectToEditCalc.Should().Throw<ApplicationException>();
+		}
+
+
+		private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             return new CalculationController(calcsClient, mapper, authorizationHelper);
         }

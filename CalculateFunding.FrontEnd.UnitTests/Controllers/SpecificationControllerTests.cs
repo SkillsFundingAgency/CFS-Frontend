@@ -131,5 +131,5 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             return new SpecificationController(specsClient, authorizationHelper);
         }
-    }
+	}
 }
