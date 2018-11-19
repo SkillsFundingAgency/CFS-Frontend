@@ -595,16 +595,14 @@
         public viewFunding(): void {
             this.pageState("main");
             this.notificationMessage('');
-            this.loadProviderResults();
-
             this.loadUserPermissions();
+
+            this.loadProviderResults();
         }
 
         /** Load the permissions the user has to control what actions are available */
         private loadUserPermissions() {
             let self = this;
-            self.workingMessage("Loading user permissions");
-            self.isWorkingVisible(true);
 
             let permissionsUrl = self.settings.permissionsUrl.replace("{specificationId}", self.selectedSpecification().id);
             let permissionsRequest = $.ajax({
@@ -623,13 +621,11 @@
                     }
 
                     self.pageState("main");
-                    self.isWorkingVisible(false);
                 })
                 .fail((ex) => {
                     self.notificationMessage("There was a problem loading your permissions for the specification.");
                     self.notificationStatus("error");
                     self.pageState("main");
-                    self.isWorkingVisible(false);
                 });
         }
 
