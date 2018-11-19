@@ -95,15 +95,14 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 return errorResult;
             }
 
-            IEnumerable<FundingStream> trimmedFundingStreams = await _authorizationHelper.SecurityTrimList(User, fundingStreamsLookupTask.Result.Content, FundingStreamActionTypes.CanChooseFunding);
-            FundingStreams = trimmedFundingStreams.Select(s => new SelectListItem()
-            {
-                Text = s.Name,
-                Value = s.Id,
-                Selected = fundingStream == s.Id,
-            });
+			FundingStreams = fundingStreamsLookupTask.Result.Content.Select(s => new SelectListItem()
+			{
+				Text = s.Name,
+				Value = s.Id,
+				Selected = fundingStream == s.Id,
+			});
 
-            FundingPeriods = fundingPeriodsLookupTask.Result.Content.Select(s => new SelectListItem()
+			FundingPeriods = fundingPeriodsLookupTask.Result.Content.Select(s => new SelectListItem()
             {
                 Text = s.Name,
                 Value = s.Id,
