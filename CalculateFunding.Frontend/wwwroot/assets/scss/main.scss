@@ -581,7 +581,7 @@ blockquote {
 
 
 .edit-policy-container {
-    .data-policy-description-firstline, .data-subpolicy-description-firstline {
+    .first-line-only {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -600,7 +600,7 @@ blockquote {
         table-layout: fixed;
 
         .theader-name {
-            width: 35%;
+            width: 115px;
         }
 
         .theader-description {
