@@ -616,10 +616,6 @@ blockquote {
         }
     }
 
-    .display-block {
-        display: block;
-    }
-
     .view-calculation-code-link {
         padding-top: 10px;
         padding-bottom: 5px;
@@ -660,10 +656,6 @@ blockquote {
         .theader-icon-holder {
             width: 45px;
         }
-    }
-
-    .display-block {
-        display: block;
     }
 
     .view-calculation-code-link {
@@ -2859,4 +2851,27 @@ table {
 
 .datsets-provider-data-notification-icon{
     margin-left: 20px;
+}
+
+#specification-relationship-page {
+    .dataset-isprovider-text {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .info-holder {
+        padding-top: 8px;
+    }
+
+    .info-holder:first-child {
+        padding-top: 0px;
+    }
+
+    #dataset-header-column {
+        width: 50%;
+    }
+}
+
+.display-block {
+    display: block;
 }

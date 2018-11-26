@@ -192,7 +192,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             string specificationId = Guid.NewGuid().ToString();
 
-            SpecificationSummary specification = new SpecificationSummary
+			SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId
             };
@@ -219,18 +219,19 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                     },
                     Version = 1,
                     Id = "rel-id",
-                    Name = "rel name"
+                    Name = "rel name",
+					IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK, relationships);
+	        ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK, relationships);
 
-            IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
+			IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
             datasetsApiClient
                 .GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(relationshipsResponse);
 
-            ILogger logger = CreateLogger();
+			ILogger logger = CreateLogger();
 
             SpecificationRelationshipsPageModel pageModel = CreatePageModel(specsApiClient, datasetsApiClient, logger);
 
@@ -293,6 +294,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .RelationshipId
                 .Should()
                 .Be("rel-id");
+
+	        pageModel
+		        .ViewModel
+		        .Items
+		        .First()
+		        .IsProviderData
+		        .Should().BeTrue();
         }
 
         private static SpecificationRelationshipsPageModel CreatePageModel(

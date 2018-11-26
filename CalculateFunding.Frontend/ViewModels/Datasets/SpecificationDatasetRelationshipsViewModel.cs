@@ -11,11 +11,26 @@
             Items = Enumerable.Empty<SpecificationDatasetRelationshipItemViewModel>();
 
             Specification = specification;
+	        SpecificationTrimmedViewModel = ToSpecificationTrimmedViewModel(specification);
         }
 
         public IEnumerable<SpecificationDatasetRelationshipItemViewModel> Items { get; set; }
 
         public SpecificationSummaryViewModel Specification { get; set; }
+
+		public SpecificationViewModel SpecificationTrimmedViewModel { get; set; }
+
+	    public SpecificationViewModel ToSpecificationTrimmedViewModel(SpecificationSummaryViewModel specificationSummaryViewModel)
+	    {
+			return new SpecificationViewModel()
+		    {
+			    FundingPeriod = specificationSummaryViewModel.FundingPeriod,
+			    Description = specificationSummaryViewModel.Description,
+			    FundingStreams = specificationSummaryViewModel.FundingStreams,
+			    Id = specificationSummaryViewModel.Id,
+			    Name = specificationSummaryViewModel.Name
+		    };
+		}
 
         public string GetCountPhrase()
         {
@@ -26,7 +41,7 @@
 
             int selectedCount = Items.Count(m => !string.IsNullOrWhiteSpace(m.DatasetId));
 
-            return $"{selectedCount} of {totalCount} datasets available selected for {Specification.Name}";
+            return $"{selectedCount} of {totalCount} datasets mapped with data source file";
         }
     }
 }

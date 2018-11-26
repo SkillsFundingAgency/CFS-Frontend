@@ -20,6 +20,9 @@
 
         public string RelationName { get; set; }
 
+		public bool IsProviderData { get; set; }
+
+
         public string DatasetPhrase
         {
             get
@@ -39,10 +42,10 @@
             {
                 if (string.IsNullOrWhiteSpace(DatasetName))
                 {
-                    return "Select source dataset";
+                    return "Map data source file";
                 }
 
-                return "Change source dataset";
+                return "Change data source file";
             }
         }
     }

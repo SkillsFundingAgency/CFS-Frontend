@@ -13,5 +13,7 @@
         public string DatasetId { get; set; }
 
         public string RelationshipDescription { get; set; }
+
+		public bool IsProviderData { get; set; }
     }
 }

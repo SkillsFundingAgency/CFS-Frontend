@@ -75,8 +75,8 @@
 
                 return null;
             }
-
-            viewModel.Items = apiResponse.Content.Select(m => new SpecificationDatasetRelationshipItemViewModel
+			
+			viewModel.Items = apiResponse.Content.Select(m => new SpecificationDatasetRelationshipItemViewModel
             {
                 DatasetId = m.DatasetId,
                 DatasetName = m.DatasetName,
@@ -86,7 +86,8 @@
                 DatasetVersion = m.Version.HasValue ? m.Version.Value : 0,
                 RelationName = m.Name,
                 RelationshipId = m.Id,
-                RelationshipDescription = m.RelationshipDescription
+                RelationshipDescription = m.RelationshipDescription,
+				IsProviderData = m.IsProviderData
             });
 
             return viewModel;

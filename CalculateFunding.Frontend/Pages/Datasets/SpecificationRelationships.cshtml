@@ -1,9 +1,11 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Datasets.SpecificationRelationshipsPageModel
 @using CalculateFunding.Frontend.Properties
+@using ViewModels.Specs
 
 @{
     ViewData["Title"] = "Specification relationships";
+    const string pathToMapToDataSchema = "~/datasets/selectsourcedataset?relationshipId={0}";
 }
 
 @section NavBar {
@@ -21,12 +23,11 @@
     </div>
 }
 
-@section BannerLeft{
-    <p class="hero-title">@Model.ViewModel.Specification.Name</p>
-    <p class="hero-description">@PageText.SpecificationRelationshipDescr</p>
+@section BannerWholeBlue {
+    <partial name="_SpecificationHeaderPartial" model="@Model.ViewModel.SpecificationTrimmedViewModel" />
 }
 
-<div class="row spacing-15">
+<div class="row spacing-15" id="specification-relationship-page">
     <div class="col-xs-12">
 
         @if (Model.ShowSuccessMessage)
@@ -53,23 +54,73 @@
         }
         else
         {
-            @foreach (var item in Model.ViewModel.Items)
-            {
-                <div class="@(counter %2 == 0 ? "spec-rel-grey-back":"spec-rel-white-back") specification-relationship-container">
-                    <h2 class="heading-medium heading-24 no-margin specification-relationship-relation-name">@item.DefinitionName</h2>
-                    <h4 class="heading-small no-margin specification-relationship-definition-name">@item.RelationName</h4>
-                    <p class="faded-text small no-margin specification-relationship-description">@item.RelationshipDescription</p>
-                    <p><strong>@item.DatasetPhrase</strong> <a href="~/datasets/selectsourcedataset?relationshipId=@item.RelationshipId">@item.LinkPhrase</a></p>
-                </div>
+            <table class="cf" id="datasets-table">
+                <thead>
+                    <tr>
+                        <th id="dataset-header-column">Dataset</th>
+                        <th>Mapped data source file</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ViewModel.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="dataset-name-holder">
+                                    <span>@item.RelationName</span>
+                                    @if (item.IsProviderData)
+                                    {
+                                        <div class="float-right"><span class="dotted-icon">&#9679;</span> <span class="dataset-isprovider-text">Provider data</span></div>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.DatasetName.IsNullOrEmpty())
+                                {
+                                    <a href=@Url.Content(string.Format(pathToMapToDataSchema, @item.RelationshipId))>@item.LinkPhrase</a>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <span class="button-split-container">
+                                            <span class="button-split-icon">
+                                                <a href=@Url.Content(string.Format(pathToMapToDataSchema, @item.RelationshipId))><i title="Edit" class="material-icons">edit</i></a>
+                                            </span>
+                                            <span>
+                                                @item.DatasetName
+                                            </span>
+                                        </span>
+                                    </div>
+                                }
+                            </td>
+                            <td class="expander-trigger-cell fixed-width-30"><i class="material-icons">keyboard_arrow_down</i></td>
+                        </tr>
 
-                counter++;
-            }
+                        <tr class="expander-container">
+                            <td colspan="3" class="expander-container-background expander-container-padding-md">
+
+                                <div class="spacing-15-bottom dataset-info-card">
+                                    <span class="display-block info-holder"><strong>Data Schema:</strong> @item.DefinitionName</span>
+                                    <span class="display-block info-holder"><strong>Dataset description:</strong> @item.RelationshipDescription</span>
+                                    <span class="display-block info-holder">Data source file version: <strong>@item.DatasetVersion</strong></span>
+                                    <a class="display-block info-holder" href=@Url.Content(string.Format(pathToMapToDataSchema, @item.RelationshipId))>@item.LinkPhrase</a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        counter++;
+                    }
+
+                </tbody>
+            </table>
         }
 
     </div>
 </div>
 
 @section Scripts{
+    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
     <script type="text/javascript">
 
         $('#dismiss-link').on('click', function (e) {
