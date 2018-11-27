@@ -12,6 +12,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Helpers
@@ -37,16 +38,19 @@ namespace CalculateFunding.Frontend.Helpers
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
         private readonly ILogger _logger;
+        private readonly PermissionOptions _permissionOptions;
 
-        public AuthorizationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient, ILogger logger)
+        public AuthorizationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient, ILogger logger, IOptions<PermissionOptions> permissionOptions)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
             Guard.ArgumentNotNull(usersClient, nameof(usersClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(permissionOptions, nameof(permissionOptions));
 
             _authorizationService = authorizationService;
             _usersClient = usersClient;
             _logger = logger;
+            _permissionOptions = permissionOptions.Value;
         }
 
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired)
@@ -65,6 +69,11 @@ namespace CalculateFunding.Frontend.Helpers
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(fundingStreamIds, nameof(fundingStreamIds));
+
+            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            {
+                return true;
+            }
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
@@ -97,6 +106,11 @@ namespace CalculateFunding.Frontend.Helpers
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(fundingStreams, nameof(fundingStreams));
 
+            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            {
+                return fundingStreams;
+            }
+
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
             ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
@@ -127,6 +141,11 @@ namespace CalculateFunding.Frontend.Helpers
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(specifications, nameof(specifications));
+
+            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            {
+                return specifications;
+            }
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
@@ -159,10 +178,31 @@ namespace CalculateFunding.Frontend.Helpers
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
+            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            {
+                return new Common.ApiClient.Users.Models.EffectiveSpecificationPermission
+                {
+                    CanAdministerFundingStream = true,
+                    CanApproveFunding = true,
+                    CanApproveSpecification = true,
+                    CanChooseFunding = true,
+                    CanCreateQaTests = true,
+                    CanCreateSpecification = true,
+                    CanEditCalculations = true,
+                    CanEditQaTests = true,
+                    CanEditSpecification = true,
+                    CanMapDatasets = true,
+                    CanPublishFunding = true,
+                    CanRefreshFunding = true,
+                    SpecificationId = specificationId,
+                    UserId = user.GetUserProfile()?.Id,
+                };
+            }
+
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
             ApiResponse<Common.ApiClient.Users.Models.EffectiveSpecificationPermission> response = await _usersClient.GetEffectivePermissionsForUser(userId, specificationId);
-            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
                 _logger.Error("Failed to get effective permissions for user ({user}) - {statuscode}", user.Identity.Name, response.StatusCode);
 
