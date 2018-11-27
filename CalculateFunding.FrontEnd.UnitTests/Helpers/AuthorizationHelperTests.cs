@@ -405,7 +405,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(Common.Identity.Authorization.Constants.ObjectIdentifierClaimType, userId)
+                new Claim(Common.Identity.Constants.ObjectIdentifierClaimType, userId)
             };
             ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity(claims));
             return user;

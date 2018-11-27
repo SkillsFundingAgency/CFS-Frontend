@@ -193,13 +193,13 @@ namespace CalculateFunding.Frontend.Helpers
 
         private static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal user)
         {
-            if (!user.HasClaim(c => c.Type == Common.Identity.Authorization.Constants.ObjectIdentifierClaimType))
+            if (!user.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType))
             {
                 throw new Exception("Cannot security trim a list when cannot identify the user");
             }
             else
             {
-                return user.FindFirst(Common.Identity.Authorization.Constants.ObjectIdentifierClaimType).Value;
+                return user.FindFirst(Common.Identity.Constants.ObjectIdentifierClaimType).Value;
             }
         }
     }
