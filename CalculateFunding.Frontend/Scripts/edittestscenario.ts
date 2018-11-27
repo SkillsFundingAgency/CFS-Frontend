@@ -170,6 +170,13 @@ namespace calculateFunding.editTestScenario {
             this.isIntellisenseLoading = ko.pureComputed(() => {
                 return self.state() === this.stateKeyIntellisenseLoading;
             });
+
+            $(window).on('beforeunload',
+                () => {
+                    if (self.hasGherkinEdited()) {
+                        return "You have unsaved test script changes";
+                    }
+                });
         }
 
         private extractTestScenarioDetails(options: IEditTestScenarioViewModelConstructorParameters){

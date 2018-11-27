@@ -138,6 +138,13 @@ namespace calculateFunding.createTestScenario {
             this.isIntellisenseLoading = ko.pureComputed(() => {
                 return self.state() === this.stateKeyIntellisenseLoading;
             });
+
+            $(window).on('beforeunload',
+                () => {
+                    if (self.sourceCode() && self.state() !== "redirecting") {
+                        return "You have unsaved test script changes";
+                    }
+                });
         }
 
         private resetValidation() {
@@ -239,7 +246,8 @@ namespace calculateFunding.createTestScenario {
             });
 
             request.done((response) => {
-                let responseModel : ICreateNewTestScenarioResponseModel = response ;
+                let responseModel: ICreateNewTestScenarioResponseModel = response;
+                self.state("redirecting");
                 window.location.href = "/scenarios/edittestscenario/" +responseModel.id +"/True";
             });
         }

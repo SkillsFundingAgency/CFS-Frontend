@@ -105,6 +105,13 @@ namespace calculateFunding.editCalculation {
 
                 return false;
             });
+
+            $(window).on('beforeunload',
+                () => {
+                    if (self.initialCodeContents !== self.sourceCode() && self.state() !== "redirecting") {
+                        return "You have unsaved calculation script changes";
+                    }
+                });
         }
 
         public buildCalculation() {
@@ -176,7 +183,7 @@ namespace calculateFunding.editCalculation {
                 });
 
                 request.done((successText) => {
-                    self.state("idle");
+                    self.state("redirecting");
 
                     // Redirect back to Manage Calculations page
                     window.location.href = "/calcs";
