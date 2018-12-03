@@ -68,70 +68,69 @@
                             <i class="material-icons">warning</i> <span>No dataset has been set as provider data. This may affect results.</span>
                         </div>
                     }
-                    else
-                    {
-                        <div class="datasets-mapping-link">
-                            <a href="/datasets/specificationrelationships?specificationId=@Model.Specification.Id">Map data source file to data set</a>
-                        </div>
-                        <table class="cf" id="datasets-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50%">Dataset</th>
-                                    <th colspan="2">Data schema</th>
-                                </tr>
-                            </thead>
+                   
+                    <div class="datasets-mapping-link">
+                        <a href="/datasets/specificationrelationships?specificationId=@Model.Specification.Id">Map data source file to data set</a>
+                    </div>
+                    <table class="cf" id="datasets-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%">Dataset</th>
+                                <th colspan="2">Data schema</th>
+                            </tr>
+                        </thead>
 
-                            <tbody id="static-results-table-body">
-                                @{
-                                    int rowId = 0;
-                                }
+                        <tbody id="static-results-table-body">
+                            @{
+                                int rowId = 0;
+                            }
 
-                                @foreach (var datasetDefinition in Model.DatasetDefinitions)
+                            @foreach (var datasetDefinition in Model.DatasetDefinitions)
+                            {
+                                foreach (var dataset in datasetDefinition.Datasets)
                                 {
-                                    foreach (var dataset in datasetDefinition.Datasets)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <span class="button-split-container">
-                                                    @*Hidden for now until we have edit datasets available*@
-                                                    @*<span class="button-split-icon">
-                                                            <a href="/datasets/EditDataset/@dataset.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">edit</i>@dataset.Name</a>
-                                                            @if (dataset.IsSetAsProviderData)
-                                                            {
-                                                                <span class="datsets-provider-data-notification-icon"> &#9679; <span class="datsets-provider-data-notification-text">Provider data </span></span>
-                                                            }
-                                                        </span>*@
-                                                    <span class="button-split-text">
-                                                        <span>@dataset.Name </span>
+                                    <tr>
+                                        <td>
+                                            <span class="button-split-container">
+                                                @*Hidden for now until we have edit datasets available*@
+                                                @*<span class="button-split-icon">
+                                                        <a href="/datasets/EditDataset/@dataset.Id?returnPage=Specifications" class="data-static-specification-name"><i class="material-icons">edit</i>@dataset.Name</a>
                                                         @if (dataset.IsSetAsProviderData)
                                                         {
                                                             <span class="datsets-provider-data-notification-icon"> &#9679; <span class="datsets-provider-data-notification-text">Provider data </span></span>
                                                         }
-                                                    </span>
+                                                    </span>*@
+                                                <span class="button-split-text">
+                                                    <span>@dataset.Name </span>
+                                                    @if (dataset.IsSetAsProviderData)
+                                                    {
+                                                        <span class="datsets-provider-data-notification-icon"> &#9679; <span class="datsets-provider-data-notification-text">Provider data </span></span>
+                                                    }
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <span>@datasetDefinition.Name</span>
-                                            </td>
-                                            <td class="expander-trigger-cell fixed-width-30" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
-                                        </tr>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>@datasetDefinition.Name</span>
+                                        </td>
+                                        <td class="expander-trigger-cell fixed-width-30" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
+                                    </tr>
 
-                                        <tr class="expander-container">
-                                            <td colspan="3" class="expander-container-background expander-container-padding-md">
+                                    <tr class="expander-container">
+                                        <td colspan="3" class="expander-container-background expander-container-padding-md">
 
-                                                <div class="spacing-15-bottom">
-                                                    <p><strong>Dataset description:</strong></p>
-                                                    <p class="data-specification-fundingperiod">@dataset.Description</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        rowId++;
-                                    }
+                                            <div class="spacing-15-bottom">
+                                                <p><strong>Dataset description:</strong></p>
+                                                <p class="data-specification-fundingperiod">@dataset.Description</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    rowId++;
                                 }
-                            </tbody>
-                        </table>
+                            }
+                        </tbody>
+                    </table>
 
-                    }
+                    
 
 
 
