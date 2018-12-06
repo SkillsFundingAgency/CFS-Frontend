@@ -11,6 +11,20 @@
     <h1 class="hero-title">Edit calculation specification for policy</h1>
 }
 
+@if (!Model.IsAuthorizedToEdit)
+{
+    @section PermissionWarnings
+        {
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this specification</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 @section NavBar {
     <partial name="_NavbarPartial" />
 }
@@ -95,7 +109,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update calculation specification</button> <a href="/specs/policies/@Model.Specification.Id" id="cancel-link">Back</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" disabled="@(!Model.IsAuthorizedToEdit)" id="save-button">Update calculation specification</button> <a href="/specs/policies/@Model.Specification.Id" id="cancel-link">Back</a></p>
 
         </form>
 

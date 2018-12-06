@@ -2875,3 +2875,27 @@ table {
 .display-block {
     display: block;
 }
+
+.permission-warning-banner {
+    background-color: #ffbf47;
+    height: 70px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.permission-warning-inner {
+    display: inline-block;
+    line-height: 70px;
+}
+
+.permission-warning-text {
+    font-size: 22px;
+    color: black;
+}
+
+.permission-warning-icon {
+    position: relative;
+    top: 4px;
+    right: 8px;
+}
+

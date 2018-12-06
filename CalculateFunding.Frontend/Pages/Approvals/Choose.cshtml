@@ -24,6 +24,20 @@
     <h1 class="hero-title">Choose funding specification</h1>
 }
 
+@if (!Model.IsSpecificationSelectedForThisFunding && !Model.IsUserAuthorizedToChooseSomeSpecs)
+{
+    @section PermissionWarnings
+    {
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You may not be able to choose some of the specifiations listed</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 @if (Model.PageBannerOperation != null)
 {
     <partial name="_PageBannerOperationPartial" model="Model.PageBannerOperation"></partial>

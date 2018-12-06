@@ -183,6 +183,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Count()
                .Should()
                .Be(1);
+
+	        pageModel
+		        .IsAuthorizedToCreate
+		        .Should().BeTrue();
         }
 
         [TestMethod]
@@ -240,7 +244,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Should()
                .Be(2);
 
-            pageModel
+	        pageModel
+		        .IsAuthorizedToCreate
+		        .Should().BeTrue();
+
+			pageModel
                 .FundingPeriods
                 .First(m => m.Value == "fp2")
                 .Selected
@@ -285,7 +293,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             // Assert
             result.Should().BeOfType<PageResult>();
             pageModel.FundingStreams.Should().BeEmpty();
-        }
+	        pageModel
+		        .IsAuthorizedToCreate
+		        .Should().BeFalse();
+		}
 
         [TestMethod]
         public async Task OnPostAsync_GivenPagePopulatesButModelStateIsInvalid_ReturnsPage()
@@ -351,7 +362,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should()
                 .Be(1);
 
-            pageModel
+			pageModel
                .FundingPeriods
                .Count()
                .Should()

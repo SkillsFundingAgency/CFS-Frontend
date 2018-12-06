@@ -41,7 +41,9 @@
 
         public string FundingPeriodId { get; set; }
 
-        [BindProperty]
+	    public bool IsAuthorizedToCreate { get; set; }
+
+		[BindProperty]
         public CreateSpecificationViewModel CreateSpecificationViewModel { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null)
@@ -52,7 +54,7 @@
             }
 
             await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
-
+	        IsAuthorizedToCreate = FundingStreams.Count() != 0;
             return Page();
         }
 

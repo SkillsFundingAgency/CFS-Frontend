@@ -53,7 +53,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string ParentPolicyId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId, string subPolicyId, string parentPolicyId)
+	    public bool IsAuthorizedToEdit { get; set; }
+
+		public async Task<IActionResult> OnGetAsync(string specificationId, string subPolicyId, string parentPolicyId)
         {
             Guard.IsNullOrWhiteSpace(subPolicyId, nameof(subPolicyId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -70,10 +72,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             Specification specification = specificationQuery.specification;
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
+	        IsAuthorizedToEdit =
+		        await _authorizationHelper.DoesUserHavePermission(User, specification,
+			        SpecificationActionTypes.CanEditSpecification);
 
             PopulateSpecificationProperites(specification);
 

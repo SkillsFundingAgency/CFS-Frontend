@@ -37,9 +37,14 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public string SelectedFundingPeriodId { get; set; }
 
+		public bool IsSpecificationSelectedForThisFunding { get; set; }
+
+		public bool IsUserAuthorizedToChooseSomeSpecs { get; set; }
+
         public IEnumerable<ChooseApprovalSpecificationViewModel> Specifications { get; set; }
 
         public PageBannerOperation PageBannerOperation { get; set; }
+
 
         public ChoosePageModel(ISpecsApiClient specsApiClient,
             ICalculationsApiClient calcsClient,
@@ -67,18 +72,18 @@ namespace CalculateFunding.Frontend.Pages.Approvals
         {
             List<Task> tasks = new List<Task>();
             Task<ApiResponse<IEnumerable<SpecificationSummary>>> specificationsLookupTask = null;
-
+			
             if (!string.IsNullOrWhiteSpace(fundingPeriod) && !string.IsNullOrWhiteSpace(fundingStream))
             {
                 specificationsLookupTask = _specsClient.GetApprovedSpecifications(fundingPeriod, fundingStream);
                 tasks.Add(specificationsLookupTask);
             }
 
-            Task<ApiResponse<IEnumerable<Reference>>> fundingPeriodsLookupTask = _specsClient.GetFundingPeriods();
+			Task<ApiResponse<IEnumerable<Reference>>> fundingPeriodsLookupTask = _specsClient.GetFundingPeriods();
 
             Task<ApiResponse<IEnumerable<FundingStream>>> fundingStreamsLookupTask = _specsClient.GetFundingStreams();
 
-            tasks.Add(fundingPeriodsLookupTask);
+			tasks.Add(fundingPeriodsLookupTask);
             tasks.Add(fundingStreamsLookupTask);
 
             await TaskHelper.WhenAllAndThrow(tasks.ToArray());
@@ -112,9 +117,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
             Dictionary<string, ChooseApprovalSpecificationViewModel> specifications = new Dictionary<string, ChooseApprovalSpecificationViewModel>();
 
-            string chosenSpecificationId = null;
-
-            if (!string.IsNullOrWhiteSpace(fundingPeriod) && !string.IsNullOrWhiteSpace(fundingStream))
+	        if (!string.IsNullOrWhiteSpace(fundingPeriod) && !string.IsNullOrWhiteSpace(fundingStream))
             {
                 errorResult = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
                 if (errorResult != null)
@@ -126,30 +129,22 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
                 SelectedFundingStreamId = fundingStream;
 
-                IActionResult specificationLookupError = specificationsLookupTask.Result.IsSuccessOrReturnFailureResult("Specification");
-                foreach (SpecificationSummary specification in specificationsLookupTask.Result.Content)
-                {
-                    ChooseApprovalSpecificationViewModel chooseSpecification = new ChooseApprovalSpecificationViewModel()
-                    {
-                        Id = specification.Id,
-                        Name = specification.Name,
-                        ApprovalStatus = _mapper.Map<PublishStatusViewModel>(specification.ApprovalStatus),
-                        IsSelectedForFunding = specification.IsSelectedForFunding,
-                        CanBeChosen = true,
-                        FundingStreams = _mapper.Map<List<ReferenceViewModel>>(specification.FundingStreams),
-                    };
+	            IEnumerable<SpecificationSummary> specificationSummaries = specificationsLookupTask.Result.Content.ToList();
+	            IEnumerable<SpecificationSummary> specificationSummariesTrimmed = await _authorizationHelper.SecurityTrimList(User, specificationSummaries, SpecificationActionTypes.CanChooseFunding);
+	            IEnumerable<SpecificationSummary> specificationSummariesUnauthorizedToChoose = specificationSummaries.Except(specificationSummariesTrimmed);
 
-                    if (specification.IsSelectedForFunding)
-                    {
-                        chosenSpecificationId = specification.Id;
-                    }
+	            IsSpecificationSelectedForThisFunding = specificationSummaries.Any(sc => sc.IsSelectedForFunding);
+				IEnumerable<ChooseApprovalSpecificationViewModel> specificationsAuthorizedViewModel = ConvertToChooseApprovalSpecificationModelWithCanBeChosenFlag(specificationSummariesTrimmed, !IsSpecificationSelectedForThisFunding);
+	            IEnumerable<ChooseApprovalSpecificationViewModel> specificationsUnauthorizedViewModel = ConvertToChooseApprovalSpecificationModelWithCanBeChosenFlag(specificationSummariesUnauthorizedToChoose, false);
 
-                    specifications.Add(specification.Id, chooseSpecification);
+	            IsUserAuthorizedToChooseSomeSpecs = !specificationsUnauthorizedViewModel.Any();
+				
+	            IEnumerable<ChooseApprovalSpecificationViewModel> specificationViewModels = specificationsAuthorizedViewModel.Concat(specificationsUnauthorizedViewModel);
 
-                }
+	            specifications = specificationViewModels.ToDictionary(vm => vm.Id);
             }
 
-            if (specifications.Count > 0)
+	        if (specifications.Count > 0)
             {
                 SpecificationIdsRequestModel specificationIdsRequest = new SpecificationIdsRequestModel()
                 {
@@ -218,18 +213,9 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                     chooseVm.QaTestsTotal = counts.Passed + counts.Ignored + counts.Failed;
                     chooseVm.ProviderQaCoverage = counts.TestCoverage;
                 }
-
-                // Make sure all specifications can't be chosen if one already has for this funding stream/period
-                if (!string.IsNullOrWhiteSpace(chosenSpecificationId))
-                {
-                    foreach (ChooseApprovalSpecificationViewModel specification in specifications.Values)
-                    {
-                        specification.CanBeChosen = false;
-                    }
-                }
             }
 
-            Specifications = specifications.Values.AsEnumerable();
+			Specifications = specifications.Values.AsEnumerable();
 
             if (operationType.HasValue && specifications.ContainsKey(operationId))
             {
@@ -248,5 +234,18 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
             return Page();
         }
+
+	    private IEnumerable<ChooseApprovalSpecificationViewModel> ConvertToChooseApprovalSpecificationModelWithCanBeChosenFlag(IEnumerable<SpecificationSummary> specificationSummaryToConvert, bool canBeChosen)
+	    {
+		    return specificationSummaryToConvert.Select(specification => new ChooseApprovalSpecificationViewModel
+		    {
+			    Id = specification.Id,
+			    Name = specification.Name,
+			    ApprovalStatus = _mapper.Map<PublishStatusViewModel>(specification.ApprovalStatus),
+			    IsSelectedForFunding = specification.IsSelectedForFunding,
+			    CanBeChosen = canBeChosen,
+			    FundingStreams = _mapper.Map<List<ReferenceViewModel>>(specification.FundingStreams),
+		    });
+	    }
     }
 }

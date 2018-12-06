@@ -47,7 +47,10 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public string FundingPeriodName { get; set; }
 
-        private string PolicyId { get; set; }
+	    public bool IsAuthorizedToEdit { get; set; }
+
+		private string PolicyId { get; set; }
+		
 
         public async Task<IActionResult> OnGetAsync(string specificationId, string policyId)
         {
@@ -59,10 +62,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             Specification specification = await GetSpecification(specificationId);
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
+	        IsAuthorizedToEdit =
+		        await _authorizationHelper.DoesUserHavePermission(User, specification,
+			        SpecificationActionTypes.CanEditSpecification);
 
             if (specification != null)
             {

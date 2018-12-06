@@ -1,39 +1,51 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Datasets
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Net;
+	using System.Threading.Tasks;
+	using AutoMapper;
+	using Common.Utility;
+	using Common.ApiClient.Models;
+	using Clients.DatasetsClient.Models;
+	using Clients.SpecsClient.Models;
+	using Interfaces.ApiClient;
+	using ViewModels.Datasets;
+	using ViewModels.Specs;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.AspNetCore.Mvc.RazorPages;
+	using Serilog;
+	using Common.Identity.Authorization.Models;
+	using Helpers;
 
-    public class SpecificationRelationshipsPageModel : PageModel
+	public class SpecificationRelationshipsPageModel : PageModel
     {
+		private readonly IAuthorizationHelper _authorizationHelper;
         private readonly ISpecsApiClient _specsApiClient;
         private readonly IDatasetsApiClient _datasetsApiClient;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public SpecificationRelationshipsPageModel(ISpecsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger, IMapper mapper)
+        public SpecificationRelationshipsPageModel(ISpecsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
-            _specsApiClient = specsApiClient;
+	        Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+	        Guard.ArgumentNotNull(datasetsApiClient, nameof(datasetsApiClient));
+	        Guard.ArgumentNotNull(logger, nameof(logger));
+	        Guard.ArgumentNotNull(mapper, nameof(mapper));
+	        Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
+			_specsApiClient = specsApiClient;
             _datasetsApiClient = datasetsApiClient;
             _logger = logger;
             _mapper = mapper;
+	        _authorizationHelper = authorizationHelper;
         }
 
         public SpecificationDatasetRelationshipsViewModel ViewModel { get; set; }
 
         public bool ShowSuccessMessage { get; set; }
+
+		public bool IsAuthorizedToMap { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId, bool wasSuccess = false)
         {
@@ -49,7 +61,10 @@
                 return new StatusCodeResult((int)specificationResponse.StatusCode);
             }
 
-            SpecificationDatasetRelationshipsViewModel viewModel = await PopulateViewModel(specificationResponse.Content);
+			IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content,
+				SpecificationActionTypes.CanMapDatasets);
+
+			SpecificationDatasetRelationshipsViewModel viewModel = await PopulateViewModel(specificationResponse.Content);
 
             if (viewModel == null)
             {

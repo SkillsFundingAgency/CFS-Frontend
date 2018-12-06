@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
@@ -545,8 +546,195 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             permissions.CanPublishFunding.Should().BeTrue("CanPublishFunding");
             permissions.CanRefreshFunding.Should().BeTrue("CanRefreshFunding");
         }
+		[TestMethod]
+		public async Task Specifications_SecurityTrimListForChooseFunding_WhenUserHasChooseFundingPermissionForAllFundingStreams_ThenReturnAllSpecifications()
+		{
+			// Arrange
+			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
+			{
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+			};
+			string userId = "testuser";
+			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
+			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-        private static ClaimsPrincipal BuildClaimsPrincipal(string userId, bool addAdminGroupClaim = false)
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			{
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = true },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanChooseFunding = true }
+			});
+
+			IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+			IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+			usersClient
+				.GetFundingStreamPermissionsForUser(userId)
+				.Returns(permissionsResponse);
+
+			AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+			// Act
+			IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
+
+			// Assert
+			results.Should().HaveCount(3);
+		}
+
+		[TestMethod]
+		public async Task Specifications_SecurityTrimListForChooseFunding_WhenUserHasAccessToNone_ThenReturnZeroSpecifications()
+		{
+			// Arrange
+			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
+			{
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+			};
+			string userId = "testuser";
+			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
+			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
+
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			{
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = false },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanChooseFunding = false }
+			});
+
+			IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+			IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+			usersClient
+				.GetFundingStreamPermissionsForUser(userId)
+				.Returns(permissionsResponse);
+
+			AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+			// Act
+			IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
+
+			// Assert
+			results.Should().BeEmpty();
+		}
+
+		[TestMethod]
+		public async Task Specifications_SecurityTrimListForChooseFunding_WhenUserHasAccessToSome_ThenReturnCorrectSpecifications()
+		{
+			// Arrange
+			const string spec1Id = "spec1";
+			const string spec3Id = "spec3";
+
+			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
+			{
+				new SpecificationSummary { Id = spec1Id, FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = spec3Id, FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+			};
+			string userId = "testuser";
+			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
+			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
+
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			{
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanChooseFunding = true }
+			});
+
+			IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+			IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+			usersClient
+				.GetFundingStreamPermissionsForUser(userId)
+				.Returns(permissionsResponse);
+
+			AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+			// Act
+			IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
+
+			// Assert
+			results.Should().HaveCount(2);
+
+			results
+				.Any(s => s.Id == spec1Id)
+				.Should()
+				.BeTrue();
+
+			results
+				.Any(s => s.Id == spec1Id)
+				.Should()
+				.BeTrue();
+		}
+
+		[TestMethod]
+		public async Task Specifications_SecurityTrimListChooseFunding_WhenUserDoesHaveAccessToAllFundingStreamsInASpecification_ThenReturnsSpecification()
+		{
+			// Arrange
+			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
+			{
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+			};
+			string userId = "testuser";
+			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
+			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
+
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			{
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = true }
+			});
+
+			IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+			IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+			usersClient
+				.GetFundingStreamPermissionsForUser(userId)
+				.Returns(permissionsResponse);
+
+			AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+			// Act
+			IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
+
+			// Assert
+			results.Should().HaveCount(1);
+		}
+
+		[TestMethod]
+		public async Task Specifications_SecurityTrimListChooseFunding_WhenUserDoesNotHaveAccessToAllFundingStreamsWithinSpecification_ThenReturnEmpty()
+		{
+			// Arrange
+			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
+			{
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+			};
+			string userId = "testuser";
+			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
+			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
+
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			{
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },
+				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanChooseFunding = true }
+			});
+
+			IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+			IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+			usersClient
+				.GetFundingStreamPermissionsForUser(userId)
+				.Returns(permissionsResponse);
+
+			AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+			// Act
+			IEnumerable<SpecificationSummary> results = await authHelper.SecurityTrimList(user, specifications, permissionRequired);
+
+			// Assert
+			results.Should().BeEmpty();
+		}
+
+		private static ClaimsPrincipal BuildClaimsPrincipal(string userId, bool addAdminGroupClaim = false)
         {
             List<Claim> claims = new List<Claim>
             {

@@ -53,7 +53,9 @@
 
         public IEnumerable<SelectListItem> CalculationTypes { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId, string calculationId)
+	    public bool IsAuthorizedToEdit { get; set; }
+
+		public async Task<IActionResult> OnGetAsync(string specificationId, string calculationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -61,10 +63,7 @@
 
             if (specification != null)
             {
-                if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-                {
-                    return new ForbidResult();
-                }
+	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification);
 
                 ApiResponse<CalculationCurrentVersion> calculationResult = await _specsClient.GetCalculationById(specificationId, calculationId);
                 if (calculationResult == null)

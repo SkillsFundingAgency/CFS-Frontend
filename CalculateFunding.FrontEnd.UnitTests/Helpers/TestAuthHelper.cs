@@ -37,10 +37,10 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             return pageContext;
         }
 
-        internal static IAuthorizationHelper CreateAuthorizationHelperSubstitute(SpecificationActionTypes permissionRequired)
+        internal static IAuthorizationHelper CreateAuthorizationHelperSubstitute(SpecificationActionTypes permissionRequired, bool returns = true)
         {
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
-            authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(permissionRequired)).Returns(true);
+            authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(permissionRequired)).Returns(returns);
             return authHelper;
         }
 

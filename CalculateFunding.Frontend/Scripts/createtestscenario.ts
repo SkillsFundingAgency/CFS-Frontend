@@ -64,13 +64,17 @@ namespace calculateFunding.createTestScenario {
 
         private codeContexts: ILoadedCodeContexts = {};
 
-        constructor() {
+        private isAuthorizedToCreate: KnockoutObservable<boolean> = ko.observable(false);
+
+        constructor(isAuthorizedToCreate: boolean) {
 
             let self = this;
 
             //self.isFormVisible = ko.pureComputed(() => {
             //    return self.state() === "idle";
             //});
+
+            this.isAuthorizedToCreate(isAuthorizedToCreate);
 
             self.isValidationSummaryVisible = ko.pureComputed(() => {
                 return !(this.isSpecificationIdValid() && this.isNameValid() && this.isDescriptionValid());
@@ -101,7 +105,7 @@ namespace calculateFunding.createTestScenario {
 
             this.canSaveTestScenario = ko.computed(() => {
                 // Has the user entered the test cases
-                if (!self.successfulValidationSourceCode()) {
+                if (!self.successfulValidationSourceCode() || !self.isAuthorizedToCreate()) {
                     return false;
                 }
 

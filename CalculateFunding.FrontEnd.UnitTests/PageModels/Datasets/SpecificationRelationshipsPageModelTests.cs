@@ -19,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
 
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
@@ -301,19 +303,90 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		        .First()
 		        .IsProviderData
 		        .Should().BeTrue();
+
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
         }
 
-        private static SpecificationRelationshipsPageModel CreatePageModel(
+		[TestMethod]
+		public async Task SpecificationRelationshipsPageModel_GivenUserHasNoPermissionToMapDataSetsForSpecification_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
+		{
+			// Arrange
+			string specificationId = Guid.NewGuid().ToString();
+
+			SpecificationSummary specification = new SpecificationSummary
+			{
+				Id = specificationId
+			};
+
+			ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
+
+			ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+			specsApiClient
+				.GetSpecificationSummary(Arg.Is(specificationId))
+				.Returns(specificationResponse);
+
+			IEnumerable<DatasetSpecificationRelationshipModel> relationships = new[]
+			{
+				new DatasetSpecificationRelationshipModel
+				{
+					DatasetId = "any-ds-id",
+					DatasetName = "any ds name",
+					RelationshipDescription = "any relationship description",
+					Definition = new SpecificationDataDefinitionRelationshipModel
+					{
+						Id = "def-id",
+						Name = "def name",
+						Description = "def desc"
+					},
+					Version = 1,
+					Id = "rel-id",
+					Name = "rel name",
+					IsProviderData = true
+				}
+			};
+
+			ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK, relationships);
+
+			IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
+			datasetsApiClient
+				.GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
+				.Returns(relationshipsResponse);
+
+			ILogger logger = CreateLogger();
+
+			SpecificationRelationshipsPageModel pageModel = CreatePageModel(specsApiClient, datasetsApiClient, logger,
+				authorizationHelper: CreateMockAuthenticationHelper(false));
+
+
+			// Act
+			IActionResult result = await pageModel.OnGetAsync(specificationId);
+
+			// Assert
+			result
+				.Should()
+				.BeOfType<PageResult>();
+
+			pageModel
+				.IsAuthorizedToMap
+				.Should()
+				.BeFalse();
+		}
+
+		private static SpecificationRelationshipsPageModel CreatePageModel(
             ISpecsApiClient specsApiClient = null, 
             IDatasetsApiClient datasetsApiClient = null, 
             ILogger logger = null,
-            IMapper mapper = null)
+            IMapper mapper = null,
+            IAuthorizationHelper authorizationHelper = null)
         {
             return new SpecificationRelationshipsPageModel(
                 specsApiClient ?? CreateSpecsApiClient(), 
                 datasetsApiClient ?? CreateDatasetApiClient(),
                 logger ?? CreateLogger(),
-                mapper ?? MappingHelper.CreateFrontEndMapper());
+                mapper ?? MappingHelper.CreateFrontEndMapper(),
+	            authorizationHelper ?? CreateMockAuthenticationHelper());
         }
 
         private static ISpecsApiClient CreateSpecsApiClient()
@@ -330,5 +403,15 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         {
             return Substitute.For<ILogger>();
         }
-    }
+
+	    private static IAuthorizationHelper CreateMockAuthenticationHelper(bool authUser = true)
+	    {
+		    IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
+			    .Returns(authUser);
+
+		    return mockAuthorizationHelper;
+	    }
+	}
 }

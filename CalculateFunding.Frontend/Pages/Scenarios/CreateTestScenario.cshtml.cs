@@ -42,25 +42,27 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
 
+		public bool IsAuthorizedToCreate { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
-            await PopulateSpecifications();
+            await PopulatePageModel();
 
             return Page();
         }
 
-        public async Task PopulateSpecifications()
+        public async Task PopulatePageModel()
         {
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationSummaries();
 
-            if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
+			if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Specification information: Status Code = {apiResponse.StatusCode}");
             }
 
             IEnumerable<SpecificationSummary> trimmedSpecs = await _authorizationHelper.SecurityTrimList(User, apiResponse.Content, SpecificationActionTypes.CanCreateQaTests);
-
-            Specifications = trimmedSpecs.OrderBy(s => s.Name).Select(m => new SelectListItem
+	        IsAuthorizedToCreate = trimmedSpecs.Any();
+	        Specifications = trimmedSpecs.OrderBy(s => s.Name).Select(m => new SelectListItem
             {
                 Value = m.Id,
                 Text = m.Name

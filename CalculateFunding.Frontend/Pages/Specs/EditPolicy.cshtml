@@ -27,6 +27,21 @@
     <p class="hero-text"> Edit policy for @Model.SpecificationName</p>
 }
 
+@if (!Model.IsAuthorizedToEdit)
+{
+    @section PermissionWarnings
+        {
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this specification</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 <div class="row edit-policy-container">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form" id="edit-policy-form">
@@ -51,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button">Update policy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
+            <p class="form-submit-container"><button class="button" disabled="@(!Model.IsAuthorizedToEdit)" type="submit">Update policy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
         </form>
     </div>
 </div>

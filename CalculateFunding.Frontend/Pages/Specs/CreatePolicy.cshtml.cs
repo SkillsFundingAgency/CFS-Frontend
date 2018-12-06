@@ -43,7 +43,9 @@
 
         public string FundingPeriodName { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId)
+		public bool IsAuthorizedToEdit { get; set; }
+
+		public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -51,10 +53,9 @@
 
             SpecificationSummary specification = await GetSpecification(specificationId);
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
+	        IsAuthorizedToEdit =
+		        await _authorizationHelper.DoesUserHavePermission(User, specification,
+			        SpecificationActionTypes.CanEditSpecification);
 
             if (specification != null)
             {
@@ -78,12 +79,12 @@
 
             SpecificationSummary specification = await GetSpecification(specificationId);
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
+			if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+			{
+				return new ForbidResult();
+			}
 
-            if (!string.IsNullOrWhiteSpace(CreatePolicyViewModel.Name))
+			if (!string.IsNullOrWhiteSpace(CreatePolicyViewModel.Name))
             {
                 ApiResponse<Policy> existingPolicyResponse = await _specsClient.GetPolicyBySpecificationIdAndPolicyName(specificationId, CreatePolicyViewModel.Name);
 

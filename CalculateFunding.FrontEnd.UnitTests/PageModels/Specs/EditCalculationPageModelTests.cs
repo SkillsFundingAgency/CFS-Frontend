@@ -224,6 +224,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         Value = "al4",
                     }
                 });
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
         }
 
         private static Specification CreateSpecification(string specificationId)
@@ -515,7 +519,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task EditCalculationPageModel_OnGetAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
+        public async Task EditCalculationPageModel_OnGetAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnOkWithAuthorizedToEditFlagSetToFalse()
         {
             // Arrange
             const string specificationId = "spec1";
@@ -555,10 +559,16 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             // Act
             IActionResult result = await pageModel.OnGetAsync(specificationId, calculationId);
 
-            // Assert
-            result
-                .Should()
-                .BeOfType<ForbidResult>();
+			// Assert
+			result
+				.Should()
+				.BeOfType<PageResult>()
+				.Which
+				.Should().NotBeNull();
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeFalse();
         }
 
         [TestMethod]

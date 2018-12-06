@@ -105,9 +105,9 @@
                 };
             }
 
-            this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
+	        this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
-            this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
+			this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
 

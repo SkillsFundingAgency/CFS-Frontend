@@ -199,10 +199,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Any()
                 .Should()
                 .BeTrue();
+
+	        pageModel
+		        .IsAuthorizedtoEdit
+		        .Should().BeTrue();
         }
 
         [TestMethod]
-        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnsForbidResult()
+        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
             // Arrange
             IAuthorizationHelper mockAuthHelper = Substitute.For<IAuthorizationHelper>();
@@ -216,7 +220,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IActionResult result = await pageModel.OnGetAsync(specificationId);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+	        result
+		        .Should().BeOfType<PageResult>();
+
+	        pageModel
+		        .IsAuthorizedtoEdit
+		        .Should().BeFalse();
         }
 
         [TestMethod]

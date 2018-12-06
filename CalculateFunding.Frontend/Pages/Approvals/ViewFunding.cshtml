@@ -10,6 +10,18 @@
     <partial name="_NavbarPartial" />
 }
 
+@section PermissionWarnings
+{
+    <div class="row" data-bind="visible:!doesUserHaveAllPermissions() && pageState() == 'main'">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text">
+                    <i class="material-icons permission-warning-icon">warning</i><span data-bind="text: userPermissionsText"></span></p>
+            </div>
+        </div>
+    </div>
+}
+
 @section BreadCrumb {
     <div class="breadcrumbs">
         <ol>

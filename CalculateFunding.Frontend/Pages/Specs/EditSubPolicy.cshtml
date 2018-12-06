@@ -10,6 +10,20 @@
     <partial name="_NavbarPartial" />
 }
 
+@if (!Model.IsAuthorizedToEdit)
+{
+    @section PermissionWarnings
+    {
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this specification</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
@@ -63,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button">Update subpolicy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" disabled="@(!Model.IsAuthorizedToEdit)">Update subpolicy</button> <a href="/specs/policies/@Model.SpecificationId">Back</a></p>
         </form>
     </div>
 </div>

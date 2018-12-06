@@ -164,37 +164,50 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Count()
                 .Should()
                 .Be(1);
+
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenUserDoesNotHaveMapDatasetsPermission_Returns403()
+        public async Task OnGetAsync_GivenUserDoesNotHaveMapDatasetsPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
-            // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+	        // Arrange
+	        SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+	        sourceModel.Datasets = new[]
+	        {
+		        new DatasetVersionsModel
+		        {
+			        Id = "ds-id",
+			        Name = "ds name",
+			        Versions = new[] { 1 }
+		        }
+	        };
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+	        ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
 
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-            datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
-                .Returns(sourcesResponse);
+	        IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
+	        datasetsApiClient
+		        .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+		        .Returns(sourcesResponse);
 
-            ILogger logger = CreateLogger();
+	        ILogger logger = CreateLogger();
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
-                .Returns(false);
+	        IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanMapDatasets, false);
+	        SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger, authorizationHelper: mockAuthorizationHelper);
 
-            SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger, authorizationHelper);
+	        // Act
+	        IActionResult result = await pageModel.OnGetAsync(relationshipId);
 
-            // Act
-            IActionResult result = await pageModel.OnGetAsync(relationshipId);
+	        //Assert
+	        result
+		        .Should()
+		        .BeOfType<PageResult>();
 
-            //Assert
-            result
-                .Should()
-                .BeOfType<ForbidResult>();
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeFalse();
         }
 
         [TestMethod]

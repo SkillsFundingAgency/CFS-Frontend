@@ -14,6 +14,20 @@
     <partial name="_NavbarPartial" />
 }
 
+@if (!Model.IsAuthorizedToEdit)
+{
+    @section PermissionWarnings
+        {
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this specification</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
@@ -90,7 +104,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Update specification</button> <a href="/specs/policies/@Model.EditSpecificationViewModel.Id" id="cancel-link">Back</a></p>
+            <p class="form-submit-container"><button class="button" disabled="@(!Model.IsAuthorizedToEdit)" id="save-button" type="submit">Update specification</button> <a href="/specs/policies/@Model.EditSpecificationViewModel.Id" id="cancel-link">Back</a></p>
 
         </form>
 
@@ -98,11 +112,20 @@
 </div>
 
 @section scripts{
+    <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
     <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
     <script asp-src-include="~/js/edit.specification.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
+
+
+    <script>
+        var editSpecificationViewModel = new calculateFunding.manageSpecifications.EditSpecification(@Model.IsAuthorizedToEdit);
+
+        ko.applyBindings(editSpecificationViewModel);
+    </script>
 }
 
 @section styles{
     <link rel="stylesheet" href="~/assets/libs/css/select2.min.css" />
 }
+

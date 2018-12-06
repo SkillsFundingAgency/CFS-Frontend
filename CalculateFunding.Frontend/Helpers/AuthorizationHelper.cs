@@ -163,6 +163,10 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 allowedFundingStreams = allowedFundingStreams.Where(p => p.CanCreateQaTests);
             }
+			else if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
+            {
+				allowedFundingStreams = allowedFundingStreams.Where(p => p.CanChooseFunding);
+			}
             else
             {
                 throw new NotSupportedException($"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
@@ -230,7 +234,7 @@ namespace CalculateFunding.Frontend.Helpers
                 return response.Content;
             }
         }
-
+		
         private static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal user)
         {
             if (!user.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType))

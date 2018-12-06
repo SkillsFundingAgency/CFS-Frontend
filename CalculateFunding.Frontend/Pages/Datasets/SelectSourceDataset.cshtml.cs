@@ -35,7 +35,9 @@
 
         public SelectDataSourceViewModel ViewModel { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string relationshipId)
+	    public bool IsAuthorizedToMap { get; set; }
+
+		public async Task<IActionResult> OnGetAsync(string relationshipId)
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
@@ -47,10 +49,7 @@
                 return NotFound();
             }
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets))
-            {
-                return new ForbidResult();
-            }
+            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets);
 
             SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
 

@@ -11,6 +11,20 @@
     <partial name="_NavbarPartial" />
 }
 
+@if (!Model.IsAuthorizedToEdit)
+{
+@section PermissionWarnings
+{
+    <div class="row">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this specification</p>
+            </div>
+        </div>
+    </div>
+}
+}
+
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
@@ -82,7 +96,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <p class="form-submit-container"><button type="submit" class="button" id="createDatasetButton">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId" id="cancelLink">Back</a></p>
+                    <p class="form-submit-container"><button type="submit" class="button" disabled="@(!Model.IsAuthorizedToEdit)" id="createDatasetButton">Create dataset</button> <a href="/specs/policies/@Model.SpecificationId" id="cancelLink">Back</a></p>
                 </div>
             </div>
         </form>

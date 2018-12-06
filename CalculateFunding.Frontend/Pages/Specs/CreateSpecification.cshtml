@@ -9,6 +9,21 @@
     <partial name="_NavbarPartial" />
 }
 
+@if (!Model.IsAuthorizedToCreate)
+{
+@section PermissionWarnings
+{
+    <div class="row">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to create a specification for any funding stream</p>
+            </div>
+        </div>
+    </div>
+}
+}
+
 @section FormBannerLeft{
     <h1 class="hero-title">Create specification</h1>
 }
@@ -72,7 +87,7 @@
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" id="save-button">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
+            <p class="form-submit-container"><button type="submit" class="button" disabled="@(!Model.IsAuthorizedToCreate)" id="save-button">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
 
         </form>
 

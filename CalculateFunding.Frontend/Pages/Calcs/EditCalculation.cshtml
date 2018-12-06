@@ -10,6 +10,17 @@
     <partial name="_NavbarPartial" />
 }
 
+@section PermissionWarnings
+{
+    <div id="permissions-banner-editcalc" class="row" data-bind="visible:!doesUserHavePermissionToApproveOrEdit()">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this calculation</p>
+            </div>
+        </div>
+    </div>
+}
+
 @section FormBannerLeft{
     <p class="hero-description">@Model.SpecificationName </p>
     <p class="hero-title">
@@ -112,6 +123,7 @@
             ko.applyBindings(viewModel, editCalculationElement);
 
             ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
+            ko.applyBindings(viewModel, document.getElementById("permissions-banner-editcalc"));
         }
     </script>
 }

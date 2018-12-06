@@ -47,6 +47,8 @@
 
         public string ParentPolicyId { get; set; }
 
+	    public bool IsAuthorizedToEdit { get; set; }
+
         public IEnumerable<SelectListItem> Policies { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
@@ -57,10 +59,9 @@
 
             Specification specification = await GetSpecification(specificationId);
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
+	        IsAuthorizedToEdit =
+		        await _authorizationHelper.DoesUserHavePermission(User, specification,
+			        SpecificationActionTypes.CanEditSpecification);
 
             if (specification != null)
             {

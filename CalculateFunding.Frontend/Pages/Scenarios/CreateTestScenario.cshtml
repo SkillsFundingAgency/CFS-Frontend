@@ -20,6 +20,17 @@
     </div>
 }
 
+@section PermissionWarnings
+{
+    <div id="permissions-alert-createtest" class="row" data-bind="visible: !isAuthorizedToCreate()">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to create a QA test for any funding stream</p>
+            </div>
+        </div>
+    </div>
+}
+
 @section FormBannerLeft{
     <p class="hero-title">Create quality assurance test</p>
 
@@ -125,10 +136,13 @@
     <script asp-src-include="~/js/createtestscenario.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var createTestScenarioElement = document.getElementById("create-test-scenario");
-        var vm = new calculateFunding.createTestScenario.CreateTestScenarioViewModel();
+        var permissionAlertHolderElement = document.getElementById("permissions-alert-createtest");
+        var vm = new calculateFunding.createTestScenario.CreateTestScenarioViewModel(@Model.IsAuthorizedToCreate.ToString().ToLowerInvariant());
 
         if (createTestScenarioElement) {
             ko.applyBindings(vm, createTestScenarioElement);
         }
+        ko.applyBindings(vm, permissionAlertHolderElement);
+
     </script>
 }

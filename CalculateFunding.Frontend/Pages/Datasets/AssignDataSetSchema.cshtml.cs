@@ -52,6 +52,8 @@
 
         public IEnumerable<GdsSelectListItem> Datasets { get; set; }
 
+	    public bool IsAuthorizedToEdit { get; set; }
+
         [BindProperty]
         public AssignDatasetSchemaViewModel AssignDatasetSchemaViewModel { get; set; }
 
@@ -80,11 +82,8 @@
                     throw new InvalidOperationException(message: $"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
                 }
 
-                if (!await _authorizationHelper.DoesUserHavePermission(User, specContent, SpecificationActionTypes.CanEditSpecification))
-                {
-                    return new ForbidResult();
-                }
-
+	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specContent, SpecificationActionTypes.CanEditSpecification);
+				
                 SpecificationName = specContent.Name;
                 SpecificationDescription = specContent.Description;
                 FundingPeriodId = specContent.FundingPeriod.Id;

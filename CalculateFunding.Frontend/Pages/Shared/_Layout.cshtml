@@ -62,7 +62,12 @@
 
     @if (IsSectionDefined("BannerLeft"))
     {
-    <section class="banner-container">
+        if (IsSectionDefined("PermissionWarnings"))
+        {
+            <hr class="navbar-separator" />
+            @RenderSection("PermissionWarnings", false)
+        }
+        <section class="banner-container">
         <div class="container">
             <div class="row">
                 <div class="col-xs-9">
@@ -93,6 +98,10 @@
     {
     <section class="form-banner-container">
         <hr class="navbar-separator" />
+        @if (IsSectionDefined("PermissionWarnings"))
+        {
+            @RenderSection("PermissionWarnings", false);
+        }
         <div class="container">
             <div class="row">
                 <div class="col-xs-9">
@@ -115,16 +124,20 @@
     {
     <section class="form-banner-container">
         <hr class="navbar-separator" />
+        @if (IsSectionDefined("PermissionWarnings"))
+        {
+            @RenderSection("PermissionWarnings", false);
+        }
         <div class="container">
             @if (IsSectionDefined("BreadCrumb"))
-                {
-            <div class="row">
-                <div class="col-xs-12">
-                    @RenderSection("BreadCrumb", false)
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        @RenderSection("BreadCrumb", false)
+                    </div>
                 </div>
-            </div>
 
-                }
+            }
             <div class="row">
                 <div class="col-xs-12">
                     @RenderSection("BannerWhole")
@@ -136,16 +149,21 @@
     else if (IsSectionDefined("BannerWholeBlue"))
     {
     <section class="banner-container">
+        @if (IsSectionDefined("PermissionWarnings"))
+        {
+            <hr class="navbar-separator" />
+            @RenderSection("PermissionWarnings", false);
+        }
         <div class="container">
             @if (IsSectionDefined("BreadCrumb"))
-                {
-            <div class="row">
-                <div class="col-xs-12">
-                    @RenderSection("BreadCrumb", false)
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        @RenderSection("BreadCrumb", false)
+                    </div>
                 </div>
-            </div>
 
-                }
+            }
             <div class="row">
                 <div class="col-xs-12">
                     @RenderSection("BannerWholeBlue")

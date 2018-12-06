@@ -408,6 +408,14 @@
             return false;
         }, this);
 
+        doesUserHaveAllPermissions: KnockoutComputed<boolean> = ko.pureComputed(function () {
+            return this.permissions().doesUserHaveAllPermissions();
+        }, this);
+
+        userPermissionsText: KnockoutComputed<string> = ko.pureComputed(function () {
+            return this.permissions().generatePermissionsDeniedText();
+        }, this);
+
         /** Show confirmation page for publish of selected allocation lines */
         confirmPublish() {
             let publishVM = new ConfirmPublishApproveViewModel();
@@ -1086,5 +1094,37 @@
         canRefresh: boolean;
         canApprove: boolean;
         canPublish: boolean;
+        
+        public doesUserHaveAllPermissions(): boolean {
+            return this.canRefresh && this.canApprove && this.canPublish;
+        }
+
+        public generatePermissionsDeniedText(): string {
+            let permissionsText: string[] = [];
+            if (!this.canRefresh) {
+                permissionsText.push("refresh");
+            }
+            if (!this.canApprove) {
+                permissionsText.push("approve");
+            }
+            if (!this.canPublish) {
+                permissionsText.push('publish');
+            }
+
+            let generatedText: string;
+            if (permissionsText.length != 0) {
+                generatedText = "You are not permitted to";
+                for (let i = 0; i < permissionsText.length; i++) {
+                    if (i == 0) {
+                        generatedText += " " + permissionsText[i];
+                    }
+                    else {
+                        generatedText += " or " + permissionsText[i];
+                    }
+                }
+                generatedText += " funding values for this specification.";
+            }
+            return generatedText;
+        }
     }
 }

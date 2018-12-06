@@ -421,7 +421,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Should()
                .Be(1);
 
-            viewModel
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
+
+			viewModel
                 .OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
@@ -504,33 +508,94 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Should()
                .Be(2);
 
-            viewModel
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
+
+			viewModel
                 .OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
+        public async Task OnGetAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
-            // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-            specsClient
-                .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification { Id = specificationId }));
+			// Arrange
+			IEnumerable<Reference> fundingPeriods = new[]
+			{
+				new Reference { Id = "fp1", Name = "Funding Period 1" },
+				new Reference { Id = "fp2", Name = "Funding Period 2" }
+			};
+			IEnumerable<FundingStream> fundingStreams = new[]
+			{
+				new FundingStream { Id = "fp1", Name = "funding" }
+			};
+	        Specification specification = new Specification { Id = specificationId, Name = specName };
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+			ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+			ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+			ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+
+	        EditSpecificationViewModel viewModelReturned = CreateEditSpecificationViewModel();
+
+	        ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+                .GetSpecification(Arg.Is(specificationId))
+                .Returns(specificationResponse);
+
+			mockSpecsClient
+				.GetFundingPeriods()
+		        .Returns(fundingPeriodsResponse);
+
+			mockSpecsClient
+				.GetFundingStreams()
+		        .Returns(fundingStreamsResponse);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+            mockAuthorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
+			mockAuthorizationHelper
+				.SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+		        .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
+			IMapper mockMapper = CreateMapper();
+			mockMapper
+				.Map<EditSpecificationViewModel>(Arg.Is(specification))
+				.Returns(viewModelReturned);
+
+			EditSpecificationPageModel pageModel = CreatePageModel(specsClient: mockSpecsClient, authorizationHelper: mockAuthorizationHelper, mapper: mockMapper);
 
             // Act
-            IActionResult result = await pageModel.OnGetAsync(specificationId);
+            IActionResult pageResult = await pageModel.OnGetAsync(specificationId);
 
-            // Assert
-            result.Should().BeOfType<ForbidResult>();
+			// Assert
+			pageResult
+		        .Should()
+		        .BeOfType<PageResult>();
+
+			pageModel
+				.FundingStreams
+				.Count()
+				.Should()
+				.Be(1);
+
+			pageModel
+				.FundingPeriods
+				.Count()
+				.Should()
+				.Be(2);
+
+			pageModel
+				.EditSpecificationViewModel
+				.OriginalSpecificationName
+				.Should()
+				.BeEquivalentTo(specName);
+
+			pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeFalse();
         }
 
         [TestMethod]

@@ -10,6 +10,17 @@
     <partial name="_NavbarPartial" />
 }
 
+@section PermissionWarnings
+{
+    <div id="permission-alert-edit-test-scenario" class="row" data-bind="visible:!doesUserHavePermissionToSave()">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this QA test</p>
+            </div>
+        </div>
+    </div>
+}
+
 @section FormBannerLeft{
     <p class="hero-title">Edit quality assurance test</p>
 }
@@ -133,11 +144,13 @@
     <script asp-src-include="~/js/edittestscenario.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
         var editTestScenarioElement = document.getElementById("edit-test-scenario");
+        var permissionAlertTestScenario = document.getElementById("permission-alert-edit-test-scenario");
         var vm = new calculateFunding.editTestScenario.EditTestScenarioViewModel({ "name": "@Html.Raw(Model.EditScenarioViewModel.Name)", "description": "@Html.Raw(Model.EditScenarioViewModel.Description)", "sourceCode": "@Html.Raw(Model.EditScenarioViewModel.Gherkin)", "specificationId": "@Html.Raw(Model.SpecificationId)", "scenarioId": "@Html.Raw(Model.TestScenarioId)" });
         vm.doesUserHavePermissionToSave(@Model.DoesUserHavePermissionToSave);
         if (editTestScenarioElement) {
             ko.applyBindings(vm, editTestScenarioElement);
         }
+        ko.applyBindings(vm, permissionAlertTestScenario);
     </script>
 
 }

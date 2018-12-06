@@ -43,7 +43,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
         [BindProperty]
         public EditSpecificationViewModel EditSpecificationViewModel { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId)
+	    public bool IsAuthorizedToEdit { get; set; }
+
+		public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -51,13 +53,11 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content != null)
             {
-                if (!await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanEditSpecification))
-                {
-                    return new ForbidResult();
-                }
+	            EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
+	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
+		            specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
 
-                EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
-                EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
+				EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
                 EditSpecificationViewModel.OriginalFundingStreams = string.Join(",", EditSpecificationViewModel.FundingStreamIds);
                 EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
 

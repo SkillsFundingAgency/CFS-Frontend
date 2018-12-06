@@ -4,7 +4,7 @@
 
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
-    using System;
+	using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Security.Claims;
@@ -24,8 +24,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using Serilog;
+	using Microsoft.AspNetCore.Mvc.RazorPages;
 
-    [TestClass]
+	[TestClass]
     public class AssignDatasetSchemaPageModelTests
     {
         [TestMethod]
@@ -122,8 +123,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             datasetSchemaPageModel.SpecificationName.Should().Be(expectedSpecification.Name);
             datasetSchemaPageModel.FundingPeriodId.Should().Be(expectedSpecification.FundingPeriod.Id);
             datasetSchemaPageModel.FundingPeriodName.Should().Be(expectedSpecification.FundingPeriod.Name);
+	        datasetSchemaPageModel.IsAuthorizedToEdit.Should().BeTrue();
 
-            List<SelectListItem> datasetDefinition = new List<SelectListItem>(datasetSchemaPageModel.Datasets);
+			List<SelectListItem> datasetDefinition = new List<SelectListItem>(datasetSchemaPageModel.Datasets);
 
             datasetDefinition[0].Value.Should().Be(d1.Id);
             datasetDefinition[0].Text.Should().Be(d1.Name);
@@ -401,34 +403,70 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         }
 
         [TestMethod]
-        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturn403()
+        public async Task OnGet_WhenUserDoesNotHaveEditSpecificationPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+	        string anyString = "anyString";
 
-            string expectedSpecificationId = "spec123";
+			string expectedSpecificationId = "spec123";
 
-            SpecificationSummary expectedSpecification = new SpecificationSummary();
+	        SpecificationSummary expectedSpecification = new SpecificationSummary()
+	        {
+		        FundingPeriod = new Reference(anyString, anyString),
+		        Name = anyString,
+		        Description = anyString
+	        };
 
-            specsClient
+	        ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+			specsClient
                 .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+	        IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+		        .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+
+			IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
-            AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
+	        AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, datasetsClient: mockDatasetsApiClient);
 
             // Act
             IActionResult result = await datasetSchemaPageModel.OnGet(expectedSpecificationId);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result
+	            .Should().BeOfType<PageResult>();
+
+	        datasetSchemaPageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeFalse();
         }
 
-        private static AssignDatasetSchemaPageModel CreatePageModel(ISpecsApiClient specsClient = null, IDatasetsApiClient datasetsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+	    private static IEnumerable<DatasetDefinition> GetDummyDataDefinitions()
+	    {
+		    DatasetDefinition d1 = new DatasetDefinition()
+		    {
+			    Id = "1",
+			    Name = "APT Final Baselines",
+			    Description = "Local Authority return of provider baselines",
+		    };
+
+		    DatasetDefinition d2 = new DatasetDefinition()
+		    {
+			    Id = "2",
+			    Name = "School Provider Dataset",
+			    Description = "List of providers",
+		    };
+
+		    IEnumerable<DatasetDefinition> dataDefn = new List<DatasetDefinition> {d1, d2};
+		    return dataDefn;
+	    }
+
+	    private static AssignDatasetSchemaPageModel CreatePageModel(ISpecsApiClient specsClient = null, IDatasetsApiClient datasetsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
             AssignDatasetSchemaPageModel pageModel = new AssignDatasetSchemaPageModel(
                 specsClient ?? CreateApiClient(),

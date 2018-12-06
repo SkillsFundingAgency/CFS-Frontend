@@ -12,6 +12,21 @@
     <partial name="_NavbarPartial" />
 }
 
+@if (!Model.IsAuthorizedToMap)
+{
+    @section PermissionWarnings
+    {
+
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to map datasets for this specification</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 @section BreadCrumb{
     <div class="breadcrumbs">
         <ol>
