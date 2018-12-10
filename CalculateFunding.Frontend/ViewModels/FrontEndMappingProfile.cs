@@ -2,8 +2,8 @@
 {
     using System.Linq;
     using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
@@ -74,9 +74,9 @@
                 .ForMember(m => m.FundingPeriodId, opt => opt.Ignore());
 
             CreateMap<ScenarioSearchResultItemViewModel, TestScenarioResultItemViewModel>()
-                .ForMember(m => m.Passes, opt => opt.UseValue(0))
-                .ForMember(m => m.Failures, opt => opt.UseValue(0))
-                .ForMember(m => m.Ignored, opt => opt.UseValue(0));
+                .ForMember(m => m.Passes, opt => opt.MapFrom(v => 0))
+                .ForMember(m => m.Failures, opt => opt.MapFrom(v => 0))
+                .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
             CreateMap<CalculationProviderResultSearchResultItem, CalculationProviderResultSearchResultItemViewModel>();
         }

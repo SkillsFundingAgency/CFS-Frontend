@@ -3,12 +3,12 @@
 @using CalculateFunding.Frontend.Properties
 
 @{
-    ViewData["Title"] = "Create calculation specification for policy";
+    ViewData["Title"] = "Create calculation specification";
 }
 
 @section FormBannerLeft{
-    <p class="hero-description">Funding Period: @Model.FundingPeriodName</p>
-    <h1 class="hero-title">Create calculation specification for policy</h1>
+    <p class="hero-description">Specification: @Model.SpecificationName</p>
+    <h1 class="hero-title">Create calculation specification</h1>
 }
 
 @section NavBar {
@@ -80,10 +80,19 @@
                 <div gds-validationblock-for="CreateCalculationViewModel.AllocationLineId">
                     <div class="form-group">
                         <a validationanchor-for="CreateCalculationViewModel.AllocationLineId"></a>
-                        <label asp-for="CreateCalculationViewModel.AllocationLineId">Allocation line</label>
-                        <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
-                            <option></option>
-                        </select>
+                        <label asp-for="CreateCalculationViewModel.AllocationLineId" id="allocationLineIdLabel">Allocation line</label>
+                        @if (Model.AvailableBaselineAllocationLineIds > 0)
+                        {
+                            <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="CreateCalculationViewModel.AllocationLineId" class="form-control">
+                                <option></option>
+                            </select>
+                        }
+                        else
+                        {
+                            <div id="noAllocationLinesError" class="validation-failed-label spacing-10-top">
+                                <i class="material-icons">warning</i> No allocation lines are available to create a calculation for within the specification.
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -116,6 +125,13 @@
 </div>
 
 @section scripts{
+
+    <script type="text/javascript">
+        var hideAllocationLines = @Html.Raw(Model.HideAllocationLinesForBaselinesJson);
+        var existingAllocationId = "";
+        var availableBaselineAllocationLineIds = @Model.AvailableBaselineAllocationLineIds;
+    </script>
+
     <script asp-src-include="~/js/calculationspec.create-edit.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -38,12 +39,20 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
                 PolicyId = "policyId",
                 PolicyName = "Policy Name"
             };
+
+            List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
+            baselineCalculations.Add(new CalculationCurrentVersion()
+            {
+                AllocationLine = new Reference("AL1", "Allocation Line 1"),
+            });
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselineCalculationsResponse = new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, baselineCalculations);
 
             Specification specification = CreateSpecification(specificationId);
 
@@ -51,11 +60,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, calculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, calculation));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(baselineCalculationsResponse);
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -225,9 +238,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     }
                 });
 
-	        pageModel
-		        .IsAuthorizedToEdit
-		        .Should().BeTrue();
+            pageModel
+                .HideAllocationLinesForBaselinesJson
+                .Should()
+                .Be("[\"AL1\"]");
+
+            pageModel
+                .IsAuthorizedToEdit
+                .Should().BeTrue();
         }
 
         private static Specification CreateSpecification(string specificationId)
@@ -317,11 +335,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.NotFound, null));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.NotFound, null));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, new Specification()));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -362,7 +380,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, new Specification()));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient, logger);
 
@@ -403,11 +421,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.InternalServerError, null));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.InternalServerError, null));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, new Specification()));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient, logger);
 
@@ -448,11 +466,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, null));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, null));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, new Specification()));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient, logger);
 
@@ -493,7 +511,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.NotFound, new Specification()));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, new Specification()));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient, logger);
 
@@ -530,7 +548,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
                 PolicyId = "policyId",
@@ -543,11 +561,35 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, calculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, calculation));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+            fundingStreams.Add(new FundingStream
+            {
+                Id = "fs1",
+                AllocationLines = new List<AllocationLine>()
+                {
+                    new AllocationLine()
+                    {
+                        Id = "al1",
+                        Name = "Allocation Line 1",
+                    }
+                }
+            });
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specification.Id))
+                .Returns(new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, Enumerable.Empty<CalculationCurrentVersion>()));
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            specsClient
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
+                .Returns(fundingStreamResponse);
+
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
@@ -559,16 +601,18 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             // Act
             IActionResult result = await pageModel.OnGetAsync(specificationId, calculationId);
 
-			// Assert
-			result
-				.Should()
-				.BeOfType<PageResult>()
-				.Which
-				.Should().NotBeNull();
+            // Assert
+            result
+                .Should()
+                .BeOfType<PageResult>()
+                .Which
+                .Should()
+                .NotBeNull();
 
-	        pageModel
-		        .IsAuthorizedToEdit
-		        .Should().BeFalse();
+            pageModel
+                .IsAuthorizedToEdit
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
@@ -593,7 +637,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
             };
@@ -602,7 +646,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .UpdateCalculation(Arg.Is(specificationId), Arg.Is(calculationId), Arg.Any<CalculationUpdateModel>())
-                .Returns(new ValidatedApiResponse<Calculation>(System.Net.HttpStatusCode.OK, resultCalculation));
+                .Returns(new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, resultCalculation));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -658,22 +702,30 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
             };
+
+            List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
 
             ISpecsApiClient specsClient = CreateSpecsClient();
 
             specsClient
                 .UpdateCalculation(Arg.Is(specificationId), Arg.Is(calculationId), Arg.Any<CalculationUpdateModel>())
-                .Returns(new ValidatedApiResponse<Calculation>(System.Net.HttpStatusCode.OK, resultCalculation));
+                .Returns(new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, resultCalculation));
 
             Specification specification = CreateSpecification(specificationId);
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselineCalculationsResponse = new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, baselineCalculations);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(baselineCalculationsResponse);
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -887,14 +939,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
             };
 
             ISpecsApiClient specsClient = CreateSpecsClient();
 
-            ValidatedApiResponse<Calculation> validatedResponse = new ValidatedApiResponse<Calculation>(System.Net.HttpStatusCode.BadRequest, resultCalculation)
+            ValidatedApiResponse<Calculation> validatedResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.BadRequest, resultCalculation)
             {
                 ModelState = new Dictionary<string, IEnumerable<string>>()
                 {
@@ -910,7 +962,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -1122,7 +1174,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = calculationId,
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
-                CalculationType = CalculationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
                 IsPublic = false,
                 PolicyId = "policyId",
@@ -1135,11 +1187,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsClient
                 .GetCalculationById(Arg.Is(specificationId), Arg.Is(calculationId))
-                .Returns(new ApiResponse<CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, calculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, calculation));
 
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(System.Net.HttpStatusCode.OK, specification));
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper

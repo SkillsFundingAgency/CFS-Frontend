@@ -3,12 +3,12 @@
 @using CalculateFunding.Frontend.Properties
 
 @{
-    ViewData["Title"] = "Create calculation specification for policy";
+    ViewData["Title"] = "Edit calculation specification";
 }
 
 @section FormBannerLeft{
-    <p class="hero-text">Funding Period: @Model.Specification.FundingPeriod.Name</p>
-    <h1 class="hero-title">Edit calculation specification for policy</h1>
+    <p class="hero-text">Specification: @Model.Specification.Name</p>
+    <h1 class="hero-title">Edit calculation specification</h1>
 }
 
 @if (!Model.IsAuthorizedToEdit)
@@ -80,10 +80,18 @@
                 <div gds-validationblock-for="EditCalculationViewModel.AllocationLineId">
                     <div class="form-group">
                         <a validationanchor-for="EditCalculationViewModel.AllocationLineId"></a>
-                        <label asp-for="EditCalculationViewModel.AllocationLineId">Allocation line</label>
+                        <label asp-for="EditCalculationViewModel.AllocationLineId" id="allocationLineIdLabel">Allocation line</label>
                         <select id="AllocationLines" asp-items="@(Model.AllocationLines)" asp-for="EditCalculationViewModel.AllocationLineId" class="form-control">
                             <option></option>
                         </select>
+
+                        @if (Model.AvailableBaselineAllocationLineIds <= 0)
+                        {
+                            <div id="noAllocationLinesError" class="validation-failed-label spacing-10-top">
+                                <i class="material-icons">warning</i> No allocation lines are available to change this baseline calculation to within this specification.
+                            </div>
+                        }
+
                     </div>
                 </div>
             </div>
@@ -117,6 +125,12 @@
 </div>
 
 @section scripts {
+    <script type="text/javascript">
+        var hideAllocationLines = @Html.Raw(Model.HideAllocationLinesForBaselinesJson);
+        var existingAllocationId = @Html.Raw(Model.ExistingAllocationLineId);
+        var availableBaselineAllocationLineIds = @Model.AvailableBaselineAllocationLineIds;
+    </script>
+
     <script asp-src-include="~/js/calculationspec.create-edit.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }

@@ -6,9 +6,9 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
@@ -18,6 +18,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using Newtonsoft.Json;
 
     public class CreateCalculationPageModel : PageModel
     {
@@ -25,7 +26,7 @@
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        private static readonly IEnumerable<string> _calculationTypes = new[] { CalculationSpecificationType.Funding.ToString(), CalculationSpecificationType.Number.ToString() };
+        private static readonly IEnumerable<string> _calculationTypes = new[] { CalculationSpecificationType.Funding.ToString(), CalculationSpecificationType.Number.ToString(), CalculationSpecificationType.Baseline.ToString() };
 
         public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
@@ -63,6 +64,9 @@
 
         public IEnumerable<SelectListItem> CalculationTypes { get; set; }
 
+        public string HideAllocationLinesForBaselinesJson { get; set; }
+        public int AvailableBaselineAllocationLineIds { get; set; }
+
 		public bool IsAuthorizedtoEdit { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
@@ -87,8 +91,10 @@
 
                 return await PopulateForm(specification);
             }
-
-            return Page();
+            else
+            {
+                return new PreconditionFailedResult("Specification not found");
+            }
         }
 
         private async Task<IActionResult> PopulateForm(Specification specification)
@@ -107,6 +113,26 @@
             PopulatePolicies(specification);
 
             PopulateCalculationTypes();
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselinesQuery = await _specsClient.GetBaselineCalculationsBySpecificationId(specification.Id);
+            IActionResult baselinesError = baselinesQuery.IsSuccessOrReturnFailureResult("Calculation baselines");
+            if (baselinesError != null)
+            {
+                return baselinesError;
+            }
+
+            IEnumerable<string> hiddenAllocationLineIds;
+            if (baselinesQuery.Content.AnyWithNullCheck())
+            {
+                hiddenAllocationLineIds = baselinesQuery.Content.Select(s => s.AllocationLine?.Id).Where(s => !string.IsNullOrWhiteSpace(s));
+            }
+            else
+            {
+                hiddenAllocationLineIds = Enumerable.Empty<string>();
+            }
+
+            HideAllocationLinesForBaselinesJson = JsonConvert.SerializeObject(hiddenAllocationLineIds);
+            AvailableBaselineAllocationLineIds = AllocationLines.Count() - hiddenAllocationLineIds.Count();
 
             return Page();
         }
@@ -154,13 +180,19 @@
 
             calculation.SpecificationId = specificationId;
 
-            ApiResponse<Calculation> newCalculationResponse = await _specsClient.CreateCalculation(calculation);
+            ValidatedApiResponse<Calculation> newCalculationResponse = await _specsClient.CreateCalculation(calculation);
 
             if (newCalculationResponse.StatusCode == HttpStatusCode.OK)
             {
                 Calculation newCalculation = newCalculationResponse.Content;
 
                 return Redirect($"/specs/policies/{specificationId}?operationType=CalculationCreated&operationId={newCalculation.Id}");
+            }
+            else if (newCalculationResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                newCalculationResponse.AddValidationResultErrors(ModelState);
+
+                return await PopulateForm(specification);
             }
             else
             {

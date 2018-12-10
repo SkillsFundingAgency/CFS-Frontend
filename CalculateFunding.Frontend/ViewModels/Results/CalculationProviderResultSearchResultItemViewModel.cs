@@ -22,6 +22,8 @@
                             return CalculationResult.Value.AsFormattedMoney();
                         case CalculationSpecificationType.Number:
                             return CalculationResult.Value.AsFormattedNumber();
+                        case CalculationSpecificationType.Baseline:
+                            return CalculationResult.Value.AsFormattedMoney();
                         default:
                             throw new InvalidOperationException("Unknown calculation type");
                     }

@@ -5,8 +5,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -46,7 +46,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenSpecificationCouldNotBeFound_ReturnsPage()
+        public async Task OnGetAsync_GivenSpecificationCouldNotBeFound_ReturnsPreconditionFailed()
         {
             //Arrange
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
@@ -68,22 +68,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             result
                 .Should()
-                .BeAssignableTo<PageResult>();
-
-            pageModel
-                .FundingPeriodName
+                .BeAssignableTo<PreconditionFailedResult>()
+                .Which
+                .Value
                 .Should()
-                .BeNullOrWhiteSpace();
-
-            pageModel
-               .FundingPeriodId
-               .Should()
-               .BeNullOrWhiteSpace();
-
-            pageModel
-               .SpecificationName
-               .Should()
-               .BeNullOrWhiteSpace();
+                .Be("Specification not found");
         }
 
         [TestMethod]
@@ -138,10 +127,17 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             fundingStreams.Add(fundingStream);
 
+            List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
+            baselineCalculations.Add(new CalculationCurrentVersion()
+            {
+                AllocationLine = new Reference("AL1", "Allocation Line Name"),
+            });
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselineCalculationsResult = new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, baselineCalculations);
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -152,6 +148,10 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             specsClient
                 .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(baselineCalculationsResult);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -200,9 +200,14 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Should()
                 .BeTrue();
 
-	        pageModel
-		        .IsAuthorizedtoEdit
-		        .Should().BeTrue();
+            pageModel
+                .IsAuthorizedtoEdit
+                .Should().BeTrue();
+
+            pageModel
+                .HideAllocationLinesForBaselinesJson
+                .Should()
+                .Be("[\"AL1\"]");
         }
 
         [TestMethod]
@@ -214,18 +219,58 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
-            CreateCalculationPageModel pageModel = CreatePageModel(authorizationHelper: mockAuthHelper);
+            ISpecsApiClient specsClient = CreateSpecsApiClient();
+
+            Specification specification = new Specification()
+            {
+                Id = specificationId,
+                FundingPeriod = new Reference("fp1", "FP 2"),
+            };
+
+            specsClient.GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, Enumerable.Empty<CalculationCurrentVersion>()));
+
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+            fundingStreams.Add(new FundingStream
+            {
+                Id = fundingStreamId,
+                AllocationLines = new List<AllocationLine>()
+                {
+                    new AllocationLine()
+                    {
+                        Id = "al1",
+                        Name = "Allocation Line 1",
+                    }
+                }
+            });
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            specsClient
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
+                .Returns(fundingStreamResponse);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, Enumerable.Empty<CalculationCurrentVersion>()));
+
+            CreateCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: mockAuthHelper);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(specificationId);
 
             // Assert
-	        result
-		        .Should().BeOfType<PageResult>();
+            result
+                .Should()
+                .BeOfType<PageResult>();
 
-	        pageModel
-		        .IsAuthorizedtoEdit
-		        .Should().BeFalse();
+            pageModel
+                .IsAuthorizedtoEdit
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
@@ -275,18 +320,21 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             fundingStreams.Add(fundingStream);
 
+            List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
-            ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.OK);
+            ApiResponse<Calculation> calcApiResponse = new ApiResponse<Calculation>(HttpStatusCode.OK);
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselineCalculationsResponse = new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, baselineCalculations);
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             specsClient
                 .GetCalculationBySpecificationIdAndCalculationName(Arg.Is(specificationId), Arg.Is(viewModel.Name))
-                .Returns(calcApiRespnse);
+                .Returns(calcApiResponse);
 
             specsClient
               .GetSpecification(Arg.Is(specificationId))
@@ -295,6 +343,10 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             specsClient
                 .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(baselineCalculationsResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -367,24 +419,26 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             fundingStreams.Add(fundingStream);
 
+            List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
-
 
             CalculationCreateModel createModel = new CalculationCreateModel
             {
                 SpecificationId = specificationId
             };
 
-            ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
+            ApiResponse<Calculation> calcApiResponse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
 
             ApiResponse<Specification> apiResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+
+            ApiResponse<IEnumerable<CalculationCurrentVersion>> baselineCalculationsResponse = new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, baselineCalculations);
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             specsClient
                 .GetCalculationBySpecificationIdAndCalculationName(Arg.Is(specificationId), Arg.Is(viewModel.Name))
-                .Returns(calcApiRespnse);
+                .Returns(calcApiResponse);
 
             specsClient
             .GetSpecification(Arg.Is(specificationId))
@@ -393,6 +447,10 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             specsClient
                 .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
                 .Returns(fundingStreamResponse);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(baselineCalculationsResponse);
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
 
@@ -451,7 +509,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
 
-            ApiResponse<Calculation> newCalcApiResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation
+            ValidatedApiResponse<Calculation> newCalcApiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation
             {
                 Id = "new-calc-id"
             });
@@ -524,10 +582,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             ApiResponse<Calculation> calcApiRespnse = new ApiResponse<Calculation>(HttpStatusCode.NotFound);
 
-            ApiResponse<Calculation> newCalcApiResponse = new ApiResponse<Calculation>(HttpStatusCode.BadRequest, new Calculation
+            ValidatedApiResponse<Calculation> newCalcApiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.InternalServerError, new Calculation
             {
-                Id = "new-calc-id"
+                Id = "new-calc-id",
             });
+
+            newCalcApiResponse.ModelState = new Dictionary<string, IEnumerable<string>>();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -538,6 +598,32 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             specsClient
                 .CreateCalculation(Arg.Is(createModel))
                 .Returns(newCalcApiResponse);
+
+            List<FundingStream> fundingStreams = new List<FundingStream>();
+            fundingStreams.Add(new FundingStream
+            {
+                Id = fundingStreamId,
+                AllocationLines = new List<AllocationLine>()
+                {
+                    new AllocationLine()
+                    {
+                        Id = "al1",
+                        Name = "Allocation Line 1",
+                    }
+                }
+            });
+
+            ApiResponse<IEnumerable<FundingStream>> fundingStreamResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            specsClient
+                .GetFundingStreamsForSpecification(Arg.Is(specification.Id))
+                .Returns(fundingStreamResponse);
+
+            specsClient
+                .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<CalculationCurrentVersion>>(HttpStatusCode.OK, Enumerable.Empty<CalculationCurrentVersion>()));
+
+            specsClient.GetSpecification(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             CreateCalculationPageModel pageModel = CreatePageModel(specsClient, mapper);
 

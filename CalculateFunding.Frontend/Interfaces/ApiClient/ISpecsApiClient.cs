@@ -77,7 +77,10 @@
 
         Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId);
 
-        Task<ApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation);
+        Task<ApiResponse<IEnumerable<CalculationCurrentVersion>>> GetBaselineCalculationsBySpecificationId(string specificationId);
+
+
+        Task<ValidatedApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation);
 
         Task<ValidatedApiResponse<Calculation>> UpdateCalculation(string specificationId, string calculationId, CalculationUpdateModel calculation);
 

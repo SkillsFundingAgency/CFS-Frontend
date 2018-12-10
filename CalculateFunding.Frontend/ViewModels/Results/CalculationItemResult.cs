@@ -1,5 +1,5 @@
-﻿using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-using System;
+﻿using System;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -23,6 +23,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
                             return SubTotal.Value.AsFormattedMoney();
                         case CalculationSpecificationType.Number:
                             return SubTotal.Value.AsFormattedNumber();
+                        case CalculationSpecificationType.Baseline:
+                            return SubTotal.Value.AsFormattedMoney();
                         default:
                             throw new InvalidOperationException("Unknown calculation type");
                     }

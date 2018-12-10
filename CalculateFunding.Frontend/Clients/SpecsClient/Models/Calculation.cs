@@ -13,6 +13,6 @@
 
         public DateTime LastUpdated { get; set; }
 
-        public CalculationType CalculationType { get; set; }
+        public CalculationSpecificationType CalculationType { get; set; }
     }
 }
