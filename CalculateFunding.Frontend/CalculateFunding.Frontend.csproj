@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
     <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
     <CodeAnalysisRuleSet>CalculateFunding.ruleset</CodeAnalysisRuleSet>
@@ -69,10 +71,10 @@
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.8" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
-    <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.1.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />   
+    <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />
     <PackageReference Include="Serilog" Version="2.7.1" />
@@ -208,5 +210,9 @@
 
   </PropertyGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties tsconfig_1tests_1json__JSONSchema="http://json.schemastore.org/tsconfig" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties tsconfig_1tests_1json__JSONSchema="http://json.schemastore.org/tsconfig" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
