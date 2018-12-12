@@ -1,6 +1,5 @@
 ﻿declare var variableRegex: RegExp;
 
-
 namespace calculateFunding.providers {
 
     export class VisualBasicIntellisenseProvider {
@@ -210,19 +209,21 @@ namespace calculateFunding.providers {
 
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
-                            let variable: IVariable;
+                            let variables: Array<IVariable>;
                             let isAggregableFunctionDeclared = (self.aggregatesFeatureEnabled === true && VisualBasicIntellisenseProvider.IsAggregableFunctionDeclared(lineContentsSoFar));
 
                             if (isAggregableFunctionDeclared === true) {
 
-                                variable = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
+                                variables = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
 
-                                results.push(self.CreateCompletionItem(variable));
+                                for (let i in variables) {
+                                    results.push(self.CreateCompletionItem(variables[i]));
+                                }
                             }
                             else {
                                 for (let key in self.contextVariables) {
 
-                                    variable = self.contextVariables[key];
+                                    let variable = self.contextVariables[key];
 
                                     results.push(self.CreateCompletionItem(variable));
                                 }
@@ -311,7 +312,16 @@ namespace calculateFunding.providers {
                                     };
                                 }
 
-                                results.push(localFunctionItem);
+                                let indexOfDuplicateFunction = results.indexOf(results.filter(function (val) {
+                                    return val.label === localFunction.label;
+                                })[0]);
+
+                                if (indexOfDuplicateFunction > -1) {
+                                    results[indexOfDuplicateFunction] = localFunctionItem;
+                                }
+                                else {
+                                    results.push(localFunctionItem);
+                                }
                             }
 
                             let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
@@ -334,9 +344,11 @@ namespace calculateFunding.providers {
                 resolveCompletionItem: (item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
                     if (item) {
                         if (item.label) {
+                            
+                            let description = item.detail;
                             let lowerLabel = item.label.toLowerCase();
                             let localFunction = self.contextFunctions[lowerLabel];
-                            if (localFunction) {
+                            if (localFunction && description.indexOf("function aggregate") === -1) {
                                 item.insertText = localFunction.label + "(";
                             }
                         }
@@ -383,6 +395,8 @@ namespace calculateFunding.providers {
                     value: documentationValue,
                     isTrusted: true,
                 };
+
+                variableItem.detail = documentationValue;
             }
 
             return variableItem;
@@ -877,9 +891,10 @@ namespace calculateFunding.providers {
             return false;
         }
 
-        public static GetVariableForAggregatePath(path: string, variables: IVariableContainer): IVariable {
+        public static GetVariableForAggregatePath(path: string, variables: IVariableContainer): Array<IVariable> {
             let clonedVariableContainer = Object.assign({}, variables) as IVariableContainer;
             let clonedVariable = clonedVariableContainer["datasets"];
+            let variablesArray: Array<IVariable> = [];
 
             let datasets = VisualBasicIntellisenseProvider.GetVariablesForPath("Datasets", clonedVariableContainer);
 
@@ -909,7 +924,19 @@ namespace calculateFunding.providers {
                 }
             }
 
-            return clonedVariable;
+            variablesArray.push(clonedVariable);
+
+            for (let c in clonedVariableContainer) {
+                let calcVariable: IVariable = clonedVariableContainer[c];
+
+                if (calcVariable.isAggregable !== null && calcVariable.isAggregable.toLowerCase() === "true") {
+
+                    variablesArray.push(calcVariable);
+                    //clonedVariable.items[calcVariable.name] = calcVariable
+                }
+            }
+
+            return variablesArray;
         }
     }
 
@@ -977,6 +1004,8 @@ namespace calculateFunding.providers {
 
         returnType: string;
 
+        isCustom: boolean;
+
         getFunctionAndParameterDescription(): string;
     }
 
@@ -998,6 +1027,8 @@ namespace calculateFunding.providers {
         parameters: Array<IFunctionParameter>;
 
         returnType: string;
+
+        isCustom: boolean;
     }
 
     export class VisualBasicSub implements ILocalFunction {
@@ -1008,6 +1039,7 @@ namespace calculateFunding.providers {
                 this.parameters = data.parameters;
                 this.returnType = data.returnType;
                 this.friendlyName = data.friendlyName;
+                this.isCustom = data.isCustom;
             }
         }
 
@@ -1020,6 +1052,8 @@ namespace calculateFunding.providers {
         public parameters: Array<IFunctionParameter>;
 
         public returnType: string;
+
+        public isCustom: boolean;
 
         public getFunctionAndParameterDescription(): string {
 

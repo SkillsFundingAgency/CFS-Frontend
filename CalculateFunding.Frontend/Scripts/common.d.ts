@@ -52,6 +52,7 @@
         description: string;
         returnType: string;
         entityId: string;
+        isCustom: boolean;
         parameters: Array<IParameterInformationResponse>;
     }
 

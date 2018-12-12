@@ -239,6 +239,7 @@ namespace calculateFunding.editCalculation {
                                     returnType: currentMethod.returnType,
                                     parameters: [],
                                     friendlyName: currentMethod.friendlyName,
+                                    isCustom: currentMethod.isCustom
                                 });
 
                                 for (let p in currentMethod.parameters) {
@@ -250,6 +251,20 @@ namespace calculateFunding.editCalculation {
                                     };
 
                                     functionInformation.parameters.push(parameterInformation);
+                                }
+                                //this is implicity feature toggled as determined in the type information set from the back end
+                                if (functionInformation.isCustom) {
+
+                                    let variable: providers.IVariable = {
+                                        name: currentMethod.name,
+                                        friendlyName: currentMethod.friendlyName,
+                                        description: currentMethod.description + " function aggregate",
+                                        type: currentMethod.returnType,
+                                        items: {},
+                                        isAggregable: "true"
+                                    };
+
+                                    variables[variable.name.toLowerCase()] = variable;
                                 }
 
                                 functions[functionInformation.label.toLowerCase()] = functionInformation;

@@ -137,7 +137,8 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 isAggregable: "false",
                 items: {
                     urn: {
-                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false" }
+                        name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: "false"
+                    }
                 }
             },
             "datasets": {
@@ -148,23 +149,43 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 items: {
                     ds1: {
                         name: "ds1", isAggregable: "false", friendlyName: "", type: "", items: {
-                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} } }
+                            f1: { name: "f1", isAggregable: "true", friendlyName: "", type: "", items: {} }, f2: { name: "f2", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f3", isAggregable: "true", friendlyName: "", type: "", items: {} }
+                        }
                     },
                     ds2: {
                         name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
+            },
+            "calc1": {
+                name: "Calc1",
+                friendlyName: "Calc1",
+                isAggregable: "true",
+            },
+            "calc2": {
+                name: "Calc2",
+                friendlyName: "Calc2",
+                isAggregable: "true",
+            },
+            "calc3": {
+                name: "Calc3",
+                friendlyName: "Calc3",
+                isAggregable: "true",
             }
         };
+
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Sum(", container);
-            expect(variables.name === "Providers").toBeFalsy();
-            expect(variables.name === "Datasets").toBeTruthy();
-            expect(variables.items.ds1).toBeTruthy();
-            expect(variables.items.ds1.items.f1).toBeTruthy();
-            expect(variables.items.ds1.items.f2).toBeFalsy();
-            expect(variables.items.ds1.items.f3).toBeTruthy();
-            expect(variables.items.ds2).toBeFalsy();
+            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Datasets").toBeTruthy();
+            expect(variables[0].items.ds1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f2).toBeFalsy();
+            expect(variables[0].items.ds1.items.f3).toBeTruthy();
+            expect(variables[0].items.ds2).toBeFalsy();
+            expect(variables[1].name === "Calc1").toBeTruthy();
+            expect(variables[2].name === "Calc2").toBeTruthy();
+            expect(variables[3].name === "Calc3").toBeTruthy();
         });
     });
 
@@ -196,17 +217,35 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                         name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
+            },
+            "calc1": {
+                name: "Calc1",
+                friendlyName: "Calc1",
+                isAggregable: "true",
+            },
+            "calc2": {
+                name: "Calc2",
+                friendlyName: "Calc2",
+                isAggregable: "true",
+            },
+            "calc3": {
+                name: "Calc3",
+                friendlyName: "Calc3",
+                isAggregable: "true",
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Avg(", container);
-            expect(variables.name === "Providers").toBeFalsy();
-            expect(variables.name === "Datasets").toBeTruthy();
-            expect(variables.items.ds1).toBeTruthy();
-            expect(variables.items.ds1.items.f1).toBeTruthy();
-            expect(variables.items.ds1.items.f2).toBeFalsy();
-            expect(variables.items.ds1.items.f3).toBeTruthy();
-            expect(variables.items.ds2).toBeFalsy();
+            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Datasets").toBeTruthy();
+            expect(variables[0].items.ds1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f2).toBeFalsy();
+            expect(variables[0].items.ds1.items.f3).toBeTruthy();
+            expect(variables[0].items.ds2).toBeFalsy();
+            expect(variables[1].name === "Calc1").toBeTruthy();
+            expect(variables[2].name === "Calc2").toBeTruthy();
+            expect(variables[3].name === "Calc3").toBeTruthy();
         });
     });
     describe("when Min has been typed ", function () {
@@ -237,17 +276,35 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                         name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
+            },
+            "calc1": {
+                name: "Calc1",
+                friendlyName: "Calc1",
+                isAggregable: "true",
+            },
+            "calc2": {
+                name: "Calc2",
+                friendlyName: "Calc2",
+                isAggregable: "true",
+            },
+            "calc3": {
+                name: "Calc3",
+                friendlyName: "Calc3",
+                isAggregable: "true",
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Min(", container);
-            expect(variables.name === "Providers").toBeFalsy();
-            expect(variables.name === "Datasets").toBeTruthy();
-            expect(variables.items.ds1).toBeTruthy();
-            expect(variables.items.ds1.items.f1).toBeTruthy();
-            expect(variables.items.ds1.items.f2).toBeFalsy();
-            expect(variables.items.ds1.items.f3).toBeTruthy();
-            expect(variables.items.ds2).toBeFalsy();
+            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Datasets").toBeTruthy();
+            expect(variables[0].items.ds1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f2).toBeFalsy();
+            expect(variables[0].items.ds1.items.f3).toBeTruthy();
+            expect(variables[0].items.ds2).toBeFalsy();
+            expect(variables[1].name === "Calc1").toBeTruthy();
+            expect(variables[2].name === "Calc2").toBeTruthy();
+            expect(variables[3].name === "Calc3").toBeTruthy();
         });
     });
     describe("when Max has been typed ", function () {
@@ -278,17 +335,36 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                         name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
                     }
                 }
+            },
+            "calc1": {
+                name: "Calc1",
+                friendlyName: "Calc1",
+                isAggregable: "true",
+            },
+            "calc2": {
+                name: "Calc2",
+                friendlyName: "Calc2",
+                isAggregable: "true",
+            },
+            "calc3": {
+                name: "Calc3",
+                friendlyName: "Calc3",
+                isAggregable: "true",
             }
+
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Max(", container);
-            expect(variables.name === "Providers").toBeFalsy();
-            expect(variables.name === "Datasets").toBeTruthy();
-            expect(variables.items.ds1).toBeTruthy();
-            expect(variables.items.ds1.items.f1).toBeTruthy();
-            expect(variables.items.ds1.items.f2).toBeFalsy();
-            expect(variables.items.ds1.items.f3).toBeTruthy();
-            expect(variables.items.ds2).toBeFalsy();
+            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Datasets").toBeTruthy();
+            expect(variables[0].items.ds1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f1).toBeTruthy();
+            expect(variables[0].items.ds1.items.f2).toBeFalsy();
+            expect(variables[0].items.ds1.items.f3).toBeTruthy();
+            expect(variables[0].items.ds2).toBeFalsy();
+            expect(variables[1].name === "Calc1").toBeTruthy();
+            expect(variables[2].name === "Calc2").toBeTruthy();
+            expect(variables[3].name === "Calc3").toBeTruthy();
         });
     });
     describe("when dataset (ds1) is selected ", function () {
