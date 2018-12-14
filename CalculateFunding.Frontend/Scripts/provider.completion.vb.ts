@@ -396,6 +396,10 @@ namespace calculateFunding.providers {
                     isTrusted: true,
                 };
 
+                if (documentationValue.indexOf("function aggregate") > -1) {
+                    variableItem.kind = 2
+                }
+
                 variableItem.detail = documentationValue;
             }
 
