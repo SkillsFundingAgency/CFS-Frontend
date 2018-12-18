@@ -84,10 +84,12 @@ namespace calculateFunding.providers {
             let self: VisualBasicIntellisenseProvider = this;
             return {
                 triggerCharacters: [".", " ", "("],
-                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
+                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
 
-                    let results: Array<monaco.languages.CompletionItem> = [];
-
+                    let results: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
+                   
                     let lastCharacterTyped: string = "";
                     if (position.column > 0) {
                         let range: monaco.Range = new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column);
@@ -126,6 +128,7 @@ namespace calculateFunding.providers {
                                                 label: variable.name,
                                                 kind: monaco.languages.CompletionItemKind.Field,
                                                 detail: variable.type,
+                                                insertText: variable.name
                                             }
 
                                             let description = "";
@@ -160,7 +163,7 @@ namespace calculateFunding.providers {
                                             }
 
 
-                                            results.push(pathVariable);
+                                            results.suggestions.push(pathVariable);
                                         }
                                     }
                                 }
@@ -217,7 +220,7 @@ namespace calculateFunding.providers {
                                 variables = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
 
                                 for (let i in variables) {
-                                    results.push(self.CreateCompletionItem(variables[i]));
+                                    results.suggestions.push(self.CreateCompletionItem(variables[i]));
                                 }
                             }
                             else {
@@ -225,7 +228,7 @@ namespace calculateFunding.providers {
 
                                     let variable = self.contextVariables[key];
 
-                                    results.push(self.CreateCompletionItem(variable));
+                                    results.suggestions.push(self.CreateCompletionItem(variable));
                                 }
                             }
 
@@ -233,7 +236,7 @@ namespace calculateFunding.providers {
                                 let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
 
                                 if (defaultTypeCompletionItems) {
-                                    results.push.apply(results, defaultTypeCompletionItems)
+                                    results.suggestions.push.apply(results, defaultTypeCompletionItems)
                                 }
 
                                 return results;
@@ -248,9 +251,10 @@ namespace calculateFunding.providers {
                                 let variableItem: monaco.languages.CompletionItem = {
                                     label: variable,
                                     kind: monaco.languages.CompletionItemKind.Field,
+                                    insertText: variable
                                 };
 
-                                results.push(variableItem);
+                                results.suggestions.push(variableItem);
                             }
 
                             // TODO - add default types
@@ -279,6 +283,7 @@ namespace calculateFunding.providers {
                                     label: localFunction.label,
                                     kind: monaco.languages.CompletionItemKind.Function,
                                     detail: localFunction.getFunctionAndParameterDescription(),
+                                    insertText: localFunction.label
                                 };
 
                                 let description = "";
@@ -312,28 +317,28 @@ namespace calculateFunding.providers {
                                     };
                                 }
 
-                                let indexOfDuplicateFunction = results.indexOf(results.filter(function (val) {
+                                let indexOfDuplicateFunction = results.suggestions.indexOf(results.suggestions.filter(function (val) {
                                     return val.label === localFunction.label;
                                 })[0]);
 
                                 if (indexOfDuplicateFunction > -1) {
-                                    results[indexOfDuplicateFunction] = localFunctionItem;
+                                    results.suggestions[indexOfDuplicateFunction] = localFunctionItem;
                                 }
                                 else {
-                                    results.push(localFunctionItem);
+                                    results.suggestions.push(localFunctionItem);
                                 }
                             }
 
                             let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
 
                             if (defaultTypeCompletionItems) {
-                                results.push.apply(results, defaultTypeCompletionItems)
+                                results.suggestions.push.apply(results, defaultTypeCompletionItems)
                             }
 
                             let keywordCompletionItems = VisualBasicIntellisenseProvider.GetKeywordsCompletionItems(lineContentsSoFar, self.contextKeywords);
 
                             if (keywordCompletionItems) {
-                                results.push.apply(results, keywordCompletionItems)
+                                results.suggestions.push.apply(results, keywordCompletionItems)
                             }
 
                         }
@@ -341,7 +346,8 @@ namespace calculateFunding.providers {
 
                     return results;
                 },
-                resolveCompletionItem: (item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
+
+                resolveCompletionItem: (model: monaco.editor.ITextModel, position: monaco.Position, item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
                     if (item) {
                         if (item.label) {
                             
@@ -364,6 +370,7 @@ namespace calculateFunding.providers {
                 label: variable.name,
                 kind: monaco.languages.CompletionItemKind.Field,
                 detail: variable.type,
+                insertText: variable.name
             };
 
             let description = "";
@@ -808,7 +815,8 @@ namespace calculateFunding.providers {
                     let defaultTypeItem: monaco.languages.CompletionItem = {
                         label: defaultType.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        detail: defaultType.description
+                        detail: defaultType.description,
+                        insertText: defaultType.label
                     };
 
                     let description = "";
@@ -856,7 +864,8 @@ namespace calculateFunding.providers {
                     let keywordItem: monaco.languages.CompletionItem = {
                         label: keyword.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        detail: keyword.label
+                        detail: keyword.label,
+                        insertText: keyword.label
                     };
 
                     if (keyword.label === "If-Then-ElseIf-Then") {

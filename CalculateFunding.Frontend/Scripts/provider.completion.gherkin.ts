@@ -39,9 +39,11 @@ namespace calculateFunding.providers {
             let self: GherkinIntellisenseProvider = this;
             return {
                 triggerCharacters: ["'"],
-                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
+                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
 
-                    let results: Array<monaco.languages.CompletionItem> = [];
+                    let results: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
 
                     let lastCharacterTyped: string = "";
                     if (position.column > 0) {
@@ -66,6 +68,7 @@ namespace calculateFunding.providers {
                             let completionItem: monaco.languages.CompletionItem = {
                                 label: dataset.name,
                                 kind: monaco.languages.CompletionItemKind.Field,
+                                insertText: dataset.name
                             };
 
                             if (typeof dataset.description !== "undefined") {
@@ -76,7 +79,7 @@ namespace calculateFunding.providers {
                                 completionItem.insertText = dataset.name + "'";
                             }
 
-                            results.push(completionItem);
+                            results.suggestions.push(completionItem);
                         }
 
                         return results;
@@ -99,6 +102,7 @@ namespace calculateFunding.providers {
                                     label: datasetField.name,
                                     kind: monaco.languages.CompletionItemKind.Field,
                                     detail: datasetField.type,
+                                    insertText: datasetField.name
                                 };
 
                                 if (typeof datasetField.description !== "undefined") {
@@ -109,7 +113,7 @@ namespace calculateFunding.providers {
                                     completionItem.insertText = datasetField.name + "'";
                                 }
 
-                                results.push(completionItem);
+                                results.suggestions.push(completionItem);
                             }
                         }
 
@@ -124,6 +128,7 @@ namespace calculateFunding.providers {
                             let completionItem: monaco.languages.CompletionItem = {
                                 label: calculation.name,
                                 kind: monaco.languages.CompletionItemKind.Method,
+                                insertText: calculation.name
                             };
 
                             if (typeof calculation.description !== "undefined") {
@@ -134,14 +139,15 @@ namespace calculateFunding.providers {
                                 completionItem.insertText = calculation.name + "'";
                             }
 
-                            results.push(completionItem);
+                            results.suggestions.push(completionItem);
 
                         }
                     }
-
+                    
                     return results;
                 },
-                resolveCompletionItem: (item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
+
+                resolveCompletionItem: (model: monaco.editor.ITextModel, position: monaco.Position, item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
                     return null;
                 }
             };
