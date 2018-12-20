@@ -74,10 +74,25 @@
 
         @if (Model.DraftSavedCalculation != null)
         {
-            <div class="draft-saved-panel" id="draft-saved-panel">
-                <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right" id="dismiss-draft-link">Dismiss</a>
-                @Model.DraftSavedCalculation.Name saved in DRAFT successfully.
-            </div>
+            if (Model.ShouldViewResultsLinkBeEnabled)
+            {
+                <div class="notification-panel">
+                    <div class="notification-panel-oneblock">
+                        <span class="notification-panel-text">
+                            <i class="material-icons">check</i>
+                            @Model.DraftSavedCalculation.Name saved successfully.
+                        </span>
+                        <a href="/results/calculationproviderresults?calculationId=@Model.DraftSavedCalculation.Id" class="notification-panel-view">View results</a>
+                    </div>
+                </div>            
+            }
+            else
+            {
+                <div class="draft-saved-panel" id="draft-saved-panel">
+                    <a href="/calcs?pageNumber=@Model.SearchResults.PagerState.CurrentPage" class="pull-right" id="dismiss-draft-link">Dismiss</a>
+                    @Model.DraftSavedCalculation.Name saved in DRAFT successfully.
+                </div>
+            }
         }
 
         @if (Model.PublishedCalculation != null)

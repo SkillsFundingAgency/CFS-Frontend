@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
     using System.Threading.Tasks;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -15,13 +16,15 @@
         private ICalculationsApiClient _calculationsApiClient;
         private ICalculationSearchService _searchService;
 
-        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService)
+        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService, IFeatureToggle featuretoggle)
         {
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
             Guard.ArgumentNotNull(searchService, nameof(searchService));
+            Guard.ArgumentNotNull(featuretoggle, nameof(featuretoggle));
 
             _calculationsApiClient = calculationsApiClient;
             _searchService = searchService;
+            ShouldViewResultsLinkBeEnabled = featuretoggle.IsNewEditCalculationPageEnabled();
         }
 
         public CalculationSearchResultViewModel SearchResults { get; set; }
@@ -29,6 +32,8 @@
         public Calculation DraftSavedCalculation { get; set; }
 
         public Calculation PublishedCalculation { get; set; }
+
+        public bool ShouldViewResultsLinkBeEnabled { get; private set; }
 
         [BindProperty]
         public string SearchTerm { get; set; }

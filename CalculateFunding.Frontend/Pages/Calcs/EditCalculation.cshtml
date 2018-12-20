@@ -11,7 +11,7 @@
 }
 
 @section PermissionWarnings
-{
+    {
     <div id="permissions-banner-editcalc" class="row" data-bind="visible:!doesUserHavePermissionToApproveOrEdit()">
         <div class="col-xs-12 permission-warning-banner">
             <div class="permission-warning-inner">
@@ -21,82 +21,196 @@
     </div>
 }
 
-@section FormBannerLeft{
-    <p class="hero-description">@Model.SpecificationName </p>
-    <p class="hero-title">
-        @Model.Calculation.Name
-        <span class="flag flag--soon">@Model.Calculation.CalculationType</span>
-    </p>
 
-    <div class="inline-calculation-container">
-        <div class="inline-calculation-heading">
-            <span>Description</span>
+
+@if (Model.ShouldNewEditCalculationPageBeEnabled)
+{
+    @section FormBannerLeft{
+
+    }
+
+    @section FormBannerRight{
+
+    }
+
+    @section BreadCrumb{
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+                <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+                <li>@Model.Calculation.Name</li>
+            </ol>
         </div>
-        <div class="inline-calculation-contents">
-            @Model.Calculation.Description
-        </div>
-    </div>
+    }
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row edit-calculation-header form-banner-container">
+                <div class="col-xs-12">
+                    <div class="hero-description">Specification: @Model.SpecificationName </div>
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <div class="hero-title">
+                                @Model.Calculation.Name
+                                <div class="pill"><span class="pill-circle">@Model.Calculation.CalculationType.ToString()[0]</span><span class="pill-text">@Model.Calculation.CalculationType</span></div>
+                            </div>
+                        </div>
+                        <div class="bannerblue-button-container edit-calculation-status-container col-xs-3" id="approve-button-container">
+                            <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+                        </div>
 
-}
+                    </div>
 
-@section FormBannerRight{
-    <div class="bannerblue-container">
-        <div class="bannerblue-title">Status</div>
-        <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
-        <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
-        <div class="bannerblue-button-container" id="approve-button-container">
-            <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
-        </div>
-    </div>
-}
-
-@section BreadCrumb{
-    <div class="breadcrumbs">
-        <ol>
-            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
-            <li>@Model.Calculation.Name</li>
-        </ol>
-    </div>
-}
-<div class="row">
-    <div class="col-xs-12 edit-calculation" id="edit-calculation">
-        <strong>Calculation script</strong>
-        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
-
-        <div>
-            <a href="/calcs/compare/@Model.Calculation.Id" id="view-previous-versions-button">View previous versions</a>
-        </div>
-
-        <div class="spacing-30">
-            <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
-        </div>
-
-        <strong>Build output</strong>
-
-        <div class="build-output">
-            <div data-bind="text: buildOutput"></div>
-            <div data-bind="with: compilerResponse" id="compiler-response">
-                Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
-
-                <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
-                    <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
+                    <div>
+                        @Model.Calculation.Description
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row edit-calculation" id="edit-calculation">
 
-        <div class="spacing-30" data-bind="visible: !calculationBuilt()">Your calculation's build output must be successful before you can save it.</div>
-        <div class="spacing-15">
-            <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+        <div class="col-xs-9 edit-calculation-editor-wrapper">
+            <div class="edit-calculation-editor-container">
+                <div class="edit-calculation-container-header">
+                    <strong>Calculation script</strong>
+                </div>
+                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+                <div class="edit-calculation-container-footer spacing-30">
+                    <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+                    <span class="build-output-message">Your calculation's build output must be successful before you can save it.</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3 edit-calculation-history-wrapper">
+            <div class="edit-calculation-editor-container">
+                <div class="edit-calculation-container-header">
+                    <strong>Calculation history</strong>
+                </div>
+                <div class="edit-calculation-history-container">
+                    <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
+                    <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
+                    <div class="edit-calculation-view-provider-link-container">
+                        <a class="@(Model.CalculationHasResults ? "" : "disabled")" href=@(Model.CalculationHasResults ? $"/results/calculationproviderresults?calculationId={@Model.Calculation.Id}" : "#")>View results</a>
+                    </div>
+                    <div>
+                        <a href="/calcs/compare/@Model.Calculation.Id" id="view-previous-versions-button">View previous versions</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult"></div>
 
-        <div>
-            <a href="/calcs" id="link-back">Back</a>
+        <div class="col-xs-12">
+            <div class="build-output no-border">
+                <strong>Build output</strong>
+                <div data-bind="text: buildOutput"></div>
+                <div data-bind="with: compilerResponse" id="compiler-response">
+                    Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
+
+                    <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                        <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spacing-15">
+                <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+            </div>
+
+            <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult"></div>
+
+            <div>
+                <a href="/calcs" class="govuk-back-link" id="link-back">Back</a>
+            </div>
         </div>
     </div>
-</div>
+
+}
+else
+{
+
+    @section FormBannerLeft{
+        <p class="hero-description">@Model.SpecificationName </p>
+        <p class="hero-title">
+            @Model.Calculation.Name
+            <span class="flag flag--soon">@Model.Calculation.CalculationType</span>
+        </p>
+
+        <div class="inline-calculation-container">
+            <div class="inline-calculation-heading">
+                <span>Description</span>
+            </div>
+            <div class="inline-calculation-contents">
+                @Model.Calculation.Description
+            </div>
+        </div>
+
+    }
+
+    @section FormBannerRight{
+        <div class="bannerblue-container">
+            <div class="bannerblue-title">Status</div>
+            <div class="bannerblue-lastmodifiedby">Last saved by: @Model.Calculation.LastModifiedByName</div>
+            <div class="bannerblue-lastmodified">@Model.Calculation.LastModified.ToString(FormatStrings.DateTimeFormatString)</div>
+            <div class="bannerblue-button-container" id="approve-button-container">
+                <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+            </div>
+        </div>
+    }
+
+    @section BreadCrumb{
+        <div class="breadcrumbs">
+            <ol>
+                <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+                <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
+                <li>@Model.Calculation.Name</li>
+            </ol>
+        </div>
+    }
+    <div class="row">
+        <div class="col-xs-12 edit-calculation" id="edit-calculation">
+            <strong>Calculation script</strong>
+            <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+            <div>
+                <a href="/calcs/compare/@Model.Calculation.Id" id="view-previous-versions-button">View previous versions</a>
+            </div>
+
+            <div class="spacing-30">
+                <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+            </div>
+
+            <strong>Build output</strong>
+
+            <div class="build-output">
+                <div data-bind="text: buildOutput"></div>
+                <div data-bind="with: compilerResponse" id="compiler-response">
+                    Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
+
+                    <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                        <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spacing-30" data-bind="visible: !calculationBuilt()">Your calculation's build output must be successful before you can save it.</div>
+            <div class="spacing-15">
+                <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+            </div>
+
+            <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult"></div>
+
+            <div>
+                <a href="/calcs" id="link-back">Back</a>
+            </div>
+        </div>
+    </div>
+
+}
+
+
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
@@ -108,22 +222,23 @@
     <partial name="_ApproveStatusButtonPartial" />
 
     <script type="text/javascript">
-        var editCalculationElement = document.getElementById("edit-calculation");
-        if (editCalculationElement) {
-            var editViewModelOptions = {
-                calculationId: "@Model.Calculation.Id",
-                specificationId: "@Model.SpecificationId",
-                existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))",
-                calculationName: "@Model.Calculation.Name",
-                aggregatesFeatureEnabled: "@Model.ShouldAggregateSupportForCalculationsBeEnabled"
-            };
-            var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
-            viewModel.loadIntellisenseContext();
-            viewModel.doesUserHavePermissionToApproveOrEdit(@Model.DoesUserHavePermissionToApproveOrEdit);
-            ko.applyBindings(viewModel, editCalculationElement);
+    var editCalculationElement = document.getElementById("edit-calculation");
+    if (editCalculationElement) {
+        var editViewModelOptions = {
+            calculationId: "@Model.Calculation.Id",
+            specificationId: "@Model.SpecificationId",
+            existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))",
+            calculationName: "@Model.Calculation.Name",
+            aggregatesFeatureEnabled: "@Model.ShouldAggregateSupportForCalculationsBeEnabled",
+            newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled"
+        };
+        var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);
+        viewModel.loadIntellisenseContext();
+        viewModel.doesUserHavePermissionToApproveOrEdit(@Model.DoesUserHavePermissionToApproveOrEdit);
+        ko.applyBindings(viewModel, editCalculationElement);
 
-            ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
-            ko.applyBindings(viewModel, document.getElementById("permissions-banner-editcalc"));
-        }
+        ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
+        ko.applyBindings(viewModel, document.getElementById("permissions-banner-editcalc"));
+    }
     </script>
 }

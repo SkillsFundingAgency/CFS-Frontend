@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using NSubstitute;
 
@@ -26,12 +27,12 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             //need these as well for the page context
             ModelStateDictionary modelState = new ModelStateDictionary();
             ActionContext actionContext = new ActionContext(httpContext, new RouteData(), new PageActionDescriptor(), modelState);
-            //var modelMetadataProvider = new EmptyModelMetadataProvider();
-            //var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
+            EmptyModelMetadataProvider modelMetadataProvider = new EmptyModelMetadataProvider();
+            ViewDataDictionary viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
             // need page context for the page model
             PageContext pageContext = new PageContext(actionContext)
             {
-                //ViewData = viewData
+                ViewData = viewData
             };
 
             return pageContext;

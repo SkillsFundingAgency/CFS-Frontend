@@ -186,7 +186,12 @@ namespace calculateFunding.editCalculation {
                     self.state("redirecting");
 
                     // Redirect back to Manage Calculations page
-                    window.location.href = "/calcs";
+                    if (this.options.newEditCalculationPageBeEnabled.length && this.options.newEditCalculationPageBeEnabled.toLowerCase() === "true") {
+                        window.location.href = "/calcs?draftSavedId=" + this.options.calculationId;
+                    }
+                    else {
+                        window.location.href = "/calcs";
+                    }
                 });
             }
         }
@@ -351,7 +356,8 @@ namespace calculateFunding.editCalculation {
         specificationId: string,
         existingSourceCode: string,
         calculationName: string,
-        aggregatesFeatureEnabled:string
+        aggregatesFeatureEnabled: string,
+        newEditCalculationPageBeEnabled: string
     }
 
     export interface IPreviewCompileResultReponse {
