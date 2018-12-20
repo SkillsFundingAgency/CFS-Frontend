@@ -76,6 +76,18 @@
                     </div>
                 </div>
             </div>
+            <div id="inline-ispublic" class="inline-form-section spacing-20-bottom">
+                <div gds-validationblock-for="EditCalculationViewModel.IsPublic">
+                    <div class="checkbox">
+                        <a validationanchor-for="EditCalculationViewModel.IsPublic"></a>
+                        <label asp-for="EditCalculationViewModel.IsPublic" for="ispublic">
+                            <input type="checkbox" asp-for="EditCalculationViewModel.IsPublic" id="ispublic" />
+                            Show this information on the funding statement
+                        </label>
+
+                    </div>
+                </div>
+            </div>
             <div id="inline-allocation-line-container" class="inline-form-section spacing-20-bottom">
                 <div gds-validationblock-for="EditCalculationViewModel.AllocationLineId">
                     <div class="form-group">
@@ -95,18 +107,7 @@
                     </div>
                 </div>
             </div>
-            <div id="inline-ispublic" class="inline-form-section spacing-20-bottom">
-                <div gds-validationblock-for="EditCalculationViewModel.IsPublic">
-                    <div class="checkbox">
-                        <a validationanchor-for="EditCalculationViewModel.IsPublic"></a>
-                        <label asp-for="EditCalculationViewModel.IsPublic">
-                            <input type="checkbox" asp-for="EditCalculationViewModel.IsPublic" />
-                            Show this information on the funding statement
-                        </label>
 
-                    </div>
-                </div>
-            </div>
             <div>
                 <div gds-validationblock-for="EditCalculationViewModel.Description">
                     <div class="form-group">
