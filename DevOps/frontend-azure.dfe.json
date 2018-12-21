@@ -213,6 +213,13 @@
         "description": "Enable the new edit calculation page"
       },
       "defaultValue": true
+    },
+    "EnableNewManageDataSourcesPage": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable the new manage data sources page"
+      },
+      "defaultValue": true
     }
   },
   "variables": {
@@ -444,6 +451,10 @@
             {
               "name": "features:newEditCalculationPageEnabled",
               "value": "[parameters('EnableNewEditCalculationPage')]"
+            },
+            {
+              "name": "features:newManageDataSourcesPageEnabled",
+              "value": "[parameters('EnableNewManageDataSourcesPage')]"
             }
           ]
         }

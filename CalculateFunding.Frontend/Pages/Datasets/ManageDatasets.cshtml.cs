@@ -11,18 +11,25 @@
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using CalculateFunding.Common.FeatureToggles;
 
     public class ManageDatasetsPageModel : PageModel
     {
         private IDatasetSearchService _searchService;
         private readonly IDatasetsApiClient _datasetApiClient;
+        private readonly IFeatureToggle _featureToggle;
 
-        public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient)
+        public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(searchService, nameof(searchService));
+            Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _searchService = searchService;
             _datasetApiClient = datasetApiClient;
+            _featureToggle = featureToggle;
+
+            ShouldNewManageSourcesPageBeEnabled = _featureToggle.IsNewManageDataSourcesPageEnabled();
         }
 
         [BindProperty]
@@ -33,6 +40,8 @@
         public DatasetPageBannerOperationType? OperationType { get; set; }
 
         public PageBannerOperation PageBanner { get; set; }
+
+        public bool ShouldNewManageSourcesPageBeEnabled { get; private set; }
 
         public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, DatasetPageBannerOperationType? operationType = null, string operationId = null)
         {
