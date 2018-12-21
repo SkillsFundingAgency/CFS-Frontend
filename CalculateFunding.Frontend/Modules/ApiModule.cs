@@ -10,6 +10,7 @@
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient;
     using CalculateFunding.Frontend.Clients.DatasetsClient;
+    using CalculateFunding.Frontend.Clients.JobsClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
     using CalculateFunding.Frontend.Clients.ScenariosClient;
     using CalculateFunding.Frontend.Clients.SpecsClient;
@@ -108,6 +109,17 @@
              .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
               .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
+            services.AddHttpClient(HttpClientKeys.Jobs,
+                c =>
+                {
+                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("jobsClient");
+
+                    SetDefaultApiClientConfigurationOptions(c, opts, services);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+
             services
                .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
@@ -128,6 +140,9 @@
 
             services
               .AddSingleton<IUsersApiClient, UsersApiClient>();
+
+            services
+                .AddSingleton<IJobsApiClient, JobsApiClient>();
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)

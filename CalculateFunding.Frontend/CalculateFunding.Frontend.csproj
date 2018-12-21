@@ -39,6 +39,7 @@
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\navbar.ts" />
+    <None Remove="Scripts\notifications.ts" />
     <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
@@ -65,13 +66,14 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.6.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.3" />
+    <PackageReference Include="CalculateFunding.Common" Version="1.8.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.8" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.0.4" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" PrivateAssets="All" />
@@ -151,6 +153,7 @@
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />
     <TypeScriptCompile Include="Scripts\expander.ts" />
     <TypeScriptCompile Include="Scripts\navbar.ts" />
+    <TypeScriptCompile Include="Scripts\notifications.ts" />
     <TypeScriptCompile Include="Scripts\policies.ts" />
     <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
     <TypeScriptCompile Include="Scripts\search.specifications.ts" />

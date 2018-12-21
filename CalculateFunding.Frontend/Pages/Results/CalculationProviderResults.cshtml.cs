@@ -18,6 +18,10 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
+    using CalculateFunding.Frontend.Clients.JobsClient.Models;
+    using CalculateFunding.Frontend.Constants;
+    using Newtonsoft.Json;
 
     public class CalculationProviderResultsPageModel : PageModel
     {
@@ -26,6 +30,7 @@
         private readonly ICalculationsApiClient _calculationsApiClient;
         private readonly ISpecsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
+        private readonly IJobsApiClient _jobsClient;
         private readonly ILogger _logger;
 
         public CalculationProviderResultsPageModel(
@@ -34,7 +39,9 @@
             ISpecsApiClient specsApiClient,
             IMapper mapper,
             IDatasetsApiClient datasetsClient,
-            ILogger logger)
+            ILogger logger,
+            IFeatureToggle featureToggle,
+            IJobsApiClient jobsApiClient)
         {
             Guard.ArgumentNotNull(resultsSearchService, nameof(resultsSearchService));
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
@@ -42,13 +49,18 @@
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
+            Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
 
             _mapper = mapper;
             _resultsSearchService = resultsSearchService;
             _calculationsApiClient = calculationsApiClient;
             _specsClient = specsApiClient;
             _datasetsClient = datasetsClient;
+            _jobsClient = jobsApiClient;
             _logger = logger;
+
+            IsNotificationsEnabled = featureToggle.IsCalculationResultsNotificationsEnabled();
         }
 
         [BindProperty]
@@ -62,9 +74,13 @@
 
         public SpecificationSummaryViewModel Specification { get; set; }
 
-        public Task<IActionResult> OnGetAsync(string calculationId, int? pageNumber, string searchTerm)
+        public bool IsNotificationsEnabled { get; set; }
+
+        public string LatestJobJson { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(string calculationId, int? pageNumber, string searchTerm)
         {
-            return Populate(calculationId, pageNumber, searchTerm);
+            return await Populate(calculationId, pageNumber, searchTerm);
         }
 
         public async Task<IActionResult> OnPostAsync(string calculationId, int? pageNumber, string searchTerm)
@@ -72,7 +88,7 @@
             return await Populate(calculationId, pageNumber, searchTerm);
         }
 
-        async Task PopulateCalculation(string calculationId)
+        private async Task PopulateCalculation(string calculationId)
         {
             ApiResponse<Clients.CalcsClient.Models.Calculation> calculation = await _calculationsApiClient.GetCalculationById(calculationId);
 
@@ -82,7 +98,7 @@
             }
         }
 
-        async Task PerformSearch(string calculationId, int? pageNumber, string searchTerm)
+        private async Task PerformSearch(string calculationId, int? pageNumber, string searchTerm)
         {
 
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
@@ -96,7 +112,7 @@
             CalculationProviderResults = await _resultsSearchService.PerformSearch(searchRequest);
         }
 
-        async Task<IActionResult> Populate(string calculationId, int? pageNumber, string searchTerm)
+        private async Task<IActionResult> Populate(string calculationId, int? pageNumber, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
             {
@@ -114,10 +130,26 @@
 
             Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummary(Calculation.SpecificationId);
             Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(Calculation.SpecificationId);
+            Task<ApiResponse<JobSummary>> latestJobTask = _jobsClient.GetLatestJobForSpecification(Calculation.SpecificationId, new[] { JobTypes.CalculationInstruct, JobTypes.CalculationAggregration });
 
-            await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask);
+            await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask, latestJobTask);
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaTask.Result; ;
+            ApiResponse<JobSummary> latestJobResponse = latestJobTask.Result;
+
+            // There may not be a latest job for the current spec so don't fail if there isn't one
+            if (latestJobResponse != null)
+            {
+                if (latestJobResponse.Content == null)
+                {
+                    LatestJobJson = "null";
+                }
+                else
+                {
+                    LatestJobJson = JsonConvert.SerializeObject(latestJobResponse.Content);
+                }
+            }
+
+            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaTask.Result;
 
             if (datasetSchemaResponse == null || (!datasetSchemaResponse.StatusCode.IsSuccess() || datasetSchemaResponse.Content == null))
             {

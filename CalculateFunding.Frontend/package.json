@@ -1,5 +1,5 @@
 {
-  "name": "Allocations.Web",
+  "name": "allocations.web",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,7 +16,8 @@
     "material-design-icons": "^3.0.1",
     "monaco-editor": "^0.14.3",
     "rimraf": "^2.6.2",
-    "select2": "^4.0.6-rc.1"
+    "select2": "^4.0.6-rc.1",
+    "@aspnet/signalr": "^1.1.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.6",

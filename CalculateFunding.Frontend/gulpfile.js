@@ -100,7 +100,8 @@ gulp.task('copy-assets', function (cb) {
             './node_modules/select2/dist/js/select2.min.js',
             "./node_modules/jasmine-core/lib/jasmine-core/jasmine.js",
             "./node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js",
-            "./node_modules/jasmine-core/lib/jasmine-core/boot.js"
+            "./node_modules/jasmine-core/lib/jasmine-core/boot.js",
+            "./node_modules/@aspnet/signalr/dist/browser/signalr.min.js"
         ],
         css: [
             './node_modules/bootstrap/dist/css/bootstrap.css',
