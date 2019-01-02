@@ -3,6 +3,9 @@
 namespace calculateFunding.notifications {
     export abstract class NotificationsViewModel {
         private _hubConnection: signalR.HubConnection;
+        private connectionRetries: number = 0;
+
+        connectionError: KnockoutObservable<boolean> = ko.observable(false);
 
         currentStatus: KnockoutObservable<JobStatus> = ko.observable(null);
 
@@ -34,9 +37,19 @@ namespace calculateFunding.notifications {
             this._hubConnection.start()
                 .then(function () {
                     self.onConnectedToSignalr(self._hubConnection);
+                    self.connectionRetries = 0;
+                    self.connectionError(false);
                 })
                 .catch(function (error) {
                     console.error(error.message);
+
+                    if (self.connectionRetries < 3) {
+                        self.connectionRetries++;
+                        setTimeout(self.init(), 1000 * (self.connectionRetries));
+                    }
+                    else {
+                        self.connectionError(true);
+                    }
                 });
         }
 
@@ -100,7 +113,7 @@ namespace calculateFunding.notifications {
                 status = new JobStatus();
             }
 
-            if (status.jobId !== notification.jobId && !notification.parentJobId) {
+            if (status.jobId !== notification.jobId && !notification.parentJobId && notification.runningStatus !== RunningStatus.Completed) {
                 console.log("changing job created date as different job id received");
 
                 status.jobCreatedTime(notification.statusDateTime);
@@ -135,6 +148,7 @@ namespace calculateFunding.notifications {
         private onConnectionError(error: Error) {
             if (error && error.message) {
                 console.error(error.message);
+                setTimeout(this.init(), 3000);
             }
         }
     }
@@ -197,6 +211,16 @@ namespace calculateFunding.notifications {
         statusDateTime: KnockoutObservable<Date> = ko.observable();
         outcome: string;
         jobCreatedTime: KnockoutObservable<Date> = ko.observable();
+
+        percentComplete: KnockoutComputed<string> = ko.computed(function () {
+            if (this.itemCount && this.overallItemsProcessed) {
+                let percentValue = (this.overallItemsProcessed / this.itemCount) * 100;
+                return percentValue + "% completed";
+            }
+            else {
+                return "";
+            }
+        }, this);
 
         statusDateTimeDisplay: KnockoutComputed<string> = ko.computed(function () {
             if (this.statusDateTime()) {
