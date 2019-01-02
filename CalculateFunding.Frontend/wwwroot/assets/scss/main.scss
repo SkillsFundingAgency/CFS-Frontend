@@ -240,6 +240,13 @@ blockquote {
     width: 100%;
 }
 
+.view-calc-button {
+    color: white;
+    background-color: black;
+    padding: 10px 25px;
+    border: 0;
+    font-size: 16px;
+}
 
 .hero-title {
     font-size: 48px;
@@ -2462,8 +2469,11 @@ table {
 .provider-item-container {
     border-bottom: #dee0e2 1px solid;
     padding-bottom: 10px;
-}
 
+    .provider-item-header .results-in-progress {
+        color: gray;
+    }
+}
 
 .provider-item-property-container .provider-item-property {
     padding-right: 15px
@@ -2935,32 +2945,6 @@ table {
     margin-right: 0px;
     border: 1px solid #DEE0E2;
 
-    .pill {
-        background-color: #dee0e2;
-        border: none;
-        color: black;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        margin: 4px 2px;
-        border-radius: 25px;
-        vertical-align: middle;
-        font-size: 10pt;
-        padding-right: 10px;
-    }
-
-    .pill-circle {
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        color: #fff;
-        line-height: 26px;
-        text-align: center;
-        background: #000;
-        font-size: 8pt !important;
-        display: inline-block;
-        margin: 3px;
-    }
     .hero-description {
         color: #6f777b;
     }
@@ -2976,6 +2960,33 @@ table {
         border: none;
         border-top: solid 1px #F8F8F8
     }
+}
+
+.pill {
+    background-color: #dee0e2;
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    border-radius: 25px;
+    vertical-align: middle;
+    font-size: 10pt;
+    padding-right: 10px;
+}
+
+.pill-circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    color: #fff;
+    line-height: 26px;
+    text-align: center;
+    background: #000;
+    font-size: 8pt !important;
+    display: inline-block;
+    margin: 3px;
 }
 
 .edit-calculation-history-container {
@@ -3057,4 +3068,86 @@ a.govuk-back-link:hover {
     background-color: #F8F8F8
 }
 
+.notifications-undetermined-panel {
+    border: 2px solid;
+    border-color: $orange;
+    padding: 15px;
+    color: $orange;
+    font-size: 21px;
+    margin-bottom: 20px;
 
+    .notifications-undetermined-icon {
+        color: $orange;
+    }
+}
+
+.notifications-inprogress-panel {
+    border: 2px solid;
+    border-color: $orange;
+    padding: 15px;
+    color: $orange;
+    font-size: 21px;
+    margin-bottom: 20px;
+
+    .notifications-inprogress-icon {
+        color: $orange;
+    }
+
+    .notifications-inprogress-status {
+        color: black;
+        font-size: 17px;
+    }
+}
+
+.notifications-completed-successful-panel {
+    border: 2px solid;
+    border-color: $turquoise;
+    padding: 15px;
+    color: $turquoise;
+    font-size: 21px;
+    margin-bottom: 20px;
+
+    .notifications-completed-successful-icon {
+        color: $turquoise;
+    }
+
+    .notifications-completed-successful-status {
+        color: black;
+        font-size: 17px;
+    }
+
+    .notifications-completed-successful-status-bold {
+        color: black;
+        font-size: 17px;
+        font-weight: bold;
+    }
+}
+
+.notifications-completed-failed-panel {
+    border: 2px solid;
+    border-color: $error-colour;
+    padding: 15px;
+    color: $error-colour;
+    font-size: 21px;
+    margin-bottom: 20px;
+
+    .notifications-completed-failed-icon {
+        color: $error-colour;
+    }
+}
+
+.notifications-panel-bullets {
+    font-size: 19px;
+    color: black;
+
+    ul {
+        list-style: initial;
+        padding-top: 10px;
+        padding-left: 30px;
+    }
+}
+
+.notifications-panel-loading-image {
+    height: 25px;
+    width: 25px;
+}

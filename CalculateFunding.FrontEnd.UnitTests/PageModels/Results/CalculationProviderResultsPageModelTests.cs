@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Serilog;
+using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.PageModels.Results
 {
@@ -717,6 +718,51 @@ namespace CalculateFunding.Frontend.PageModels.Results
         }
 
         [TestMethod]
+        public async Task OnGetAsync_GivenCalculationResultsNotificationsDisabled_ThenIsNotificationsEnabledIsFalse()
+        {
+            // Arrange
+            string calculationId = "calc1";
+
+            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
+            calculationsApiClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient);
+
+            // Act
+            await pageModel.OnGetAsync(calculationId, 1, "");
+
+            // Assert
+            pageModel.IsNotificationsEnabled.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task OnGetAsync_GivenCalculationResultsNotificationsEnabled_ThenIsNotificationsEnabledIsTrue()
+        {
+            // Arrange
+            string calculationId = "calc1";
+
+            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
+            calculationsApiClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
+
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+            featureToggle
+                .IsCalculationResultsNotificationsEnabled()
+                .Returns(true);
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient, featureToggle: featureToggle);
+
+            // Act
+            await pageModel.OnGetAsync(calculationId, 1, "");
+
+            // Assert
+            pageModel.IsNotificationsEnabled.Should().BeTrue();
+        }
+
+        [TestMethod]
         public async Task OnPostAsync_GivenNullOrEmptyCalculationId_ReturnsBadRequest()
         {
             //Arrange
@@ -1173,13 +1219,60 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .BeFalse();
         }
 
-        static CalculationProviderResultsPageModel CreatePageModel(
+        [TestMethod]
+        public async Task OnPostAsync_GivenCalculationResultsNotificationsDisabled_ThenIsNotificationsEnabledIsFalse()
+        {
+            // Arrange
+            string calculationId = "calc1";
+
+            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
+            calculationsApiClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient);
+
+            // Act
+            await pageModel.OnPostAsync(calculationId, 1, "");
+
+            // Assert
+            pageModel.IsNotificationsEnabled.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task OnPostAsync_GivenCalculationResultsNotificationsEnabled_ThenIsNotificationsEnabledIsTrue()
+        {
+            // Arrange
+            string calculationId = "calc1";
+
+            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
+            calculationsApiClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
+
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+            featureToggle
+                .IsCalculationResultsNotificationsEnabled()
+                .Returns(true);
+
+            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient, featureToggle: featureToggle);
+
+            // Act
+            await pageModel.OnPostAsync(calculationId, 1, "");
+
+            // Assert
+            pageModel.IsNotificationsEnabled.Should().BeTrue();
+        }
+
+        private static CalculationProviderResultsPageModel CreatePageModel(
             ICalculationProviderResultsSearchService resultsSearchService = null,
             ICalculationsApiClient calculationsApiClient = null,
             ISpecsApiClient specsApiClient = null,
             IMapper mapper = null,
             IDatasetsApiClient datasetsApiClient = null,
-            ILogger logger = null)
+            ILogger logger = null,
+            IFeatureToggle featureToggle = null,
+            IJobsApiClient jobsApiClient = null)
         {
             return new CalculationProviderResultsPageModel(
                 resultsSearchService ?? CreateResultsSearchService(),
@@ -1187,37 +1280,49 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 specsApiClient ?? CreateSpecsApiClient(),
                 mapper ?? CreateMapper(),
                 datasetsApiClient ?? CreateDatasetsApiClient(),
-                logger ?? Createlogger());
+                logger ?? Createlogger(),
+                featureToggle ?? CreateFeatureToggle(),
+                jobsApiClient ?? CreateJobsApiClient());
         }
 
-        static ICalculationsApiClient CreateCalculationsApiClient()
+        private static ICalculationsApiClient CreateCalculationsApiClient()
         {
             return Substitute.For<ICalculationsApiClient>();
         }
 
-        static ICalculationProviderResultsSearchService CreateResultsSearchService()
+        private static ICalculationProviderResultsSearchService CreateResultsSearchService()
         {
             return Substitute.For<ICalculationProviderResultsSearchService>();
         }
 
-        static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecsApiClient CreateSpecsApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
         }
 
-        static IMapper CreateMapper()
+        private static IMapper CreateMapper()
         {
             return Substitute.For<IMapper>();
         }
 
-        static IDatasetsApiClient CreateDatasetsApiClient()
+        private static IDatasetsApiClient CreateDatasetsApiClient()
         {
             return Substitute.For<IDatasetsApiClient>();
         }
 
-        static ILogger Createlogger()
+        private static ILogger Createlogger()
         {
             return Substitute.For<ILogger>();
+        }
+
+        private static IFeatureToggle CreateFeatureToggle()
+        {
+            return Substitute.For<IFeatureToggle>();
+        }
+
+        private static IJobsApiClient CreateJobsApiClient()
+        {
+            return Substitute.For<IJobsApiClient>();
         }
     }
 }

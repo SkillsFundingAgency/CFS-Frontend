@@ -11,6 +11,7 @@
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Frontend.Hubs;
     using CalculateFunding.Frontend.Modules;
     using CalculateFunding.Frontend.Options;
     using Microsoft.AspNetCore.Authentication.Cookies;
@@ -124,6 +125,8 @@
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<HealthCheckOptions>(Configuration.GetSection("healthCheck"));
 
+            services.AddSignalR().AddAzureSignalR();
+
             ContainerBuilder builder = new ContainerBuilder();
 
             builder.Populate(services);
@@ -182,6 +185,11 @@
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
+            });
+
+            app.UseAzureSignalR(routes =>
+            {
+                routes.MapHub<Notifications>("/notifications");
             });
         }
     }

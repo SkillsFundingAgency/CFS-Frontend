@@ -77,6 +77,9 @@
 
         public isPageLoaded: KnockoutComputed<boolean>;
 
+        // This property is available to enable the notifications ui to set it and control ui (e.g. spinner) display within the search
+        public areResultsBeingUpdated: KnockoutObservable<boolean> = ko.observable(false);
+
         constructor() {
             var self = this;
 
