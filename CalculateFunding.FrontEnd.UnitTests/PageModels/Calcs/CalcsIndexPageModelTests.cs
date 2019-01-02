@@ -16,7 +16,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Calcs;
-    using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using FluentAssertions;
@@ -25,6 +24,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
 
     [TestClass]
     public class CalcsIndexPageModelTests
@@ -35,6 +35,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 10;
 
@@ -55,7 +56,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
@@ -78,6 +79,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 50;
             int requestedPage = 2;
@@ -102,7 +104,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(requestedPage, null, null, null);
@@ -125,6 +127,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 10;
 
@@ -145,7 +148,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnPostAsync(null);
@@ -168,6 +171,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 50;
             int requestedPage = 2;
@@ -192,7 +196,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(requestedPage, null, null, null);
@@ -215,6 +219,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 10;
             string searchTerm = "test search";
@@ -236,7 +241,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             pageModel.SearchTerm = searchTerm;
 
@@ -261,6 +266,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             int generatedNumberOfItems = 50;
             int requestedPage = 2;
@@ -286,7 +292,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                     m.Filters == searchRequest.Filters))
                 .Returns(expectedCalculationResult);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             pageModel.SearchTerm = searchTerm;
 
@@ -309,24 +315,18 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         public async Task OnGet_WhenNoCalculationsExist()
         {
             // Arrange
+            CalculationSearchResultViewModel searchResult = GenerateSearchResult(0);
+
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            calculationSearchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(searchResult);
 
-            PagedResult<CalculationSearchResultItem> zeroItemResult = new PagedResult<CalculationSearchResultItem>()
-            {
-                Items = Enumerable.Empty<CalculationSearchResultItem>(),
-                PageNumber = 1,
-                PageSize = 50,
-                TotalItems = 0,
-                TotalPages = 0,
-            };
-
-            calcsClient.FindCalculations(Arg.Any<SearchFilterRequest>())
-                .Returns(zeroItemResult);
-
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
@@ -344,14 +344,15 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
-            calcsClient
-                .When(a => a.FindCalculations(Arg.Any<SearchFilterRequest>()))
+            calculationSearchService
+                .When(a => a.PerformSearch(Arg.Any<SearchRequestViewModel>()))
                 .Do(x => { throw new HttpRequestException(); });
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             Action pageAction = new Action(() =>
@@ -369,12 +370,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
             calculationSearchService
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns((CalculationSearchResultViewModel)null);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, null, null);
@@ -392,7 +394,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
 
@@ -414,7 +417,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(expectedDraftCalculation.Id)
                 .Returns(calculationResponse);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, draftCalculationId, null, null);
@@ -430,8 +433,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
             PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
 
@@ -453,7 +457,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .GetCalculationById(expectedPublishedCalculation.Id)
                 .Returns(calculationResponse);
 
-            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService);
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(null, null, publishedCalculationId, null);
@@ -461,6 +465,34 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Assert
             pageModel.PublishedCalculation.Should().NotBeNull();
             pageModel.PublishedCalculation.Name.Should().Be(expectedPublishedCalculation.Name);
+            pageModel
+                .ShouldViewResultsLinkBeEnabled
+                .Should()
+                .Be(false);
+        }
+
+        [TestMethod]
+        public void OnGet_WhenIsNewEditCalculationPageEnabledFeaturToggleIsOn_ThenSetsShouldViewResultsLinkBeEnabledToRue()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            featureToggle
+                .IsNewEditCalculationPageEnabled()
+                .Returns(true);
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
+
+            // Act
+            IndexPageModel pageModel = new IndexPageModel(calcsClient, calculationSearchService, featureToggle);
+
+            // Assert
+            pageModel
+                .ShouldViewResultsLinkBeEnabled
+                .Should()
+                .Be(true);
         }
 
         private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems)

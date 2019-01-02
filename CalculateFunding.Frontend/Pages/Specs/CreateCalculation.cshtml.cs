@@ -67,7 +67,7 @@
         public string HideAllocationLinesForBaselinesJson { get; set; }
         public int AvailableBaselineAllocationLineIds { get; set; }
 
-		public bool IsAuthorizedtoEdit { get; set; }
+        public bool IsAuthorizedtoEdit { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string specificationId)
         {
@@ -76,10 +76,6 @@
             SpecificationId = specificationId;
 
             Specification specification = await GetSpecification(specificationId);
-
-	        IsAuthorizedtoEdit =
-		        await _authorizationHelper.DoesUserHavePermission(User, specification,
-			        SpecificationActionTypes.CanEditSpecification);
 
             if (specification != null)
             {
@@ -99,6 +95,10 @@
 
         private async Task<IActionResult> PopulateForm(Specification specification)
         {
+            IsAuthorizedtoEdit =
+                await _authorizationHelper.DoesUserHavePermission(User, specification,
+                    SpecificationActionTypes.CanEditSpecification);
+
             IActionResult populateResult = await PopulateAllocationLines(specification.Id);
             if (populateResult != null)
             {

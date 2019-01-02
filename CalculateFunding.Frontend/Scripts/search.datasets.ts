@@ -83,5 +83,8 @@
         status: string;
         description: string;
         version: string;
+        lastUpdatedByName: string;
+        changeNote: string;
+        definitionName: string;
     }
 }

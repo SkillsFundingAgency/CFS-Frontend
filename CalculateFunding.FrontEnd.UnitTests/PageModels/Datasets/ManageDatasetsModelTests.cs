@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 {
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -471,11 +472,13 @@
 
         private static ManageDatasetsPageModel CreateDatasetPageModel(
             IDatasetSearchService searchService = null,
-            IDatasetsApiClient datasetApiClient = null)
+            IDatasetsApiClient datasetApiClient = null,
+            IFeatureToggle featureToggle = null)
         {
             return new ManageDatasetsPageModel(
                 searchService ?? CreateSearchService(),
-                datasetApiClient ?? CreateDatasetApiClient());
+                datasetApiClient ?? CreateDatasetApiClient(),
+                featureToggle ?? CreateFeatureToggle());
         }
 
         private static IDatasetSearchService CreateSearchService()
@@ -486,6 +489,11 @@
         private static IDatasetsApiClient CreateDatasetApiClient()
         {
             return Substitute.For<IDatasetsApiClient>();
+        }
+
+        private static IFeatureToggle CreateFeatureToggle()
+        {
+            return Substitute.For<IFeatureToggle>();
         }
     }
 }

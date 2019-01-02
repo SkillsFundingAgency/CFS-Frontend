@@ -21,22 +21,28 @@
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
+        private readonly IResultsApiClient _resultsApiClient;
 
-        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features, IAuthorizationHelper authorizationHelper)
+        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, 
+            IMapper mapper, IFeatureToggle features, IAuthorizationHelper authorizationHelper, IResultsApiClient resultsApiClient)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(features, nameof(features));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
-
+            _resultsApiClient = resultsApiClient;
             ShouldAggregateSupportForCalculationsBeEnabled = features.IsAggregateSupportInCalculationsEnabled();
+            ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
+
+        public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
 
         public bool ShouldAggregateSupportForCalculationsBeEnabled { get; private set; }
 
@@ -52,12 +58,16 @@
 
         public string DoesUserHavePermissionToApproveOrEdit { get; set; }
 
+        public bool CalculationHasResults { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
             {
                 return new BadRequestObjectResult(ErrorMessages.CalculationIdNullOrEmpty);
             }
+
+            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
 
             ApiResponse<Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
 
@@ -88,6 +98,16 @@
             else
             {
                 SpecificationName = "Unknown";
+            }
+
+            if (ShouldNewEditCalculationPageBeEnabled)
+            {
+                ApiResponse<bool> hasCalculationResponse = await _resultsApiClient.HasCalculationResults(Calculation.Id);
+
+                if(hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    CalculationHasResults = hasCalculationResponse.Content;
+                }
             }
             return Page();
         }

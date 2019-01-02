@@ -110,6 +110,11 @@
             return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-specification?specificationId={specificationId}");
         }
 
+        public async Task<ApiResponse<bool>> HasCalculationResults(string calculationId)
+        {
+            return await GetAsync<bool>($"hasCalculationResults/{calculationId}");
+        }
+
         public async Task<ApiResponse<IEnumerable<PublishedProviderResult>>> GetPublishedProviderResults(string periodId, string specificationId, string fundingStreamId)
         {
             Guard.IsNullOrWhiteSpace(periodId, nameof(periodId));

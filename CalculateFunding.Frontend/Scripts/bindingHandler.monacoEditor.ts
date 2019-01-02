@@ -40,7 +40,6 @@
                 language: language,
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
-                parameterHints: true,
                 theme: theme,
                 autoIndent: autoIndent,
             });

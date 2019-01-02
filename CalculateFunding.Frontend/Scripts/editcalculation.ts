@@ -186,7 +186,12 @@ namespace calculateFunding.editCalculation {
                     self.state("redirecting");
 
                     // Redirect back to Manage Calculations page
-                    window.location.href = "/calcs";
+                    if (this.options.newEditCalculationPageBeEnabled.length && this.options.newEditCalculationPageBeEnabled.toLowerCase() === "true") {
+                        window.location.href = "/calcs?draftSavedId=" + this.options.calculationId;
+                    }
+                    else {
+                        window.location.href = "/calcs";
+                    }
                 });
             }
         }
@@ -239,6 +244,7 @@ namespace calculateFunding.editCalculation {
                                     returnType: currentMethod.returnType,
                                     parameters: [],
                                     friendlyName: currentMethod.friendlyName,
+                                    isCustom: currentMethod.isCustom
                                 });
 
                                 for (let p in currentMethod.parameters) {
@@ -250,6 +256,20 @@ namespace calculateFunding.editCalculation {
                                     };
 
                                     functionInformation.parameters.push(parameterInformation);
+                                }
+                                //this is implicity feature toggled as determined in the type information set from the back end
+                                if (functionInformation.isCustom) {
+
+                                    let variable: providers.IVariable = {
+                                        name: currentMethod.name,
+                                        friendlyName: currentMethod.friendlyName,
+                                        description: currentMethod.description + " function aggregate",
+                                        type: currentMethod.returnType,
+                                        items: {},
+                                        isAggregable: "true"
+                                    };
+
+                                    variables[variable.name.toLowerCase()] = variable;
                                 }
 
                                 functions[functionInformation.label.toLowerCase()] = functionInformation;
@@ -336,7 +356,8 @@ namespace calculateFunding.editCalculation {
         specificationId: string,
         existingSourceCode: string,
         calculationName: string,
-        aggregatesFeatureEnabled:string
+        aggregatesFeatureEnabled: string,
+        newEditCalculationPageBeEnabled: string
     }
 
     export interface IPreviewCompileResultReponse {

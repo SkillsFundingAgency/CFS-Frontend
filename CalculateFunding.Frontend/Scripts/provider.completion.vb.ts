@@ -1,6 +1,5 @@
 ﻿declare var variableRegex: RegExp;
 
-
 namespace calculateFunding.providers {
 
     export class VisualBasicIntellisenseProvider {
@@ -85,10 +84,12 @@ namespace calculateFunding.providers {
             let self: VisualBasicIntellisenseProvider = this;
             return {
                 triggerCharacters: [".", " ", "("],
-                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
+                provideCompletionItems: function (model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
 
-                    let results: Array<monaco.languages.CompletionItem> = [];
-
+                    let results: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
+                   
                     let lastCharacterTyped: string = "";
                     if (position.column > 0) {
                         let range: monaco.Range = new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column);
@@ -127,6 +128,7 @@ namespace calculateFunding.providers {
                                                 label: variable.name,
                                                 kind: monaco.languages.CompletionItemKind.Field,
                                                 detail: variable.type,
+                                                insertText: variable.name
                                             }
 
                                             let description = "";
@@ -161,7 +163,7 @@ namespace calculateFunding.providers {
                                             }
 
 
-                                            results.push(pathVariable);
+                                            results.suggestions.push(pathVariable);
                                         }
                                     }
                                 }
@@ -210,21 +212,23 @@ namespace calculateFunding.providers {
 
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
-                            let variable: IVariable;
+                            let variables: Array<IVariable>;
                             let isAggregableFunctionDeclared = (self.aggregatesFeatureEnabled === true && VisualBasicIntellisenseProvider.IsAggregableFunctionDeclared(lineContentsSoFar));
 
                             if (isAggregableFunctionDeclared === true) {
 
-                                variable = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
+                                variables = VisualBasicIntellisenseProvider.GetVariableForAggregatePath(lineContentsSoFar, self.contextVariables);
 
-                                results.push(self.CreateCompletionItem(variable));
+                                for (let i in variables) {
+                                    results.suggestions.push(self.CreateCompletionItem(variables[i]));
+                                }
                             }
                             else {
                                 for (let key in self.contextVariables) {
 
-                                    variable = self.contextVariables[key];
+                                    let variable = self.contextVariables[key];
 
-                                    results.push(self.CreateCompletionItem(variable));
+                                    results.suggestions.push(self.CreateCompletionItem(variable));
                                 }
                             }
 
@@ -232,7 +236,7 @@ namespace calculateFunding.providers {
                                 let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
 
                                 if (defaultTypeCompletionItems) {
-                                    results.push.apply(results, defaultTypeCompletionItems)
+                                    results.suggestions.push.apply(results, defaultTypeCompletionItems)
                                 }
 
                                 return results;
@@ -247,9 +251,10 @@ namespace calculateFunding.providers {
                                 let variableItem: monaco.languages.CompletionItem = {
                                     label: variable,
                                     kind: monaco.languages.CompletionItemKind.Field,
+                                    insertText: variable
                                 };
 
-                                results.push(variableItem);
+                                results.suggestions.push(variableItem);
                             }
 
                             // TODO - add default types
@@ -278,6 +283,7 @@ namespace calculateFunding.providers {
                                     label: localFunction.label,
                                     kind: monaco.languages.CompletionItemKind.Function,
                                     detail: localFunction.getFunctionAndParameterDescription(),
+                                    insertText: localFunction.label
                                 };
 
                                 let description = "";
@@ -311,19 +317,28 @@ namespace calculateFunding.providers {
                                     };
                                 }
 
-                                results.push(localFunctionItem);
+                                let indexOfDuplicateFunction = results.suggestions.indexOf(results.suggestions.filter(function (val) {
+                                    return val.label === localFunction.label;
+                                })[0]);
+
+                                if (indexOfDuplicateFunction > -1) {
+                                    results.suggestions[indexOfDuplicateFunction] = localFunctionItem;
+                                }
+                                else {
+                                    results.suggestions.push(localFunctionItem);
+                                }
                             }
 
                             let defaultTypeCompletionItems = VisualBasicIntellisenseProvider.GetDefaultDataTypesCompletionItems(lineContentsSoFar, self.contextDefaultTypes);
 
                             if (defaultTypeCompletionItems) {
-                                results.push.apply(results, defaultTypeCompletionItems)
+                                results.suggestions.push.apply(results, defaultTypeCompletionItems)
                             }
 
                             let keywordCompletionItems = VisualBasicIntellisenseProvider.GetKeywordsCompletionItems(lineContentsSoFar, self.contextKeywords);
 
                             if (keywordCompletionItems) {
-                                results.push.apply(results, keywordCompletionItems)
+                                results.suggestions.push.apply(results, keywordCompletionItems)
                             }
 
                         }
@@ -331,12 +346,15 @@ namespace calculateFunding.providers {
 
                     return results;
                 },
-                resolveCompletionItem: (item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
+
+                resolveCompletionItem: (model: monaco.editor.ITextModel, position: monaco.Position, item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> => {
                     if (item) {
                         if (item.label) {
+                            
+                            let description = item.detail;
                             let lowerLabel = item.label.toLowerCase();
                             let localFunction = self.contextFunctions[lowerLabel];
-                            if (localFunction) {
+                            if (localFunction && description.indexOf("function aggregate") === -1) {
                                 item.insertText = localFunction.label + "(";
                             }
                         }
@@ -352,6 +370,7 @@ namespace calculateFunding.providers {
                 label: variable.name,
                 kind: monaco.languages.CompletionItemKind.Field,
                 detail: variable.type,
+                insertText: variable.name
             };
 
             let description = "";
@@ -383,6 +402,12 @@ namespace calculateFunding.providers {
                     value: documentationValue,
                     isTrusted: true,
                 };
+
+                if (documentationValue.indexOf("function aggregate") > -1) {
+                    variableItem.kind = 2
+                }
+
+                variableItem.detail = documentationValue;
             }
 
             return variableItem;
@@ -790,7 +815,8 @@ namespace calculateFunding.providers {
                     let defaultTypeItem: monaco.languages.CompletionItem = {
                         label: defaultType.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        detail: defaultType.description
+                        detail: defaultType.description,
+                        insertText: defaultType.label
                     };
 
                     let description = "";
@@ -838,7 +864,8 @@ namespace calculateFunding.providers {
                     let keywordItem: monaco.languages.CompletionItem = {
                         label: keyword.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        detail: keyword.label
+                        detail: keyword.label,
+                        insertText: keyword.label
                     };
 
                     if (keyword.label === "If-Then-ElseIf-Then") {
@@ -877,9 +904,10 @@ namespace calculateFunding.providers {
             return false;
         }
 
-        public static GetVariableForAggregatePath(path: string, variables: IVariableContainer): IVariable {
+        public static GetVariableForAggregatePath(path: string, variables: IVariableContainer): Array<IVariable> {
             let clonedVariableContainer = Object.assign({}, variables) as IVariableContainer;
             let clonedVariable = clonedVariableContainer["datasets"];
+            let variablesArray: Array<IVariable> = [];
 
             let datasets = VisualBasicIntellisenseProvider.GetVariablesForPath("Datasets", clonedVariableContainer);
 
@@ -909,7 +937,19 @@ namespace calculateFunding.providers {
                 }
             }
 
-            return clonedVariable;
+            variablesArray.push(clonedVariable);
+
+            for (let c in clonedVariableContainer) {
+                let calcVariable: IVariable = clonedVariableContainer[c];
+
+                if (calcVariable.isAggregable !== null && calcVariable.isAggregable.toLowerCase() === "true") {
+
+                    variablesArray.push(calcVariable);
+                    //clonedVariable.items[calcVariable.name] = calcVariable
+                }
+            }
+
+            return variablesArray;
         }
     }
 
@@ -977,6 +1017,8 @@ namespace calculateFunding.providers {
 
         returnType: string;
 
+        isCustom: boolean;
+
         getFunctionAndParameterDescription(): string;
     }
 
@@ -998,6 +1040,8 @@ namespace calculateFunding.providers {
         parameters: Array<IFunctionParameter>;
 
         returnType: string;
+
+        isCustom: boolean;
     }
 
     export class VisualBasicSub implements ILocalFunction {
@@ -1008,6 +1052,7 @@ namespace calculateFunding.providers {
                 this.parameters = data.parameters;
                 this.returnType = data.returnType;
                 this.friendlyName = data.friendlyName;
+                this.isCustom = data.isCustom;
             }
         }
 
@@ -1020,6 +1065,8 @@ namespace calculateFunding.providers {
         public parameters: Array<IFunctionParameter>;
 
         public returnType: string;
+
+        public isCustom: boolean;
 
         public getFunctionAndParameterDescription(): string {
 

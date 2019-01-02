@@ -24,8 +24,9 @@
     }
 
     @RenderSection("styles", false)
+
 </head>
-<body id="top">
+<body id="top" class="@(ViewData["GreyBackground"] != null && ViewData["GreyBackground"].ToString().ToLower() == "true" ? "light-grey-background" : "")">
     <header role="banner" id="global-header" class="with-proposition">
         <div class="header-wrapper container">
             <div class="header-global">

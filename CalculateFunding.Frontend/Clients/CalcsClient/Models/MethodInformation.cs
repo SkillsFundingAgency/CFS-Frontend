@@ -16,5 +16,6 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient.Models
 
         public string EntityId { get; set; }
 
+        public bool IsCustom { get; set; }
     }
 }

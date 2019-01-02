@@ -14,5 +14,11 @@
         public DateTime LastUpdated { get; set; }
 
         public int Version { get; set; }
+
+        public string ChangeNote { get; set; }
+
+        public string LastUpdatedByName { get; set; }
+
+        public string DefinitionName { get; set; }
     }
 }

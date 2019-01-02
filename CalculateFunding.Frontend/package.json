@@ -14,7 +14,7 @@
     "jquery": "^3.3.1",
     "knockout": "^3.5.0-beta",
     "material-design-icons": "^3.0.1",
-    "monaco-editor": "^0.14.3",
+    "monaco-editor": "^0.15.6",
     "rimraf": "^2.6.2",
     "select2": "^4.0.6-rc.1",
     "@aspnet/signalr": "^1.1.0"

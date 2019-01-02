@@ -18,39 +18,7 @@
     <h1 class="hero-title">Manage data source files</h1>
 }
 
-@section BannerMiddle{
-    <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
-        <div role="search">
-            <div class="row">
-                <div class="col-xs-9 filter-field-heading"></div>
-                <div class="col-xs-3 filter-field-heading withjs-show"></div>
-            </div>
-            <div class="row">
-                <div class="col-xs-9">
-                    <div class="input-group">
-                        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search data source files" />
-                        <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
-                    </div>
-                </div>
-                <div class="col-xs-3">
-                    <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Load new data source file</a>
-                </div>
-            </div>
-            <div class="row withjs-show" data-bind="visible: searchPerformed">
-                <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter data source files</div>
-            </div>
-            <div class="row withjs-show" data-bind="visible: searchPerformed">
-                <div class="col-xs-5 filter-field-heading">Data schema</div>
 
-            </div>
-            <div class="row withjs-show" data-bind="visible: searchPerformed">
-                <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
-                    <select id="dataschema" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
-                </div>
-            </div>
-        </div>
-    </form>
-}
 
 @section BreadCrumb{
     <div class="breadcrumbs">
@@ -62,86 +30,238 @@
     </div>
 }
 
+
 @if (Model.OperationType.HasValue)
 {
     <partial name="_PageBannerOperationPartial" model="Model.PageBanner" />
 }
 
-<div class="row manage-datasets" id="manage-datasets-container">
-    <partial name="_SearchErrorPartial" />
-    <div class="col-xs-12">
-        <div data-bind="visible: isResultsVisible">
-            <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "data source files (most recent version)", Model.SearchTerm)' />
-        </div>
-
-        <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
-            @{
-                int datasetRow = 0;
-            }
-            @foreach (var dataset in Model.SearchResults.Datasets)
-            {
-
-                <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
-                    <div class="dataset-item-header">
-                        <span class="dataset-item-specificationName data-dataset-name">@dataset.Name</span> <span class="dataset-item-secondary">(version <span class="data-dataset-version">@dataset.Version</span>)</span>
-                    </div>
-                    <div class="dataset-item-secondary data-dataset-description spacing-5-bottom">@dataset.Description</div>
-
-                    <div>
-                        <span class="dataset-item-property ">
-                            <strong>Status:</strong>
-                            <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong>Uploaded:</strong>
-                            <span id="dataset-item-lastupdated-@datasetRow">
-                                @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
-                            </span>
-                        </span>
-                        <span class="dataset-item-property ">
-                            <strong><a href="/datasets/updatedataset?datasetId=@dataset.Id" id="update-dataset-link-@datasetRow" class="update-dataset-link">Update</a></strong>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong> <a href="api/datasets/download-dataset-file/@dataset.Id" id="download-dataset-link-@datasetRow" class="download-dataset-link">Download</a></strong>
-                        </span>
-                    </div>
+@if (Model.ShouldNewManageSourcesPageBeEnabled)
+{
+    @section BannerMiddle{
+        <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+            <div role="search">
+                <div class="row">
+                    <div class="col-xs-9 filter-field-heading"></div>
+                    <div class="col-xs-3 filter-field-heading withjs-show"></div>
                 </div>
-                datasetRow++;
-            }
-        </div>
-        <div data-bind="visible: isResultsVisible">
-            <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
-                <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
-                    <div class="dataset-item-header">
-                        <span data-bind="text: name" class="dataset-item-specificationName data-dataset-name"></span> <span class="dataset-item-secondary">(version <span data-bind="text: version" class="data-dataset-version"></span>)</span>
+                <div class="row">
+                    <div class="col-xs-9">
+                        <div class="input-group">
+                            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search data source files" />
+                            <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                        </div>
                     </div>
-                    <div data-bind="text: description" class="dataset-item-secondary data-dataset-description spacing-5-bottom"></div>
-                    <div>
-                        <span class="dataset-item-property">
-                            <strong>Status:</strong>
-                            <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong>Uploaded:</strong>
-                            <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong><a data-bind="attr: {'href' : '/datasets/updatedataset?datasetId=' + id}, text: 'Update'" class="update-dataset-link"></a></strong>
-                        </span>
-                        <span class="dataset-item-property">
-                            <strong><a data-bind="   attr: {'href' : '/api/datasets/download-dataset-file/' + id}, text: 'Download'" class="download-dataset-link"></a></strong>
-                        </span>
-
+                    <div class="col-xs-3">
+                        <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Upload new data source file</a>
                     </div>
                 </div>
             </div>
+        </form>
+    }
+
+        <div class="row manage-datasets" id="manage-datasets-container">
+            <partial name="_SearchErrorPartial" />
+            <div class="col-xs-12">
+                <div class="table-filter-container" id="table-filter-header">
+                    <div class="row withjs-show" data-bind="visible: searchPerformed">
+                        <div class="col-xs-5 filter-field-heading"><strong>Data schema</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <div class="row withjs-show" data-bind="visible: searchPerformed">
+                                <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
+                                    <select id="dataschema" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="spacing-30-top text-right">
+                                <partial name="_SearchTableRowCountPartial" model='new PagerPartialViewModel(Model.SearchResults, "data source files", Model.SearchTerm)' />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div data-bind="visible: isResultsVisible">
+                    <table class="cf" id="specifications-table" data-bind="visible: isResultsVisible">
+                        <thead>
+                            <tr>
+                                <th>Data source</th>
+                                <th>Last updated</th>
+                                <th class="text-center">Download</th>
+                                <th class="text-center">More</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: datasets" class="withjs-show" id="dynamic-results-table-body">
+                            <tr>
+                                <td>
+                                    <span class="button-split-container">
+                                        <span class="button-split-icon">
+                                            <a data-bind="attr: {href: '/datasets/updatedataset?datasetId=' + id }"><i class="material-icons" title="Edit">edit</i></a>
+                                        </span>
+                                        <span class="button-split-text">
+                                            <span data-bind="text: name" class="dataset-item-specificationName data-dataset-name"></span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
+                                </td>
+                                <td class="text-center">
+                                    <a data-bind="attr: { 'href' : '/api/datasets/download-dataset-file/' + id }" target="_blank"><i class="material-icons">cloud_download</i></a>
+                                </td>
+
+                                <td class="expander-trigger-cell" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
+                            </tr>
+                            <tr class="expander-container">
+                                <td colspan="4" class="expander-container-background expander-container-padding-md">
+                                    <div class="spacing-15-bottom">
+                                        <span class="display-block"><strong>Data schema:</strong></span>
+                                        <span data-bind="text: definitionName"></span>
+                                    </div>
+                                    <div class="spacing-15-bottom">
+                                        <span class="display-block"><strong>Data source description:</strong></span>
+                                        <span data-bind="text: description"></span>
+                                    </div>
+                                    <div class="spacing-15-bottom">
+                                        <strong>Data source version:</strong> <span data-bind="text: version"></span>
+                                    </div>
+                                    <div class="spacing-15-bottom">
+                                        <strong>Updated by:</strong> <span data-bind="text: lastUpdatedByName"></span>
+                                    </div>
+                                    <div class="spacing-15-bottom">
+                                        <span class="display-block"><strong>Change note for this version:</strong></span>
+                                        <span data-bind="text: changeNote"></span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+                        <img src="~/assets/images/loader.gif" alt="Loading" />
+                        <p>Loading data sources</p>
+                    </div>
+                    <partial name="_SearchTablePagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "datasets", Model.SearchTerm)' />
+                </div>
+            </div>
         </div>
-        <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
-            <img src="~/assets/images/loader.gif" alt="Loading" />
-            <p>Loading data sources</p>
+   
+}
+else
+{
+    @section BannerMiddle{
+        <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+            <div role="search">
+                <div class="row">
+                    <div class="col-xs-9 filter-field-heading"></div>
+                    <div class="col-xs-3 filter-field-heading withjs-show"></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-9">
+                        <div class="input-group">
+                            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search data source files" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search data source files" />
+                            <div class="input-group-addon"><button title="Search" class="search-button" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <a href="/datasets/createdataset" class="btn btn-filter-link-button" id="loadNewDatasourcefileButton">Load new data source file</a>
+                    </div>
+                </div>
+                <div class="row withjs-show" data-bind="visible: searchPerformed">
+                    <div class="col-xs-12 spacing-30-top spacing-15-bottom filter-field-text">Filter data source files</div>
+                </div>
+                <div class="row withjs-show" data-bind="visible: searchPerformed">
+                    <div class="col-xs-5 filter-field-heading">Data schema</div>
+
+                </div>
+                <div class="row withjs-show" data-bind="visible: searchPerformed">
+                    <div class="col-xs-5" id="manageDatasetsDataSchemaDropDown">
+                        <select id="dataschema" data-bind="multiselect2: {nonSelectedText: 'Select data schema', buttonWidth: '100%', disableIfEmpty: true}, options: dataSchemas, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedDataSchemas, enable: canSelectFilters" multiple></select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+
+    <div class="row manage-datasets" id="manage-datasets-container">
+        <partial name="_SearchErrorPartial" />
+        <div class="col-xs-12">
+            <div data-bind="visible: isResultsVisible">
+                <partial name="_SearchPagerPartial" model='new PagerPartialViewModel(Model.SearchResults, "data source files (most recent version)", Model.SearchTerm)' />
+            </div>
+
+            <div class="dataset-searchresult-container spacing-30" data-bind="visible: !searchPerformed()">
+                @{
+                    int datasetRow = 0;
+                }
+                @foreach (var dataset in Model.SearchResults.Datasets)
+                {
+
+                    <div class="dataset-item-container" id="dataset-item-result-@datasetRow">
+                        <div class="dataset-item-header">
+                            <span class="dataset-item-specificationName data-dataset-name">@dataset.Name</span> <span class="dataset-item-secondary">(version <span class="data-dataset-version">@dataset.Version</span>)</span>
+                        </div>
+                        <div class="dataset-item-secondary data-dataset-description spacing-5-bottom">@dataset.Description</div>
+
+                        <div>
+                            <span class="dataset-item-property ">
+                                <strong>Status:</strong>
+                                <span id="dataset-item-status-@datasetRow">@dataset.Status</span>
+                            </span>
+                            <span class="dataset-item-property">
+                                <strong>Uploaded:</strong>
+                                <span id="dataset-item-lastupdated-@datasetRow">
+                                    @dataset.LastUpdated.ToString(FormatStrings.DateTimeFormatString)
+                                </span>
+                            </span>
+                            <span class="dataset-item-property ">
+                                <strong><a href="/datasets/updatedataset?datasetId=@dataset.Id" id="update-dataset-link-@datasetRow" class="update-dataset-link">Update</a></strong>
+                            </span>
+                            <span class="dataset-item-property">
+                                <strong> <a href="api/datasets/download-dataset-file/@dataset.Id" id="download-dataset-link-@datasetRow" class="download-dataset-link">Download</a></strong>
+                            </span>
+                        </div>
+                    </div>
+                    datasetRow++;
+                }
+            </div>
+            <div data-bind="visible: isResultsVisible">
+                <div class="dataset-searchresult-container spacing-30 withjs-show" data-bind="foreach: datasets">
+                    <div class="dataset-item-container" data-bind="attr: {'id' : 'dataset-item-result-' + $index">
+                        <div class="dataset-item-header">
+                            <span data-bind="text: name" class="dataset-item-specificationName data-dataset-name"></span> <span class="dataset-item-secondary">(version <span data-bind="text: version" class="data-dataset-version"></span>)</span>
+                        </div>
+                        <div data-bind="text: description" class="dataset-item-secondary data-dataset-description spacing-5-bottom"></div>
+                        <div>
+                            <span class="dataset-item-property">
+                                <strong>Status:</strong>
+                                <span data-bind="text: status, attr: {'id' : 'dataset-item-status-' + $index}"></span>
+                            </span>
+                            <span class="dataset-item-property">
+                                <strong>Uploaded:</strong>
+                                <span data-bind="text: lastUpdatedDisplay, attr: {'id' : 'dataset-item-lastupdated-' + $index}"></span>
+                            </span>
+                            <span class="dataset-item-property">
+                                <strong><a data-bind="attr: {'href' : '/datasets/updatedataset?datasetId=' + id}, text: 'Update'" class="update-dataset-link"></a></strong>
+                            </span>
+                            <span class="dataset-item-property">
+                                <strong><a data-bind="   attr: {'href' : '/api/datasets/download-dataset-file/' + id}, text: 'Download'" class="download-dataset-link"></a></strong>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="withjs-show search-loading-container" data-bind="visible: isLoading">
+                <img src="~/assets/images/loader.gif" alt="Loading" />
+                <p>Loading data sources</p>
+            </div>
         </div>
     </div>
-</div>
+}
+
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
@@ -156,6 +276,8 @@
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.datasets.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
+
     <script type="text/javascript">
         var vm = new calculateFunding.manageDatasets.DatasetSearchViewModel();
         var filterElement = document.getElementById("filter-container");
