@@ -5,12 +5,12 @@
     using System.Net.Http.Headers;
     using CalculateFunding.Common.ApiClient;
     using CalculateFunding.Common.ApiClient.Interfaces;
+    using CalculateFunding.Common.ApiClient.Jobs;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.ApiClient.Users;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient;
     using CalculateFunding.Frontend.Clients.DatasetsClient;
-    using CalculateFunding.Frontend.Clients.JobsClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
     using CalculateFunding.Frontend.Clients.ScenariosClient;
     using CalculateFunding.Frontend.Clients.SpecsClient;

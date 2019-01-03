@@ -220,6 +220,13 @@
         "description": "Enable the new manage data sources page"
       },
       "defaultValue": true
+    },
+    "EnableCalculationResultsNotifications": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable the job notifications on the calculation provider results page"
+      },
+      "defaultValue": true
     }
   },
   "variables": {
@@ -455,6 +462,10 @@
             {
               "name": "features:newManageDataSourcesPageEnabled",
               "value": "[parameters('EnableNewManageDataSourcesPage')]"
+            },
+            {
+              "name": "features:calculationResultsNotificationsEnabled",
+              "value": "[parameters('EnableCalculationResultsNotifications')]"
             }
           ]
         }

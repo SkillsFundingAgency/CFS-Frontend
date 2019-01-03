@@ -68,6 +68,7 @@
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common" Version="1.10.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.8" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />

@@ -107,7 +107,7 @@ namespace calculateFunding.notifications {
         private receivedNotification(viewModel: NotificationsViewModel, notification: JobNotification): void {
             let status = viewModel.currentStatus();
 
-            console.log("received job notification for job id '" + notification.jobId + "' and type '" + notification.jobType + "'");
+            console.log("received job notification for job id '" + notification.jobId + "' and type '" + notification.jobType + "'", notification);
 
             if (!status) {
                 status = new JobStatus();

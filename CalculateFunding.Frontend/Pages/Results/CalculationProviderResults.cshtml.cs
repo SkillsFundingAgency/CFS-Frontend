@@ -19,9 +19,10 @@
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Serilog;
     using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.Clients.JobsClient.Models;
     using CalculateFunding.Frontend.Constants;
     using Newtonsoft.Json;
+    using CalculateFunding.Common.ApiClient.Jobs;
+    using CalculateFunding.Common.ApiClient.Jobs.Models;
 
     public class CalculationProviderResultsPageModel : PageModel
     {
