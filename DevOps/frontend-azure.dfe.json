@@ -227,6 +227,12 @@
         "description": "Enable the job notifications on the calculation provider results page"
       },
       "defaultValue": true
+    },
+    "SignalrConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Connection string to the Azure Signalr service"
+      }
     }
   },
   "variables": {
@@ -430,6 +436,10 @@
             {
               "name": "healthCheck:ApiKey",
               "value": "[parameters('healthCheckKey')]"
+            },
+            {
+              "name": "Azure:SignalR:ConnectionString",
+              "value": "[parameters('SignalrConnectionString')]"
             },
             {
               "name": "features:publishButtonEnabled",
