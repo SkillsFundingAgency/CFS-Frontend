@@ -1,6 +1,12 @@
-﻿using AutoMapper;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Results;
@@ -13,12 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Serilog;
-using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.PageModels.Results
 {
@@ -607,7 +608,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
                 calculationsApiClient,
-                mapper: mapper, 
+                mapper: mapper,
                 datasetsApiClient: datasetsApiClient,
                 specsApiClient: specsApiClient);
 

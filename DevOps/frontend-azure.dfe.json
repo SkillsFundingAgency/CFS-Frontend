@@ -103,6 +103,12 @@
         "description": "Api key for the Users Service"
       }
     },
+    "ApiKeyJobs": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Jobs Service"
+      }
+    },
     "aadDomain": {
       "type": "string",
       "metadata": {
@@ -220,13 +226,21 @@
         "description": "Enable the new manage data sources page"
       },
       "defaultValue": true
+    },
+    "EnableCalculationResultsNotifications": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable the job notifications on the calculation provider results page"
+      },
+      "defaultValue": true
     }
   },
   "variables": {
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
     "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
     "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs')]",
-    "frontEndCertificateName": "frontendcert"
+    "frontEndCertificateName": "frontendcert",
+    "signalRName": "[concat('sr-', parameters('environmentKey'), '-cfs')]"
   },
   "resources": [
     {
@@ -385,6 +399,14 @@
               "value": "[concat('https://app-', parameters('environmentKey'), '-users.azurewebsites.net/api/users')]"
             },
             {
+              "name": "jobsClient:ApiKey",
+              "value": "[parameters('apiKeyJobs')]"
+            },
+            {
+              "name": "jobsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-jobs.azurewebsites.net/api/jobs')]"
+            },
+            {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
             },
@@ -425,6 +447,10 @@
               "value": "[parameters('healthCheckKey')]"
             },
             {
+              "name": "Azure:SignalR:ConnectionString",
+              "value": "[concat('Endpoint=https://', variables('signalRName'), '.service.signalr.net;AccessKey=', listKeys(variables('signalRName'), providers('Microsoft.SignalRService', 'SignalR').apiVersions[0]).primaryKey)]"
+            },
+            {
               "name": "features:publishButtonEnabled",
               "value": "[parameters('publishButtonEnabled')]"
             },
@@ -455,6 +481,10 @@
             {
               "name": "features:newManageDataSourcesPageEnabled",
               "value": "[parameters('EnableNewManageDataSourcesPage')]"
+            },
+            {
+              "name": "features:calculationResultsNotificationsEnabled",
+              "value": "[parameters('EnableCalculationResultsNotifications')]"
             }
           ]
         }
