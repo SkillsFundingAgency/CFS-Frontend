@@ -233,14 +233,19 @@
         "description": "Enable the job notifications on the calculation provider results page"
       },
       "defaultValue": true
+    },
+    "SignalrConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Connection string to the Azure Signalr service"
+      }
     }
   },
   "variables": {
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01')]",
     "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]",
     "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs')]",
-    "frontEndCertificateName": "frontendcert",
-    "signalRName": "[concat('sr-', parameters('environmentKey'), '-cfs')]"
+    "frontEndCertificateName": "frontendcert"
   },
   "resources": [
     {
@@ -448,7 +453,7 @@
             },
             {
               "name": "Azure:SignalR:ConnectionString",
-              "value": "[concat('Endpoint=https://', variables('signalRName'), '.service.signalr.net;AccessKey=', listKeys(variables('signalRName'), providers('Microsoft.SignalRService', 'SignalR').apiVersions[0]).primaryKey)]"
+              "value": "[parameters('SignalrConnectionString')]"
             },
             {
               "name": "features:publishButtonEnabled",
