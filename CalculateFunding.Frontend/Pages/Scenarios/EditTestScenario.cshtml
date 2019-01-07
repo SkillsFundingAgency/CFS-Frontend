@@ -12,7 +12,7 @@
 
 @section PermissionWarnings
 {
-    <div id="permission-alert-edit-test-scenario" class="row" data-bind="visible:!doesUserHavePermissionToSave()">
+    <div id="permission-alert-edit-test-scenario" class="row" style="display:none;" data-bind="visible:!doesUserHavePermissionToSave()">
         <div class="col-xs-12 permission-warning-banner">
             <div class="permission-warning-inner">
                 <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this QA test</p>

@@ -12,7 +12,7 @@
 
 @section PermissionWarnings
     {
-    <div id="permissions-banner-editcalc" class="row" data-bind="visible:!doesUserHavePermissionToApproveOrEdit()">
+    <div id="permissions-banner-editcalc" class="row" style="display:none;" data-bind="visible:!doesUserHavePermissionToApproveOrEdit()">
         <div class="col-xs-12 permission-warning-banner">
             <div class="permission-warning-inner">
                 <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this calculation</p>
