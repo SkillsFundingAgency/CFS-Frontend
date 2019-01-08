@@ -116,7 +116,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 return specificationQuery.error;
             }
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationQuery.specification, SpecificationActionTypes.CanEditSpecification))
+	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specificationQuery.specification, SpecificationActionTypes.CanEditSpecification);
+	        if (!IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }

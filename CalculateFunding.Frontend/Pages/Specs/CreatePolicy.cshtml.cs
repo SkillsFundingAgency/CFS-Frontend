@@ -79,7 +79,8 @@
 
             SpecificationSummary specification = await GetSpecification(specificationId);
 
-			if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification);
+	        if (!IsAuthorizedToEdit)
 			{
 				return new ForbidResult();
 			}

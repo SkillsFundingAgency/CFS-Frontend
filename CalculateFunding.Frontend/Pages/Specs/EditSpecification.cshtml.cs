@@ -73,7 +73,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
-            if (!await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification))
+			IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
+
+			if (!IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }

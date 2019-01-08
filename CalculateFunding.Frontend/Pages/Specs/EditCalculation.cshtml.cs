@@ -112,8 +112,9 @@
 		{
 			Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 			Specification specification = await GetSpecification(specificationId);
+			IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification);
 
-			if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+			if (!IsAuthorizedToEdit)
 			{
 				return new ForbidResult();
 			}

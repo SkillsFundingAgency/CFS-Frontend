@@ -126,7 +126,26 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            if (!string.IsNullOrWhiteSpace(AssignDatasetSchemaViewModel.Name))
+	        SpecificationId = specificationId;
+
+	        ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+	        if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
+	        {
+		        return new NotFoundObjectResult($"Unable to get specification response. Specification Id value = {SpecificationId}");
+	        }
+
+	        if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content == null)
+	        {
+		        throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
+	        }
+
+	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+	        if (!IsAuthorizedToEdit)
+	        {
+		        return new ForbidResult();
+	        }
+
+			if (!string.IsNullOrWhiteSpace(AssignDatasetSchemaViewModel.Name))
             {
                 ApiResponse<DatasetSchemasAssigned> existingRelationshipResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecificationAndRelationshipName(specificationId, AssignDatasetSchemaViewModel.Name);
 
@@ -136,23 +155,11 @@
                 }
             }
 
-            if (!ModelState.IsValid)
+			if (!ModelState.IsValid)
             {
-                ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
-
-                if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return new NotFoundObjectResult($"Unable to get specification response. Specification Id value = {SpecificationId}");
-                }
-
                 if (specificationResponse.StatusCode == HttpStatusCode.OK)
                 {
                     SpecificationSummary specContent = specificationResponse.Content;
-
-                    if (specContent == null)
-                    {
-                        throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
-                    }
 
                     ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
 

@@ -101,7 +101,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
             }
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification))
+	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification);
+	        if (IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }

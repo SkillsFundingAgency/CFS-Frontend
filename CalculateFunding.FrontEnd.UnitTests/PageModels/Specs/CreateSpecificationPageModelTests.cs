@@ -367,6 +367,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Count()
                .Should()
                .Be(1);
+
+	        pageModel
+		        .IsAuthorizedToCreate
+		        .Should().BeTrue();
         }
 
         [TestMethod]
@@ -474,7 +478,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             // Assert
             result.Should().BeOfType<ForbidResult>();
-        }
+
+	        pageModel
+		        .IsAuthorizedToCreate
+		        .Should().BeFalse();
+		}
 
         private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {

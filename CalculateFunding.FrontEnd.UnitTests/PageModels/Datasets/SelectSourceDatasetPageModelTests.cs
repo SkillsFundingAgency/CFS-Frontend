@@ -278,6 +278,10 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             result
                 .Should()
                 .BeOfType<PageResult>();
+
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
         }
 
         [TestMethod]
@@ -311,7 +315,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Should()
                 .Be(500);
 
-            logger
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
+
+			logger
                 .Received(1)
                 .Error(Arg.Is($"Dataset version: {datasetId} is invalid"));
         }
@@ -340,7 +348,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             result
                 .Should()
                 .BeOfType<PageResult>();
-        }
+
+			pageModel
+				.IsAuthorizedToMap
+				.Should().BeTrue();
+		}
 
         [TestMethod]
         public async Task OnPostAsync_GivenValidDatsetVersionButSavingIsUnsuccessful_Returns500()
@@ -377,7 +389,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Should()
                 .Be(500);
 
-            logger
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
+
+			logger
                 .Received(1)
                 .Error(Arg.Is($"Failed to assign dataset version with status code: InternalServerError"));
         }
@@ -416,7 +432,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Url
                 .Should()
                 .Be($"/datasets/specificationrelationships?specificationId={specificationId}&wasSuccess=true");
-        }
+
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeTrue();
+		}
 
         [TestMethod]
         public async Task OnPostAsync_GivenUserDoesNotHaveMapDatasetsPermission_Returns403()
@@ -447,7 +467,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             result
                 .Should()
                 .BeOfType<ForbidResult>();
-        }
+
+	        pageModel
+		        .IsAuthorizedToMap
+		        .Should().BeFalse();
+		}
 
         private static SelectSourceDatasetPageModel CreatePageModel(IDatasetsApiClient datasetClient = null, ILogger logger = null, IAuthorizationHelper authorizationHelper = null)
         {

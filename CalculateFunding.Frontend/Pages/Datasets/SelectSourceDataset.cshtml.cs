@@ -75,7 +75,8 @@
                 return NotFound();
             }
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets))
+	        IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets);
+	        if (!IsAuthorizedToMap)
             {
                 return new ForbidResult();
             }

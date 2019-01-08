@@ -54,16 +54,17 @@
             }
 
             await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
-	        IsAuthorizedToCreate = FundingStreams.Count() != 0;
-            return Page();
+			IsAuthorizedToCreate = FundingStreams.Count() != 0;
+			return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null)
+	    public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null)
         {
             if (!ModelState.IsValid)
             {
                 await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams());
-                return Page();
+	            IsAuthorizedToCreate = FundingStreams.Count() != 0;
+				return Page();
             }
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
@@ -132,5 +133,5 @@
                 throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
             }
         }
-    }
+	}
 }

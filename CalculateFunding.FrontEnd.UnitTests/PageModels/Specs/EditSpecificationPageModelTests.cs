@@ -904,6 +904,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Count()
                .Should()
                .Be(1);
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
         }
 
         [TestMethod]
@@ -1079,6 +1083,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             IActionResult result = await pageModel.OnPostAsync(specificationId);
 
             // Assert
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeFalse();
+
             result.Should().BeOfType<ForbidResult>();
         }
 

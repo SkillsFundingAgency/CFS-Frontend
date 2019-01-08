@@ -18,7 +18,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Datasets;
     using CalculateFunding.Frontend.UnitTests.Helpers;
-    using FluentAssertions;
+	using System.Linq;
+	using CalculateFunding.Frontend.ViewModels.Datasets;
+	using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -446,7 +448,424 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		        .Should().BeFalse();
         }
 
-	    private static IEnumerable<DatasetDefinition> GetDummyDataDefinitions()
+	    [TestMethod]
+	    public async Task OnPost_WhenValidDetailsAreProvided_ShoulReturnCorrectRedirect()
+	    {
+		    // Arrange
+		    string anyString = "anyString";
+
+		    string expectedSpecificationId = "spec123";
+
+		    SpecificationSummary expectedSpecification = new SpecificationSummary()
+		    {
+			    FundingPeriod = new Reference(anyString, anyString),
+			    Name = anyString,
+			    Description = anyString
+		    };
+
+		    ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+		    mockSpecsClient
+			    .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+			    .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+		    IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+		    mockDatasetsApiClient
+			    .GetDataDefinitions()
+			    .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+		    mockDatasetsApiClient
+			    .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+			    .Returns(HttpStatusCode.OK);
+
+		    IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+		    mockAuthorizationHelper
+			    .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+			    .Returns(true);
+
+		    AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+			    authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+		    datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+		    // Assert
+		    result
+			    .Should().BeOfType<RedirectResult>()
+				.Subject
+				.Url
+			    .Should().EndWith($"datasets/ListDatasetSchemas/{expectedSpecificationId}");
+		}
+
+		[TestMethod]
+		public async Task OnPost_WhenModelIsInvalidAndSpecificationNotFound_ShoulReturnNotFoundResult()
+		{
+			// Arrange
+			string anyString = "anyString";
+
+			string expectedSpecificationId = "spec123";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(anyString, anyString),
+				Name = anyString,
+				Description = anyString
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			result
+				.Should().BeOfType<NotFoundObjectResult>()
+				.Which
+				.Value
+				.Should().Be($"Unable to get specification response. Specification Id value = {expectedSpecificationId}");
+		}
+
+		[TestMethod]
+		public void OnPost_WhenModelIsInvalidAndSpecificationFoundWithNullResponse_ShouldThrowInvalidOperationException()
+		{
+			// Arrange
+			string anyString = "anyString";
+
+			string expectedSpecificationId = "spec123";
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			Func<Task<IActionResult>> postAction = async () => await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			postAction
+				.Should()
+				.Throw<InvalidOperationException>()
+				.Which
+				.Message
+				.Should().Be(
+					$"Unable to retrieve specification model from the response. Specification Id value = {expectedSpecificationId}");
+		}
+
+		[TestMethod]
+		public async Task OnPost_WhenModelIsInvalidAndDataDefinitionsNotReturnedCorrectly_ShoulReturnNotFoundObjectResult()
+		{
+			// Arrange
+			string anyString = "anyString";
+
+			string expectedSpecificationId = "spec123";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(anyString, anyString),
+				Name = anyString,
+				Description = anyString
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.NotFound));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			result
+				.Should().BeOfType<NotFoundObjectResult>()
+				.Which
+				.Value
+				.Should().Be("Check the data schema - one or more the data definitions aren't working");
+		}
+
+		[TestMethod]
+		public void OnPost_WhenModelIsInvalidAndDatasetDefinitionListReturnedIsNull_ShoulThrowInvalidOperationException()
+		{
+			// Arrange
+			string anyString = "anyString";
+
+			string expectedSpecificationId = "spec123";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(anyString, anyString),
+				Name = anyString,
+				Description = anyString
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			Func<Task<IActionResult>> postAction = async () => await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			postAction
+				.Should()
+				.Throw<InvalidOperationException>()
+				.Which
+				.Message
+				.Should().Be(
+					$"Unable to retrieve Dataset definition from the response. Specification Id value = {expectedSpecificationId}");
+		}
+
+		[TestMethod]
+		public async Task OnPost_WhenModelIsInvalidButSpecResponseAndDatasetDefinitionsResponseIsOk_ShouldReturnPage()
+		{
+			// Arrange
+			const string anyString = "any";
+			string expectedSpecificationId = "spec123";
+			const string fundingPeriodId = "2018";
+			const string fundingPeriodName = "1819";
+
+			const string specificationName = "Pe and sports spec";
+			const string specDescription = "test spec";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(fundingPeriodId, fundingPeriodName),
+				Name = specificationName,
+				Description = specDescription
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			result
+				.Should().BeOfType<PageResult>();
+
+			datasetSchemaPageModel
+				.SpecificationName
+				.Should().Be(specificationName);
+
+			datasetSchemaPageModel
+				.SpecificationDescription
+				.Should().Be(specDescription);
+
+			datasetSchemaPageModel
+				.FundingPeriodId
+				.Should().Be(fundingPeriodId);
+
+			datasetSchemaPageModel
+				.FundingPeriodName
+				.Should().Be(fundingPeriodName);
+
+			datasetSchemaPageModel
+				.Datasets
+				.Count()
+				.Should().Be(2);
+
+			datasetSchemaPageModel
+				.IsAuthorizedToEdit
+				.Should().BeTrue();
+		}
+
+		[TestMethod]
+		public async Task OnPost_WhenModelIsInvalidAndUserIsUnauthorizedToEditSpecification_ShouldReturnForbidResult()
+		{
+			// Arrange
+			const string anyString = "any";
+			string expectedSpecificationId = "spec123";
+			const string fundingPeriodId = "2018";
+			const string fundingPeriodName = "1819";
+
+			const string specificationName = "Pe and sports spec";
+			const string specDescription = "test spec";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(fundingPeriodId, fundingPeriodName),
+				Name = specificationName,
+				Description = specDescription
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(false);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+			datasetSchemaPageModel.ModelState.AddModelError(anyString, anyString);
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			result
+				.Should().BeOfType<ForbidResult>();
+		}
+
+		[TestMethod]
+		public async Task OnPost_WhenModelIsInvalidShouldPopulate_ShoulReturnCorrectRedirect()
+		{
+			// Arrange
+			string anyString = "anyString";
+
+			string expectedSpecificationId = "spec123";
+
+			SpecificationSummary expectedSpecification = new SpecificationSummary()
+			{
+				FundingPeriod = new Reference(anyString, anyString),
+				Name = anyString,
+				Description = anyString
+			};
+
+			ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+			mockSpecsClient
+				.GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+				.Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
+
+			IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+			mockDatasetsApiClient
+				.GetDataDefinitions()
+				.Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+			mockDatasetsApiClient
+				.AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
+				.Returns(HttpStatusCode.OK);
+
+			IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
+			mockAuthorizationHelper
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+				.Returns(true);
+
+			AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
+				authorizationHelper: mockAuthorizationHelper, datasetsClient: mockDatasetsApiClient, mapper: MappingHelper.CreateFrontEndMapper());
+			datasetSchemaPageModel.AssignDatasetSchemaViewModel = new AssignDatasetSchemaViewModel();
+
+			// Act
+			IActionResult result = await datasetSchemaPageModel.OnPostAsync(expectedSpecificationId);
+
+			// Assert
+			result
+				.Should().BeOfType<RedirectResult>()
+				.Subject
+				.Url
+				.Should().EndWith($"datasets/ListDatasetSchemas/{expectedSpecificationId}");
+		}
+
+
+		private static IEnumerable<DatasetDefinition> GetDummyDataDefinitions()
 	    {
 		    DatasetDefinition d1 = new DatasetDefinition()
 		    {

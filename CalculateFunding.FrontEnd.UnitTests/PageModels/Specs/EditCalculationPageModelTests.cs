@@ -915,6 +915,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .ModelState
                 .Should()
                 .HaveCount(1);
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
         }
 
         [TestMethod]
@@ -1160,7 +1164,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .ErrorMessage
                 .Should()
                 .Be("Name was not provided");
-        }
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeTrue();
+		}
 
         [TestMethod]
         public async Task EditCalculationPageModel_OnPostAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
@@ -1207,6 +1215,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             result
                 .Should()
                 .BeOfType<ForbidResult>();
+
+	        pageModel
+		        .IsAuthorizedToEdit
+		        .Should().BeFalse();
         }
 
         public static EditCalculationPageModel CreatePageModel(
