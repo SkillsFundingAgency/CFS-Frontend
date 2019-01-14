@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
 		public bool IsSpecificationSelectedForThisFunding { get; set; }
 
-		public bool IsUserAuthorizedToChooseSomeSpecs { get; set; }
+		public bool ShouldDisplayPermissionsBanner { get; set; }
 
         public IEnumerable<ChooseApprovalSpecificationViewModel> Specifications { get; set; }
 
@@ -137,7 +137,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 				IEnumerable<ChooseApprovalSpecificationViewModel> specificationsAuthorizedViewModel = ConvertToChooseApprovalSpecificationModelWithCanBeChosenFlag(specificationSummariesTrimmed, !IsSpecificationSelectedForThisFunding);
 	            IEnumerable<ChooseApprovalSpecificationViewModel> specificationsUnauthorizedViewModel = ConvertToChooseApprovalSpecificationModelWithCanBeChosenFlag(specificationSummariesUnauthorizedToChoose, false);
 
-	            IsUserAuthorizedToChooseSomeSpecs = !specificationsUnauthorizedViewModel.Any();
+	            ShouldDisplayPermissionsBanner = specificationsUnauthorizedViewModel.Any();
 				
 	            IEnumerable<ChooseApprovalSpecificationViewModel> specificationViewModels = specificationsAuthorizedViewModel.Concat(specificationsUnauthorizedViewModel);
 

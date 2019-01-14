@@ -24,7 +24,7 @@
     <h1 class="hero-title">Choose funding specification</h1>
 }
 
-@if (!Model.IsSpecificationSelectedForThisFunding && !Model.IsUserAuthorizedToChooseSomeSpecs)
+@if (!Model.IsSpecificationSelectedForThisFunding && Model.ShouldDisplayPermissionsBanner)
 {
     @section PermissionWarnings
     {
