@@ -6,6 +6,7 @@
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
+    using CalculateFunding.Frontend.ViewModels.Approvals;
 
     public interface IResultsApiClient
     {
@@ -37,7 +38,9 @@
 
         Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria);
 
-        Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel);
+        Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatusByBatch(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel);
+
+        Task UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel);
 
         Task<ApiResponse<bool>> HasCalculationResults(string calculationId);
     }

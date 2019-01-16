@@ -129,12 +129,20 @@
             return await ValidatedPostAsync<ConfirmPublishApprove, PublishedAllocationLineResultStatusUpdateModel>($"get-confirmation-details-for-approve-publish-provider-results?specificationId={specificationId}", filterCriteria);
         }
 
-        public async Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
+        public async Task<ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>> UpdatePublishedAllocationLineStatusByBatch(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(updateModel, nameof(updateModel));
 
             return await ValidatedPostAsync<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateModel>($"update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
+        }
+
+        public async Task UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(updateModel, nameof(updateModel));
+
+            await PostAsync($"update-published-allocationline-results-status?specificationId={specificationId}", updateModel);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -41,7 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IResultsApiClient resultsClient = CreateResultsClient();
             resultsClient
-                .UpdatePublishedAllocationLineStatus(Arg.Is(specificationId), Arg.Any<PublishedAllocationLineResultStatusUpdateModel>())
+                .UpdatePublishedAllocationLineStatusByBatch(Arg.Is(specificationId), Arg.Any<PublishedAllocationLineResultStatusUpdateModel>())
                 .Returns(new ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>(HttpStatusCode.OK, new PublishedAllocationLineResultStatusUpdateResponseModel()));
 
             ApprovalController controller = CreateApprovalController(resultsClient: resultsClient, authorizationHelper: authorizationHelper);
@@ -72,7 +73,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IResultsApiClient resultsClient = CreateResultsClient();
             resultsClient
-                .UpdatePublishedAllocationLineStatus(Arg.Is(specificationId), Arg.Any<PublishedAllocationLineResultStatusUpdateModel>())
+                .UpdatePublishedAllocationLineStatusByBatch(Arg.Is(specificationId), Arg.Any<PublishedAllocationLineResultStatusUpdateModel>())
                 .Returns(new ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel>(HttpStatusCode.OK, new PublishedAllocationLineResultStatusUpdateResponseModel()));
 
             ApprovalController controller = CreateApprovalController(resultsClient: resultsClient, authorizationHelper: authorizationHelper);
@@ -135,6 +136,43 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task UpdateApprovalStatusForAllocationLine_WhenEnableServerSideFeatureEnable_ThenCallEndpointToScheduleJob()
+        {
+            // Arrange
+            string specificationId = "abc123";
+
+            PublishedAllocationLineResultStatusUpdateViewModel model = new PublishedAllocationLineResultStatusUpdateViewModel
+            {
+                Status = AllocationLineStatusViewModel.Approved,
+                Providers = new List<PublishedAllocationLineResultStatusUpdateProviderViewModel>()
+            };
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveFunding))
+                .Returns(true);
+
+            IResultsApiClient resultsClient = CreateResultsClient();
+
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+            featureToggle
+                .IsApprovalBatchingServerSideEnabled()
+                .Returns(true);
+
+            ApprovalController controller = CreateApprovalController(resultsClient: resultsClient, authorizationHelper: authorizationHelper, featureToggle: featureToggle);
+
+            // Act
+            IActionResult result = await controller.UpdateApprovalStatusForAllocationLine(specificationId, model);
+
+            // Assert
+            result.Should().BeOfType<OkResult>();
+
+            await resultsClient
+                .Received(1)
+                .UpdatePublishedAllocationLineStatus(Arg.Is(specificationId), Arg.Any<PublishedAllocationLineResultStatusUpdateModel>());
+        }
+
+        [TestMethod]
         public async Task RefreshPublishedResults_WhenUserDoesHaveRefreshFundingPermission_ThenActionAllowed()
         {
             // Arrange
@@ -178,7 +216,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private ApprovalController CreateApprovalController(IResultsApiClient resultsClient = null, ISpecsApiClient specsClient = null, IAuthorizationHelper authorizationHelper = null)
+        private ApprovalController CreateApprovalController(IResultsApiClient resultsClient = null, 
+            ISpecsApiClient specsClient = null, 
+            IAuthorizationHelper authorizationHelper = null,
+            IFeatureToggle featureToggle = null)
         {
             IMapper mapper = Substitute.For<IMapper>();
 
@@ -186,7 +227,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 resultsClient ?? CreateResultsClient(),
                 specsClient ?? CreateSpecsClient(),
                 mapper,
-                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanApproveFunding));
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanApproveFunding),
+                featureToggle ?? CreateFeatureToggle());
         }
 
         private IResultsApiClient CreateResultsClient()
@@ -197,6 +239,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private ISpecsApiClient CreateSpecsClient()
         {
             return Substitute.For<ISpecsApiClient>();
+        }
+
+        private IFeatureToggle CreateFeatureToggle()
+        {
+            return Substitute.For<IFeatureToggle>();
         }
     }
 }

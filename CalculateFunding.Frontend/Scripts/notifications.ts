@@ -79,7 +79,7 @@ namespace calculateFunding.notifications {
 
         protected abstract onConnected(): void;
 
-        protected abstract onJobStarted(): void;
+        protected abstract onJobStarted(jobType: string): void;
 
         protected abstract onJobCompleted(status: CompletionStatus): void;
 
@@ -99,7 +99,7 @@ namespace calculateFunding.notifications {
                 this.currentStatus(status);
 
                 if (status.running) {
-                    this.onJobStarted();
+                    this.onJobStarted(status.jobType);
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace calculateFunding.notifications {
 
                 status.jobCreatedTime(notification.statusDateTime);
 
-                this.onJobStarted();
+                this.onJobStarted(notification.jobType);
             }
 
             status.jobId = notification.jobId;
@@ -166,11 +166,10 @@ namespace calculateFunding.notifications {
         }
 
         protected onConnected(): void {
-            //this.startWatchingForAllNotifications();
             this.startWatchingForSpecificationNotifications(this.specificationId);
         }
 
-        protected onJobStarted(): void {
+        protected onJobStarted(jobType: string): void {
             this.searchViewModel.areResultsBeingUpdated(true);
         }
 
@@ -277,7 +276,7 @@ namespace calculateFunding.notifications {
         Completed = "Completed"
     }
 
-    enum CompletionStatus {
+    export enum CompletionStatus {
         Succeeded = "Succeeded",
         Failed = "Failed",
         Cancelled = "Cancelled",

@@ -234,6 +234,13 @@
       },
       "defaultValue": true
     },
+    "EnableApprovalBatchingServerSide": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable batching approval/publish requests on the server side rather than the client side"
+      },
+      "defaultValue": true
+    },
     "SignalrConnectionString": {
       "type": "string",
       "metadata": {
@@ -490,6 +497,10 @@
             {
               "name": "features:calculationResultsNotificationsEnabled",
               "value": "[parameters('EnableCalculationResultsNotifications')]"
+            },
+            {
+              "name": "features:approvalBatchingServerSideEnabled",
+              "value": "[parameters('EnableApprovalBatchingServerSide')]"
             }
           ]
         }
