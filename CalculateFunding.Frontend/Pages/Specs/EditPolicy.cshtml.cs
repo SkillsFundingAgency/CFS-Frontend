@@ -102,7 +102,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
 
 	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specification, SpecificationActionTypes.CanEditSpecification);
-	        if (IsAuthorizedToEdit)
+	        if (!IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }
