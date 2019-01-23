@@ -592,11 +592,8 @@
 
 @section scripts{
     <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
-    @if (Model.ShouldApprovalServerSideBatchingBeUsed)
-    {
-        <script asp-src-include="~/assets/libs/js/signalr.min.js" asp-append-version="true" type="text/javascript"></script>
-        <script asp-src-include="~/js/notifications.js" asp-append-version="true" type="text/javascript"></script>
-    }
+    <script asp-src-include="~/assets/libs/js/signalr.min.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/notifications.js" asp-append-version="true" type="text/javascript"></script>
     @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
     {
         <script type="text/javascript" asp-src-include="~/js/approvals.viewfunding.js" asp-append-version="true"></script>
