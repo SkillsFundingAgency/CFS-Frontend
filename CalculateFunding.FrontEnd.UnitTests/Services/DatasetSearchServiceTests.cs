@@ -326,7 +326,56 @@ namespace CalculateFunding.Frontend.Services
             results.EndItemNumber.Should().Be(100);
         }
 
-        private PagedResult<DatasetSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+	    [TestMethod]
+	    public async Task PerformSearchDatasetVersion_GivenClientReturnsResult_ShouldReturnCorrectlyMappedResult()
+	    {
+			// Arrange
+		    IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+		    ILogger mockLogger = Substitute.For<ILogger>();
+		    IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
+		    IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger);
+
+		    PagedResult<DatasetVersionSearchResultModel> itemResult = GeneratedPagedResultsDatasetVersionSearchResultModel(50);
+		    itemResult.PageNumber = 2;
+		    itemResult.PageSize = 50;
+		    itemResult.TotalItems = 175;
+
+		    mockDatasetsApiClient
+			    .FindDatasetsVersions(Arg.Any<SearchFilterRequest>())
+			    .Returns(itemResult);
+
+			// Act
+			DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
+
+			// Assert
+		    datasetVersionSearchResultViewModel.Should().NotBeNull();
+		    datasetVersionSearchResultViewModel.Results.Count().Should().Be(50);
+		    datasetVersionSearchResultViewModel.TotalResults.Should().Be(175);
+		    datasetVersionSearchResultViewModel.CurrentPage.Should().Be(2);
+		    datasetVersionSearchResultViewModel.PageSize.Should().Be(50);
+	    }
+
+	    [TestMethod]
+	    public async Task PerformSearchDatasetVersion_GivenClientReturnsEmptyResult_ShouldReturnCorrectlyMappedResult()
+	    {
+		    // Arrange
+		    IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
+		    ILogger mockLogger = Substitute.For<ILogger>();
+		    IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
+		    IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger);
+
+		    mockDatasetsApiClient
+			    .FindDatasetsVersions(Arg.Any<SearchFilterRequest>())
+			    .Returns((PagedResult<DatasetVersionSearchResultModel>)null);
+
+		    // Act
+		    DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
+
+		    // Assert
+		    datasetVersionSearchResultViewModel.Should().BeNull();
+	    }
+
+		private PagedResult<DatasetSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
             PagedResult<DatasetSearchResultItem> result = new PagedResult<DatasetSearchResultItem>();
             List<DatasetSearchResultItem> items = new List<DatasetSearchResultItem>();
@@ -350,5 +399,28 @@ namespace CalculateFunding.Frontend.Services
 
             return result;
         }
-    }
+
+	    private PagedResult<DatasetVersionSearchResultModel> GeneratedPagedResultsDatasetVersionSearchResultModel(int numberOfItems)
+	    {
+		    PagedResult<DatasetVersionSearchResultModel> result = new PagedResult<DatasetVersionSearchResultModel>();
+		    List<DatasetVersionSearchResultModel> items = new List<DatasetVersionSearchResultModel>();
+		    for (int i = 0; i < numberOfItems; i++)
+		    {
+			    items.Add(new DatasetVersionSearchResultModel()
+			    {
+				    Id = $"{i + 10}",
+				    Name = $"Dataset {i + 1}"
+			    });
+		    }
+
+		    result.Items = items.AsEnumerable();
+		    result.PageNumber = 1;
+		    result.PageSize = 50;
+		    result.TotalItems = numberOfItems;
+		    result.TotalPages = 1;
+		    result.Facets = null;
+
+		    return result;
+		}
+	}
 }

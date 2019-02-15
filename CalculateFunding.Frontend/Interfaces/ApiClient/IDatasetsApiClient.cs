@@ -23,7 +23,9 @@
         /// <returns>List of Calculations</returns>
         Task<PagedResult<DatasetSearchResultItem>> FindDatasets(SearchFilterRequest filterOptions);
 
-        Task<PagedResult<DatasetDefinitionSearchResultItem>> FindDatasetDefinitions(SearchFilterRequest filterOptions);
+	    Task<PagedResult<DatasetVersionSearchResultModel>> FindDatasetsVersions(SearchFilterRequest searchFilterRequest);
+
+		Task<PagedResult<DatasetDefinitionSearchResultItem>> FindDatasetDefinitions(SearchFilterRequest filterOptions);
 
         Task<ApiResponse<DatasetDefinition>> GetDatasetDefinitionById(string datasetDefinitionId);
 
@@ -47,9 +49,9 @@
 
         Task<HttpStatusCode> AssignDataSourceVersionToRelationship(AssignDatasetVersion datasetVersion);
 
-        Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId);
+        Task<ApiResponse<DownloadDatasourceModel>> GetDatasourceDownload(string datasetId, int? datasetVersion = null);
 
-        Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId);
+		Task<ApiResponse<DatasetVersionResponse>> GetCurrentDatasetVersionByDatasetId(string datasetId);
 
         Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel);
 

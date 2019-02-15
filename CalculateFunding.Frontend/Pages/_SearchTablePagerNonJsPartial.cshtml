@@ -1,0 +1,64 @@
+﻿@model CalculateFunding.Frontend.ViewModels.Common.PagerPartialViewModel
+@{
+    const string pageNumberKey = "pageNumber";
+}
+
+<div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
+    <div class="table-paging-container" id="static-paging-container">
+        @if (Model.PagerState.CurrentPage != 1)
+        {
+            var dictionaryPageSpecific = new Dictionary<string, string>(Model.QuerySearchToAppendTo) { { pageNumberKey, "1" } };
+            <a class="paging-link paging-link-first" asp-all-route-data="@dictionaryPageSpecific"><i class="material-icons">keyboard_arrow_left keyboard_arrow_left</i></a>
+        }
+        else
+        {
+            <span class="paging-link paging-link-first paging-link-disabled"><i class="material-icons">keyboard_arrow_left keyboard_arrow_left</i></span>
+        }
+
+        @if (Model.PagerState.PreviousPage.HasValue)
+        {
+            var dictionaryPageSpecific = new Dictionary<string, string>(Model.QuerySearchToAppendTo) { { pageNumberKey, @Model.PagerState.PreviousPage.Value.ToString() } };
+            <a class="paging-link paging-link-previous" asp-all-route-data="@dictionaryPageSpecific"><i class="material-icons">keyboard_arrow_left</i></a>
+        }
+        else
+        {
+            <span class="paging-link paging-link-previous paging-link-disabled" href="#"><i class="material-icons">keyboard_arrow_left</i></span>
+        }
+
+        @foreach (int pageNumber in Model.PagerState.Pages)
+        {
+            if (pageNumber == Model.PagerState.CurrentPage)
+            {
+
+                <span class="paging-link paging-link-active">@pageNumber</span>
+            }
+            else
+            {
+                var dictionaryPageSpecific = new Dictionary<string, string>(Model.QuerySearchToAppendTo) {{pageNumberKey, pageNumber.ToString()}};
+                <a asp-route-page="@pageNumber" asp-all-route-data="@dictionaryPageSpecific" class="paging-link"><span>@pageNumber</span></a>
+            }
+
+        }
+
+        @if (Model.PagerState.NextPage.HasValue)
+        {
+            var dictionaryPageSpecific = new Dictionary<string, string>(Model.QuerySearchToAppendTo) { { pageNumberKey, @Model.PagerState.NextPage.Value.ToString() } };
+            <a asp-all-route-data="@dictionaryPageSpecific" class="paging-link paging-link-next"><i class="material-icons">keyboard_arrow_right</i></a>
+        }
+        else
+        {
+            <span class="paging-link paging-link-next paging-link-disabled"><i class="material-icons">keyboard_arrow_right</i></span>
+        }
+
+        @if (Model.PagerState.CurrentPage < Model.PagerState.LastPage)
+        {
+            var dictionaryPageSpecific = new Dictionary<string, string>(Model.QuerySearchToAppendTo) { { pageNumberKey, @Model.PagerState.LastPage.ToString() } };
+            <a asp-all-route-data="@dictionaryPageSpecific" class="paging-link paging-link-last"><i class="material-icons">keyboard_arrow_right keyboard_arrow_right</i></a>
+        }
+        else
+        {
+            <span class="paging-link paging-link-last paging-link-disabled"><i class="material-icons">keyboard_arrow_right keyboard_arrow_right</i></span>
+        }
+
+    </div>
+</div>

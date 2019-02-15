@@ -4,7 +4,17 @@
 
     public class SearchResultViewModel
     {
-        public int TotalResults { get; set; }
+	    public SearchResultViewModel()
+	    {
+	    }
+
+		public SearchResultViewModel(int totalResults, int currentPage)
+	    {
+		    TotalResults = totalResults;
+		    CurrentPage = currentPage;
+	    }
+
+	    public int TotalResults { get; set; }
 
         public int CurrentPage { get; set; }
 

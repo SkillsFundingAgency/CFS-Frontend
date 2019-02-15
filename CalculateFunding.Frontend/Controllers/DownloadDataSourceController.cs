@@ -21,14 +21,14 @@
         }
 
         [HttpGet]
-        [Route("api/datasets/download-dataset-file/{datasetid}")]
-        public async Task<IActionResult> Download(string datasetId)
+        [Route("api/datasets/download-dataset-file/{datasetid}/{datasetVersion?}")]
+        public async Task<IActionResult> Download(string datasetId, int? datasetVersion = null)
         {
             Guard.ArgumentNotNull(datasetId, nameof(datasetId));
 
             // DATA SOURCE NAME_VERSION number_STATUS.xl
 
-            ApiResponse<DownloadDatasourceModel> apiResponse = await _datasetApiClient.GetDatasourceDownload(datasetId);
+            ApiResponse<DownloadDatasourceModel> apiResponse = await _datasetApiClient.GetDatasourceDownload(datasetId, datasetVersion);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.Url))
             {

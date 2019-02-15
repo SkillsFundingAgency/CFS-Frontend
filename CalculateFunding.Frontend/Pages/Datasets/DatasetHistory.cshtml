@@ -1,0 +1,77 @@
+﻿@page
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.ViewModels.Common
+@using Clients.DatasetsClient.Models
+@model Datasets.DatasetHistoryModel
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
+    <hr class="navbar-separator" />
+}
+
+@section FormBannerLeft {
+}
+
+@{
+    DatasetVersionSearchResultModel first = Model.Current;
+    Dictionary<string, string> queryStringToAppend = new Dictionary<string, string>() {{"datasetId", Model.DatasetId}};
+    ViewData["Title"] = "Dataset history";
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="~/datasets/">@BreadcrumbText.ManageDatasets</a></li>
+            <li><a href="~/datasets/managedatasets/">@BreadcrumbText.ManageDataSources</a></li>
+            <li>@first.Name</li>
+        </ol>
+    </div>
+}
+    <div id="datasource-history-page">
+        <div>
+            <h1 class="hero-text">Data source:</h1>
+            <h2 class="hero-description-skinny">@first.Name</h2>
+            <h3 class="field-header" id="description-header">Description</h3>
+            <h3>@first.Description</h3>
+            <h3 class="field-header">Data schema:</h3>
+            <h3>@first.DefinitionName</h3>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 spacing-30">
+                <table class="cf">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Version</th>
+                            <th>Change note for this version</th>
+                            <th>Updated</th>
+                            <th>Updated by</th>
+                            <th class="text-center">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var datasetVersionHistory in Model.DatasetSearchResultViewModel.Results)
+                        {
+                            <tr>
+                                <td class="text-center">@datasetVersionHistory.Version</td>
+                                <td>@datasetVersionHistory.ChangeNote</td>
+                                <td>@datasetVersionHistory.LastUpdatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@datasetVersionHistory.LastUpdatedByName</td>
+                                <td class="text-center">
+                                    <a href="/api/datasets/download-dataset-file/@datasetVersionHistory.DatasetId/@datasetVersionHistory.Version" target="_blank">
+                                        <i class="material-icons">cloud_download</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <partial name="_SearchTablePagerNonJsPartial" model='new PagerPartialViewModel(@Model.DatasetSearchResultViewModel, "datasets", string.Empty, @queryStringToAppend)' />
+        <div id="back-link">
+            <a href="~/datasets/managedatasets/">Back</a>
+        </div>
+    </div>

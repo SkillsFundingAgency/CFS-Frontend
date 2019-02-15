@@ -28,11 +28,11 @@ namespace CalculateFunding.Frontend.Pages.Datasets
             _datasetDefinitionSearchService = datasetDefinitionSearchService;
         }
 
-        public async Task<IActionResult> OnGetAsync([FromQuery]string searchTerm = null, [FromQuery] int? page = null)
+        public async Task<IActionResult> OnGetAsync([FromQuery]string searchTerm = null, [FromQuery] int? pageNumber = null)
         {
             SearchRequestViewModel searchRequest = new SearchRequestViewModel()
             {
-                PageNumber = page ?? 1,
+                PageNumber = pageNumber ?? 1,
                 IncludeFacets = false,
                 SearchTerm = searchTerm,
                 PageSize = 50,

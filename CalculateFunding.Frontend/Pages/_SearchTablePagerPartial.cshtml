@@ -1,63 +1,9 @@
-﻿@using System.Web
-@model CalculateFunding.Frontend.ViewModels.Common.PagerPartialViewModel
+﻿@model CalculateFunding.Frontend.ViewModels.Common.PagerPartialViewModel
 
 @if (Model.PagerState.LastPage > 1)
 {
     <noscript>
-        <div data-bind="visible: !searchPerformed()" id="static-rownavigation-container">
-            <div class="table-paging-container" id="static-paging-container">
-                @if (Model.PagerState.CurrentPage != 1)
-                {
-                    <a class="paging-link paging-link-first" href="?page=1"><i class="material-icons">keyboard_arrow_left keyboard_arrow_left</i></a>
-                }
-                else
-                {
-                    <span class="paging-link paging-link-first paging-link-disabled"><i class="material-icons">keyboard_arrow_left keyboard_arrow_left</i></span>
-                }
-
-                @if (Model.PagerState.PreviousPage.HasValue)
-                {
-                    <a class="paging-link paging-link-previous" href="?page=@Model.PagerState.PreviousPage.Value"><i class="material-icons">keyboard_arrow_left</i></a>
-                }
-                else
-                {
-                    <span class="paging-link paging-link-previous paging-link-disabled" href="#"><i class="material-icons">keyboard_arrow_left</i></span>
-                }
-
-                @foreach (int pageNumber in Model.PagerState.Pages)
-                {
-                    if (pageNumber == Model.PagerState.CurrentPage)
-                    {
-
-                        <span class="paging-link paging-link-active">@pageNumber</span>
-                    }
-                    else
-                    {
-                        <a href="?page=@pageNumber" class="paging-link"><span>@pageNumber</span></a>
-                    }
-
-                }
-
-                @if (Model.PagerState.NextPage.HasValue)
-                {
-                    <a href="@Model.PagerState.NextPage.Value" class="paging-link paging-link-next"><i class="material-icons">keyboard_arrow_right</i></a>
-                }
-                else
-                {
-                    <span class="paging-link paging-link-next paging-link-disabled"><i class="material-icons">keyboard_arrow_right</i></span>
-                }
-
-                @if (Model.PagerState.CurrentPage < Model.PagerState.LastPage)
-                {
-                    <a href="?page=@Model.PagerState.LastPage" class="paging-link paging-link-last"><i class="material-icons">keyboard_arrow_right keyboard_arrow_right</i></a>
-                }
-                else
-                {
-                    <span class="paging-link paging-link-last paging-link-disabled"><i class="material-icons">keyboard_arrow_right keyboard_arrow_right</i></span>
-                }
-
-            </div>
-        </div>
+        <partial name="_SearchTablePagerNonJsPartial" model= '@Model' />
     </noscript>
 }
 
