@@ -941,10 +941,14 @@ namespace calculateFunding.approvals.two {
         providerType: string;
         ukprn: string;
         authority: string;
+        totalFundingAmount: number;
         fundingAmount: KnockoutComputed<number>;
         get fundingAmountDisplay(): string {
 
             return (Number(this.fundingAmount())).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        }
+        get totalFundingAmountDisplay(): string {
+            return (Number(this.totalFundingAmount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
         }
 
         totalAllocationLines: KnockoutComputed<Number>;
