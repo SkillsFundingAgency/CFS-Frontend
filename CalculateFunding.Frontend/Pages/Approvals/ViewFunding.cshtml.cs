@@ -10,6 +10,8 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public bool ShouldAllocationLineMajorMinorVersioningEnabled { get; private set; }
 
+		public bool ShouldProviderInformationViewBeEnabled { get; private set; }
+
 		public bool ShouldFiltersBeEnabled { get; private set; }
 
         public bool ShouldApprovalServerSideBatchingBeUsed { get; private set; }
@@ -25,7 +27,10 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 			ShouldFiltersBeEnabled = features.IsPublishAndApprovePageFiltersEnabled();
 
             ShouldApprovalServerSideBatchingBeUsed = features.IsApprovalBatchingServerSideEnabled();
-        }
+
+			ShouldProviderInformationViewBeEnabled = features.IsProviderInformationViewInViewFundingPageEnabled();
+
+		}
 
         public void OnGet()
         {

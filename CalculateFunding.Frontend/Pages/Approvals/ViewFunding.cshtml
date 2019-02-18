@@ -21,10 +21,21 @@
             </div>
         </div>
     </div>
+
+    <div style="display:none;" data-bind="visible:pageState() === 'providerView'" class="banner-container">
+        <div class="container">
+            <a href="javascript:void(0)" data-bind="click:function(){pageState('main')}"><i class="material-icons valign-middle">keyboard_arrow_left</i>Back</a>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 data-bind="text: selectedProviderView() ? selectedProviderView().providerName : 'unknown'" class="hero-title-skinny"></h1>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @section BreadCrumb {
-    <div class="breadcrumbs">
+    <div style="display:none;" data-bind="visible:pageState() !== 'providerView'" class="breadcrumbs">
         <ol>
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
@@ -35,6 +46,47 @@
 }
 
 @section BannerWhole {
+    <div style="display:none;" data-bind="visible:pageState() === 'providerView'" id="viewfunding-page-provider">
+        <div class="col-xs-12 grey-box-holder">
+            <div class="funding-stream-info-holder">
+                <h2 class="hero-description-skinny bold" data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown'"></h2>
+                <p>
+                    <span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'" class="funding-period"></span>
+                    <span class="funding-stream-text">Funding stream: 
+                        <span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'" class="funding-stream-value"></span>
+                    </span>
+
+
+
+                </p>
+            </div>
+            <div class="funding-stream-total-holder float-right">
+                <span class="funding-stream-total-value hero-description-skinny bold">
+                &pound;<span data-bind="text: selectedProviderView() ? selectedProviderView().totalFundingAmountDisplay : 'unknown'"></span></span>
+                <span class="funding-stream-total-text">Funding stream total</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-top spacing-15-bottom">
+                    <li class="nav-item active">
+                        <a role="tab">Provider info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a role="tab">Allocation line</a>
+                    </li>
+                    <li class="nav-item">
+                        <a role="tab">Public calculations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a role="tab">Profile results</a>
+                    </li>
+                    <p class="last-refreshed-text align-bottom">Last refreshed on: <span data-bind="text: selectedSpecification() ? selectedSpecification().publishedResultsRefreshedAtDisplay() : 'Not available'"></span></p>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="viewfunding-page-header spacing-15">
         <div data-bind="visible: pageState() === 'initial'">
             <div>
@@ -225,9 +277,19 @@
                 <tbody id="allocation-lines-rows">
                     <!-- ko foreach: currentPageResults -->
                     <tr class="expander-trigger-container data-provider-container provider-column">
-                        <td class="expander-container-group-identifier">
-                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
-                        </td>
+                        @if (Model.ShouldProviderInformationViewBeEnabled)
+                        {
+                            <td class="expander-container-group-identifier">
+                                <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <a href=":javascript(void)" data-bind="text: providerName, click: function(){$root.selectProviderHandler($data)}" class="inline-table-label data-provider-name"></a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="expander-container-group-identifier">
+                                <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
+                            </td>
+                        }
+
                         <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-held': numberNew() > 0 }"><span data-bind="text: numberNew()"></span>/<span data-bind="text: totalAllocationLines"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-approved': numberApproved() > 0 }"><span data-bind="text: numberApproved()"></span>/<span data-bind="text: totalAllocationLines"></span></td>
@@ -301,9 +363,18 @@
                 <tbody id="allocation-lines-rows">
                     <!-- ko foreach: currentPageResults -->
                     <tr class="expander-trigger-container data-provider-container provider-column">
-                        <td class="expander-container-group-identifier">
-                            <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
-                        </td>
+                        @if (Model.ShouldProviderInformationViewBeEnabled)
+                        {
+                            <td class="expander-container-group-identifier">
+                                <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <a href=":javascript(void)" data-bind="text: providerName, click: function(){$root.selectProviderHandler($data)}" class="inline-table-label data-provider-name"></a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="expander-container-group-identifier">
+                                <input type="checkbox" data-bind="attr: { id: 'checkbox-provider-' + providerId }, checked: isSelected" class="target-checkbox-provider" /> <label data-bind="attr: { for: 'checkbox-provider-' + providerId }, text: providerName" class="inline-table-label data-provider-name"></label>
+                            </td>
+                        }
                         <td class="data-provider-id ukprn-column"><span data-bind="text: providerId"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-held': numberNew() > 0 }"><span data-bind="text: numberNew()"></span>/<span data-bind="text: totalAllocationLines"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-approved': numberApproved() > 0 }"><span data-bind="text: numberApproved()"></span>/<span data-bind="text: totalAllocationLines"></span></td>

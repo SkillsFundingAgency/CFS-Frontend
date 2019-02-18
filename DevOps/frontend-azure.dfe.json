@@ -241,6 +241,13 @@
       },
       "defaultValue": true
     },
+    "EnableProviderInformationViewInViewFundingPage": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable provider information view in view funding page"
+      },
+      "defaultValue": false
+    },
     "SignalrConnectionString": {
       "type": "string",
       "metadata": {
@@ -501,6 +508,10 @@
             {
               "name": "features:approvalBatchingServerSideEnabled",
               "value": "[parameters('EnableApprovalBatchingServerSide')]"
+            },
+            {
+              "name": "features:providerInformationViewInViewFundingPageEnabled",
+              "value": "[parameters('EnableProviderInformationViewInViewFundingPage')]"
             }
           ]
         }

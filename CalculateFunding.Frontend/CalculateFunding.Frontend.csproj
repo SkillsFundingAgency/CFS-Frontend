@@ -64,7 +64,7 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.16.0" />
+    <PackageReference Include="CalculateFunding.Common" Version="1.20.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.2" />

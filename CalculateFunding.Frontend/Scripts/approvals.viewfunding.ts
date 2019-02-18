@@ -31,6 +31,8 @@ namespace calculateFunding.approvals {
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
 
+        public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
+
         constructor(settings: IViewFundingSettings) {
             super();
 
@@ -143,6 +145,15 @@ namespace calculateFunding.approvals {
                 }
             });
         }
+
+        //***********************
+        // Provider view methods
+        //***********************
+        selectProviderHandler(providerModel: PublishedProviderResultViewModel): void {
+            this.pageState('providerView');
+            this.selectedProviderView(providerModel);            
+        }
+
 
         //***********************
         // Notifications methods
@@ -850,6 +861,7 @@ namespace calculateFunding.approvals {
                     newProvider.providerId = receivedProvider.providerId;
                     newProvider.providerName = receivedProvider.providerName;
                     newProvider.providerType = receivedProvider.providerType;
+                    newProvider.totalFundingAmount = receivedProvider.fundingAmount;
 
                     for (let fs: number = 0; fs < receivedProvider.fundingStreamResults.length; fs++) {
                         let fundingStream: IFundingStreamResultResponse = receivedProvider.fundingStreamResults[fs];
@@ -959,12 +971,14 @@ namespace calculateFunding.approvals {
         providerType: string
         ukprn: string;
         authority: string;
+        totalFundingAmount: number;
         fundingAmount: KnockoutComputed<number>;
         get fundingAmountDisplay(): string {
-
-            return (Number(this.fundingAmount())).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+            return PublishedProviderResultViewModel.getNumberFigureInTextFormat(this.fundingAmount());
         }
-
+        get totalFundingAmountDisplay(): string {
+            return PublishedProviderResultViewModel.getNumberFigureInTextFormat(this.totalFundingAmount);
+        }
         totalAllocationLines: KnockoutComputed<Number>;
         numberNew: KnockoutComputed<number>;
         numberApproved: KnockoutComputed<number>
@@ -1015,6 +1029,10 @@ namespace calculateFunding.approvals {
             return allocationLineResultsFiltered.filter(function (al) {
                 return al.status === status;
             }).length
+        }
+
+        private static getNumberFigureInTextFormat(numberToFormat: number) {
+            return (Number(numberToFormat)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
         }
 
 

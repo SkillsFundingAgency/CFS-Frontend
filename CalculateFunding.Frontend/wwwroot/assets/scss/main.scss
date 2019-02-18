@@ -469,6 +469,10 @@ blockquote {
     line-height: 19px;
 }
 
+.valign-middle{
+    vertical-align: middle;
+}
+
 .manage-policy {
     .policy-description, .subpolicy-description {
         color: $secondary-text-colour;
@@ -2226,6 +2230,44 @@ table {
     }
 }
 
+#viewfunding-page-provider {
+    .grey-box-holder {
+        background-color: $grey-4;
+        border: solid 2px $grey-3;
+        padding-top: 10px;
+    }
+
+    .funding-stream-info-holder {
+        float:left;
+    }
+
+    .funding-stream-text {
+        border-left: solid 1px $grey-2;
+        padding-left: 5px;
+    }
+
+    .funding-period {
+        padding-right: 5px;
+    }
+
+    .funding-stream-total-holder {
+        margin-top: 12px;
+        margin-right: 10px;
+    }
+
+    .funding-stream-total-text,.funding-stream-total-value {
+        display: inline-block;
+        text-align:center;
+        width:100%;
+    }
+
+    .last-refreshed-text {
+        position: absolute;
+        bottom: 0px;
+        right: 40px; 
+    }
+}
+
 
 table {
     tr {
@@ -2233,6 +2275,7 @@ table {
             width: 330px;
         }
     }
+
     .nobottomborder {
         border-bottom: 0px !important;
     }
