@@ -960,6 +960,8 @@ namespace calculateFunding.approvals.two {
         testsPassed: number;
         testsTotal: number;
 
+        public generateExpand: KnockoutObservable<boolean> = ko.observable(false);
+
         allocationLineResults: KnockoutObservableArray<PublishedAllocationLineResultViewModel> = ko.observableArray([]);
         allocationLineResultsFiltered: KnockoutComputed<Array<PublishedAllocationLineResultViewModel>> = ko.pureComputed(function () {
             return ko.utils.arrayFilter(this.allocationLineResults(), function (p) {

@@ -52,7 +52,8 @@
                 <h2 class="hero-description-skinny bold" data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown'"></h2>
                 <p>
                     <span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'" class="funding-period"></span>
-                    <span class="funding-stream-text">Funding stream: 
+                    <span class="funding-stream-text">
+                        Funding stream:
                         <span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'" class="funding-stream-value"></span>
                     </span>
 
@@ -62,7 +63,8 @@
             </div>
             <div class="funding-stream-total-holder float-right">
                 <span class="funding-stream-total-value hero-description-skinny bold">
-                &pound;<span data-bind="text: selectedProviderView() ? selectedProviderView().totalFundingAmountDisplay : 'unknown'"></span></span>
+                    &pound;<span data-bind="text: selectedProviderView() ? selectedProviderView().totalFundingAmountDisplay : 'unknown'"></span>
+                </span>
                 <span class="funding-stream-total-text">Funding stream total</span>
             </div>
         </div>
@@ -296,8 +298,9 @@
                         <td class="text-center status-column" data-bind="css: { 'status-updated': numberUpdated() > 0 }"><span data-bind="text: numberUpdated()"></span>/<span data-bind="text: totalAllocationLines"></span></td>
                         <td class="text-center status-column" data-bind="css: { 'status-published': numberPublished() > 0 }"><span data-bind="text: numberPublished()"></span>/<span data-bind="text: totalAllocationLines"></span></td>
                         <td class="data-provider-amount funding-total-column">&pound;<span data-bind="text:fundingAmountDisplay"></span></td>
-                        <td class="expander-trigger-cell expander-column" data-bind="click: function () { calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
+                        <td class="expander-trigger-cell expander-column" data-bind="click: function () { $data.generateExpand(true); calculateFunding.table.sequential.toggleExpandContainer($element); $parent.expandProvider($data, $parent); }"><i class="material-icons">keyboard_arrow_down</i></td>
                     </tr>
+                    <!-- ko if: generateExpand() -->
                     <tr class="expander-container expander-container-header">
                         <td colspan="9" class="expander-container-group-identifier">
                             <span class="qa-coverage-loading" data-bind="visible: qaTestResultsRequestStatus() === 'loading'">Loading test results</span>
@@ -325,33 +328,11 @@
                             <span data-bind="text: version"></span>
                         </td>
 
-                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Held -->
-                        <td class="status-new text-center border-right-hidden">New</td>
-                        <td class="border-right-hidden"></td>
-                        <td class="border-right-hidden"></td>
-                        <td></td>
-                        <!-- /ko -->
-                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Approved -->
-                        <td class="border-right-hidden"></td>
-                        <td class="text-center status-approved border-right-hidden">Approved</td>
-                        <td class="border-right-hidden"></td>
-                        <td></td>
-                        <!-- /ko -->
-                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Updated -->
-                        <td class="border-right-hidden"></td>
-                        <td class="border-right-hidden"></td>
-                        <td class="text-center status-updated border-right-hidden">Updated</td>
-                        <td></td>
-                        <!-- /ko -->
-                        <!-- ko if: status === calculateFunding.approvals.AllocationLineStatus.Published -->
-                        <td class="border-right-hidden"></td>
-                        <td class="border-right-hidden"></td>
-                        <td class="border-right-hidden"></td>
-                        <td class="text-center status-published">Published</td>
-                        <!-- /ko -->
+                        <!--ko approvePublishRow: $data --><!-- /ko -->
 
                         <td colspan="2" class="data-allocationline-amount">&pound;<span data-bind="text: fundingAmountDisplay"></span></td>
                     </tr>
+                    <!-- /ko -->
                     <!-- /ko -->
                     <!-- /ko -->
                     <tr class="expander-container data-allocationline-container"><td colspan="8" class="no-border-both"></td></tr>
@@ -678,6 +659,7 @@
     <script type="text/javascript" asp-src-include="~/js/expander.js" asp-append-version="true"></script>
     <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/bindingHandler.approvePublishRow.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
     @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)

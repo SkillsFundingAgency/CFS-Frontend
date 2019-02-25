@@ -72,6 +72,8 @@
                     }
                 }
 
+                localAuthorities = localAuthorities.sort();
+
                 let providerTypesSearchFacets = providerTypes.map(function (a) { return new calculateFunding.search.SearchFacet(a, 0, a) });
                 let allocationLinesSearchFacets = allocationLines.map(function (a) { return new calculateFunding.search.SearchFacet(a, 0, a) });
                 let localAuthoritySearchFacets = localAuthorities.map(function (a) { return new calculateFunding.search.SearchFacet(a, 0, a) });
@@ -114,13 +116,13 @@
                                         return sa === a.allocationLineName;
                                     }));
                                 }
-                            let allocationLineMeetsFilterCriteria = isStatusFound && isAllocationFound;
-                            if (allocationLineMeetsFilterCriteria) {
-                                a.isFilteredOut(false);
-                            }
-                            else {
-                                a.isFilteredOut(true);
-                            }
+                                let allocationLineMeetsFilterCriteria = isStatusFound && isAllocationFound;
+                                if (allocationLineMeetsFilterCriteria) {
+                                    a.isFilteredOut(false);
+                                }
+                                else {
+                                    a.isFilteredOut(true);
+                                }
                                 return allocationLineMeetsFilterCriteria;
                             });
                     } else {

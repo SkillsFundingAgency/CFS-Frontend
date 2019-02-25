@@ -129,7 +129,7 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         });
     });
     describe("when Sum has been typed ", function () {
-        var container = {
+        var container: calculateFunding.providers.IVariableContainer = {
             "providers": {
                 name: "Providers",
                 friendlyName: "Providers",
@@ -161,16 +161,19 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 name: "Calc1",
                 friendlyName: "Calc1",
                 isAggregable: "true",
+                type: ""
             },
             "calc2": {
                 name: "Calc2",
                 friendlyName: "Calc2",
                 isAggregable: "true",
+                type: ""
             },
             "calc3": {
                 name: "Calc3",
                 friendlyName: "Calc3",
                 isAggregable: "true",
+                type: ""
             }
         };
 
@@ -190,7 +193,7 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
     });
 
     describe("when Avg has been typed ", function () {
-        var container = {
+        var container: calculateFunding.providers.IVariableContainer = {
             "providers": {
                 name: "Providers",
                 friendlyName: "Providers",
@@ -222,16 +225,19 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 name: "Calc1",
                 friendlyName: "Calc1",
                 isAggregable: "true",
+                type: "",
             },
             "calc2": {
                 name: "Calc2",
                 friendlyName: "Calc2",
                 isAggregable: "true",
+                type: "",
             },
             "calc3": {
                 name: "Calc3",
                 friendlyName: "Calc3",
                 isAggregable: "true",
+                type: "",
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
@@ -249,7 +255,7 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         });
     });
     describe("when Min has been typed ", function () {
-        var container = {
+        var container: calculateFunding.providers.IVariableContainer= {
             "providers": {
                 name: "Providers",
                 friendlyName: "Providers",
@@ -281,16 +287,19 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 name: "Calc1",
                 friendlyName: "Calc1",
                 isAggregable: "true",
+                type: "",
             },
             "calc2": {
                 name: "Calc2",
                 friendlyName: "Calc2",
                 isAggregable: "true",
+                type: "",
             },
             "calc3": {
                 name: "Calc3",
                 friendlyName: "Calc3",
                 isAggregable: "true",
+                type: "",
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
@@ -308,7 +317,7 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         });
     });
     describe("when Max has been typed ", function () {
-        var container = {
+        var container: calculateFunding.providers.IVariableContainer = {
             "providers": {
                 name: "Providers",
                 friendlyName: "Providers",
@@ -340,16 +349,19 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                 name: "Calc1",
                 friendlyName: "Calc1",
                 isAggregable: "true",
+                type: "",
             },
             "calc2": {
                 name: "Calc2",
                 friendlyName: "Calc2",
                 isAggregable: "true",
+                type: "",
             },
             "calc3": {
                 name: "Calc3",
                 friendlyName: "Calc3",
                 isAggregable: "true",
+                type: "",
             }
 
         };
@@ -368,7 +380,7 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
         });
     });
     describe("when dataset (ds1) is selected ", function () {
-        var container = {
+        var container: calculateFunding.providers.IVariableContainer = {
             "providers": {
                 name: "Providers",
                 friendlyName: "Providers",

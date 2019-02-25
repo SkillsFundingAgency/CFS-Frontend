@@ -10,7 +10,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Serilog;
     using Serilog.Core;
-    using Serilog.Events;
 
     public class LoggingModule : ServiceCollectionModuleBase
     {
@@ -31,14 +30,7 @@
             return new LoggerConfiguration().Enrich.With(new ILogEventEnricher[]
             {
                 new ServiceNameLogEnricher(serviceName)
-            }).WriteTo.ApplicationInsightsTraces(
-                new TelemetryConfiguration
-                {
-                    InstrumentationKey = appInsightsKey,
-                },
-                LogEventLevel.Verbose,
-                null,
-                null);
+            }).WriteTo.ApplicationInsights(appInsightsKey, TelemetryConverter.Traces);
         }
 
         public override void Configure(IServiceCollection services)

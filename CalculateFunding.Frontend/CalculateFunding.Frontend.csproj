@@ -20,6 +20,7 @@
     <None Remove="Scripts\approvals.choose.ts" />
     <None Remove="Scripts\approvals.viewfunding.ts" />
     <None Remove="Scripts\approvals.viewfunding2.ts" />
+    <None Remove="Scripts\bindingHandler.approvePublishRow.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
@@ -70,18 +71,18 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.8" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.0.4" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.0.6" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />
-    <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.6.0" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,7 @@
     <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
     <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
     <TypeScriptCompile Include="Scripts\approvals.viewfunding2.ts" />
+    <TypeScriptCompile Include="Scripts\bindingHandler.approvePublishRow.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
