@@ -8,7 +8,8 @@
     "node_modules/typescript",
     "node_modules/gulp-typescript",
     "node_modules/async-done",
-    "node_modules/concat-with-sourcemaps"
+    "node_modules/concat-with-sourcemaps",
+    "node_modules/@aspnet/signalr/dist/esm"
   ],
   "include": [
     "scripts/*.ts",

@@ -72,7 +72,10 @@
                     }
                 }
 
+                // Sort results in alphabetical order
                 localAuthorities = localAuthorities.sort();
+                allocationLines = allocationLines.sort();
+                providerTypes = providerTypes.sort();
 
                 let providerTypesSearchFacets = providerTypes.map(function (a) { return new calculateFunding.search.SearchFacet(a, 0, a) });
                 let allocationLinesSearchFacets = allocationLines.map(function (a) { return new calculateFunding.search.SearchFacet(a, 0, a) });

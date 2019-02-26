@@ -20,7 +20,7 @@ namespace calculateFunding.notifications {
                 .withUrl("/notifications")
                 .build();
 
-            this._hubConnection.onclose(self.onConnectionError);
+            this._hubConnection.onclose((error) => { self.onConnectionError(error, self); });
 
             this._hubConnection.on("NotificationEvent", (message) => {
                 self.receivedNotification(self, message);
@@ -145,10 +145,10 @@ namespace calculateFunding.notifications {
             this.onConnected();
         }
 
-        private onConnectionError(error: Error) {
+        private onConnectionError(error: Error, vm : NotificationsViewModel ) {
             if (error && error.message) {
                 console.error(error.message);
-                setTimeout(this.init(), 3000);
+                setTimeout(vm.init(), 3000);
             }
         }
     }
