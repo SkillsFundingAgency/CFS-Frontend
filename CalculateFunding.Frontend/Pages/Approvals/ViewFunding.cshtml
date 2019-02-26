@@ -676,7 +676,7 @@
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
             "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
             "permissionsUrl": "/api/users/effectivepermissions/{specificationId}",
-            "latestJobUrl": "/api/jobs/latest?specificationId={specificationId}&jobTypes={jobTypes}"
+            "latestJobUrl": "/api/jobs/{specificationId}/latest/{jobTypes}"
         };
 
             var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
@@ -700,7 +700,7 @@
             "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
             "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
             "permissionsUrl": "/api/users/effectivepermissions/{specificationId}",
-            "latestJobUrl": "/api/jobs/latest?specificationId={specificationId}&jobTypes={jobTypes}"
+            "latestJobUrl": "/api/jobs/{specificationId}/latest/{jobTypes}"
         };
 
             var vfVM = new calculateFunding.approvals.two.ViewFundingViewModel(settings);
