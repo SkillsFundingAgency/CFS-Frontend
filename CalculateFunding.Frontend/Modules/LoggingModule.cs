@@ -48,6 +48,10 @@
             ServiceNameTelemetryInitializer serviceNameEnricher = new ServiceNameTelemetryInitializer(serviceName);
 
             services.AddSingleton<ITelemetryInitializer>(serviceNameEnricher);
+
+            // Add call to configure app insights, in order to have ITelemetryInitializer registered before calling
+            // as per https://github.com/Microsoft/ApplicationInsights-aspnetcore/wiki/Custom-Configuration
+            services.AddApplicationInsightsTelemetry(appInsightsOptions.InstrumentationKey);
         }
     }
 }
