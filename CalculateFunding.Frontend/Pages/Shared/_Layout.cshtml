@@ -24,7 +24,7 @@
     }
 
     @RenderSection("styles", false)
-
+    @Html.Raw(snippet.FullScript)
 </head>
 <body id="top" class="@(ViewData["GreyBackground"] != null && ViewData["GreyBackground"].ToString().ToLower() == "true" ? "light-grey-background" : "")">
     <header role="banner" id="global-header" class="with-proposition">
@@ -56,8 +56,9 @@
 
         </div>
 
-        @if (IsSectionDefined("Navbar")){
-        @RenderSection("Navbar", false)
+        @if (IsSectionDefined("Navbar"))
+        {
+            @RenderSection("Navbar", false)
         }
     </header>
 
@@ -69,109 +70,109 @@
             @RenderSection("PermissionWarnings", false)
         }
         <section class="banner-container">
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-9">
-                    @RenderSection("BreadCrumb", false)
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-9">
+                        @RenderSection("BreadCrumb", false)
 
-                    @RenderSection("BannerLeft", false)
+                        @RenderSection("BannerLeft", false)
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="banner-container-right">
+                            @RenderSection("BannerRight", false)
+                        </div>
+
+                    </div>
                 </div>
-                <div class="col-xs-3">
-                    <div class="banner-container-right">
-                        @RenderSection("BannerRight", false)
+                @if (IsSectionDefined("BannerMiddle"))
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @RenderSection("BannerMiddle", false)
+                        </div>
                     </div>
 
-                </div>
-            </div>
-            @if (IsSectionDefined("BannerMiddle"))
-                {
-            <div class="row">
-                <div class="col-xs-12">
-                    @RenderSection("BannerMiddle", false)
-                </div>
-            </div>
-
                 }
-        </div>
-    </section>
+            </div>
+        </section>
     }
     else if (IsSectionDefined("FormBannerLeft"))
     {
-    <section class="form-banner-container">
-        <hr class="navbar-separator" />
-        @if (IsSectionDefined("PermissionWarnings"))
-        {
-            @RenderSection("PermissionWarnings", false);
-        }
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-9">
-                    <div class="form-banner-container-left">
-                        @RenderSection("BreadCrumb", false)
-                        @RenderSection("FormBannerLeft", false)
+        <section class="form-banner-container">
+            <hr class="navbar-separator" />
+            @if (IsSectionDefined("PermissionWarnings"))
+            {
+                @RenderSection("PermissionWarnings", false);
+            }
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <div class="form-banner-container-left">
+                            @RenderSection("BreadCrumb", false)
+                            @RenderSection("FormBannerLeft", false)
+                        </div>
                     </div>
-                </div>
-                <div class="col-xs-3">
-                    <div class="form-banner-container-right">
-                        @RenderSection("FormBannerRight", false)
-                    </div>
+                    <div class="col-xs-3">
+                        <div class="form-banner-container-right">
+                            @RenderSection("FormBannerRight", false)
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     }
     else if (IsSectionDefined("BannerWhole"))
     {
-    <section class="form-banner-container">
-        <hr class="navbar-separator" />
-        @if (IsSectionDefined("PermissionWarnings"))
-        {
-            @RenderSection("PermissionWarnings", false);
-        }
-        <div class="container">
-            @if (IsSectionDefined("BreadCrumb"))
+        <section class="form-banner-container">
+            <hr class="navbar-separator" />
+            @if (IsSectionDefined("PermissionWarnings"))
             {
+                @RenderSection("PermissionWarnings", false);
+            }
+            <div class="container">
+                @if (IsSectionDefined("BreadCrumb"))
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @RenderSection("BreadCrumb", false)
+                        </div>
+                    </div>
+
+                }
                 <div class="row">
                     <div class="col-xs-12">
-                        @RenderSection("BreadCrumb", false)
+                        @RenderSection("BannerWhole")
                     </div>
                 </div>
-
-            }
-            <div class="row">
-                <div class="col-xs-12">
-                    @RenderSection("BannerWhole")
-                </div>
             </div>
-        </div>
-    </section>
+        </section>
     }
     else if (IsSectionDefined("BannerWholeBlue"))
     {
-    <section class="banner-container">
-        @if (IsSectionDefined("PermissionWarnings"))
-        {
-            <hr class="navbar-separator" />
-            @RenderSection("PermissionWarnings", false);
-        }
-        <div class="container">
-            @if (IsSectionDefined("BreadCrumb"))
+        <section class="banner-container">
+            @if (IsSectionDefined("PermissionWarnings"))
             {
+                <hr class="navbar-separator" />
+                @RenderSection("PermissionWarnings", false);
+            }
+            <div class="container">
+                @if (IsSectionDefined("BreadCrumb"))
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @RenderSection("BreadCrumb", false)
+                        </div>
+                    </div>
+
+                }
                 <div class="row">
                     <div class="col-xs-12">
-                        @RenderSection("BreadCrumb", false)
+                        @RenderSection("BannerWholeBlue")
                     </div>
                 </div>
-
-            }
-            <div class="row">
-                <div class="col-xs-12">
-                    @RenderSection("BannerWholeBlue")
-                </div>
             </div>
-        </div>
-    </section>
+        </section>
     }
     <main role="main">
         <div class="container">
@@ -204,11 +205,11 @@
 
     @if (!hostingEnv.IsDevelopment())
     {
-    <script asp-src-include="~/assetsjs/main-*.js" type="text/javascript"></script>
+        <script asp-src-include="~/assetsjs/main-*.js" type="text/javascript"></script>
     }
     else
     {
-    <script src="~/assets/js/main.js" type="text/javascript"></script>
+        <script src="~/assets/js/main.js" type="text/javascript"></script>
     }
 
     @RenderSection("Scripts", required: false)

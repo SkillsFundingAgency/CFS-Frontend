@@ -115,6 +115,8 @@
                 services.AddModule<LocalDevelopmentLoggingModule>(Configuration);
             }
 
+            services.AddModule<ApplicationInsightsModule>(Configuration);
+
             services.AddModule<MappingModule>(Configuration);
             services.AddModule<ServicesModule>(Configuration);
             services.AddModule<FeaturesModule>(Configuration);

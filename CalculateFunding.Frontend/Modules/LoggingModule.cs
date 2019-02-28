@@ -3,9 +3,7 @@
     using System;
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Core.Logging;
-    using CalculateFunding.Frontend.Core.Telemetry;
     using CalculateFunding.Frontend.Options;
-    using Microsoft.ApplicationInsights.Extensibility;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Serilog;
@@ -44,14 +42,6 @@
             string serviceName = "CalculateFunding.Frontend";
 
             services.AddSingleton<ILogger>(c => GetLoggerConfiguration(appInsightsOptions, serviceName).CreateLogger());
-
-            ServiceNameTelemetryInitializer serviceNameEnricher = new ServiceNameTelemetryInitializer(serviceName);
-
-            services.AddSingleton<ITelemetryInitializer>(serviceNameEnricher);
-
-            // Add call to configure app insights, in order to have ITelemetryInitializer registered before calling
-            // as per https://github.com/Microsoft/ApplicationInsights-aspnetcore/wiki/Custom-Configuration
-            services.AddApplicationInsightsTelemetry(appInsightsOptions.InstrumentationKey);
         }
     }
 }
