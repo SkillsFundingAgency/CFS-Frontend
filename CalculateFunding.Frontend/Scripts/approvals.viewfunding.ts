@@ -696,7 +696,7 @@ namespace calculateFunding.approvals {
                             this.isWorkingVisible(false);
                         }
 
-                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage, response.publishedResultsRefreshedAt, response.approvedCount, response.publishedCount, response.updatedCount);
+                        let status = new SpecificationExecutionStatus(response.specificationId, response.percentageCompleted, response.calculationProgress, response.errorMessage, response.publishedResultsRefreshedAt, response.newCount, response.approvedCount, response.publishedCount, response.updatedCount);
 
                         if (status.calculationProgressStatus === CalculationProgressStatus.InProgress
                             || status.calculationProgressStatus === CalculationProgressStatus.NotStarted) {
@@ -721,14 +721,17 @@ namespace calculateFunding.approvals {
                             }
                             else {
                                 this.notificationStatus("refreshUpdated");
-                                this.updatedCount(response.updatedCount);
+                                this.updatedCount(response.updatedCount + response.newCount);
                             }
                             this.workingPercentComplete(null);
                             this.isWorkingVisible(false);
 
                             this.loadProviderResults();
 
-                            this.selectedSpecification().publishedResultsRefreshedAt(status.publishedResultsRefreshedAt)
+                            if (status.publishedResultsRefreshedAt) {
+                                // If the refresh resulted in changes then the refreshed date will change, otherwise it won't
+                                this.selectedSpecification().publishedResultsRefreshedAt(status.publishedResultsRefreshedAt);
+                            }
                         }
                     });
 
@@ -938,17 +941,19 @@ namespace calculateFunding.approvals {
         calculationProgressStatus: CalculationProgressStatus;
         errorMessage: string;
         publishedResultsRefreshedAt: Date;
+        newCount: number;
         approvedCount: number;
         publishedCount: number;
         updatedCount: number;
         hasChanges: boolean;
 
-        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string, publishedResultsRefreshedAt: Date, approvedCount: number, publishedCount: number, updatedCount: number) {
+        constructor(specificationId: string, percentageCompleted: number, calculationProgressStatus: CalculationProgressStatus, errorMessage: string, publishedResultsRefreshedAt: Date, newCount: number, approvedCount: number, publishedCount: number, updatedCount: number) {
             this.specificationId = specificationId;
             this.percentageCompleted = percentageCompleted;
             this.calculationProgressStatus = calculationProgressStatus;
             this.errorMessage = errorMessage;
             this.publishedResultsRefreshedAt = publishedResultsRefreshedAt;
+            this.newCount = newCount;
             this.approvedCount = approvedCount;
             this.updatedCount = updatedCount;
             this.publishedCount = publishedCount;

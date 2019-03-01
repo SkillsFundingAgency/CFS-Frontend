@@ -14,6 +14,8 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 
         public DateTimeOffset? PublishedResultsRefreshedAt { get; set; }
 
+        public int NewCount { get; set; }
+
         public int ApprovedCount { get; set; }
 
         public int UpdatedCount { get; set; }
@@ -24,7 +26,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
         {
             get
             {
-                return (ApprovedCount + UpdatedCount + PublishedCount) > 0;
+                return (NewCount + ApprovedCount + UpdatedCount + PublishedCount) > 0;
             }
         }
     }
