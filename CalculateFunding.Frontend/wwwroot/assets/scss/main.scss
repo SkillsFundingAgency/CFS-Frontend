@@ -469,7 +469,7 @@ blockquote {
     line-height: 19px;
 }
 
-.valign-middle{
+.valign-middle {
     vertical-align: middle;
 }
 
@@ -793,8 +793,8 @@ blockquote {
     justify-content: space-between;
     flex-flow: row wrap;
 
-    .flex-item {   
-         display: flex;
+    .flex-item {
+        display: flex;
     }
 }
 
@@ -810,7 +810,7 @@ blockquote {
         justify-content: space-between;
         display: flex;
     }
-    
+
     .notification-panel-firstline {
         padding: 20px 5px 0 5px;
         align-content: space-between;
@@ -821,18 +821,18 @@ blockquote {
     .notification-panel-text {
         display: flex;
     }
-    
+
     .notification-panel-summary {
         padding: 10px 5px 20px 5px;
-        display: flex;  
+        display: flex;
         margin-bottom: 20px;
     }
 
     .notification-panel-summary-text {
-        display: flex;  
+        display: flex;
         padding-left: 15px;
-     }
-    
+    }
+
     i.material-icons {
         padding-left: 15px;
         padding-right: 5px;
@@ -899,7 +899,7 @@ blockquote {
     a:visited {
         text-decoration: underline;
         color: #005ea5;
-        cursor:pointer;
+        cursor: pointer;
     }
 }
 
@@ -1058,7 +1058,7 @@ blockquote {
 }
 
 .build-output.no-border {
-        border: none;
+    border: none;
 }
 
 .diff-container {
@@ -1930,13 +1930,13 @@ table {
 .multiselect-container {
     border-radius: 0;
     font-size: 16px;
-   
+
     label {
         padding: 5px;
     }
 }
 
-.facet-select + div > ul{
+.facet-select + div > ul {
     max-height: 300px;
     overflow: auto;
 }
@@ -2110,12 +2110,26 @@ table {
     }
 
     table.cf tbody tr td.expander-container-group-identifier {
-        border-left-width: 2px !important;
-        border-left-color: $grey-1 !important;
+        border-left-width: 1px !important;
+        border-left-color: #BFC1C3 !important;
     }
 
     table.cf tbody tr.expander-container-header {
         background-color: $grey-4;
+    }
+
+    table.cf {
+        thead {
+            border-bottom: none;
+
+            th {
+                background-color: #F8F8F8;
+            }
+        }
+
+        td {
+            border-color: #BFC1C3 !important;
+        }
     }
 
     .affix {
@@ -2125,6 +2139,7 @@ table {
 
     .table-filter-container {
         margin: 0;
+        background-color: #DEE0E2;
 
         .total-count {
             text-align: right;
@@ -2226,6 +2241,15 @@ table {
             vertical-align: middle;
         }
     }
+
+    .funding-total-text {
+        font-size: 14px;
+    }
+
+    .funding-total-amount {
+        font-size: 24px;
+        font-weight: bold;
+    }
 }
 
 #viewfunding-page-provider {
@@ -2236,7 +2260,7 @@ table {
     }
 
     .funding-stream-info-holder {
-        float:left;
+        float: left;
     }
 
     .funding-stream-text {
@@ -2253,16 +2277,16 @@ table {
         margin-right: 10px;
     }
 
-    .funding-stream-total-text,.funding-stream-total-value {
+    .funding-stream-total-text, .funding-stream-total-value {
         display: inline-block;
-        text-align:center;
-        width:100%;
+        text-align: center;
+        width: 100%;
     }
 
     .last-refreshed-text {
         position: absolute;
         bottom: 0px;
-        right: 40px; 
+        right: 40px;
     }
 }
 
@@ -2901,11 +2925,11 @@ table {
     width: 30px;
 }
 
-.datsets-provider-data-notification-text{
+.datsets-provider-data-notification-text {
     font-size: 14px;
 }
 
-.datsets-provider-data-notification-icon{
+.datsets-provider-data-notification-icon {
     margin-left: 20px;
 }
 
@@ -2973,7 +2997,7 @@ table {
     a.disabled {
         color: $grey-2 !important;
         border: 2px solid $grey-2 !important;
-        cursor:none;
+        cursor: none;
     }
 }
 
@@ -3038,7 +3062,7 @@ table {
     padding: 20px 20px 20px 0px;
     border-bottom: solid 2px #F8F8F8;
     margin: 10px;
-    }
+}
 
 .edit-calculation-container-footer {
     padding: 20px 20px 20px 0px;
@@ -3048,7 +3072,7 @@ table {
 
 .edit-calculation-status-container {
     text-align: right;
-    margin-top:15px;
+    margin-top: 15px;
 }
 
 .build-output-message {

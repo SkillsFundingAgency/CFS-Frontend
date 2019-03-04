@@ -80,6 +80,8 @@ namespace calculateFunding.approvals.two {
             self.canApprove.extend({ deferred: true });
             self.canPublish.extend({ deferred: true });
             self.numberAllocationLinesSelected.extend({ deferred: true });
+            self.filteredResultsSelectedAllocationTotal.extend({ deferred: true });
+            self.filteredResultsSelectedAllocationTotalDisplay.extend({ deferred: true });
 
             self.pageState() == "initial";
 
@@ -235,6 +237,25 @@ namespace calculateFunding.approvals.two {
             }
             return allResultsRaw;
         }, this);
+
+        public filteredResultsSelectedAllocationTotal: KnockoutComputed<number> = ko.pureComputed(() => {
+            let total: number = 0;
+            let providers: Array<PublishedProviderResultViewModel> = this.filteredResults()
+            for (let i in providers) {
+                let provider: PublishedProviderResultViewModel = providers[i];
+                let providerFilteredAllocationLines = provider.allocationLineResultsFiltered();
+                for (let k in providerFilteredAllocationLines) {
+                    let allocationLine: PublishedAllocationLineResultViewModel = providerFilteredAllocationLines[k];
+                        total = total + allocationLine.fundingAmount;
+                }
+            }
+
+            return total;
+        });
+
+        public filteredResultsSelectedAllocationTotalDisplay: KnockoutComputed<string> = ko.pureComputed(() => {
+            return this.filteredResultsSelectedAllocationTotal().toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        });
 
         collapseAllAllocationLines(): void {
             $(".expander-container").hide();

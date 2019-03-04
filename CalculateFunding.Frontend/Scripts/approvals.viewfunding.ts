@@ -5,7 +5,7 @@ namespace calculateFunding.approvals {
     export class ViewFundingViewModel extends calculateFunding.notifications.NotificationsViewModel {
         private settings: IViewFundingSettings;
         public isLoadingVisible: KnockoutComputed<boolean>;
-        
+
         public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray();
         public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
         public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
@@ -83,6 +83,8 @@ namespace calculateFunding.approvals {
             self.canApprove.extend({ deferred: true });
             self.canPublish.extend({ deferred: true });
             self.numberAllocationLinesSelected.extend({ deferred: true });
+            self.filteredResultsSelectedAllocationTotal.extend({ deferred: true });
+            self.filteredResultsSelectedAllocationTotalDisplay.extend({ deferred: true });
 
             self.pageState() == "initial";
 
@@ -151,7 +153,7 @@ namespace calculateFunding.approvals {
         //***********************
         selectProviderHandler(providerModel: PublishedProviderResultViewModel): void {
             this.pageState('providerView');
-            this.selectedProviderView(providerModel);            
+            this.selectedProviderView(providerModel);
         }
 
 
@@ -235,7 +237,7 @@ namespace calculateFunding.approvals {
             return count;
         }, this);
 
-        filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
+        public filteredResults: KnockoutComputed<Array<PublishedProviderResultViewModel>> = ko.pureComputed(function () {
             let allResultsRaw: Array<PublishedProviderResultViewModel> = this.allProviderResults();
             this.collapseAllAllocationLines();
             if (this.isPublishAndApprovePageFiltersEnabled) {
@@ -246,6 +248,25 @@ namespace calculateFunding.approvals {
             }
             return allResultsRaw;
         }, this);
+
+        public filteredResultsSelectedAllocationTotal: KnockoutComputed<number> = ko.pureComputed(() => {
+            let total: number = 0;
+            let providers: Array<PublishedProviderResultViewModel> = this.filteredResults()
+            for (let i in providers) {
+                let provider: PublishedProviderResultViewModel = providers[i];
+                let providerFilteredAllocationLines = provider.allocationLineResultsFiltered();
+                for (let k in providerFilteredAllocationLines) {
+                    let allocationLine: PublishedAllocationLineResultViewModel = providerFilteredAllocationLines[k];
+                        total = total + allocationLine.fundingAmount;
+                }
+            }
+
+            return total;
+        });
+
+        public filteredResultsSelectedAllocationTotalDisplay: KnockoutComputed<string> = ko.pureComputed(() => {
+            return this.filteredResultsSelectedAllocationTotal().toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        });
 
         collapseAllAllocationLines(): void {
             $(".expander-container").hide();

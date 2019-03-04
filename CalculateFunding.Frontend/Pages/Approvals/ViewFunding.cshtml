@@ -56,9 +56,6 @@
                         Funding stream:
                         <span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'" class="funding-stream-value"></span>
                     </span>
-
-
-
                 </p>
             </div>
             <div class="funding-stream-total-holder float-right">
@@ -203,6 +200,12 @@
                 </ul>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <a href="#" data-bind="click: approveSearchModel.removeFilters()" style="margin-right: 30px">Clear filters</a>
+                <span>Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <span class="bold" data-bind="text: filteredResults().length"></span> providers</span>
+            </div>
+        </div>
         <div class="row table-filter-container">
             @if (Model.ShouldFiltersBeEnabled)
             {
@@ -234,14 +237,12 @@
                     </div>
                 </div>
 
-                <div class="col-xs-2">
-                    <div class="spacing-30-top withjs-show">
-                        <a href="#" data-bind="click: approveSearchModel.removeFilters()">Clear filters</a>
+                <div class="col-xs-4">
+                    <div class="withjs-show text-right">
+                        <div class="funding-total-text">Funding total</div>
+                        <div class="funding-total-amount">&pound;<span data-bind="text: filteredResultsSelectedAllocationTotalDisplay"></span></div>
+                        <div class="funding-total-text">of filtered items</div>
                     </div>
-                </div>
-
-                <div class="col-xs-2 total-count spacing-30-top">
-                    <span class="align-text-bottom">Showing <span data-bind="text: (pageNumber() * itemsPerPage) + 1"></span>-<span data-bind="text: (pageNumber() * itemsPerPage) + currentPageResults().length"></span> of <span class="bold" data-bind="text: filteredResults().length"></span> providers</span>
                 </div>
             }
             else
