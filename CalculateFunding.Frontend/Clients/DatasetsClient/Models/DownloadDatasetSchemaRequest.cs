@@ -2,6 +2,6 @@
 {
     public class DownloadDatasetSchemaRequest
     {
-        public string DatasetDefinitionName { get; set; }
+        public string DatasetDefinitionId { get; set; }
     }
 }

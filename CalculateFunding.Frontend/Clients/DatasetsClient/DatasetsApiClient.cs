@@ -48,27 +48,27 @@
             }
         }
 
-	    public async Task<PagedResult<DatasetVersionSearchResultModel>> FindDatasetsVersions(SearchFilterRequest searchFilterRequest)
-	    {
-			SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(searchFilterRequest);
+        public async Task<PagedResult<DatasetVersionSearchResultModel>> FindDatasetsVersions(SearchFilterRequest searchFilterRequest)
+        {
+            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(searchFilterRequest);
 
-		    ApiResponse<SearchResults<DatasetVersionSearchResultModel>> apiResponse = 
-			    await PostAsync<SearchResults<DatasetVersionSearchResultModel>,SearchQueryRequest>($"datasets-version-search", request);
+            ApiResponse<SearchResults<DatasetVersionSearchResultModel>> apiResponse =
+                await PostAsync<SearchResults<DatasetVersionSearchResultModel>, SearchQueryRequest>($"datasets-version-search", request);
 
-		    if (apiResponse.StatusCode == HttpStatusCode.OK)
-		    {
-			    PagedResult<DatasetVersionSearchResultModel> result = new SearchPagedResult<DatasetVersionSearchResultModel>(searchFilterRequest, apiResponse.Content.TotalCount)
-			    {
-				    Items = apiResponse.Content.Results
-			    };
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                PagedResult<DatasetVersionSearchResultModel> result = new SearchPagedResult<DatasetVersionSearchResultModel>(searchFilterRequest, apiResponse.Content.TotalCount)
+                {
+                    Items = apiResponse.Content.Results
+                };
 
-			    return result;
-		    }
-		    return null;
-	    }
+                return result;
+            }
+            return null;
+        }
 
 
-		public async Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
+        public async Task<ApiResponse<IEnumerable<DatasetDefinition>>> GetDataDefinitions()
         {
             return await GetAsync<IEnumerable<DatasetDefinition>>("get-data-definitions");
         }
@@ -172,16 +172,16 @@
                 throw new ArgumentNullException(nameof(datasetId), "Dataset Id for dataset download is null");
             }
 
-			string queryString = $"download-dataset-file?datasetId={datasetId}";
-			if (datasetVersion.HasValue)
-			{
-				queryString = $"{queryString}&datasetVersion={datasetVersion.ToString()}";
-			}
+            string queryString = $"download-dataset-file?datasetId={datasetId}";
+            if (datasetVersion.HasValue)
+            {
+                queryString = $"{queryString}&datasetVersion={datasetVersion.ToString()}";
+            }
 
             return await GetAsync<DownloadDatasourceModel>(queryString);
         }
-		
-		public async Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel)
+
+        public async Task<ApiResponse<DownloadDatasetSchemaResponse>> GetDatasetSchemaUrl(DownloadDatasetSchemaRequest requestModel)
         {
             Guard.ArgumentNotNull(requestModel, nameof(requestModel));
 

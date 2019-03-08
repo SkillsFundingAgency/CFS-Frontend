@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +18,14 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasets/download-dataset-schema/{schemaName}")]
-        public async Task<IActionResult> Download([FromRoute]string schemaName)
+        [Route("api/datasets/download-dataset-schema/{schemaId}")]
+        public async Task<IActionResult> Download([FromRoute]string schemaId)
         {
-            Guard.IsNullOrWhiteSpace(schemaName, nameof(schemaName));
+            Guard.IsNullOrWhiteSpace(schemaId, nameof(schemaId));
 
             DownloadDatasetSchemaRequest downloadDatasetSchemaRequest = new DownloadDatasetSchemaRequest
             {
-                DatasetDefinitionName = schemaName
+                DatasetDefinitionId = schemaId
             };
 
             ApiResponse<DownloadDatasetSchemaResponse> apiResponse = await _datasetApiClient.GetDatasetSchemaUrl(downloadDatasetSchemaRequest);

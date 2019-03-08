@@ -43,7 +43,7 @@
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionName == schemaName))
+                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionId == schemaName))
                 .Returns(apiResponse);
 
             DownloadDatasetSchemaController controller = CreateController(apiClient);
@@ -74,7 +74,7 @@
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionName == schemaName))
+                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionId == schemaName))
                 .Returns(apiResponse);
 
             DownloadDatasetSchemaController controller = CreateController(apiClient);

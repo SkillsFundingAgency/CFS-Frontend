@@ -68,7 +68,7 @@
                         </span>
                     </td>
                     <td class="text-center">
-                        <a data-bind="attr: { 'href' : '/api/datasets/download-dataset-schema/' + encodeURIComponent(name) }" target="_blank"><i class="material-icons">cloud_download</i></a>
+                        <a data-bind="attr: { 'href' : '/api/datasets/download-dataset-schema/' + id }" target="_blank"><i class="material-icons">cloud_download</i></a>
                     </td>
                     <td class="expander-trigger-cell" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
                 </tr>
@@ -100,7 +100,7 @@
                                     <span class="datetime-split-time data-static-datasetDefinition-lastupdated-time">@schema.LastUpdatedTimeFormatted</span>
                                 </span>
                             </td>
-                            <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Name"><i class="material-icons">cloud_download</i></a></td>
+                            <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Id"><i class="material-icons">cloud_download</i></a></td>
                             <td></td>
                         </tr>
                         <tr class="highlight-background">
