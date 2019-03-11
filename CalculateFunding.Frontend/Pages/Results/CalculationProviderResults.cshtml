@@ -377,7 +377,8 @@
         <script asp-src-include="~/js/notifications.js" asp-append-version="true" type="text/javascript"></script>
 
         <script type="text/javascript">
-            var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM);
+            var precedingJobTypes = [ 'MapDatasetJob' ];
+            var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM, 'CreateInstructAllocationJob', precedingJobTypes);
 
             var notificationsContainer = document.getElementById("notifications-container");
             ko.applyBindings(notificationsVM, notificationsContainer);

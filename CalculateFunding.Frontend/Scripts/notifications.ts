@@ -81,7 +81,7 @@ namespace calculateFunding.notifications {
 
         protected abstract onJobStarted(jobType: string): void;
 
-        protected abstract onJobCompleted(status: CompletionStatus): void;
+        protected abstract onJobCompleted(status: CompletionStatus, jobType: string): void;
 
         protected loadLatestJobStatus(latestJobStatus: IJobSummary) {
             if (latestJobStatus) {
@@ -135,7 +135,7 @@ namespace calculateFunding.notifications {
             viewModel.currentStatus(status);
 
             if (!notification.parentJobId && notification.runningStatus === RunningStatus.Completed) {
-                viewModel.onJobCompleted(notification.completionStatus);
+                viewModel.onJobCompleted(notification.completionStatus, notification.jobType);
             }
         }
 
@@ -156,11 +156,15 @@ namespace calculateFunding.notifications {
     export class SearchNotificationsViewModel extends NotificationsViewModel {
         specificationId: string;
         searchViewModel: calculateFunding.search.SearchViewModel;
+        jobTypeThatDirectlyAffectsResults: string;    // Job type that directly generates results
+        jobTypesThatUlimatelyAffectResults: string[]; // Job types that precede job that generates results
 
-        constructor(specificationId: string, latestJobStatus: IJobSummary, searchViewModel: calculateFunding.search.SearchViewModel) {
+        constructor(specificationId: string, latestJobStatus: IJobSummary, searchViewModel: calculateFunding.search.SearchViewModel, jobTypeThatDirectlyAffectsResults: string, jobTypesThatUlimatelyAffectResults: string[]) {
             super();
             this.specificationId = specificationId;
             this.searchViewModel = searchViewModel;
+            this.jobTypeThatDirectlyAffectsResults = jobTypeThatDirectlyAffectsResults;
+            this.jobTypesThatUlimatelyAffectResults = jobTypesThatUlimatelyAffectResults;
 
             this.loadLatestJobStatus(latestJobStatus);
         }
@@ -170,11 +174,13 @@ namespace calculateFunding.notifications {
         }
 
         protected onJobStarted(jobType: string): void {
-            this.searchViewModel.areResultsBeingUpdated(true);
+            if (jobType === this.jobTypeThatDirectlyAffectsResults || (this.jobTypesThatUlimatelyAffectResults && this.jobTypesThatUlimatelyAffectResults.some(t => t == jobType))) {
+                this.searchViewModel.areResultsBeingUpdated(true);
+            }
         }
 
-        protected onJobCompleted(status: CompletionStatus): void {
-            if (status === CompletionStatus.Succeeded) {
+        protected onJobCompleted(status: CompletionStatus, jobType: string): void {
+            if (status === CompletionStatus.Succeeded && jobType === this.jobTypeThatDirectlyAffectsResults) {
                 console.log("received completed notification - updating search results");
                 this.searchViewModel.performSearch(this.searchViewModel.pageNumber());
 

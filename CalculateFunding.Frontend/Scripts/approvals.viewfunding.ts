@@ -183,7 +183,7 @@ namespace calculateFunding.approvals {
             }
         }
 
-        protected onJobCompleted(status: calculateFunding.notifications.CompletionStatus): void {
+        protected onJobCompleted(status: calculateFunding.notifications.CompletionStatus, jobType: string): void {
             console.log("received completed notification of job type: " + this.currentJobType());
 
             if (status === calculateFunding.notifications.CompletionStatus.Succeeded) {
