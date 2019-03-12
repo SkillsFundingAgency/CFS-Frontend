@@ -16,7 +16,9 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public bool ShouldApprovalServerSideBatchingBeUsed { get; private set; }
 
-		public ViewFundingModel(IFeatureToggle features)
+        public bool ShouldCheckJobStatusForChooseAndRefreshBeEnabled { get; private set; }
+
+        public ViewFundingModel(IFeatureToggle features)
 		{
 			Guard.ArgumentNotNull(features, nameof(features));
 
@@ -30,7 +32,8 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
 			ShouldProviderInformationViewBeEnabled = features.IsProviderInformationViewInViewFundingPageEnabled();
 
-		}
+            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = features.IsCheckJobStatusForChooseAndRefreshEnabled();
+        }
 
         public void OnGet()
         {

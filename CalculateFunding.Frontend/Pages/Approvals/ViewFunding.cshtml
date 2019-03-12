@@ -10,6 +10,8 @@
     <partial name="_NavbarPartial" />
 }
 
+<partial name="_CheckLastJobStatusTemplatesPartial" />
+
 @section PermissionWarnings
     {
     <div class="row" style="display:none;" data-bind="visible:!doesUserHaveAllPermissions() && pageState() == 'main'">
@@ -662,6 +664,7 @@
     <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/bindingHandler.approvePublishRow.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/knockstrap.min.js" asp-append-version="true" type="text/javascript"></script>
 
     @if (Model.ShouldAllocationLineMajorMinorVersioningEnabled)
     {
@@ -684,6 +687,7 @@
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
             vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
             vfVM.shouldApprovalServerSideBatchingBeUsed = @Model.ShouldApprovalServerSideBatchingBeUsed.ToString().ToLowerInvariant();
+            vfVM.shouldCheckJobStatusForChooseAndRefreshBeEnabled = @Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
         </script>
     }
@@ -708,7 +712,9 @@
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
             vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
             vfVM.shouldApprovalServerSideBatchingBeUsed = @Model.ShouldApprovalServerSideBatchingBeUsed.ToString().ToLowerInvariant();
+            vfVM.shouldCheckJobStatusForChooseAndRefreshBeEnabled = @Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
+
         </script>
 
     }

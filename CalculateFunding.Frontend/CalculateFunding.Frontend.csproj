@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Scripts\approvals.choose.ts" />
+    <None Remove="Scripts\approvals.chooseforfunding.ts" />
     <None Remove="Scripts\approvals.viewfunding.ts" />
     <None Remove="Scripts\approvals.viewfunding2.ts" />
     <None Remove="Scripts\bindingHandler.approvePublishRow.ts" />
@@ -54,6 +55,7 @@
     <None Remove="Scripts\submit.disabler.ts" />
     <None Remove="Scripts\table.expander.sequential.ts" />
     <None Remove="Scripts\table.expander.ts" />
+    <None Remove="Scripts\Tests\bindingHandler.showModal.ts" />
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <None Remove="Scripts\Tests\list-provider-test-results.ts" />
     <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
@@ -65,7 +67,7 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.20.0" />
+    <PackageReference Include="CalculateFunding.Common" Version="1.21.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.2" />
@@ -138,6 +140,7 @@
     <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\approvals.chooseforfunding.ts" />
     <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
     <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
     <TypeScriptCompile Include="Scripts\approvals.viewfunding2.ts" />
@@ -198,6 +201,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\_SearchTablePagerPartial.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\_CheckLastJobStatusTemplatesPartial.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\_SearchTableRowCountPartial.cshtml">

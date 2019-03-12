@@ -1,0 +1,40 @@
+﻿<div data-bind="modal: {
+    visible: modalVisible,
+    dialogCss: modalSize,
+    header: { data: { label: '' } },
+    body: { name: bodyTemplate, data: bodyData }
+}"></div>
+
+<script type="text/html" id="jobFailedMessageTemplate">
+    <div class="modal-container">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">
+            <h2 class="modal-title"><i class="material-icons text-danger">warning</i><span data-bind="text: modalTitle"></span></h2>
+            <p>
+                <span class="text-danger">A calculation for this specification failed to run.</span>
+                <span>initiated by <span data-bind="text: jobInvokerDisplayName" /> on <span data-bind="text: jobCreatedAt" /></span>
+            </p>
+            <button type="button" class="btn modal-button" id="btnclose" data-dismiss="modal">I'll try later</button>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="jobStillRunningMessageTemplate">
+    <div class="modal-container">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">
+            <h2 class="modal-title"><i class="material-icons text-warning">warning</i><span data-bind="text: modalTitle"></span></h2>
+            <p>
+                <span class="text-warning">A claulation for this specification is running in the background.</span>
+                <span>initiated by <span data-bind="text: jobInvokerDisplayName" /> on <span data-bind="text: jobCreatedAt" /></span>
+            </p>
+            <button type="button" class="btn modal-button" id="btnclose" data-dismiss="modal">I'll try later</button>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="blankTemplate"></script>

@@ -3250,3 +3250,69 @@ a.govuk-back-link:hover {
         margin-top: 20px;
     }
 }
+
+.funding-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -250px;
+
+    .modal-content > .modal-header {
+        display: none;
+    }
+
+    .modal-content {
+        border-radius: 0px;
+    }
+
+    .modal-container {
+        background-color: #fff;
+
+        .text-warning {
+            color: $orange;
+        }
+
+        .text-danger {
+            color: $red;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            height: 20px;
+            .close {
+                opacity: 1;
+                font-size: 30px;
+            }
+        }
+
+        .modal-body {
+            text-align: center;
+
+            p > span {
+                display: block;
+            }
+
+            .modal-title {
+                font-weight: bold;
+                font-size: 26px;
+                margin-bottom: 30px;
+
+                i {
+                    font-size: 26px;
+                    margin-right: 10px;
+                    position: relative;
+                    top: 4px;
+                }
+            }
+        }
+
+        .modal-button {
+            background-color: #006435;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 0;
+            margin: 0 15px;
+        }
+    }
+}

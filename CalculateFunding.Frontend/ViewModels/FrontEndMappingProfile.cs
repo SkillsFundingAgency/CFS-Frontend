@@ -2,6 +2,7 @@
 {
     using System.Linq;
     using AutoMapper;
+    using CalculateFunding.Common.ApiClient.Jobs.Models;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -14,6 +15,7 @@
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
+    using CalculateFunding.Frontend.ViewModels.Jobs;
     using CalculateFunding.Frontend.ViewModels.Results;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using CalculateFunding.Frontend.ViewModels.Specs;
@@ -241,6 +243,7 @@
             CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
             CreateMap<Reference, ReferenceViewModel>();
             CreateMap<PublishStatus, PublishStatusViewModel>();
+            CreateMap<JobSummary, JobSummaryViewModel>();
         }
     }
 }

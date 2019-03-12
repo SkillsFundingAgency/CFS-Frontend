@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@aspnet/signalr": "1.1.0",
     "@types/bootstrap": "^3.3.37",
     "@types/select2": "^4.0.45",
     "bootstrap": "~3.3.7",
@@ -13,11 +14,11 @@
     "govuk_frontend_toolkit": "^7.1.0",
     "jquery": "^3.3.1",
     "knockout": "^3.5.0",
+    "knockstrap": "^1.4.0",
     "material-design-icons": "^3.0.1",
     "monaco-editor": "^0.15.6",
     "rimraf": "^2.6.2",
-    "select2": "^4.0.6-rc.1",
-    "@aspnet/signalr": "1.1.0"
+    "select2": "^4.0.6-rc.1"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.6",

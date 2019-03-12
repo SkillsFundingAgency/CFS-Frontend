@@ -28,10 +28,18 @@ namespace calculateFunding.approvals {
         public isPublishButtonEnabled: boolean;
         public isPublishAndApprovePageFiltersEnabled: boolean;
         public shouldApprovalServerSideBatchingBeUsed: boolean;
+        public shouldCheckJobStatusForChooseAndRefreshBeEnabled: boolean;
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
-
         public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
+
+        private readonly instructCalculationsJobDefinitionId: string = "CreateInstructAllocationJob";
+        private readonly instructAggregationsCalculationsJobDefinitionId: string = "CreateInstructGenerateAggregationsAllocationJob";
+        public messageTemplateData: ITemplateData = { jobInvokerDisplayName: "", jobCreatedAt: "", modalTitle: "Unable to refresh funding" };
+        public modalVisible: KnockoutObservable<boolean> = ko.observable(false);
+        public bodyTemplate: KnockoutObservable<string> = ko.observable("blankTemplate");
+        public bodyData: KnockoutComputed<any>;
+        public modalSize: KnockoutObservable<string> = ko.observable('funding-modal');
 
         constructor(settings: IViewFundingSettings) {
             super();
@@ -87,6 +95,10 @@ namespace calculateFunding.approvals {
             self.filteredResultsSelectedAllocationTotalDisplay.extend({ deferred: true });
 
             self.pageState() == "initial";
+
+            self.bodyData = ko.computed(function () {
+                return self.messageTemplateData;
+            });
 
             /** Request to get the funding periods */
             this.loadFundingPeriods();
@@ -257,7 +269,7 @@ namespace calculateFunding.approvals {
                 let providerFilteredAllocationLines = provider.allocationLineResultsFiltered();
                 for (let k in providerFilteredAllocationLines) {
                     let allocationLine: PublishedAllocationLineResultViewModel = providerFilteredAllocationLines[k];
-                        total = total + allocationLine.fundingAmount;
+                    total = total + allocationLine.fundingAmount;
                 }
             }
 
@@ -379,16 +391,16 @@ namespace calculateFunding.approvals {
                         RequestVerificationToken: self.settings.antiforgeryToken
                     }
                 })
-                .done((result) => {
-                    console.log("successfully submitted request to change allocation line status");
-                })
-                .fail((ex) => {
-                    console.log("error submitting request to change allocation line status: " + ex);
+                    .done((result) => {
+                        console.log("successfully submitted request to change allocation line status");
+                    })
+                    .fail((ex) => {
+                        console.log("error submitting request to change allocation line status: " + ex);
 
-                    this.notificationMessage(failureMessage);
-                    this.notificationStatus('error');
-                    this.dismissConfirmPage();
-                })
+                        this.notificationMessage(failureMessage);
+                        this.notificationStatus('error');
+                        this.dismissConfirmPage();
+                    })
             }
             else {
                 let batchSize: number = 250;
@@ -674,10 +686,10 @@ namespace calculateFunding.approvals {
         }, this);
 
         /**
-         * Request that the funding snapshot is refreshed
-         * As the process is asynchronous is sets up a poll mechanism to check on the progress
-         * */
-        refreshFundingSnapshot() {
+        * Request that the funding snapshot is refreshed
+        * As the process is asynchronous is sets up a poll mechanism to check on the progress
+        * */
+        performSnapshotRefresh() {
             this.notificationMessage('');
             this.workingMessage("Refreshing funding values for providers");
             this.isWorkingVisible(true);
@@ -698,6 +710,49 @@ namespace calculateFunding.approvals {
                     this.notificationStatus("refreshError");
                     this.isWorkingVisible(false);
                 });
+        }
+
+        /**
+         * Request that the funding snapshot is refreshed
+         * As the process is asynchronous is sets up a poll mechanism to check on the progress
+         * */
+        refreshFundingSnapshot() {
+
+            if (this.shouldCheckJobStatusForChooseAndRefreshBeEnabled === true) {
+                this.performSnapshotRefresh();
+            }
+            else {
+                let lastestJobUrl = this.settings.latestJobUrl.replace("{specificationId}", this.selectedSpecification().id).replace("{jobTypes}", this.instructCalculationsJobDefinitionId + "," + this.instructAggregationsCalculationsJobDefinitionId);
+
+                $.ajax({
+                    url: lastestJobUrl,
+                    dataType: "json",
+                    method: "GET"
+                }).done((result) => {
+                    console.log("successfully submitted request to check lastest job");
+
+                    this.messageTemplateData.jobInvokerDisplayName = result.invokerUserDisplayName;
+                    this.messageTemplateData.jobCreatedAt = result.createdFormatted;
+
+                    if (result.runningStatus !== "Completed") {
+                        this.bodyTemplate("jobStillRunningMessageTemplate");
+                        this.modalVisible(true);
+                    }
+                    else if (result.completionStatus === "Failed") {
+                        this.bodyTemplate("jobFailedMessageTemplate");
+                        this.modalVisible(true);
+                    }
+                    else {
+                        this.performSnapshotRefresh();
+                    }
+
+                })
+                    .fail((ex) => {
+                        console.log("error submitting request to check lastest job: " + ex);
+
+                        return false;
+                    });
+            }
         }
 
         /** Polls for the current status of a refresh operation */
@@ -933,7 +988,7 @@ namespace calculateFunding.approvals {
                     self.FundingPeriods(newPeriodArray);
 
                     // If the query string contains a funding period then try and pre-select it
-                    let givenPeriod:string = self.getQueryStringValue("fundingPeriodId");
+                    let givenPeriod: string = self.getQueryStringValue("fundingPeriodId");
                     if (givenPeriod) {
                         let foundItem = ko.utils.arrayFirst(newPeriodArray, function (item) {
                             return item.id == givenPeriod;
@@ -950,7 +1005,7 @@ namespace calculateFunding.approvals {
                 })
         }
 
-        private getQueryStringValue(key:string) {
+        private getQueryStringValue(key: string) {
             return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
         }
     }
@@ -1053,7 +1108,7 @@ namespace calculateFunding.approvals {
             });
         }
 
-        private static getTotalForStatus(allocationLineResultsFiltered: PublishedAllocationLineResultViewModel[] ,status: AllocationLineStatus) {
+        private static getTotalForStatus(allocationLineResultsFiltered: PublishedAllocationLineResultViewModel[], status: AllocationLineStatus) {
             return allocationLineResultsFiltered.filter(function (al) {
                 return al.status === status;
             }).length
@@ -1138,7 +1193,7 @@ namespace calculateFunding.approvals {
         fundingStreamResults: Array<IFundingStreamResultResponse>
         specificationId: string;
         providerName: string;
-        providerType:string
+        providerType: string;
         providerId: string;
         ukprn: string;
         fundingAmount: number;
@@ -1180,6 +1235,12 @@ namespace calculateFunding.approvals {
         failed: number;
         ignored: number;
         testCoverage: number;
+    }
+
+    interface ITemplateData {
+        jobInvokerDisplayName: string;
+        jobCreatedAt: string,
+        modalTitle: string
     }
 
     /** A summary of the data to be approved or published */

@@ -248,6 +248,13 @@
       },
       "defaultValue": false
     },
+    "EnableCheckJobStatusForChooseAndRefresh": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable checking calc job status prior to choosing and refreshing"
+      },
+      "defaultValue": true
+    },
     "SignalrConnectionString": {
       "type": "string",
       "metadata": {
@@ -516,6 +523,10 @@
             {
               "name": "features:providerInformationViewInViewFundingPageEnabled",
               "value": "[parameters('EnableProviderInformationViewInViewFundingPage')]"
+            },
+            {
+              "name": "features:checkJobStatusForChooseAndRefreshEnabled",
+              "value": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]"
             }
           ]
         }

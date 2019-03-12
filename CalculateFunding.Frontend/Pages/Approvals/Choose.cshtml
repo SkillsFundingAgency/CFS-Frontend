@@ -27,7 +27,7 @@
 @if (!Model.IsSpecificationSelectedForThisFunding && Model.ShouldDisplayPermissionsBanner)
 {
     @section PermissionWarnings
-    {
+        {
         <div class="row">
             <div class="col-xs-12 permission-warning-banner">
                 <div class="permission-warning-inner">
@@ -42,6 +42,9 @@
 {
     <partial name="_PageBannerOperationPartial" model="Model.PageBannerOperation"></partial>
 }
+
+
+<partial name="_CheckLastJobStatusTemplatesPartial" />
 
 <div class="choose-container">
     <form action="/approvals/choose" method="get">
@@ -90,11 +93,17 @@
                         @if (specification.IsSelectedForFunding)
                         {
                             <a class="target-viewfunding" href="/approvals/viewfunding?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId">View funding</a>
-
                         }
                         else if (specification.CanBeChosen)
                         {
-                            <a class="btn btn-choose target-choose" href="/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId">Choose</a>
+                            if (Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled)
+                            {
+                                <a data-bind="click: function(){$root.checkLastJobStatus('@specification.Id', '/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId')}" class="btn btn-choose target-choose">Choose</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-choose target-choose" href="/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId">Choose</a>
+                            }
                         }
                         else
                         {
@@ -121,10 +130,28 @@
                 <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ? @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
             </span>
         </div>
-
     }
+
 </div>
 
 @section scripts{
+
+    <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
+
     <script asp-src-include="~/js/approvals.choose.js" asp-append-version="true" type="text/javascript"></script>
+
+    @if(Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled){
+
+        <script asp-src-include="~/js/approvals.chooseforfunding.js" asp-append-version="true" type="text/javascript"></script>
+
+        <script asp-src-include="~/assets/libs/js/knockstrap.min.js" asp-append-version="true" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            var vfVM = new calculateFunding.approvals.CheckLastJobStatusViewModel();
+
+            ko.applyBindings(vfVM);
+
+        </script>
+    }
 }

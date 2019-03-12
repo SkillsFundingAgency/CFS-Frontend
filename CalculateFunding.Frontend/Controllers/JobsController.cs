@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.ViewModels.Jobs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -11,12 +13,14 @@ namespace CalculateFunding.Frontend.Controllers
     public class JobsController : ControllerBase
     {
         private readonly IJobsApiClient _jobsApiClient;
+        private readonly IMapper _mapper;
 
-        public JobsController(IJobsApiClient jobsApiClient)
+        public JobsController(IJobsApiClient jobsApiClient, IMapper mapper)
         {
             Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
 
             _jobsApiClient = jobsApiClient;
+            _mapper = mapper;
         }
 
         [Route("api/jobs/{specificationId}/latest/{jobTypes}")]
@@ -32,7 +36,9 @@ namespace CalculateFunding.Frontend.Controllers
                 return errorResult;
             }
 
-            return Ok(latestJobTask.Content);
+            JobSummaryViewModel jobSummaryViewModel = _mapper.Map<JobSummaryViewModel>(latestJobTask.Content);
+
+            return Ok(jobSummaryViewModel);
         }
     }
 }

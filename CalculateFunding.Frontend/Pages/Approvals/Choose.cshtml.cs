@@ -17,6 +17,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.Pages.Approvals
 {
@@ -28,6 +29,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
         private readonly ITestEngineApiClient _testEngineClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
+        private readonly IFeatureToggle _featureToggle;
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
@@ -45,13 +47,16 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public PageBannerOperation PageBannerOperation { get; set; }
 
+        public bool ShouldCheckJobStatusForChooseAndRefreshBeEnabled { get; private set; }
 
-        public ChoosePageModel(ISpecsApiClient specsApiClient,
+        public ChoosePageModel(
+            ISpecsApiClient specsApiClient,
             ICalculationsApiClient calcsClient,
             IResultsApiClient resultsClient,
             ITestEngineApiClient testEngineClient,
             IMapper mapper,
-            IAuthorizationHelper authorizationHelper)
+            IAuthorizationHelper authorizationHelper,
+            IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(calcsClient, nameof(calcsClient));
@@ -59,6 +64,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             Guard.ArgumentNotNull(testEngineClient, nameof(testEngineClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _specsClient = specsApiClient;
             _calcsClient = calcsClient;
@@ -66,6 +72,9 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _testEngineClient = testEngineClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
+            _featureToggle = featureToggle;
+
+            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = _featureToggle.IsCheckJobStatusForChooseAndRefreshEnabled();
         }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriod, string fundingStream, ChoosePageBannerOperationType? operationType = null, string operationId = null)
@@ -113,7 +122,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 Value = s.Id,
                 Selected = fundingPeriod == s.Id,
             });
-
 
             Dictionary<string, ChooseApprovalSpecificationViewModel> specifications = new Dictionary<string, ChooseApprovalSpecificationViewModel>();
 
