@@ -4,6 +4,7 @@
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Jobs.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;

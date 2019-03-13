@@ -227,20 +227,6 @@
       },
       "defaultValue": true
     },
-    "EnableCalculationResultsNotifications": {
-      "type": "bool",
-      "metadata": {
-        "description": "Enable the job notifications on the calculation provider results page"
-      },
-      "defaultValue": true
-    },
-    "EnableApprovalBatchingServerSide": {
-      "type": "bool",
-      "metadata": {
-        "description": "Enable batching approval/publish requests on the server side rather than the client side"
-      },
-      "defaultValue": true
-    },
     "EnableProviderInformationViewInViewFundingPage": {
       "type": "bool",
       "metadata": {
@@ -511,14 +497,6 @@
             {
               "name": "features:newManageDataSourcesPageEnabled",
               "value": "[parameters('EnableNewManageDataSourcesPage')]"
-            },
-            {
-              "name": "features:calculationResultsNotificationsEnabled",
-              "value": "[parameters('EnableCalculationResultsNotifications')]"
-            },
-            {
-              "name": "features:approvalBatchingServerSideEnabled",
-              "value": "[parameters('EnableApprovalBatchingServerSide')]"
             },
             {
               "name": "features:providerInformationViewInViewFundingPageEnabled",

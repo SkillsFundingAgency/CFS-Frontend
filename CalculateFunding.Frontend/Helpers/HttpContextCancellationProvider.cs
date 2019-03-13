@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.Interfaces;
 using CalculateFunding.Common.Utility;
 using Microsoft.AspNetCore.Http;
 

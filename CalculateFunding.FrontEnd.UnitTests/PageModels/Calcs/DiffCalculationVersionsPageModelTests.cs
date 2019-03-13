@@ -9,8 +9,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
+    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;

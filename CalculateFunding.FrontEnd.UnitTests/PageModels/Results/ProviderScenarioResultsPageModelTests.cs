@@ -1,7 +1,13 @@
 ﻿namespace CalculateFunding.Frontend.PageModels.Results
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -15,11 +21,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using Serilog;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class ProviderScenarioResultsPageModelTests
@@ -205,7 +206,7 @@
 
         }
 
-      
+
         [TestMethod]
         public async Task OnGetAsync_WhenTestScenariosSearchResultsFound_ThenSuccessfullyShown()
         {
@@ -413,7 +414,7 @@
                 TestScenarioId = "1",
                 TestScenarioName = "Test Scenario 01",
                 LastUpdatedDateDisplay = "1",
-            }; 
+            };
             TestScenarioSearchResultItemViewModel testScen2 = new TestScenarioSearchResultItemViewModel()
             {
                 Id = "2",

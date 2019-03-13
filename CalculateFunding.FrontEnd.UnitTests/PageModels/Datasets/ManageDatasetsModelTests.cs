@@ -1,7 +1,12 @@
 ﻿namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.FeatureToggles;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -14,10 +19,6 @@
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class ManageDatasetsModelTests
@@ -389,9 +390,9 @@
                     OperationId = "Dataset1",
                     SecondaryActionUrl = "/datasets/updatedataset?datasetId=" + datasetId,
                     DisplayOperationActionSummary = true,
-                     CurrentDataSourceRows= datasetVersionResponse.CurrentDataSourceRows,
-                     PreviousDataSourceRows= datasetVersionResponse.PreviousDataSourceRows,
-                    OperationActionSummaryText = "A new version of a data source with "+ datasetVersionResponse.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + datasetVersionResponse.PreviousDataSourceRows  + "  data rows",
+                    CurrentDataSourceRows = datasetVersionResponse.CurrentDataSourceRows,
+                    PreviousDataSourceRows = datasetVersionResponse.PreviousDataSourceRows,
+                    OperationActionSummaryText = "A new version of a data source with " + datasetVersionResponse.CurrentDataSourceRows + " data rows uploaded, the previous version contained " + datasetVersionResponse.PreviousDataSourceRows + "  data rows",
                 });
         }
 
@@ -446,7 +447,7 @@
                     CurrentDataSourceRows = datasetVersionResponse.CurrentDataSourceRows,
                     PreviousDataSourceRows = datasetVersionResponse.PreviousDataSourceRows,
                     DisplayOperationActionSummary = true,
-                    OperationActionSummaryText= "A new data source with " + datasetVersionResponse.CurrentDataSourceRows +" data rows uploaded",
+                    OperationActionSummaryText = "A new data source with " + datasetVersionResponse.CurrentDataSourceRows + " data rows uploaded",
                 });
         }
 
@@ -464,8 +465,8 @@
                 Version = 1,
                 Definition = new Reference("1", "Test Definition"),
                 LastUpdatedDate = new DateTime(2018, 3, 5, 12, 34, 52),
-                CurrentDataSourceRows=10,
-                PreviousDataSourceRows=10,
+                CurrentDataSourceRows = 10,
+                PreviousDataSourceRows = 10,
             };
         }
 

@@ -4,9 +4,9 @@
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
-    using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.Identity.Authorization;
     using CalculateFunding.Common.Identity.Authorization.Repositories;
+    using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Core.Middleware;
     using CalculateFunding.Frontend.Extensions;

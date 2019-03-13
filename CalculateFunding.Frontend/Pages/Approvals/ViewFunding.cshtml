@@ -686,7 +686,6 @@
             var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
             vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
-            vfVM.shouldApprovalServerSideBatchingBeUsed = @Model.ShouldApprovalServerSideBatchingBeUsed.ToString().ToLowerInvariant();
             vfVM.shouldCheckJobStatusForChooseAndRefreshBeEnabled = @Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
         </script>
@@ -711,7 +710,6 @@
             var vfVM = new calculateFunding.approvals.two.ViewFundingViewModel(settings);
             vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
             vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
-            vfVM.shouldApprovalServerSideBatchingBeUsed = @Model.ShouldApprovalServerSideBatchingBeUsed.ToString().ToLowerInvariant();
             vfVM.shouldCheckJobStatusForChooseAndRefreshBeEnabled = @Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled.ToString().ToLowerInvariant();
             ko.applyBindings(vfVM);
 

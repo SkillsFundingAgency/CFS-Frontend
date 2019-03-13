@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -51,7 +50,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IActionResult result = await controller.UpdateApprovalStatusForAllocationLine(specificationId, model);
 
             // Assert
-            result.Should().BeOfType<OkObjectResult>();
+            result.Should().BeOfType<OkResult>();
         }
 
         [TestMethod]
@@ -82,7 +81,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IActionResult result = await controller.UpdateApprovalStatusForAllocationLine(specificationId, model);
 
             // Assert
-            result.Should().BeOfType<OkObjectResult>();
+            result.Should().BeOfType<OkResult>();
         }
 
         [TestMethod]
@@ -136,7 +135,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task UpdateApprovalStatusForAllocationLine_WhenEnableServerSideFeatureEnable_ThenCallEndpointToScheduleJob()
+        public async Task UpdateApprovalStatusForAllocationLine_ThenCallEndpointToScheduleJob()
         {
             // Arrange
             string specificationId = "abc123";
@@ -154,12 +153,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IResultsApiClient resultsClient = CreateResultsClient();
 
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-            featureToggle
-                .IsApprovalBatchingServerSideEnabled()
-                .Returns(true);
-
-            ApprovalController controller = CreateApprovalController(resultsClient: resultsClient, authorizationHelper: authorizationHelper, featureToggle: featureToggle);
+            ApprovalController controller = CreateApprovalController(resultsClient: resultsClient, authorizationHelper: authorizationHelper);
 
             // Act
             IActionResult result = await controller.UpdateApprovalStatusForAllocationLine(specificationId, model);
@@ -216,10 +210,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private ApprovalController CreateApprovalController(IResultsApiClient resultsClient = null, 
-            ISpecsApiClient specsClient = null, 
-            IAuthorizationHelper authorizationHelper = null,
-            IFeatureToggle featureToggle = null)
+        private ApprovalController CreateApprovalController(IResultsApiClient resultsClient = null,
+            ISpecsApiClient specsClient = null,
+            IAuthorizationHelper authorizationHelper = null)
         {
             IMapper mapper = Substitute.For<IMapper>();
 
@@ -227,8 +220,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 resultsClient ?? CreateResultsClient(),
                 specsClient ?? CreateSpecsClient(),
                 mapper,
-                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanApproveFunding),
-                featureToggle ?? CreateFeatureToggle());
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanApproveFunding));
         }
 
         private IResultsApiClient CreateResultsClient()
@@ -239,11 +231,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private ISpecsApiClient CreateSpecsClient()
         {
             return Substitute.For<ISpecsApiClient>();
-        }
-
-        private IFeatureToggle CreateFeatureToggle()
-        {
-            return Substitute.For<IFeatureToggle>();
         }
     }
 }

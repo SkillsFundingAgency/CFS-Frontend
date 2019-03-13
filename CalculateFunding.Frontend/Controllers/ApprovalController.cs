@@ -2,9 +2,9 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -12,7 +12,6 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
 using Microsoft.AspNetCore.Mvc;
-using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -22,21 +21,18 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
-        private readonly IFeatureToggle _featureToggle;
 
-        public ApprovalController(IResultsApiClient resultsApiClient, ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper, IFeatureToggle featureToggle)
+        public ApprovalController(IResultsApiClient resultsApiClient, ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _resultsClient = resultsApiClient;
             _mapper = mapper;
             _specsClient = specsClient;
             _authorizationHelper = authorizationHelper;
-            _featureToggle = featureToggle;
         }
 
         [Route("api/specs/{specificationId}/allocationlineapprovalstatus")]
@@ -88,24 +84,8 @@ namespace CalculateFunding.Frontend.Controllers
                 providerUpdateModel.AddAllocationLine(updateItem.AllocationLineId);
             }
 
-            if (_featureToggle.IsApprovalBatchingServerSideEnabled())
-            {
-                await _resultsClient.UpdatePublishedAllocationLineStatus(specificationId, updateModel);
-                return Ok();
-            }
-            else
-            {
-                ValidatedApiResponse<PublishedAllocationLineResultStatusUpdateResponseModel> updateStatusResponse = await _resultsClient.UpdatePublishedAllocationLineStatusByBatch(specificationId, updateModel);
-                IActionResult errorResult = updateStatusResponse.IsSuccessOrReturnFailureResult("Allocation Line Status Update");
-                if (errorResult != null)
-                {
-                    return errorResult;
-                }
-
-                PublishedAllocationLineResultStatusUpdateResponseViewModel result = _mapper.Map<PublishedAllocationLineResultStatusUpdateResponseViewModel>(updateStatusResponse.Content);
-
-                return Ok(result);
-            }
+            await _resultsClient.UpdatePublishedAllocationLineStatus(specificationId, updateModel);
+            return Ok();
         }
 
         [Route("api/specs/{specificationId}/refresh-published-results")]

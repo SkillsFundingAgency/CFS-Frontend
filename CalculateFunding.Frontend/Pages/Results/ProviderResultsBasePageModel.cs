@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
+using CalculateFunding.Common.Models;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {

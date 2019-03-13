@@ -5,8 +5,8 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient;
-    using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -27,11 +27,11 @@
             return GetAsync<Calculation>($"calculation-current-version?calculationId={calculationId}");
         }
 
-	    public Task<ApiResponse<Calculation>> GetCalculationByCalculationSpecificationId(string calculationSpecificationId)
-	    {
-		    return GetAsync<Calculation>(
-			    $"{calculationSpecificationId}/calculation");
-	    }
+        public Task<ApiResponse<Calculation>> GetCalculationByCalculationSpecificationId(string calculationSpecificationId)
+        {
+            return GetAsync<Calculation>(
+                $"{calculationSpecificationId}/calculation");
+        }
 
         public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions)
         {

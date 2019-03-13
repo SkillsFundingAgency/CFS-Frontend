@@ -14,8 +14,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
 		public bool ShouldFiltersBeEnabled { get; private set; }
 
-        public bool ShouldApprovalServerSideBatchingBeUsed { get; private set; }
-
         public bool ShouldCheckJobStatusForChooseAndRefreshBeEnabled { get; private set; }
 
         public ViewFundingModel(IFeatureToggle features)
@@ -27,8 +25,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 			ShouldAllocationLineMajorMinorVersioningEnabled = features.IsAllocationLineMajorMinorVersioningEnabled();
 
 			ShouldFiltersBeEnabled = features.IsPublishAndApprovePageFiltersEnabled();
-
-            ShouldApprovalServerSideBatchingBeUsed = features.IsApprovalBatchingServerSideEnabled();
 
 			ShouldProviderInformationViewBeEnabled = features.IsProviderInformationViewInViewFundingPageEnabled();
 

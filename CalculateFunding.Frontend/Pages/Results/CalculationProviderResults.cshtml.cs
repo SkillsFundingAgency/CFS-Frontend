@@ -4,10 +4,13 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
+    using CalculateFunding.Common.ApiClient.Jobs;
+    using CalculateFunding.Common.ApiClient.Jobs.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using CalculateFunding.Frontend.Constants;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;
@@ -17,12 +20,8 @@
     using CalculateFunding.Frontend.ViewModels.Specs;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.Constants;
     using Newtonsoft.Json;
-    using CalculateFunding.Common.ApiClient.Jobs;
-    using CalculateFunding.Common.ApiClient.Jobs.Models;
+    using Serilog;
 
     public class CalculationProviderResultsPageModel : PageModel
     {
@@ -41,7 +40,6 @@
             IMapper mapper,
             IDatasetsApiClient datasetsClient,
             ILogger logger,
-            IFeatureToggle featureToggle,
             IJobsApiClient jobsApiClient)
         {
             Guard.ArgumentNotNull(resultsSearchService, nameof(resultsSearchService));
@@ -50,7 +48,6 @@
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
             Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
 
             _mapper = mapper;
@@ -60,8 +57,6 @@
             _datasetsClient = datasetsClient;
             _jobsClient = jobsApiClient;
             _logger = logger;
-
-            IsNotificationsEnabled = featureToggle.IsCalculationResultsNotificationsEnabled();
         }
 
         [BindProperty]
@@ -74,8 +69,6 @@
         public bool HasProviderDatasetsAssigned { get; set; }
 
         public SpecificationSummaryViewModel Specification { get; set; }
-
-        public bool IsNotificationsEnabled { get; set; }
 
         public string LatestJobJson { get; set; }
 

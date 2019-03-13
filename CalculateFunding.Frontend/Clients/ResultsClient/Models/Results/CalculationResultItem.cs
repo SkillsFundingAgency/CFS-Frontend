@@ -1,4 +1,4 @@
-﻿using CalculateFunding.Common.ApiClient.Models;
+﻿using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models.Results

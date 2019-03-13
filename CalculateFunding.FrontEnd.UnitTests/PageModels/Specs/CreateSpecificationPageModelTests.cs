@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -184,9 +185,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Should()
                .Be(1);
 
-	        pageModel
-		        .IsAuthorizedToCreate
-		        .Should().BeTrue();
+            pageModel
+                .IsAuthorizedToCreate
+                .Should().BeTrue();
         }
 
         [TestMethod]
@@ -244,11 +245,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                .Should()
                .Be(2);
 
-	        pageModel
-		        .IsAuthorizedToCreate
-		        .Should().BeTrue();
+            pageModel
+                .IsAuthorizedToCreate
+                .Should().BeTrue();
 
-			pageModel
+            pageModel
                 .FundingPeriods
                 .First(m => m.Value == "fp2")
                 .Selected
@@ -293,10 +294,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             // Assert
             result.Should().BeOfType<PageResult>();
             pageModel.FundingStreams.Should().BeEmpty();
-	        pageModel
-		        .IsAuthorizedToCreate
-		        .Should().BeFalse();
-		}
+            pageModel
+                .IsAuthorizedToCreate
+                .Should().BeFalse();
+        }
 
         [TestMethod]
         public async Task OnPostAsync_GivenPagePopulatesButModelStateIsInvalid_ReturnsPage()
@@ -362,15 +363,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should()
                 .Be(1);
 
-			pageModel
+            pageModel
                .FundingPeriods
                .Count()
                .Should()
                .Be(1);
 
-	        pageModel
-		        .IsAuthorizedToCreate
-		        .Should().BeTrue();
+            pageModel
+                .IsAuthorizedToCreate
+                .Should().BeTrue();
         }
 
         [TestMethod]
@@ -479,10 +480,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             // Assert
             result.Should().BeOfType<ForbidResult>();
 
-	        pageModel
-		        .IsAuthorizedToCreate
-		        .Should().BeFalse();
-		}
+            pageModel
+                .IsAuthorizedToCreate
+                .Should().BeFalse();
+        }
 
         private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {

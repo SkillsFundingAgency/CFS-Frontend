@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -719,51 +718,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
         }
 
         [TestMethod]
-        public async Task OnGetAsync_GivenCalculationResultsNotificationsDisabled_ThenIsNotificationsEnabledIsFalse()
-        {
-            // Arrange
-            string calculationId = "calc1";
-
-            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
-            calculationsApiClient
-                .GetCalculationById(Arg.Is(calculationId))
-                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
-
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient);
-
-            // Act
-            await pageModel.OnGetAsync(calculationId, 1, "");
-
-            // Assert
-            pageModel.IsNotificationsEnabled.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public async Task OnGetAsync_GivenCalculationResultsNotificationsEnabled_ThenIsNotificationsEnabledIsTrue()
-        {
-            // Arrange
-            string calculationId = "calc1";
-
-            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
-            calculationsApiClient
-                .GetCalculationById(Arg.Is(calculationId))
-                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
-
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-            featureToggle
-                .IsCalculationResultsNotificationsEnabled()
-                .Returns(true);
-
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient, featureToggle: featureToggle);
-
-            // Act
-            await pageModel.OnGetAsync(calculationId, 1, "");
-
-            // Assert
-            pageModel.IsNotificationsEnabled.Should().BeTrue();
-        }
-
-        [TestMethod]
         public async Task OnPostAsync_GivenNullOrEmptyCalculationId_ReturnsBadRequest()
         {
             //Arrange
@@ -1220,51 +1174,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .BeFalse();
         }
 
-        [TestMethod]
-        public async Task OnPostAsync_GivenCalculationResultsNotificationsDisabled_ThenIsNotificationsEnabledIsFalse()
-        {
-            // Arrange
-            string calculationId = "calc1";
-
-            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
-            calculationsApiClient
-                .GetCalculationById(Arg.Is(calculationId))
-                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
-
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient);
-
-            // Act
-            await pageModel.OnPostAsync(calculationId, 1, "");
-
-            // Assert
-            pageModel.IsNotificationsEnabled.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public async Task OnPostAsync_GivenCalculationResultsNotificationsEnabled_ThenIsNotificationsEnabledIsTrue()
-        {
-            // Arrange
-            string calculationId = "calc1";
-
-            ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
-            calculationsApiClient
-                .GetCalculationById(Arg.Is(calculationId))
-                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()));
-
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-            featureToggle
-                .IsCalculationResultsNotificationsEnabled()
-                .Returns(true);
-
-            CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationsApiClient: calculationsApiClient, featureToggle: featureToggle);
-
-            // Act
-            await pageModel.OnPostAsync(calculationId, 1, "");
-
-            // Assert
-            pageModel.IsNotificationsEnabled.Should().BeTrue();
-        }
-
         private static CalculationProviderResultsPageModel CreatePageModel(
             ICalculationProviderResultsSearchService resultsSearchService = null,
             ICalculationsApiClient calculationsApiClient = null,
@@ -1272,7 +1181,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IMapper mapper = null,
             IDatasetsApiClient datasetsApiClient = null,
             ILogger logger = null,
-            IFeatureToggle featureToggle = null,
             IJobsApiClient jobsApiClient = null)
         {
             return new CalculationProviderResultsPageModel(
@@ -1282,7 +1190,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 mapper ?? CreateMapper(),
                 datasetsApiClient ?? CreateDatasetsApiClient(),
                 logger ?? Createlogger(),
-                featureToggle ?? CreateFeatureToggle(),
                 jobsApiClient ?? CreateJobsApiClient());
         }
 
@@ -1314,11 +1221,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
         private static ILogger Createlogger()
         {
             return Substitute.For<ILogger>();
-        }
-
-        private static IFeatureToggle CreateFeatureToggle()
-        {
-            return Substitute.For<IFeatureToggle>();
         }
 
         private static IJobsApiClient CreateJobsApiClient()

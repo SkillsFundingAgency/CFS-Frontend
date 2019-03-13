@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Models;
 
 namespace CalculateFunding.Frontend.Pages.Approvals
 {

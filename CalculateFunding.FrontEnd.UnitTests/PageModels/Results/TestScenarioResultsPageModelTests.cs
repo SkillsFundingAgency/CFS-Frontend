@@ -1,22 +1,23 @@
-﻿using CalculateFunding.Frontend.Interfaces.ApiClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Results;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Results;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
-using CalculateFunding.Frontend.Interfaces.Services;
-using AutoMapper;
-using CalculateFunding.Frontend.Helpers;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using FluentAssertions;
-using System.Collections.Generic;
-using CalculateFunding.Common.ApiClient.Models;
-using System.Net;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using CalculateFunding.Frontend.ViewModels.Results;
-using CalculateFunding.Frontend.ViewModels.Common;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
 {
@@ -45,13 +46,13 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
-                 Specifications = new List<ReferenceViewModel>()
+                Specifications = new List<ReferenceViewModel>()
                  {
                      new ReferenceViewModel("spec1", "Specification 1"),
                      new ReferenceViewModel("spec2", "Specification 2"),
                      new ReferenceViewModel("spec3", "Specification 3"),
                  },
-                  TestResults = new List<TestScenarioResultItemViewModel>()
+                TestResults = new List<TestScenarioResultItemViewModel>()
                   {
                        new TestScenarioResultItemViewModel()
                      {
@@ -150,7 +151,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             };
 
             testScenarioResultsService
-                .PerformSearch(Arg.Is<TestScenarioResultRequestViewModel>(c=> c.PageNumber == 2))
+                .PerformSearch(Arg.Is<TestScenarioResultRequestViewModel>(c => c.PageNumber == 2))
                 .Returns(testScenarioResultViewModel);
 
             // Act

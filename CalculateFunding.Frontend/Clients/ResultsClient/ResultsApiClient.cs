@@ -6,8 +6,8 @@
     using System.Threading;
     using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient;
-    using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;

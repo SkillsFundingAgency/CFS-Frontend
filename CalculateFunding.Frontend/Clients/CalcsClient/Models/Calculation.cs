@@ -5,6 +5,7 @@
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using Newtonsoft.Json;
+    using CalculateFunding.Common.Models;
 
     public class Calculation : Reference, ISpecificationAuthorizationEntity
     {

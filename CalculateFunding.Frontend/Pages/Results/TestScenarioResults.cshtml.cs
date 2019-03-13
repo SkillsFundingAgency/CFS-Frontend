@@ -19,6 +19,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using Serilog;
+    using CalculateFunding.Common.Models;
 
     public class TestScenarioResultsPageModel : PageModel
     {

@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
-    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
     using Newtonsoft.Json;
 
     public class EditPolicyModel : Reference

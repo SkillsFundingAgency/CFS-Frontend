@@ -4,13 +4,15 @@
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
+    using System.Net;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using AutoMapper;
+    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Identity.Authorization.Models;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Calcs;
@@ -21,9 +23,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
-    using System.Net;
-    using Microsoft.AspNetCore.Mvc.ViewFeatures;
-    using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     [TestClass]
     public class EditCalculationPageModelTests
@@ -153,7 +152,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            
+
             string calculationId = "5";
 
             Calculation calcsCalculation = new Calculation()
@@ -433,7 +432,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-            
+
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
             featureToggle

@@ -19,6 +19,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Serilog;
+    using CalculateFunding.Common.Models;
 
     public class ProviderScenarioResultsPageModel : PageModel
     {

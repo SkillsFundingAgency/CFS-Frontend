@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
-    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
 
     public class DatasetVersion
     {

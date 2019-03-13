@@ -1,6 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
-    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
 
     public class ViewSpecificationViewModel
     {

@@ -1,8 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
 {
-    using CalculateFunding.Common.ApiClient.Models;
     using System;
     using System.Collections.Generic;
+    using CalculateFunding.Common.Models;
 
     public class ScenarioSearchResultItem : Reference
     {

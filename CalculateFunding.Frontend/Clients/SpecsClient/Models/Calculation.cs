@@ -1,7 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
     using System;
-    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
 
     public class Calculation : Reference
     {

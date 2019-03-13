@@ -1,8 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ResultsClient.Models
 {
-    using CalculateFunding.Common.ApiClient.Models;
-    using Newtonsoft.Json;
     using System;
+    using CalculateFunding.Common.Models;
+    using Newtonsoft.Json;
 
     public class Provider : Reference
     {

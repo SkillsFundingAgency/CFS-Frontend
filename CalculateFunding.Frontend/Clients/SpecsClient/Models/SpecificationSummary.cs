@@ -1,8 +1,9 @@
-﻿using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.ApiClient.Models;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {

@@ -33,10 +33,7 @@
     </div>
 }
 @section BannerRight{
-    @if (Model.IsNotificationsEnabled)
-    {
-        <a href="/calcs/editCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
-    }
+    <a href="/calcs/editCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
 }
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
@@ -72,70 +69,58 @@
 }
 
 <div class="row providers-search">
-    @if (!Model.IsNotificationsEnabled)
-    {
-        <div class="col-xs-12">
-            <div class="grey-alert alert--info-grey" role="alert">
-                <div class="alert__message"> <span>Status: <strong>@Model.Calculation.PublishStatus</strong></span><span class="alert-content-margin"> Last saved by: <strong>@Model.Calculation.LastModifiedByName</strong></span><span class="alert-content-margin"><strong>@Model.Calculation.LastModified.ToString("dd/MM/yy HH:mm:ss")</strong></span><span class="alert-content-margin"> Calculation type: <strong>@Model.Calculation.CalculationType</strong></span> <a href="/calcs/editCalculation/@Model.Calculation.Id" class="float-right"><strong>View calculation</strong></a></div>
+    <div id="notifications-container" class="col-xs-12">
+        <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus()" style="display:none;">
+            <span class="notifications-undetermined-icon">
+                <i class="material-icons">warning</i>
+            </span>
+            <span>
+                Unable to determine the last job that generated these results.
+            </span>
+            <div class="notifications-panel-bullets">
+                <ul>
+                    <li>This is because existing result in system.</li>
+                </ul>
             </div>
         </div>
-    }
-
-    @if (Model.IsNotificationsEnabled)
-    {
-        <div id="notifications-container" class="col-xs-12">
-            <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus()" style="display:none;">
-                <span class="notifications-undetermined-icon">
-                    <i class="material-icons">warning</i>
-                </span>
-                <span>
-                    Unable to determine the last job that generated these results.
-                </span>
-                <div class="notifications-panel-bullets">
-                    <ul>
-                        <li>This is because existing result in system.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().running" style="display:none;">
-                <span class="notifications-inprogress-icon">
-                    <i class="material-icons">warning</i>
-                </span>
-                <span>
-                    <span>Calculation is running in the background.</span><span class="float-right notifications-inprogress-status"><span data-bind="text: currentStatus().percentComplete"></span> <img src="~/assets/images/loader.gif" class="notifications-panel-loading-image" /></span>
-                </span>
-                <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                    <ul>
-                        <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="notifications-completed-successful-panel" data-bind="visible: !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
-                <span class="notifications-completed-successful-icon">
-                    <i class="material-icons">check</i>
-                </span>
-                <span>Calculation completed successfully.</span><span class="float-right"><span class="notifications-completed-successful-status-bold">Results update: </span><span data-bind="text: currentStatus().statusDateTimeDisplay" class="notifications-completed-successful-status"></span></span>
-                <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                    <ul>
-                        <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="notifications-completed-failed-panel" data-bind="visible: !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
-                <span class="notifications-completed-failed-icon">
-                    <i class="material-icons">warning</i>
-                </span>
-                <span>
-                    Calculation failed to run.
-                </span>
-                <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                    <ul>
-                        <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
-                    </ul>
-                </div>
+        <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().running" style="display:none;">
+            <span class="notifications-inprogress-icon">
+                <i class="material-icons">warning</i>
+            </span>
+            <span>
+                <span>Calculation is running in the background.</span><span class="float-right notifications-inprogress-status"><span data-bind="text: currentStatus().percentComplete"></span> <img src="~/assets/images/loader.gif" class="notifications-panel-loading-image" /></span>
+            </span>
+            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+                <ul>
+                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
+                </ul>
             </div>
         </div>
-    }
+        <div class="notifications-completed-successful-panel" data-bind="visible: !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
+            <span class="notifications-completed-successful-icon">
+                <i class="material-icons">check</i>
+            </span>
+            <span>Calculation completed successfully.</span><span class="float-right"><span class="notifications-completed-successful-status-bold">Results update: </span><span data-bind="text: currentStatus().statusDateTimeDisplay" class="notifications-completed-successful-status"></span></span>
+            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+                <ul>
+                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="notifications-completed-failed-panel" data-bind="visible: !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
+            <span class="notifications-completed-failed-icon">
+                <i class="material-icons">warning</i>
+            </span>
+            <span>
+                Calculation failed to run.
+            </span>
+            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+                <ul>
+                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <div class="col-xs-12" id="providers-search-container">
         <partial name="_SearchFilterPartial" />
@@ -275,14 +260,11 @@
                         <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationId=' + $root.specificationId }, text: name"></a></h4>
 
                     </div>
-                    @if (!Model.IsNotificationsEnabled)
-                    {
-                        <p>
-                            <span class="provider-item-property">
-                                Updated: <strong><span>@Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)</span></strong>
-                            </span>
-                        </p>
-                    }
+                    <p>
+                        <span class="provider-item-property">
+                            Updated: <strong><span>@Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)</span></strong>
+                        </span>
+                    </p>
                     <p>
                         <span class="provider-item-property">
                             UPIN:&nbsp; <strong> <span data-bind="text: upin != '' ? upin : 'No data found', attr:{  'id' : 'provider-item-upin-'+$index() }"></span> </strong>
@@ -371,19 +353,16 @@
 
     </script>
 
-    @if (Model.IsNotificationsEnabled)
-    {
-        <script asp-src-include="~/assets/libs/js/signalr.min.js" asp-append-version="true" type="text/javascript"></script>
-        <script asp-src-include="~/js/notifications.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/signalr.min.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/notifications.js" asp-append-version="true" type="text/javascript"></script>
 
-        <script type="text/javascript">
-            var precedingJobTypes = [ 'MapDatasetJob' ];
-            var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM, 'CreateInstructAllocationJob', precedingJobTypes);
+    <script type="text/javascript">
+        var precedingJobTypes = [ 'MapDatasetJob' ];
+        var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM, 'CreateInstructAllocationJob', precedingJobTypes);
 
-            var notificationsContainer = document.getElementById("notifications-container");
-            ko.applyBindings(notificationsVM, notificationsContainer);
-        </script>
-    }
+        var notificationsContainer = document.getElementById("notifications-container");
+        ko.applyBindings(notificationsVM, notificationsContainer);
+    </script>
 }
 
 @section styles{

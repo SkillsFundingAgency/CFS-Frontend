@@ -1,7 +1,12 @@
 ﻿namespace CalculateFunding.Frontend.PageModels.Results
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;
@@ -13,13 +18,9 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using Serilog;
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
 
     [TestClass]
-  public class ProviderFundingAllocationTests
+    public class ProviderFundingAllocationTests
     {
         [TestMethod]
         public void OnGetAsync_GivenNullProviderReturnsArgumentNullExceptionThrown()
@@ -73,7 +74,7 @@
                 CalculationResults = calResult
             };
 
-            var fundingPeriods = specsClient.GetFundingPeriods()
+            NSubstitute.Core.ConfiguredCall fundingPeriods = specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.NotFound, academicYears));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
@@ -419,7 +420,7 @@
             // Assert
             test
             .Should()
-            .ThrowExactly<System.InvalidOperationException>();         
+            .ThrowExactly<System.InvalidOperationException>();
         }
         private Provider CreateProvider()
         {
@@ -510,7 +511,7 @@
 
         private static ProviderAllocationLinePageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
         {
-            return new ProviderAllocationLinePageModel(resultsApiClient,  mapper, specsApiClient, logger);
+            return new ProviderAllocationLinePageModel(resultsApiClient, mapper, specsApiClient, logger);
         }
 
         private static ILogger CreateLogger()

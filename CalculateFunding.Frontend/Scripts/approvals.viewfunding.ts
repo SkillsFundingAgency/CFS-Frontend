@@ -27,7 +27,6 @@ namespace calculateFunding.approvals {
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
         public isPublishButtonEnabled: boolean;
         public isPublishAndApprovePageFiltersEnabled: boolean;
-        public shouldApprovalServerSideBatchingBeUsed: boolean;
         public shouldCheckJobStatusForChooseAndRefreshBeEnabled: boolean;
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
@@ -363,75 +362,42 @@ namespace calculateFunding.approvals {
 
             this.isWorkingVisible(true);
 
-            if (this.shouldApprovalServerSideBatchingBeUsed) {
+            let publishedAllocationLineResultStatusUpdatesViewModel = new PublishedAllocationLineResultStatusUpdateViewModel()
+            publishedAllocationLineResultStatusUpdatesViewModel.Status = AllocationLineStatus.Approved;
+            if (action === StatusAction.Publish) {
+                // Change the variables if the action is publish
+                publishedAllocationLineResultStatusUpdatesViewModel.Status = AllocationLineStatus.Published;
+            }
 
-                let publishedAllocationLineResultStatusUpdatesViewModel = new PublishedAllocationLineResultStatusUpdateViewModel()
-                publishedAllocationLineResultStatusUpdatesViewModel.Status = AllocationLineStatus.Approved;
-                if (action === StatusAction.Publish) {
-                    // Change the variables if the action is publish
-                    publishedAllocationLineResultStatusUpdatesViewModel.Status = AllocationLineStatus.Published;
+            selectedItems.allocationLines.forEach((element) => {
+
+                publishedAllocationLineResultStatusUpdatesViewModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(element.providerId, element.allocationLineId));
+            });
+
+            this.jobFailureMessage = failureMessage;
+            this.jobSuccessMessage = successMessage;
+
+            let self = this;
+
+            $.ajax({
+                url: changeStatusUrl,
+                method: "PUT",
+                contentType: 'application/json',
+                data: JSON.stringify(publishedAllocationLineResultStatusUpdatesViewModel),
+                headers: {
+                    RequestVerificationToken: self.settings.antiforgeryToken
                 }
-
-                selectedItems.allocationLines.forEach((element) => {
-
-                    publishedAllocationLineResultStatusUpdatesViewModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(element.providerId, element.allocationLineId));
-                });
-
-                this.jobFailureMessage = failureMessage;
-                this.jobSuccessMessage = successMessage;
-
-                let self = this;
-
-                $.ajax({
-                    url: changeStatusUrl,
-                    method: "PUT",
-                    contentType: 'application/json',
-                    data: JSON.stringify(publishedAllocationLineResultStatusUpdatesViewModel),
-                    headers: {
-                        RequestVerificationToken: self.settings.antiforgeryToken
-                    }
+            })
+                .done((result) => {
+                    console.log("successfully submitted request to change allocation line status");
                 })
-                    .done((result) => {
-                        console.log("successfully submitted request to change allocation line status");
-                    })
-                    .fail((ex) => {
-                        console.log("error submitting request to change allocation line status: " + ex);
+                .fail((ex) => {
+                    console.log("error submitting request to change allocation line status: " + ex);
 
-                        this.notificationMessage(failureMessage);
-                        this.notificationStatus('error');
-                        this.dismissConfirmPage();
-                    })
-            }
-            else {
-                let batchSize: number = 250;
-                let tasks: Array<PublishedAllocationLineResultStatusUpdateViewModel> = [];
-
-                let numBatches: number = Math.ceil(selectedItems.allocationLines.length / batchSize);
-
-                for (let j = 0; j < numBatches; j++) {
-                    let updateModel = new PublishedAllocationLineResultStatusUpdateViewModel();
-                    updateModel.Status = AllocationLineStatus.Approved;
-                    if (action === StatusAction.Publish) {
-                        // Change the variables if the action is publish
-                        updateModel.Status = AllocationLineStatus.Published;
-                    }
-
-                    let start = j * batchSize;
-
-                    for (let i = start; i < start + batchSize; i++) {
-                        let selectedItem = selectedItems.allocationLines[i];
-                        if (selectedItem === undefined) {
-                            break;
-                        }
-
-                        updateModel.Providers.push(new PublishedAllocationLineResultStatusUpdateProviderViewModel(selectedItem.providerId, selectedItem.allocationLineId));
-                    }
-
-                    tasks.push(updateModel);
-                }
-
-                this.executeStatusChange(tasks, 0, changeStatusUrl, successMessage, failureMessage);
-            }
+                    this.notificationMessage(failureMessage);
+                    this.notificationStatus('error');
+                    this.dismissConfirmPage();
+                })
         }
 
         /** Execute a unit of work by calling the change status endpoint */
@@ -823,12 +789,10 @@ namespace calculateFunding.approvals {
 
             this.loadProviderResults();
 
-            if (this.shouldApprovalServerSideBatchingBeUsed) {
-                // Start watching for job notifications for the selected specification
-                this.startWatchingForSpecificationNotifications(this.selectedSpecification().id);
+            // Start watching for job notifications for the selected specification
+            this.startWatchingForSpecificationNotifications(this.selectedSpecification().id);
 
-                this.retrieveLatestJobStatus();
-            }
+            this.retrieveLatestJobStatus();
         }
 
         private retrieveLatestJobStatus() {

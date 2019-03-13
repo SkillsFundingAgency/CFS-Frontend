@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -916,9 +917,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should()
                 .HaveCount(1);
 
-	        pageModel
-		        .IsAuthorizedToEdit
-		        .Should().BeTrue();
+            pageModel
+                .IsAuthorizedToEdit
+                .Should().BeTrue();
         }
 
         [TestMethod]
@@ -1165,10 +1166,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should()
                 .Be("Name was not provided");
 
-	        pageModel
-		        .IsAuthorizedToEdit
-		        .Should().BeTrue();
-		}
+            pageModel
+                .IsAuthorizedToEdit
+                .Should().BeTrue();
+        }
 
         [TestMethod]
         public async Task EditCalculationPageModel_OnPostAsync_WhenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
@@ -1216,9 +1217,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should()
                 .BeOfType<ForbidResult>();
 
-	        pageModel
-		        .IsAuthorizedToEdit
-		        .Should().BeFalse();
+            pageModel
+                .IsAuthorizedToEdit
+                .Should().BeFalse();
         }
 
         public static EditCalculationPageModel CreatePageModel(

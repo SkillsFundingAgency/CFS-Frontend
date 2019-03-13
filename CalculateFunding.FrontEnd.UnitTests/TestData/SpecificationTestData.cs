@@ -5,7 +5,7 @@
 namespace CalculateFunding.Frontend.TestData
 {
     using System.Collections.Generic;
-    using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
     public static class SpecificationTestData

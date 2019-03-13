@@ -1,10 +1,10 @@
-﻿using CalculateFunding.Common.ApiClient.Models;
+﻿using System;
+using CalculateFunding.Common.Models;
 using Newtonsoft.Json;
-using System;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
-    public class ProviderViewModel : Reference 
+    public class ProviderViewModel : Reference
     {
         public string ProviderType { get; set; }
 
@@ -21,7 +21,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         [JsonProperty("openDate")]
         public DateTime? DateOpened { get; set; }
 
-        public string DateOpenedDisplay { get; set; } 
- 
+        public string DateOpenedDisplay { get; set; }
+
     }
 }

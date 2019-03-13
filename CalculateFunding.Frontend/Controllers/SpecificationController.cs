@@ -11,6 +11,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
+using CalculateFunding.Common.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {

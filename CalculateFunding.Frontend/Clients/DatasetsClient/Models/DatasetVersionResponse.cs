@@ -1,6 +1,6 @@
-﻿using CalculateFunding.Common.ApiClient.Models;
+﻿using System;
+using CalculateFunding.Common.Models;
 using Newtonsoft.Json;
-using System;
 
 namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
