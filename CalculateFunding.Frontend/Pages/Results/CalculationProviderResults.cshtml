@@ -70,7 +70,7 @@
 
 <div class="row providers-search">
     <div id="notifications-container" class="col-xs-12">
-        <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus()" style="display:none;">
+        <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus().jobId" style="display:none;">
             <span class="notifications-undetermined-icon">
                 <i class="material-icons">warning</i>
             </span>
@@ -79,11 +79,11 @@
             </span>
             <div class="notifications-panel-bullets">
                 <ul>
-                    <li>This is because existing result in system.</li>
+                    <li>This is because the result was pre-existing in the system.</li>
                 </ul>
             </div>
         </div>
-        <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().running" style="display:none;">
+        <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().jobId && currentStatus().running" style="display:none;">
             <span class="notifications-inprogress-icon">
                 <i class="material-icons">warning</i>
             </span>
@@ -96,7 +96,7 @@
                 </ul>
             </div>
         </div>
-        <div class="notifications-completed-successful-panel" data-bind="visible: !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
+        <div class="notifications-completed-successful-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
             <span class="notifications-completed-successful-icon">
                 <i class="material-icons">check</i>
             </span>
@@ -107,7 +107,7 @@
                 </ul>
             </div>
         </div>
-        <div class="notifications-completed-failed-panel" data-bind="visible: !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
+        <div class="notifications-completed-failed-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
             <span class="notifications-completed-failed-icon">
                 <i class="material-icons">warning</i>
             </span>

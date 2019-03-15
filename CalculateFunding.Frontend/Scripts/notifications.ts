@@ -7,7 +7,7 @@ namespace calculateFunding.notifications {
 
         connectionError: KnockoutObservable<boolean> = ko.observable(false);
 
-        currentStatus: KnockoutObservable<JobStatus> = ko.observable(null);
+        currentStatus: KnockoutObservable<JobStatus> = ko.observable(new JobStatus());
 
         constructor() {
             this.init();
