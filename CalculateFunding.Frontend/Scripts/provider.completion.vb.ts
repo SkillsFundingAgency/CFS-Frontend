@@ -128,7 +128,8 @@ namespace calculateFunding.providers {
                                                 label: variable.name,
                                                 kind: monaco.languages.CompletionItemKind.Field,
                                                 detail: variable.type,
-                                                insertText: variable.name
+                                                insertText: variable.name,
+                                                range: null,
                                             }
 
                                             let description = "";
@@ -251,7 +252,8 @@ namespace calculateFunding.providers {
                                 let variableItem: monaco.languages.CompletionItem = {
                                     label: variable,
                                     kind: monaco.languages.CompletionItemKind.Field,
-                                    insertText: variable
+                                    insertText: variable,
+                                    range: null,
                                 };
 
                                 results.suggestions.push(variableItem);
@@ -283,7 +285,8 @@ namespace calculateFunding.providers {
                                     label: localFunction.label,
                                     kind: monaco.languages.CompletionItemKind.Function,
                                     detail: localFunction.getFunctionAndParameterDescription(),
-                                    insertText: localFunction.label
+                                    insertText: localFunction.label,
+                                    range: null,
                                 };
 
                                 let description = "";
@@ -370,7 +373,8 @@ namespace calculateFunding.providers {
                 label: variable.name,
                 kind: monaco.languages.CompletionItemKind.Field,
                 detail: variable.type,
-                insertText: variable.name
+                insertText: variable.name,
+                range: null,
             };
 
             let description = "";
@@ -816,7 +820,8 @@ namespace calculateFunding.providers {
                         label: defaultType.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         detail: defaultType.description,
-                        insertText: defaultType.label
+                        insertText: defaultType.label,
+                        range: null,
                     };
 
                     let description = "";
@@ -865,7 +870,8 @@ namespace calculateFunding.providers {
                         label: keyword.label,
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         detail: keyword.label,
-                        insertText: keyword.label
+                        insertText: keyword.label,
+                        range: null,
                     };
 
                     if (keyword.label === "If-Then-ElseIf-Then") {

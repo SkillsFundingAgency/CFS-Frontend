@@ -68,7 +68,8 @@ namespace calculateFunding.providers {
                             let completionItem: monaco.languages.CompletionItem = {
                                 label: dataset.name,
                                 kind: monaco.languages.CompletionItemKind.Field,
-                                insertText: dataset.name
+                                insertText: dataset.name,
+                                range: null,
                             };
 
                             if (typeof dataset.description !== "undefined") {
@@ -102,7 +103,8 @@ namespace calculateFunding.providers {
                                     label: datasetField.name,
                                     kind: monaco.languages.CompletionItemKind.Field,
                                     detail: datasetField.type,
-                                    insertText: datasetField.name
+                                    insertText: datasetField.name,
+                                    range: null,
                                 };
 
                                 if (typeof datasetField.description !== "undefined") {
@@ -128,7 +130,8 @@ namespace calculateFunding.providers {
                             let completionItem: monaco.languages.CompletionItem = {
                                 label: calculation.name,
                                 kind: monaco.languages.CompletionItemKind.Method,
-                                insertText: calculation.name
+                                insertText: calculation.name,
+                                range: null,
                             };
 
                             if (typeof calculation.description !== "undefined") {

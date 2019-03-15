@@ -57,6 +57,7 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                         label: "Test Dataset",
                         kind: monaco.languages.CompletionItemKind.Field,
                         insertText: "Test Dataset'",
+                        range: null,
                     }];
 
                     expect(result).toEqual(expectedResult);
@@ -112,17 +113,20 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                         kind: monaco.languages.CompletionItemKind.Field,
                         documentation: "Test Dataset 1 Description",
                         insertText: "Test Dataset 1'",
+                        range: null,
                     },
                     {
                         label: "Test Dataset 2",
                         kind: monaco.languages.CompletionItemKind.Field,
                         insertText: "Test Dataset 2'",
+                        range: null,
                     },
                     {
                         label: "Test Dataset 3",
                         kind: monaco.languages.CompletionItemKind.Field,
                         documentation: null,
                         insertText: "Test Dataset 3'",
+                        range: null,
                     }];
 
                     expect(result).toEqual(expectedResult);
@@ -164,12 +168,14 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                         kind: monaco.languages.CompletionItemKind.Field,
                         detail: "String",
                         insertText: "Field 1'",
+                        range: null,
                     },
                     {
                         label: "Field 2",
                         kind: monaco.languages.CompletionItemKind.Field,
                         detail: "Decimal",
                         insertText: "Field 2'",
+                        range: null,
                     }];
 
                     expect(result).toEqual(expectedResult);
@@ -268,18 +274,21 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                         kind: monaco.languages.CompletionItemKind.Method,
                         documentation: "Description for Calc 1",
                         insertText: "Calc 1'",
+                        range: null,
                     },
                     {
                         label: "Calc 2",
                         kind: monaco.languages.CompletionItemKind.Method,
                         documentation: "Description for Calc 2",
                         insertText: "Calc 2'",
+                        range: null,
                     },
                     {
                         label: "Calc 3",
                         kind: monaco.languages.CompletionItemKind.Method,
                         documentation: "Description for Calc 3",
                         insertText: "Calc 3'",
+                        range: null,
                     }];
 
                     expect(result).toEqual(expectedResult);
