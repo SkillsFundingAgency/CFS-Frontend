@@ -144,7 +144,7 @@
 			}
 			else
 			{
-				throw new InvalidOperationException($"Unable to create calculation specifications. Status Code = {editCalculationResponse.StatusCode}");
+				throw new InvalidOperationException($"Unable to edit calculation specification. Status Code = {editCalculationResponse.StatusCode}");
 			}
 		}
 

@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -25,18 +26,21 @@
         private readonly ISpecsApiClient _specsClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
+        private readonly IFeatureToggle _featureToggle;
 
         private static readonly IEnumerable<string> _calculationTypes = new[] { CalculationSpecificationType.Funding.ToString(), CalculationSpecificationType.Number.ToString(), CalculationSpecificationType.Baseline.ToString() };
 
-        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public CreateCalculationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _specsClient = specsClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
+            _featureToggle = featureToggle;
         }
 
         [BindProperty]
@@ -148,13 +152,16 @@
                 return new ForbidResult();
             }
 
-            if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
+            if (!_featureToggle.IsDuplicateCalculationNameCheckEnabled())
             {
-                ApiResponse<Calculation> existingCalculationResponse = await _specsClient.GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
-
-                if (existingCalculationResponse.StatusCode != HttpStatusCode.NotFound)
+                if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
                 {
-                    this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.Name)}", ValidationMessages.CalculationNameAlreadyExists);
+                    ApiResponse<Calculation> existingCalculationResponse = await _specsClient.GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
+
+                    if (existingCalculationResponse.StatusCode != HttpStatusCode.NotFound)
+                    {
+                        this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.Name)}", ValidationMessages.CalculationNameAlreadyExists);
+                    }
                 }
             }
 
@@ -166,11 +173,8 @@
             if (!ModelState.IsValid)
             {
                 SpecificationName = specification.Name;
-
                 SpecificationId = specificationId;
-
                 FundingPeriodName = specification.FundingPeriod.Name;
-
                 FundingPeriodId = specification.FundingPeriod.Id;
 
                 return await PopulateForm(specification);
@@ -191,6 +195,11 @@
             else if (newCalculationResponse.StatusCode == HttpStatusCode.BadRequest)
             {
                 newCalculationResponse.AddValidationResultErrors(ModelState);
+
+                SpecificationName = specification.Name;
+                SpecificationId = specificationId;
+                FundingPeriodName = specification.FundingPeriod.Name;
+                FundingPeriodId = specification.FundingPeriod.Id;
 
                 return await PopulateForm(specification);
             }

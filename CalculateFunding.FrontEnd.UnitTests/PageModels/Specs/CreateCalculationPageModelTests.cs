@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -21,7 +22,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
-namespace CalculateFunding.Frontend.PageModels.Calcs
+namespace CalculateFunding.Frontend.PageModels.Specs
 {
     [TestClass]
     public class CreateCalculationPageModelTests
@@ -692,9 +693,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             };
         }
 
-        static CreateCalculationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        static CreateCalculationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null, IFeatureToggle featureToggle = null)
         {
-            CreateCalculationPageModel pageModel = new CreateCalculationPageModel(specsClient ?? CreateSpecsApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
+            CreateCalculationPageModel pageModel = new CreateCalculationPageModel(
+                specsClient ?? CreateSpecsApiClient(), 
+                mapper ?? CreateMapper(), 
+                authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification),
+                featureToggle ?? CreateFeatureToggle());
 
             pageModel.PageContext = TestAuthHelper.CreatePageContext();
             return pageModel;
@@ -708,6 +713,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         static IMapper CreateMapper()
         {
             return Substitute.For<IMapper>();
+        }
+
+        private static IFeatureToggle CreateFeatureToggle()
+        {
+            return Substitute.For<IFeatureToggle>();
         }
     }
 }

@@ -366,7 +366,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseIsNull_ThenNotErrorIsReturned()
+        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseIsNull_ThenInternalErrorIsReturned()
         {
             // Arrange
             const string specificationId = "spec1";
@@ -411,7 +411,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseIsNotSuccessful_ThenNotErrorIsReturned()
+        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseIsNotSuccessful_ThenInternalErrorIsReturned()
         {
             // Arrange
             const string specificationId = "spec1";
@@ -456,7 +456,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseContentIsNull_ThenNotErrorIsReturned()
+        public async Task EditCalculationPageModel_OnGetAsync_WhenCalculationApiResponseContentIsNull_ThenInternalErrorIsReturned()
         {
             // Arrange
             const string specificationId = "spec1";

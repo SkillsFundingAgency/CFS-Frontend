@@ -246,6 +246,13 @@
       "metadata": {
         "description": "Connection string to the Azure Signalr service"
       }
+    },
+    "EnableDuplicateCalculationNameCheck": {
+      "defaultValue": false,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to enable new check for duplicate calculation names"
+      }
     }
   },
   "variables": {
@@ -505,6 +512,10 @@
             {
               "name": "features:checkJobStatusForChooseAndRefreshEnabled",
               "value": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]"
+            },
+            {
+              "name": "features:duplicateCalculationNameCheckEnabled",
+              "value": "[parameters('EnableDuplicateCalculationNameCheck')]"
             }
           ]
         }
