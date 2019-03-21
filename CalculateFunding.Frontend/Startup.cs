@@ -5,7 +5,6 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Common.Identity.Authorization;
-    using CalculateFunding.Common.Identity.Authorization.Repositories;
     using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Core.Middleware;
@@ -67,11 +66,9 @@
                 services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
                 services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
 
-                services.AddSingleton<IPermissionsRepository, PermissionsRepository>();
                 services.Configure<PermissionOptions>(options =>
                 {
                     Configuration.GetSection("permissionOptions").Bind(options);
-                    options.HttpClientName = Common.ApiClient.HttpClientKeys.Users;
                 });
 
                 services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();

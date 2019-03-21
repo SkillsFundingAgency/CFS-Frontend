@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using CalculateFunding.Common.Identity.Authentication;
 using CalculateFunding.Common.Identity.Authorization;
-using CalculateFunding.Common.Identity.Authorization.Repositories;
 using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Options;
@@ -46,11 +45,9 @@ namespace CalculateFunding.Frontend.Modules
                 services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
                 services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
 
-                services.AddSingleton<IPermissionsRepository, PermissionsRepository>();
                 services.Configure<PermissionOptions>(options =>
                 {
                     Configuration.GetSection("permissionOptions").Bind(options);
-                    options.HttpClientName = Common.ApiClient.HttpClientKeys.Users;
                 });
 
                 services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
