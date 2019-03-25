@@ -25,7 +25,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
     public class CalcsVersionPageModelTests
     {
         [TestMethod]
-        public async Task OnGet_WhenCalculationDoesNotExistThenNotFoundReturned()
+        public async Task OnGet_WhenCalculationDoesNotExist_ThenNotFoundReturned()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -104,7 +104,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGet_WhenSpecificationDoesntExistThenErrorReturned()
+        public async Task OnGet_WhenSpecificationDoesntExist_ThenErrorReturned()
         {
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGet_WhenCalculationExistsThenCalculationReturned()
+        public async Task OnGet_WhenCalculationExists_ThenCalculationReturned()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -253,6 +253,81 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             ViewModels.Calculations.CalculationVersionViewModel firstCalculation = comparePageModel.Calculations.First();
 
             firstCalculation.Version.Should().Be(calcsVersion3.Version);
+        }
+
+        [TestMethod]
+        public async Task OnGet_WhenCalculationHasManyVersions_ThenReturnsVersionsInDescendingOrder()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            ILogger logger = Substitute.For<ILogger>();
+
+            string calculationId = "1";
+
+            Calculation expectedCalculation = new Calculation()
+            {
+                Id = "1",
+                Name = "Specs Calculation",
+                FundingPeriodName = "2018/19",
+                SpecificationId = "3",
+                PublishStatus = PublishStatus.Draft,
+                LastModifiedBy = new Reference("1", "Matt Vallily"),
+                SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product     Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
+                Version = 10,
+                CalculationSpecification = new Reference("1", "Test Spec")
+            };
+
+            calcsClient
+                .GetCalculationById(calculationId)
+                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedCalculation));
+
+            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            {
+                Id = "1",
+                Name = "Test spec",
+                Description = "Test description",
+                AllocationLine = new Reference("1", "Test Allocation")
+            };
+
+            specsClient
+               .GetCalculationById(expectedCalculation.SpecificationId, calculationId)
+               .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specCalculation));
+
+            List<CalculationVersion> calculationVersions = new List<CalculationVersion>();
+
+            DateTime startCalcTime = DateTime.UtcNow.AddDays(-1);
+
+            for (int i = 1; i < 11; i++)
+            {
+                calculationVersions.Add(new CalculationVersion()
+                {
+                    Status = "Draft",
+                    Version = i.ToString(),
+                    DecimalPlaces = 4,
+                    Date = startCalcTime.AddHours(i),
+                    Author = new Reference("1", "Matt Vallily"),
+                    SourceCode = "Public Function GetProductResult(rid As String) As Decimal 'change to As String if text product     Dim result As Decimal = 0 'change to As String if text product     Dim P04_Learners As Decimal = products.1819_Additional_Funding.P04_Learner_Numbers     Dim P03_Rate As Decimal = products.1819_Additional_Funding.P03_Maths_Top_Up_Rate     result = P03_Rate * P04_learners     Return result End Function",
+                });
+            }
+
+            calcsClient
+               .GetAllVersionsByCalculationId(calculationId)
+               .Returns(new ApiResponse<IEnumerable<CalculationVersion>>(System.Net.HttpStatusCode.OK, calculationVersions));
+
+            ComparePageModel comparePageModel = new ComparePageModel(specsClient, calcsClient, mapper);
+
+            // Act
+            IActionResult result = await comparePageModel.OnGet(calculationId);
+
+            // Assert
+            result.Should().NotBeNull();
+
+            comparePageModel.Calculations.Should().HaveCount(10);
+
+            comparePageModel.Calculations.Select(f => int.Parse(f.Version)).Should().BeInDescendingOrder();
         }
     }
 }

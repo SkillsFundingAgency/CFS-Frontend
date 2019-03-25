@@ -12,6 +12,7 @@
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using CalculateFunding.Frontend.Helpers;
 
     public class ComparePageModel : PageModel
     {
@@ -68,7 +69,7 @@
             }
 
             List<CalculationVersionViewModel> calculationVersions = new List<CalculationVersionViewModel>();
-            foreach (CalculationVersion calculationVersion in calculationAllVersionsResponse.Content.OrderByDescending(c => c.Version))
+            foreach (CalculationVersion calculationVersion in calculationAllVersionsResponse.Content.OrderByDescending(c => c.Version, new VersionStringComparer()))
             {
                 calculationVersions.Add(_mapper.Map<CalculationVersionViewModel>(calculationVersion));
             }
