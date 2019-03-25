@@ -14,6 +14,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using Serilog;
+using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -24,20 +25,26 @@ namespace CalculateFunding.Frontend.Services
         private ITestEngineApiClient _testEngineClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly ISpecsApiClient _specsApiClient;
+        private readonly IFeatureToggle _featureToggle;
 
-        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecsApiClient specsApiClient, ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger)
+        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecsApiClient specsApiClient, 
+            ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(testEngineApiClient, nameof(testEngineApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _scenariosSearchService = scenariosApiClient;
             _specsClient = specsApiClient;
             _testEngineClient = testEngineApiClient;
             _mapper = mapper;
             _logger = logger;
+            _specsApiClient = specsApiClient;
+            _featureToggle = featureToggle;
         }
 
         public async Task<TestScenarioResultViewModel> PerformSearch(TestScenarioResultRequestViewModel request)
@@ -51,6 +58,7 @@ namespace CalculateFunding.Frontend.Services
                 Filters = request.Filters,
                 PageNumber = request.PageNumber,
                 PageSize = 20,
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
             };
 
             if (searchRequest.Filters == null)

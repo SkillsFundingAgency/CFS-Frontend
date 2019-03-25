@@ -253,6 +253,13 @@
       "metadata": {
         "description": "Feature toggle to enable new check for duplicate calculation names"
       }
+    },
+    "SearchModeAllEnabled": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to use search mode all"
+      }
     }
   },
   "variables": {
@@ -516,6 +523,10 @@
             {
               "name": "features:duplicateCalculationNameCheckEnabled",
               "value": "[parameters('EnableDuplicateCalculationNameCheck')]"
+            },
+            {
+              "name": "features:searchModeAllEnabled",
+              "value": "[parameters('SearchModeAllEnabled')]"
             }
           ]
         }

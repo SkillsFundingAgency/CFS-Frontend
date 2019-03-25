@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
@@ -699,21 +700,246 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Warning(Arg.Is("Row counts api request failed with null content"));
         }
 
+        [TestMethod]
+        public async Task TestScenarioResultsService_PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOff_SearchModeIsAny()
+        {
+            // Arrange
+            IScenarioSearchService searchService = CreateScenarioSearchService();
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
+
+            string periodId = "1819";
+
+            TestScenarioResultsService testScenarioResultsService = CreateService(searchService, specsApiClient, testEngineApiClient);
+
+            TestScenarioResultRequestViewModel resultRequestViewModel = new TestScenarioResultRequestViewModel()
+            {
+                SearchTerm = "",
+                PageNumber = 1,
+                FundingPeriodId = periodId,
+                SpecificationId = null,
+            };
+
+            ScenarioSearchResultViewModel scenarioSearchResultViewModel = new ScenarioSearchResultViewModel()
+            {
+                CurrentPage = 1,
+                TotalResults = 1,
+                StartItemNumber = 1,
+                EndItemNumber = 1,
+                Scenarios = new List<ScenarioSearchResultItemViewModel>()
+                {
+                    new ScenarioSearchResultItemViewModel()
+                    {
+                        Id = "ts1",
+                        Name ="Test Scenario 1",
+                        FundingPeriodName = "2018/2019",
+                        Status = "Passed",
+                        SpecificationName = "Specifcation 1",
+                        LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
+                    }
+                }
+            };
+
+            searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
+                .Returns(scenarioSearchResultViewModel);
+
+            List<SpecificationSummary> specifications = CreateSpecifications();
+
+            specsApiClient
+                .GetSpecifications(Arg.Is(periodId))
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+
+            List<TestScenarioResultCounts> testScenarioResultCounts = new List<TestScenarioResultCounts>();
+            testScenarioResultCounts.Add(new TestScenarioResultCounts()
+            {
+                Passed = 5,
+                Failed = 10,
+                Ignored = 50,
+                LastUpdatedDate = new DateTime(2018, 10, 5, 7, 8, 9),
+                TestScenarioId = "ts1",
+                TestScenarioName = "Test Scenario 1",
+            });
+
+            testEngineApiClient
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
+                .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
+
+            // Act
+            TestScenarioResultViewModel resultViewModel = await testScenarioResultsService.PerformSearch(resultRequestViewModel);
+
+            // Assert
+            resultViewModel.Should().NotBeNull();
+
+            TestScenarioResultViewModel expectedResult = new TestScenarioResultViewModel()
+            {
+                CurrentPage = 1,
+                EndItemNumber = 1,
+                Facets = new List<SearchFacetViewModel>(),
+                FundingPeriodId = null,
+                Specifications = new List<ReferenceViewModel>()
+                {
+                    new ReferenceViewModel("spec1", "Specification 1"),
+                    new ReferenceViewModel("spec2", "Specification 2"),
+                    new ReferenceViewModel("spec3", "Specification for 2018/2019"),
+
+                },
+                StartItemNumber = 1,
+                TotalResults = 1,
+                TestResults = new List<TestScenarioResultItemViewModel>()
+                 {
+                     new TestScenarioResultItemViewModel()
+                     {
+                        Id = "ts1",
+                        Name ="Test Scenario 1",
+                        Passes = 5,
+                        Failures = 10,
+                        Ignored = 50,
+                        LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
+                     }
+                 }
+            };
+
+            resultViewModel.Should().BeEquivalentTo(expectedResult);
+
+            await
+                searchService
+                    .Received(1)
+                    .PerformSearch(Arg.Is<SearchRequestViewModel>(m => m.SearchMode == SearchMode.Any));
+        }
+
+        [TestMethod]
+        public async Task TestScenarioResultsService_PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOn_SearchModeIsAll()
+        {
+            // Arrange
+            IScenarioSearchService searchService = CreateScenarioSearchService();
+            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
+            IFeatureToggle featureToggle = CreateFeatureToggle(true);
+
+            string periodId = "1819";
+
+            TestScenarioResultsService testScenarioResultsService = CreateService(searchService, specsApiClient, testEngineApiClient, featureToggle: featureToggle);
+
+            TestScenarioResultRequestViewModel resultRequestViewModel = new TestScenarioResultRequestViewModel()
+            {
+                SearchTerm = "",
+                PageNumber = 1,
+                FundingPeriodId = periodId,
+                SpecificationId = null,
+            };
+
+            ScenarioSearchResultViewModel scenarioSearchResultViewModel = new ScenarioSearchResultViewModel()
+            {
+                CurrentPage = 1,
+                TotalResults = 1,
+                StartItemNumber = 1,
+                EndItemNumber = 1,
+                Scenarios = new List<ScenarioSearchResultItemViewModel>()
+                {
+                    new ScenarioSearchResultItemViewModel()
+                    {
+                        Id = "ts1",
+                        Name ="Test Scenario 1",
+                        FundingPeriodName = "2018/2019",
+                        Status = "Passed",
+                        SpecificationName = "Specifcation 1",
+                        LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
+                    }
+                }
+            };
+
+            searchService.PerformSearch(Arg.Is<SearchRequestViewModel>(s => s.SearchTerm == resultRequestViewModel.SearchTerm))
+                .Returns(scenarioSearchResultViewModel);
+
+            List<SpecificationSummary> specifications = CreateSpecifications();
+
+            specsApiClient
+                .GetSpecifications(Arg.Is(periodId))
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specifications.AsEnumerable()));
+
+            List<TestScenarioResultCounts> testScenarioResultCounts = new List<TestScenarioResultCounts>();
+            testScenarioResultCounts.Add(new TestScenarioResultCounts()
+            {
+                Passed = 5,
+                Failed = 10,
+                Ignored = 50,
+                LastUpdatedDate = new DateTime(2018, 10, 5, 7, 8, 9),
+                TestScenarioId = "ts1",
+                TestScenarioName = "Test Scenario 1",
+            });
+
+            testEngineApiClient
+                .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
+                .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
+
+            // Act
+            TestScenarioResultViewModel resultViewModel = await testScenarioResultsService.PerformSearch(resultRequestViewModel);
+
+            // Assert
+            resultViewModel.Should().NotBeNull();
+
+            TestScenarioResultViewModel expectedResult = new TestScenarioResultViewModel()
+            {
+                CurrentPage = 1,
+                EndItemNumber = 1,
+                Facets = new List<SearchFacetViewModel>(),
+                FundingPeriodId = null,
+                Specifications = new List<ReferenceViewModel>()
+                {
+                    new ReferenceViewModel("spec1", "Specification 1"),
+                    new ReferenceViewModel("spec2", "Specification 2"),
+                    new ReferenceViewModel("spec3", "Specification for 2018/2019"),
+
+                },
+                StartItemNumber = 1,
+                TotalResults = 1,
+                TestResults = new List<TestScenarioResultItemViewModel>()
+                 {
+                     new TestScenarioResultItemViewModel()
+                     {
+                        Id = "ts1",
+                        Name ="Test Scenario 1",
+                        Passes = 5,
+                        Failures = 10,
+                        Ignored = 50,
+                        LastUpdatedDate = new DateTime(2018, 1, 5, 7, 8, 9),
+                     }
+                 }
+            };
+
+            resultViewModel.Should().BeEquivalentTo(expectedResult);
+
+            await
+                searchService
+                    .Received(1)
+                    .PerformSearch(Arg.Is<SearchRequestViewModel>(m => m.SearchMode == SearchMode.All));
+        }
+
         private static TestScenarioResultsService CreateService(
             IScenarioSearchService scenarioSearchService = null,
             ISpecsApiClient specsApiClient = null,
             ITestEngineApiClient testEngineApiClient = null,
             IMapper mapper = null,
-            ILogger logger = null
-            )
+            ILogger logger = null,
+            IFeatureToggle featureToggle = null)
         {
             return new TestScenarioResultsService(
                 scenarioSearchService ?? CreateScenarioSearchService(),
                  specsApiClient ?? CreateSpecsApiClient(),
                  testEngineApiClient ?? CreateTestEngineApiClient(),
                  mapper ?? MappingHelper.CreateFrontEndMapper(),
-                 logger ?? CreateLogger()
-                );
+                 logger ?? CreateLogger(),
+                 featureToggle ?? CreateFeatureToggle());
+        }
+
+        private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)
+        {
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            featureToggle
+                .IsSearchModeAllEnabled()
+                .Returns(featureToggleOn);
+
+            return featureToggle;
         }
 
         private static IScenarioSearchService CreateScenarioSearchService()

@@ -11,6 +11,7 @@
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
 
     public class ScenarioSearchService : IScenarioSearchService
     {
@@ -18,16 +19,19 @@
         private IScenariosApiClient _scenariosApiClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IFeatureToggle _featureToggle;
 
-        public ScenarioSearchService(IScenariosApiClient scenariosClient, IMapper mapper, ILogger logger)
+        public ScenarioSearchService(IScenariosApiClient scenariosClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(scenariosClient, nameof(scenariosClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _scenariosApiClient = scenariosClient;
             _mapper = mapper;
             _logger = logger;
+            _featureToggle = featureToggle;
         }
 
         public async Task<ScenarioSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -39,6 +43,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = true,
                 Filters = request.Filters,
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

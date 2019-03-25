@@ -11,6 +11,7 @@ namespace CalculateFunding.Frontend.Services
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -32,7 +33,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             specsClient
                 .When(a => a.FindSpecifications(Arg.Any<SearchFilterRequest>()))
@@ -57,7 +60,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             PagedResult<SpecificationSearchResultItem> expectedServiceResult = null;
 
@@ -81,7 +86,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 25;
 
@@ -112,7 +119,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 25;
 
@@ -168,7 +177,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 25;
 
@@ -232,7 +243,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 0;
 
@@ -259,7 +272,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 25;
 
@@ -286,7 +301,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 25;
 
@@ -319,7 +336,9 @@ namespace CalculateFunding.Frontend.Services
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger);
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
 
             int numberOfItems = 50;
 
@@ -343,6 +362,68 @@ namespace CalculateFunding.Frontend.Services
             // Assert
             results.StartItemNumber.Should().Be(51);
             results.EndItemNumber.Should().Be(100);
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_WhenFeatureToggleIsSwitchedOff_EnsureSearchModeIsAny()
+        {
+            // Arrange
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            IFeatureToggle featureToggle = CreateFeatureToggle();
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
+
+            SearchRequestViewModel request = new SearchRequestViewModel()
+            {
+                PageNumber = 2,
+            };
+
+            // Act
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
+
+            // Assert
+            await
+                specsClient
+                    .Received(1)
+                    .FindSpecifications(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_WhenFeatureToggleIsSwitchedOn_EnsureSearchModeIsAll()
+        {
+            // Arrange
+            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            IFeatureToggle featureToggle = CreateFeatureToggle(true);
+
+            ISpecificationSearchService SpecificationSearchService = new SpecificationSearchService(specsClient, mapper, logger, featureToggle);
+
+            SearchRequestViewModel request = new SearchRequestViewModel()
+            {
+                PageNumber = 2,
+            };
+
+            // Act
+            SpecificationSearchResultViewModel results = await SpecificationSearchService.PerformSearch(request);
+
+            // Assert
+            await
+                specsClient
+                    .Received(1)
+                    .FindSpecifications(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
+        }
+
+        private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)
+        {
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            featureToggle
+                .IsSearchModeAllEnabled()
+                .Returns(featureToggleOn);
+
+            return featureToggle;
         }
 
         private PagedResult<SpecificationSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)

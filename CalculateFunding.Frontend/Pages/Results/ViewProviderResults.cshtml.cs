@@ -45,9 +45,6 @@
 
             ProviderResults = await _providerSearchService.PerformSearch(searchRequest);
 
-            // ApiResponse<ProviderSearchResultViewModel> apiResponse = await GetProviderSearchResultsAsync(searchRequest);
-
-            // ProviderResults = apiResponse.Content;
             if (ProviderResults == null)
             {
                 return new StatusCodeResult(500);

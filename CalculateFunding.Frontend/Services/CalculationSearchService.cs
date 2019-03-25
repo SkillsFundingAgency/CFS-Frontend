@@ -12,22 +12,26 @@
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
 
     public class CalculationSearchService : ICalculationSearchService
     {
         private ICalculationsApiClient _calculationsApiClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IFeatureToggle _featureToggle;
 
-        public CalculationSearchService(ICalculationsApiClient calculationsClient, IMapper mapper, ILogger logger)
+        public CalculationSearchService(ICalculationsApiClient calculationsClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(calculationsClient, nameof(calculationsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _calculationsApiClient = calculationsClient;
             _mapper = mapper;
             _logger = logger;
+            _featureToggle = featureToggle;
         }
 
         public async Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -39,7 +43,8 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                FacetCount = request.FacetCount
+                FacetCount = request.FacetCount,
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

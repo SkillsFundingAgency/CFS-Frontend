@@ -44,7 +44,7 @@
             {
                 PageNumber = pageNumber ?? 1,
                 IncludeFacets = true,
-                SearchTerm = searchTerm,
+                SearchTerm = searchTerm
             };
 
             SearchTerm = searchTerm;

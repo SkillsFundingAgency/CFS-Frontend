@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -203,13 +204,54 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>());
         }
 
+        [TestMethod]
+        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOff_SearchModeIsAny()
+        {
+            // Arrange
+            IDatasetsApiClient apiClient = CreateApiClient();
 
-        static DatasetDefinitionSearchService CreateSearchService(IDatasetsApiClient apiClient = null, IMapper mapper = null, ILogger logger = null)
+            DatasetDefinitionSearchService searchService = CreateSearchService(apiClient);
+
+            SearchRequestViewModel request = new SearchRequestViewModel();
+
+            // Act
+            DatasetDefinitionSearchResultViewModel result = await searchService.PerformSearch(request);
+
+            // Assert
+            await
+                apiClient
+                    .Received(1)
+                    .FindDatasetDefinitions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOn_SearchModeIsAll()
+        {
+            // Arrange
+            IDatasetsApiClient apiClient = CreateApiClient();
+            IFeatureToggle featureToggle = CreateFeatureToggle(true);
+
+            DatasetDefinitionSearchService searchService = CreateSearchService(apiClient, featureToggle: featureToggle);
+
+            SearchRequestViewModel request = new SearchRequestViewModel();
+
+            // Act
+            DatasetDefinitionSearchResultViewModel result = await searchService.PerformSearch(request);
+
+            // Assert
+            await
+                apiClient
+                    .Received(1)
+                    .FindDatasetDefinitions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
+        }
+
+        static DatasetDefinitionSearchService CreateSearchService(IDatasetsApiClient apiClient = null, IMapper mapper = null, ILogger logger = null, IFeatureToggle featureToggle = null)
         {
             return new DatasetDefinitionSearchService(
                 apiClient ?? CreateApiClient(),
                 mapper ?? CreateMapper(),
-                logger ?? CreateLogger());
+                logger ?? CreateLogger(),
+                featureToggle ?? CreateFeatureToggle());
         }
 
         static IDatasetsApiClient CreateApiClient()
@@ -225,6 +267,16 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         static ILogger CreateLogger()
         {
             return Substitute.For<ILogger>();
+        }
+
+        private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)
+        {
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+            featureToggle
+                .IsSearchModeAllEnabled()
+                .Returns(featureToggleOn);
+
+            return featureToggle;
         }
 
         PagedResult<DatasetDefinitionSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)

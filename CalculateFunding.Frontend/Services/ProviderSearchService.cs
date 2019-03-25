@@ -11,22 +11,26 @@
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
 
     public class ProviderSearchService : IProviderSearchService
     {
         private IResultsApiClient _resultsClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IFeatureToggle _featureToggle;
 
-        public ProviderSearchService(IResultsApiClient resultsApiClient, IMapper mapper, ILogger logger)
+        public ProviderSearchService(IResultsApiClient resultsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _resultsClient = resultsApiClient;
             _mapper = mapper;
             _logger = logger;
+            _featureToggle = featureToggle;
         }
 
         public async Task<ProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -38,6 +42,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

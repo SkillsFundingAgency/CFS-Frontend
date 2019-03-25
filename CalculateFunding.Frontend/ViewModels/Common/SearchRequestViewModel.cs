@@ -1,5 +1,6 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Common
 {
+    using CalculateFunding.Common.ApiClient.Models;
     using System.Collections.Generic;
 
     public class SearchRequestViewModel
@@ -15,5 +16,7 @@
         public int? PageSize { get; set; }
 
         public int FacetCount { get; set; } = 10;
+
+        public SearchMode SearchMode { get;  set; }
     }
 }

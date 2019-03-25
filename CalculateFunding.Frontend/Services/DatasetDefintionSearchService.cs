@@ -11,22 +11,26 @@
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Datasets;
     using Serilog;
+    using CalculateFunding.Common.FeatureToggles;
 
     public class DatasetDefinitionSearchService : IDatasetDefinitionSearchService
     {
         private IDatasetsApiClient _datasetsClient;
         private IMapper _mapper;
         private ILogger _logger;
+        private readonly IFeatureToggle _featureToggle;
 
-        public DatasetDefinitionSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger)
+        public DatasetDefinitionSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _datasetsClient = datasetsClient;
             _mapper = mapper;
             _logger = logger;
+            _featureToggle = featureToggle;
         }
 
         public async Task<DatasetDefinitionSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -38,6 +42,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
