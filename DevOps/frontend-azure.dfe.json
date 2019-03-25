@@ -254,7 +254,7 @@
         "description": "Feature toggle to enable new check for duplicate calculation names"
       }
     },
-    "SearchModeAllEnabled": {
+    "EnableSearchModeAll": {
       "defaultValue": true,
       "type": "bool",
       "metadata": {
@@ -526,7 +526,7 @@
             },
             {
               "name": "features:searchModeAllEnabled",
-              "value": "[parameters('SearchModeAllEnabled')]"
+              "value": "[parameters('EnableSearchModeAll')]"
             }
           ]
         }
