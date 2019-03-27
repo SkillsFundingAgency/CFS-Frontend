@@ -68,22 +68,55 @@
             </div>
         </div>
         <div class="row">
+
             <div class="col-xs-12">
-                <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-top spacing-15-bottom">
-                    <li class="nav-item active">
-                        <a role="tab">Provider info</a>
+                <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-top spacing-15-bottom"
+                    data-bind="foreach: ['ProviderInfo', 'AllocationLine', 'PublicCalculations', 'ProfileResults']">
+                    <li class="nav-item" data-bind="class : $root.providerViewSelectTab($data), click : $root.providerViewClickTab($data)">
+                        <a role="tab" data-bind="text: $root.providerViewTab($data)"></a>
                     </li>
-                    <li class="nav-item">
-                        <a role="tab">Allocation line</a>
-                    </li>
-                    <li class="nav-item">
-                        <a role="tab">Public calculations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a role="tab">Profile results</a>
-                    </li>
-                    <p class="last-refreshed-text align-bottom">Last refreshed on: <span data-bind="text: selectedSpecification() ? selectedSpecification().publishedResultsRefreshedAtDisplay() : 'Not available'"></span></p>
                 </ul>
+                <p class="last-refreshed-text align-bottom">
+                    Last refreshed on: <span data-bind="text: selectedSpecification() ? selectedSpecification().publishedResultsRefreshedAtDisplay() : 'Not available'"></span>
+                </p>
+            </div>
+
+            <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'ProviderInfo'">
+                Provider info body                                          
+            </div>
+
+            <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'AllocationLine'">
+                <table class="cf">
+                    <thead>
+                        <tr>
+                            <th role="heading" scope="col" class="col-xs-7">Allocation lines</th>
+                            <th role="heading" scope="col" class="col-xs-2">Status</th>
+                            <th role="heading" scope="col" class="col-xs-3">Allocation line funding total</th>
+                        </tr>
+                    </thead>
+
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" class="spec-rel-grey-back"><strong>Total allocation line</strong></td>
+                            <td class="text-right spec-rel-grey-back"><strong data-bind="text: selectedProviderView() ? '&pound;' + selectedProviderView().totalFundingAmountDisplay : 'unknown'" /></td>
+                        </tr>
+                    </tfoot>
+
+                    <tbody data-bind="foreach: selectedProviderView() ? selectedProviderView().allocationLineResults : null ">
+                        <tr>
+                            <td data-bind="text: allocationLineName" />
+                            <td data-bind="text: statusDisplay, class: statusDisplayClass" />
+                            <td data-bind="text: '&pound;' + fundingAmountDisplay" class="text-right" />
+                        </tr>
+                    </tbody>
+                </table>
+            </div>       
+            
+            <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'PublicCalculations'">
+                Public calculations body                                    
+            </div>
+
+            <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'ProfileResults'">
             </div>
         </div>
     </div>
@@ -714,7 +747,5 @@
             ko.applyBindings(vfVM);
 
         </script>
-
     }
-
 }

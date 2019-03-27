@@ -31,6 +31,7 @@ namespace calculateFunding.approvals {
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
         public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
+        public providerViewSelectedTab: KnockoutObservable<ProviderViewSelectedTab> = ko.observable();
 
         private readonly instructCalculationsJobDefinitionId: string = "CreateInstructAllocationJob";
         private readonly instructAggregationsCalculationsJobDefinitionId: string = "CreateInstructGenerateAggregationsAllocationJob";
@@ -164,6 +165,7 @@ namespace calculateFunding.approvals {
         //***********************
         selectProviderHandler(providerModel: PublishedProviderResultViewModel): void {
             this.pageState('providerView');
+            this.providerViewSelectedTab(ProviderViewSelectedTab.ProviderInfo);
             this.selectedProviderView(providerModel);
         }
 
@@ -177,7 +179,7 @@ namespace calculateFunding.approvals {
         jobFailureMessage: string;
 
         protected onConnected(): void {
-            // Doesn't immediatley subscribe to any groups, has to wait until user has chosen the specification details to view the funding details for
+            // Doesn't immediately subscribe to any groups, has to wait until user has chosen the specification details to view the funding details for
         }
 
         protected onJobStarted(jobType: string): void {
@@ -531,6 +533,37 @@ namespace calculateFunding.approvals {
             }
             return false;
         }, this);
+
+        providerViewSelectTab(selectedTab: string) : string {
+            return this.providerViewSelectedTab() == (<any>ProviderViewSelectedTab)[selectedTab]
+                ? "nav-item active"
+                : "nav-item";
+        }
+
+        providerViewClickTab(selectedTab: string): void {
+            this.providerViewSelectedTab((<any>ProviderViewSelectedTab)[selectedTab]);
+        }
+
+        providerViewTab(selectedTab: string): string {
+            switch (selectedTab) {
+                case "ProviderInfo":
+                    return "Provider info";
+
+                case "AllocationLine":
+                    return "Allocation line";
+
+                case "PublicCalculations":
+                    return "Public calculations";
+
+                case "ProfileResults":
+                    return "Profile results";
+            }
+        }
+
+        providerViewSelectedTabName: KnockoutComputed<string> = ko.pureComputed(() => {
+            return ProviderViewSelectedTab[this.providerViewSelectedTab()];
+        });
+
 
         doesUserHaveAllPermissions: KnockoutComputed<boolean> = ko.pureComputed(function () {
             return this.permissions().doesUserHaveAllPermissions();
@@ -1009,6 +1042,13 @@ namespace calculateFunding.approvals {
         Finished
     }
 
+    enum ProviderViewSelectedTab {
+        ProviderInfo,
+        AllocationLine,
+        PublicCalculations,
+        ProfileResults
+    }
+
     /** A published provider result */
     export class PublishedProviderResultViewModel {
         providerName: string;
@@ -1123,6 +1163,12 @@ namespace calculateFunding.approvals {
         authority: string;
         get fundingAmountDisplay(): string {
             return (Number(this.fundingAmount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+        }
+        get statusDisplay(): string {
+            return (<any>AllocationLineStatus)[this.status];
+        }
+        get statusDisplayClass(): string {
+            return "status-" + (<any>AllocationLineStatus)[this.status].toLowerCase()
         }
         version: string;
         isSelected: KnockoutObservable<boolean> = ko.observable(false);
