@@ -345,7 +345,55 @@
               {
                 "ipAddress": "86.188.174.157",
                 "subnetMask": "255.255.255.255",
-                "name" : "DfE Sheffield Proxy",
+                "name" : "DfE Sheffield Proxy Old",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.130",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 0",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.131",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 1",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.132",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 2",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.133",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 3",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.175.48",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block A",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.175.64",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block B",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.165.192",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block C",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.165.176",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block D",
                 "priority": 200
               }
             ]
