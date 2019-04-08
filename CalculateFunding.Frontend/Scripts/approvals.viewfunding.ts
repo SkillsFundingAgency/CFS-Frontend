@@ -1053,7 +1053,7 @@ namespace calculateFunding.approvals {
     export class PublishedProviderResultViewModel {
         providerName: string;
         providerId: string;
-        providerType: string
+        providerType: string;
         ukprn: string;
         authority: string;
         totalFundingAmount: number;
@@ -1122,14 +1122,11 @@ namespace calculateFunding.approvals {
             return (Number(numberToFormat)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
         }
 
-
-
         /** 
          *  Are all allocation lines in the provider currently selected.
          *  Note: there is no direct selection of a provider line, it is all based on whether the child allocation lines are selected
          */
         isSelected: KnockoutComputed<boolean> = ko.computed({
-
             read: function () {
                 let allocationResults = this();
                 for (let i = 0; i < allocationResults.length; i++) {

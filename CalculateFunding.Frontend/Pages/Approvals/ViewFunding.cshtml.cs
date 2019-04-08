@@ -8,8 +8,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
     {
         public string ShouldPublishButtonBeEnabled { get; private set; }
 
-        public bool ShouldAllocationLineMajorMinorVersioningEnabled { get; private set; }
-
 		public bool ShouldProviderInformationViewBeEnabled { get; private set; }
 
 		public bool ShouldFiltersBeEnabled { get; private set; }
@@ -21,8 +19,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 			Guard.ArgumentNotNull(features, nameof(features));
 
 			ShouldPublishButtonBeEnabled = features.IsPublishButtonEnabled().ToString().ToLowerInvariant();
-
-			ShouldAllocationLineMajorMinorVersioningEnabled = features.IsAllocationLineMajorMinorVersioningEnabled();
 
 			ShouldFiltersBeEnabled = features.IsPublishAndApprovePageFiltersEnabled();
 
