@@ -86,8 +86,8 @@
             </div>
 
             <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'AllocationLine'">
-                <!-- ko if: selectedProviderView() -->
-                <table class="cf" data-bind="with: selectedProviderView()">
+                <!-- ko with: selectedProviderView -->
+                <table class="cf">
                     <thead>
                         <tr>
                             <th role="heading" scope="col" class="col-xs-7">Allocation lines</th>
