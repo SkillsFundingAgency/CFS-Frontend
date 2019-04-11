@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Controllers;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.UnitTests.Helpers;
@@ -208,6 +210,126 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             // Assert
             result.Should().BeOfType<ForbidResult>();
+        }
+
+        [TestMethod]
+        [DataRow(null, null, null, "providerId")]
+        [DataRow("", null, null, "providerId")]
+        [DataRow("a", null, null, "specificationId")]
+        [DataRow("a", "", null, "specificationId")]
+        [DataRow("a", "b", null, "fundingStreamId")]
+        [DataRow("a", "b", "", "fundingStreamId")]
+        public void PublishedProviderProfile_MissingData_Errors(string providerId, string specificationId, string fundingStreamId, string parameterName)
+        {
+            //Arrange
+            var resultsApiClient = Substitute.For<IResultsApiClient>();
+            var specsApiClient = Substitute.For<ISpecsApiClient>();
+            var mapper = Substitute.For<IMapper>();
+            var authorizationHelper = Substitute.For<IAuthorizationHelper>();
+
+            var controller = new ApprovalController(resultsApiClient, specsApiClient, mapper, authorizationHelper);
+
+            //Act
+            Func<Task> action = async () => 
+                await controller.PublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            //Assert
+            action
+                .Should().Throw<ArgumentNullException>()
+                .WithMessage($"Value cannot be null.{Environment.NewLine}Parameter name: {parameterName}");
+
+            resultsApiClient.Received(0).GetPublishedProviderResults(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+            mapper.Received(0).Map<IEnumerable<PublishedProviderProfileViewModel>>(Arg.Any<IEnumerable<PublishedProviderProfile>>());
+        }
+
+        //Missing NUnit's TestCaseSource here :..(
+        [TestMethod]
+        [DataRow(HttpStatusCode.NotFound, typeof(NotFoundObjectResult))]
+        [DataRow(HttpStatusCode.PreconditionFailed, typeof(InternalServerErrorResult))]
+        [DataRow(HttpStatusCode.Redirect, typeof(InternalServerErrorResult))]
+        public async Task PublishedProviderProfile_ClientCallFails_ReturnsError(HttpStatusCode statusCode, Type actionResultType)
+        {
+            //Arrange
+            var resultsApiClient = Substitute.For<IResultsApiClient>();
+            var specsApiClient = Substitute.For<ISpecsApiClient>();
+            var mapper = Substitute.For<IMapper>();
+            var authorizationHelper = Substitute.For<IAuthorizationHelper>();
+
+            var callResult = new ApiResponse<IEnumerable<PublishedProviderProfile>>(statusCode);
+
+            resultsApiClient
+                .GetPublishedProviderProfile(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                .Returns(callResult);
+
+            var controller = new ApprovalController(resultsApiClient, specsApiClient, mapper, authorizationHelper);
+
+            var providerId = "p";
+            var specificationId = "s";
+            var fundingStreamId = "f";
+
+            //Act
+            var result = await controller.PublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            //Assert
+            await resultsApiClient
+                .Received(1)
+                .GetPublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            mapper
+                .Received(0)
+                .Map<IEnumerable<PublishedProviderProfileViewModel>>(Arg.Any<IEnumerable<PublishedProviderProfile>>());
+
+            result
+                .Should()
+                .BeOfType(actionResultType);
+        }
+
+        [TestMethod]
+        public async Task PublishedProviderProfile_CallsSucceed_ReturnsOK()
+        {
+            //Arrange
+            var resultsApiClient = Substitute.For<IResultsApiClient>();
+            var specsApiClient = Substitute.For<ISpecsApiClient>();
+            var mapper = Substitute.For<IMapper>();
+            var authorizationHelper = Substitute.For<IAuthorizationHelper>();
+
+            var callContent = new PublishedProviderProfile[] { };
+            var callResult = new ApiResponse<IEnumerable<PublishedProviderProfile>>(HttpStatusCode.OK, callContent);
+            var mappedResult = new[] { new PublishedProviderProfileViewModel() };
+
+            resultsApiClient
+                .GetPublishedProviderProfile(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                .Returns(callResult);
+
+            mapper
+                .Map<IEnumerable<PublishedProviderProfileViewModel>>(callResult.Content)
+                .Returns(mappedResult);
+
+            var controller = new ApprovalController(resultsApiClient, specsApiClient, mapper, authorizationHelper);
+
+            var providerId = "p";
+            var specificationId = "s";
+            var fundingStreamId = "f";
+
+            //Act
+            var result = await controller.PublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            //Assert
+            await resultsApiClient
+                .Received(1)
+                .GetPublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            mapper
+                .Received(1)
+                .Map<IEnumerable<PublishedProviderProfileViewModel>>(callContent);
+
+            result
+                .Should()
+                .BeOfType(typeof(OkObjectResult));
+
+            var value = (result as OkObjectResult).Value;
+
+            value.Should().Be(mappedResult);
         }
 
         private ApprovalController CreateApprovalController(IResultsApiClient resultsClient = null,

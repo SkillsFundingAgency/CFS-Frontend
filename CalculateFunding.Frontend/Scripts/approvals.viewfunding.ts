@@ -32,6 +32,8 @@ namespace calculateFunding.approvals {
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
         public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
         public providerViewSelectedTab: KnockoutObservable<ProviderViewSelectedTab> = ko.observable();
+        public profileResults: KnockoutObservableArray<ProfileResultsViewModel> = ko.observableArray();
+        public profileResult: KnockoutObservable<ProfileResultsViewModel> = ko.observable();
 
         private readonly instructCalculationsJobDefinitionId: string = "CreateInstructAllocationJob";
         private readonly instructAggregationsCalculationsJobDefinitionId: string = "CreateInstructGenerateAggregationsAllocationJob";
@@ -158,6 +160,10 @@ namespace calculateFunding.approvals {
                     self.FundingStreams([]);
                 }
             });
+
+            /** If the profile result isn't initialised the binding dies at page load */
+            this.profileResult(new ProfileResultsViewModel());
+            this.profileResults(new Array());
         }
 
         //***********************
@@ -169,6 +175,63 @@ namespace calculateFunding.approvals {
             this.selectedProviderView(providerModel);
         }
 
+        public LoadProfileResult(providerId: string, specificationId: string, fundingStreamId: string): void {
+            let results = this.profileResults().filter(p => p.providerId == providerId && p.specificationId == specificationId && p.fundingStreamId == fundingStreamId);
+
+            if (results.length > 0) {
+                this.profileResult(results[0]);
+            }
+            else {
+                let self = this;
+
+                $.ajax({
+                    url: "/api/results/published-provider-profile/providerId/" + providerId + "/specificationId/" + specificationId + "/fundingStreamId/" + fundingStreamId,
+                    type: "GET",
+                    success: function (data) {
+                        let result = new ProfileResultsViewModel();
+                        result.providerId = providerId;
+                        result.specificationId = specificationId;
+                        result.fundingStreamId = fundingStreamId;
+                        result.ProfileResults = new Array();
+
+                        data.forEach(function (item) {
+                            let pr = new ProfileResultViewModel();
+                            pr.name = item.name;
+
+                            pr.profilePeriods = new Array();
+                            item.profilePeriods.forEach(function (pd) {
+                                let vm = new ProfilePeriodsViewModel();
+                                vm.period = pd.period;
+                                vm.occurrence = pd.occurrence;
+                                vm.periodYear = pd.periodYear;
+                                vm.periodType = pd.periodType;
+                                vm.profileValue = pd.profileValue;
+                                vm.distributionPeriod = pd.distributionPeriod;
+                                pr.profilePeriods.push(vm);
+                            });
+
+                            pr.financialEnvelopes = new Array();
+                            item.financialEnvelopes.forEach(function (fe) {
+                                let vm = new FinancialEnvelopesViewModel();
+                                vm.monthStart = fe.monthStart;
+                                vm.yearStart = fe.yearStart;
+                                vm.monthEnd = fe.monthEnd;
+                                vm.yearEnd = fe.yearEnd;
+                                vm.value = fe.value;
+                                pr.financialEnvelopes.push(vm);
+                            })
+
+                            result.ProfileResults.push(pr);
+                        });
+
+                        self.profileResults.push(result);
+                        self.profileResult(result);
+
+                        return true;
+                    }
+                });
+            }
+        }
 
         //***********************
         // Notifications methods
@@ -534,14 +597,22 @@ namespace calculateFunding.approvals {
             return false;
         }, this);
 
-        providerViewSelectTab(selectedTab: string) : string {
+        providerViewSelectTab(selectedTab: string): string {
             return this.providerViewSelectedTab() == (<any>ProviderViewSelectedTab)[selectedTab]
                 ? "nav-item active"
                 : "nav-item";
         }
 
-        providerViewClickTab(selectedTab: string): void {
-            this.providerViewSelectedTab((<any>ProviderViewSelectedTab)[selectedTab]);
+        providerViewClickTab(selectedTab: string, viewModel: ViewFundingViewModel): void {
+            viewModel.providerViewSelectedTab((<any>ProviderViewSelectedTab)[selectedTab]);
+
+            if (viewModel.providerViewSelectedTab() == ProviderViewSelectedTab.ProfileResults) {
+                let providerId = viewModel.selectedProviderView().providerId;
+                let specificationId = viewModel.selectedSpecification().id;
+                let fundingStreamId = viewModel.selectedFundingStream().id;
+
+                viewModel.LoadProfileResult(providerId, specificationId, fundingStreamId);
+            }
         }
 
         providerViewTab(selectedTab: string): string {
@@ -1250,6 +1321,10 @@ namespace calculateFunding.approvals {
         modalTitle: string
     }
 
+    function FormatCurrency(amount: number): string {
+        return (Number(amount)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+
     /** A summary of the data to be approved or published */
     class ConfirmPublishApproveViewModel {
         numberOfProviders: number;
@@ -1258,7 +1333,7 @@ namespace calculateFunding.approvals {
         allocationLines: Array<AllocationLineSummaryViewModel> = [];
         totalFundingApproved: number = 0;
         get totalFundingApprovedDisplay(): string {
-            return "£" + (Number(this.totalFundingApproved)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+            return "£" + FormatCurrency(this.totalFundingApproved);
         }
 
         allocationLinesRollup: Array<AllocationLineRollupViewModel> = [];
@@ -1278,8 +1353,7 @@ namespace calculateFunding.approvals {
         }
 
         get valueDisplay(): string {
-
-            return "£" + (Number(this.value)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+            return "£" + FormatCurrency(this.value);
         }
     }
 
@@ -1289,7 +1363,7 @@ namespace calculateFunding.approvals {
         value: number;
 
         get valueDisplay(): string {
-            return "£" + (Number(this.value)).toLocaleString('en-GB', { style: 'decimal', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+            return "£" + FormatCurrency(this.value);
         }
     }
 
@@ -1313,6 +1387,69 @@ namespace calculateFunding.approvals {
         constructor(providerId: string, allocationLineId: string) {
             this.ProviderId = providerId;
             this.AllocationLineId = allocationLineId;
+        }
+    }
+
+    class ProfileResultViewModel {
+        name: string;
+        profilePeriods: ProfilePeriodsViewModel[];
+        financialEnvelopes: FinancialEnvelopesViewModel[];
+
+        profilePeriodValues : KnockoutComputed<string> = ko.pureComputed(()=>
+            "£" + FormatCurrency(this.profilePeriods
+                .map(q => q.profileValue)
+                .reduce((add, a) => add + a, 0))
+        );
+    }
+
+    class ProfilePeriodsViewModel {
+        period: string;
+        occurrence: string;
+        periodYear: number;
+        periodType: string;
+        profileValue: number;
+        distributionPeriod: string;
+
+        get periodDisplay(): string {
+            return this.period + " " + this.periodYear;
+        }
+
+        get profileValueDisplay(): string {
+            return "£" + FormatCurrency(this.profileValue);
+        }
+    }
+
+    class FinancialEnvelopesViewModel {
+        monthStart: string;
+        yearStart: string;
+        monthEnd: string;
+        yearEnd: string;
+        value: number;
+
+        get valueDisplay(): string {
+            return "£" + FormatCurrency(this.value);
+        }
+    }
+
+    class ProfileResultsViewModel {
+        providerId: string;
+        specificationId: string;
+        fundingStreamId: string;
+        ProfileResults: ProfileResultViewModel[];
+
+        get profiles(): string[] {
+            return this.ProfileResults
+                .map(p => p.name)
+                .filter((p, i, a) => a.indexOf(p) == i);
+        }
+
+        profilePeriodValues(profile: string): number {
+            return this.ProfileResults
+                .filter(p => p.name == profile)
+                .map(p => p.profilePeriods)
+                .reduce((p, q) => [...p, ...q], [])
+                .map(q => q.profileValue)
+                .reduce((add, a) => add + a, 0);
         }
     }
 

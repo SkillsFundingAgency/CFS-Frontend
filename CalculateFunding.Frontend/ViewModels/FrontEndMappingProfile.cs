@@ -82,6 +82,12 @@
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
             CreateMap<CalculationProviderResultSearchResultItem, CalculationProviderResultSearchResultItemViewModel>();
+
+            CreateMap<PublishedProviderProfile, PublishedProviderProfileViewModel>();
+
+            CreateMap<ProfilingPeriod, ProfilingPeriodViewModel>();
+
+            CreateMap<FinancialEnvelope, FinancialEnvelopeViewModel>();
         }
 
         private void MapCalcs()

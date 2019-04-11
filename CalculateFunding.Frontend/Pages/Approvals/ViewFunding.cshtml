@@ -72,7 +72,7 @@
             <div class="col-xs-12">
                 <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-top spacing-15-bottom"
                     data-bind="foreach: ['ProviderInfo', 'AllocationLine', 'PublicCalculations', 'ProfileResults']">
-                    <li class="nav-item" data-bind="class : $root.providerViewSelectTab($data), click : $root.providerViewClickTab($data)">
+                    <li class="nav-item" data-bind="class : $root.providerViewSelectTab($data), click : function() { $root.providerViewClickTab($data, $root);}">
                         <a role="tab" data-bind="text: $root.providerViewTab($data)"></a>
                     </li>
                 </ul>
@@ -82,7 +82,7 @@
             </div>
 
             <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'ProviderInfo'">
-                Provider info body                                          
+                Provider info body
             </div>
 
             <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'AllocationLine'">
@@ -112,13 +112,39 @@
                     </tfoot>
                 </table>
                 <!-- /ko -->
-            </div>       
-            
+            </div>
+
             <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'PublicCalculations'">
-                Public calculations body                                    
+                Public calculations body
             </div>
 
             <div class="col-xs-12" data-bind="visible: providerViewSelectedTabName() === 'ProfileResults'">
+                <table class="cf">
+                    <thead>
+                        <tr>
+                            <th role="heading" scope="col" class="col-xs-8">Allocation lines</th>
+                            <th role="heading" scope="col" class="col-xs-3">Funding total</th>
+                            <th role="heading" scope="col" class="col-xs-1 expander-column" />
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <!-- ko foreach: $root.profileResult().ProfileResults -->
+                        <tr>
+                            <td><strong data-bind="text: name" />
+                            <td class="text-right" data-bind="text: profilePeriodValues" />
+                            <td class="expander-trigger-cell expander-column" onclick="calculateFunding.table.sequential.toggleExpandContainer(this)"><i class="material-icons">keyboard_arrow_down</i></td>
+                        </tr>
+                        <!-- ko foreach: profilePeriods -->
+                        <tr class="expander-container expander-container-header" style="display:table-row;">
+                            <td class="expander-container-group-identifier expander-container-background expander-container-padding-md" data-bind="text: periodDisplay" />
+                            <td class="expander-container-background expander-container-padding-md text-right" data-bind="text: profileValueDisplay" />
+                            <td class="expander-container-background expander-container-padding-md" />
+                        </tr>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

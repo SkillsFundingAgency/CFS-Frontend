@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
@@ -12,6 +9,9 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -153,6 +153,23 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(publishedProviderResponse.Content);
+        }
+
+        [Route("/api/results/published-provider-profile/providerId/{providerId}/specificationId/{specificationId}/fundingStreamId/{fundingStreamId}")]
+        public async Task<IActionResult> PublishedProviderProfile([FromRoute] string providerId, [FromRoute] string specificationId, [FromRoute] string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<PublishedProviderProfile>> callResult = await _resultsClient.GetPublishedProviderProfile(providerId, specificationId, fundingStreamId);
+
+            var errorResult = callResult.IsSuccessOrReturnFailureResult("PublishedProviderProfile");
+            if (errorResult != null) return errorResult;
+
+            var publishedProviderProfileViewModel = _mapper.Map<IEnumerable<PublishedProviderProfileViewModel>>(callResult.Content);
+
+            return Ok(publishedProviderProfileViewModel);
         }
     }
 }

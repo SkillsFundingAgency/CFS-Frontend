@@ -1,12 +1,12 @@
 ﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.ViewModels.Approvals;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public interface IResultsApiClient
     {
@@ -43,5 +43,7 @@
         Task UpdatePublishedAllocationLineStatus(string specificationId, PublishedAllocationLineResultStatusUpdateModel updateModel);
 
         Task<ApiResponse<bool>> HasCalculationResults(string calculationId);
+
+        Task<ApiResponse<IEnumerable<PublishedProviderProfile>>> GetPublishedProviderProfile(string providerId, string specificationId, string fundingStreamId);
     }
 }

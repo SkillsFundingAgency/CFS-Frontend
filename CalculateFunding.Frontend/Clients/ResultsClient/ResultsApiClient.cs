@@ -1,22 +1,22 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ResultsClient
 {
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading;
-    using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
+    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Serilog;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public class ResultsApiClient : BaseApiClient, IResultsApiClient
     {
-
         public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
             : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Results, logger, cancellationTokenProvider)
         {
@@ -122,6 +122,15 @@
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
             return await GetAsync<IEnumerable<PublishedProviderResult>>($"get-published-provider-results-for-funding-stream?fundingPeriodId={periodId}&specificationId={specificationId}&fundingStreamId={fundingStreamId}");
+        }
+
+        public async Task<ApiResponse<IEnumerable<PublishedProviderProfile>>> GetPublishedProviderProfile(string providerId, string specificationId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            return await GetAsync<IEnumerable<PublishedProviderProfile>>($"published-provider-profile/providerId/{providerId}/specificationId/{specificationId}/fundingStreamId/{fundingStreamId}");
         }
 
         public async Task<ValidatedApiResponse<ConfirmPublishApprove>> GetProviderResultsForPublishOrApproval(string specificationId, PublishedAllocationLineResultStatusUpdateModel filterCriteria)
