@@ -81,7 +81,7 @@
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
 
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             }
             else
             {
@@ -92,7 +92,7 @@
                 services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
                 services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
 
-                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             }
 
             services.AddAntiforgery(options =>
