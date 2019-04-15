@@ -194,12 +194,12 @@ namespace calculateFunding.approvals {
                         result.fundingStreamId = fundingStreamId;
                         result.ProfileResults = new Array();
 
-                        data.forEach(function (item) {
+                        data.forEach(function (item: calculateFunding.common.IProfileResult) {
                             let pr = new ProfileResultViewModel();
                             pr.name = item.name;
 
                             pr.profilePeriods = new Array();
-                            item.profilePeriods.forEach(function (pd) {
+                            item.profilePeriods.forEach(function (pd: calculateFunding.common.IProfilePeriods) {
                                 let vm = new ProfilePeriodsViewModel();
                                 vm.period = pd.period;
                                 vm.occurrence = pd.occurrence;
@@ -211,7 +211,7 @@ namespace calculateFunding.approvals {
                             });
 
                             pr.financialEnvelopes = new Array();
-                            item.financialEnvelopes.forEach(function (fe) {
+                            item.financialEnvelopes.forEach(function (fe: calculateFunding.common.IFinancialEnvelopes) {
                                 let vm = new FinancialEnvelopesViewModel();
                                 vm.monthStart = fe.monthStart;
                                 vm.yearStart = fe.yearStart;
@@ -219,7 +219,7 @@ namespace calculateFunding.approvals {
                                 vm.yearEnd = fe.yearEnd;
                                 vm.value = fe.value;
                                 pr.financialEnvelopes.push(vm);
-                            })
+                            });
 
                             result.ProfileResults.push(pr);
                         });
@@ -1283,7 +1283,7 @@ namespace calculateFunding.approvals {
         lastUpdated: string;
         authority: string;
     }
-
+    
     /** The allowable statuses of an allocation line */
     export enum AllocationLineStatus {
         New,

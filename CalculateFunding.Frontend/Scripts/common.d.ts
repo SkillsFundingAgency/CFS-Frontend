@@ -76,6 +76,29 @@
         line: number;
         column: number;
     }
+
+    export interface IProfileResult {
+        name: string;
+        profilePeriods: IProfilePeriods[];
+        financialEnvelopes: IFinancialEnvelopes[];
+    }
+
+    export interface IProfilePeriods {
+        period: string;
+        occurrence: string;
+        periodYear: number;
+        periodType: string;
+        profileValue: number;
+        distributionPeriod: string;
+    }
+
+    export interface IFinancialEnvelopes {
+        monthStart: string;
+        yearStart: string;
+        monthEnd: string;
+        yearEnd: string;
+        value: number;
+    }
 }
 
 interface Object {
