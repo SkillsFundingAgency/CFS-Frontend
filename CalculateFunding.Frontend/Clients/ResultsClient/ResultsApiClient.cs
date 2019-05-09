@@ -84,10 +84,10 @@
 
             if (results.StatusCode == HttpStatusCode.OK)
             {
-                PagedResult<CalculationProviderResultSearchResultItem> result = new SearchPagedResult<CalculationProviderResultSearchResultItem>(filterOptions, results.Content.TotalCount)
+                PagedResult<CalculationProviderResultSearchResultItem> result = new SearchPagedResult<CalculationProviderResultSearchResultItem>(filterOptions, results.Content.TotalCount, results.Content.TotalErrorCount)
                 {
                     Items = results.Content.Results,
-                    Facets = results.Content.Facets,
+                    Facets = results.Content.Facets
                 };
 
                 return result;

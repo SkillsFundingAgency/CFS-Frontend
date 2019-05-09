@@ -16,6 +16,8 @@
         public authority: KnockoutObservableArray<calculateFunding.search.SearchFacet> = ko.observableArray([]);
         public selectedLocalAuthorities: KnockoutObservableArray<string> = ko.observableArray([]);
 
+        public errorToggle: KnockoutObservableArray<string> = ko.observableArray(["No Error", "Errors"]);
+        
         constructor(options: ICaluclationProviderResultSearchViewModelConstructorParameters) {
             super();
 
@@ -62,8 +64,8 @@
 
                 super.buildSelectedSearchFacets(facets, self.selectedProviderTypes(), self.providerType());
                 super.buildSelectedSearchFacets(facets, self.selectedProviderSubTypes(), self.providerSubType());
-                super.buildSelectedSearchFacets(facets, self.selectedLocalAuthorities(), self.authority());              
-
+                super.buildSelectedSearchFacets(facets, self.selectedLocalAuthorities(), self.authority());
+                
                 return facets;
             }).extend({ throttle: 3 });
 
@@ -92,6 +94,11 @@
                 console.log("Selected search facets string:", newValue);
             });
 
+            self.selectedErrorToggle.subscribe((newValue) => {
+                self.performSearch();
+                console.log("error filter toggle:", newValue);
+            });
+
             self.state.subscribe((newValue) => {
                 console.log("State changed: ", newValue);
             });
@@ -112,6 +119,7 @@
                 self.populateFacets("providerType", result.facets, self.providerType);
                 self.populateFacets("providerSubType", result.facets, self.providerSubType);
                 self.populateFacets("localAuthority", result.facets, self.authority);
+                self.totalErrorCount(result.totalErrorResults);
             });
         }
 
@@ -157,6 +165,8 @@
         dateOpenedDisplay: string;
         calculationResult: string;
         lastUpdatedDateDisplay: string;
+        calculationExceptionType: string;
+        calculationExceptionMessage: string;
     }
 
     export interface ICaluclationProviderResultSearchViewModelConstructorParameters

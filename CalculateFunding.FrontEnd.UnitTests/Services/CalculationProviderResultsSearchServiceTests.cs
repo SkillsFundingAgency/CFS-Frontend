@@ -122,6 +122,46 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .CalculationResult
                 .Should()
                 .Be(1);
+
+            CalculationProviderResultSearchResultItemViewModel last = results.CalculationProviderResults.Last();
+
+            last
+                .CalculationExceptionType
+                .Should()
+                .Be("Exception");
+
+            last
+                .CalculationExceptionMessage
+                .Should()
+                .Be("An exception has occurred");
+        }
+
+        [TestMethod]
+        public async Task PerformSearch_GivenFirstSearchResultReturnedCorrectly_EnsuresResults()
+        {
+            // Arrange
+            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
+            ILogger logger = CreateLogger();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
+
+            int numberOfItems = 25;
+
+            PagedResult<CalculationProviderResultSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+
+            resultClient
+                .FindCalculationProviderResults(Arg.Any<SearchFilterRequest>())
+                .Returns(itemResult);
+
+            SearchRequestViewModel request = new SearchRequestViewModel();
+
+            // Act
+            CalculationProviderResultSearchResultViewModel results = await resultsSearchService.PerformSearch(request);
+
+            // Assert
+            results.TotalResults.Should().Be(numberOfItems + 1);
+            results.TotalErrorResults.Should().Be(1);
         }
 
         [TestMethod]
@@ -246,11 +286,22 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 });
             }
 
+            items.Add(new CalculationProviderResultSearchResultItem()
+            {
+                Id = $"{numberOfItems + 10}",
+                Name = $"prov-{numberOfItems + 1}",
+                CalculationResult = numberOfItems + 1,
+                CalculationType = "Number",
+                CalculationExceptionType = "Exception",
+                CalculationExceptionMessage = "An exception has occurred"
+            });
+
             result.Items = items.AsEnumerable();
             result.PageNumber = 1;
             result.PageSize = 50;
-            result.TotalItems = numberOfItems;
+            result.TotalItems = numberOfItems + 1;
             result.TotalPages = 1;
+            result.TotalErrorItems = 1;
             result.Facets = facets;
 
             return result;

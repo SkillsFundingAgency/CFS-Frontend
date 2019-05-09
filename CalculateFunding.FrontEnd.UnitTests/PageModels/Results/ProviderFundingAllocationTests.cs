@@ -458,8 +458,7 @@
             CalculationResultItem cal2 = new CalculationResultItem()
             {
                 Calculation = new Reference { Id = "2", Name = "Calc 2" },
-                Value = 4234234,
-
+                Value = 4234234
             };
 
             IList<CalculationResultItem> calResult = new List<CalculationResultItem>
