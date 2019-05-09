@@ -37,7 +37,8 @@
                 PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
-                Filters = request.Filters,
+                ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors" ? true : false),
+                Filters = request.Filters
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
@@ -57,6 +58,7 @@
             {
                 TotalResults = searchRequestResult.TotalItems,
                 CurrentPage = searchRequestResult.PageNumber,
+                TotalErrorResults = searchRequestResult.TotalErrorItems
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();

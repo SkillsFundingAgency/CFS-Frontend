@@ -9,6 +9,10 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public CalculationSpecificationType CalculationType { get; set; }
 
+        public string CalculationExceptionType { get; set; }
+
+        public string CalculationExceptionMessage { get; set; }
+
         public decimal? SubTotal { get; set; }
 
         public string TotalFormatted

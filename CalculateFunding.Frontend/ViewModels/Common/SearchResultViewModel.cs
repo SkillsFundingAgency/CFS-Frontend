@@ -8,13 +8,16 @@
 	    {
 	    }
 
-		public SearchResultViewModel(int totalResults, int currentPage)
+		public SearchResultViewModel(int totalResults, int currentPage, int totalErrorResults = 0)
 	    {
 		    TotalResults = totalResults;
 		    CurrentPage = currentPage;
-	    }
+            TotalErrorResults = totalErrorResults;
+        }
 
 	    public int TotalResults { get; set; }
+
+        public int TotalErrorResults { get; set; }
 
         public int CurrentPage { get; set; }
 

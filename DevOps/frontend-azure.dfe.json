@@ -260,6 +260,13 @@
       "metadata": {
         "description": "Feature toggle to use search mode all"
       }
+    },
+    "EnableExceptionMessages": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to enable exception messages to be surfaced up to the user"
+      }
     }
   },
   "variables": {
@@ -575,6 +582,10 @@
             {
               "name": "features:searchModeAllEnabled",
               "value": "[parameters('EnableSearchModeAll')]"
+            },
+            {
+              "name": "features:exceptionMessagesEnabled",
+              "value": "[parameters('EnableExceptionMessages')]"
             }
           ]
         }

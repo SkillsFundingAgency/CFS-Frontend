@@ -64,64 +64,92 @@
         </div>
     </form>
 }
-
 <div class="row provider-funding">
-    <div class="col-xs-12">
-        <div class="row view-policy">
-            <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="AllocationLineTabs" role="tablist">
-                <li class="nav-item">
-                    <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true">Allocation line</a>
-                </li>
-                <li class="nav-item active">
-                    <a id="nav-calculations-tab" href="#" role="tab" aria-selected="false">Calculation results</a>
-                </li>
-                <li class="nav-item">
-                    <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
-                </li>
+    @if (@Model.CalculationErrorCount > 0)
+    {
+        <div id="notifications-container" class="col-xs-12">
+            <div class="notifications-completed-failed-panel">
+                <span class="notifications-completed-failed-icon">
+                    <i class="material-icons">warning</i>
+                </span>
+                <span>
+                    Calculation failed to run.
+                </span>
+                <div class="notifications-panel-bullets">
+                    <ul>
+                        <li>@Model.CalculationErrorCount<span>&nbsp;calculation(s) causing <span class="error-highlight">runtime errors</span></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+        <div class="col-xs-12">
+            <div class="row view-policy">
+                <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="AllocationLineTabs" role="tablist">
+                    <li class="nav-item">
+                        <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true">Allocation line</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a id="nav-calculations-tab" href="#" role="tab" aria-selected="false">Calculation results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false">Test results</a>
+                    </li>
 
-            </ul>
-            <br />
-            @if (!@Model.ViewModel.CalculationItems.IsNullOrEmpty())
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th style="width:70%" scope="col">Calculation Name</th>
-                            <th style="width:15%" scope="col">Calculation Type</th>
-                            <th scope="col">Value</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var result in Model.ViewModel.CalculationItems)
-                        {
+                </ul>
+                <br />
+                @if (!@Model.ViewModel.CalculationItems.IsNullOrEmpty())
+                {
+                    <table class="table table-striped calculation-item-table">
+                        <thead>
                             <tr>
-                                <th scope="row">@result.Calculation</th>
-                                <td>@result.CalculationType.ToString()</td>
-                                <td>@result.TotalFormatted</td>
+                                <th style="width:70%" scope="col">Calculation Name</th>
+                                <th style="width:15%" scope="col">Calculation Type</th>
+                                <th scope="col">Value</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p><strong>Select a specification to view results</strong></p>
-            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var result in Model.ViewModel.CalculationItems)
+                            {
+                                <tr class="calculation-item-property">
+                                    <th scope="row">@result.Calculation</th>
+                                    <td>@result.CalculationType.ToString()</td>
+                                    @if (string.IsNullOrWhiteSpace(result.CalculationExceptionType))
+                                    {
+                                        <td>@result.TotalFormatted</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="error-highlight">Error</td>
+                                    }
+                                </tr>
+                                @if (!string.IsNullOrWhiteSpace(result.CalculationExceptionType))
+                                {
+                                    <tr class="calculation-item-property"><td colspan="3" class="error-highlight">@result.CalculationExceptionMessage</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p><strong>Select a specification to view results</strong></p>
+                }
+            </div>
         </div>
     </div>
-</div>
 
-@section Scripts{
-    <script type="text/javascript">
-        $("#search-button").hide();
+    @section Scripts{
+        <script type="text/javascript">
+            $("#search-button").hide();
 
-        $('select').change(function () {
-            if ($(this).attr('id') == "FundingPeriodId") {
-                $("#SpecificationId").val('');
+            $('select').change(function () {
+                if ($(this).attr('id') == "FundingPeriodId") {
+                    $("#SpecificationId").val('');
 
-            }
-            $("#search-button").click();
-        });
-    </script>
-}
+                }
+                $("#search-button").click();
+            });
+        </script>
+    }

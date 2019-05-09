@@ -73,6 +73,10 @@
 
         public errorMessage: KnockoutObservable<string> = ko.observable();
 
+        public totalErrorCount: KnockoutObservable<number> = ko.observable();
+
+        public selectedErrorToggle: KnockoutObservable<string> = ko.observable("");
+
         public selectedSearchFilters: KnockoutComputed<Array<calculateFunding.search.SearchFilter>>;
 
         public isPageLoaded: KnockoutComputed<boolean>;
@@ -161,6 +165,7 @@
                     searchTerm: this.searchTerm(),
                     includeFacets: true,
                     filters: filters,
+                    errorToggle: this.selectedErrorToggle()
                 };
 
                 let data = searchRequestData;

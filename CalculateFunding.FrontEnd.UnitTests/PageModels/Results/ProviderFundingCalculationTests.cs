@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
@@ -36,7 +37,9 @@
 
             ILogger logger = Substitute.For<ILogger>();
 
-            ProviderCalcsResultsPageModel providerCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel providerCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             // Act - Assert
             Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerCalcPageModel.OnGetAsync(null, string.Empty, string.Empty));
@@ -55,7 +58,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             Provider provider = CreateProvider();
 
@@ -107,7 +112,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             Provider provider = CreateProvider();
 
@@ -165,7 +172,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -221,7 +230,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -258,6 +269,8 @@
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
 
+            provideCalcPageModel.CalculationErrorCount.Equals(0);
+
             // Assert
             provideCalcPageModel.ViewModel.Should().NotBeNull();
             provideCalcPageModel.ViewModel.Upin.Should().Be(234234);
@@ -278,7 +291,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -316,6 +331,8 @@
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
 
             // Assert
+            provideCalcPageModel.CalculationErrorCount.Equals(1);
+
             provideCalcPageModel.ViewModel.CalculationItems.Should().HaveSameCount(calResult);
 
             provideCalcPageModel.ViewModel.CalculationItems.First().CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Number);
@@ -335,7 +352,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -368,6 +387,8 @@
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
 
+            provideCalcPageModel.CalculationErrorCount.Equals(0);
+
             // Assert
             PageResult pageResult = result as PageResult;
             pageResult.Should().NotBeNull();
@@ -388,7 +409,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger);
+            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
+
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -462,7 +485,9 @@
             {
                 Calculation = new Reference { Id = "2", Name = "Calc 2" },
                 Value = 4234234,
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
+                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding,
+                ExceptionType = "Exception",
+                ExceptionMessage = "An exception has occured."
             };
 
             IList<CalculationResultItem> calResult = new List<CalculationResultItem>
@@ -511,9 +536,9 @@
         {
             return MappingHelper.CreateFrontEndMapper();
         }
-        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
+        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
-            return new ProviderCalcsResultsPageModel(resultsApiClient, specsApiClient, mapper, logger);
+            return new ProviderCalcsResultsPageModel(resultsApiClient, specsApiClient, mapper, logger, featureToggle);
         }
 
         private static ILogger CreateLogger()
