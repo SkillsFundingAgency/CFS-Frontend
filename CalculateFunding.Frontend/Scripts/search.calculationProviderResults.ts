@@ -131,7 +131,7 @@
                     selectedArray = this.selectedProviderTypes;
                 } else if (fieldName === "providerSubType") {
                     selectedArray = this.selectedProviderSubTypes;
-                } else if (fieldName === "authority") {
+                } else if (fieldName === "localAuthority") {
                     selectedArray = this.selectedLocalAuthorities;
                 }
 

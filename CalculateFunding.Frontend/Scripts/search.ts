@@ -71,6 +71,8 @@
 
         public canSelectFilters: KnockoutComputed<boolean>;
 
+        public canSelectErrorToggle: KnockoutComputed<boolean>;
+
         public errorMessage: KnockoutObservable<string> = ko.observable();
 
         public totalErrorCount: KnockoutObservable<number> = ko.observable();
@@ -105,6 +107,10 @@
 
             this.isResultsVisible = ko.pureComputed(() => {
                 return self.state() === IdleStateKey && self.searchPerformed();
+            });
+
+            this.canSelectErrorToggle = ko.computed(() => {
+                return self.totalErrorCount() > 0;
             });
         }
 

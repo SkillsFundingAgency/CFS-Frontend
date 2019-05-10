@@ -76,7 +76,7 @@
                     <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
                 </div>
                 <div class="col-xs-3">
-                    <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:totalErrorCount() > 0 && totalErrorCount() < totalResults()"></select>
+                    <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
                 </div>
             }
             else
@@ -147,7 +147,7 @@
                     <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
                     @if (Model.ShowExceptionCountAndFacet)
                     {
-                    <li><span id="error-count" data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
+                    <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
                     }
                 </ul>
             </div>
