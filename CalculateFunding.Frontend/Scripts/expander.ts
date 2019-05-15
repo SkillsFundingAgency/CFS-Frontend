@@ -37,7 +37,7 @@
             let previousState = this.expanded();
             this.expanded(!previousState);
 
-            if (this.expanded() === true) {
+            if (this.expanded()) {
                 this.icon(this.expandedIcon);
             }
             else {
