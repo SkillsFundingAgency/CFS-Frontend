@@ -54,7 +54,7 @@
                 <div class="col-xs-3 filter-field-heading">Provider type</div>
                 <div class="col-xs-3 filter-field-heading">Provider subtype</div>
                 <div class="col-xs-3 filter-field-heading">Local authority</div>
-                <div class="col-xs-3 filter-field-heading">Runtime status</div>
+                <div class="col-xs-3 filter-field-heading">Results status</div>
             }
             else
             {
@@ -147,7 +147,7 @@
                     <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
                     @if (Model.ShowExceptionCountAndFacet)
                     {
-                    <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
+                        <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
                     }
                 </ul>
             </div>
@@ -182,104 +182,104 @@
 
                 @foreach (var provider in Model.CalculationProviderResults.CalculationProviderResults)
                 {
-                <div class="provider-item-container" id="provider-item-result-@providerRow">
-                    <div class="provider-item-header">
+                    <div class="provider-item-container" id="provider-item-result-@providerRow">
+                        <div class="provider-item-header">
+                            @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
+                            {
+                                <span class="float-right error-highlight"><strong>Error</strong></span>
+                            }
+                            else
+                            {
+                                <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
+                            }
+                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
+                        </div>
                         @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
                         {
-                            <span class="float-right error-highlight"><strong>Error</strong></span>
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-date-opened">
+                                    <strong>
+                                        <span class="error-highlight" id="provider-item-exception-@providerRow">@provider.CalculationExceptionMessage</span>
+                                    </strong>
+                                </span>
+                            </div>
                         }
-                        else
-                        {
-                            <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
-                        }
-                        <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
-                    {
                         <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-date-opened">
+                            <span class="provider-item-property provider-item-property-last-updated">
+                                Updated:
                                 <strong>
-                                    <span class="error-highlight" id="provider-item-exception-@providerRow">@provider.CalculationExceptionMessage</span>
+                                    <span id="provider-item-last-updated-@providerRow">
+                                        @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)
+                                    </span>
                                 </strong>
                             </span>
                         </div>
-                    }
-                    <div class="provider-item-property-container">
-                        <span class="provider-item-property provider-item-property-last-updated">
-                            Updated:
-                            <strong>
-                                <span id="provider-item-last-updated-@providerRow">
-                                    @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)
-                                </span>
-                            </strong>
-                        </span>
-                    </div>
-                    <div class="provider-item-property-container">
-                        <span class="provider-item-property provider-item-property-upin">
-                            UPIN:
-                            <strong>
-                                <span id="provider-item-upin-@providerRow">
-                                    @(!string.IsNullOrWhiteSpace(provider.Upin) ? provider.Upin.ToString() : "No data found")
-                                </span>
-                            </strong>
-                        </span>
-                        <span class="provider-item-property provider-item-property-ukprn">
-                            UKPRN:
-                            <strong>
-                                <span id="provider-item-ukprn-@providerRow">
-                                    @(!string.IsNullOrWhiteSpace(provider.Ukprn) ? provider.Ukprn.ToString() : "No data found")
+                        <div class="provider-item-property-container">
+                            <span class="provider-item-property provider-item-property-upin">
+                                UPIN:
+                                <strong>
+                                    <span id="provider-item-upin-@providerRow">
+                                        @(!string.IsNullOrWhiteSpace(provider.Upin) ? provider.Upin.ToString() : "No data found")
+                                    </span>
+                                </strong>
+                            </span>
+                            <span class="provider-item-property provider-item-property-ukprn">
+                                UKPRN:
+                                <strong>
+                                    <span id="provider-item-ukprn-@providerRow">
+                                        @(!string.IsNullOrWhiteSpace(provider.Ukprn) ? provider.Ukprn.ToString() : "No data found")
 
-                                </span>
-                            </strong>
-                        </span>
-                        <span class="provider-item-property provider-item-property-urn">
-                            URN:
-                            <strong>
-                                <span id="provider-item-urn-@providerRow">
-                                    @(!string.IsNullOrWhiteSpace(provider.Urn) ? provider.Urn.ToString() : "No data found")
-                                </span>
-                            </strong>
-                        </span>
-                        <span class="provider-item-property provider-item-property-estab-num">
-                            Establishment number:
-                            <strong>
-                                <span id="provider-item-establishmentnumber-@providerRow">
-                                    @(!string.IsNullOrWhiteSpace(provider.EstablishmentNumber) ? provider.EstablishmentNumber.ToString() : "No data found")
-                                </span>
-                            </strong>
-                        </span>
+                                    </span>
+                                </strong>
+                            </span>
+                            <span class="provider-item-property provider-item-property-urn">
+                                URN:
+                                <strong>
+                                    <span id="provider-item-urn-@providerRow">
+                                        @(!string.IsNullOrWhiteSpace(provider.Urn) ? provider.Urn.ToString() : "No data found")
+                                    </span>
+                                </strong>
+                            </span>
+                            <span class="provider-item-property provider-item-property-estab-num">
+                                Establishment number:
+                                <strong>
+                                    <span id="provider-item-establishmentnumber-@providerRow">
+                                        @(!string.IsNullOrWhiteSpace(provider.EstablishmentNumber) ? provider.EstablishmentNumber.ToString() : "No data found")
+                                    </span>
+                                </strong>
+                            </span>
+                        </div>
+                        <div class="provider-item-property-container">
+                            <span class="provider-item-property provider-item-property-providertype">
+                                Provider type:
+                                <strong>
+                                    <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
+                                </strong>
+                            </span>
+                            <span class="provider-item-property provider-item-property-provider">
+                                &nbsp;Provider subtype:
+                                <strong>
+                                    <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
+                                </strong>
+                            </span>
+                        </div>
+                        <div class="provider-item-property-container">
+                            <span class="provider-item-property provider-item-property-local-authority">
+                                Local authority:
+                                <strong>
+                                    <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
+                                </strong>
+                            </span>
+                        </div>
+                        <div class="provider-item-property-container">
+                            <span class="provider-item-property provider-item-property-date-opened">
+                                Date Opened:
+                                <strong>
+                                    <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
+                                </strong>
+                            </span>
+                        </div>
                     </div>
-                    <div class="provider-item-property-container">
-                        <span class="provider-item-property provider-item-property-providertype">
-                            Provider type:
-                            <strong>
-                                <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
-                            </strong>
-                        </span>
-                        <span class="provider-item-property provider-item-property-provider">
-                            &nbsp;Provider subtype:
-                            <strong>
-                                <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
-                            </strong>
-                        </span>
-                    </div>
-                    <div class="provider-item-property-container">
-                        <span class="provider-item-property provider-item-property-local-authority">
-                            Local authority:
-                            <strong>
-                                <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
-                            </strong>
-                        </span>
-                    </div>
-                    <div class="provider-item-property-container">
-                        <span class="provider-item-property provider-item-property-date-opened">
-                            Date Opened:
-                            <strong>
-                                <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
-                            </strong>
-                        </span>
-                    </div>
-                </div>
                     providerRow++;
                 }
             </div>
@@ -402,10 +402,7 @@
         if (providerResultsContainer) {
             ko.applyBindings(searchVM, providerResultsContainer);
         }
-        var errorCount = document.getElementById("error-count");
-        if (errorCount) {
-            ko.applyBindings(searchVM, errorCount);
-        }
+
         searchVM.performSearch();
 
     </script>
@@ -418,7 +415,9 @@
         var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM, 'CreateInstructAllocationJob', precedingJobTypes);
 
         var notificationsContainer = document.getElementById("notifications-container");
-        ko.applyBindings(notificationsVM, notificationsContainer);
+        if (notificationsContainer != null) {
+            ko.applyBindings(notificationsVM, notificationsContainer);
+        }
     </script>
 }
 

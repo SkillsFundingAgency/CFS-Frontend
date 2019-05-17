@@ -13,7 +13,7 @@ namespace calculateFunding.notifications {
             this.init();
         }
 
-        private init() {
+        private init() : void {
             let self = this;
 
             this._hubConnection = new signalR.HubConnectionBuilder()
@@ -45,7 +45,7 @@ namespace calculateFunding.notifications {
 
                     if (self.connectionRetries < 3) {
                         self.connectionRetries++;
-                        setTimeout(self.init(), 1000 * (self.connectionRetries));
+                        setTimeout(self.init, 1000 * (self.connectionRetries));
                     }
                     else {
                         self.connectionError(true);
@@ -148,16 +148,18 @@ namespace calculateFunding.notifications {
         private onConnectionError(error: Error, vm : NotificationsViewModel ) {
             if (error && error.message) {
                 console.error(error.message);
-                setTimeout(vm.init(), 3000);
+                setTimeout(vm.init, 3000);
             }
         }
     }
 
     export class SearchNotificationsViewModel extends NotificationsViewModel {
-        specificationId: string;
-        searchViewModel: calculateFunding.search.SearchViewModel;
-        jobTypeThatDirectlyAffectsResults: string;    // Job type that directly generates results
-        jobTypesThatUlimatelyAffectResults: string[]; // Job types that precede job that generates results
+        private specificationId: string;
+        private searchViewModel: calculateFunding.search.SearchViewModel;
+        private jobTypeThatDirectlyAffectsResults: string;    // Job type that directly generates results
+        private jobTypesThatUlimatelyAffectResults: string[]; // Job types that precede job that generates results
+
+        public totalErrorCount: KnockoutObservable<number> = ko.observable(0);
 
         constructor(specificationId: string, latestJobStatus: IJobSummary, searchViewModel: calculateFunding.search.SearchViewModel, jobTypeThatDirectlyAffectsResults: string, jobTypesThatUlimatelyAffectResults: string[]) {
             super();
@@ -167,6 +169,15 @@ namespace calculateFunding.notifications {
             this.jobTypesThatUlimatelyAffectResults = jobTypesThatUlimatelyAffectResults;
 
             this.loadLatestJobStatus(latestJobStatus);
+
+            // Update total errors based on the parent view model results
+            if (searchViewModel && searchViewModel.totalErrorCount) {
+                let self = this;
+
+                searchViewModel.totalErrorCount.subscribe((totalErrors: number) => {
+                    self.totalErrorCount(totalErrors);
+                });
+            }
         }
 
         protected onConnected(): void {
