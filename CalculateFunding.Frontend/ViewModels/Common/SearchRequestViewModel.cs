@@ -9,6 +9,8 @@
 
         public string SearchTerm { get; set; }
 
+        public string ErrorToggle { get; set; }
+
         public bool IncludeFacets { get; set; }
 
         public IDictionary<string, string[]> Filters { get; set; }

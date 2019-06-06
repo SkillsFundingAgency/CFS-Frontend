@@ -71,7 +71,13 @@
 
         public canSelectFilters: KnockoutComputed<boolean>;
 
+        public canSelectErrorToggle: KnockoutComputed<boolean>;
+
         public errorMessage: KnockoutObservable<string> = ko.observable();
+
+        public totalErrorCount: KnockoutObservable<number> = ko.observable();
+
+        public selectedErrorToggle: KnockoutObservable<string> = ko.observable("");
 
         public selectedSearchFilters: KnockoutComputed<Array<calculateFunding.search.SearchFilter>>;
 
@@ -101,6 +107,10 @@
 
             this.isResultsVisible = ko.pureComputed(() => {
                 return self.state() === IdleStateKey && self.searchPerformed();
+            });
+
+            this.canSelectErrorToggle = ko.computed(() => {
+                return self.totalErrorCount() > 0;
             });
         }
 
@@ -161,6 +171,7 @@
                     searchTerm: this.searchTerm(),
                     includeFacets: true,
                     filters: filters,
+                    errorToggle: this.selectedErrorToggle()
                 };
 
                 let data = searchRequestData;

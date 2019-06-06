@@ -5,6 +5,7 @@
         includeFacets: boolean;
         filters: ISearchFilterRequest;
         pageSize?: number;
+        errorToggle: string;
     }
 
     export interface ISearchFilterRequest {
@@ -18,6 +19,7 @@
         pagerState: IPagerStateResponse;
         startItemNumber: number;
         totalResults: number;
+        totalErrorResults: number;
     }
 
     export interface IPagerStateResponse {

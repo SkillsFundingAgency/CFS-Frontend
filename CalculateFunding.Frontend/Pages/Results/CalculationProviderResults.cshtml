@@ -38,10 +38,10 @@
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-9 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
+            <div class="col-xs-10 filter-field-heading">Search by provider name, UPIN, UKPRN, URN or establishment number</div>
         </div>
         <div class="row">
-            <div class="col-xs-9">
+            <div class="col-xs-10">
                 <div class="input-group">
                     <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search provider" data-bind="textInput: searchTerm, enable: canSelectFilters" />
                     <div class="input-group-addon"><input id="filter-search-button-image" type="image" src="~/assets/images/icon-search.png" data-bind="enable: canPerformSearch" /></div>
@@ -49,21 +49,49 @@
             </div>
         </div>
         <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-4 filter-field-heading">Provider type</div>
-            <div class="col-xs-4 filter-field-heading">Provider subtype</div>
-            <div class="col-xs-4 filter-field-heading">Local authority</div>
+            @if (Model.ShowExceptionCountAndFacet)
+            {
+                <div class="col-xs-3 filter-field-heading">Provider type</div>
+                <div class="col-xs-3 filter-field-heading">Provider subtype</div>
+                <div class="col-xs-3 filter-field-heading">Local authority</div>
+                <div class="col-xs-3 filter-field-heading">Results status</div>
+            }
+            else
+            {
+                <div class="col-xs-4 filter-field-heading">Provider type</div>
+                <div class="col-xs-4 filter-field-heading">Provider subtype</div>
+                <div class="col-xs-4 filter-field-heading">Local authority</div>
+            }
         </div>
         <div class="row withjs-show" data-bind="visible: searchPerformed">
-            <div class="col-xs-4">
-                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-4">
-                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-4">
-                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
-            </div>
+            @if (Model.ShowExceptionCountAndFacet)
+            {
+                <div class="col-xs-3">
+                    <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-3">
+                    <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-4">
+                    <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-4">
+                    <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+                </div>
+                <div class="col-xs-4">
+                    <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+                </div>
 
+            }
         </div>
     </form>
 }
@@ -117,6 +145,10 @@
             <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
                 <ul>
                     <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
+                    @if (Model.ShowExceptionCountAndFacet)
+                    {
+                        <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
+                    }
                 </ul>
             </div>
         </div>
@@ -152,9 +184,26 @@
                 {
                     <div class="provider-item-container" id="provider-item-result-@providerRow">
                         <div class="provider-item-header">
-                            <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
+                            @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
+                            {
+                                <span class="float-right error-highlight"><strong>Error</strong></span>
+                            }
+                            else
+                            {
+                                <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
+                            }
                             <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationId=@Model.Calculation.SpecificationId">@provider.Name</a></h4>
                         </div>
+                        @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
+                        {
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-date-opened">
+                                    <strong>
+                                        <span class="error-highlight" id="provider-item-exception-@providerRow">@provider.CalculationExceptionMessage</span>
+                                    </strong>
+                                </span>
+                            </div>
+                        }
                         <div class="provider-item-property-container">
                             <span class="provider-item-property provider-item-property-last-updated">
                                 Updated:
@@ -255,10 +304,14 @@
             <div class="providers-searchresult-container withjs-show" data-bind="foreach: providerSearchResults">
                 <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index() }">
                     <div class="provider-item-header">
-                        <strong><span class="float-right" data-bind="text: calculationResultDisplay, css: $root.areResultsBeingUpdated() === true ? 'results-in-progress' : ''"></span></strong>
+                        <strong><span class="float-right" data-bind="text: !calculationExceptionType ? calculationResultDisplay : 'Error', css: {'results-in-progress' : $root.areResultsBeingUpdated() === true, 'error-highlight':calculationExceptionType}"></span></strong>
                         <img src="~/assets/images/loader.gif" data-bind="visible: $root.areResultsBeingUpdated()" class="float-right notifications-panel-loading-image" />
                         <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationId=' + $root.specificationId }, text: name"></a></h4>
-
+                    </div>
+                    <div>
+                        <span class="provider-item-property error-highlight" data-bind="visible: calculationExceptionType != ''">
+                            <strong><span data-bind="text: calculationExceptionMessage, attr: { 'id' :'provider-item-exception-'+$index() }"> </span></strong>
+                        </span>
                     </div>
                     <p>
                         <span class="provider-item-property">
@@ -349,6 +402,7 @@
         if (providerResultsContainer) {
             ko.applyBindings(searchVM, providerResultsContainer);
         }
+
         searchVM.performSearch();
 
     </script>
@@ -361,7 +415,9 @@
         var notificationsVM = new calculateFunding.notifications.SearchNotificationsViewModel('@Model.Specification.Id', @Html.Raw(Model.LatestJobJson), searchVM, 'CreateInstructAllocationJob', precedingJobTypes);
 
         var notificationsContainer = document.getElementById("notifications-container");
-        ko.applyBindings(notificationsVM, notificationsContainer);
+        if (notificationsContainer != null) {
+            ko.applyBindings(notificationsVM, notificationsContainer);
+        }
     </script>
 }
 
