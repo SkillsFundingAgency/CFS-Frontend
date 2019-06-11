@@ -266,34 +266,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             BadRequestObjectResult typedResult = result as BadRequestObjectResult;
             typedResult.Value.Should().Be("Enter a unique name");
-
-            pageModel
-                .ShouldAggregateSupportForCalculationsBeEnabled
-                .Should()
-                .BeFalse();
-        }
-
-        [TestMethod]
-        public async Task OnGet_WhenIsAggregateSupportInCalculationsEnabled_SetsPropertyToTrue()
-        {
-            // Arrange
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            featureToggle
-                .IsAggregateSupportInCalculationsEnabled()
-                .Returns(true);
-
-            string calculationId = null;
-
-            EditCalculationPageModel pageModel = CreatePageModel(features: featureToggle);
-
-            // Act
-            IActionResult result = await pageModel.OnGet(calculationId);
-
-            // Assert
-            pageModel
-                .ShouldAggregateSupportForCalculationsBeEnabled
-                .Should()
-                .BeTrue();
         }
 
         [TestMethod]

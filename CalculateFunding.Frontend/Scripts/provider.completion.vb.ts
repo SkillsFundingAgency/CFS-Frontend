@@ -8,8 +8,6 @@ namespace calculateFunding.providers {
         private contextDefaultTypes: IDefaultTypeContainer = {};
         private contextKeywords: IKeywordsContainer = {};
 
-        private aggregatesFeatureEnabled: boolean;
-
         private variableAllowedNowPrefixes: Array<string> = [
             // If and If with brackets and spaces, but not matching End If - regex not supported in IE11
             //"(?<!End )If(\s)*(\\()?( )*",
@@ -76,10 +74,7 @@ namespace calculateFunding.providers {
             this.contextKeywords = keywords;
         }
 
-        public setAggregateFeatureEnabled(isEnabled: boolean = false) {
-            this.aggregatesFeatureEnabled = isEnabled;
-        }
-
+     
         public getCompletionProvider(): monaco.languages.CompletionItemProvider {
             let self: VisualBasicIntellisenseProvider = this;
             return {
@@ -214,7 +209,7 @@ namespace calculateFunding.providers {
                         if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
                             let variables: Array<IVariable>;
-                            let isAggregableFunctionDeclared = (self.aggregatesFeatureEnabled === true && VisualBasicIntellisenseProvider.IsAggregableFunctionDeclared(lineContentsSoFar));
+                            let isAggregableFunctionDeclared = VisualBasicIntellisenseProvider.IsAggregableFunctionDeclared(lineContentsSoFar);
 
                             if (isAggregableFunctionDeclared === true) {
 
