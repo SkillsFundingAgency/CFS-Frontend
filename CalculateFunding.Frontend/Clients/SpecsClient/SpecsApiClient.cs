@@ -1,28 +1,24 @@
-﻿namespace CalculateFunding.Frontend.Clients.SpecsClient
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Interfaces;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Serilog;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Interfaces;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Clients.SpecsClient
+{
     public class SpecsApiClient : BaseApiClient, ISpecsApiClient
     {
-        private readonly IFeatureToggle _featureToggle;
-
-        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider, IFeatureToggle featureToggle)
-           : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Specifications, logger, cancellationTokenProvider)
+        public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
+           : base(httpClientFactory, HttpClientKeys.Specifications, logger, cancellationTokenProvider)
         {
-            _featureToggle = featureToggle;
         }
 
         public async Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
@@ -211,19 +207,14 @@
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
             ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>("specifications-dataset-relationships-search", request);
-            if (results.StatusCode == HttpStatusCode.OK)
-            {
-                PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
-                {
-                    Items = results.Content.Results
-                };
+            if (results.StatusCode != HttpStatusCode.OK) return null;
 
-                return result;
-            }
-            else
+            PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
             {
-                return null;
-            }
+                Items = results.Content.Results
+            };
+
+            return result;
         }
 
         public async Task<PagedResult<SpecificationSearchResultItem>> FindSpecifications(SearchFilterRequest filterOptions)
@@ -231,20 +222,15 @@
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
             ApiResponse<SearchResults<SpecificationSearchResultItem>> results = await PostAsync<SearchResults<SpecificationSearchResultItem>, SearchQueryRequest>("specifications-search", request);
-            if (results.StatusCode == HttpStatusCode.OK)
-            {
-                PagedResult<SpecificationSearchResultItem> result = new SearchPagedResult<SpecificationSearchResultItem>(filterOptions, results.Content.TotalCount)
-                {
-                    Items = results.Content.Results,
-                    Facets = results.Content.Facets,
-                };
+            if (results.StatusCode != HttpStatusCode.OK) return null;
 
-                return result;
-            }
-            else
+            PagedResult<SpecificationSearchResultItem> result = new SearchPagedResult<SpecificationSearchResultItem>(filterOptions, results.Content.TotalCount)
             {
-                return null;
-            }
+                Items = results.Content.Results,
+                Facets = results.Content.Facets,
+            };
+
+            return result;
         }
 
         public async Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model)
@@ -266,15 +252,8 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            if (_featureToggle.IsAllocationLineMajorMinorVersioningEnabled())
-            {
-                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
-            }
-            else
-            {
-                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
-            }
-        }
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
+		}
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
         {

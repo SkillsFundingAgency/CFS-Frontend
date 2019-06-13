@@ -152,16 +152,14 @@
                 return new ForbidResult();
             }
 
-            if (!_featureToggle.IsDuplicateCalculationNameCheckEnabled())
+            if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
             {
-                if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
-                {
-                    ApiResponse<Calculation> existingCalculationResponse = await _specsClient.GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
+                ApiResponse<Calculation> existingCalculationResponse = await _specsClient
+	                .GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
 
-                    if (existingCalculationResponse.StatusCode != HttpStatusCode.NotFound)
-                    {
-                        this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.Name)}", ValidationMessages.CalculationNameAlreadyExists);
-                    }
+                if (existingCalculationResponse.StatusCode != HttpStatusCode.NotFound)
+                {
+                    this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.Name)}", ValidationMessages.CalculationNameAlreadyExists);
                 }
             }
 

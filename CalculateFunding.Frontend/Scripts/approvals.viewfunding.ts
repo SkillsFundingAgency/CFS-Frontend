@@ -27,7 +27,6 @@ namespace calculateFunding.approvals {
         public totalNumberAllocationLines: KnockoutObservable<number> = ko.observable(0);
         public isPublishButtonEnabled: boolean;
         public isPublishAndApprovePageFiltersEnabled: boolean;
-        public shouldCheckJobStatusForChooseAndRefreshBeEnabled: boolean;
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
         public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
@@ -787,42 +786,7 @@ namespace calculateFunding.approvals {
          * As the process is asynchronous is sets up a poll mechanism to check on the progress
          * */
         refreshFundingSnapshot() {
-
-            if (this.shouldCheckJobStatusForChooseAndRefreshBeEnabled === true) {
-                this.performSnapshotRefresh();
-            }
-            else {
-                let lastestJobUrl = this.settings.latestJobUrl.replace("{specificationId}", this.selectedSpecification().id).replace("{jobTypes}", this.instructCalculationsJobDefinitionId + "," + this.instructAggregationsCalculationsJobDefinitionId);
-
-                $.ajax({
-                    url: lastestJobUrl,
-                    dataType: "json",
-                    method: "GET"
-                }).done((result) => {
-                    console.log("successfully submitted request to check lastest job");
-
-                    this.messageTemplateData.jobInvokerDisplayName = result.invokerUserDisplayName;
-                    this.messageTemplateData.jobCreatedAt = result.createdFormatted;
-
-                    if (result.runningStatus !== "Completed") {
-                        this.bodyTemplate("jobStillRunningMessageTemplate");
-                        this.modalVisible(true);
-                    }
-                    else if (result.completionStatus === "Failed") {
-                        this.bodyTemplate("jobFailedMessageTemplate");
-                        this.modalVisible(true);
-                    }
-                    else {
-                        this.performSnapshotRefresh();
-                    }
-
-                })
-                    .fail((ex) => {
-                        console.log("error submitting request to check lastest job: " + ex);
-
-                        return false;
-                    });
-            }
+            this.performSnapshotRefresh();
         }
 
         /** Polls for the current status of a refresh operation */

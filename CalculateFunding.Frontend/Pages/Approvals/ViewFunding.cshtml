@@ -647,7 +647,6 @@
         var vfVM = new calculateFunding.approvals.ViewFundingViewModel(settings);
         vfVM.isPublishButtonEnabled = @Model.ShouldPublishButtonBeEnabled;
         vfVM.isPublishAndApprovePageFiltersEnabled = @Model.ShouldFiltersBeEnabled.ToString().ToLowerInvariant();
-        vfVM.shouldCheckJobStatusForChooseAndRefreshBeEnabled = @Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled.ToString().ToLowerInvariant();
         ko.applyBindings(vfVM);
     </script>
 }
