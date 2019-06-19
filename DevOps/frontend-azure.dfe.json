@@ -424,6 +424,10 @@
           "clientAffinityEnabled": false,
           "appSettings": [
             {
+              "name": "WEBSITE_TIME_ZONE",
+              "value": "GMT Standard Time"
+            },
+            {
               "name": "specsClient:ApiKey",
               "value": "[parameters('apiKeySpecs')]"
             },
