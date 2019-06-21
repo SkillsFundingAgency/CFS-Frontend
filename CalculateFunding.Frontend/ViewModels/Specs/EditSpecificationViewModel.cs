@@ -1,10 +1,10 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Specs
-{
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Frontend.Properties;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Frontend.Properties;
 
+namespace CalculateFunding.Frontend.ViewModels.Specs
+{
     public class EditSpecificationViewModel : ISpecificationAuthorizationEntity
     {
         public string Id { get; set; }

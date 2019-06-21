@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
 using Microsoft.AspNetCore.Mvc;
-using CalculateFunding.Common.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -40,7 +40,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult(500);
             }
 
-            if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            if (apiResponse.StatusCode != HttpStatusCode.OK)
             {
                 return new StatusCodeResult((int)apiResponse.StatusCode);
             }
@@ -68,16 +68,12 @@ namespace CalculateFunding.Frontend.Controllers
         {
             ApiResponse<IEnumerable<Reference>> response = await _specsClient.GetFundingPeriods();
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-
                 return Ok(response.Content);
             }
-            else
-            {
-                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
-            }
 
+            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
 
         [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
@@ -91,14 +87,14 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
             }
-            else if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
                 return new BadRequestResult();
             }
+
             return new StatusCodeResult(500);
         }
-
-
 
         [Route("api/specs/{specificationId}/status")]
         [HttpPut]
@@ -114,14 +110,12 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<PublishStatusResult> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
-            else
-            {
-                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
-            }
+
+            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
 
         [Route("api/specs/{specificationId}/selectforfunding")]
@@ -141,10 +135,8 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return NoContent();
             }
-            else
-            {
-                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
-            }
+
+            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
         }
     }
 }

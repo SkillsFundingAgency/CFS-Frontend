@@ -1,12 +1,12 @@
-﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
-{
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
+namespace CalculateFunding.Frontend.Interfaces.ApiClient
+{
     public interface ISpecsApiClient
     {
         Task<ApiResponse<Specification>> GetSpecification(string specificationId);

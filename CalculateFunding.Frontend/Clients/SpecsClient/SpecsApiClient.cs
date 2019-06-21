@@ -84,8 +84,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-
-            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
+			return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
         }
 
         public async Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification)
