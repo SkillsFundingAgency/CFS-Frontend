@@ -190,7 +190,7 @@
     <script type="text/javascript">
         var vm = new calculateFunding.listProviderTestResults.ProviderTestSearchViewModel({"providerId": "@Model.ProviderId", "fundingPeriodId": "@Model.FundingPeriodId" });
 
-        @if (!string.IsNullOrEmpty(Model.SpecificationProviderVersion)) {
+        @if (!string.IsNullOrWhiteSpace(Model.SpecificationProviderVersion)) {
 
             <text> vm.selectedSpec("@(Model.SpecificationProviderVersion.Split("_")[0])"); </text>
         }

@@ -49,21 +49,11 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public string ProviderId { get; set; }
 
-        public string SpecificationId
-        {
-            get
-            {
-                return SpecificationProviderVersion?.Split("_")[0];
-            }
-        }
+        public string SpecificationId => SpecificationProviderVersion?.Split("_")[0];
 
-        public string ProviderVersionId
-        {
-            get
-            {
-                return SpecificationProviderVersion?.Split("_").Count() > 1 ? SpecificationProviderVersion?.Split("_")[1] : null;
-            }
-        }
+        public string ProviderVersionId => SpecificationProviderVersion?.Split("_").Count() > 1 
+            ? SpecificationProviderVersion?.Split("_")[1] 
+            : null;
 
         public async Task<IActionResult> OnGetAsync(string providerId, string fundingPeriodId = null, string specificationProviderVersion = null)
         {

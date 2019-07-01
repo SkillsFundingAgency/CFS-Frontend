@@ -229,7 +229,6 @@ else
             specificationId: "@Model.SpecificationId",
             existingSourceCode: "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))",
             calculationName: "@Model.Calculation.Name",
-            aggregatesFeatureEnabled: "@Model.ShouldAggregateSupportForCalculationsBeEnabled",
             newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled"
         };
         var viewModel = new calculateFunding.editCalculation.EditCalculationViewModel(editViewModelOptions);

@@ -52,8 +52,6 @@ namespace calculateFunding.editCalculation {
             this.initialCodeContents = options.existingSourceCode;
             this.sourceCode(options.existingSourceCode);
 
-            this.codeContext.setAggregateFeatureEnabled(options.aggregatesFeatureEnabled.toLowerCase() === "true");
-
             let self = this;
 
             this.canBuildCalculation = ko.computed(() => {
@@ -356,7 +354,6 @@ namespace calculateFunding.editCalculation {
         specificationId: string,
         existingSourceCode: string,
         calculationName: string,
-        aggregatesFeatureEnabled: string,
         newEditCalculationPageBeEnabled: string
     }
 
