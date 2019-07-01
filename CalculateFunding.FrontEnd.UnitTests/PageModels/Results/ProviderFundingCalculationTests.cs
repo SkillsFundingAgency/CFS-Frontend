@@ -7,9 +7,10 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -30,6 +31,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -39,7 +41,7 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel providerCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel providerCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             // Act - Assert
             Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerCalcPageModel.OnGetAsync(null, string.Empty, string.Empty));
@@ -51,6 +53,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -60,9 +63,9 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = null;
 
@@ -72,8 +75,8 @@
 
             IList<AllocationLineResultItem> allocResult = GetAllocationResults();
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             ProviderResults providerResults = new ProviderResults()
             {
@@ -105,6 +108,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -114,9 +118,9 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -132,8 +136,8 @@
                 CalculationResults = calResult
             };
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -165,6 +169,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -174,11 +179,11 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            Provider provider = null;
+            ProviderVersionSearchResult provider = null;
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -192,8 +197,8 @@
                 CalculationResults = calResult
             };
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.NotFound, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.NotFound, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -223,6 +228,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -232,11 +238,11 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -250,8 +256,8 @@
                 CalculationResults = calResult
             };
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -284,6 +290,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -293,11 +300,11 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -311,8 +318,8 @@
                 CalculationResults = calResult
             };
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -345,6 +352,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -354,11 +362,11 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -368,8 +376,8 @@
 
             ProviderResults providerResults = null;
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -402,6 +410,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -411,11 +420,11 @@
 
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
 
-            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, specsClient, mapper, logger, featureToggle);
+            ProviderCalcsResultsPageModel provideCalcPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger, featureToggle);
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IList<string> specSummary = null;
 
@@ -425,8 +434,8 @@
 
             ProviderResults providerResults = null;
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient.GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
@@ -447,16 +456,16 @@
             .ThrowExactly<System.InvalidOperationException>();
         }
 
-        private Provider CreateProvider()
+        private ProviderVersionSearchResult CreateProvider()
         {
-            return new Provider()
+            return new ProviderVersionSearchResult()
             {
                 ProviderType = "Academy",
-                ProviderSubtype = "Academy",
-                LocalAuthority = "LA",
-                UPIN = 234234,
-                UKPRN = 345345,
-                URN = 2234,
+                ProviderSubType = "Academy",
+                Authority = "LA",
+                UPIN = "234234",
+                UKPRN = "345345",
+                URN = "2234",
                 DateOpened = new DateTime(12, 01, 23),
                 Id = "2",
                 Name = "Test school"
@@ -527,6 +536,11 @@
             return Substitute.For<IResultsApiClient>();
         }
 
+        private static IProvidersApiClient CreateProvidersApiClient()
+        {
+            return Substitute.For<IProvidersApiClient>();
+        }
+
         private static ISpecsApiClient CreateSpecsApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
@@ -536,9 +550,9 @@
         {
             return MappingHelper.CreateFrontEndMapper();
         }
-        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providerssApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
-            return new ProviderCalcsResultsPageModel(resultsApiClient, specsApiClient, mapper, logger, featureToggle);
+            return new ProviderCalcsResultsPageModel(resultsApiClient, providerssApiClient, specsApiClient, mapper, logger, featureToggle);
         }
 
         private static ILogger CreateLogger()

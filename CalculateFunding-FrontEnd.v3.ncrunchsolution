@@ -2,6 +2,7 @@
   <Settings>
     <AllowParallelTestExecution>True</AllowParallelTestExecution>
     <BuildProcessArchitecture>x64</BuildProcessArchitecture>
+    <FrameworkUtilisationTypeForMSTest>UseDynamicAnalysis</FrameworkUtilisationTypeForMSTest>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>
 </SolutionConfiguration>

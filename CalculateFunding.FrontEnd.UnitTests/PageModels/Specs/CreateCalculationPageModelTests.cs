@@ -312,6 +312,16 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 }
             };
 
+            CalculationCreateModel createModel = new CalculationCreateModel
+            {
+                SpecificationId = specificationId
+            };
+
+            IMapper mapper = CreateMapper();
+            mapper
+                .Map<CalculationCreateModel>(Arg.Is(viewModel))
+                .Returns(createModel);
+
             List<FundingStream> fundingStreams = new List<FundingStream>();
 
             FundingStream fundingStream = new FundingStream
@@ -350,7 +360,21 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .GetBaselineCalculationsBySpecificationId(Arg.Is(specificationId))
                 .Returns(baselineCalculationsResponse);
 
-            CreateCalculationPageModel pageModel = CreatePageModel(specsClient);
+            ValidatedApiResponse<Calculation> newCalcApiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.BadRequest, new Calculation
+            {
+                Id = "new-calc-id"
+            });
+
+            newCalcApiResponse.ModelState = new Dictionary<string, IEnumerable<string>>
+            {
+                { "Name", new[] { "Invalid name" } }
+            };
+
+            specsClient
+                .CreateCalculation(Arg.Is(createModel))
+                .Returns(newCalcApiResponse);
+
+            CreateCalculationPageModel pageModel = CreatePageModel(specsClient, mapper);
 
             pageModel.PageContext = new PageContext();
 

@@ -3,6 +3,7 @@
         private calculationId: string;
         private fundingPeriodId: string;
         private specificationId: string;
+        private providerVersionId: string;
         private doSearch: boolean;
 
         public providerSearchResults: KnockoutObservableArray<ICalculationProviderResultDetailResponse> = ko.observableArray([]);
@@ -18,7 +19,7 @@
 
         public errorToggle: KnockoutObservableArray<string> = ko.observableArray(["No Error", "Errors"]);
         
-        constructor(options: ICaluclationProviderResultSearchViewModelConstructorParameters) {
+        constructor(options: ICalculationProviderResultSearchViewModelConstructorParameters) {
             super();
 
             let self = this;
@@ -50,6 +51,7 @@
                 self.calculationId = options.calculationId;
                 self.fundingPeriodId = options.fundingPeriodId;
                 self.specificationId = options.specificationId;
+                self.providerVersionId = options.providerVersionId;
                 self.doSearch = options.doSearch;
 
                 self.selectedSearchFilters = ko.computed(() => {
@@ -169,11 +171,12 @@
         calculationExceptionMessage: string;
     }
 
-    export interface ICaluclationProviderResultSearchViewModelConstructorParameters
+    export interface ICalculationProviderResultSearchViewModelConstructorParameters
     {
         calculationId: string;
         fundingPeriodId: string;
         specificationId: string;
+        providerVersionId: string;
         doSearch: boolean;
     }
 }

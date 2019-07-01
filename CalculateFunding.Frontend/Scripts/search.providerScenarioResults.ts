@@ -73,11 +73,11 @@
             });
 
             this.allocationLineUrl = ko.pureComputed(() => {
-                return "/results/ProviderAllocationLine?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationId=" + self.selectedSpec();
+                return "/results/ProviderAllocationLine?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationProviderVersion=" + self.selectedSpec();
             });
 
             this.calculationResultsUrl = ko.pureComputed(() => {
-                return "/results/ProviderCalcsResults?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationId=" + self.selectedSpec();
+                return "/results/ProviderCalcsResults?providerId=" + self.providerId + "&fundingPeriodId=" + self.selectedFundingPeriod() + "&specificationProviderVersion=" + self.selectedSpec();
             });
         }
 

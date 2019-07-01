@@ -15,6 +15,9 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
         [JsonProperty("fundingStreams")]
         public IEnumerable<Reference> FundingStreams { get; set; }
 
+        [JsonProperty("providerVersionId")]
+        public string ProviderVersionId { get; set; }
+
         [JsonProperty("description")]
         public string Description { get; set; }
 

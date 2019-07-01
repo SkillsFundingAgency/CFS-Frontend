@@ -24,7 +24,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
 			ShouldProviderInformationViewBeEnabled = features.IsProviderInformationViewInViewFundingPageEnabled();
 
-            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = features.IsCheckJobStatusForChooseAndRefreshEnabled();
+            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = true;
         }
 
         public void OnGet()

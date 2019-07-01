@@ -8,7 +8,6 @@ namespace CalculateFunding.Frontend.Pages.Results
     using AutoMapper;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -20,6 +19,8 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Serilog;
     using CalculateFunding.Common.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 
     public class ProviderScenarioResultsPageModel : PageModel
     {
@@ -27,11 +28,13 @@ namespace CalculateFunding.Frontend.Pages.Results
         private ISpecsApiClient _specsApiClient;
         private IMapper _mapper;
         private readonly IResultsApiClient _resultsApiClient;
+        private readonly IProvidersApiClient _providersApiClient;
         private readonly ITestScenarioSearchService _testScenarioSearchService;
 
         public ProviderScenarioResultsPageModel(
             ITestScenarioSearchService testScenarioSearchService,
             IResultsApiClient resultsApiClient,
+            IProvidersApiClient providersApiClient,
             IMapper mapper,
             ISpecsApiClient specsApiClient,
             ILogger logger)
@@ -39,12 +42,14 @@ namespace CalculateFunding.Frontend.Pages.Results
         {
             Guard.ArgumentNotNull(testScenarioSearchService, nameof(testScenarioSearchService));
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
 
             _testScenarioSearchService = testScenarioSearchService;
             _resultsApiClient = resultsApiClient;
+            _providersApiClient = providersApiClient;
             _mapper = mapper;
             _specsApiClient = specsApiClient;
             _logger = logger;
@@ -58,7 +63,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         public string FundingPeriodId { get; set; }
 
         [BindProperty]
-        public string SpecificationId { get; set; }
+        public string SpecificationProviderVersion { get; set; }
 
         public string ProviderId { get; set; }
 
@@ -77,9 +82,27 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public TestScenarioSearchResultViewModel TestScenarioSearchResults { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string providerId, int? pageNumber, string searchTerm = null, string fundingPeriodId = null, string specificationId = null)
+        public string SpecificationId
+        {
+            get
+            {
+                return SpecificationProviderVersion?.Split("_")[0];
+            }
+        }
+
+        public string ProviderVersionId
+        {
+            get
+            {
+                return SpecificationProviderVersion?.Split("_").Count() > 1 ? SpecificationProviderVersion?.Split("_")[1] : null;
+            }
+        }
+
+        public async Task<IActionResult> OnGetAsync(string providerId, int? pageNumber, string searchTerm = null, string fundingPeriodId = null, string specificationProviderVersion = null)
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            SpecificationProviderVersion = specificationProviderVersion;
 
             ProviderId = providerId;
 
@@ -91,13 +114,13 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Filters = new Dictionary<string, string[]>
                 {
                     { "providerId", new[] { providerId }},
-                    { "specificationId", new[] { specificationId }},
+                    { "specificationId", new[] { SpecificationId }},
                 }
             };
 
             Task populatePeriodsTask = PopulateFundingPeriods(fundingPeriodId);
 
-            Task<ApiResponse<Provider>> apiResponseTask = _resultsApiClient.GetProviderByProviderId(providerId);
+            Task<ApiResponse<ProviderVersionSearchResult>> apiResponseTask = _providersApiClient.GetProviderByIdFromMaster(providerId);
 
 
             await TaskHelper.WhenAllAndThrow(populatePeriodsTask, apiResponseTask);
@@ -109,15 +132,13 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             FundingPeriodId = fundingPeriodId;
 
-            await PopulateSpecifications(providerId, specificationId);
+            await PopulateSpecifications(providerId, SpecificationId);
 
-            SpecificationId = specificationId;
-
-            ApiResponse<Provider> apiResponse = apiResponseTask.Result;
+            ApiResponse<ProviderVersionSearchResult> apiResponse = apiResponseTask.Result;
 
             if (apiResponse != null && apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content != null)
             {
-                Provider response = apiResponse.Content;
+                ProviderVersionSearchResult response = apiResponse.Content;
 
                 ProviderViewModel providerViewModel = _mapper.Map<ProviderViewModel>(apiResponse.Content);
 
@@ -129,7 +150,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                 return new StatusCodeResult(500);
             }
 
-            if (!string.IsNullOrWhiteSpace(specificationId))
+            if (!string.IsNullOrWhiteSpace(SpecificationId))
             {
                 TestScenarioSearchResults = await _testScenarioSearchService.PerformSearch(searchRequest);
                 if (TestScenarioSearchResults != null)
@@ -172,17 +193,13 @@ namespace CalculateFunding.Frontend.Pages.Results
             }).ToList();
         }
 
-        private async Task PopulateSpecifications(string providerId, string specificationId = null)
+        private async Task PopulateSpecifications(string providerId, string specificationId)
         {
             ApiResponse<IEnumerable<string>> specResponse = await _resultsApiClient.GetSpecificationIdsForProvider(providerId);
 
             if (specResponse.Content != null && specResponse.StatusCode == HttpStatusCode.OK)
             {
                 IEnumerable<string> specificationIds = specResponse.Content;
-                if (string.IsNullOrWhiteSpace(specificationId))
-                {
-                    specificationId = SpecificationId;
-                }
 
                 Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary> specificationSummaries = new Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary>();
 
@@ -213,9 +230,12 @@ namespace CalculateFunding.Frontend.Pages.Results
                 foreach (string specId in specificationIds)
                 {
                     string specName = specId;
+                    string specValue = specId;
 
                     if (specificationSummaries.ContainsKey(specId))
                     {
+                        specValue = $"{specId}_{specificationSummaries[specId].ProviderVersionId}";
+
                         if (specificationSummaries[specId].FundingPeriod.Id != FundingPeriodId)
                         {
                             continue;
@@ -230,7 +250,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
                     selectListItems.Add(new SelectListItem
                     {
-                        Value = specId,
+                        Value = specValue,
                         Text = specName,
                         Selected = specId == specificationId
                     });

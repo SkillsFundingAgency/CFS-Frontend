@@ -7,8 +7,9 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -47,6 +48,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -54,12 +56,12 @@
 
             ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = null;
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             SearchRequestViewModel searchRequest = CreateSearchRequest();
 
@@ -80,14 +82,15 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -99,8 +102,8 @@
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
@@ -124,6 +127,7 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -131,7 +135,7 @@
 
             ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
 
-            Provider provider = null;
+            ProviderVersionSearchResult provider = null;
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -143,8 +147,8 @@
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.NotFound, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.NotFound, provider));
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
@@ -164,14 +168,15 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -183,8 +188,8 @@
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
@@ -212,12 +217,12 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
-
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -229,8 +234,8 @@
             resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
@@ -253,7 +258,7 @@
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(results);
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
@@ -280,12 +285,13 @@
         {
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
+            IProvidersApiClient providersApiClient = CreateProvidersApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            Provider provider = CreateProvider();
+            ProviderVersionSearchResult provider = CreateProvider();
 
             IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
 
@@ -297,8 +303,8 @@
             resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
 
-            resultsApiClient.GetProviderByProviderId(Arg.Any<string>())
-                .Returns(new ApiResponse<Provider>(HttpStatusCode.OK, provider));
+            providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
+                .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             IList<TestScenarioSearchResultItemViewModel> testScenarioSearchResultItems = GetTestScenarioSearchResults();
             TestScenarioSearchResultItemViewModel ignoredItem = new TestScenarioSearchResultItemViewModel()
@@ -352,7 +358,7 @@
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
                 .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
@@ -368,16 +374,16 @@
             providerScenarioResultsPageModel.TestCoverage.Should().Be(75);
         }
 
-        private Provider CreateProvider()
+        private ProviderVersionSearchResult CreateProvider()
         {
-            return new Provider()
+            return new ProviderVersionSearchResult()
             {
                 ProviderType = "Academy",
-                ProviderSubtype = "Academy",
-                LocalAuthority = "LA",
-                UPIN = 234234,
-                UKPRN = 345345,
-                URN = 2234,
+                ProviderSubType = "Academy",
+                Authority = "LA",
+                UPIN = "234234",
+                UKPRN = "345345",
+                URN = "2234",
                 DateOpened = new DateTime(12, 01, 23),
                 Id = "1",
                 Name = "Test school"
@@ -452,6 +458,11 @@
             return Substitute.For<IResultsApiClient>();
         }
 
+        private static IProvidersApiClient CreateProvidersApiClient()
+        {
+            return Substitute.For<IProvidersApiClient>();
+        }
+
         private static ISpecsApiClient CreateSpecsApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
@@ -470,6 +481,7 @@
         private static ProviderScenarioResultsPageModel CreatePageModel(
                 ITestScenarioSearchService testScenarioSearchService = null,
                 IResultsApiClient resultsApiClient = null,
+                IProvidersApiClient providersApiClient = null,
                 ISpecsApiClient specsApiClient = null,
                 IMapper mapper = null,
                 ILogger logger = null)
@@ -477,6 +489,7 @@
             return new ProviderScenarioResultsPageModel(
                 testScenarioSearchService ?? CreateTestScenarioSearchService(),
             resultsApiClient ?? CreateApiClient(),
+            providersApiClient ?? CreateProvidersApiClient(),
             mapper ?? CreateMapper(),
             specsApiClient ?? CreateSpecsApiClient(),
             logger ?? CreateLogger());

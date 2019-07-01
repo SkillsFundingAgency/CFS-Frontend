@@ -38,7 +38,7 @@
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _resultsApiClient = resultsApiClient;
-            ShouldAggregateSupportForCalculationsBeEnabled = features.IsAggregateSupportInCalculationsEnabled();
+            ShouldAggregateSupportForCalculationsBeEnabled = true;
             ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
 

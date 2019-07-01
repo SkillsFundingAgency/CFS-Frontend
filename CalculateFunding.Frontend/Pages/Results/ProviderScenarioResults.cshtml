@@ -56,7 +56,7 @@
                 </select>
             </div>
             <div class="col-xs-4">
-                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationId" class="form-control filter" id="select-spec" name="specificationId" data-bind="value:selectedSpec">
+                <select asp-items="@(Model.Specifications)" asp-for="@Model.SpecificationProviderVersion" class="form-control filter" id="select-spec" name="specificationProviderVersion" data-bind="value:selectedSpec">
                     <option></option>
                 </select>
             </div>
@@ -92,15 +92,17 @@
     <div class="col-xs-12 view-provider-test-results">
         <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="TestSceanarioTabs" role="tablist">
             <li class="nav-item">
-                <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="true" data-bind="attr: {'href' : allocationLineUrl }">Allocation line</a>
+                <a id="nav-allocations-tab" href="/results/ProviderAllocationLine?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationProviderVersion=@Model.SpecificationProviderVersion" role="tab" aria-selected="true" data-bind="attr: {'href' : allocationLineUrl }">Allocation line</a>
             </li>
             <li class="nav-item">
-                <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationId=@Model.SpecificationId" role="tab" aria-selected="false" data-bind="attr: {'href' : calculationResultsUrl }">Calculation results</a>
+                <a id="nav-calculations-tab" href="/results/ProviderCalcsResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationProviderVersion=@Model.SpecificationProviderVersion" role="tab" aria-selected="false" data-bind="attr: {'href' : calculationResultsUrl }">Calculation results</a>
             </li>
             <li class="nav-item active">
                 <a id="nav-test-results-tab" href="#" role="tab" aria-selected="true">Test results</a>
             </li>
-
+            <li class="nav-item">
+                <a id="nav-provider-summary-tab" href="/results/ProviderSummary?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationProviderVersion=@Model.SpecificationProviderVersion" role="tab" aria-selected="false">Provider summary</a>
+            </li>
         </ul>
 
 
@@ -188,9 +190,9 @@
     <script type="text/javascript">
         var vm = new calculateFunding.listProviderTestResults.ProviderTestSearchViewModel({"providerId": "@Model.ProviderId", "fundingPeriodId": "@Model.FundingPeriodId" });
 
-        @if (!string.IsNullOrEmpty(Model.SpecificationId)) {
+        @if (!string.IsNullOrEmpty(Model.SpecificationProviderVersion)) {
 
-            <text> vm.selectedSpec("@Model.SpecificationId"); </text>
+            <text> vm.selectedSpec("@(Model.SpecificationProviderVersion.Split("_")[0])"); </text>
         }
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {

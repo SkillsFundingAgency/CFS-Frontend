@@ -9,13 +9,14 @@
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
+    using CalculateFunding.Common.ApiClient.Providers;
 
     public class ProviderAllocationLinePageModel : ProviderResultsBasePageModel
     {
         private ILogger _logger;
 
-        public ProviderAllocationLinePageModel(IResultsApiClient resultsApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
-            : base(resultsApiClient, mapper, specsApiClient, logger)
+        public ProviderAllocationLinePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
+            : base(resultsApiClient, providersApiClient, mapper, specsApiClient, logger)
         {
             _logger = logger;
         }

@@ -2,6 +2,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -15,8 +16,8 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public int CalculationErrorCount { get; set; }
 
-        public ProviderCalcsResultsPageModel(IResultsApiClient resultsApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
-            : base(resultsApiClient, mapper, specsApiClient, logger)
+        public ProviderCalcsResultsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+            : base(resultsApiClient, providersApiClient, mapper, specsApiClient, logger)
         {
             _featureToggle = featureToggle;
         }

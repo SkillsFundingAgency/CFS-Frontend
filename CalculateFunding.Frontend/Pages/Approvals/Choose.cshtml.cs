@@ -75,7 +75,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _authorizationHelper = authorizationHelper;
             _featureToggle = featureToggle;
 
-            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = _featureToggle.IsCheckJobStatusForChooseAndRefreshEnabled();
+            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = true;
         }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriod, string fundingStream, ChoosePageBannerOperationType? operationType = null, string operationId = null)

@@ -266,14 +266,7 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            if (_featureToggle.IsAllocationLineMajorMinorVersioningEnabled())
-            {
-                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
-            }
-            else
-            {
-                return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationIds={specificationId}", specificationId);
-            }
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
         }
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)

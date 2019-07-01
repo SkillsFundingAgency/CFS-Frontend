@@ -31,6 +31,38 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string DateOpened { get; set; }
 
+        public string DateClosed { get; set; }
+
+        public string TrustStatus { get; set; }
+
+        public string Successor { get; set; }
+
+        public string ReasonEstablishmentClosed { get; set; }
+
+        public string ReasonEstablishmentOpened { get; set; }
+
+        public string PhaseOfEducation { get; set; }
+
+        public string Status { get; set; }
+
+        public string LegalName { get; set; }
+
+        public string CrmAccountId { get; set; }
+
+        public string NavVendorNo { get; set; }
+
+        public string LaCode { get; set; }
+
+        public string ProviderProfileIdType { get; set; }
+
+        public string DfeEstablishmentNumber { get; set; }
+
+        public string EstablishmentNumber { get; set; }
+
+        public string TrustName { get; set; }
+
+        public string TrustCode { get; set; }
+
         public string TotalDescription { get; set; }
 
         public double? Total
