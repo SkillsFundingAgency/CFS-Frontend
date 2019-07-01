@@ -550,6 +550,7 @@
         {
             return MappingHelper.CreateFrontEndMapper();
         }
+
         private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, 
             IProvidersApiClient providerssApiClient, 
             ISpecsApiClient specsApiClient, 
