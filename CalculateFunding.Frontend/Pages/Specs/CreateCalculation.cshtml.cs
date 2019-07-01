@@ -152,19 +152,6 @@
                 return new ForbidResult();
             }
 
-            if (!_featureToggle.IsDuplicateCalculationNameCheckEnabled())
-            {
-                if (!string.IsNullOrWhiteSpace(CreateCalculationViewModel.Name))
-                {
-                    ApiResponse<Calculation> existingCalculationResponse = await _specsClient.GetCalculationBySpecificationIdAndCalculationName(specificationId, CreateCalculationViewModel.Name);
-
-                    if (existingCalculationResponse.StatusCode != HttpStatusCode.NotFound)
-                    {
-                        this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.Name)}", ValidationMessages.CalculationNameAlreadyExists);
-                    }
-                }
-            }
-
             if (CreateCalculationViewModel.CalculationType == "Funding" && string.IsNullOrWhiteSpace(CreateCalculationViewModel.AllocationLineId))
             {
                 this.ModelState.AddModelError($"{nameof(CreateCalculationViewModel)}.{nameof(CreateCalculationViewModel.AllocationLineId)}", ValidationMessages.CalculationAllocationLineRequired);

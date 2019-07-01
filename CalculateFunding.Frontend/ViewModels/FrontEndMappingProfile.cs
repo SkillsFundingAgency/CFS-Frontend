@@ -1,9 +1,11 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels
 {
+    using System;
     using System.Linq;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Jobs.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -181,10 +183,14 @@
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
-            CreateMap<Provider, ProviderViewModel>()
+            CreateMap<ProviderVersionSearchResult, ProviderViewModel>()
               .ForMember(m => m.DateOpenedDisplay, opt => opt.Ignore())
+              .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(c => c.Authority))
+              .ForMember(m => m.Upin, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UPIN) ? 0 : Convert.ToInt32(c.UPIN)))
+              .ForMember(m => m.Ukprn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UKPRN) ? 0 : Convert.ToInt32(c.UKPRN)))
+              .ForMember(m => m.Urn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.URN) ? 0 : Convert.ToInt32(c.URN)))
 
-             .AfterMap((Provider source, ProviderViewModel destination) =>
+             .AfterMap((ProviderVersionSearchResult source, ProviderViewModel destination) =>
               {
                   if (source.DateOpened.HasValue)
                   {

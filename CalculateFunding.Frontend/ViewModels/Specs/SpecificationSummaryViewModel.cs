@@ -7,6 +7,8 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
     {
         public ReferenceViewModel FundingPeriod { get; set; }
 
+        public string ProviderVersionId { get; set; }
+
         public IEnumerable<ReferenceViewModel> FundingStreams { get; set; }
 
         public string Description { get; set; }

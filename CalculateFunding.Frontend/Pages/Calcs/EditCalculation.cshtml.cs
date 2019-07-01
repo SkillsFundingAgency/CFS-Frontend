@@ -38,13 +38,10 @@
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _resultsApiClient = resultsApiClient;
-            ShouldAggregateSupportForCalculationsBeEnabled = features.IsAggregateSupportInCalculationsEnabled();
             ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
 
         public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
-
-        public bool ShouldAggregateSupportForCalculationsBeEnabled { get; private set; }
 
         public CalculationViewModel Calculation { get; set; }
 

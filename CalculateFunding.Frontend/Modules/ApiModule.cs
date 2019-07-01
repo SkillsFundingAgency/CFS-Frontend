@@ -7,6 +7,7 @@
     using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.ApiClient.Jobs;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Users;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.CalcsClient;
@@ -47,6 +48,17 @@
                 c =>
                 {
                     ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("resultsClient");
+
+                    SetDefaultApiClientConfigurationOptions(c, opts, services);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+
+            services.AddHttpClient(HttpClientKeys.Providers,
+                c =>
+                {
+                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("providersClient");
 
                     SetDefaultApiClientConfigurationOptions(c, opts, services);
                 })
@@ -125,6 +137,9 @@
 
             services
                 .AddSingleton<IResultsApiClient, ResultsApiClient>();
+
+            services
+                .AddSingleton<IProvidersApiClient, ProvidersApiClient>();
 
             services
                .AddSingleton<ISpecsApiClient, SpecsApiClient>();
