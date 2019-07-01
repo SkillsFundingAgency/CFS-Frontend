@@ -550,7 +550,12 @@
         {
             return MappingHelper.CreateFrontEndMapper();
         }
-        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providerssApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        private static ProviderCalcsResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, 
+            IProvidersApiClient providerssApiClient, 
+            ISpecsApiClient specsApiClient, 
+            IMapper mapper, 
+            ILogger logger, 
+            IFeatureToggle featureToggle)
         {
             return new ProviderCalcsResultsPageModel(resultsApiClient, providerssApiClient, specsApiClient, mapper, logger, featureToggle);
         }
