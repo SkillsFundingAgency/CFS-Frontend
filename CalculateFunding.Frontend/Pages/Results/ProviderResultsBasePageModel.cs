@@ -129,7 +129,9 @@ namespace CalculateFunding.Frontend.Pages.Results
                 DfeEstablishmentNumber = response.DfeEstablishmentNumber,
                 EstablishmentNumber = response.EstablishmentNumber,
                 TrustName = response.TrustName,
-                TrustCode = response.TrustCode
+                TrustCode = response.TrustCode,
+                Town = response.Town,
+                Postcode = response.Postcode
             };
 
             ViewModel = viewModel;

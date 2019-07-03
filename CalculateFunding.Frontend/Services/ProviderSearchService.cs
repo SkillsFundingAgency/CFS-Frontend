@@ -6,28 +6,28 @@
     using AutoMapper;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
     using CalculateFunding.Common.FeatureToggles;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 
     public class ProviderSearchService : IProviderSearchService
     {
-        private IResultsApiClient _resultsClient;
+        private IProvidersApiClient _providersApiClient;
         private IMapper _mapper;
         private ILogger _logger;
         private readonly IFeatureToggle _featureToggle;
 
-        public ProviderSearchService(IResultsApiClient resultsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public ProviderSearchService(IProvidersApiClient providersApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
-            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
             Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
-            _resultsClient = resultsApiClient;
+            _providersApiClient = providersApiClient;
             _mapper = mapper;
             _logger = logger;
             _featureToggle = featureToggle;
@@ -50,7 +50,7 @@
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<ProviderSearchResultItem> searchRequestResult = await _resultsClient.FindProviders(requestOptions);
+            PagedResult<ProviderVersionSearchResult> searchRequestResult = await _providersApiClient.SearchMasterProviders(requestOptions);
 
             if (searchRequestResult == null)
             {
@@ -78,7 +78,7 @@
 
             List<ProviderSearchResultItemViewModel> itemResults = new List<ProviderSearchResultItemViewModel>();
 
-            foreach (ProviderSearchResultItem searchresult in searchRequestResult.Items)
+            foreach (ProviderVersionSearchResult searchresult in searchRequestResult.Items)
             {
                 itemResults.Add(_mapper.Map<ProviderSearchResultItemViewModel>(searchresult));
             }

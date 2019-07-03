@@ -5,7 +5,6 @@
 namespace CalculateFunding.Frontend.PageModels.Results
 {
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Results;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -23,15 +22,13 @@ namespace CalculateFunding.Frontend.PageModels.Results
         public async Task OnGetAsync_GivenNullSearchResultsReturns_ReturnsStatusCode500()
         {
             // Arrange
-            IResultsApiClient resultsApiClient = CreateApiClient();
-
             IProviderSearchService searchService = CreateSearchService();
 
             searchService
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns((ProviderSearchResultViewModel)null);
 
-            ViewProviderResultsPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
+            ViewProviderResultsPageModel pageModel = CreatePageModel(searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty);
@@ -49,8 +46,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
         public async Task OnGetAsync_GivenSearchResultsReturnsResults_ReturnsPage()
         {
             // Arrange
-            IResultsApiClient resultsApiClient = CreateApiClient();
-
             IProviderSearchService searchService = CreateSearchService();
 
             ProviderSearchResultViewModel model = new ProviderSearchResultViewModel();
@@ -59,7 +54,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(model);
 
-            ViewProviderResultsPageModel pageModel = CreatePageModel(resultsApiClient, searchService);
+            ViewProviderResultsPageModel pageModel = CreatePageModel(searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty);
@@ -70,14 +65,9 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 .BeOfType<PageResult>();
         }
 
-        private static ViewProviderResultsPageModel CreatePageModel(IResultsApiClient resultsApiClient, IProviderSearchService searchService)
+        private static ViewProviderResultsPageModel CreatePageModel(IProviderSearchService searchService)
         {
-            return new ViewProviderResultsPageModel(resultsApiClient ?? CreateApiClient(), searchService ?? CreateSearchService());
-        }
-
-        private static IResultsApiClient CreateApiClient()
-        {
-            return Substitute.For<IResultsApiClient>();
+            return new ViewProviderResultsPageModel(searchService ?? CreateSearchService());
         }
 
         private static IProviderSearchService CreateSearchService()
