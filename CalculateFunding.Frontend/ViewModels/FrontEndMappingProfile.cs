@@ -64,7 +64,8 @@
                         .ForMember(m => m.ConvertDate, opt => opt.Ignore())
                         .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
                         .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-                        .ForMember(m => m.DateClosed, opt => opt.Ignore());
+                        .ForMember(m => m.DateClosed, opt => opt.Ignore())
+                        .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
 
             CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
                .ForMember(m => m.ConvertDate, opt => opt.Ignore())
