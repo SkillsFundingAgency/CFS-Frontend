@@ -142,7 +142,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             ProviderSearchResultViewModel results = await providersSearchService.PerformSearch(request);
 
             // Assert
-            results.TotalResults.Should().Be(numberOfItems + 1);
+            results.TotalResults.Should().Be(numberOfItems);
         }
 
         [TestMethod]
@@ -261,7 +261,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             PagedResult<ProviderVersionSearchResult> result = new PagedResult<ProviderVersionSearchResult>();
             List<ProviderVersionSearchResult> items = new List<ProviderVersionSearchResult>();
-            for (int i = 0; i < numberOfItems; i++)
+            for (int i = 0; i < numberOfItems - 1; i++)
             {
                 items.Add(new ProviderVersionSearchResult()
                 {
@@ -275,9 +275,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             result.Items = items.AsEnumerable();
             result.PageNumber = 1;
             result.PageSize = 50;
-            result.TotalItems = numberOfItems + 1;
+            result.TotalItems = numberOfItems;
             result.TotalPages = 1;
-            result.TotalErrorItems = 1;
             result.Facets = facets;
 
             return result;
