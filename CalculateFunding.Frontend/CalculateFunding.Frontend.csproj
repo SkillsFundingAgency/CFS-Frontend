@@ -70,7 +70,7 @@
     <PackageReference Include="CalculateFunding.Common" Version="1.33.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.15" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.9" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.10" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.9" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.2" />

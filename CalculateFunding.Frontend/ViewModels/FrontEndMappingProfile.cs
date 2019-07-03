@@ -7,6 +7,7 @@
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Common.Models;
+    using CalculateFunding.Common.Models.Search;
     using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models;
@@ -59,11 +60,12 @@
 
         private void MapResults()
         {
-            CreateMap<ProviderSearchResultItem, ProviderSearchResultItemViewModel>()
+            CreateMap<ProviderVersionSearchResult, ProviderSearchResultItemViewModel>()
                         .ForMember(m => m.ConvertDate, opt => opt.Ignore())
                         .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
                         .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-                        .ForMember(m => m.DateClosed, opt => opt.Ignore());
+                        .ForMember(m => m.DateClosed, opt => opt.Ignore())
+                        .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
 
             CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
                .ForMember(m => m.ConvertDate, opt => opt.Ignore())
@@ -253,6 +255,7 @@
         private void MapCommon()
         {
             CreateMap<SearchFacet, SearchFacetViewModel>();
+            CreateMap<Facet, SearchFacetViewModel>();
             CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
             CreateMap<Reference, ReferenceViewModel>();
             CreateMap<PublishStatus, PublishStatusViewModel>();

@@ -63,6 +63,10 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string TrustCode { get; set; }
 
+        public string Town { get; set; }
+
+        public string Postcode { get; set; }
+
         public string TotalDescription { get; set; }
 
         public double? Total

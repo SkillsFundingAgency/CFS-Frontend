@@ -30,30 +30,6 @@
             return await GetAsync<ProviderResults>($"get-provider-results?providerId={providerId}&specificationId={specificationId}", cancellationToken);
         }
 
-        public async Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions)
-        {
-            Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
-
-            SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
-
-            ApiResponse<SearchResults<ProviderSearchResultItem>> results = await PostAsync<SearchResults<ProviderSearchResultItem>, SearchQueryRequest>($"providers-search", request);
-
-            if (results.StatusCode == HttpStatusCode.OK)
-            {
-                PagedResult<ProviderSearchResultItem> result = new SearchPagedResult<ProviderSearchResultItem>(filterOptions, results.Content.TotalCount)
-                {
-                    Items = results.Content.Results,
-                    Facets = results.Content.Facets,
-                };
-
-                return result;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public async Task<ApiResponse<IEnumerable<string>>> GetSpecificationIdsForProvider(string providerId)
         {
             return await GetAsync<IEnumerable<string>>($"get-provider-specs?providerId={providerId}");

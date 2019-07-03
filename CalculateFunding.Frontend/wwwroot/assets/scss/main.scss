@@ -731,7 +731,21 @@ blockquote {
     }
 }
 
+.view-provider-summary {
+    table.provider-summary-table {
+        td {
+            padding: 10px 0px 10px 5px;
+        }
 
+        thead {
+            color: white;
+        }
+
+        td.tab {
+            background-color: lightgray;
+        }
+    }
+}
 
 .view-provider-test-results {
     .test-results-table {

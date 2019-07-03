@@ -11,13 +11,6 @@
     public interface IResultsApiClient
     {
         /// <summary>
-        /// Gets a paged list of providers, given the paged query options and search options
-        /// </summary>
-        /// <param name="filterOptions">Filter Options</param>
-        /// <returns>List of Providers</returns>
-        Task<PagedResult<ProviderSearchResultItem>> FindProviders(SearchFilterRequest filterOptions);
-
-        /// <summary>
         /// Returns specification IDs with results for given provider
         /// </summary>
         /// <param name="providerId">Provider ID</param>
