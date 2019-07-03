@@ -210,7 +210,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Should()
                 .Be("auth-1");
 
-            results.Facets.Count().Should().Be(2);
+            results.Facets.Count().Should().Be(facets.Count());
             results.Facets.First().Name.Should().Be("facet 1");
             results.Facets.First().FacetValues.Count().Should().Be(1);
             results.Facets.First().FacetValues.First().Name.Should().Be("f1");
