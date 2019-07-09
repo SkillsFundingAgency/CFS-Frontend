@@ -1,8 +1,8 @@
-﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
-{
-    using Newtonsoft.Json;
-    using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
+namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+{
     public class EditSpecificationModel
     {
         [JsonProperty("fundingPeriodId")]

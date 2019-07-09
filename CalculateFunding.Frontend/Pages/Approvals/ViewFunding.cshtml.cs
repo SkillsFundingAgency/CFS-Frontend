@@ -12,8 +12,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
 		public bool ShouldFiltersBeEnabled { get; private set; }
 
-        public bool ShouldCheckJobStatusForChooseAndRefreshBeEnabled { get; private set; }
-
         public ViewFundingModel(IFeatureToggle features)
 		{
 			Guard.ArgumentNotNull(features, nameof(features));

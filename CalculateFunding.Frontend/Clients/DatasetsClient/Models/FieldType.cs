@@ -9,6 +9,8 @@
         Float,
         Decimal,
         DateTime,
-        String
+        String,
+        NullableOfDecimal,
+        NullableOfInteger
     }
 }

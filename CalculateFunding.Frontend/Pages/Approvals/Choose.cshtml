@@ -96,14 +96,7 @@
                         }
                         else if (specification.CanBeChosen)
                         {
-                            if (Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled)
-                            {
-                                <a data-bind="click: function(){$root.checkLastJobStatus('@specification.Id', '/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId')}" class="btn btn-choose target-choose">Choose</a>
-                            }
-                            else
-                            {
-                                <a class="btn btn-choose target-choose" href="/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId">Choose</a>
-                            }
+                            <a data-bind="click: function(){$root.checkLastJobStatus('@specification.Id', '/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId')}" class="btn btn-choose target-choose">Choose</a>
                         }
                         else
                         {
@@ -140,18 +133,15 @@
 
     <script asp-src-include="~/js/approvals.choose.js" asp-append-version="true" type="text/javascript"></script>
 
-    @if(Model.ShouldCheckJobStatusForChooseAndRefreshBeEnabled){
+    <script asp-src-include="~/js/approvals.chooseforfunding.js" asp-append-version="true" type="text/javascript"></script>
 
-        <script asp-src-include="~/js/approvals.chooseforfunding.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/knockstrap.min.js" asp-append-version="true" type="text/javascript"></script>
 
-        <script asp-src-include="~/assets/libs/js/knockstrap.min.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
 
-        <script type="text/javascript">
+        var vfVM = new calculateFunding.approvals.CheckLastJobStatusViewModel();
 
-            var vfVM = new calculateFunding.approvals.CheckLastJobStatusViewModel();
+        ko.applyBindings(vfVM);
 
-            ko.applyBindings(vfVM);
-
-        </script>
-    }
+    </script>
 }

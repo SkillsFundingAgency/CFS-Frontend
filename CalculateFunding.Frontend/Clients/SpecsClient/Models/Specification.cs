@@ -1,13 +1,14 @@
-﻿namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Utility;
+using Newtonsoft.Json;
 
+namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
+{
     public class Specification : Reference, ISpecificationAuthorizationEntity
     {
         public Specification()
@@ -100,7 +101,7 @@
                     {
                         foreach (Calculation calculation in policy.Calculations)
                         {
-                            if (calculation != null && string.Equals(calculation.Id, calculationId, System.StringComparison.InvariantCultureIgnoreCase))
+                            if (calculation != null && string.Equals(calculation.Id, calculationId, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 return calculation;
                             }
@@ -111,11 +112,11 @@
                     {
                         foreach (Policy subPolicy in policy.SubPolicies)
                         {
-                            if (subPolicy != null && subPolicy.Calculations != null)
+                            if (subPolicy?.Calculations != null)
                             {
                                 foreach (Calculation calculation in subPolicy.Calculations)
                                 {
-                                    if (calculation != null && string.Equals(calculation.Id, calculationId, System.StringComparison.InvariantCultureIgnoreCase))
+                                    if (calculation != null && string.Equals(calculation.Id, calculationId, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         return calculation;
                                     }

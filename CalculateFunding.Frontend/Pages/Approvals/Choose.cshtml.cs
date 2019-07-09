@@ -48,8 +48,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public PageBannerOperation PageBannerOperation { get; set; }
 
-        public bool ShouldCheckJobStatusForChooseAndRefreshBeEnabled { get; private set; }
-
         public ChoosePageModel(
             ISpecsApiClient specsApiClient,
             ICalculationsApiClient calcsClient,
@@ -74,8 +72,6 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _featureToggle = featureToggle;
-
-            ShouldCheckJobStatusForChooseAndRefreshBeEnabled = true;
         }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriod, string fundingStream, ChoosePageBannerOperationType? operationType = null, string operationId = null)

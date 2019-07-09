@@ -311,7 +311,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             };
 
             IEnumerable<FundingStream> fundingStreams = new[]
-           {
+            {
                 new FundingStream { Id = "fp1", Name = "funding" }
             };
 

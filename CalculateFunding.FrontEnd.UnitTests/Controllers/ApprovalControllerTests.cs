@@ -242,7 +242,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             mapper.Received(0).Map<IEnumerable<PublishedProviderProfileViewModel>>(Arg.Any<IEnumerable<PublishedProviderProfile>>());
         }
 
-        //Missing NUnit's TestCaseSource here :..(
+#if NCRUNCH
+        [Ignore]
+#endif
         [TestMethod]
         [DataRow(HttpStatusCode.NotFound, typeof(NotFoundObjectResult))]
         [DataRow(HttpStatusCode.PreconditionFailed, typeof(InternalServerErrorResult))]
