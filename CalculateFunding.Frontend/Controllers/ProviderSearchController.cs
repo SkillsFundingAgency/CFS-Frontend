@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient.Providers.Models;
     using CalculateFunding.Common.Utility;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
@@ -38,7 +39,7 @@
             }
             else
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult($"Cannot find provider versions for funding stream:{fundingStreamId}");
             }
         }
 
@@ -55,7 +56,7 @@
             }
             else
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult($"Find providers HTTP request failed");
             }
         }
 
@@ -73,7 +74,7 @@
             }
             else
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult($"Find provider results HTTP request failed");
             }
         }
     }
