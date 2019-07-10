@@ -17,6 +17,8 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using CalculateFunding.Common.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
+    using PolicyModels = Common.ApiClient.Policies.Models;
 
     public class IndexModel : PageModel
     {
@@ -24,13 +26,17 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         private readonly ISpecsApiClient _specsClient;
 
-        public IndexModel(ISpecsApiClient specsClient, IScenarioSearchService scenariosSearchService)
+        private readonly IPoliciesApiClient _policiesApiClient;
+
+        public IndexModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IScenarioSearchService scenariosSearchService)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(scenariosSearchService, nameof(scenariosSearchService));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
 
             _specsClient = specsClient;
             _scenarioSearchservice = scenariosSearchService;
+            _policiesApiClient = policiesApiClient;
         }
 
         public IEnumerable<SelectListItem> FundingPeriods { get; set; }
@@ -88,7 +94,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<PolicyModels.Period>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode.Equals(HttpStatusCode.OK) && periodsResponse.Content != null)
             {
