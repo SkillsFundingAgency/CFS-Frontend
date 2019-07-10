@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Jobs.Models;
@@ -119,9 +120,38 @@
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
                 .ForMember(m => m.PublishStatus, opt => opt.Ignore());
 
-            CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>();
+            CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()
+                .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+                .AfterMap((CreateSpecificationModel source, CreateSpecificationViewModel destination) =>
+                {
+                    destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
+                });
 
-            CreateMap<EditSpecificationViewModel, EditSpecificationModel>();
+            CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
+                .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
+                .AfterMap((CreateSpecificationViewModel source, CreateSpecificationModel destination) =>
+                {
+                    destination.FundingStreamIds = new List<string> { source.FundingStreamId };
+                });
+
+            CreateMap<EditSpecificationViewModel, EditSpecificationModel>()
+                .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
+                .AfterMap((EditSpecificationViewModel source, EditSpecificationModel destination) =>
+                {
+                    destination.FundingStreamIds = new List<string> { source.FundingStreamId };
+                });
+
+            CreateMap<EditSpecificationModel, EditSpecificationViewModel>()
+                .ForMember(m => m.Id, opt => opt.Ignore())
+                .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingPeriodId, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingStreamId, opt => opt.Ignore())
+                .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
+                .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
+                .AfterMap((EditSpecificationModel source, EditSpecificationViewModel destination) =>
+                {
+                    destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
+                });
 
             CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
@@ -156,14 +186,14 @@
             CreateMap<CalculationCurrentVersion, Specs.CalculationViewModel>();
 
             CreateMap<Specification, EditSpecificationViewModel>()
-                .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
-                .ForMember(m => m.OriginalFundingStreams, opt => opt.Ignore())
+                .ForMember(m => m.OriginalFundingStreamId, opt => opt.Ignore())
                 .ForMember(m => m.OriginalFundingPeriodId, opt => opt.Ignore())
+                .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
                 .AfterMap((Specification source, EditSpecificationViewModel destination) =>
                 {
                     destination.FundingPeriodId = source.FundingPeriod.Id;
-                    destination.FundingStreamIds = source.FundingStreams.Select(m => m.Id);
+                    destination.FundingStreamId = source.FundingStreams.FirstOrDefault()?.Id;
                 });
 
             CreateMap<SpecificationSearchResultItem, SpecificationSearchResultItemViewModel>();

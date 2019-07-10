@@ -1,7 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient.Providers.Models;
     using CalculateFunding.Common.Utility;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
@@ -24,6 +27,23 @@
         }
 
         [HttpPost]
+        [Route("api/providerversions/getbyfundingstream")]
+        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody] string fundingStreamId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+
+            IEnumerable<ProviderVersion> result = await _providerSearchService.GetProviderVersionsByFundingStream(fundingStreamId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return new InternalServerErrorResult($"Cannot find provider versions for funding stream:{fundingStreamId}");
+            }
+        }
+
+        [HttpPost]
         [Route("api/results/searchproviders")]
         public async Task<IActionResult> SearchProviders([FromBody] SearchRequestViewModel request)
         {
@@ -36,7 +56,7 @@
             }
             else
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult($"Find providers HTTP request failed");
             }
         }
 
@@ -54,7 +74,7 @@
             }
             else
             {
-                return new StatusCodeResult(500);
+                return new InternalServerErrorResult($"Find provider results HTTP request failed");
             }
         }
     }

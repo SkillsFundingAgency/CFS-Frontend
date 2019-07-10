@@ -6,6 +6,7 @@ namespace CalculateFunding.Frontend.Controllers
 {
     using System;
     using System.Threading.Tasks;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
@@ -53,9 +54,9 @@ namespace CalculateFunding.Frontend.Controllers
             // Asserts
             actionResult
                 .Should()
-                .BeOfType<StatusCodeResult>();
+                .BeOfType<InternalServerErrorResult>();
 
-            StatusCodeResult statusCodeResult = actionResult as StatusCodeResult;
+            InternalServerErrorResult statusCodeResult = actionResult as InternalServerErrorResult;
 
             statusCodeResult
                 .StatusCode
@@ -124,9 +125,9 @@ namespace CalculateFunding.Frontend.Controllers
             // Asserts
             actionResult
                 .Should()
-                .BeOfType<StatusCodeResult>();
+                .BeOfType<InternalServerErrorResult>();
 
-            StatusCodeResult statusCodeResult = actionResult as StatusCodeResult;
+            InternalServerErrorResult statusCodeResult = actionResult as InternalServerErrorResult;
 
             statusCodeResult
                 .StatusCode

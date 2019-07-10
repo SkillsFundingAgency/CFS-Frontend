@@ -17,29 +17,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CalculateFunding.Common.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class EditSpecificationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
+        private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditSpecificationPageModel(ISpecsApiClient specsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public EditSpecificationPageModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
+            _policiesApiClient = policiesApiClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
         }
 
         public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
-        public MultiSelectList FundingStreams { get; set; }
+        public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
         [BindProperty]
         public EditSpecificationViewModel EditSpecificationViewModel { get; set; }
@@ -59,10 +64,10 @@ namespace CalculateFunding.Frontend.Pages.Specs
 		            specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
 
 				EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
-                EditSpecificationViewModel.OriginalFundingStreams = string.Join(",", EditSpecificationViewModel.FundingStreamIds);
+                EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
                 EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
 
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamIds));
+                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId));
 
                 return Page();
             }
@@ -94,15 +99,15 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (EditSpecificationViewModel.IsSelectedForFunding)
             {
                 ModelState.Remove($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.FundingPeriodId)}");
-                ModelState.Remove($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.FundingStreamIds)}");
+                ModelState.Remove($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.FundingStreamId)}");
 
                 EditSpecificationViewModel.FundingPeriodId = EditSpecificationViewModel.OriginalFundingPeriodId;
-                EditSpecificationViewModel.FundingStreamIds = EditSpecificationViewModel.OriginalFundingStreams.Split(",").ToArraySafe();
+                EditSpecificationViewModel.FundingStreamId = EditSpecificationViewModel.OriginalFundingStreamId;
             }
 
             if (!ModelState.IsValid)
             {
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamIds));
+                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId));
                 return Page();
             }
 
@@ -126,9 +131,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
         }
 
-        private async Task PopulateFundingStreams(IEnumerable<string> fundingStreamIds)
+        private async Task PopulateFundingStreams(string fundingStreamId)
         {
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = await _specsClient.GetFundingStreams();
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policiesApiClient.GetFundingStreams();
 
             if (fundingStreamsResponse == null)
             {
@@ -138,17 +143,22 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
                 // Need to make sure existing funding stream ids on the spec are still included on the list to display in the list as the security trimmed list is based on Create permission not Edit
-                IEnumerable<FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fundingStreamIds.Contains(fs.Id));
-                IEnumerable<FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
+                IEnumerable<PolicyModels.FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
+                IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
 
-                IEnumerable<FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new FundingStreamComparer());
+                IEnumerable<PolicyModels.FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new FundingStreamComparer());
                 IEnumerable <SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
                 {
                     Value = m.Id,
                     Text = m.Name,
                 }).ToList();
 
-                FundingStreams = new MultiSelectList(fundingStreamListItems, "Value", "Text", fundingStreamIds);
+                FundingStreams = fundingStreams.Select(m => new SelectListItem
+                {
+                    Value = m.Id,
+                    Text = m.Name,
+                    Selected = m.Id == fundingStreamId
+                }).ToList();
             }
             else
             {
@@ -158,7 +168,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         private async Task PopulateFundingPeriods(string fundingPeriodId)
         {
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = await _specsClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = await _policiesApiClient.GetFundingPeriods();
 
             if (fundingPeriodsResponse == null)
             {

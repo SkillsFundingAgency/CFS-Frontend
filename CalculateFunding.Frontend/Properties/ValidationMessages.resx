@@ -190,10 +190,13 @@
     <value>You must select a funding period</value>
   </data>
   <data name="SpecificationFundingStreamRequired" xml:space="preserve">
-    <value>Select at least one funding stream</value>
+    <value>You must select a funding stream</value>
   </data>
   <data name="SpecificationNameRequired" xml:space="preserve">
     <value>Enter a unique name</value>
+  </data>
+  <data name="SpecificationProviderVersionRequired" xml:space="preserve">
+    <value>You must select a core provider</value>
   </data>
   <data name="SubPolicyDescriptionRequired" xml:space="preserve">
     <value>Enter a description</value>

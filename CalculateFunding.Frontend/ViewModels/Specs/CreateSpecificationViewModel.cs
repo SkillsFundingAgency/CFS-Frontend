@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using CalculateFunding.Frontend.Properties;
-
-namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
+    using System.ComponentModel.DataAnnotations;
+    using CalculateFunding.Frontend.Properties;
+
     public class CreateSpecificationViewModel
     {
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationNameRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Name { get; set; }
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingStreamRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
-        public IEnumerable<string> FundingStreamIds { get; set; }
+        public string FundingStreamId { get; set; }
+
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationProviderVersionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
+        public string ProviderVersionId { get; set; }
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationDescriptionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Description { get; set; }

@@ -14,6 +14,7 @@ using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Serilog;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers
 {
@@ -101,7 +102,7 @@ namespace CalculateFunding.Frontend.Helpers
             return !fundingStreamIds.Except(allowedFundingStreamIds).Any();
         }
 
-        public async Task<IEnumerable<FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
+        public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(fundingStreams, nameof(fundingStreams));
@@ -118,7 +119,7 @@ namespace CalculateFunding.Frontend.Helpers
             if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
             {
                 _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
-                return Enumerable.Empty<FundingStream>();
+                return Enumerable.Empty<PolicyModels.FundingStream>();
             }
 
             IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;

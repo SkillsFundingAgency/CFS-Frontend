@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {
-    public class FundingStreamComparer : IEqualityComparer<FundingStream>
+    public class FundingStreamComparer : IEqualityComparer<PolicyModels.FundingStream>
     {
-        public bool Equals(FundingStream x, FundingStream y)
+        public bool Equals(PolicyModels.FundingStream x, PolicyModels.FundingStream y)
         {
             if (y == null && x == null)
             {
@@ -24,7 +25,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
             }
         }
 
-        public int GetHashCode(FundingStream obj)
+        public int GetHashCode(PolicyModels.FundingStream obj)
         {
             return obj.Id.GetHashCode();
         }
