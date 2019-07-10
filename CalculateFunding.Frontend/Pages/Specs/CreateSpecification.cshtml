@@ -11,17 +11,17 @@
 
 @if (!Model.IsAuthorizedToCreate)
 {
-@section PermissionWarnings
+    @section PermissionWarnings
 {
-    <div class="row">
-        <div class="col-xs-12 permission-warning-banner">
-            <div class="permission-warning-inner">
+        <div class="row">
+            <div class="col-xs-12 permission-warning-banner">
+                <div class="permission-warning-inner">
 
-                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to create a specification for any funding stream</p>
+                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to create a specification for any funding stream</p>
+                </div>
             </div>
         </div>
-    </div>
-}
+    }
 }
 
 @section FormBannerLeft{
@@ -38,7 +38,7 @@
     </div>
 }
 
-<div class="row">
+<div id="create-specification" class="row">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
             <div gds-validation-summary="All">
@@ -58,7 +58,6 @@
 
                 <div gds-validationblock-for="CreateSpecificationViewModel.FundingPeriodId">
                     <div class="form-group">
-
                         <label asp-for="CreateSpecificationViewModel.FundingPeriodId">Funding period</label>
                         <select asp-items="@(Model.FundingPeriods)" asp-for="CreateSpecificationViewModel.FundingPeriodId" class="form-control">
                             <option></option>
@@ -67,14 +66,27 @@
                 </div>
             </div>
             <div>
-                <a validationanchor-for="CreateSpecificationViewModel.FundingStreamIds"></a>
+                <a validationanchor-for="CreateSpecificationViewModel.FundingStreamId"></a>
 
-                <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamIds">
+                <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamId">
                     <div class="form-group">
+                        <label asp-for="CreateSpecificationViewModel.FundingStreamId">Funding streams</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream</span></h4>
+                        <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream" asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" id="select-funding-stream" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a validationanchor-for="CreateSpecificationViewModel.ProviderVersionId"></a>
 
-                        <label asp-for="CreateSpecificationViewModel.FundingStreamIds">Funding streams</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select one or more funding streams</span></h4>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamIds" class="form-control gds-select-multiple"></select>
+                <div gds-validationblock-for="CreateSpecificationViewModel.ProviderVersionId">
+                    <div class="form-group">
+                        <label asp-for="CreateSpecificationViewModel.ProviderVersionId">Core Provider Data</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream before choosing the provider data</span></h4>
+                        <select data-bind="foreach:providerVersions" asp-for="CreateSpecificationViewModel.ProviderVersionId" class="form-control gds-select gds-select-taghelper">
+                            <option></option>
+                            <option data-bind="value: providerVersionId, text: display, attr: {'data-description': description}"></option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -95,9 +107,18 @@
 </div>
 
 @section scripts{
-    <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/specification.common.js" type="text/javascript" asp-append-version="true"></script>
     <script type="text/javascript">
-        $("#CreateSpecificationViewModel-FundingStreamIds").select2();
+        var vm = new calculateFunding.specification.SpecificationCommonViewModel();
+
+        var createSpecificationContainer = document.getElementById("create-specification");
+        if (createSpecificationContainer) {
+            ko.applyBindings(vm, createSpecificationContainer);
+        }
+
+        vm.fundingStreamChanged();
     </script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }

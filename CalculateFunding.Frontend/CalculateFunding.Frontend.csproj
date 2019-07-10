@@ -52,6 +52,7 @@
     <None Remove="Scripts\search.specifications.ts" />
     <None Remove="Scripts\search.testScenarioResults.ts" />
     <None Remove="Scripts\search.ts" />
+    <None Remove="Scripts\specification.common.ts" />
     <None Remove="Scripts\submit.disabler.ts" />
     <None Remove="Scripts\table.expander.sequential.ts" />
     <None Remove="Scripts\table.expander.ts" />
@@ -68,9 +69,11 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common" Version="1.33.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.15" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.16" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.10" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="1.0.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.9" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.2" />
@@ -153,6 +156,7 @@
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
+    <TypeScriptCompile Include="Scripts\specification.common.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\dataset.common.ts" />
     <TypeScriptCompile Include="Scripts\edit.specification.ts" />

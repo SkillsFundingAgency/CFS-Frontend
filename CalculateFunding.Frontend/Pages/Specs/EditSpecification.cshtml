@@ -39,12 +39,12 @@
     </div>
 }
 
-<div class="row">
+<div class="row" id="edit-specification">
     <div class="col-sm-9 col-md-6">
         <form method="post" class="form">
             <input asp-for="EditSpecificationViewModel.Id" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalSpecificationName" type="hidden" />
-            <input asp-for="EditSpecificationViewModel.OriginalFundingStreams" type="hidden" />
+            <input asp-for="EditSpecificationViewModel.OriginalFundingStreamId" type="hidden" />
             <input asp-for="EditSpecificationViewModel.OriginalFundingPeriodId" type="hidden" />
             <input asp-for="EditSpecificationViewModel.IsSelectedForFunding" type="hidden" />
             <div gds-validation-summary="All">
@@ -77,13 +77,28 @@
                 </div>
             </div>
             <div>
-                <a validationanchor-for="EditSpecificationViewModel.FundingStreamIds"></a>
+                <a validationanchor-for="EditSpecificationViewModel.FundingStreamId"></a>
 
-                <div gds-validationblock-for="EditSpecificationViewModel.FundingStreamIds">
+                <div gds-validationblock-for="EditSpecificationViewModel.FundingStreamId">
                     <div class="form-group">
-                        <label asp-for="EditSpecificationViewModel.FundingStreamIds">Funding stream</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">@(Model.EditSpecificationViewModel.IsSelectedForFunding ? "You can't change this as this specification has been chosen for a funding period" : "Deleting a funding stream will break the specification's funding calculations")</span></h4>
-                        <select asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamIds" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control gds-select-multiple"></select>
+                        <label asp-for="EditSpecificationViewModel.FundingStreamId">Funding stream</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">@(Model.EditSpecificationViewModel.IsSelectedForFunding ? "You can't change this as this specification has been chosen for a funding period" : "Changing a funding stream will break the specification's funding calculations")</span></h4>
+                        <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream" asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamId" id="select-funding-stream" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a validationanchor-for="EditSpecificationViewModel.ProviderVersionId"></a>
+
+                <div gds-validationblock-for="EditSpecificationViewModel.ProviderVersionId">
+                    <div class="form-group">
+
+                        <label asp-for="EditSpecificationViewModel.ProviderVersionId">Core Provider Data</label>
+                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream before choosing the provider data</span></h4>
+                        <select data-bind="foreach:providerVersions, value:selectedProviderVersion" asp-for="EditSpecificationViewModel.ProviderVersionId" class="form-control gds-select gds-select-taghelper">
+                            <option></option>
+                            <option data-bind="value: providerVersionId, text: display, attr: {'data-description': description}"></option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -97,13 +112,6 @@
                     </div>
                 </div>
             </div>
-            <div>
-                <div class="form-group">
-                    <div class="alert alert--warning">
-                        <div class="icon-funding-stream-removed"><i class="material-icons">warning</i></div><div>Funding stream deleted: this resets funding calculation allocation lines set to the funding stream. You'll need to set new ones.</div>
-                    </div>
-                </div>
-            </div>
             <p class="form-submit-container"><button class="button" disabled="@(!Model.IsAuthorizedToEdit)" id="save-button" type="submit">Update specification</button> <a href="/specs/policies/@Model.EditSpecificationViewModel.Id" id="cancel-link">Back</a></p>
 
         </form>
@@ -112,9 +120,19 @@
 </div>
 
 @section scripts{
-    <script type="text/javascript" src="~/assets/libs/js/select2.min.js"></script>
-    <script asp-src-include="~/js/edit.specification.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/specification.common.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
+    <script type="text/javascript">
+        var vm = new calculateFunding.specification.SpecificationCommonViewModel();
+
+        var editSpecificationContainer = document.getElementById("edit-specification");
+        if (editSpecificationContainer) {
+            ko.applyBindings(vm, editSpecificationContainer);
+        }
+        vm.fundingStreamChanged('@(Model.EditSpecificationViewModel.ProviderVersionId)');
+    </script>
 }
 
 @section styles{

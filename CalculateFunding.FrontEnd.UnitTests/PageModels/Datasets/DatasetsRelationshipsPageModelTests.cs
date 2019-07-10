@@ -8,8 +8,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using System.Net;
     using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Datasets;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -19,6 +18,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
+    using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
     [TestClass]
     public class DatasetsRelationshipsPageModelTests
@@ -27,15 +27,15 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenNullSearchResultsReturns_ReturnsStatusCode500()
         {
             // Arrange
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "1819", Name = "1018/19" }
+                new PolicyModels.Period { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.Period>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
-            ISpecsApiClient specsApiClient = CreateApiClient();
-            specsApiClient
+            IPoliciesApiClient policiesApiClient = CreateApiClient();
+            policiesApiClient
                 .GetFundingPeriods()
                 .Returns(apiResponse);
 
@@ -44,7 +44,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns((SpecificationDatasourceRelationshipSearchResultViewModel)null);
 
-            DatasetRelationshipsPageModel pageModel = CreatePageModel(specsApiClient, searchService);
+            DatasetRelationshipsPageModel pageModel = CreatePageModel(policiesApiClient, searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty, string.Empty);
@@ -72,15 +72,15 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenSearchResultsReturnsResults_ReturnsPage()
         {
             // Arrange
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "1819", Name = "1018/19" }
+                new PolicyModels.Period { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<Reference>> apiResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.Period>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
-            ISpecsApiClient specsApiClient = CreateApiClient();
-            specsApiClient
+            IPoliciesApiClient policiesApiClient = CreateApiClient();
+            policiesApiClient
                 .GetFundingPeriods()
                 .Returns(apiResponse);
 
@@ -91,7 +91,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(model);
 
-            DatasetRelationshipsPageModel pageModel = CreatePageModel(specsApiClient, searchService);
+            DatasetRelationshipsPageModel pageModel = CreatePageModel(policiesApiClient, searchService);
 
             // Act
             IActionResult actionResult = await pageModel.OnGetAsync(1, string.Empty, string.Empty);
@@ -108,14 +108,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .Be(1);
         }
 
-        private static DatasetRelationshipsPageModel CreatePageModel(ISpecsApiClient apiClient, IDatasetRelationshipsSearchService searchService)
+        private static DatasetRelationshipsPageModel CreatePageModel(IPoliciesApiClient apiClient, IDatasetRelationshipsSearchService searchService)
         {
             return new DatasetRelationshipsPageModel(apiClient ?? CreateApiClient(), searchService ?? CreateSearchService());
         }
 
-        private static ISpecsApiClient CreateApiClient()
+        private static IPoliciesApiClient CreateApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<IPoliciesApiClient>();
         }
 
         private static IDatasetRelationshipsSearchService CreateSearchService()

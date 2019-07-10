@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ValidationMessages {
@@ -277,7 +277,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select at least one funding stream.
+        ///   Looks up a localized string similar to You must select a funding stream.
         /// </summary>
         internal static string SpecificationFundingStreamRequired {
             get {
@@ -291,6 +291,15 @@ namespace CalculateFunding.Frontend.Properties {
         internal static string SpecificationNameRequired {
             get {
                 return ResourceManager.GetString("SpecificationNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must select a core provider.
+        /// </summary>
+        internal static string SpecificationProviderVersionRequired {
+            get {
+                return ResourceManager.GetString("SpecificationProviderVersionRequired", resourceCulture);
             }
         }
         

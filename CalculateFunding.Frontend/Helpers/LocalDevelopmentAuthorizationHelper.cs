@@ -7,6 +7,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers
 {
@@ -37,7 +38,7 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(true);
         }
 
-        public async Task<IEnumerable<FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
+        public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(fundingStreams, nameof(fundingStreams));

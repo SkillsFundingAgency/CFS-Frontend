@@ -12,6 +12,7 @@
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+    using CalculateFunding.Common.ApiClient.Providers.Models;
 
     public class ProviderSearchService : IProviderSearchService
     {
@@ -32,6 +33,20 @@
             _logger = logger;
             _featureToggle = featureToggle;
         }
+
+        public async Task<IEnumerable<ProviderVersion>> GetProviderVersionsByFundingStream(string fundingStreamId)
+        {
+            ApiResponse<IEnumerable<ProviderVersion>> providerVersionsResponse = await _providersApiClient.GetProviderVersions(fundingStreamId);
+
+            if (providerVersionsResponse?.Content == null)
+            {
+                _logger.Error("Get provider verions by funding stream HTTP request failed");
+                return null;
+            }
+
+            return providerVersionsResponse.Content;
+        }
+
 
         public async Task<ProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {

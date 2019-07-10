@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.UnitTests.Helpers
 {
@@ -163,11 +164,11 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         public async Task FundingStreams_SecurityTrimList_WhenUserHasAccessToAll_ThenReturnAll()
         {
             // Arrange
-            IEnumerable<FundingStream> fundingStreamIds = new List<FundingStream>
+            IEnumerable<PolicyModels.FundingStream> fundingStreamIds = new List<PolicyModels.FundingStream>
             {
-                new FundingStream { Id = "fs1" },
-                new FundingStream { Id = "fs2" },
-                new FundingStream { Id = "fs3" }
+                new PolicyModels.FundingStream { Id = "fs1" },
+                new PolicyModels.FundingStream { Id = "fs2" },
+                new PolicyModels.FundingStream { Id = "fs3" }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -189,7 +190,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
+            IEnumerable<PolicyModels.FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
 
             // Assert
             results.Should().HaveCount(3);
@@ -199,11 +200,11 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         public async Task FundingStreams_SecurityTrimList_WhenUserHasAccessToNone_ThenReturnNone()
         {
             // Arrange
-            IEnumerable<FundingStream> fundingStreamIds = new List<FundingStream>
+            IEnumerable<PolicyModels.FundingStream> fundingStreamIds = new List<PolicyModels.FundingStream>
             {
-                new FundingStream { Id = "fs1" },
-                new FundingStream { Id = "fs2" },
-                new FundingStream { Id = "fs3" }
+                new PolicyModels.FundingStream { Id = "fs1" },
+                new PolicyModels.FundingStream { Id = "fs2" },
+                new PolicyModels.FundingStream { Id = "fs3" }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -225,7 +226,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
+            IEnumerable<PolicyModels.FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
 
             // Assert
             results.Should().BeEmpty();
@@ -235,11 +236,11 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         public async Task FundingStreams_SecurityTrimList_WhenUserHasAccessToSome_ThenReturnSome()
         {
             // Arrange
-            IEnumerable<FundingStream> fundingStreamIds = new List<FundingStream>
+            IEnumerable<PolicyModels.FundingStream> fundingStreamIds = new List<PolicyModels.FundingStream>
             {
-                new FundingStream { Id = "fs1" },
-                new FundingStream { Id = "fs2" },
-                new FundingStream { Id = "fs3" }
+                new PolicyModels.FundingStream { Id = "fs1" },
+                new PolicyModels.FundingStream { Id = "fs2" },
+                new PolicyModels.FundingStream { Id = "fs3" }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -261,7 +262,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
+            IEnumerable<PolicyModels.FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
 
             // Assert
             results.Should().HaveCount(1);
@@ -272,11 +273,11 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         public async Task FundingStreams_SecurityTrimList_WhenUserIsAdmin_ThenReturnAll()
         {
             // Arrange
-            IEnumerable<FundingStream> fundingStreamIds = new List<FundingStream>
+            IEnumerable<PolicyModels.FundingStream> fundingStreamIds = new List<PolicyModels.FundingStream>
             {
-                new FundingStream { Id = "fs1" },
-                new FundingStream { Id = "fs2" },
-                new FundingStream { Id = "fs3" }
+                new PolicyModels.FundingStream { Id = "fs1" },
+                new PolicyModels.FundingStream { Id = "fs2" },
+                new PolicyModels.FundingStream { Id = "fs3" }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
@@ -298,7 +299,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            IEnumerable<FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
+            IEnumerable<PolicyModels.FundingStream> results = await authHelper.SecurityTrimList(user, fundingStreamIds, permissionRequired);
 
             // Assert
             results.Should().HaveCount(3);
@@ -310,9 +311,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-                new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-                new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+                new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+                new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);

@@ -1,6 +1,8 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient.Providers.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -21,6 +23,23 @@
 
             _providerSearchService = providerSearchService;
             _calculationProviderResultsSearchService = calculationProviderResultsSearchService;
+        }
+
+        [HttpPost]
+        [Route("api/providerversions/getbyfundingstream")]
+        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody] string fundingStreamId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+
+            IEnumerable<ProviderVersion> result = await _providerSearchService.GetProviderVersionsByFundingStream(fundingStreamId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return new StatusCodeResult(500);
+            }
         }
 
         [HttpPost]

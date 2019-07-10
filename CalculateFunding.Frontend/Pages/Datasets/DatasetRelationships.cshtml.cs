@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Specs;
@@ -13,12 +13,12 @@
 
     public class DatasetRelationshipsPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly IPoliciesApiClient _policiesClient;
         private readonly IDatasetRelationshipsSearchService _datasetRelationshipsSearchService;
 
-        public DatasetRelationshipsPageModel(ISpecsApiClient specsClient, IDatasetRelationshipsSearchService datasetRelationshipsSearchService)
+        public DatasetRelationshipsPageModel(IPoliciesApiClient policiesClient, IDatasetRelationshipsSearchService datasetRelationshipsSearchService)
         {
-            _specsClient = specsClient;
+            _policiesClient = policiesClient;
             _datasetRelationshipsSearchService = datasetRelationshipsSearchService;
         }
 
@@ -85,7 +85,7 @@
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {
-            var periodsResponse = await _specsClient.GetFundingPeriods();
+            var periodsResponse = await _policiesClient.GetFundingPeriods();
             var fundingPeriods = periodsResponse.Content;
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))

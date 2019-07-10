@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 {
@@ -123,7 +125,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper : mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -159,7 +161,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -195,7 +197,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -242,7 +244,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper : mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -289,7 +291,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -336,7 +338,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             //Act/Assert
             Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
@@ -358,32 +360,33 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new PolicyModels.Period { Id = "fp1", Name = "funding" }
             };
 
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fp1", Name = "funding" }
+                new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
             ISpecsApiClient apiClient = CreateApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             apiClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
@@ -400,7 +403,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper, authorizationHelper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, policiesApiClient, mapper: mapper, authorizationHelper: authorizationHelper);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(specificationId);
@@ -444,33 +447,34 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "Funding Period 1" },
-                new Reference { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
             };
 
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fp1", Name = "funding" }
+                new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
             ISpecsApiClient apiClient = CreateApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             apiClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
@@ -487,7 +491,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper, authorizationHelper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, policiesApiClient, mapper, authorizationHelper);
 
             //Act
             IActionResult result = await pageModel.OnGetAsync(specificationId);
@@ -523,33 +527,34 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
             // Arrange
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "Funding Period 1" },
-                new Reference { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
             };
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fp1", Name = "funding" }
+                new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
             Specification specification = new Specification { Id = specificationId, Name = specName };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
             ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
             EditSpecificationViewModel viewModelReturned = CreateEditSpecificationViewModel();
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecsApiClient mockSpecsClient = CreateApiClient();
+            IPoliciesApiClient mockPoliciesClient = CreatePoliciesApiClient();
             mockSpecsClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            mockSpecsClient
+            mockPoliciesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            mockSpecsClient
+            mockPoliciesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
@@ -566,7 +571,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationViewModel>(Arg.Is(specification))
                 .Returns(viewModelReturned);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: mockSpecsClient, authorizationHelper: mockAuthorizationHelper, mapper: mockMapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: mockSpecsClient, policiesApiClient: mockPoliciesClient, authorizationHelper: mockAuthorizationHelper, mapper: mockMapper);
 
             // Act
             IActionResult pageResult = await pageModel.OnGetAsync(specificationId);
@@ -609,52 +614,52 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Test Spec",
                 FundingStreams = new List<FundingStream>
                 {
-                    new FundingStream { Id = "fs1", Name = "FS One" },
-                    new FundingStream { Id = "fs2", Name = "FS Two" }
+                    new FundingStream { Id = "fs1", Name = "FS One" }
                 },
                 FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
             };
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "Funding Period 1" },
-                new Reference { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
             };
 
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fs1", Name = "FS One" },
-                new FundingStream { Id = "fs2", Name = "FS Two" }
+                new PolicyModels.FundingStream { Id = "fs1", Name = "FS One" },
+                new PolicyModels.FundingStream { Id = "fs2", Name = "FS Two" }
             };
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecsApiClient specsClient = CreateApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
-            specsClient
+            policiesApiClient
                 .GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods));
 
-            specsClient
+            policiesApiClient
                 .GetFundingStreams()
-                .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             authorizationHelper
-                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
-                .Returns(Enumerable.Empty<FundingStream>());
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<PolicyModels.FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(Enumerable.Empty<PolicyModels.FundingStream>());
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
 
             // Act
             await pageModel.OnGetAsync(specificationId);
 
             // Assert
-            pageModel.FundingStreams.Should().HaveCount(2);
+            pageModel.FundingStreams.Should().HaveCount(1);
         }
 
         [TestMethod]
@@ -667,55 +672,55 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Test Spec",
                 FundingStreams = new List<FundingStream>
                 {
-                    new FundingStream { Id = "fs1", Name = "FS One" },
-                    new FundingStream { Id = "fs2", Name = "FS Two" }
+                    new FundingStream { Id = "fs1", Name = "FS One" }
                 },
                 FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
             };
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "Funding Period 1" },
-                new Reference { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
             };
 
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fs1", Name = "FS One" },
-                new FundingStream { Id = "fs2", Name = "FS Two" }
+                new PolicyModels.FundingStream { Id = "fs1", Name = "FS One" },
+                new PolicyModels.FundingStream { Id = "fs2", Name = "FS Two" }
             };
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecsApiClient specsClient = CreateApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             specsClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
-            specsClient
+            policiesApiClient
                 .GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods));
 
-            specsClient
+            policiesApiClient
                 .GetFundingStreams()
-                .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             authorizationHelper
-                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
-                .Returns(new List<FundingStream>
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<PolicyModels.FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(new List<PolicyModels.FundingStream>
                 {
-                    new FundingStream { Id = "fs1", Name = "FS One" }
+                    new PolicyModels.FundingStream { Id = "fs1", Name = "FS One" }
                 });
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
 
             // Act
             await pageModel.OnGetAsync(specificationId);
 
             // Assert
-            pageModel.FundingStreams.Should().HaveCount(2);
+            pageModel.FundingStreams.Should().HaveCount(1);
         }
 
         [TestMethod]
@@ -838,33 +843,34 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnPostAsync_GivenPagePopulatesButModelStateIsInvalid_ReturnsPage()
         {
             //Arrange
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new PolicyModels.Period { Id = "fp1", Name = "funding" }
             };
 
-            IEnumerable<FundingStream> fundingStreams = new[]
+            IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
-                new FundingStream { Id = "fs1", Name = "funding stream" }
+                new PolicyModels.FundingStream { Id = "fs1", Name = "funding stream" }
             };
 
             ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
-            ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
             ISpecsApiClient apiClient = CreateApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             apiClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            policiesApiClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
@@ -876,12 +882,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: apiClient, authorizationHelper: authorizationHelper);
+            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: apiClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper);
 
             pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
                 Name = specName,
-                FundingStreamIds = new List<string> { "fs1" }
+                FundingStreamId = "fs1"
             };
 
             pageModel.PageContext = new PageContext();
@@ -936,7 +942,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationModel>(Arg.Is(viewModel))
                 .Returns(editModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             pageModel.EditSpecificationViewModel = viewModel;
 
@@ -988,7 +994,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationModel>(Arg.Is(viewModel))
                 .Returns(editModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             pageModel.EditSpecificationViewModel = viewModel;
 
@@ -1040,7 +1046,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Map<EditSpecificationModel>(Arg.Is(viewModel))
                 .Returns(editModel);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper);
+            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
 
             pageModel.EditSpecificationViewModel = viewModel;
 
@@ -1091,9 +1097,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private static EditSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        private static EditSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IPoliciesApiClient policiesApiClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
-            EditSpecificationPageModel pageModel = new EditSpecificationPageModel(specsClient ?? CreateApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
+            EditSpecificationPageModel pageModel = new EditSpecificationPageModel(specsClient ?? CreateApiClient(), policiesApiClient ?? CreatePoliciesApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
 
             pageModel.PageContext = TestAuthHelper.CreatePageContext();
 
@@ -1103,6 +1109,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         private static ISpecsApiClient CreateApiClient()
         {
             return Substitute.For<ISpecsApiClient>();
+        }
+        private static IPoliciesApiClient CreatePoliciesApiClient()
+        {
+            return Substitute.For<IPoliciesApiClient>();
         }
 
         private static IMapper CreateMapper()
@@ -1117,7 +1127,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = specificationId,
                 Name = specName,
                 FundingPeriodId = "fp1",
-                FundingStreamIds = new[] { "fs1, fs2" }
+                FundingStreamId = "fs1"
             };
         }
     }
