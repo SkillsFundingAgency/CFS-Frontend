@@ -102,13 +102,6 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             return await PutAsync($"specification-edit?specificationId={specificationId}", specification);
         }
 
-        public async Task<ApiResponse<Policy>> CreatePolicy(CreatePolicyModel policy)
-        {
-            Guard.ArgumentNotNull(policy, nameof(policy));
-
-            return await PostAsync<Policy, CreatePolicyModel>("policies", policy);
-        }
-
         public async Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));

@@ -70,8 +70,6 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
 
         Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
 
-        Task<ApiResponse<Policy>> CreatePolicy(CreatePolicyModel policy);
-
         Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy);
 
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
