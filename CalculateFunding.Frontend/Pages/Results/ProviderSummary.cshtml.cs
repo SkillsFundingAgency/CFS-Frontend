@@ -2,6 +2,7 @@
 {
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
@@ -12,8 +13,8 @@
     {
         private IFeatureToggle _featureToggle;
 
-        public ProviderSummaryPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
-            : base(resultsApiClient, providersApiClient, mapper, specsApiClient, logger)
+        public ProviderSummaryPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+            : base(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger)
         {
             _featureToggle = featureToggle;
         }

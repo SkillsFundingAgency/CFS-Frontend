@@ -77,6 +77,8 @@
                 </li>
             </ul>
             <br />
+            <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">@($"You are using the {Model.ViewModel.ProviderName} from ") @(Model.ViewModel.Version.HasValue ? $"{Model.ViewModel.TargetDate} Version {Model.ViewModel.Version}." : " the Master Version.")</span></h4>
+            <br />
             <div class="view-provider-summary">
                 <table class="cf provider-summary-table">
                     <thead>

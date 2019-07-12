@@ -16,6 +16,9 @@ using Serilog;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Providers.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
@@ -23,14 +26,16 @@ namespace CalculateFunding.Frontend.Pages.Results
     {
         private readonly IResultsApiClient _resultsApiClient;
         private readonly IProvidersApiClient _providersApiClient;
+        private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
         private readonly ISpecsApiClient _specsApiClient;
         private readonly ILogger _logger;
 
-        public ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
+        public ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
         {
             _resultsApiClient = resultsApiClient;
             _providersApiClient = providersApiClient;
+            _policiesApiClient = policiesApiClient;
             _mapper = mapper;
             _specsApiClient = specsApiClient;
             _logger = logger;
@@ -86,6 +91,9 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             ProviderId = providerId;
 
+            string targetDate = string.Empty;
+            int? version = null;
+
             ApiResponse<ProviderVersionSearchResult> apiResponse;
 
             if (string.IsNullOrWhiteSpace(ProviderVersionId))
@@ -95,6 +103,13 @@ namespace CalculateFunding.Frontend.Pages.Results
             else
             {
                 apiResponse = await _providersApiClient.GetProviderByIdFromProviderVersion(ProviderVersionId, providerId);
+                ApiResponse<ProviderVersion> apiResponseMetaData = await _providersApiClient.GetProvidersByVersion(ProviderVersionId);
+
+                if(apiResponseMetaData?.Content != null)
+                {
+                    targetDate = apiResponseMetaData?.Content.TargetDate.LocalDateTime.ToShortDateString();
+                    version = apiResponseMetaData?.Content.Version;
+                }
             }
 
             if (apiResponse.StatusCode != HttpStatusCode.OK && apiResponse.Content == null)
@@ -106,6 +121,8 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             ProviderResultsViewModel viewModel = new ProviderResultsViewModel
             {
+                TargetDate = targetDate,
+                Version = version,
                 ProviderName = response.Name,
                 ProviderType = response.ProviderType,
                 ProviderSubtype = response.ProviderSubType,
@@ -155,13 +172,13 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<Period>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
+            IEnumerable<Period> fundingPeriods = periodsResponse.Content;
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {
