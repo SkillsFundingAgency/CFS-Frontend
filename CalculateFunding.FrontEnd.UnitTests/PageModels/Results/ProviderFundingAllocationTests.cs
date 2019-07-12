@@ -6,6 +6,8 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
+    using CalculateFunding.Common.ApiClient.Policies.Models;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Common.Models;
@@ -29,6 +31,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -36,7 +39,7 @@
 
             ILogger logger = Substitute.For<ILogger>();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
             // Act - Assert
             Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await providerAllocPageModel.OnGetAsync(null, string.Empty, string.Empty));
@@ -50,6 +53,7 @@
             IResultsApiClient resultsApiClient = CreateApiClient();
 
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -57,11 +61,11 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> academicYears = null;
+            IEnumerable<Period> academicYears = null;
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -78,8 +82,8 @@
                 CalculationResults = calResult
             };
 
-            NSubstitute.Core.ConfiguredCall fundingPeriods = specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.NotFound, academicYears));
+            NSubstitute.Core.ConfiguredCall fundingPeriods = policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.NotFound, academicYears));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -104,6 +108,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -111,11 +116,11 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -132,8 +137,8 @@
             providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -163,6 +168,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -170,9 +176,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -191,8 +197,8 @@
             providersApiClient.GetProviderByIdFromProviderVersion(Arg.Is("3"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -222,6 +228,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -229,9 +236,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = null;
 
@@ -250,8 +257,8 @@
             providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.NotFound, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -279,6 +286,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -286,9 +294,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -307,8 +315,8 @@
             providersApiClient.GetProviderByIdFromProviderVersion(Arg.Is("3"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -334,6 +342,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -341,9 +350,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -358,8 +367,8 @@
             providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));
@@ -391,6 +400,7 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
@@ -398,9 +408,9 @@
 
             ILogger logger = CreateLogger();
 
-            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, specsClient, mapper, logger);
+            ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -415,8 +425,8 @@
             providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));
@@ -512,6 +522,10 @@
         {
             return Substitute.For<IProvidersApiClient>();
         }
+        private static IPoliciesApiClient CreatePoliciesApiClient()
+        {
+            return Substitute.For<IPoliciesApiClient>();
+        }
 
         private static ISpecsApiClient CreateSpecsApiClient()
         {
@@ -523,9 +537,9 @@
             return MappingHelper.CreateFrontEndMapper();
         }
 
-        private static ProviderAllocationLinePageModel CreatePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
+        private static ProviderAllocationLinePageModel CreatePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger)
         {
-            return new ProviderAllocationLinePageModel(resultsApiClient, providersApiClient, mapper, specsApiClient, logger);
+            return new ProviderAllocationLinePageModel(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger);
         }
 
         private static ILogger CreateLogger()

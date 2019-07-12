@@ -15,6 +15,10 @@ namespace CalculateFunding.Frontend.ViewModels.Results
             ScenarioItems = Enumerable.Empty<ScenarioItemResult>();
         }
 
+        public int? Version { get; set; }
+
+        public string TargetDate { get; set; }
+
         public string ProviderName { get; set; }
 
         public string ProviderType { get; set; }
