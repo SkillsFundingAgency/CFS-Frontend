@@ -107,7 +107,9 @@
 
 	        this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
-			this.Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
+			Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
+
+            Specification.Calculations = GetCalculationsFromExistingPolicies(specificationResponse.Content).ToList();
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
 
@@ -139,88 +141,16 @@
                         }
 
                         break;
-                    case PoliciesPageBannerOperationType.PolicyUpdated:
-                    case PoliciesPageBannerOperationType.PolicyCreated:
-                        PageBanner.EntityName = Specification.Policies.Where(p => p.Id == operationId).FirstOrDefault()?.Name;
-                        PageBanner.EntityType = "Policy";
-                        PageBanner.ActionText = "Edit";
-                        PageBanner.ActionUrl = $"/specs/editPolicy/{specificationId}/{operationId}";
-
-                        if (operationType.Value == PoliciesPageBannerOperationType.PolicyUpdated)
-                        {
-                            PageBanner.OperationAction = "updated";
-                        }
-                        else if (operationType.Value == PoliciesPageBannerOperationType.PolicyCreated)
-                        {
-                            PageBanner.OperationAction = "created";
-                        }
-
-                        break;
-                    case PoliciesPageBannerOperationType.SubpolicyUpdated:
-                    case PoliciesPageBannerOperationType.SubpolicyCreated:
-                        string policyId = null;
-                        if (Specification.Policies.AnyWithNullCheck())
-                        {
-                            foreach (PolicyViewModel policy in Specification.Policies)
-                            {
-                                if (policy.SubPolicies.AnyWithNullCheck())
-                                {
-                                    foreach (PolicyViewModel subpolicy in policy.SubPolicies)
-                                    {
-                                        if (subpolicy.Id == operationId)
-                                        {
-                                            PageBanner.EntityName = subpolicy.Name;
-                                            policyId = policy.Id;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        PageBanner.EntityType = "Subpolicy";
-                        PageBanner.ActionText = "Edit";
-                        PageBanner.ActionUrl = $"/specs/EditSubPolicy/{specificationId}/{operationId}/{policyId}";
-
-                        if (operationType.Value == PoliciesPageBannerOperationType.SubpolicyUpdated)
-                        {
-                            PageBanner.OperationAction = "updated";
-                        }
-                        else if (operationType.Value == PoliciesPageBannerOperationType.SubpolicyCreated)
-                        {
-                            PageBanner.OperationAction = "created";
-                        }
-                        break;
+                   
                     case PoliciesPageBannerOperationType.CalculationUpdated:
                     case PoliciesPageBannerOperationType.CalculationCreated:
-                        if (Specification.Policies.AnyWithNullCheck())
+                        if (Specification.Calculations.AnyWithNullCheck())
                         {
-                            foreach (PolicyViewModel policy in Specification.Policies)
+                            foreach (CalculationViewModel calculation in Specification.Calculations)
                             {
-                                if (policy.SubPolicies.AnyWithNullCheck())
+                                if (calculation.Id == operationId)
                                 {
-                                    foreach (PolicyViewModel subpolicy in policy.SubPolicies)
-                                    {
-                                        if (subpolicy.Calculations.AnyWithNullCheck())
-                                        {
-                                            foreach (CalculationViewModel calculation in subpolicy.Calculations)
-                                            {
-                                                if (calculation.Id == operationId)
-                                                {
-                                                    PageBanner.EntityName = calculation.Name;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (policy.Calculations.AnyWithNullCheck())
-                                {
-                                    foreach (CalculationViewModel calculation in policy.Calculations)
-                                    {
-                                        if (calculation.Id == operationId)
-                                        {
-                                            PageBanner.EntityName = calculation.Name;
-                                        }
-                                    }
+                                    PageBanner.EntityName = calculation.Name;
                                 }
                             }
                         }
@@ -242,6 +172,22 @@
             }
 
             return Page();
+        }
+
+        //temp until backend done
+        private IEnumerable<CalculationViewModel> GetCalculationsFromExistingPolicies(Specification specification)
+        {
+            List<CalculationViewModel> calculationViewModels = new List<CalculationViewModel>();
+
+            foreach(Policy policy in specification.Policies)
+            {
+                if (!policy.Calculations.IsNullOrEmpty())
+                {
+                    calculationViewModels.AddRange(policy.Calculations.Select(c => _mapper.Map<CalculationViewModel>(c)));
+
+                }
+            }
+            return calculationViewModels.OrderBy(m => m.Name);
         }
     }
 }

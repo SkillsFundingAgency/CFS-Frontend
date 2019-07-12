@@ -17,12 +17,10 @@
             <a href="/specs/editspecification/@Model.Id?returnPage=ManagePolicies">Edit specification</a>
         </div>
 
-        @if (Model.Policies != null && Model.Policies.Any())
-        {
-            <div>
-                <a href="/specs/createcalculation/@Model.Id">Create calculation specification</a>
-            </div>
-        }
+        <div>
+            <a href="/specs/createcalculation/@Model.Id">Create calculation specification</a>
+        </div>
+
         <div>
             <a href="/datasets/AssignDatasetSchema/@Model.Id">Create dataset</a>
         </div>

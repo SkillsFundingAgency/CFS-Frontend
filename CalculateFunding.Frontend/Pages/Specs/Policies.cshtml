@@ -29,6 +29,7 @@
 {
     <partial name="_PageBannerOperationPartial" model="Model.PageBanner" />
 }
+
 <div class="edit-policy-container">
     <div class="row">
         <div class="col-xs-12 policy-spec-what ">
@@ -46,7 +47,7 @@
     </div>
     <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
         <li class="nav-item active">
-            <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">Policy structure</a>
+            <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">Calculation List</a>
         </li>
         <li class="nav-item">
             <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">
@@ -65,82 +66,23 @@
     </ul>
     <div class="row">
         <div class="col-xs-12">
-        <div class="jump-to-container">
-            <div>Policy</div>
-            <div class="pull-right"><a href="#" data-action="expand" id="expandCollapseAll">Expand all</a></div>
-            <div>
-                <select id="policy-jump">
-                    <option>Jump to</option>
-                    @foreach (var policy in Model.Specification.Policies)
-                    {
-                        <option value="@policy.Id">@policy.Name</option>
-                    }
-                </select>
-            </div>
-        </div>
-            <table class="cf edit-policy-table">
-                <thead class="table-primary-border">
-                <tr>
-                    <th class="table-primary-border"></th>
-                    <th class="text-center no-border theader-name">Name</th>
-                    <th colspan="3" class="text-center theader-description">Description</th>
-                    <th class="text-center theader-last-edited">Last edited </th>
-                    <th class="theader-icon-holder"></th>
-                </tr>
+            <table class="cf" id="calculations-table">
+                <thead>
+                    <tr>
+                        <th id="calculation-header-column">Name</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Last Edited</th>
+                        <th></th>
+                    </tr>
                 </thead>
-                @{
-                    List<PolicyViewModel> policies = new List<PolicyViewModel>(Model.Specification.Policies);
-                }
-                @for (int p = 0; p < policies.Count; p++)
-                {
-                    PolicyViewModel policy = policies[p];
-            
-                    <tr class="data-policy-container cr-table-primary-highlight">
-                        <td class="table-primary-border"><a name="policy-@policy.Id"></a></td>
-                        <td class="no-border min-width-sm data-policy-name">Policy</td>
-                        <td class="min-width-md">
-                            <span class="button-split-container">
-                                <span class="button-split-icon">
-                                    <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink-icon"><i class="material-icons" alt="Edit">edit</i></a>
-                                </span>
-                                <span class="button-split-text">
-                                    <a href="/specs/editPolicy/@Model.Specification.Id/@policy.Id" class="data-policy-editlink"><span class="data-policy-name">@policy.Name</span></a>
-                                </span>
-                            </span>
-                        </td>
-                        <td colspan="2" class="data-policy-description-firstline first-line-only">@policy.DescriptionFirstLine</td>
-                        <td class="text-nowrap data-policy-lastupdated">
-                            <span class="datetime-split-container">
-                                <span class="datetime-split-date data-policy-lastupdated-date">@policy.LastUpdatedDateFormatted</span>
-                                <span class="datetime-split-time data-policy-lastupdated-time">@policy.LastUpdatedTimeFormatted</span>
-                            </span>
-                        </td>
-                        <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
-                    </tr>
-                    <tr class="cr-table-primary-highlight expander-container">
-                        <td class="table-primary-border"></td>
-                        <td colspan="6" class="no-border data-policy-description">
-                            @policy.Description.ReplaceLineBreaksForHtml()
-                        </td>
-                    </tr>
-                    if (policy.Calculations.AnyWithNullCheck())
+                <tbody>
+                    @foreach (CalculationViewModel calculation in Model.Specification.Calculations)
                     {
-                        List<CalculationViewModel> calculations = new List<CalculationViewModel>(policy.Calculations);
-            
-                        for (int i = 0; i < calculations.Count; i++)
-                        {
-                            CalculationViewModel calculation = calculations[i];
-            
-                            <tr class="cr-table-primary-highlight data-calculation-container">
-                                <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
-                                @if (i == 0)
-                                {
-                                    <td id="calcs-for-@policy.Id" rowspan="@calculations.Count" class="data-calculation-label cr-table-secondary-highlight cf-table-columnar-header multi-row-header" data-totalItems="@calculations.Count" data-openItems="0">
-                                        <div class="table-type-header">Calculation specification</div>
-                                    </td>
-                                }
-            
-                                <td>
+                        <tr>
+
+                            <td>
+                                <div class="calculation-name-holder">
                                     <span class="button-split-container">
                                         <span class="button-split-icon">
                                             <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
@@ -149,132 +91,36 @@
                                             <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
                                         </span>
                                     </span>
-                                </td>
-                                <td class="data-calculation-description-firstline first-line-only">@calculation.DescriptionFirstLine</td>
-                                <td class="data-calculation-type">@calculation.CalculationType</td>
-                                <td class="text-nowrap data-calculation-lastupdated">
-                                    <span class="datetime-split-container">
-                                        <span class="datetime-split-date data-calculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
-                                        <span class="datetime-split-time data-calculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
-                                    </span>
-                                </td>
-                                <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@policy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
-                            </tr>
-                            <tr class="cr-table-primary-highlight expander-container">
-                                <td class="table-primary-border"></td>
-            
-                                <td colspan="5" class="">
-                                    @calculation.Description.ReplaceLineBreaksForHtml()
-                                    <a class="display-block view-calculation-code-link" href="/api/specs/redirectToCalc/@calculation.Id">View calculation code</a>
-                                </td>
-                            </tr>
-                        }
+                                </div>
+                            </td>
+                            <td class="data-calculation-description-firstline first-line-only">@calculation.DescriptionFirstLine</td>
+                            <td class="data-calculation-type">@calculation.CalculationType</td>
+                            <td class="text-nowrap data-calculation-lastupdated">
+                                <span class="datetime-split-container">
+                                    <span class="datetime-split-date data-calculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
+                                    <span class="datetime-split-time data-calculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
+                                </span>
+                            </td>
+                            <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@calculation.Id"><i class="material-icons">keyboard_arrow_down</i></td>
+                        </tr>
+
+                        <tr class="cr-table-primary-highlight expander-container">
+                            <td colspan="5" class="">
+                                @calculation.Description.ReplaceLineBreaksForHtml()
+                                <a class="display-block view-calculation-code-link" href="/api/specs/redirectToCalc/@calculation.Id">View calculation code</a>
+                            </td>
+                        </tr>
+
+
                     }
-            
-                    @if (policy.SubPolicies.AnyWithNullCheck())
-                     {
-                         List<PolicyViewModel> subpolicies = new List<PolicyViewModel>(policy.SubPolicies);
-                         for (int i = 0; i < subpolicies.Count; i++)
-                         {
-                             PolicyViewModel subpolicy = subpolicies[i];
-            
-                             <tr class="cr-table-primary-highlight data-subpolicy-container">
-                                 <td class="table-primary-border"><a name="policy-@subpolicy.Id"></a></td>
-            
-                                 <td id="subpolicies-for-@policy.Id" rowspan="1" class="data-subpolicy-label cr-table-secondary-highlight cf-table-columnar-header" data-totalItems="@subpolicies.Count" data-openItems="0">
-                                     <div class="table-type-header">Subpolicy</div>
-                                 </td>
-            
-                                 <td>
-                                     <span class="button-split-container">
-                                         <span class="button-split-icon">
-                                             <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink-icon"><i class="material-icons">edit</i></a>
-                                         </span>
-                                         <span class="button-split-text">
-                                             <a href="/specs/EditSubPolicy/@Model.Specification.Id/@subpolicy.Id/@policy.Id" class="data-subpolicy-editlink"><span class="data-subpolicy-name">@subpolicy.Name</span></a>
-                                         </span>
-                                     </span>
-                                 </td>
-                                 <td colspan="2" class="data-subpolicy-description-firstline first-line-only">@subpolicy.DescriptionFirstLine</td>
-                                 <td class="text-nowrap data-subpolicy-lastupdated">
-                                     <span class="datetime-split-container">
-                                         <span class="datetime-split-date data-subpolicy-lastupdated-date">@subpolicy.LastUpdatedDateFormatted</span>
-                                         <span class="datetime-split-time data-subpolicy-lastupdated-time">@subpolicy.LastUpdatedTimeFormatted</span>
-                                     </span>
-                                 </td>
-                                 <td class="expander-trigger-cell"><i class="material-icons">keyboard_arrow_down</i></td>
-                             </tr>
-                             <tr class="cr-table-primary-highlight expander-container">
-                                 <td class="table-primary-border"></td>
-                                 <td colspan="6" class="no-border data-subpolicy-description">
-                                     @subpolicy.Description.ReplaceLineBreaksForHtml()
-                                 </td>
-                             </tr>
-                             if (subpolicy.Calculations.AnyWithNullCheck())
-                             {
-                                 List<CalculationViewModel> calculations = new List<CalculationViewModel>(subpolicy.Calculations);
-            
-                                 for (int k = 0; k < calculations.Count; k++)
-                                 {
-                                     CalculationViewModel calculation = calculations[k];
-            
-                                     <tr class="cr-table-primary-highlight data-subpolicycalculation-container">
-                                         <td class="table-primary-border"><a name="calculation-@calculation.Id"></a></td>
-                                         @if (k == 0)
-                                         {
-                                             <td id="calcs-for-@subpolicy.Id" rowspan="@calculations.Count" class="data-subpolicycalculation-label cr-table-secondary-highlight cf-table-columnar-header multi-row-header" data-totalItems="@calculations.Count" data-openItems="0">
-                                                 <div class="table-type-header">Calcuation Specification</div>
-                                             </td>
-                                         }
-                                         <td>
-                                             <span class="button-split-container">
-                                                 <span class="button-split-icon">
-                                                     <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
-                                                 </span>
-                                                 <span class="button-split-text">
-                                                     <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
-                                                 </span>
-                                             </span>
-                                         </td>
-                                         <td class="data-subpolicycalculation-description-firstline">@calculation.DescriptionFirstLine</td>
-                                         <td class="data-subpolicycalculation-type">@calculation.CalculationType</td>
-                                         <td class="data-subpolicycalculation-lastupdated">
-                                             <span class="datetime-split-container">
-                                                 <span class="datetime-split-date data-subpolicycalculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
-                                                 <span class="datetime-split-time data-subpolicycalculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
-                                             </span>
-                                         </td>
-                                         <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@subpolicy.Id"><i class="material-icons">keyboard_arrow_down</i></td>
-                                     </tr>
-                                     <tr class="cr-table-primary-highlight expander-container">
-                                         <td class="table-primary-border"></td>
-            
-                                         <td colspan="5" class="">
-                                             @calculation.Description.ReplaceLineBreaksForHtml()
-                                             <a class="display-block view-calculation-code-link" href="/api/specs/redirectToCalc/@calculation.Id">View calculation code</a>
-                                         </td>
-                                     </tr>
-                                 }
-                             }
-                         }
-            
-                     }
-            
-                    @if (p <= policies.Count - 2)
-                     {
-                         <tr>
-                             <td colspan="6" class="no-border-both"></td>
-                         </tr>
-                     }
-                }
-            
+
+                </tbody>
             </table>
         </div>
     </div>
 </div>
 
 @section scripts{
-    <script type="text/javascript" asp-src-include="~/js/policies.js" asp-append-version="true"></script>
     <script type="text/javascript" asp-src-include="~/js/table.expander.js" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
     <partial name="_ApproveStatusButtonPartial" />

@@ -11,7 +11,9 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
 
         public string Description { get; set; }
 
-        public List<PolicyViewModel> Policies { get; set; }
+        public List<CalculationViewModel> Calculations { get; set; }
+
+        //public List<PolicyViewModel> Policies { get; set; }
 
         public PublishStatusViewModel PublishStatus { get; set; }
     }
