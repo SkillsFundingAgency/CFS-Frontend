@@ -40,7 +40,6 @@
     <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\navbar.ts" />
     <None Remove="Scripts\notifications.ts" />
-    <None Remove="Scripts\policies.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
     <None Remove="Scripts\search.calcuation-results.ts" />
@@ -163,7 +162,6 @@
     <TypeScriptCompile Include="Scripts\expander.ts" />
     <TypeScriptCompile Include="Scripts\navbar.ts" />
     <TypeScriptCompile Include="Scripts\notifications.ts" />
-    <TypeScriptCompile Include="Scripts\policies.ts" />
     <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
     <TypeScriptCompile Include="Scripts\search.specifications.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />

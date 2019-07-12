@@ -94,31 +94,22 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 FundingPeriod = new ReferenceViewModel("1617", "2016/2017"),
                 Description = "Test Description",
                 FundingStreams = new List<ReferenceViewModel>() { new ReferenceViewModel("fs1", "Funding Stream Name"), },
-                Policies = new List<PolicyViewModel>()
+               
+                Calculations = new List<CalculationViewModel>()
                 {
-                    new PolicyViewModel()
+                    new CalculationViewModel()
                     {
-                        Id = "pol1",
-                        Name = "Policy 1",
-                        Description = "Policy 1 Description",
-                        Calculations = new List<CalculationViewModel>()
-                        {
-                            new CalculationViewModel()
-                            {
-                                Id ="calc1",
-                                Name = "Calculation 1",
-                                Description = "Calculation with allocation line",
-                                AllocationLine = new ReferenceViewModel("al1", "Allocation Line 1"),
-                            },
-                            new CalculationViewModel()
-                            {
-                                Id ="calc2",
-                                Name = "Calculation Two",
-                                Description = "Calculation without allocation line",
-                                AllocationLine = null
-                            },
-                        },
-                        SubPolicies = new List<PolicyViewModel>(),
+                        Id ="calc1",
+                        Name = "Calculation 1",
+                        Description = "Calculation with allocation line",
+                        AllocationLine = new ReferenceViewModel("al1", "Allocation Line 1"),
+                    },
+                    new CalculationViewModel()
+                    {
+                        Id ="calc2",
+                        Name = "Calculation Two",
+                        Description = "Calculation without allocation line",
+                        AllocationLine = null
                     },
                 }
             };
@@ -320,88 +311,6 @@ namespace CalculateFunding.Frontend.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsPolicyCreated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.PolicyCreated, "policy2");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-            .PageBanner
-            .Should()
-            .BeEquivalentTo(new PageBannerOperation()
-            {
-                EntityName = "Policy Two",
-                EntityType = "Policy",
-                OperationAction = "created",
-                OperationId = null,
-                ActionText = "Edit",
-                ActionUrl = $"/specs/editPolicy/spec123/policy2",
-            });
-        }
-
-        [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubpolicyCreated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.SubpolicyCreated, "subPolicy2");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-                .PageBanner
-                .Should()
-                .BeEquivalentTo(new PageBannerOperation()
-                {
-                    EntityName = "Sub Policy 2",
-                    EntityType = "Subpolicy",
-                    OperationAction = "created",
-                    OperationId = null,
-                    ActionText = "Edit",
-                    ActionUrl = $"/specs/EditSubPolicy/{specificationId}/subPolicy2/pol1",
-                });
-        }
-
-        [TestMethod]
         public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsCalculationCreated_ThenBannerPopulated()
         {
             // Arrange
@@ -439,129 +348,6 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                     OperationId = null,
                     ActionText = "Edit",
                     ActionUrl = $"/specs/EditCalculation/calc1?specificationId={specificationId}",
-                });
-        }
-
-        [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubPolicyCalculationCreated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationCreated, "subpolicyCalculation1");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-                   .PageBanner
-                   .Should()
-                   .BeEquivalentTo(new PageBannerOperation()
-                   {
-                       EntityName = "Sub Policy 2 Calculation 1",
-                       EntityType = "Calculation specification",
-                       OperationAction = "created",
-                       OperationId = null,
-                       ActionText = "Edit",
-                       ActionUrl = $"/specs/EditCalculation/subpolicyCalculation1?specificationId={specificationId}",
-                   });
-        }
-
-        [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsPolicyUpdated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.PolicyUpdated, "policy2");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-            .PageBanner
-            .Should()
-            .BeEquivalentTo(new PageBannerOperation()
-            {
-                EntityName = "Policy Two",
-                EntityType = "Policy",
-                OperationAction = "updated",
-                OperationId = null,
-                ActionText = "Edit",
-                ActionUrl = $"/specs/editPolicy/spec123/policy2",
-            });
-        }
-
-        [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubpolicyUpdated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.SubpolicyUpdated, "subPolicy2");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-                .PageBanner
-                .Should()
-                .BeEquivalentTo(new PageBannerOperation()
-                {
-                    EntityName = "Sub Policy 2",
-                    EntityType = "Subpolicy",
-                    OperationAction = "updated",
-                    OperationId = null,
-                    ActionText = "Edit",
-                    ActionUrl = $"/specs/EditSubPolicy/{specificationId}/subPolicy2/pol1",
                 });
         }
 
@@ -604,47 +390,6 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                     ActionText = "Edit",
                     ActionUrl = $"/specs/EditCalculation/calc1?specificationId={specificationId}",
                 });
-        }
-
-        [TestMethod]
-        public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSubPolicyCalculationUpdated_ThenBannerPopulated()
-        {
-            // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
-            IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
-
-            PoliciesModel policiesModel = GetPoliciesModel(specsApiClient, datasetsApiClient);
-
-            string specificationId = "spec123";
-            Specification specification = CreateSpecificationForBannerChecks(specificationId);
-
-            specsApiClient.GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
-
-            datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
-
-            // Act
-            IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, "subpolicyCalculation1");
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<PageResult>();
-
-            policiesModel
-                   .PageBanner
-                   .Should()
-                   .BeEquivalentTo(new PageBannerOperation()
-                   {
-                       EntityName = "Sub Policy 2 Calculation 1",
-                       EntityType = "Calculation specification",
-                       OperationAction = "updated",
-                       OperationId = null,
-                       ActionText = "Edit",
-                       ActionUrl = $"/specs/EditCalculation/subpolicyCalculation1?specificationId={specificationId}",
-                   });
         }
 
         [TestMethod]

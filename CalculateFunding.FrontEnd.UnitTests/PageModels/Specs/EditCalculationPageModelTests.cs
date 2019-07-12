@@ -110,8 +110,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         new ReferenceViewModel("fsId", "Funding Stream 1"),
                         new ReferenceViewModel("fs2Id", "Funding Stream 2"),
                     },
-                },
-                c => c.Excluding(m => m.Policies));
+                });
 
             pageModel
                 .Policies
@@ -777,8 +776,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         new ReferenceViewModel("fsId", "Funding Stream 1"),
                         new ReferenceViewModel("fs2Id", "Funding Stream 2"),
                     },
-                },
-                c => c.Excluding(m => m.Policies));
+                });
 
             pageModel
                 .Policies
@@ -1016,8 +1014,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         new ReferenceViewModel("fsId", "Funding Stream 1"),
                         new ReferenceViewModel("fs2Id", "Funding Stream 2"),
                     },
-                },
-                c => c.Excluding(m => m.Policies));
+                });
 
             pageModel
                 .Policies

@@ -159,7 +159,8 @@
             CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
-            CreateMap<Specification, SpecificationViewModel>();
+            CreateMap<Specification, SpecificationViewModel>()
+                .ForMember(m => m.Calculations, opt => opt.Ignore());
 
             CreateMap<Policy, PolicyViewModel>();
 
