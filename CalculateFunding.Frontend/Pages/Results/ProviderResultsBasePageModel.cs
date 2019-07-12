@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
-using CalculateFunding.Common.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Providers.Models;
@@ -33,6 +32,10 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
         {
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+
             _resultsApiClient = resultsApiClient;
             _providersApiClient = providersApiClient;
             _policiesApiClient = policiesApiClient;
