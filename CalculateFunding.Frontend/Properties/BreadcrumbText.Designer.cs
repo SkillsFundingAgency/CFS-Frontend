@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class BreadcrumbText {
@@ -151,29 +151,11 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create policy.
-        /// </summary>
-        public static string CreatePolicy {
-            get {
-                return ResourceManager.GetString("CreatePolicy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Create specification.
         /// </summary>
         public static string CreateSpecification {
             get {
                 return ResourceManager.GetString("CreateSpecification", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Create subpolicy.
-        /// </summary>
-        public static string CreateSubPolicy {
-            get {
-                return ResourceManager.GetString("CreateSubPolicy", resourceCulture);
             }
         }
         

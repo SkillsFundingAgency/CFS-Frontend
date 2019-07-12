@@ -16,14 +16,9 @@
         <div>
             <a href="/specs/editspecification/@Model.Id?returnPage=ManagePolicies">Edit specification</a>
         </div>
-        <div>
-            <a href="/specs/createPolicy/@Model.Id">Create policy</a>
-        </div>
+
         @if (Model.Policies != null && Model.Policies.Any())
         {
-            <div>
-                <a href="/specs/createSubPolicy/@Model.Id">Create subpolicy</a>
-            </div>
             <div>
                 <a href="/specs/createcalculation/@Model.Id">Create calculation specification</a>
             </div>

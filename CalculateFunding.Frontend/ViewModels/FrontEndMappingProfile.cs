@@ -153,18 +153,8 @@
                     destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
                 });
 
-            CreateMap<CreatePolicyViewModel, CreatePolicyModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
             CreateMap<EditPolicyViewModel, EditPolicyModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
-            CreateMap<CreateSubPolicyViewModel, CreateSubPolicyModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-                .AfterMap((CreateSubPolicyViewModel source, CreateSubPolicyModel destination) =>
-                {
-                    destination.ParentPolicyId = source.ParentPolicyId;
-                });
 
             CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
