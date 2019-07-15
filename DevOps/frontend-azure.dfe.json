@@ -109,6 +109,12 @@
         "description": "Api key for the Jobs Service"
       }
     },
+    "ApiKeyPolicy": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Policy Service"
+      }
+    },
     "aadDomain": {
       "type": "string",
       "metadata": {
