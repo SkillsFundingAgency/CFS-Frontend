@@ -490,8 +490,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLineId = "al2",
                 CalculationType = "Number",
                 Description = "Updated description",
-                IsPublic = true,
-                PolicyId = "pol2",
+                IsPublic = true
             };
 
             Calculation resultCalculation = new Calculation()
@@ -537,8 +536,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         m => m.AllocationLineId == viewModel.AllocationLineId &&
                         m.Description == viewModel.Description &&
                         m.IsPublic == viewModel.IsPublic &&
-                        m.Name == viewModel.Name &&
-                        m.PolicyId == viewModel.PolicyId
+                        m.Name == viewModel.Name
                     ));
         }
 
@@ -555,8 +553,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLineId = "al2",
                 CalculationType = "Number",
                 Description = "Updated description",
-                IsPublic = true,
-                PolicyId = "pol2",
+                IsPublic = true
             };
 
             Calculation resultCalculation = new Calculation()
@@ -622,7 +619,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                    CalculationType = "Number",
                    Description = "Updated description",
                    IsPublic = true,
-                   PolicyId = "pol2",
                    Name = null,
                });
 
@@ -704,8 +700,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLineId = "al2",
                 CalculationType = "Number",
                 Description = "Updated description",
-                IsPublic = true,
-                PolicyId = "pol2",
+                IsPublic = true
             };
 
             Calculation resultCalculation = new Calculation()
@@ -769,7 +764,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                    CalculationType = "Number",
                    Description = "Updated description",
                    IsPublic = true,
-                   PolicyId = "pol2",
                    Name = null,
                });
 

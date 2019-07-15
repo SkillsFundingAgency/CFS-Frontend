@@ -108,7 +108,9 @@
 	        this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
 			Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
-            Specification.Calculations = specificationResponse.Content.Calculations?.Select(m => _mapper.Map<CalculationViewModel>(m)).ToList();
+            Specification.Calculations = specificationResponse.Content.Calculations.IsNullOrEmpty() ? 
+                    new List<CalculationViewModel>() : 
+                    specificationResponse.Content.Calculations.Select(m => _mapper.Map<CalculationViewModel>(m)).ToList();
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
 
