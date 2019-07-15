@@ -115,6 +115,18 @@
         "description": "Api key for the Policy Service"
       }
     },
+    "ApiKeyProviders": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Providers Service"
+      }
+    },
+    "ApiKeyPublishing": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Publishing Service"
+      }
+    },
     "aadDomain": {
       "type": "string",
       "metadata": {
@@ -496,7 +508,23 @@
             },
             {
               "name": "policiesClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-policy.azurewebsites.net/api/jobs')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-policy.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "providersClient:ApiKey",
+              "value": "[parameters('apiKeyProviders')]"
+            },
+            {
+              "name": "providersClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-providers.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "publishingClient:ApiKey",
+              "value": "[parameters('apiKeyPublishing')]"
+            },
+            {
+              "name": "publishingClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-publishing.azurewebsites.net/api/')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
