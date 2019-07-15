@@ -116,6 +116,7 @@
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.FundingPeriod, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
+                .ForMember(m => m.Calculations, opt => opt.Ignore())
                 .ForMember(m => m.Policies, opt => opt.Ignore())
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
                 .ForMember(m => m.PublishStatus, opt => opt.Ignore());

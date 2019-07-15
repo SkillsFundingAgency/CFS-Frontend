@@ -108,8 +108,7 @@
 	        this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
 			Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
-
-            Specification.Calculations = GetCalculationsFromExistingPolicies(specificationResponse.Content).ToList();
+            Specification.Calculations = specificationResponse.Content.Calculations?.Select(m => _mapper.Map<CalculationViewModel>(m)).ToList();
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
 
@@ -172,22 +171,6 @@
             }
 
             return Page();
-        }
-
-        //temp until backend done
-        private IEnumerable<CalculationViewModel> GetCalculationsFromExistingPolicies(Specification specification)
-        {
-            List<CalculationViewModel> calculationViewModels = new List<CalculationViewModel>();
-
-            foreach(Policy policy in specification.Policies)
-            {
-                if (!policy.Calculations.IsNullOrEmpty())
-                {
-                    calculationViewModels.AddRange(policy.Calculations.Select(c => _mapper.Map<CalculationViewModel>(c)));
-
-                }
-            }
-            return calculationViewModels.OrderBy(m => m.Name);
         }
     }
 }

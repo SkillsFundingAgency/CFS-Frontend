@@ -54,15 +54,9 @@
 
         public string FundingPeriodName { get; set; }
 
-        public string PolicyId { get; set; }
-
-        public string PolicyName { get; set; }
-
         public string AllocationLineId { get; set; }
 
         public string CalculationType { get; set; }
-
-        public IList<SelectListItem> Policies { get; set; }
 
         public IEnumerable<SelectListItem> AllocationLines { get; set; }
 
@@ -113,8 +107,6 @@
             {
                 return new InternalServerErrorResult($"Failed to load allocation lines for specification id: {specification.Id}");
             }
-
-            PopulatePolicies(specification);
 
             PopulateCalculationTypes();
 
@@ -204,44 +196,6 @@
                 Text = m,
                 Selected = string.Equals(m, CalculationType, StringComparison.InvariantCultureIgnoreCase)
             });
-        }
-
-        private void PopulatePolicies(Specification specification)
-        {
-            Guard.ArgumentNotNull(specification, nameof(specification));
-
-            Policies = new List<SelectListItem>();
-
-            if (specification.Policies != null)
-            {
-                SelectListGroup policiesGroup = new SelectListGroup { Name = "Policies" };
-                SelectListGroup subPoliciesGroup = new SelectListGroup { Name = "Subpolicies" };
-
-                foreach (Policy policy in specification.Policies)
-                {
-                    Policies.Add(new SelectListItem
-                    {
-                        Value = policy.Id,
-                        Text = policy.Name,
-                        Selected = policy.Id == PolicyId,
-                        Group = policiesGroup
-                    });
-
-                    if (policy.SubPolicies != null)
-                    {
-                        foreach (Policy subPolicy in policy.SubPolicies)
-                        {
-                            Policies.Add(new SelectListItem
-                            {
-                                Value = subPolicy.Id,
-                                Text = subPolicy.Name,
-                                Selected = subPolicy.Id == PolicyId,
-                                Group = subPoliciesGroup
-                            });
-                        }
-                    }
-                }
-            }
         }
 
         private async Task<IActionResult> PopulateAllocationLines(string specificationId)

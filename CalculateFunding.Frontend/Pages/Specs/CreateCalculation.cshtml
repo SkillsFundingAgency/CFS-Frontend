@@ -54,17 +54,7 @@
                     </div>
                 </div>
             </div>
-            <div>
-                <div gds-validationblock-for="CreateCalculationViewModel.PolicyId">
-                    <div class="form-group">
-                        <a validationanchor-for="CreateCalculationViewModel.PolicyId"></a>
-                        <label asp-for="CreateCalculationViewModel.PolicyId">Select policy or subpolicies</label>
-                        <select asp-items="@(Model.Policies)" asp-for="CreateCalculationViewModel.PolicyId" class="form-control">
-                            <option></option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+          
             <div>
                 <div gds-validationblock-for="CreateCalculationViewModel.CalculationType">
                     <div class="form-group">

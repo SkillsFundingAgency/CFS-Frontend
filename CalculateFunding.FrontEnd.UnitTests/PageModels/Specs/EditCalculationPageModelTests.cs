@@ -42,9 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
-                IsPublic = false,
-                PolicyId = "policyId",
-                PolicyName = "Policy Name"
+                IsPublic = false
             };
 
             List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
@@ -94,8 +92,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     AllocationLineId = "al1",
                     CalculationType = "Funding",
                     Description = "Calculation Description",
-                    IsPublic = false,
-                    PolicyId = "policyId",
+                    IsPublic = false
                 });
 
             pageModel
@@ -110,97 +107,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         new ReferenceViewModel("fsId", "Funding Stream 1"),
                         new ReferenceViewModel("fs2Id", "Funding Stream 2"),
                     },
-                });
-
-            pageModel
-                .Policies
-                .Should()
-                .BeEquivalentTo(new List<SelectListItem>()
-                {
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 1",
-                        Value = "p1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 1",
-                        Value = "sub1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 2",
-                        Value = "sub2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 2",
-                        Value = "p2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 3",
-                        Value = "p3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 3",
-                        Value = "sub3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 4",
-                        Value = "p4",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    }
                 });
 
             pageModel
@@ -276,50 +182,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                             new AllocationLine("al4", "Funding Stream 2 - Allocation Line 2"),
                         }
                     }
-                 },
-                Policies = new List<Policy>()
-                 {
-                     new Policy()
-                     {
-                         Id = "p1",
-                         Name = "Policy 1",
-                         SubPolicies = new List<Policy>()
-                         {
-                            new Policy()
-                            {
-                                Id = "sub1",
-                                Name= "Sub Policy 1",
-                            },
-                            new Policy()
-                            {
-                                Id = "sub2",
-                                Name = "Sub Policy 2",
-                            },
-                         }
-                     },
-                     new Policy()
-                     {
-                         Id = "p2",
-                         Name= "Policy 2",
-                     },
-                     new Policy()
-                     {
-                         Id = "p3",
-                         Name = "Policy 3",
-                         SubPolicies = new List<Policy>()
-                         {
-                            new Policy()
-                            {
-                                Id = "sub3",
-                                Name= "Sub Policy 3",
-                            },
-                         }
-                     },
-                     new Policy()
-                     {
-                         Id = "p4",
-                         Name= "Policy 4",
-                     },
                  }
             };
         }
@@ -779,97 +641,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 });
 
             pageModel
-                .Policies
-                .Should()
-                .BeEquivalentTo(new List<SelectListItem>()
-                {
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 1",
-                        Value = "p1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 1",
-                        Value = "sub1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 2",
-                        Value = "sub2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 2",
-                        Value = "p2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 3",
-                        Value = "p3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 3",
-                        Value = "sub3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 4",
-                        Value = "p4",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    }
-                });
-
-            pageModel
                 .AllocationLines
                 .Should()
                 .BeEquivalentTo(new List<SelectListItem>()
@@ -1014,97 +785,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         new ReferenceViewModel("fsId", "Funding Stream 1"),
                         new ReferenceViewModel("fs2Id", "Funding Stream 2"),
                     },
-                });
-
-            pageModel
-                .Policies
-                .Should()
-                .BeEquivalentTo(new List<SelectListItem>()
-                {
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 1",
-                        Value = "p1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 1",
-                        Value = "sub1",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 2",
-                        Value = "sub2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 2",
-                        Value = "p2",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 3",
-                        Value = "p3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem()
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Sub Policy 3",
-                        Value = "sub3",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Subpolicies",
-                             Disabled = false,
-                        },
-                    },
-                    new SelectListItem
-                    {
-                        Disabled = false,
-                        Selected = false,
-                        Text = "Policy 4",
-                        Value = "p4",
-                        Group = new SelectListGroup()
-                        {
-                             Name = "Policies",
-                             Disabled = false,
-                        },
-                    }
                 });
 
             pageModel
