@@ -115,6 +115,18 @@
         "description": "Api key for the Policy Service"
       }
     },
+    "ApiKeyProviders": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Providers Service"
+      }
+    },
+    "ApiKeyPublishing": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Publishing Service"
+      }
+    },
     "aadDomain": {
       "type": "string",
       "metadata": {
@@ -489,6 +501,30 @@
             {
               "name": "jobsClient:ApiEndpoint",
               "value": "[concat('https://app-', parameters('environmentKey'), '-jobs.azurewebsites.net/api/jobs')]"
+            },
+            {
+              "name": "policyClient:ApiKey",
+              "value": "[parameters('apiKeyPolicy')]"
+            },
+            {
+              "name": "policyClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-policy.azurewebsites.net/api/jobs')]"
+            },
+            {
+              "name": "providersClient:ApiKey",
+              "value": "[parameters('apiKeyProviders')]"
+            },
+            {
+              "name": "providersClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-providers.azurewebsites.net/api/jobs')]"
+            },
+            {
+              "name": "publishingClient:ApiKey",
+              "value": "[parameters('apiKeyPublishing')]"
+            },
+            {
+              "name": "publishingClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-publishing.azurewebsites.net/api/jobs')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
