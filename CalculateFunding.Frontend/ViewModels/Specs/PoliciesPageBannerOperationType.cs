@@ -3,12 +3,8 @@
     public enum PoliciesPageBannerOperationType
     {
         SpecificationUpdated,
-        PolicyUpdated,
-        SubpolicyUpdated,
         CalculationUpdated,
-        PolicyCreated,
-        SubpolicyCreated,
         CalculationCreated,
-        SpecificationCreated,
+        SpecificationCreated
     }
 }

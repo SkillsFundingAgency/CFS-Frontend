@@ -117,7 +117,6 @@
                 .ForMember(m => m.FundingPeriod, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
                 .ForMember(m => m.Calculations, opt => opt.Ignore())
-                .ForMember(m => m.Policies, opt => opt.Ignore())
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
                 .ForMember(m => m.PublishStatus, opt => opt.Ignore());
 
@@ -154,22 +153,11 @@
                     destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
                 });
 
-            CreateMap<EditPolicyViewModel, EditPolicyModel>()
-               .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
             CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<Specification, SpecificationViewModel>()
                 .ForMember(m => m.Calculations, opt => opt.Ignore());
-
-            CreateMap<Policy, PolicyViewModel>();
-
-            CreateMap<EditSubPolicyViewModel, EditSubPolicyModel>()
-             .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
-            CreateMap<Policy, EditSubPolicyViewModel>()
-             .ForMember(m => m.ParentPolicyId, opt => opt.Ignore());
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 

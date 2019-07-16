@@ -12,8 +12,6 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
         public Specification()
         {
             Calculations = Enumerable.Empty<Calculation>();
-
-            Policies = Enumerable.Empty<Policy>();
         }
 
         [JsonProperty("calculations")]
@@ -24,9 +22,6 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 
         [JsonProperty("description")]
         public string Description { get; set; }
-
-        [JsonProperty("policies")]
-        public IEnumerable<Policy> Policies { get; set; }
 
         [JsonProperty("fundingStreams")]
         public IEnumerable<FundingStream> FundingStreams { get; set; }
