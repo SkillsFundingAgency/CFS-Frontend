@@ -68,16 +68,11 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
 
         Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreamsForSpecification(string specificationId);
 
-        Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName);
-
-        Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy);
-
         Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName);
 
         Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId);
 
         Task<ApiResponse<IEnumerable<CalculationCurrentVersion>>> GetBaselineCalculationsBySpecificationId(string specificationId);
-
 
         Task<ValidatedApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation);
 
@@ -90,8 +85,6 @@ namespace CalculateFunding.Frontend.Interfaces.ApiClient
         Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions);
 
         Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification);
-
-        Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy);
 
         Task<ValidatedApiResponse<PublishStatusResult>> UpdatePublishStatus(string specificationId, PublishStatusEditModel model);
 

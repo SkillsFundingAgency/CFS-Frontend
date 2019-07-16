@@ -689,18 +689,6 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                     Id = "2018/19",
                     Name = "2018 - 19"
                 },
-                Policies = new[]
-                {
-                     new Policy
-                     {
-                         Id = "policy-id",
-                         Name = "policy-name",
-                         SubPolicies = new List<Policy>
-                         {
-                             new Policy { Id = "sub-policy-id", Name = "sub-policy-name"}
-                         }
-                     }
-                 },
                 FundingStreams = new List<FundingStream>()
                 {
                     new FundingStream

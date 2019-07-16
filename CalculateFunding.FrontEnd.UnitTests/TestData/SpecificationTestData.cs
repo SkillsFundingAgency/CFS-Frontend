@@ -18,22 +18,19 @@ namespace CalculateFunding.Frontend.TestData
                 {
                     FundingPeriod = new Reference(),
                     FundingStreams = new List<FundingStream>(),
-                    Description = "test",
-                    Policies = new List<Policy>()
+                    Description = "test"
                 },
                 new Specification
                 {
                     FundingPeriod = new Reference(),
                     FundingStreams = new List<FundingStream>(),
-                    Description = "test",
-                    Policies = new List<Policy>()
+                    Description = "test"
                 },
                 new Specification
                 {
                     FundingPeriod = new Reference(),
                     FundingStreams = new List<FundingStream>(),
-                    Description = "test",
-                    Policies = new List<Policy>()
+                    Description = "test"
                 }
             };
         }

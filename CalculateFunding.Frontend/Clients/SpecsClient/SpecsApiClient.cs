@@ -102,22 +102,6 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             return await PutAsync($"specification-edit?specificationId={specificationId}", specification);
         }
 
-        public async Task<ValidatedApiResponse<Policy>> UpdateSubPolicy(string specificationId, string subPolicyId, EditSubPolicyModel subPolicy)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(subPolicyId, nameof(subPolicyId));
-            Guard.ArgumentNotNull(subPolicy, nameof(subPolicy));
-
-            return await ValidatedPutAsync<Policy, EditSubPolicyModel>($"policies?specificationId={specificationId}&policyId={subPolicyId} ", subPolicy);
-        }
-
-        public async Task<ValidatedApiResponse<Policy>> UpdatePolicy(string specificationId, string policyId, EditPolicyModel updatedPolicy)
-        {
-            Guard.ArgumentNotNull(updatedPolicy, nameof(updatedPolicy));
-
-            return await ValidatedPutAsync<Policy, EditPolicyModel>($"policies?specificationId={specificationId}&policyId={policyId}", updatedPolicy);
-        }
-
         public async Task<ValidatedApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
@@ -155,16 +139,6 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
             return await GetAsync<FundingStream>($"get-fundingstream-by-id?fundingstreamId={fundingStreamId}");
-        }
-
-        public async Task<ApiResponse<Policy>> GetPolicyBySpecificationIdAndPolicyName(string specificationId, string policyName)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(policyName, nameof(policyName));
-
-            PolicyByNameRequestModel model = new PolicyByNameRequestModel { SpecificationId = specificationId, Name = policyName };
-
-            return await PostAsync<Policy, PolicyByNameRequestModel>("policy-by-name", model);
         }
 
         public async Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
