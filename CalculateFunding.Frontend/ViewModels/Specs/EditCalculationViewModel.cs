@@ -7,9 +7,6 @@
     {
         public string AllocationLineId { get; set; }
 
-        [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationPolicyIdRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
-        public string PolicyId { get; set; }
-
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.CalculationDescriptionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Description { get; set; }
 

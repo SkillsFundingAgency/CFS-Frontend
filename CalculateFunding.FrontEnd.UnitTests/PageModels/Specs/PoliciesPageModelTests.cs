@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
@@ -45,31 +46,21 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 FundingPeriod = new Reference("1617", "2016/2017"),
                 Description = "Test Description",
                 FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), },
-                Policies = new List<Policy>()
+                Calculations = new List<Calculation>()
                 {
-                    new Policy()
+                    new Calculation()
                     {
-                        Id = "pol1",
-                        Name = "Policy 1",
-                        Description = "Policy 1 Description",
-                        Calculations = new List<Calculation>()
-                        {
-                            new Calculation()
-                            {
-                                Id ="calc1",
-                                Name = "Calculation 1",
-                                Description = "Calculation with allocation line",
-                                AllocationLine = new Reference("al1", "Allocation Line 1"),
-                            },
-                            new Calculation()
-                            {
-                                Id ="calc2",
-                                Name = "Calculation Two",
-                                Description = "Calculation without allocation line",
-                                AllocationLine = null
-                            },
-                        },
-                        SubPolicies = new List<Policy>(),
+                        Id ="calc1",
+                        Name = "Calculation 1",
+                        Description = "Calculation with allocation line",
+                        AllocationLine = new Reference("al1", "Allocation Line 1"),
+                    },
+                    new Calculation()
+                    {
+                        Id ="calc2",
+                        Name = "Calculation Two",
+                        Description = "Calculation without allocation line",
+                        AllocationLine = null
                     },
                 }
             };
@@ -505,61 +496,26 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 FundingPeriod = new Reference("1617", "2016/2017"),
                 Description = "Test Description",
                 FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), },
-                Policies = new List<Policy>()
+                Calculations = new List<Calculation>()
                 {
-                    new Policy()
+                    new Calculation()
                     {
-                        Id = "pol1",
-                        Name = "Policy 1",
-                        Description = "Policy 1 Description",
-                        Calculations = new List<Calculation>()
-                        {
-                            new Calculation()
-                            {
-                                Id ="calc1",
-                                Name = "Calculation 1",
-                                Description = "Calculation with allocation line",
-                                AllocationLine = new Reference("al1", "Allocation Line 1"),
-                            },
-                            new Calculation()
-                            {
-                                Id ="calc2",
-                                Name = "Calculation Two",
-                                Description = "Calculation without allocation line",
-                                AllocationLine = null
-                            },
-                        },
-                        SubPolicies = new List<Policy>()
-                        {
-                            new Policy()
-                            {
-                                Id="subPolicy1",
-                                Name="Sub Policy 1"
-                            },
-                            new Policy()
-                            {
-                                Id="subPolicy2",
-                                Name="Sub Policy 2",
-                                Calculations = new List<Calculation>()
-                                {
-                                    new Calculation()
-                                    {
-                                         Id="subpolicyCalculation1",
-                                         Name="Sub Policy 2 Calculation 1",
-                                    }
-                                }
-                            },
-                            new Policy()
-                            {
-                                Id="subPolicy3",
-                                Name="Sub Policy 3"
-                            }
-                        }
+                        Id ="calc1",
+                        Name = "Calculation 1",
+                        Description = "Calculation with allocation line",
+                        AllocationLine = new Reference("al1", "Allocation Line 1"),
                     },
-                    new Policy()
+                    new Calculation()
                     {
-                        Id="policy2",
-                        Name="Policy Two",
+                        Id ="calc2",
+                        Name = "Calculation Two",
+                        Description = "Calculation without allocation line",
+                        AllocationLine = null
+                    },
+                    new Calculation()
+                    {
+                        Id="subpolicyCalculation1",
+                        Name="Sub Policy 2 Calculation 1",
                     }
                 }
             };
@@ -569,8 +525,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             ISpecsApiClient specsApiClient = null,
             IDatasetsApiClient datasetsApiClient = null,
             ILogger logger = null,
-            IAuthorizationHelper authorizationHelper = null
-            )
+            IAuthorizationHelper authorizationHelper = null)
         {
             return new PoliciesModel(
                 specsApiClient ?? CreateSpecsApiClient(),

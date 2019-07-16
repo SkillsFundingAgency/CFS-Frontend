@@ -185,12 +185,6 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                .Be("spec-name");
 
             pageModel
-                .Policies
-                .Count
-                .Should()
-                .Be(2);
-
-            pageModel
                 .AllocationLines
                 .Count()
                 .Should()

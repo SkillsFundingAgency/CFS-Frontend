@@ -10,9 +10,6 @@
         [JsonProperty("allocationLineId")]
         public string AllocationLineId { get; set; }
 
-        [JsonProperty("policyId")]
-        public string PolicyId { get; set; }
-
         [JsonProperty("description")]
         public string Description { get; set; }
 

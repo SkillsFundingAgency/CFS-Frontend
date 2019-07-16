@@ -48,8 +48,6 @@
 
 		public SpecificationViewModel Specification { get; set; }
 
-		public IList<SelectListItem> Policies { get; set; }
-
 		public IEnumerable<SelectListItem> AllocationLines { get; set; }
 
 		public IEnumerable<SelectListItem> CalculationTypes { get; set; }
@@ -159,8 +157,6 @@
 				return new InternalServerErrorResult($"Failed to load allocation lines for specification id: {specification.Id}");
 			}
 
-			PopulatePolicies(specification);
-
 			PopulateCalculationTypes();
 
 			ApiResponse<IEnumerable<CalculationCurrentVersion>> baselinesQuery = await _specsClient.GetBaselineCalculationsBySpecificationId(specification.Id);
@@ -182,7 +178,7 @@
 
 			HideAllocationLinesForBaselinesJson = JsonConvert.SerializeObject(hiddenAllocationLineIds);
 
-			ExistingAllocationLineId = JsonConvert.SerializeObject(specification.GetCalculationById(calculationId)?.AllocationLine?.Id);
+			ExistingAllocationLineId = JsonConvert.SerializeObject(specification.Calculations.FirstOrDefault(m => m.Id == calculationId)?.AllocationLine?.Id);
 			AvailableBaselineAllocationLineIds = AllocationLines.Count() - hiddenAllocationLineIds.Count();
 
 			return Page();
@@ -196,44 +192,6 @@
 				Text = m,
 				Selected = string.Equals(m, EditCalculationViewModel.CalculationType, StringComparison.InvariantCultureIgnoreCase)
 			});
-		}
-
-		private void PopulatePolicies(Specification specification)
-		{
-			Guard.ArgumentNotNull(specification, nameof(specification));
-
-			Policies = new List<SelectListItem>();
-
-			if (specification.Policies != null)
-			{
-				SelectListGroup policiesGroup = new SelectListGroup { Name = "Policies" };
-				SelectListGroup subPoliciesGroup = new SelectListGroup { Name = "Subpolicies" };
-
-				foreach (Policy policy in specification.Policies)
-				{
-					Policies.Add(new SelectListItem
-					{
-						Value = policy.Id,
-						Text = policy.Name,
-						Selected = policy.Id == EditCalculationViewModel.PolicyId,
-						Group = policiesGroup
-					});
-
-					if (policy.SubPolicies != null)
-					{
-						foreach (Policy subPolicy in policy.SubPolicies)
-						{
-							Policies.Add(new SelectListItem
-							{
-								Value = subPolicy.Id,
-								Text = subPolicy.Name,
-								Selected = subPolicy.Id == EditCalculationViewModel.PolicyId,
-								Group = subPoliciesGroup
-							});
-						}
-					}
-				}
-			}
 		}
 
 		private void PopulateAllocationLines(Specification specification)

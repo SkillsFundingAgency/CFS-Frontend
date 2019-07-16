@@ -18,7 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CalculateFunding.Common.FeatureToggles;
-using CalculateFunding.Common.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Approvals
 {
@@ -31,6 +32,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IFeatureToggle _featureToggle;
+        private readonly IPoliciesApiClient _policiesApiClient;
 
         public IEnumerable<SelectListItem> FundingStreams { get; set; }
 
@@ -55,7 +57,8 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             ITestEngineApiClient testEngineClient,
             IMapper mapper,
             IAuthorizationHelper authorizationHelper,
-            IFeatureToggle featureToggle)
+            IFeatureToggle featureToggle,
+            IPoliciesApiClient policiesApiClient)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(calcsClient, nameof(calcsClient));
@@ -64,6 +67,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
             Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
 
             _specsClient = specsApiClient;
             _calcsClient = calcsClient;
@@ -72,6 +76,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _featureToggle = featureToggle;
+            _policiesApiClient = policiesApiClient;
         }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriod, string fundingStream, ChoosePageBannerOperationType? operationType = null, string operationId = null)
@@ -85,9 +90,9 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 tasks.Add(specificationsLookupTask);
             }
 
-			Task<ApiResponse<IEnumerable<Reference>>> fundingPeriodsLookupTask = _specsClient.GetFundingPeriods();
+            Task<ApiResponse<IEnumerable<Period>>> fundingPeriodsLookupTask = _policiesApiClient.GetFundingPeriods();
 
-            Task<ApiResponse<IEnumerable<FundingStream>>> fundingStreamsLookupTask = _specsClient.GetFundingStreams();
+            Task<ApiResponse<IEnumerable<Common.ApiClient.Policies.Models.FundingStream>>> fundingStreamsLookupTask = _policiesApiClient.GetFundingStreams();
 
 			tasks.Add(fundingPeriodsLookupTask);
             tasks.Add(fundingStreamsLookupTask);
