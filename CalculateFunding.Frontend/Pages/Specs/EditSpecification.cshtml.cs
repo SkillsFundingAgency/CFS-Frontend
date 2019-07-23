@@ -188,7 +188,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
             else
             {
-                throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to retrieve Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
             }
         }
     }

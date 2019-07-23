@@ -15,8 +15,5 @@
 
         [JsonProperty("calculationType")]
         public CalculationSpecificationType CalculationType { get; set; }
-
-        [JsonProperty("isPublic")]
-        public bool IsPublic { get; set; }
     }
 }

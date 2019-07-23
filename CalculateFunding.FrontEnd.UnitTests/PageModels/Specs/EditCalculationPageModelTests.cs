@@ -41,8 +41,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
-                Description = "Calculation Description",
-                IsPublic = false
+                Description = "Calculation Description"
             };
 
             List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
@@ -91,8 +90,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     Name = "Calculation Name",
                     AllocationLineId = "al1",
                     CalculationType = "Funding",
-                    Description = "Calculation Description",
-                    IsPublic = false
+                    Description = "Calculation Description"
                 });
 
             pageModel
@@ -412,7 +410,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
-                IsPublic = false,
                 PolicyId = "policyId",
                 PolicyName = "Policy Name"
             };
@@ -489,8 +486,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Updated Name",
                 AllocationLineId = "al2",
                 CalculationType = "Number",
-                Description = "Updated description",
-                IsPublic = true
+                Description = "Updated description"
             };
 
             Calculation resultCalculation = new Calculation()
@@ -499,9 +495,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
-                Description = "Calculation Description",
-                IsPublic = false,
-            };
+                Description = "Calculation Description"            };
 
             ISpecsApiClient specsClient = CreateSpecsClient();
 
@@ -535,7 +529,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                     Arg.Is<CalculationUpdateModel>(
                         m => m.AllocationLineId == viewModel.AllocationLineId &&
                         m.Description == viewModel.Description &&
-                        m.IsPublic == viewModel.IsPublic &&
                         m.Name == viewModel.Name
                     ));
         }
@@ -552,8 +545,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = null,
                 AllocationLineId = "al2",
                 CalculationType = "Number",
-                Description = "Updated description",
-                IsPublic = true
+                Description = "Updated description"
             };
 
             Calculation resultCalculation = new Calculation()
@@ -562,8 +554,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
-                Description = "Calculation Description",
-                IsPublic = false,
+                Description = "Calculation Description"
             };
 
             List<CalculationCurrentVersion> baselineCalculations = new List<CalculationCurrentVersion>();
@@ -618,7 +609,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                    AllocationLineId = "al2",
                    CalculationType = "Number",
                    Description = "Updated description",
-                   IsPublic = true,
                    Name = null,
                });
 
@@ -699,8 +689,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = null,
                 AllocationLineId = "al2",
                 CalculationType = "Number",
-                Description = "Updated description",
-                IsPublic = true
+                Description = "Updated description"
             };
 
             Calculation resultCalculation = new Calculation()
@@ -709,8 +698,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Calculation Name",
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
-                Description = "Calculation Description",
-                IsPublic = false,
+                Description = "Calculation Description"
             };
 
             ISpecsApiClient specsClient = CreateSpecsClient();
@@ -763,7 +751,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                    AllocationLineId = "al2",
                    CalculationType = "Number",
                    Description = "Updated description",
-                   IsPublic = true,
                    Name = null,
                });
 
@@ -856,7 +843,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 AllocationLine = new Reference("al1", "Allocation Line"),
                 CalculationType = CalculationSpecificationType.Funding,
                 Description = "Calculation Description",
-                IsPublic = false,
                 PolicyId = "policyId",
                 PolicyName = "Policy Name"
             };
