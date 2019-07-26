@@ -69,9 +69,7 @@
         {
             if (!ModelState.IsValid)
             {
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams(fundingStreamId));
-	            IsAuthorizedToCreate = FundingStreams.Count() != 0;
-				return Page();
+	            return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
             }
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
@@ -88,11 +86,9 @@
             }
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {
-                result.AddValidationResultErrors(ModelState);
+	            result.AddValidationResultErrors(ModelState);
 
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams(fundingStreamId));
-
-                return Page();
+	            return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
             }
             else
             {
@@ -100,7 +96,18 @@
             }
         }
 
-        private async Task PopulateFundingStreams(string fundingStreamId)
+	    private async Task<IActionResult> ActionResultForFundingPeriodStream(string fundingPeriodId, string fundingStreamId)
+	    {
+		    await TaskHelper.WhenAllAndThrow(
+			    PopulateFundingPeriods(fundingPeriodId),
+			    PopulateFundingStreams(fundingStreamId));
+
+		    IsAuthorizedToCreate = FundingStreams.Count() != 0;
+
+		    return Page();
+	    }
+
+	    private async Task PopulateFundingStreams(string fundingStreamId)
         {
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policiesApiClient.GetFundingStreams();
 

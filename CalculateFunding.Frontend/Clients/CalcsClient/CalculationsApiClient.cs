@@ -1,17 +1,17 @@
-﻿namespace CalculateFunding.Frontend.Clients.CalcsClient
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Interfaces;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Serilog;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Interfaces;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.CalcsClient.Models;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Clients.CalcsClient
+{
     public class CalculationsApiClient : BaseApiClient, ICalculationsApiClient
     {
         public CalculationsApiClient(
@@ -50,10 +50,8 @@
 
                 return result;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public Task<ApiResponse<Calculation>> UpdateCalculation(string calculationId, CalculationUpdateModel calculation)
