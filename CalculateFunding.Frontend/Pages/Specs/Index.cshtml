@@ -91,7 +91,6 @@
                     <th>Specification</th>
                     <th class="text-center">Last edited</th>
                     <th class="text-center">Specification status</th>
-                    <th class="text-center">More</th>
                 </tr>
             </thead>
 
@@ -114,20 +113,6 @@
                         </span>
                     </td>
                     <td data-bind="text: status, css: $root.statusCssClass(status)"></td>
-                    <td class="expander-trigger-cell" data-bind="click: function(){calculateFunding.table.toggleExpandContainer($element)}"><i class="material-icons">keyboard_arrow_down</i></td>
-                </tr>
-                <tr class="expander-container">
-                    <td colspan="4" class="expander-container-background expander-container-padding-md">
-
-                        <div class="spacing-15-bottom">
-                            <span>Funding period:</span> <strong class="data-specification-fundingperiod" data-bind="text: fundingPeriodName"></strong>
-                        </div>
-                        <div class="spacing-15-bottom">
-                            <span>Funding streams:</span>
-                            <span data-bind="foreach: fundingStreamNames" class="inline-list"><strong data-bind="text: $data" class="inline-list-item data-specification-fundingstream"></strong> </span>
-                        </div>
-                        <div class="spacing-15-bottom" data-bind="text: description"></div>
-                    </td>
                 </tr>
             </tbody>
             <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
@@ -155,25 +140,6 @@
                             </span>
                         </td>
                         <td>@specification.Status</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            <div class="spacing-15-bottom">
-                                <span>Funding period:</span> <strong class="data-static-specification-fundingperiod">@specification.FundingPeriodName</strong>
-                            </div>
-                            <div class="spacing-15-bottom">
-                                <span>Funding streams:</span>
-                                <span class="inline-list">
-                                    @foreach (string fundingStreamName in specification.FundingStreamNames)
-                                    {
-                                        <strong class="inline-list-item data-static-specification-fundingstream">@fundingStreamName</strong>
-                                    }
-
-                                </span>
-                            </div>
-                            <div class="spacing-15-bottom">@specification.Description.ReplaceLineBreaksForHtml()</div>
-                        </td>
                     </tr>
                     rowId++;
                 }
@@ -218,7 +184,6 @@
     <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
 
     <script asp-src-include="~/js/search.specifications.js" asp-append-version="true" type="text/javascript"></script>
-    <script asp-src-include="~/js/table.expander.js" asp-append-version="true" type="text/javascript"></script>
 
     <script type="text/javascript">
         var vm = new calculateFunding.manageSpecifications.SpecificationSearchViewModel();
