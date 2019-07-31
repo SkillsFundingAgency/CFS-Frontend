@@ -22,23 +22,26 @@
         </ol>
     </div>
 }
-@section BannerLeft{
+@section BannerWholeBlue{
     <!-- Breadcrumbs -->
     <h1 class="hero-title">Specifications</h1>
-    <form method="post" action="/specs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+    <div class="row">
+        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+            <form method="post" action="/specs" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
 
-        <div class="input-group" role="search">
-            <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search specifications" />
-            <div class="input-group-addon"><button class="search-button" title="Search" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                <div class="input-group" role="search">
+                    <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search specifications" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search specifications" />
+                    <div class="input-group-addon"><button class="search-button" title="Search" data-bind="enable: canPerformSearch"><img src="~/assets/images/icon-search.png" /></button></div>
+                </div>
+            </form>
         </div>
-    </form>
-}
-
-
-@section BannerRight{
-    <div class="banner-floating-link-container">
-        <a href="/specs/CreateSpecification">Create specification</a>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <div class="banner-floating-link-container">
+                <a href="/specs/CreateSpecification">Create specification</a>
+            </div>
+        </div>
     </div>
+    
 }
 
 @if (Model.OperationType.HasValue)
@@ -54,21 +57,21 @@
             <div class="row">
                 <div class="col-xs-2">
                     <div class="withjs-show">
-                        <span>Funding period</span>
+                        <b>Funding period</b>
                         <select id="fundingPeriods" data-bind="multiselect2: multiSelectConfigOptions, options: fundingPeriods, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingPeriods, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
                 <div class="col-xs-3">
                     <div class="withjs-show">
-                        <span>Funding streams</span>
+                        <b>Funding streams</b>
                         <select id="fundingStreams" data-bind="multiselect2: multiSelectConfigOptions, options: fundingStreams, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedFundingStreams, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
 
                 <div class="col-xs-2">
                     <div class="withjs-show">
-                        <span>Status</span>
+                        <b>Status</b>
                         <select id="status" data-bind="multiselect2: multiSelectConfigOptions, options: statuses, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedStatuses, enable: canSelectFilters" multiple></select>
                     </div>
                 </div>
