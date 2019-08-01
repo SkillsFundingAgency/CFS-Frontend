@@ -4,8 +4,8 @@ table.cf {
     border-collapse: collapse;
 
     thead {
-        background-color: #bfc1c3;
-        color: #000;
+        background-color: #768693;
+        color: #fff;
         padding: 10px;
 
         &.table-primary-border {
@@ -21,8 +21,7 @@ table.cf {
 
         th {
             border: 1px solid #DEE0E2 !important;
-            padding-left: 5px;
-            padding-right: 5px;
+            padding: 20px
         }
 
         th.no-border {
@@ -63,7 +62,7 @@ table.cf {
 
         td {
             font-size: 16px;
-            padding: 5px;
+            padding: 10px 10px 10px 20px;
             border: 1px solid #DEE0E2 !important;
         }
 
@@ -157,7 +156,7 @@ table.cf {
         text-decoration: underline;
     }
 
-    .valign-top{
+    .valign-top {
         vertical-align: top;
     }
 }
@@ -173,6 +172,10 @@ table.cf {
     padding: 30px 15px 15px 15px;
     font-size: 16px;
 
+    a{
+        color: #000;
+    }
+
     .dropdown-toggle {
         padding-top: 5px;
         padding-bottom: 5px;
@@ -181,6 +184,10 @@ table.cf {
 
     .btn-group {
         margin-top: 5px;
+
+        .btn{
+            border: 1px solid;
+        }
     }
 
     select {
