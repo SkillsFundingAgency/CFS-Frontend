@@ -1,18 +1,19 @@
-﻿namespace CalculateFunding.Frontend.Services
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using Serilog;
+
+namespace CalculateFunding.Frontend.Services
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
 
     public class CalculationSearchService : ICalculationSearchService
     {
@@ -52,31 +53,30 @@
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<CalculationSearchResultItem> calculationsResult = await _calculationsApiClient.FindCalculations(requestOptions);
+            ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult = await _calculationsApiClient.FindCalculations(requestOptions);
+
             if (calculationsResult == null)
             {
                 _logger.Error("Find calculations HTTP request failed");
                 return null;
             }
 
-            CalculationSearchResultViewModel result = new CalculationSearchResultViewModel();
-
-            result.TotalResults = calculationsResult.TotalItems;
-            result.CurrentPage = calculationsResult.PageNumber;
-            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-            if (calculationsResult.Facets != null)
+            CalculationSearchResultViewModel result = new CalculationSearchResultViewModel
             {
-                foreach (SearchFacet facet in calculationsResult.Facets)
-                {
-                    searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
-                }
+                TotalResults = calculationsResult.Content.TotalCount
+            };
+
+            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
+            if (calculationsResult.Content.Facets != null)
+            {
+                searchFacets.AddRange(calculationsResult.Content.Facets.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)));
             }
 
             result.Facets = searchFacets.AsEnumerable();
 
             List<CalculationSearchResultItemViewModel> itemResults = new List<CalculationSearchResultItemViewModel>();
 
-            foreach (CalculationSearchResultItem searchResult in calculationsResult.Items)
+            foreach (CalculationSearchResult searchResult in calculationsResult.Content.Results)
             {
                 itemResults.Add(_mapper.Map<CalculationSearchResultItemViewModel>(searchResult));
             }
@@ -93,12 +93,18 @@
                 result.EndItemNumber = result.StartItemNumber + requestOptions.PageSize - 1;
             }
 
-            if (result.EndItemNumber > calculationsResult.TotalItems)
+            if (result.EndItemNumber > calculationsResult.Content.TotalCount)
             {
-                result.EndItemNumber = calculationsResult.TotalItems;
+                result.EndItemNumber = calculationsResult.Content.TotalCount;
             }
 
-            result.PagerState = new PagerState(requestOptions.Page, calculationsResult.TotalPages, 4);
+            int totalPages = 0;
+            if (calculationsResult.Content.TotalCount > 0)
+            {
+                totalPages = requestOptions.PageSize % calculationsResult.Content.TotalCount;
+            }
+
+            result.PagerState = new PagerState(requestOptions.Page, totalPages, 4);
 
             return result;
         }

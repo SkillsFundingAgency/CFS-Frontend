@@ -1,20 +1,21 @@
-﻿namespace CalculateFunding.Frontend.Pages.Calcs
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
+namespace CalculateFunding.Frontend.Pages.Calcs
+{
     public class DiffCalculationModel : PageModel
     {
         private ISpecsApiClient _specsClient;
@@ -32,7 +33,7 @@
             _mapper = mapper;
         }
 
-        public CalculationVersionViewModel LeftCalcualationDiffModel { get; set; }
+        public CalculationVersionViewModel LeftCalculationDiffModel { get; set; }
 
         public CalculationVersionViewModel RightCalculationDiffModel { get; set; }
 
@@ -68,10 +69,10 @@
             Calculation calculation = calculationResponse.Content;
 
             CalculationName = calculation.Name;
-            CalculationPeriodName = calculation.FundingPeriodName;
+            CalculationPeriodName = calculation.FundingStreamId;
             CalculationId = calculation.Id;
 
-            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.CalculationSpecification.Id);
+            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
 
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {
@@ -104,7 +105,7 @@
 
                     List<CalculationVersion> calculationVersionsList = calculationVersions.OrderBy(c => c.Version).ToList();
 
-                    LeftCalcualationDiffModel = _mapper.Map<CalculationVersionViewModel>(calculationVersionsList[0]);
+                    LeftCalculationDiffModel = _mapper.Map<CalculationVersionViewModel>(calculationVersionsList[0]);
                     RightCalculationDiffModel = _mapper.Map<CalculationVersionViewModel>(calculationVersionsList[1]);
                 }
             }

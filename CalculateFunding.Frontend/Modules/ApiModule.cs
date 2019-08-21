@@ -1,9 +1,7 @@
 ﻿namespace CalculateFunding.Frontend.Modules
 {
-    using System;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
     using CalculateFunding.Common.ApiClient;
+    using CalculateFunding.Common.ApiClient.Calcs;
     using CalculateFunding.Common.ApiClient.Interfaces;
     using CalculateFunding.Common.ApiClient.Jobs;
     using CalculateFunding.Common.ApiClient.Models;
@@ -11,7 +9,6 @@
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Users;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient;
     using CalculateFunding.Frontend.Clients.DatasetsClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
     using CalculateFunding.Frontend.Clients.ScenariosClient;
@@ -22,6 +19,9 @@
     using CalculateFunding.Frontend.Interfaces.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Polly;
+    using System;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
 
     public class ApiModule : ServiceCollectionModuleBase
     {
@@ -146,6 +146,9 @@
 
             services
                .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
+
+            services
+	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
             services
                 .AddSingleton<IResultsApiClient, ResultsApiClient>();

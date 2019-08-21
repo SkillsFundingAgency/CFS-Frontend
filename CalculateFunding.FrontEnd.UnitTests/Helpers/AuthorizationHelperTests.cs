@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
@@ -33,7 +34,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
@@ -76,7 +77,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
@@ -107,7 +108,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
@@ -138,7 +139,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
@@ -174,7 +175,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
@@ -210,7 +211,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
@@ -246,7 +247,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
@@ -283,7 +284,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
             FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
@@ -319,7 +320,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = true },
@@ -355,7 +356,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = false },
@@ -391,7 +392,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = false },
@@ -425,7 +426,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = true },
@@ -459,7 +460,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = true },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = false },
@@ -495,7 +496,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
             SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanCreateQaTests;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
             {
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateQaTests = false },
                 new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateQaTests = false },
@@ -561,7 +562,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
 			{
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = true },
@@ -597,7 +598,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
 			{
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = false },
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },
@@ -636,7 +637,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
 			{
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },
@@ -680,7 +681,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
 			{
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = true }
@@ -713,7 +714,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 			SpecificationActionTypes permissionRequired = SpecificationActionTypes.CanChooseFunding;
 
-			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(System.Net.HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+			ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
 			{
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanChooseFunding = true },
 				new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanChooseFunding = false },

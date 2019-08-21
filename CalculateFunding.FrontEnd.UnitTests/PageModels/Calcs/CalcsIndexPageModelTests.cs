@@ -1,31 +1,28 @@
-﻿// <copyright file="CalcsIndexPageModelTests.cs" company="Department for Education">
-// Copyright (c) Department for Education. All rights reserved.
-// </copyright>
+﻿using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.Pages.Calcs;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.Pages.Calcs;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
-
     [TestClass]
     public class CalcsIndexPageModelTests
     {
@@ -397,17 +394,16 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
-
+            var itemResult = GeneratePagedResult(10);
+			
             string draftCalculationId = "5";
 
             Calculation expectedDraftCalculation = new Calculation()
             {
                 Id = draftCalculationId,
-                Name = "Draft Calculation 5"
             };
 
-            ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedDraftCalculation);
+            ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, expectedDraftCalculation);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -437,17 +433,17 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             ICalculationSearchService calculationSearchService = Substitute.For<ICalculationSearchService>();
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(10);
+            var itemResult = GeneratePagedResult(10);
 
             string publishedCalculationId = "15";
 
             Calculation expectedPublishedCalculation = new Calculation()
             {
                 Id = publishedCalculationId,
-                Name = "Published Calculation 5"
             };
 
-            ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, expectedPublishedCalculation);
+
+            ApiResponse<Calculation> calculationResponse = new ApiResponse<Calculation>(HttpStatusCode.OK, expectedPublishedCalculation);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -495,29 +491,27 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 .Be(true);
         }
 
-        private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems)
+        private Task<ApiResponse<SearchResults<CalculationSearchResult>>> GeneratePagedResult(int numberOfItems)
         {
-            PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>();
-            List<CalculationSearchResultItem> items = new List<CalculationSearchResultItem>();
+            
+
+            List<CalculationSearchResult> items = new List<CalculationSearchResult>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new CalculationSearchResultItem()
+                items.Add(new CalculationSearchResult()
                 {
                     Id = $"{i}",
                     Name = $"Calculation {i}",
-                    FundingPeriodName = "Test Period",
-                    SpecificationName = "Spec Name",
-                    Status = "Unknown",
                 });
             }
 
-            result.Items = items.AsEnumerable();
-            result.PageNumber = 1;
-            result.PageSize = 50;
-            result.TotalItems = numberOfItems;
-            result.TotalPages = 1;
+            var result = new ApiResponse<SearchResults<CalculationSearchResult>>(HttpStatusCode.OK,
+	            new SearchResults<CalculationSearchResult> {Results = items.AsEnumerable(),})
+            {
+	            Content = {Results = items.AsEnumerable(), TotalCount = numberOfItems}
+            };
 
-            return result;
+            return new Task<ApiResponse<SearchResults<CalculationSearchResult>>>(() => result);
         }
 
         private CalculationSearchResultViewModel GenerateSearchResult(int numberOfItems)

@@ -1,10 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.Pages.Calcs
 {
-    using System.Threading.Tasks;
+	using CalculateFunding.Common.ApiClient.Calcs;
+	using CalculateFunding.Common.ApiClient.Calcs.Models;
+	using System.Threading.Tasks;
     using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using CalculateFunding.Frontend.ViewModels.Common;

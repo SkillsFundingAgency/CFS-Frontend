@@ -1,30 +1,33 @@
-﻿namespace CalculateFunding.Frontend.Pages.Calcs
-{
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
+
+namespace CalculateFunding.Frontend.Pages.Calcs
+{
     public class EditCalculationPageModel : PageModel
     {
         private ISpecsApiClient _specsClient;
+        private ISpecificationAuthorizationEntity _specificationAuthorizationEntity;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IResultsApiClient _resultsApiClient;
 
-        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, 
-            IMapper mapper, IFeatureToggle features, IAuthorizationHelper authorizationHelper, IResultsApiClient resultsApiClient)
+        public EditCalculationPageModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient,
+            IMapper mapper, IFeatureToggle features, IAuthorizationHelper authorizationHelper, IResultsApiClient resultsApiClient, ISpecificationAuthorizationEntity specificationAuthorizationEntity)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
@@ -38,6 +41,7 @@
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _resultsApiClient = resultsApiClient;
+            _specificationAuthorizationEntity = specificationAuthorizationEntity;
             ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
 
@@ -73,9 +77,11 @@
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            this.DoesUserHavePermissionToApproveOrEdit = (await _authorizationHelper.DoesUserHavePermission(User, calculation.Content, SpecificationActionTypes.CanEditCalculations)).ToString().ToLowerInvariant();
+            bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, _specificationAuthorizationEntity, SpecificationActionTypes.CanEditCalculations);
 
-            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.CalculationSpecification.Id);
+            DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
+
+            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.Id);
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
@@ -101,7 +107,7 @@
             {
                 ApiResponse<bool> hasCalculationResponse = await _resultsApiClient.HasCalculationResults(Calculation.Id);
 
-                if(hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)
+                if (hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)
                 {
                     CalculationHasResults = hasCalculationResponse.Content;
                 }

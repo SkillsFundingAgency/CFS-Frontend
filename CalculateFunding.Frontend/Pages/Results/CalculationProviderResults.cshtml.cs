@@ -1,29 +1,31 @@
-﻿namespace CalculateFunding.Frontend.Pages.Results
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Jobs;
-    using CalculateFunding.Common.ApiClient.Jobs.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Constants;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
-    using CalculateFunding.Frontend.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Newtonsoft.Json;
-    using Serilog;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Jobs;
+using CalculateFunding.Common.ApiClient.Jobs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Constants;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Results;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Pages.Results
+{
     public class CalculationProviderResultsPageModel : PageModel
     {
         private readonly IMapper _mapper;
@@ -90,9 +92,9 @@
 
         private async Task PopulateCalculation(string calculationId)
         {
-            ApiResponse<Clients.CalcsClient.Models.Calculation> calculation = await _calculationsApiClient.GetCalculationById(calculationId);
+            ApiResponse<Common.ApiClient.Calcs.Models.Calculation> calculation = await _calculationsApiClient.GetCalculationById(calculationId);
 
-            if (calculation != null || calculation.StatusCode == System.Net.HttpStatusCode.OK)
+            if (calculation != null || calculation.StatusCode == HttpStatusCode.OK)
             {
                 Calculation = _mapper.Map<ViewModels.Calculations.CalculationViewModel>(calculation.Content);
             }

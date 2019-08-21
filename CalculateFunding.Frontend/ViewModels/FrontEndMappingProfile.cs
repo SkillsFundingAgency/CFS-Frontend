@@ -1,31 +1,32 @@
-﻿namespace CalculateFunding.Frontend.ViewModels
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Jobs.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Common.Models.Search;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.ViewModels.Approvals;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using CalculateFunding.Frontend.ViewModels.Jobs;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using CalculateFunding.Frontend.ViewModels.Scenarios;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using CalculateFunding.Frontend.ViewModels.TestEngine;
+﻿using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Jobs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Models.Search;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Approvals;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using CalculateFunding.Frontend.ViewModels.Jobs;
+using CalculateFunding.Frontend.ViewModels.Results;
+using CalculateFunding.Frontend.ViewModels.Scenarios;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using CalculateFunding.Frontend.ViewModels.TestEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Models = CalculateFunding.Common.ApiClient.Calcs.Models;
 
+namespace CalculateFunding.Frontend.ViewModels
+{
     public class FrontEndMappingProfile : Profile
     {
         public FrontEndMappingProfile()
@@ -97,17 +98,56 @@
 
         private void MapCalcs()
         {
-            CreateMap<Clients.CalcsClient.Models.Calculation, CalculationEditViewModel>();
-            CreateMap<Clients.CalcsClient.Models.Calculation, Calculations.CalculationViewModel>()
-                .ForMember(m => m.Description, opt => opt.Ignore());
+            CreateMap<Models.Calculation, CalculationEditViewModel>()
+	            .ForMember(m => m.SourceCode, opt => opt.MapFrom(f=>f.Current.SourceCode))
+	            ;
 
-            CreateMap<CalculationUpdateViewModel, Clients.CalcsClient.Models.CalculationUpdateModel>();
+            CreateMap<Models.Calculation, Calculations.CalculationViewModel>()
+	            .ForMember(m => m.Description, opt => opt.Ignore())
+	            .ForMember(m => m.FundingPeriodId, opt => opt.Ignore())
+	            .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
+	            .ForMember(m => m.LastModified, opt => opt.Ignore())
+	            .ForMember(m => m.Version, opt => opt.Ignore())
+	            .ForMember(m => m.LastModifiedByName, opt => opt.Ignore())
+	            .ForMember(m => m.SourceCode, opt => opt.Ignore())
+	            .ForMember(m => m.CalculationType, opt => opt.Ignore())
+	            .ForMember(m => m.PublishStatus, opt => opt.Ignore());
 
-            CreateMap<CalculationSearchResultItem, CalculationSearchResultItemViewModel>();
+            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>()
+	            .ForMember(m => m.CalculationType, opt => opt.Ignore())
+	            .ForMember(m => m.Name, opt => opt.Ignore())
+	            .ForMember(m => m.AllocationLineId, opt => opt.Ignore())
+	            .ForMember(m => m.Description, opt => opt.Ignore());
 
-            CreateMap<PreviewCompileRequestViewModel, PreviewCompileRequest>()
-                .ForMember(m => m.CalculationId, opt => opt.Ignore())
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+            CreateMap<PreviewCompileRequestViewModel, PreviewRequest>()
+	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+	            .ForMember(d => d.CalculationId, opt => opt.Ignore())
+	            .ForMember(d => d.Name, opt => opt.Ignore())
+	            ;
+
+            CreateMap<CalculationUpdateViewModel, CalculationEditModel>()
+	            .ForMember(d => d.Description, opt => opt.Ignore())
+	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+	            .ForMember(d => d.CalculationId, opt => opt.Ignore())
+	            .ForMember(d => d.Name, opt => opt.Ignore())
+	            .ForMember(d => d.ValueType, opt => opt.Ignore())
+                ;
+
+            CreateMap<CalculationVersion, CalculationVersionsCompareModel>()
+                .ForMember(m => m.Versions, opt => opt.MapFrom(f => new[] { f.Version }))
+                ;
+
+            CreateMap<CalculationVersion, CalculationVersionViewModel>()
+	            .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
+	            .ForMember(m => m.Status, opt => opt.Ignore())
+	            ;
+
+            CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>()
+	            .ForMember(m => m.SpecificationName, opt => opt.Ignore())
+	            .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
+	            .ForMember(m => m.Status, opt => opt.Ignore())
+	            .ForMember(m => m.LastUpdatedDate, opt => opt.Ignore())
+	            ;
         }
 
         private void MapSpecs()
@@ -153,17 +193,27 @@
                     destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
                 });
 
-            CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
-               .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+            CreateMap<CreateCalculationViewModel, Models.CalculationCreateModel>()
+	            .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+	            .ForMember(m => m.SourceCode, opt => opt.Ignore())
+	            .ForMember(m => m.ValueType, opt => opt.Ignore())
+	            .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+	            .ForMember(m => m.Id, opt => opt.Ignore());
 
             CreateMap<Specification, SpecificationViewModel>()
                 .ForMember(m => m.Calculations, opt => opt.Ignore());
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
-            CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>();
+            CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>()
+	            .ForMember(d => d.LastUpdated, opt => opt.Ignore());
 
-            CreateMap<CalculationCurrentVersion, Specs.CalculationViewModel>();
+
+            CreateMap<Models.CalculationCurrentVersion,
+		            Specs.CalculationViewModel>()
+	            .ForMember(d => d.LastUpdated, opt => opt.Ignore())
+	            .ForMember(d => d.Description, opt => opt.Ignore())
+	            .ForMember(d => d.AllocationLine, opt => opt.Ignore());
 
             CreateMap<Specification, EditSpecificationViewModel>()
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
@@ -222,6 +272,7 @@
             CreateMap<DatasetCreateUpdateResponseModel, DatasetCreateUpdateResponseViewModel>();
             CreateMap<DatasetValidationStatusOperation, DatasetValidationStatusOperationViewModel>();
         }
+
         private void MapTestEngine()
         {
             this.CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()

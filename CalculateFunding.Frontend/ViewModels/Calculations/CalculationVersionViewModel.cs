@@ -9,7 +9,7 @@
 
         public string SourceCode { get; set; }
 
-        public string Version { get; set; }
+        public int Version { get; set; }
 
         public DateTime Date { get; set; }
 

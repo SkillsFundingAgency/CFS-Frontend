@@ -53,9 +53,9 @@
             <div class="diff-details-container">
                 <div class="diff-left diff-details-panel">
                     <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                    <span>@Model.LeftCalcualationDiffModel.Author?.Name</span>
-                    <span>@Model.LeftCalcualationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString)</span>
-                    <span class="diff-left-status">@Model.LeftCalcualationDiffModel.Status</span>
+                    <span>@Model.LeftCalculationDiffModel.Author?.Name</span>
+                    <span>@Model.LeftCalculationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString)</span>
+                    <span class="diff-left-status">@Model.LeftCalculationDiffModel.Status</span>
                 </div>
                 <div class="diff-right diff-details-panel">
                     <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
@@ -86,11 +86,10 @@
         if (diffContainer) {
             var vm = new calculateFunding.compare.CompareViewModel();
 
-            vm.original("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.LeftCalcualationDiffModel.SourceCode))");
+            vm.original("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.LeftCalculationDiffModel.SourceCode))");
             vm.modified("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Model.RightCalculationDiffModel.SourceCode))");
+
             ko.applyBindings(vm, diffContainer);
         }
     </script>
-
-
 }

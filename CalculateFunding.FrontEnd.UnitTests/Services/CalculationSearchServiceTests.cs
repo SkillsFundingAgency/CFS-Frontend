@@ -2,27 +2,28 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+
 namespace CalculateFunding.Frontend.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using FluentAssertions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
-
     [TestClass]
     public class CalculationSearchServiceTests
     {
@@ -64,7 +65,7 @@ namespace CalculateFunding.Frontend.Services
 
             ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
 
-            PagedResult<CalculationSearchResultItem> expectedServiceResult = null;
+            ApiResponse<SearchResults<CalculationSearchResult>> expectedServiceResult = null;
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -80,7 +81,7 @@ namespace CalculateFunding.Frontend.Services
         }
 
         [TestMethod]
-        public async Task PerformSearch_FirstSearchResultReturnedCorrectly()
+        public async Task PerformSearch_SearchResultsReturnedCorrectly()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -92,7 +93,7 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            ApiResponse<SearchResults<CalculationSearchResult>> itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -104,13 +105,12 @@ namespace CalculateFunding.Frontend.Services
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
-            first.Should().NotBeNull();
-            first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
-            first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
+            CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+            for (int i = 0; i < calcs.Length; i++)
+            {
+                calcs[i].Id.Should().Be((i + 10).ToString());
+                calcs[i].Name.Should().Be($"Calculation {i + 1}");
+            }
         }
 
         [TestMethod]
@@ -131,7 +131,7 @@ namespace CalculateFunding.Frontend.Services
                 new SearchFacet(), new SearchFacet()
             };
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            ApiResponse<SearchResults<CalculationSearchResult>> itemResult = GeneratePagedResult(numberOfItems, facets);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -143,13 +143,12 @@ namespace CalculateFunding.Frontend.Services
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
-            first.Should().NotBeNull();
-            first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
-            first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
+            CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+            for (int i = 0; i < calcs.Length; i++)
+            {
+                calcs[i].Id.Should().Be((i + 10).ToString());
+                calcs[i].Name.Should().Be($"Calculation {i + 1}");
+            }
 
             results.Facets.Count().Should().Be(2);
         }
@@ -188,7 +187,7 @@ namespace CalculateFunding.Frontend.Services
                 }
             };
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            var itemResult = GeneratePagedResult(numberOfItems, facets);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -200,15 +199,15 @@ namespace CalculateFunding.Frontend.Services
             CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
 
             // Assert
-            CalculationSearchResultItemViewModel first = results.Calculations.First();
-            first.Should().NotBeNull();
-            first.Id.Should().Be("10");
-            first.SpecificationName.Should().Be("Spec Name");
-            first.Status.Should().Be("Unknown");
-            first.FundingPeriodName.Should().Be("Test Period");
-            first.Name.Should().Be("Calculation 1");
+            CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+            for (int i = 0; i < calcs.Length; i++)
+            {
+                calcs[i].Id.Should().Be((i + 10).ToString());
+                calcs[i].Name.Should().Be($"Calculation {i + 1}");
+            }
 
-            results.Facets.Count().Should().Be(2);
+            results.Facets.Count().Should().Be(facets.Count());
+
             results.Facets.First().Name.Should().Be("facet 1");
             results.Facets.First().FacetValues.Count().Should().Be(1);
             results.Facets.First().FacetValues.First().Name.Should().Be("f1");
@@ -234,7 +233,7 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 0;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            var itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -263,7 +262,7 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            var itemResult = GeneratePagedResult(numberOfItems);
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -292,10 +291,8 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 75;
+            var itemResult = GeneratePagedResult(numberOfItems);
+            itemResult.Content.TotalCount = 75;
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -327,10 +324,8 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 50;
 
-            PagedResult<CalculationSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 175;
+            var itemResult = GeneratePagedResult(numberOfItems);
+            itemResult.Content.TotalCount = 175;
 
             calcsClient
                 .FindCalculations(Arg.Any<SearchFilterRequest>())
@@ -409,28 +404,27 @@ namespace CalculateFunding.Frontend.Services
             return featureToggle;
         }
 
-        private PagedResult<CalculationSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+        private ApiResponse<SearchResults<CalculationSearchResult>> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
-            PagedResult<CalculationSearchResultItem> result = new PagedResult<CalculationSearchResultItem>();
-            List<CalculationSearchResultItem> items = new List<CalculationSearchResultItem>();
+            SearchResults<CalculationSearchResult> output = new SearchResults<CalculationSearchResult>();
+
+            var items = new List<CalculationSearchResult>();
+
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new CalculationSearchResultItem()
+                items.Add(new CalculationSearchResult()
                 {
                     Id = $"{i + 10}",
                     Name = $"Calculation {i + 1}",
-                    FundingPeriodName = "Test Period",
-                    SpecificationName = "Spec Name",
-                    Status = "Unknown",
+                    SpecificationId = $"{i}",
                 });
             }
 
-            result.Items = items.AsEnumerable();
-            result.PageNumber = 1;
-            result.PageSize = 50;
-            result.TotalItems = numberOfItems;
-            result.TotalPages = 1;
-            result.Facets = facets;
+            output.Results = items.AsEnumerable();
+            output.TotalCount = numberOfItems;
+            output.Facets = facets;
+            ApiResponse<SearchResults<CalculationSearchResult>> result = new ApiResponse<SearchResults<CalculationSearchResult>>(HttpStatusCode.OK, output);
+
 
             return result;
         }

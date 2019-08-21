@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -14,7 +16,6 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using Serilog;
-using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -28,7 +29,7 @@ namespace CalculateFunding.Frontend.Services
         private readonly ISpecsApiClient _specsApiClient;
         private readonly IFeatureToggle _featureToggle;
 
-        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecsApiClient specsApiClient, 
+        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecsApiClient specsApiClient,
             ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
@@ -97,7 +98,7 @@ namespace CalculateFunding.Frontend.Services
                 throw new InvalidOperationException("Specifications API Response was null");
             }
 
-            if (specificationsApiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            if (specificationsApiResponse.StatusCode != HttpStatusCode.OK)
             {
                 _logger.Warning("Specifications API Response content did not return OK, but instead {specificationsApiResponse.StatusCode}", specificationsApiResponse.StatusCode);
                 throw new InvalidOperationException($"Specifications API Response content did not return OK, but instead '{specificationsApiResponse.StatusCode}'");
@@ -133,7 +134,7 @@ namespace CalculateFunding.Frontend.Services
                     throw new InvalidOperationException($"Row counts api request failed with null response");
                 }
 
-                if (rowCounts.StatusCode != System.Net.HttpStatusCode.OK)
+                if (rowCounts.StatusCode != HttpStatusCode.OK)
                 {
                     _logger.Warning("Row counts api request failed with status code: {rowCounts.StatusCode}", rowCounts.StatusCode);
                     throw new InvalidOperationException($"Row counts api request failed with status code: {rowCounts.StatusCode}");

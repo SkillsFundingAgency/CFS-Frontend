@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,12 @@ namespace CalculateFunding.Common.ApiClient.Models
                 return new InternalServerErrorResult($"{entityName} API response returned null.");
             }
 
-            if (apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (apiResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult($"{entityName} not found.");
             }
 
-            if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            if (apiResponse.StatusCode != HttpStatusCode.OK)
             {
                 return new InternalServerErrorResult($"{entityName} API call did not return success, but instead '{apiResponse.StatusCode}'");
             }

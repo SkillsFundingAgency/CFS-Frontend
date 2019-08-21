@@ -2,6 +2,9 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+
 namespace CalculateFunding.Frontend.Controllers
 {
     using System;
@@ -10,10 +13,8 @@ namespace CalculateFunding.Frontend.Controllers
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.UnitTests.Helpers;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using FluentAssertions;
@@ -46,12 +47,13 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                SourceCode = updateViewModel.SourceCode,
+				Current = new CalculationVersion { 
+                SourceCode = updateViewModel.SourceCode},
             };
 
             calcsClient
-                .UpdateCalculation(calculationId, Arg.Any<CalculationUpdateModel>())
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, apiResultCalculation));
+                .EditCalculation(specificationId, calculationId, Arg.Any<CalculationEditModel>())
+                .Returns(new ValidatedApiResponse<Common.ApiClient.Calcs.Models.Calculation>(HttpStatusCode.OK, apiResultCalculation));
 
             // Act
             IActionResult result = await controller.SaveCalculation(specificationId, calculationId, updateViewModel);
@@ -62,7 +64,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             OkObjectResult typedResult = result as OkObjectResult;
             Calculation resultCalculation = typedResult.Value as Calculation;
-            resultCalculation.SourceCode.Should().Be(updateViewModel.SourceCode);
+            resultCalculation?.Current.SourceCode.Should().Be(updateViewModel.SourceCode);
         }
 
         [TestMethod]
@@ -108,8 +110,8 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
 
             calcsClient
-                .UpdateCalculation(calculationId, Arg.Any<CalculationUpdateModel>())
-                .Returns(Task.FromResult(new ApiResponse<Calculation>(System.Net.HttpStatusCode.ServiceUnavailable, null)));
+                .EditCalculation(specificationId, calculationId, Arg.Any<CalculationEditModel>())
+                .Returns(Task.FromResult(new ValidatedApiResponse<Calculation>(HttpStatusCode.ServiceUnavailable, null)));
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -151,12 +153,14 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
+				Current = new CalculationVersion { 
                 SourceCode = updateViewModel.SourceCode,
+				}
             };
 
             calcsClient
-                .UpdateCalculation(calculationId, Arg.Any<CalculationUpdateModel>())
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, apiResultCalculation));
+                .EditCalculation(specificationId, calculationId, Arg.Any<CalculationEditModel>())
+                .Returns(new ValidatedApiResponse<Common.ApiClient.Calcs.Models.Calculation>(HttpStatusCode.OK, apiResultCalculation));
 
             // Act
             IActionResult result = await controller.SaveCalculation(specificationId, calculationId, updateViewModel);
@@ -183,17 +187,17 @@ namespace CalculateFunding.Frontend.Controllers
                 SourceCode = "Updated source code",
             };
 
-            PreviewCompileResult apiResultCalculation = new PreviewCompileResult()
+            PreviewResponse apiResultCalculation = new PreviewResponse()
             {
-                 CompilerOutput = new CompilerOutput()
+                 CompilerOutput = new Build()
                  {
                       Success = true,
                  }
             };
 
             calcsClient
-                .PreviewCompile(Arg.Any<PreviewCompileRequest>())
-                .Returns(new ApiResponse<PreviewCompileResult>(System.Net.HttpStatusCode.OK, apiResultCalculation));
+                .PreviewCompile(Arg.Any<PreviewRequest>())
+                .Returns(new ApiResponse<PreviewResponse>(HttpStatusCode.OK, apiResultCalculation));
 
             // Act
             IActionResult result = await controller.CompilePreview(specificationId, calculationId, previewViewModel);
@@ -203,7 +207,7 @@ namespace CalculateFunding.Frontend.Controllers
             result.Should().BeOfType<OkObjectResult>();
 
             OkObjectResult typedResult = result as OkObjectResult;
-            PreviewCompileResult previewResult = typedResult.Value as PreviewCompileResult;
+            PreviewResponse previewResult = typedResult.Value as PreviewResponse;
             previewResult.CompilerOutput.Success.Should().Be(apiResultCalculation.CompilerOutput.Success);
 
             await authorizationHelper
@@ -263,8 +267,8 @@ namespace CalculateFunding.Frontend.Controllers
             };
 
             calcsClient
-                .PreviewCompile(Arg.Any<PreviewCompileRequest>())
-                .Returns(Task.FromResult(new ApiResponse<PreviewCompileResult>(System.Net.HttpStatusCode.ServiceUnavailable, null)));
+                .PreviewCompile(Arg.Any<PreviewRequest>())
+                .Returns(Task.FromResult(new ApiResponse<PreviewResponse>(HttpStatusCode.ServiceUnavailable, null)));
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -379,87 +383,6 @@ namespace CalculateFunding.Frontend.Controllers
             // Assert
             result.Should().BeOfType<ForbidResult>();
         }
-
-		[TestMethod]
-		public void RedirectToEditCalc_WhenAParameterIsNull_ShouldThrowException()
-		{
-			// Arrange
-			ICalculationsApiClient mockCalculationApiClient = Substitute.For<ICalculationsApiClient>();
-			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
-			IMapper mockMapper = Substitute.For<IMapper>();
-
-			CalculationController controller = new CalculationController(mockCalculationApiClient, mockMapper, mockAuthorizationHelper);
-
-			// Act
-			Func<Task<IActionResult>> redirectToEditCalc = async () => await controller.RedirectToEditCalc(null);
-
-			// Assert
-			redirectToEditCalc.Should().Throw<ArgumentException>();
-		}
-
-		[TestMethod]
-		public async Task RedirectToEditCalc_WhenValidRequestAndCalculationIsFound_ShouldRedirectToEditCalculationPage()
-		{
-			// Arrange
-			const string calculationSpecificationId = "calcSpecId";
-			const string calculationIdReturned = "Calc55";
-
-			Calculation calculationReturned = new Calculation()
-			{
-				Id = calculationIdReturned
-			};
-			ValidatedApiResponse<Calculation> apiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, calculationReturned);
-
-			ICalculationsApiClient mockCalculationApiClient = Substitute.For<ICalculationsApiClient>();
-			mockCalculationApiClient
-				.GetCalculationByCalculationSpecificationId(calculationSpecificationId)
-				.Returns(apiResponse);
-
-			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
-			IMapper mockMapper = Substitute.For<IMapper>();
-
-			CalculationController controller = new CalculationController(mockCalculationApiClient, mockMapper, mockAuthorizationHelper);
-
-			// Act
-			IActionResult actionResult = await controller.RedirectToEditCalc(calculationSpecificationId);
-
-			// Assert
-			actionResult
-				.Should()
-				.BeOfType<RedirectResult>();
-
-			RedirectResult redirectResult = actionResult as RedirectResult;
-			redirectResult
-				.Url
-				.Should()
-				.EndWith($"calcs/editCalculation/{calculationIdReturned}");
-		}
-
-		[TestMethod]
-		public void RedirectToEditCalc_WhenValidRequestButCalculationNotFoundResult_ShouldThrowException()
-		{
-			// Arrange
-			const string calculationSpecificationId = "calcSpecId";
-
-			ValidatedApiResponse<Calculation> apiResponse = new ValidatedApiResponse<Calculation>(HttpStatusCode.NotFound);
-
-			ICalculationsApiClient calculationsApiClient = Substitute.For<ICalculationsApiClient>();
-			calculationsApiClient
-				.GetCalculationByCalculationSpecificationId(calculationSpecificationId)
-				.Returns(apiResponse);
-
-			IAuthorizationHelper mockAuthorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute("doesnt matter", SpecificationActionTypes.CanApproveSpecification);
-			IMapper mockMapper = Substitute.For<IMapper>();
-
-			CalculationController controller = new CalculationController(calculationsApiClient, mockMapper, mockAuthorizationHelper);
-
-			// Act
-			Func<Task<IActionResult>> redirectToEditCalc = async () => await controller.RedirectToEditCalc(calculationSpecificationId);
-
-			// Assert
-			redirectToEditCalc.Should().Throw<ApplicationException>();
-		}
-
 
 		private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {

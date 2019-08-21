@@ -1,16 +1,17 @@
-﻿namespace CalculateFunding.Frontend.Controllers
+﻿using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+
+namespace CalculateFunding.Frontend.Controllers
 {
     using System;
     using System.Net;
-	using System.Collections.Generic;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Microsoft.AspNetCore.Mvc;
 
@@ -49,10 +50,10 @@
                 return BadRequest(ModelState);
             }
 
-            CalculationUpdateModel update = _mapper.Map<CalculationUpdateModel>(vm);
-            ApiResponse<Calculation> response = await _calcClient.UpdateCalculation(calculationId, update);
+            CalculationEditModel update = _mapper.Map<CalculationEditModel>(vm);
+            ValidatedApiResponse<Common.ApiClient.Calcs.Models.Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, update);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
@@ -71,13 +72,13 @@
                 return BadRequest(ModelState);
             }
 
-            PreviewCompileRequest request = _mapper.Map<PreviewCompileRequest>(vm);
+            PreviewRequest request = _mapper.Map<PreviewRequest>(vm);
             request.CalculationId = calculationId;
             request.SpecificationId = specificationId;
 
-            ApiResponse<PreviewCompileResult> response = await _calcClient.PreviewCompile(request);
+            ApiResponse<PreviewResponse> response = await _calcClient.PreviewCompile(request);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
@@ -93,8 +94,8 @@
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<IEnumerable<TypeInformation>> response = await _calcClient.GetCodeContextForSpecification(specificationId);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            ApiResponse<IEnumerable<Common.ApiClient.Calcs.Models.Code.TypeInformation>> response = await _calcClient.GetCodeContextForSpecification(specificationId);
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
@@ -118,7 +119,7 @@
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
@@ -127,22 +128,5 @@
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
         }
-
-	    [Route("api/specs/redirectToCalc/{calculationSpecificationId}")]
-	    public async Task<IActionResult> RedirectToEditCalc(string calculationSpecificationId)
-	    {
-		    Guard.IsNullOrWhiteSpace(calculationSpecificationId, nameof(calculationSpecificationId));
-
-		    ApiResponse<Calculation> apiResponse = await _calcClient.GetCalculationByCalculationSpecificationId(calculationSpecificationId);
-
-		    if (apiResponse.StatusCode == HttpStatusCode.OK)
-		    {
-			    return Redirect($"/calcs/editCalculation/{apiResponse.Content.Id}");
-		    }
-
-		    string errorMessage =
-			    $"Could not redirect for calculationSpecificationId: {calculationSpecificationId}, as the search for calculation returned status code: {apiResponse.StatusCode.ToString()}";
-		    throw new ApplicationException(errorMessage);
-	    }
-	}
+    }
 }

@@ -1,8 +1,8 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
-{
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using System;
+﻿using System;
+using CalculateFunding.Frontend.ViewModels.Common;
 
+namespace CalculateFunding.Frontend.ViewModels.Calculations
+{
     public class CalculationViewModel : ReferenceViewModel
     {
         public string SpecificationId { get; set; }
@@ -21,7 +21,7 @@
 
         public string SourceCode { get; set; }
 
-        public CalculationSpecificationTypeViewModel CalculationType { get; set; }
+        public CalculationTypeViewModel CalculationType { get; set; }
 
         public PublishStatusViewModel PublishStatus { get; set; }
     }

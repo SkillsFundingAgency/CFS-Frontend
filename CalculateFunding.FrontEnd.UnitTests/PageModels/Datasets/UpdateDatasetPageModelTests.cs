@@ -1,17 +1,18 @@
-﻿using CalculateFunding.Frontend.Interfaces.ApiClient;
+﻿using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.Threading.Tasks;
 using Serilog;
-using AutoMapper;
-using CalculateFunding.Frontend.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 {
@@ -35,7 +36,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(System.Net.HttpStatusCode.OK, datasetVersionResponse));
+                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, datasetVersionResponse));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);
@@ -90,7 +91,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(System.Net.HttpStatusCode.InternalServerError, null));
+                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.InternalServerError, null));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);
@@ -116,7 +117,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(System.Net.HttpStatusCode.OK, null));
+                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, null));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);

@@ -1,7 +1,7 @@
 ﻿@page "{calculationId}"
 @model CalculateFunding.Frontend.Pages.Calcs.ComparePageModel
 @using CalculateFunding.Frontend.Properties
-@using CalculateFunding.Frontend.Helpers
+@*@using CalculateFunding.Frontend.Helpers*@
 @{
     ViewData["Title"] = "Compare calculations";
 }
@@ -69,23 +69,26 @@
                         }
                         @foreach (var calculation in Model.Calculations)
                         {
-                            <tr id="calculation-version-compare-row-@rowCount">
-                                <td class="calculation-select">
-                                    <div class="multiple-choice">
-                                        <input id="calculation-version-compare-checkbox-@rowCount" type="checkbox" class="calculation-version-compare-checkbox" name="Versions" value="@calculation.Version" />
-                                        <label></label>
-                                    </div>
-                                </td>
-                                <td class="calculation-status">
-                                    @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation.Status) ? "none" : calculation.Status.ToLower(); }
-                                    <span class="calculation-status-@statusClass">@calculation.Status</span>
-                                </td>
-                                <td class="calculation-version"><span class="calculation-version">@calculation.Version</span></td>
-                                <td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
-                                <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>
-                            </tr>
+                            @foreach (var version in calculation.Versions)
+                             {
+                                 <tr id="calculation-version-compare-row-@rowCount">
+                                     <td class="calculation-select">
+                                         <div class="multiple-choice">
+                                             <input id="calculation-version-compare-checkbox-@rowCount" type="checkbox" class="calculation-version-compare-checkbox" name="Versions" value="@version"/>
+                                             <label></label>
+                                         </div>
+                                     </td>
+                                     @*<td class="calculation-status">
+                                         @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation..Status) ? "none" : calculation.Status.ToLower(); }
+                                         <span class="calculation-status-@statusClass">@calculation.Status</span>
+                                     </td>*@
+                                     <td class="calculation-version"><span class="calculation-version">@version</span></td>
+                                     @*<td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
+                                     <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>*@
+                                 </tr>
 
-                            rowCount++;
+                                 rowCount++;
+                             }
                         }
                     </tbody>
                 </table>

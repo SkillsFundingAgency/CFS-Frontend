@@ -1,25 +1,25 @@
-﻿namespace CalculateFunding.Frontend.Pages.Specs
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using PolicyModels = Common.ApiClient.Policies.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
+namespace CalculateFunding.Frontend.Pages.Specs
+{
     public class CreateSpecificationPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
@@ -50,7 +50,7 @@
 
         public bool IsAuthorizedToCreate { get; set; }
 
-		[BindProperty]
+        [BindProperty]
         public CreateSpecificationViewModel CreateSpecificationViewModel { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string fundingPeriodId = null, string fundingStreamId = null)
@@ -61,15 +61,15 @@
             }
 
             await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams(fundingStreamId));
-			IsAuthorizedToCreate = FundingStreams.Count() != 0;
-			return Page();
+            IsAuthorizedToCreate = FundingStreams.Count() != 0;
+            return Page();
         }
 
-	    public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null, string fundingStreamId = null)
+        public async Task<IActionResult> OnPostAsync(string fundingPeriodId = null, string fundingStreamId = null)
         {
             if (!ModelState.IsValid)
             {
-	            return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
+                return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
             }
 
             CreateSpecificationModel specification = _mapper.Map<CreateSpecificationModel>(CreateSpecificationViewModel);
@@ -86,9 +86,9 @@
             }
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {
-	            result.AddValidationResultErrors(ModelState);
+                result.AddValidationResultErrors(ModelState);
 
-	            return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
+                return await ActionResultForFundingPeriodStream(fundingPeriodId, fundingStreamId);
             }
             else
             {
@@ -96,18 +96,18 @@
             }
         }
 
-	    private async Task<IActionResult> ActionResultForFundingPeriodStream(string fundingPeriodId, string fundingStreamId)
-	    {
-		    await TaskHelper.WhenAllAndThrow(
-			    PopulateFundingPeriods(fundingPeriodId),
-			    PopulateFundingStreams(fundingStreamId));
+        private async Task<IActionResult> ActionResultForFundingPeriodStream(string fundingPeriodId, string fundingStreamId)
+        {
+            await TaskHelper.WhenAllAndThrow(
+                PopulateFundingPeriods(fundingPeriodId),
+                PopulateFundingStreams(fundingStreamId));
 
-		    IsAuthorizedToCreate = FundingStreams.Count() != 0;
+            IsAuthorizedToCreate = FundingStreams.Count() != 0;
 
-		    return Page();
-	    }
+            return Page();
+        }
 
-	    private async Task PopulateFundingStreams(string fundingStreamId)
+        private async Task PopulateFundingStreams(string fundingStreamId)
         {
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policiesApiClient.GetFundingStreams();
 

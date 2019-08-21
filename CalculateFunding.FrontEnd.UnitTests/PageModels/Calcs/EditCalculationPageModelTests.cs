@@ -1,29 +1,25 @@
-﻿// <copyright file="EditCalculationPageModelTests.cs" company="Department for Education">
-// Copyright (c) Department for Education. All rights reserved.
-// </copyright>
+﻿using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Pages.Calcs;
+using CalculateFunding.Frontend.UnitTests.Helpers;
+using CalculateFunding.Frontend.ViewModels.Common;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
-    using System.Net;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Pages.Calcs;
-    using CalculateFunding.Frontend.UnitTests.Helpers;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-
     [TestClass]
     public class EditCalculationPageModelTests
     {
@@ -54,10 +50,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             string calculationId = "5";
 
-            calcsClient.GetCalculationById(calculationId).Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, new Calculation()
+            calcsClient.GetCalculationById(calculationId).Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Reference("1", "Test Calculation Specification"),
                 SpecificationId = "54",
             }));
 
@@ -86,9 +81,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
                 SpecificationId = specificationId,
-                SourceCode = "Test Source Code"
+                Current = new CalculationVersion()
+                {
+                    SourceCode = "Test Source Code"
+                }
             };
 
             Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
@@ -100,11 +97,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
             {
@@ -114,7 +111,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(System.Net.HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
@@ -129,7 +126,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Name.Should().Be(calcsCalculation.Name);
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
-            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
+            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.Current.SourceCode);
             pageModel.SpecificationName.Should().Be(specificationName);
 
             await calcsClient
@@ -146,7 +143,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGet_WhenCalculationExistsButCalculationTypeIsZero_ThenCalculationDisplayTypeIsEmpty()
+        public async Task OnGet_WhenCalculationExistsButCalculationTypeIsAdditional_ThenCalculationDisplayTypeIsEmpty()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -158,10 +155,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
                 SpecificationId = "54",
-                SourceCode = "Test Source Code",
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Number
+                Current = new CalculationVersion()
+                {
+                    SourceCode = "Test Source Code",
+                    CalculationType = CalculationType.Additional
+                }
             };
 
             Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
@@ -173,11 +172,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
@@ -192,59 +191,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Name.Should().Be(calcsCalculation.Name);
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
-            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Number);
-        }
-
-        [TestMethod]
-        public async Task OnGet_WhenCalculationExistdCalculationTypeIsFunding_ThenCalculationDisplayTypeIsFunding()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            string calculationId = "5";
-
-            Calculation calcsCalculation = new Calculation()
-            {
-                Id = calculationId,
-                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
-                SpecificationId = "54",
-                SourceCode = "Test Source Code",
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
-            };
-
-            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
-            {
-                Id = calculationId,
-                Name = "Specs Calculation",
-                Description = "Spec Description",
-            };
-
-            calcsClient
-                .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
-
-            specsClient
-                .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
-
-            EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
-
-            // Act
-            IActionResult result = await pageModel.OnGet(calculationId);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<PageResult>();
-
-            pageModel.Calculation.Should().NotBeNull();
-            pageModel.Calculation.Name.Should().Be(calcsCalculation.Name);
-            pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
-            pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
-            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Funding);
+            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.Current.SourceCode);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationTypeViewModel.Additional);
         }
 
         [TestMethod]
@@ -275,14 +223,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             string calculationId = "5";
             Calculation calcsCalculation = new Calculation()
             {
-                SpecificationId = "abc123",
-                CalculationSpecification = new Reference { Id = "cs345", Name = "calc name" }
+                SpecificationId = "abc123"
             };
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
@@ -308,14 +255,13 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             Calculation calcsCalculation = new Calculation()
             {
-                SpecificationId = "abc123",
-                CalculationSpecification = new Reference { Id = "cs345", Name = "calc name" }
+                SpecificationId = "abc123"
             };
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
@@ -337,13 +283,17 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task OnGet_WhenCalculationExistdCalculationTypeIsFundingAndShouldNewEditCalculationPageBeEnabledIsTurnedOn_ThenCalculationDisplayTypeIsFundingEnsuresCheckForCalcResults()
+        public async Task OnGet_WhenCalculationExistsCalculationTypeIsFundingAndShouldNewEditCalculationPageBeEnabledIsTurnedOn_ThenCalculationDisplayTypeIsFundingEnsuresCheckForCalcResults()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+
             IResultsApiClient resultsApiClient = CreateResultsApiClient();
+
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
             IFeatureToggle featureToggle = CreateFeatureToggle();
             featureToggle
                 .IsNewEditCalculationPageEnabled()
@@ -354,10 +304,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
                 SpecificationId = "54",
-                SourceCode = "Test Source Code",
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
+                Current = new CalculationVersion()
+                {
+                    SourceCode = "Test Source Code",
+                    CalculationType = CalculationType.Additional
+                }
             };
 
             Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
@@ -369,11 +321,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper, features: featureToggle, resultsApiClient: resultsApiClient);
 
@@ -388,18 +340,17 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Name.Should().Be(calcsCalculation.Name);
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
-            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Funding);
+            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.Current.SourceCode);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationTypeViewModel.Additional);
             pageModel.CalculationHasResults.Should().BeFalse();
 
-            await
-                resultsApiClient
-                    .Received(1)
-                    .HasCalculationResults(Arg.Is(calcsCalculation.Id));
+            await resultsApiClient
+                .Received(1)
+                .HasCalculationResults(Arg.Is(calcsCalculation.Id));
         }
 
         [TestMethod]
-        public async Task OnGet_WhenCalculationExistdCalculationTypeIsFundingAndShouldNewEditCalculationPageBeEnabledIsTurnedOnAndResultFound_ThenCalculationDisplayTypeIsFundingSetsHasCalculationResultToTrue()
+        public async Task OnGet_WhenCalculationExistsCalculationTypeIsFundingAndShouldNewEditCalculationPageBeEnabledIsTurnedOnAndResultFound_ThenCalculationDisplayTypeIsFundingSetsHasCalculationResultToTrue()
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -416,10 +367,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             Calculation calcsCalculation = new Calculation()
             {
                 Id = calculationId,
-                CalculationSpecification = new Reference(calculationId, "Test Calculation Specification"),
                 SpecificationId = "54",
-                SourceCode = "Test Source Code",
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding
+                Current = new CalculationVersion
+                {
+                    SourceCode = "Test Source Code",
+                    CalculationType = CalculationType.Additional
+                }
             };
 
             Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
@@ -431,11 +384,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             calcsClient
                 .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(System.Net.HttpStatusCode.OK, calcsCalculation));
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calcsCalculation));
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(System.Net.HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             ApiResponse<bool> hasCalcsResponse = new ApiResponse<bool>(HttpStatusCode.OK, true);
 
@@ -457,8 +410,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             pageModel.Calculation.Name.Should().Be(calcsCalculation.Name);
             pageModel.Calculation.Description.Should().Be(specsCalculation.Description);
             pageModel.SpecificationId.Should().Be(calcsCalculation.SpecificationId);
-            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.SourceCode);
-            pageModel.Calculation.CalculationType.Should().Be(CalculationSpecificationTypeViewModel.Funding);
+            pageModel.EditModel.SourceCode.Should().Be(calcsCalculation.Current.SourceCode);
+            pageModel.Calculation.CalculationType.Should().Be(CalculationTypeViewModel.Additional);
             pageModel.CalculationHasResults.Should().BeTrue();
 
             string shouldShowGreyBackground = pageModel.ViewData["GreyBackground"].ToString();
@@ -474,7 +427,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
             IMapper mapper = null,
             IFeatureToggle features = null,
             IAuthorizationHelper authorizationHelper = null,
-            IResultsApiClient resultsApiClient = null)
+            IResultsApiClient resultsApiClient = null,
+            ISpecificationAuthorizationEntity specAuthEntity = null)
         {
             EditCalculationPageModel pageModel = new EditCalculationPageModel(
                 specsClient ?? CreateSpecsApiClient(),
@@ -482,7 +436,8 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 mapper ?? CreateMapper(),
                 features ?? CreateFeatureToggle(),
                 authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditCalculations),
-                resultsApiClient ?? CreateResultsApiClient());
+                resultsApiClient ?? CreateResultsApiClient(),
+                specAuthEntity ?? CreateSpecAuthEntity());
 
             pageModel.PageContext = TestAuthHelper.CreatePageContext();
             return pageModel;
@@ -496,6 +451,11 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
         private static ICalculationsApiClient CreateCalcsApiClient()
         {
             return Substitute.For<ICalculationsApiClient>();
+        }
+
+        private static ISpecificationAuthorizationEntity CreateSpecAuthEntity()
+        {
+            return Substitute.For<ISpecificationAuthorizationEntity>();
         }
 
         private static IMapper CreateMapper()

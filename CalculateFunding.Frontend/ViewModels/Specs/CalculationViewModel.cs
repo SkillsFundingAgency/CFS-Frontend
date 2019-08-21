@@ -32,7 +32,7 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
             }
         }
 
-        public CalculationSpecificationTypeViewModel CalculationType { get; set; }
+        public CalculationTypeViewModel CalculationType { get; set; }
 
         public DateTime LastUpdated { get; set; }
 

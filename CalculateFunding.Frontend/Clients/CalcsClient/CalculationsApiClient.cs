@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Calcs.Models.Code;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Interfaces;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.CalcsClient
@@ -27,44 +30,43 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             return GetAsync<Calculation>($"calculation-current-version?calculationId={calculationId}");
         }
 
+        public Task<ValidatedApiResponse<Calculation>> EditCalculation(string specificationId, string calculationId, CalculationEditModel calculationEditModel)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+            Guard.ArgumentNotNull(calculationEditModel, nameof(calculationEditModel));
+
+            return ValidatedPostAsync<Calculation, CalculationEditModel>($"calculation-save-version?calculationId={calculationId}", calculationEditModel, CancellationToken.None);
+        }
+
+        public Task<ApiResponse<PreviewResponse>> PreviewCompile(PreviewRequest previewRequest)
+        {
+            return PostAsync<PreviewResponse, PreviewRequest>($"compile-preview", previewRequest);
+        }
+
         public Task<ApiResponse<Calculation>> GetCalculationByCalculationSpecificationId(string calculationSpecificationId)
         {
             return GetAsync<Calculation>(
                 $"{calculationSpecificationId}/calculation");
         }
 
-        public async Task<PagedResult<CalculationSearchResultItem>> FindCalculations(SearchFilterRequest filterOptions)
+
+
+        public async Task<ApiResponse<SearchResults<CalculationSearchResult>>> FindCalculations(SearchFilterRequest filterOptions)
         {
             Guard.ArgumentNotNull(filterOptions, nameof(filterOptions));
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<CalculationSearchResultItem>> results = await PostAsync<SearchResults<CalculationSearchResultItem>, SearchQueryRequest>($"calculations-search", request);
+            ApiResponse<SearchResults<CalculationSearchResult>> results = await PostAsync<SearchResults<CalculationSearchResult>, SearchQueryRequest>($"calculations-search", request);
             if (results.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                PagedResult<CalculationSearchResultItem> result = new SearchPagedResult<CalculationSearchResultItem>(filterOptions, results.Content.TotalCount)
-                {
-                    Items = results.Content.Results,
-                    Facets = results.Content.Facets,
-                };
+                ApiResponse<SearchResults<CalculationSearchResult>> result =
+                    new ApiResponse<SearchResults<CalculationSearchResult>>(results.StatusCode, results.Content);
 
                 return result;
             }
 
             return null;
-        }
-
-        public Task<ApiResponse<Calculation>> UpdateCalculation(string calculationId, CalculationUpdateModel calculation)
-        {
-            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
-            Guard.ArgumentNotNull(calculation, nameof(calculation));
-
-            return PostAsync<Calculation, CalculationUpdateModel>($"calculation-save-version?calculationId={calculationId}", calculation);
-        }
-
-        public Task<ApiResponse<PreviewCompileResult>> PreviewCompile(PreviewCompileRequest request)
-        {
-            return PostAsync<PreviewCompileResult, PreviewCompileRequest>($"compile-preview", request);
         }
 
         public Task<IEnumerable<Calculation>> GetVersionsByCalculationId(string calculationId)
@@ -82,7 +84,8 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             Guard.ArgumentNotNull(versionIds, nameof(versionIds));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            CalculationVersionsRequestModel calcsVersGetModel = new CalculationVersionsRequestModel()
+
+            CalculationVersion calcsVersGetModel = new CalculationVersion()
             {
                 Versions = versionIds,
                 CalculationId = calculationId,
@@ -91,6 +94,7 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             return PostAsync<IEnumerable<CalculationVersion>, CalculationVersionsRequestModel>($"calculation-versions", calcsVersGetModel);
         }
 
+        
         public Task<ApiResponse<IEnumerable<TypeInformation>>> GetCodeContextForSpecification(string specificationId)
         {
             return GetAsync<IEnumerable<TypeInformation>>($"get-calculation-code-context?specificationId={specificationId}");
@@ -109,6 +113,67 @@ namespace CalculateFunding.Frontend.Clients.CalcsClient
             Guard.ArgumentNotNull(request, nameof(request));
 
             return PostAsync<IEnumerable<CalculationStatusCounts>, SpecificationIdsRequestModel>($"status-counts", request);
+        }
+
+        public Task<ApiResponse<IEnumerable<CalculationMetadata>>> GetCalculations(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<IEnumerable<CalculationSummaryModel>>> GetCalculationSummariesForSpecification(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<BuildProject>> GetBuildProjectBySpecificationId(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<byte[]>> GetAssemblyBySpecificationId(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<BuildProject>> UpdateBuildProjectRelationships(string specificationId, DatasetRelationshipSummary datasetRelationshipSummary)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<IEnumerable<CalculationCurrentVersion>>> GetCurrentCalculationsBySpecificationId(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<HttpStatusCode>> CompileAndSaveAssembly(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        Task<ApiResponse<IEnumerable<CalculationStatusCounts>>> ICalculationsApiClient.GetCalculationStatusCounts(SpecificationIdsRequestModel request)
+        {
+            throw new System.NotImplementedException();
+        }
+		
+        Task<ApiResponse<IEnumerable<CalculationVersion>>> ICalculationsApiClient.GetAllVersionsByCalculationId(string calculationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        
+        Task<ApiResponse<IEnumerable<Common.ApiClient.Calcs.Models.Code.TypeInformation>>> ICalculationsApiClient.GetCodeContextForSpecification(string specificationId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ApiResponse<bool>> IsCalculationNameValid(string specificationId, string calculationName, string existingCalculationId = null)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ValidatedApiResponse<Calculation>> CreateCalculation(string specificationId, CalculationCreateModel calculationCreateModel)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

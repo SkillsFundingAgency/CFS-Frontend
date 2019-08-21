@@ -1,24 +1,25 @@
-﻿namespace CalculateFunding.Frontend.Pages.Scenarios
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Scenarios;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using CalculateFunding.Frontend.ViewModels.TestEngine;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
+using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Scenarios;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using CalculateFunding.Frontend.ViewModels.TestEngine;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
+namespace CalculateFunding.Frontend.Pages.Scenarios
+{
     public class ViewProviderTestResultsPageModel : PageModel
     {
         private readonly ITestResultsSearchService _testResultsSearchService;
@@ -98,7 +99,7 @@
                 return new InternalServerErrorResult("Count Task result was null");
             }
 
-            if (countTask.Result.StatusCode != System.Net.HttpStatusCode.OK)
+            if (countTask.Result.StatusCode != HttpStatusCode.OK)
             {
                 return new InternalServerErrorResult($"Count Task didn't return OK, but instead '{countTask.Result.StatusCode}'");
             }
@@ -124,7 +125,7 @@
                 return new InternalServerErrorResult("Specification summary API call result was null");
             }
 
-            if (specResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            if (specResponse.StatusCode != HttpStatusCode.OK)
             {
                 return new InternalServerErrorResult($"Specification summary API call didn't return OK, but instead '{countTask.Result.StatusCode}'");
             }

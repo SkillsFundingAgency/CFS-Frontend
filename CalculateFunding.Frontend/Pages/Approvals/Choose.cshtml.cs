@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.CalcsClient.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
