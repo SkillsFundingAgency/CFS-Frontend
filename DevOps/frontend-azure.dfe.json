@@ -452,7 +452,7 @@
             },
             {
               "name": "calcsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-calcs.azurewebsites.net/api/calcs')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-calcs.azurewebsites.net/api/')]"
             },
             {
               "name": "datasetsClient:ApiKey",
