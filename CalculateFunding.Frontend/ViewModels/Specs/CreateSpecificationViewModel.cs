@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿using Newtonsoft.Json;
+
+namespace CalculateFunding.Frontend.ViewModels.Specs
 {
     using System.ComponentModel.DataAnnotations;
     using CalculateFunding.Frontend.Properties;

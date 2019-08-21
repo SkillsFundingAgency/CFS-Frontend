@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -61,19 +66,6 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(result);
-        }
-
-        [Route("api/specs/funding-periods")]
-        public async Task<IActionResult> GetFundingPeriods()
-        {
-            ApiResponse<IEnumerable<Reference>> response = await _specsClient.GetFundingPeriods();
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(response.Content);
-            }
-
-            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
 
         [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
@@ -137,6 +129,56 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
+        }
+
+
+        [HttpPost]
+        [Route("api/specs/create")]
+        public async Task<IActionResult> CreateSpecification([FromBody]CreateSpecificationViewModel viewModel)
+        {
+            //TODO: Could do with some validation here
+
+            if (!ModelState.IsValid)
+            {
+                return new BadRequestResult();
+            }
+
+            //var viewModel = JsonConvert.DeserializeObject<CreateSpecificationViewModel>(data);
+
+            var fundingStreamIds = new List<string> { viewModel.FundingStreamId };
+
+            CreateSpecificationModel specification = new CreateSpecificationModel
+            {
+                Description = viewModel.Description,
+                Name = viewModel.Name,
+                FundingPeriodId = viewModel.FundingPeriodId,
+                FundingStreamIds = fundingStreamIds,
+                ProviderVersionId = viewModel.ProviderVersionId
+            };
+
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specification.FundingStreamIds, FundingStreamActionTypes.CanCreateSpecification))
+            {
+                return new ForbidResult();
+            }
+
+            ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
+
+            if (result.StatusCode.IsSuccess())
+            {
+				return new OkObjectResult(result.Content);
+                //return Redirect($"/specs/policies/{result.Content.Id}?operationType=SpecificationCreated&operationId={result.Content.Id}");
+            }
+            else if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                result.AddValidationResultErrors(ModelState);
+
+                return new BadRequestResult();
+            }
+            else
+            {
+                return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
+            }
         }
     }
 }

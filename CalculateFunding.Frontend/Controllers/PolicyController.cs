@@ -32,5 +32,17 @@ namespace CalculateFunding.Frontend.Controllers
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
+        [Route("api/policy/fundingstreams")]
+        public async Task<IActionResult> GetFundingStreams()
+        {
+            ApiResponse<IEnumerable<FundingStream>> response = await _policiesApiClient.GetFundingStreams();
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+
+            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+        }
     }
 }

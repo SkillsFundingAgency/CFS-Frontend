@@ -8,7 +8,7 @@
             let self = this;
         }
 
-        public fundingStreamChanged(providerVesionId:string = null): void {
+        public fundingStreamChanged(providerVesionId: string = null): void {
             let selectedItem: string = $("#select-funding-stream").val().toString();
             let selectedText: string = $("#select-funding-stream option:selected").text().toString();
             this.selectedFundingStream(selectedItem);

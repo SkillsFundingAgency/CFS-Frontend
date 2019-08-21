@@ -37,53 +37,57 @@
         </ol>
     </div>
 }
-
 <div id="create-specification" class="row">
-    <div class="col-sm-9 col-md-6">
-        <form method="post" class="form">
-            <div gds-validation-summary="All">
-            </div>
-            <div>
-                <div gds-validationblock-for="CreateSpecificationViewModel.Name">
-                    <div class="form-group">
-                        <a validationanchor-for="CreateSpecificationViewModel.Name"></a>
-                        <label asp-for="CreateSpecificationViewModel.Name">Specification name</label>
-                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
-                        <input asp-for="CreateSpecificationViewModel.Name" class="form-control" type="text">
-                    </div>
+    <div class="col-sm-9 col-md-6" data-bind="hidden: isInProgress">
+        <div class="hidden" data-bind="css: formValid() === false ? 'validation-summary-errors' : 'hidden'">
+            <h3 class="heading-large">There is a problem</h3>
+            <p>
+                <strong>Check that you have answered the questions correctly</strong>
+            </p>
+            <ul>
+                <li><a href="" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
+                <li><a href="" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
+                <li><a href="" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
+                <li><a href="" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
+            </ul>
+        </div>
+
+        <form class="form" data-bind="submit: createSpecification">
+            @*<div data-bind="text: validationSummary"></div>*@
+            <div data-bind="css: nameValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
+                <div class="form-group">
+                    <label for="specificationName">Specification name</label>
+                    <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                    <input id="specificationName" class="form-control" type="text" data-bind="value: name">
                 </div>
             </div>
             <div>
-                <a validationanchor-for="CreateSpecificationViewModel.FundingPeriodId"></a>
-
-                <div gds-validationblock-for="CreateSpecificationViewModel.FundingPeriodId">
+                <div data-bind="css: fundingPeriodIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
-                        <label asp-for="CreateSpecificationViewModel.FundingPeriodId">Funding period</label>
-                        <select asp-items="@(Model.FundingPeriods)" asp-for="CreateSpecificationViewModel.FundingPeriodId" class="form-control">
-                            <option></option>
+                        <label for="select-funding-period">Funding period</label>
+                        <select id="select-funding-period" class="form-control" data-bind="foreach: fundingPeriods">
+                            <option data-bind="value:id, text: name"></option>
                         </select>
                     </div>
                 </div>
             </div>
             <div>
-                <a validationanchor-for="CreateSpecificationViewModel.FundingStreamId"></a>
-
-                <div gds-validationblock-for="CreateSpecificationViewModel.FundingStreamId">
+                <div data-bind="css: fundingStreamIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
-                        <label asp-for="CreateSpecificationViewModel.FundingStreamId">Funding streams</label>
+                        <label for="select-funding-stream">Funding streams</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream</span></h4>
-                        <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream" asp-items="@(Model.FundingStreams)" asp-for="CreateSpecificationViewModel.FundingStreamId" id="select-funding-stream" class="form-control"></select>
+                        <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream, foreach: fundingStreams" id="select-funding-stream" class="form-control">
+                            <option data-bind="value:id, text:name"></option>
+                        </select>
                     </div>
                 </div>
             </div>
             <div>
-                <a validationanchor-for="CreateSpecificationViewModel.ProviderVersionId"></a>
-
-                <div gds-validationblock-for="CreateSpecificationViewModel.ProviderVersionId">
+                <div data-bind="css: providerVersionIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
-                        <label asp-for="CreateSpecificationViewModel.ProviderVersionId">Core Provider Data</label>
+                        <label for="providerVersionIdSelect">Core Provider Data</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream before choosing the provider data</span></h4>
-                        <select data-bind="foreach:providerVersions" asp-for="CreateSpecificationViewModel.ProviderVersionId" class="form-control gds-select gds-select-taghelper">
+                        <select id="providerVersionIdSelect" data-bind="foreach:providerVersions" asp-for="CreateSpecificationViewModel.ProviderVersionId" class="form-control gds-select gds-select-taghelper">
                             <option></option>
                             <option data-bind="value: providerVersionId, text: display, attr: {'data-description': description}"></option>
                         </select>
@@ -91,33 +95,43 @@
                 </div>
             </div>
             <div>
-                <div gds-validationblock-for="CreateSpecificationViewModel.Description">
+                <div data-bind="css: descriptionValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
-                        <a validationanchor-for="CreateSpecificationViewModel.Description"></a>
-                        <label asp-for="CreateSpecificationViewModel.Description">Description</label>
-                        <textarea asp-for="CreateSpecificationViewModel.Description" rows="10" class="form-control"></textarea>
+                        <label for="description">Description</label>
+                        <textarea rows="10" class="form-control" data-bind="value: description"></textarea>
                     </div>
                 </div>
             </div>
-            <p class="form-submit-container"><button type="submit" class="button" disabled="@(!Model.IsAuthorizedToCreate)" id="save-button">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
-
+            <p class="form-submit-container"><button type="button" class="button" disabled="@(!Model.IsAuthorizedToCreate)" id="save-button" data-bind="click: createSpecification">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
+            <p class="info error" data-bind="text: errorMessage"></p>
         </form>
 
     </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" style="display: none" data-bind="visible: isInProgress">
+        <h1>Loading specification</h1>
+        <h2>Please wait, this can take several minutes.</h2>
+        <img src="~/assets/images/loading.svg" alt="Processing" />
+        <h2 data-bind="visible: showCreatingSpec">Creating specification</h2>
+        <h2 data-bind="visible: showCreatingCalcs">Creating calculation <span data-bind="text: currentStatus.overallItemsProcessed"></span> of <span data-bind="text: currentStatus.itemCount"></span></h2>
+    </div>
 </div>
+
 
 @section scripts{
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>
-    <script asp-src-include="~/js/specification.common.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/signalr.min.js"></script>
+    <script src="~/js/createspecification.js"></script>
     <script type="text/javascript">
-        var vm = new calculateFunding.specification.SpecificationCommonViewModel();
-
+        var vm = new calculateFunding.specification.CreateSpecificationViewModel();
+        vm.isInProgress(false);
         var createSpecificationContainer = document.getElementById("create-specification");
         if (createSpecificationContainer) {
             ko.applyBindings(vm, createSpecificationContainer);
         }
-
+        vm.getFundingPeriod();
+        vm.getFundingStream();
         vm.fundingStreamChanged();
     </script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>

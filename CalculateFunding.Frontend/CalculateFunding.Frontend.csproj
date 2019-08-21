@@ -31,6 +31,7 @@
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\component.approveStatusButton.ts" />
     <None Remove="Scripts\confirm.funding-specification.ts" />
+    <None Remove="Scripts\createspecification.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
     <None Remove="Scripts\dataset.common.ts" />
@@ -160,6 +161,7 @@
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
+    <TypeScriptCompile Include="Scripts\createspecification.ts" />
     <TypeScriptCompile Include="Scripts\specification.common.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\dataset.common.ts" />

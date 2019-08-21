@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -118,11 +119,13 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             return await ValidatedPutAsync<Calculation, CalculationUpdateModel>($"calculations?specificationId={specificationId}&calculationId={calculationId}", calculation);
         }
 
+		[Obsolete]
         public async Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
         {
             return await GetAsync<IEnumerable<Reference>>("get-fundingperiods");
         }
 
+        [Obsolete]
         public async Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams()
         {
             return await GetAsync<IEnumerable<FundingStream>>("get-fundingstreams");
