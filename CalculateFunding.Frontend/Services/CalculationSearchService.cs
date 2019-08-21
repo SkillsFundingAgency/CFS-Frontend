@@ -14,7 +14,6 @@ using Serilog;
 
 namespace CalculateFunding.Frontend.Services
 {
-
     public class CalculationSearchService : ICalculationSearchService
     {
         private ICalculationsApiClient _calculationsApiClient;
@@ -63,7 +62,9 @@ namespace CalculateFunding.Frontend.Services
 
             CalculationSearchResultViewModel result = new CalculationSearchResultViewModel
             {
-                TotalResults = calculationsResult.Content.TotalCount
+                TotalResults = calculationsResult.Content.TotalCount,
+                CurrentPage = requestOptions.Page,
+                Calculations = calculationsResult.Content.Results.Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
@@ -74,14 +75,6 @@ namespace CalculateFunding.Frontend.Services
 
             result.Facets = searchFacets.AsEnumerable();
 
-            List<CalculationSearchResultItemViewModel> itemResults = new List<CalculationSearchResultItemViewModel>();
-
-            foreach (CalculationSearchResult searchResult in calculationsResult.Content.Results)
-            {
-                itemResults.Add(_mapper.Map<CalculationSearchResultItemViewModel>(searchResult));
-            }
-
-            result.Calculations = itemResults.AsEnumerable();
             if (result.TotalResults == 0)
             {
                 result.StartItemNumber = 0;

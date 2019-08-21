@@ -86,7 +86,7 @@
         public performSearch(pageNumber: number = null) {
             let self = this;
 
-            super.makeSearchResultAndProcess("/api/specifications/search", pageNumber, self.searchCompleted);
+            super.makeSearchResultAndProcess("/api/specifications/search", pageNumber, self.searchCompleted,);
         }
 
         /**

@@ -533,8 +533,6 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 {
                     Id = $"{i}",
                     Name = $"Calculation {i}",
-                    FundingPeriodName = "Test Period",
-                    SpecificationName = "Spec Name",
                     Status = "Unknown",
                 });
             }

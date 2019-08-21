@@ -142,12 +142,7 @@ namespace CalculateFunding.Frontend.ViewModels
 	            .ForMember(m => m.Status, opt => opt.Ignore())
 	            ;
 
-            CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>()
-	            .ForMember(m => m.SpecificationName, opt => opt.Ignore())
-	            .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
-	            .ForMember(m => m.Status, opt => opt.Ignore())
-	            .ForMember(m => m.LastUpdatedDate, opt => opt.Ignore())
-	            ;
+            CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>();
         }
 
         private void MapSpecs()

@@ -977,6 +977,25 @@ blockquote {
     }
 }
 
+.noresults-grey-panel {
+    background-color: #dee0e2;
+    color: #000;
+    font-size: 19px;
+    padding: 20px 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    top: 100px;
+    a,
+    a:visited {
+        color: #000;
+    }
+
+    .noresults-panel-view {
+        margin-right: 10px;
+    }
+}
+
 .error-highlight {
     color: $error-colour;
 }
@@ -1919,6 +1938,10 @@ table {
         padding: 13px 10px 10px 10px;
         line-height: 20px;
         font-size: 19px;
+    }
+
+    .search-box {
+        border: 1px solid #000;
     }
 }
 

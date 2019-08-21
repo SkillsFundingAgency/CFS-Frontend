@@ -1,0 +1,167 @@
+﻿@page "{specificationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.AdditionalCalculationsModel
+@using  CalculateFunding.Common.ApiClient.Calcs.Models
+@using CalculateFunding.Frontend.ViewModels.Common
+@using CalculateFunding.Frontend.ViewModels.Calculations
+@using CalculateFunding.Frontend.Properties
+@{
+    ViewData["Title"] = "Additional Calculations";
+    ViewData["ActiveNavBarArea"] = "specs";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
+
+@section BreadCrumb{
+
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="~/specs/policies/@Model.Specification.Id">@Model.Specification.Name</a></li>
+            <li>@BreadcrumbText.ManageCalculations</li>
+        </ol>
+    </div>
+}
+@section BannerWholeBlue {
+    <partial name="_SpecificationFullHeaderPartial" model="Model.Specification" />
+}
+
+<div class="addional-calcs">
+    <div class="row">
+        <div class="col-xs-12 policy-spec-what ">
+            <p class="withjs-hide">What is @Model.Specification.Name?</p>
+            <div class="inline-collapse-container spacing-15-bottom">
+                <div class="inline-collapse-heading withjs-show">
+                    <i class="inline-collapse-arrow"></i>
+                    <span>What is @Model.Specification.Name?</span>
+                </div>
+                <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                    @Model.Specification.Description.ReplaceLineBreaksForHtml()
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
+        <li class="nav-item">
+            <a id="nav-policy-tab" href="/specs/policies/@Model.Specification.Id" role="tab" aria-selected="true">Funding line structure</a>
+        </li>
+        <li class="nav-item active">
+            <a id="nav-policy-tab" href="#" role="tab" aria-selected="true">Additional calculations</a>
+        </li>
+        <li class="nav-item">
+            <a id="nav-dataset-tab" href="/datasets/listdatasetschemas/@Model.Specification.Id" role="tab" aria-selected="false">
+                <span class="provider-datasets-warning-tab">
+                    <span>Datasets</span>
+                    @if (!Model.HasProviderDatasetsAssigned)
+                    {
+                        <i class="material-icons icon-not-HasProviderDatasetsAssigned">warning</i>
+                    }
+                </span>
+            </a>
+        </li>
+    </ul>
+    <div role="search">
+        <div id="filter-container" class="row">
+            <div class="col-xs-6">
+                <form method="post" action="/calcs/addictionalCalculations" class="spacing-15 filter-container" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
+                    <div class="input-group spacing-15">
+
+                        <input type="text" asp-for="SearchTerm" class="form-control search-box" placeholder="Search additional calculation" data-bind="textInput: searchTerm, enable: canSelectFilters" aria-label="Search additional calculation" />
+                        <div class="input-group-addon"><button class="search-button" title="Search" data-bind="enable: canPerformSearch" /><img src="~/assets/images/icon-search.png" /></div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-6">
+                <div class="spacing-30-top text-right">
+                    <partial name="_SearchTableRowCountPartial" model='new PagerPartialViewModel(Model.CalculationSearchResults, "calculations", Model.SearchTerm)' />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="manage-calculations-container">
+        <partial name="_SearchErrorPartial" />
+        <div class="col-xs-12">
+            <table class="cf" id="calculations-table" data-bind="visible: isResultsVisible">
+                <thead>
+                    <tr>
+                        <th>Additional calculation name</th>
+                        <th>Status</th>
+                        <th>Value type</th>
+                        <th>Last edited date</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: calculations" class="withjs-show" id="dynamic-results-table-body">
+                    <tr>
+                        <td> <a data-bind="attr: {href: '/calcs/EditAdditionalCalculation/' + id }, text: name"></a></td>
+                        <td data-bind="text: status"></td>
+                        <td data-bind="text: valueType"></td>
+                        <td>
+                            <span class="datetime-split-date data-specification-lastupdated-date" data-bind="text: lastUpdatedDateDisplay"></span>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
+                    @{
+                        int rowId = 0;
+                    }
+
+                    @foreach (CalculationSearchResultItemViewModel calculation in Model.CalculationSearchResults.Calculations)
+                    {
+                        <tr>
+                            <td>
+                                <a href="/calcs/editAdditionalCalculation/@calculation.Id">@calculation.Name</a>
+                            </td>
+                            <td> @calculation.Status</td>
+                            <td>@calculation.ValueType</td>
+                            <td>@calculation.LastUpdatedDateDisplay</td>
+                        </tr>
+                        rowId++;
+                    }
+                </tbody>
+
+            </table>
+            <div class="withjs-show search-loading-container spacing-30-top" data-bind="visible: isLoading">
+                <img src="~/assets/images/loader.gif" alt="Loading" />
+                <p>Loading calculations</p>
+            </div>
+
+            <div class="noresults-grey-panel spacing-30 withjs-show" data-bind="visible: calculations().length === 0">
+                <span>
+                    No additional calculations available. <a href="/calcs/CreateAdditionalCalculation/@Model.Specification.Id">Create a calculation</a>.
+                </span>
+            </div>
+
+            <partial name="_SearchTablePagerPartial" model='new PagerPartialViewModel(Model.CalculationSearchResults, "calculations", Model.SearchTerm)' />
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script asp-src-include="~/js/search.additionalCalculations.js" asp-append-version="true" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var vm = new calculateFunding.manageCalculations.AdditionalCalculationsSearchViewModel('@Model.Specification.Id');
+        var filterElement = document.getElementById("filter-container");
+        if (filterElement) {
+            ko.applyBindings(vm, filterElement);
+        }
+
+        var manageCalculationsContainer = document.getElementById("manage-calculations-container");
+        if (manageCalculationsContainer) {
+            ko.applyBindings(vm, manageCalculationsContainer);
+        }
+
+        var initialResults = @Html.Raw(Model.InitialSearchResults);
+
+        vm.setInitialResults(initialResults);
+
+    </script>
+}
+

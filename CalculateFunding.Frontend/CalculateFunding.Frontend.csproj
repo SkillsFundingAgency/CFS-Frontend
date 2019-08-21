@@ -43,6 +43,7 @@
     <None Remove="Scripts\notifications.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
+    <None Remove="Scripts\search.additionalCalculations.ts" />
     <None Remove="Scripts\search.calcuation-results.ts" />
     <None Remove="Scripts\search.calcuations.ts" />
     <None Remove="Scripts\search.calculationProviderResults.ts" />
@@ -69,8 +70,8 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common" Version="1.33.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.18" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.5" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.19" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.8" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.8" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.2" />
@@ -84,7 +85,7 @@
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.0.7" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />
     <PackageReference Include="Serilog" Version="2.8.0" />
@@ -162,6 +163,7 @@
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\createspecification.ts" />
+    <TypeScriptCompile Include="Scripts\search.additionalCalculations.ts" />
     <TypeScriptCompile Include="Scripts\specification.common.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
     <TypeScriptCompile Include="Scripts\dataset.common.ts" />

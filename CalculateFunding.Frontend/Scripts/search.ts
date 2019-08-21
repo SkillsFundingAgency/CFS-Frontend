@@ -54,6 +54,8 @@
 
         public searchTerm: KnockoutObservable<string> = ko.observable("");
 
+        public pageSize: KnockoutObservable<number> = ko.observable(null);
+
         public isLoading: KnockoutComputed<boolean>;
         public isResultsVisible: KnockoutComputed<boolean>;
 
@@ -171,7 +173,8 @@
                     searchTerm: this.searchTerm(),
                     includeFacets: true,
                     filters: filters,
-                    errorToggle: this.selectedErrorToggle()
+                    errorToggle: this.selectedErrorToggle(),
+                    pageSize: this.pageSize()
                 };
 
                 let data = searchRequestData;

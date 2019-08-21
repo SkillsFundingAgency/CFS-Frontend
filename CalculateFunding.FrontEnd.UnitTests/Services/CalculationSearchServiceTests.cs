@@ -106,6 +106,7 @@ namespace CalculateFunding.Frontend.Services
 
             // Assert
             CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+
             for (int i = 0; i < calcs.Length; i++)
             {
                 calcs[i].Id.Should().Be((i + 10).ToString());
@@ -144,6 +145,7 @@ namespace CalculateFunding.Frontend.Services
 
             // Assert
             CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+
             for (int i = 0; i < calcs.Length; i++)
             {
                 calcs[i].Id.Should().Be((i + 10).ToString());
@@ -200,6 +202,7 @@ namespace CalculateFunding.Frontend.Services
 
             // Assert
             CalculationSearchResultItemViewModel[] calcs = results.Calculations.ToArray();
+
             for (int i = 0; i < calcs.Length; i++)
             {
                 calcs[i].Id.Should().Be((i + 10).ToString());
@@ -424,8 +427,6 @@ namespace CalculateFunding.Frontend.Services
             output.TotalCount = numberOfItems;
             output.Facets = facets;
             ApiResponse<SearchResults<CalculationSearchResult>> result = new ApiResponse<SearchResults<CalculationSearchResult>>(HttpStatusCode.OK, output);
-
-
             return result;
         }
     }
