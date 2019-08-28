@@ -176,6 +176,9 @@
 
             services
                 .AddSingleton<IJobsApiClient, JobsApiClient>();
+
+            services
+              .AddSingleton<Common.ApiClient.Specifications.ISpecificationsApiClient, Common.ApiClient.Specifications.SpecificationsApiClient>();
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)

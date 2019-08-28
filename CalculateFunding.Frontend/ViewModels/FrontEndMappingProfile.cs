@@ -200,6 +200,12 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
+            CreateMap<SpecificationSummary, CalculateFunding.Common.ApiClient.Specifications.Models.SpecificationSummary>();
+
+            CreateMap<CalculateFunding.Common.ApiClient.Specifications.Models.SpecificationSummary, SpecificationViewModel>()
+                  .ForMember(m => m.PublishStatus, opt => opt.MapFrom(c => c.ApprovalStatus))
+                  .ForMember(m => m.Calculations, opt => opt.Ignore());
+
             CreateMap<Clients.SpecsClient.Models.Calculation, Specs.CalculationViewModel>()
 	            .ForMember(d => d.LastUpdated, opt => opt.Ignore());
 

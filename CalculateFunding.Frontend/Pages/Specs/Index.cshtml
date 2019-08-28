@@ -102,7 +102,7 @@
                     <td class="no-border">
                         <span class="button-split-container">
                             <span class="button-split-text">
-                                <a data-bind="attr: {href: '/specs/policies/' + id }, text: name"></a>
+                                <a data-bind="attr: {href: '/specs/fundinglinestructure/' + id }, text: name"></a>
                             </span>
                         </span>
                     </td>
@@ -116,7 +116,8 @@
                 </tr>
             </tbody>
             <tbody data-bind="visible: !searchPerformed()" id="static-results-table-body">
-                @{
+            @{
+                // JB:What is this for?
                     int rowId = 0;
                 }
 
@@ -126,7 +127,7 @@
                         <td>
                             <span class="button-split-container">
                                 <span class="button-split-text">
-                                    <a href="/specs/Policies/@specification.Id" class="data-static-specification-name">@specification.Name</a>
+                                    <a href="/specs/FundingLineStructure/@specification.Id" class="data-static-specification-name">@specification.Name</a>
                                 </span>
                             </span>
                         </td>

@@ -3312,6 +3312,35 @@ a.govuk-back-link:hover {
     }
 }
 
+#funding-lines-table {
+    position: relative;
+
+    .grey-border-cell {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: 5px;
+        background-color: #DEE0E2;
+        padding: 0;
+        height: 100%;
+        border-bottom: 1px solid #fff !important;
+    }
+
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: #768693;
+        border-top: none !important;
+    }
+
+    .calc-spec-title-cell {
+        vertical-align: top;
+        border-left: none !important;
+    }
+
+}
+
+
 .funding-modal {
     position: fixed;
     top: 50%;

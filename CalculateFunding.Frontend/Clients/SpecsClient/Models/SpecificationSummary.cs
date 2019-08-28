@@ -30,6 +30,12 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
         [JsonProperty("publishedResultsRefreshedAt")]
         public DateTimeOffset? PublishedResultsRefreshedAt { get; set; }
 
+        [JsonProperty("lastCalculationUpdatedAt")]
+        public DateTimeOffset? LastCalculationUpdatedAt { get; set; }
+
+        [JsonProperty("templateIds")]
+        public IDictionary<string, string> TemplateIds { get; set; }
+
         public string GetSpecificationId()
         {
             return Id;

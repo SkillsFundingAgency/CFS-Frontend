@@ -1,9 +1,10 @@
 ﻿@page "{specificationId}"
-@model CalculateFunding.Frontend.Pages.Specs.PoliciesModel
+@model CalculateFunding.Frontend.Pages.Specs.FundingLineStructureModel
 @using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Common.TemplateMetadata.Models
 @using CalculateFunding.Frontend.ViewModels.Specs
 @{
-    ViewData["Title"] = "Policies";
+    ViewData["Title"] = "Funding Line Structure";
 }
 
 @section NavBar {
@@ -46,7 +47,7 @@
         </div>
     </div>
     <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
-        <li class="nav-item">
+        <li class="nav-item active">
             <a id="nav-policy-tab" href="/specs/fundinglinestructure/@Model.Specification.Id" role="tab" aria-selected="false">Funding Line Structure</a>
         </li>
         <li class="nav-item">
@@ -69,54 +70,27 @@
     </ul>
     <div class="row">
         <div class="col-xs-12">
-            <table class="cf" id="calculations-table">
+            <table class="cf funding-lines-table" id="funding-lines-table">
                 <thead>
                     <tr>
-                        <th id="calculation-header-column">Name</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Last Edited</th>
-                        <th></th>
+                        <th width="20%" id="calculation-header-column" colspan="2" class="sticky-header">Structure</th>
+                        <th width="40%" class="sticky-header">Name</th>
+                        <th width="20%" class="sticky-header">Calculation Type</th>
+                        <th width="20%" class="sticky-header">Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (CalculationViewModel calculation in Model.Specification.Calculations)
+                    @foreach (TemplateMetadataContents templateMetadataContents in Model.TemplateData)
                     {
-                        <tr>
+                        var viewModel = new FundingLineViewModel
+                        {
+                            Calculations = Model.Calculations,
+                            FundingLines = templateMetadataContents.RootFundingLines,
+                            BorderThicknessMultiplier = 1
+                        };
 
-                            <td>
-                                <div class="calculation-name-holder">
-                                    <span class="button-split-container">
-                                        <span class="button-split-icon">
-                                            <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink-icon"><i class="material-icons">edit</i></a>
-                                        </span>
-                                        <span class="button-split-text">
-                                            <a href="/specs/EditCalculation/@calculation.Id?specificationId=@Model.Specification.Id" class="data-calculation-editlink"><span class="data-calculation-name">@calculation.Name</span></a>
-                                        </span>
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="data-calculation-description-firstline first-line-only">@calculation.DescriptionFirstLine</td>
-                            <td class="data-calculation-type">@calculation.CalculationType</td>
-                            <td class="text-nowrap data-calculation-lastupdated">
-                                <span class="datetime-split-container">
-                                    <span class="datetime-split-date data-calculation-lastupdated-date">@calculation.LastUpdatedDateFormatted</span>
-                                    <span class="datetime-split-time data-calculation-lastupdated-time">@calculation.LastUpdatedTimeFormatted</span>
-                                </span>
-                            </td>
-                            <td class="expander-trigger-cell" data-multi-row-header="calcs-for-@calculation.Id"><i class="material-icons">keyboard_arrow_down</i></td>
-                        </tr>
-
-                        <tr class="cr-table-primary-highlight expander-container">
-                            <td colspan="5" class="">
-                                @calculation.Description.ReplaceLineBreaksForHtml()
-                                <a class="display-block view-calculation-code-link" href="/api/specs/redirectToCalc/@calculation.Id">View calculation code</a>
-                            </td>
-                        </tr>
-
-
+                         <partial name="_FundingLineRows" model="viewModel" />
                     }
-
                 </tbody>
             </table>
         </div>
