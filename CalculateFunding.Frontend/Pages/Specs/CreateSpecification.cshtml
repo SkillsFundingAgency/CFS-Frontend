@@ -71,22 +71,22 @@
                 </div>
             </div>
             <div>
-                <div data-bind="css: fundingPeriodIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
-                    <div class="form-group">
-                        <label for="select-funding-period">Funding period</label>
-                        <select id="select-funding-period" class="form-control" data-bind="foreach: fundingPeriods">
-                            <option data-bind="value:id, text: name"></option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div>
                 <div data-bind="css: fundingStreamIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
                         <label for="select-funding-stream">Funding streams</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a funding stream</span></h4>
                         <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream, foreach: fundingStreams" id="select-funding-stream" class="form-control">
                             <option data-bind="value:id, text:name"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div data-bind="css: fundingPeriodIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
+                    <div class="form-group">
+                        <label for="select-funding-period">Funding period</label>
+                        <select id="select-funding-period" class="form-control" data-bind="foreach: fundingPeriods">
+                            <option data-bind="value:id, text: name"></option>
                         </select>
                     </div>
                 </div>

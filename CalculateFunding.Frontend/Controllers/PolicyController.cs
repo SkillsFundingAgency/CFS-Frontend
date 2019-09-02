@@ -59,13 +59,18 @@ namespace CalculateFunding.Frontend.Controllers
 
             await TaskHelper.WhenAllAndThrow(fundingConfigsLookupTask, fundingPeriodsLookupTask);
 
-            IActionResult fundingConfigsLookupResult = fundingConfigsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingConfiguration));
+            IActionResult fundingConfigsLookupErrorResult = fundingConfigsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingConfiguration));
 
-            IActionResult fundingPeriodsLookupResult = fundingPeriodsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingPeriod));
+            IActionResult fundingPeriodsLookupErrorResult = fundingPeriodsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingPeriod));
 
-            if (fundingConfigsLookupResult != null || fundingPeriodsLookupResult != null)
+            if (fundingConfigsLookupErrorResult != null)
             {
-                throw new InvalidOperationException($"An error occurred while retrieving funding periods");
+                return fundingConfigsLookupErrorResult;
+            }
+
+            if (fundingPeriodsLookupErrorResult != null)
+            {
+                return fundingPeriodsLookupErrorResult;
             }
 
             IEnumerable<Reference> fundingPeriods = fundingConfigsLookupTask.Result.Content.Select(fc =>

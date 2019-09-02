@@ -444,7 +444,7 @@
             },
             {
               "name": "specsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-specs.azurewebsites.net/api/specs')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs.azurewebsites.net/api/')]"
             },
             {
               "name": "calcsClient:ApiKey",
