@@ -175,13 +175,13 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Period>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<FundingPeriod>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
             }
-            IEnumerable<Period> fundingPeriods = periodsResponse.Content;
+            IEnumerable<FundingPeriod> fundingPeriods = periodsResponse.Content;
 
             if (string.IsNullOrWhiteSpace(fundingPeriodId))
             {

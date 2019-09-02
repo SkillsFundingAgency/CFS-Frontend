@@ -60,7 +60,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 FundingPeriodId = fundingPeriodId;
             }
 
-            await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(fundingPeriodId), PopulateFundingStreams(fundingStreamId));
+            await PopulateFundingStreams(fundingStreamId);
             IsAuthorizedToCreate = FundingStreams.Count() != 0;
             return Page();
         }
@@ -98,9 +98,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         private async Task<IActionResult> ActionResultForFundingPeriodStream(string fundingPeriodId, string fundingStreamId)
         {
-            await TaskHelper.WhenAllAndThrow(
-                PopulateFundingPeriods(fundingPeriodId),
-                PopulateFundingStreams(fundingStreamId));
+            await PopulateFundingStreams(fundingStreamId);
 
             IsAuthorizedToCreate = FundingStreams.Count() != 0;
 
@@ -128,25 +126,5 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
         }
 
-        private async Task PopulateFundingPeriods(string fundingPeriodId)
-        {
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = await _policiesApiClient.GetFundingPeriods();
-
-            if (fundingPeriodsResponse.StatusCode == HttpStatusCode.OK && !fundingPeriodsResponse.Content.IsNullOrEmpty())
-            {
-                IEnumerable<PolicyModels.Period> fundingPeriods = fundingPeriodsResponse.Content;
-
-                FundingPeriods = fundingPeriods.Select(m => new SelectListItem
-                {
-                    Value = m.Id,
-                    Text = m.Name,
-                    Selected = m.Id == fundingPeriodId
-                }).ToList();
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
-            }
-        }
     }
 }

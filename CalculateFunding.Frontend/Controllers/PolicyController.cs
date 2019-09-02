@@ -1,10 +1,14 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -23,7 +27,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/policy/fundingperiods")]
         public async Task<IActionResult> GetFundingPeriods()
         {
-            ApiResponse<IEnumerable<Period>> response = await _policiesApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<FundingPeriod>> response = await _policiesApiClient.GetFundingPeriods();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -32,6 +36,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
+
         [Route("api/policy/fundingstreams")]
         public async Task<IActionResult> GetFundingStreams()
         {
@@ -43,6 +48,30 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+        }
+
+        [Route("api/policy/fundingperiods/{fundingStreamId}")]
+        public async Task<IActionResult> GetFundingPeriods(string fundingStreamId)
+        {
+            Task<ApiResponse<IEnumerable<FundingConfiguration>>> fundingConfigsLookupTask = _policiesApiClient.GetFundingConfigurationsByFundingStreamId(fundingStreamId);
+
+            Task<ApiResponse<IEnumerable<FundingPeriod>>> fundingPeriodsLookupTask = _policiesApiClient.GetFundingPeriods();
+
+            await TaskHelper.WhenAllAndThrow(fundingConfigsLookupTask, fundingPeriodsLookupTask);
+
+            IActionResult fundingConfigsLookupResult = fundingConfigsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingConfiguration));
+
+            IActionResult fundingPeriodsLookupResult = fundingPeriodsLookupTask.Result.IsSuccessOrReturnFailureResult(nameof(FundingPeriod));
+
+            if (fundingConfigsLookupResult != null || fundingPeriodsLookupResult != null)
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving funding periods");
+            }
+
+            IEnumerable<Reference> fundingPeriods = fundingConfigsLookupTask.Result.Content.Select(fc =>
+                fundingPeriodsLookupTask.Result.Content.FirstOrDefault(m => string.Equals(m.Id, fc.FundingPeriodId, StringComparison.InvariantCultureIgnoreCase)));
+
+            return new OkObjectResult(fundingPeriods);
         }
     }
 }

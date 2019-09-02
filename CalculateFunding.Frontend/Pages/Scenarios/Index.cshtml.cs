@@ -94,7 +94,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<PolicyModels.Period>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<PolicyModels.FundingPeriod>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
 
             if (periodsResponse.StatusCode.Equals(HttpStatusCode.OK) && periodsResponse.Content != null)
             {

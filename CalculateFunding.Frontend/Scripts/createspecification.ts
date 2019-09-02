@@ -196,6 +196,9 @@ namespace calculateFunding.specification {
                     item.description = item.description;
                     return item;
                 }));
+                $("#select-funding-period > option").remove();
+
+                this.populateFundingPeriods(selectedItem);
                 this.selectedProviderVersion(providerVersionId);
             });
 
@@ -204,30 +207,33 @@ namespace calculateFunding.specification {
                 console.log("Search request failed");
                 this.isInProgress(false);
             });
+
+           
         }
 
-        public getFundingPeriod(): void {
+        public populateFundingPeriods(selectedFundingStreamId: string) {
             let request = $.ajax({
-                url: "/api/policy/fundingperiods",
+                url: `/api/policy/fundingperiods/${selectedFundingStreamId}`,
                 dataType: "json",
-                method: "GET",
-                contentType: "application/json"
+                method: "GET"
             });
 
+            console.log("Starting request for funding period ids");
+
             request.done((resultUntyped) => {
-                console.log("received funding periods");
+                console.log("Request completed");
                 let results: Array<IFundingPeriod> = resultUntyped;
-                this.fundingPeriods(ko.utils.arrayMap(results, item => {
+                this.fundingPeriods(ko.utils.arrayMap(results, function (item) {
                     return item;
                 }));
             });
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
-
-                console.log("funding periods request failed");
+                console.log("Search request failed");
                 this.isInProgress(false);
             });
         }
+
         public getFundingStream(): void {
             let request = $.ajax({
                 url: "/api/policy/fundingstreams",

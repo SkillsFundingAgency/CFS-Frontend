@@ -65,7 +65,7 @@
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Period> academicYears = null;
+            IEnumerable<FundingPeriod> academicYears = null;
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -83,7 +83,7 @@
             };
 
             NSubstitute.Core.ConfiguredCall fundingPeriods = policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.NotFound, academicYears));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.NotFound, academicYears));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -120,7 +120,7 @@
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
@@ -138,7 +138,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -178,7 +178,7 @@
 
             ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -198,7 +198,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -238,7 +238,7 @@
 
             ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = null;
 
@@ -258,7 +258,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.NotFound, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -296,7 +296,7 @@
 
             ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -316,7 +316,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.OK, providerResults));
@@ -352,7 +352,7 @@
 
             ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -368,7 +368,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));
@@ -410,7 +410,7 @@
 
             ProviderAllocationLinePageModel providerAllocPageModel = CreatePageModel(resultsApiClient, providersApiClient, policiesApiClient, specsClient, mapper, logger);
 
-            IEnumerable<Period> fundingPeriods = new[] { new Period { Id = "1617", Name = "2016-2017" }, new Period { Id = "1718", Name = "2017-2018" }, new Period { Id = "1819", Name = "2018-2019" } };
+            IEnumerable<FundingPeriod> fundingPeriods = new[] { new FundingPeriod { Id = "1617", Name = "2016-2017" }, new FundingPeriod { Id = "1718", Name = "2017-2018" }, new FundingPeriod { Id = "1819", Name = "2018-2019" } };
 
             ProviderVersionSearchResult provider = CreateProvider();
 
@@ -426,7 +426,7 @@
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             policiesApiClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetProviderResults(Arg.Is("2"), Arg.Is("2"))
                 .Returns(new ApiResponse<ProviderResults>(HttpStatusCode.NoContent, providerResults));

@@ -27,12 +27,12 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenNullSearchResultsReturns_ReturnsStatusCode500()
         {
             // Arrange
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
+            IEnumerable<PolicyModels.FundingPeriod> fundingPeriods = new[]
             {
-                new PolicyModels.Period { Id = "1819", Name = "1018/19" }
+                new PolicyModels.FundingPeriod { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<PolicyModels.Period>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.FundingPeriod>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             IPoliciesApiClient policiesApiClient = CreateApiClient();
             policiesApiClient
@@ -72,12 +72,12 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenSearchResultsReturnsResults_ReturnsPage()
         {
             // Arrange
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
+            IEnumerable<PolicyModels.FundingPeriod> fundingPeriods = new[]
             {
-                new PolicyModels.Period { Id = "1819", Name = "1018/19" }
+                new PolicyModels.FundingPeriod { Id = "1819", Name = "1018/19" }
             };
 
-            ApiResponse<IEnumerable<PolicyModels.Period>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<PolicyModels.FundingPeriod>> apiResponse = new ApiResponse<IEnumerable<PolicyModels.FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             IPoliciesApiClient policiesApiClient = CreateApiClient();
             policiesApiClient

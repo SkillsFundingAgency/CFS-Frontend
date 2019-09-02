@@ -16,7 +16,6 @@ using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using CalculateFunding.Common.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
@@ -67,7 +66,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
                 EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
 
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId));
+                await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
 
                 return Page();
             }
@@ -107,7 +106,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (!ModelState.IsValid)
             {
-                await TaskHelper.WhenAllAndThrow(PopulateFundingPeriods(EditSpecificationViewModel.FundingPeriodId), PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId));
+                await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
                 return Page();
             }
 
@@ -166,30 +165,5 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
         }
 
-        private async Task PopulateFundingPeriods(string fundingPeriodId)
-        {
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = await _policiesApiClient.GetFundingPeriods();
-
-            if (fundingPeriodsResponse == null)
-            {
-                throw new InvalidOperationException($"Null funding periods response returned");
-            }
-
-            if (fundingPeriodsResponse.StatusCode == HttpStatusCode.OK && !fundingPeriodsResponse.Content.IsNullOrEmpty())
-            {
-                IEnumerable<Reference> fundingPeriods = fundingPeriodsResponse.Content;
-
-                FundingPeriods = fundingPeriods.Select(m => new SelectListItem
-                {
-                    Value = m.Id,
-                    Text = m.Name,
-                    Selected = m.Id == fundingPeriodId
-                }).ToList();
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unable to retrieve Funding Streams. Status Code = {fundingPeriodsResponse.StatusCode}");
-            }
-        }
     }
 }

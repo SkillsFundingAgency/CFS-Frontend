@@ -70,8 +70,9 @@
                         {
                             <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">You can't change this as this specification has been chosen for a funding period</span></h4>
                         }
-                        <select asp-items="@(Model.FundingPeriods)" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" asp-for="EditSpecificationViewModel.FundingPeriodId" class="form-control">
-                            <option></option>
+
+                        <select id="select-funding-period" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control" asp-for="EditSpecificationViewModel.FundingPeriodId" data-bind="foreach: fundingPeriods">
+                            <option data-bind="value:id, text: name"></option>
                         </select>
                     </div>
                 </div>
@@ -131,7 +132,7 @@
         if (editSpecificationContainer) {
             ko.applyBindings(vm, editSpecificationContainer);
         }
-        vm.fundingStreamChanged('@(Model.EditSpecificationViewModel.ProviderVersionId)');
+        vm.fundingStreamChanged('@(Model.EditSpecificationViewModel.ProviderVersionId)', '@(Model.EditSpecificationViewModel.FundingPeriodId)');
     </script>
 }
 

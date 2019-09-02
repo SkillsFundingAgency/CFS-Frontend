@@ -91,7 +91,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
                 tasks.Add(specificationsLookupTask);
             }
 
-            Task<ApiResponse<IEnumerable<Period>>> fundingPeriodsLookupTask = _policiesApiClient.GetFundingPeriods();
+            Task<ApiResponse<IEnumerable<FundingPeriod>>> fundingPeriodsLookupTask = _policiesApiClient.GetFundingPeriods();
 
             Task<ApiResponse<IEnumerable<Common.ApiClient.Policies.Models.FundingStream>>> fundingStreamsLookupTask = _policiesApiClient.GetFundingStreams();
 

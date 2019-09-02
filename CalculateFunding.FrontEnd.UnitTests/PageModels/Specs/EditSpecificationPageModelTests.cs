@@ -360,17 +360,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
-            {
-                new PolicyModels.Period { Id = "fp1", Name = "funding" }
-            };
-
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
                 new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
-
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
@@ -381,10 +374,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             apiClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
-
-            policiesApiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
 
             policiesApiClient
                 .GetFundingStreams()
@@ -420,12 +409,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be(1);
 
             pageModel
-               .FundingPeriods
-               .Count()
-               .Should()
-               .Be(1);
-
-            pageModel
                 .IsAuthorizedToEdit
                 .Should().BeTrue();
 
@@ -447,18 +430,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
-            {
-                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
-                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
-            };
-
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
                 new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
-
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
@@ -469,10 +444,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             apiClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
-
-            policiesApiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
 
             policiesApiClient
                 .GetFundingStreams()
@@ -508,12 +479,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be(1);
 
             pageModel
-               .FundingPeriods
-               .Count()
-               .Should()
-               .Be(2);
-
-            pageModel
                 .IsAuthorizedToEdit
                 .Should().BeTrue();
 
@@ -527,18 +492,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
             // Arrange
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
-            {
-                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
-                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
-            };
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
                 new PolicyModels.FundingStream { Id = "fp1", Name = "funding" }
             };
             Specification specification = new Specification { Id = specificationId, Name = specName };
 
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
             ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
 
@@ -549,10 +508,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             mockSpecsClient
                 .GetSpecification(Arg.Is(specificationId))
                 .Returns(specificationResponse);
-
-            mockPoliciesClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
 
             mockPoliciesClient
                 .GetFundingStreams()
@@ -582,18 +537,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .BeOfType<PageResult>();
 
             pageModel
-                .FundingStreams
-                .Count()
-                .Should()
-                .Be(1);
-
-            pageModel
-                .FundingPeriods
-                .Count()
-                .Should()
-                .Be(2);
-
-            pageModel
                 .EditSpecificationViewModel
                 .OriginalSpecificationName
                 .Should()
@@ -619,10 +562,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
             };
 
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
+            IEnumerable<PolicyModels.FundingPeriod> fundingPeriods = new[]
             {
-                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
-                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.FundingPeriod { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.FundingPeriod { Id = "fp2", Name = "Funding Period 2" }
             };
 
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
@@ -639,7 +582,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             policiesApiClient
                 .GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             policiesApiClient
                 .GetFundingStreams()
@@ -677,10 +620,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 FundingPeriod = new Reference { Id = "fp1", Name = "FP One" }
             };
 
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
+            IEnumerable<PolicyModels.FundingPeriod> fundingPeriods = new[]
             {
-                new PolicyModels.Period { Id = "fp1", Name = "Funding Period 1" },
-                new PolicyModels.Period { Id = "fp2", Name = "Funding Period 2" }
+                new PolicyModels.FundingPeriod { Id = "fp1", Name = "Funding Period 1" },
+                new PolicyModels.FundingPeriod { Id = "fp2", Name = "Funding Period 2" }
             };
 
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
@@ -697,7 +640,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             policiesApiClient
                 .GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods));
+                .Returns(new ApiResponse<IEnumerable<PolicyModels.FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             policiesApiClient
                 .GetFundingStreams()
@@ -843,19 +786,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnPostAsync_GivenPagePopulatesButModelStateIsInvalid_ReturnsPage()
         {
             //Arrange
-            IEnumerable<PolicyModels.Period> fundingPeriods = new[]
-            {
-                new PolicyModels.Period { Id = "fp1", Name = "funding" }
-            };
-
             IEnumerable<PolicyModels.FundingStream> fundingStreams = new[]
             {
                 new PolicyModels.FundingStream { Id = "fs1", Name = "funding stream" }
             };
 
             ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
-
-            ApiResponse<IEnumerable<PolicyModels.Period>> fundingPeriodsResponse = new ApiResponse<IEnumerable<PolicyModels.Period>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<PolicyModels.FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
@@ -865,10 +801,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             apiClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
-
-            policiesApiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
 
             policiesApiClient
                 .GetFundingStreams()
@@ -905,12 +837,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Count()
                 .Should()
                 .Be(1);
-
-            pageModel
-               .FundingPeriods
-               .Count()
-               .Should()
-               .Be(1);
 
             pageModel
                 .IsAuthorizedToEdit
