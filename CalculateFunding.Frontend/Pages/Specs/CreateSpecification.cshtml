@@ -39,17 +39,26 @@
 }
 <div id="create-specification" class="row">
     <div class="col-sm-9 col-md-6" data-bind="hidden: isInProgress">
-        <div class="hidden" data-bind="css: formValid() === false ? 'validation-summary-errors' : 'hidden'">
+        <div class="hidden" data-bind="css: formValid() === false || formError() === true ? 'validation-summary-errors' : 'hidden'">
             <h3 class="heading-large">There is a problem</h3>
-            <p>
-                <strong>Check that you have answered the questions correctly</strong>
-            </p>
-            <ul>
-                <li><a href="" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
-                <li><a href="" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
-                <li><a href="" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
-                <li><a href="" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
-            </ul>
+            <div class="hidden" data-bind="css: formValid() === false ? 'visible' : 'hidden'">
+                <p>
+                    <strong>Check that you have answered the questions correctly</strong>
+                </p>
+                <ul>
+                    <li><a href="" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
+                    <li><a href="" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
+                    <li><a href="" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
+                    <li><a href="" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
+                </ul>
+            </div>
+            <div class="hidden" data-bind="css: formError() === true ? 'visible' : 'hidden'">
+                <p>
+                    <strong>The specification creation has failed. please try again.</strong>
+                </p>
+                <p class="info error" data-bind="text: errorMessage"></p>
+                <a href="#">Contact the helpline service</a>
+            </div>
         </div>
 
         <form class="form" data-bind="submit: createSpecification">
@@ -103,7 +112,6 @@
                 </div>
             </div>
             <p class="form-submit-container"><button type="button" class="button" disabled="@(!Model.IsAuthorizedToCreate)" id="save-button" data-bind="click: createSpecification">Create specification</button> <a href="/specs?fundingPeriodId=@Model.FundingPeriodId" id="cancel-link">Cancel</a></p>
-            <p class="info error" data-bind="text: errorMessage"></p>
         </form>
 
     </div>

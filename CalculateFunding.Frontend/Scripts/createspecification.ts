@@ -22,6 +22,7 @@ namespace calculateFunding.specification {
         public fundingPeriodIdValid: KnockoutObservable<boolean> = ko.observable();
         public descriptionValid: KnockoutObservable<boolean> = ko.observable();
         public formValid: KnockoutObservable<boolean> = ko.observable();
+        public formError: KnockoutObservable<boolean> = ko.observable();
 
         public showCreatingSpec: KnockoutObservable<boolean> = ko.observable(false);
         public showCreatingCalcs: KnockoutObservable<boolean> = ko.observable(false);
@@ -253,7 +254,6 @@ namespace calculateFunding.specification {
         public createSpecification(): void {
             console.log("Creating specification");
 
-
             var isValidSubmission = this.checkValidSubmission();
 
             if (isValidSubmission) {
@@ -275,9 +275,16 @@ namespace calculateFunding.specification {
                 });
 
                 request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
-                    this.errorMessage(xhrDetails.responseJSON);
+                    if (xhrDetails.responseJSON != null) {
+                        let message: string = "";
+                        $.each(Object.keys(xhrDetails.responseJSON), function (i, fieldItem) {
+                            message += xhrDetails.responseJSON[fieldItem];
+                        })
+                        message += "\n";
+                        this.errorMessage(message);
+                    }
                     this.isInProgress(false);
-                    this.nameValid(false);
+                    this.formError(true);
                 });
 
                 request.done((data) => {
@@ -297,6 +304,7 @@ namespace calculateFunding.specification {
 
         public checkValidSubmission() {
             this.formValid(true);
+            this.formError(false);
 
             if (this.name() == null || this.name().length == 0) {
                 this.nameValid(false);
@@ -327,7 +335,7 @@ namespace calculateFunding.specification {
                 this.fundingPeriodIdValid(true);
             }
 
-            if (this.description() == null) {
+            if (this.description() == null || this.description().length == 0) {
                 this.descriptionValid(false);
                 this.formValid(false);
             } else {

@@ -140,7 +140,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (!ModelState.IsValid)
             {
-                return new BadRequestResult();
+                return new BadRequestObjectResult(ModelState);
             }
 
             //var viewModel = JsonConvert.DeserializeObject<CreateSpecificationViewModel>(data);
@@ -173,7 +173,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 result.AddValidationResultErrors(ModelState);
 
-                return new BadRequestResult();
+                return new BadRequestObjectResult(result.ModelState);
             }
             else
             {

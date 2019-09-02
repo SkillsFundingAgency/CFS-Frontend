@@ -145,7 +145,7 @@
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services
-               .AddSingleton<Common.ApiClient.Calcs.ICalculationsApiClient, CalculationsApiClient>();
+               .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
             services
 	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();

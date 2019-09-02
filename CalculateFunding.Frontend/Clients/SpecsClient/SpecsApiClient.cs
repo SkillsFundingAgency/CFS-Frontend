@@ -17,6 +17,8 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 {
     public class SpecsApiClient : BaseApiClient, ISpecsApiClient
     {
+        private const string UrlRoot = "specs";
+
         public SpecsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
            : base(httpClientFactory, HttpClientKeys.Specifications, logger, cancellationTokenProvider)
         {
@@ -24,48 +26,48 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 
         public async Task<ApiResponse<IEnumerable<Specification>>> GetSpecifications()
         {
-            return await GetAsync<IEnumerable<Specification>>("specifications");
+            return await GetAsync<IEnumerable<Specification>>($"{UrlRoot}/specifications");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFunding()
         {
-            return await GetAsync<IEnumerable<SpecificationSummary>>("specifications-selected-for-funding");
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"{UrlRoot}/specifications-selected-for-funding");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationsSelectedForFundingByPeriod(string fundingPeriodId)
         {
-            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-selected-for-funding-by-period?fundingPeriodId={fundingPeriodId}");
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"{UrlRoot}/specifications-selected-for-funding-by-period?fundingPeriodId={fundingPeriodId}");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries()
         {
-            return await GetAsync<IEnumerable<SpecificationSummary>>("specification-summaries");
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"{UrlRoot}/specification-summaries");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecifications(string fundingPeriodId)
         {
-            return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-year?fundingPeriodId={fundingPeriodId}");
+            return await GetAsync<IEnumerable<SpecificationSummary>>($"{UrlRoot}/specifications-by-year?fundingPeriodId={fundingPeriodId}");
         }
 
         public async Task<ApiResponse<Specification>> GetSpecificationByName(string specificationName)
         {
             Guard.IsNullOrWhiteSpace(specificationName, nameof(specificationName));
 
-            return await GetAsync<Specification>($"specification-by-name?specificationName={specificationName}");
+            return await GetAsync<Specification>($"{UrlRoot}/specification-by-name?specificationName={specificationName}");
         }
 
         public async Task<ApiResponse<Specification>> GetSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await GetAsync<Specification>($"specification-current-version-by-id?specificationId={specificationId}");
+            return await GetAsync<Specification>($"{UrlRoot}/specification-current-version-by-id?specificationId={specificationId}");
         }
 
         public async Task<ApiResponse<SpecificationSummary>> GetSpecificationSummary(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await GetAsync<SpecificationSummary>($"specification-summary-by-id?specificationId={specificationId}");
+            return await GetAsync<SpecificationSummary>($"{UrlRoot}/specification-summary-by-id?specificationId={specificationId}");
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetSpecificationSummaries(IEnumerable<string> specificationIds)
@@ -77,7 +79,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
                 return new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>());
             }
 
-            return await PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>("specification-summaries-by-ids", specificationIds);
+            return await PostAsync<IEnumerable<SpecificationSummary>, IEnumerable<string>>($"{UrlRoot}/specification-summaries-by-ids", specificationIds);
         }
 
         public async Task<ApiResponse<IEnumerable<SpecificationSummary>>> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId)
@@ -85,14 +87,14 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-			return await GetAsync<IEnumerable<SpecificationSummary>>($"specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
+			return await GetAsync<IEnumerable<SpecificationSummary>>($"{UrlRoot}/specifications-by-fundingperiod-and-fundingstream?fundingPeriodId={fundingPeriodId}&fundingStreamId={fundingStreamId}");
         }
 
         public async Task<ValidatedApiResponse<Specification>> CreateSpecification(CreateSpecificationModel specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return await ValidatedPostAsync<Specification, CreateSpecificationModel>("specifications", specification);
+            return await ValidatedPostAsync<Specification, CreateSpecificationModel>($"{UrlRoot}/specifications", specification);
         }
 
         public async Task<HttpStatusCode> UpdateSpecification(string specificationId, EditSpecificationModel specification)
@@ -100,14 +102,14 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            return await PutAsync($"specification-edit?specificationId={specificationId}", specification);
+            return await PutAsync($"{UrlRoot}/specification-edit?specificationId={specificationId}", specification);
         }
 
         public async Task<ValidatedApiResponse<Calculation>> CreateCalculation(CalculationCreateModel calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
-            return await ValidatedPostAsync<Calculation, CalculationCreateModel>("calculations", calculation);
+            return await ValidatedPostAsync<Calculation, CalculationCreateModel>($"{UrlRoot}/calculations", calculation);
         }
 
         public async Task<ValidatedApiResponse<Calculation>> UpdateCalculation(string specificationId, string calculationId, CalculationUpdateModel calculation)
@@ -116,32 +118,32 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(calculation, nameof(calculation));
 
-            return await ValidatedPutAsync<Calculation, CalculationUpdateModel>($"calculations?specificationId={specificationId}&calculationId={calculationId}", calculation);
+            return await ValidatedPutAsync<Calculation, CalculationUpdateModel>($"{UrlRoot}/calculations?specificationId={specificationId}&calculationId={calculationId}", calculation);
         }
 
 		[Obsolete]
         public async Task<ApiResponse<IEnumerable<Reference>>> GetFundingPeriods()
         {
-            return await GetAsync<IEnumerable<Reference>>("get-fundingperiods");
+            return await GetAsync<IEnumerable<Reference>>($"{UrlRoot}/get-fundingperiods");
         }
 
         [Obsolete]
         public async Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreams()
         {
-            return await GetAsync<IEnumerable<FundingStream>>("get-fundingstreams");
+            return await GetAsync<IEnumerable<FundingStream>>($"{UrlRoot}/get-fundingstreams");
         }
 
         public async Task<ApiResponse<IEnumerable<FundingStream>>> GetFundingStreamsForSpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await GetAsync<IEnumerable<FundingStream>>($"get-fundingstreams-for-specification?specificationId={specificationId}");
+            return await GetAsync<IEnumerable<FundingStream>>($"{UrlRoot}/get-fundingstreams-for-specification?specificationId={specificationId}");
         }
 
         public async Task<ApiResponse<FundingStream>> GetFundingStreamByFundingStreamId(string fundingStreamId)
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
-            return await GetAsync<FundingStream>($"get-fundingstream-by-id?fundingstreamId={fundingStreamId}");
+            return await GetAsync<FundingStream>($"{UrlRoot}/get-fundingstream-by-id?fundingstreamId={fundingStreamId}");
         }
 
         public async Task<ApiResponse<Calculation>> GetCalculationBySpecificationIdAndCalculationName(string specificationId, string calculationName)
@@ -151,7 +153,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 
             CalculationByNameRequestModel model = new CalculationByNameRequestModel { SpecificationId = specificationId, Name = calculationName };
 
-            return await PostAsync<Calculation, CalculationByNameRequestModel>("calculation-by-name", model);
+            return await PostAsync<Calculation, CalculationByNameRequestModel>($"{UrlRoot}/calculation-by-name", model);
         }
 
         public async Task<ApiResponse<CalculationCurrentVersion>> GetCalculationById(string specificationId, string calculationId)
@@ -159,14 +161,14 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            return await GetAsync<CalculationCurrentVersion>($"calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
+            return await GetAsync<CalculationCurrentVersion>($"{UrlRoot}/calculation-by-id?calculationId={calculationId}&specificationId={specificationId}");
         }
 
         public async Task<ApiResponse<IEnumerable<CalculationCurrentVersion>>> GetBaselineCalculationsBySpecificationId(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await GetAsync<IEnumerable<CalculationCurrentVersion>>($"specifications/{specificationId}/baseline-calculations");
+            return await GetAsync<IEnumerable<CalculationCurrentVersion>>($"{UrlRoot}/specifications/{specificationId}/baseline-calculations");
         }
 
         public async Task<PagedResult<SpecificationDatasourceRelationshipSearchResultItem>> FindSpecificationAndRelationships(SearchFilterRequest filterOptions)
@@ -175,7 +177,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
 
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>("specifications-dataset-relationships-search", request);
+            ApiResponse<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>> results = await PostAsync<SearchResults<SpecificationDatasourceRelationshipSearchResultItem>, SearchQueryRequest>($"{UrlRoot}/specifications-dataset-relationships-search", request);
             if (results.StatusCode != HttpStatusCode.OK) return null;
 
             PagedResult<SpecificationDatasourceRelationshipSearchResultItem> result = new SearchPagedResult<SpecificationDatasourceRelationshipSearchResultItem>(filterOptions, results.Content.TotalCount)
@@ -190,7 +192,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
         {
             SearchQueryRequest request = SearchQueryRequest.FromSearchFilterRequest(filterOptions);
 
-            ApiResponse<SearchResults<SpecificationSearchResultItem>> results = await PostAsync<SearchResults<SpecificationSearchResultItem>, SearchQueryRequest>("specifications-search", request);
+            ApiResponse<SearchResults<SpecificationSearchResultItem>> results = await PostAsync<SearchResults<SpecificationSearchResultItem>, SearchQueryRequest>($"{UrlRoot}/specifications-search", request);
             if (results.StatusCode != HttpStatusCode.OK) return null;
 
             PagedResult<SpecificationSearchResultItem> result = new SearchPagedResult<SpecificationSearchResultItem>(filterOptions, results.Content.TotalCount)
@@ -207,28 +209,28 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(model, nameof(model));
 
-            return await ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"specification-edit-status?specificationId={specificationId}", model);
+            return await ValidatedPutAsync<PublishStatusResult, PublishStatusEditModel>($"{UrlRoot}/specification-edit-status?specificationId={specificationId}", model);
         }
 
         public async Task<HttpStatusCode> SelectSpecificationForFunding(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await PostAsync($"select-for-funding?specificationId={specificationId}");
+            return await PostAsync($"{UrlRoot}/select-for-funding?specificationId={specificationId}");
         }
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> RefreshPublishedResults(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"refresh-published-results?specificationId={specificationId}", specificationId);
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"{UrlRoot}/refresh-published-results?specificationId={specificationId}", specificationId);
 		}
 
         public async Task<ApiResponse<SpecificationCalculationExecutionStatusModel>> CheckPublishResultStatus(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"check-publish-result-status?specificationId={specificationId}", specificationId);
+            return await PostAsync<SpecificationCalculationExecutionStatusModel, string>($"{UrlRoot}/check-publish-result-status?specificationId={specificationId}", specificationId);
         }
     }
 }
