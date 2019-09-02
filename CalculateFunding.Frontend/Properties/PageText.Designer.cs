@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class PageText {
@@ -142,6 +142,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Funding period.
+        /// </summary>
+        public static string FundingPeriod {
+            get {
+                return ResourceManager.GetString("FundingPeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Funding streams.
         /// </summary>
         public static string FundingStreams {
@@ -183,6 +192,15 @@ namespace CalculateFunding.Frontend.Properties {
         public static string ManagePoliciesHeadingText {
             get {
                 return ResourceManager.GetString("ManagePoliciesHeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specification name.
+        /// </summary>
+        public static string SpecificationName {
+            get {
+                return ResourceManager.GetString("SpecificationName", resourceCulture);
             }
         }
         

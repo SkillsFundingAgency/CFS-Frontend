@@ -132,6 +132,12 @@
   <data name="FundingStreams" xml:space="preserve">
     <value>Funding streams</value>
   </data>
+  <data name="FundingPeriod" xml:space="preserve">
+    <value>Funding period</value>
+  </data>
+  <data name="SpecificationName" xml:space="preserve">
+    <value>Specification name</value>
+  </data>
   <data name="ManagePolicies" xml:space="preserve">
     <value>Manage the specification, policies and map datasets.</value>
   </data>

@@ -40,6 +40,14 @@
         line-height: 1.0416666667;
     }
 
+    h1.hero-title-headed {
+        padding: 5px 0 5px 0;
+        margin: 0;
+        line-height: 1.0416666667;
+        font-size: 48px;
+        font-weight: bold;
+    }
+
     .hero-text {
         margin: 0;
     }
@@ -47,6 +55,12 @@
     .hero-subtext {
         font-size: 16px;
         margin: 0;
+    }
+
+    .hero-text-bold {
+        font-size: 16px;
+        margin: 10px 0 0 0;
+        font-weight: bold;
     }
 }
 
