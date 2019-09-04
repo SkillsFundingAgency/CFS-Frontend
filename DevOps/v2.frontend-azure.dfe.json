@@ -1,0 +1,565 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "aadClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Client id of ad application"
+      }
+    },
+    "aadClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Client secret of ad application"
+      }
+    },
+    "aadDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain name for ad application"
+      }
+    },
+    "aadEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable authentication"
+      },
+      "defaultValue": "true"
+    },
+    "aadGroups": {
+      "type": "string",
+      "metadata": {
+        "description": "AD groups"
+      }
+    },
+    "aadInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "AD instance url for application"
+      }
+    },
+    "aadAuthIssuer": {
+      "type": "string",
+      "metadata": {
+        "description": "The issuer for the platform level auth AAD provider"
+      },
+      "defaultValue": "https://sts.windows.net/fad277c9-c60a-4da1-b5f3-b3b8b34a82f9/"
+    },
+    "aadTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Tenant id of ad application"
+      }
+    },
+    "adminGroupId": {
+      "type": "string",
+      "metadata": {
+        "description": "The id of the AAD group containing admin users"
+      }
+    },
+    "allocationLineMajorMinorVersioningEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the major minor versioning"
+      },
+      "defaultValue": "true"
+    },
+    "ApiKeyCalcs": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Calcs Service"
+      }
+    },
+    "ApiKeyDatasets": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Datasets Service"
+      }
+    },
+    "ApiKeyJobs": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Jobs Service"
+      }
+    },
+    "ApiKeyPolicy": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Policy Service"
+      }
+    },
+    "ApiKeyProviders": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Providers Service"
+      }
+    },
+    "ApiKeyPublishing": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Publishing Service"
+      }
+    },
+    "ApiKeyResults": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Results Service"
+      }
+    },
+    "ApiKeyScenarios": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Scenarios Service"
+      }
+    },
+    "ApiKeySpecs": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Specs Service"
+      }
+    },
+    "ApiKeyTestEngine": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Test Engine Service"
+      }
+    },
+    "ApiKeyUsers": {
+      "type": "string",
+      "metadata": {
+        "description": "Api key for the Users Service"
+      }
+    },
+    "EnableCheckJobStatusForChooseAndRefresh": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable checking calc job status prior to choosing and refreshing"
+      },
+      "defaultValue": true
+    },
+    "EnableNewEditCalculationPage": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable the new edit calculation page"
+      },
+      "defaultValue": true
+    },
+    "EnableNewManageDataSourcesPage": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable the new manage data sources page"
+      },
+      "defaultValue": true
+    },
+    "enablePlatformAuth": {
+      "type": "bool",
+      "metadata": {
+        "description": "Should platform authentication be enabled"
+      },
+      "defaultValue": false
+    },
+    "enableRoleBasedAccess": {
+      "type": "bool",
+      "metadata": {
+        "description": "Should role based access be enabled"
+      },
+      "defaultValue": false
+    },
+    "EnableProviderInformationViewInViewFundingPage": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable provider information view in view funding page"
+      },
+      "defaultValue": false
+    },
+    "EnableDuplicateCalculationNameCheck": {
+      "defaultValue": false,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to enable new check for duplicate calculation names"
+      }
+    },
+    "EnableSearchModeAll": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to use search mode all"
+      }
+    },
+    "EnableExceptionMessages": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Feature toggle to enable exception messages to be surfaced up to the user"
+      }
+    },
+    "environmentKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The environment key for this particular environment eg t1dv"
+      }
+    },
+    "healthCheckKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Calculate Funding Frontend Health Check Key"
+      }
+    },
+    "productVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "Product Version"
+      }
+    },
+    "publishButtonEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the publish button on the view funding page"
+      },
+      "defaultValue": "true"
+    },
+    "publishAndApprovePageFiltersEnabled": {
+      "type": "string",
+      "metadata": {
+        "description": "Enable the filtering on publish and approve page"
+      },
+      "defaultValue": "true"
+    }
+  },
+  "variables": {
+    "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
+    "frontEndCertificateName": "frontendcert",
+    "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
+    "signalRName": "[concat('sr-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
+    "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]"  
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-08-01",
+      "name": "[variables('webSiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('hostingPlanName')]",
+        "[variables('applicationInsightsName')]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName')))]": "empty",
+        "displayName": "Website"
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-08-01",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "type": "siteextensions",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"
+          ],
+          "properties": {}
+        },
+        {
+          "name": "authSettings",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
+          "properties":{
+            "enabled": "[parameters('enablePlatformAuth')]",
+            "unauthenticatedClientAction": 0,
+            "tokenStoreEnabled": true,
+            "defaultProvider": 0,
+            "clientId": "[parameters('aadClientId')]",
+            "clientSecret": "[parameters('aadClientSecret')]",
+            "issuer": "[parameters('aadAuthIssuer')]",
+            "allowedAudiences": null,
+            "isAadAutoProvisioned": false,
+            "additionalLoginParams": [ "response_type=code id_token", "resource=https://graph.microsoft.com"]
+          }
+        },
+        {
+          "name": "[concat(variables('webSiteName'), '/web')]",
+          "type": "Microsoft.Web/sites/config",
+          "apiVersion": "2016-08-01",
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
+          "properties":{
+            "ipSecurityRestrictions": [
+              {
+                "ipAddress": "213.123.63.150",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE London Proxy",
+                "priority": 100
+              },
+              {
+                "ipAddress": "86.188.174.157",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy Old",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.130",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 0",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.131",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 1",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.132",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 2",
+                "priority": 200
+              },
+              {
+                "ipAddress": "194.72.231.133",
+                "subnetMask": "255.255.255.255",
+                "name" : "DfE Sheffield Proxy New 3",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.175.48",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block A",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.175.64",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block B",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.165.192",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block C",
+                "priority": 200
+              },
+              {
+                "ipAddress": "217.38.165.176",
+                "subnetMask": "255.255.255.240",
+                "name" : "DfE External IP Block D",
+                "priority": 200
+              }
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "name": "[variables('webSiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "AlwaysOn": true,
+          "use32BitWorkerProcess": false,
+          "http20Enabled": true,
+          "phpVersion": "",
+          "pythonVersion": "",
+          "nodeVersion": "",
+          "httpsOnly": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "clientAffinityEnabled": false,
+          "appSettings": [
+            {
+              "name": "WEBSITE_TIME_ZONE",
+              "value": "GMT Standard Time"
+            },
+            {
+              "name": "specsClient:ApiKey",
+              "value": "[parameters('apiKeySpecs')]"
+            },
+            {
+              "name": "specsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "calcsClient:ApiKey",
+              "value": "[parameters('apiKeyCalcs')]"
+            },
+            {
+              "name": "calcsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-calcs.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "datasetsClient:ApiKey",
+              "value": "[parameters('apiKeyDatasets')]"
+            },
+            {
+              "name": "datasetsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-datasets.azurewebsites.net/api/datasets')]"
+            },
+            {
+              "name": "resultsClient:ApiKey",
+              "value": "[parameters('apiKeyResults')]"
+            },
+            {
+              "name": "resultsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-results.azurewebsites.net/api/results')]"
+            },
+            {
+              "name": "scenariosClient:ApiKey",
+              "value": "[parameters('apiKeyScenarios')]"
+            },
+            {
+              "name": "scenariosClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-scenarios.azurewebsites.net/api/scenarios')]"
+            },
+            {
+              "name": "testEngineClient:ApiKey",
+              "value": "[parameters('apiKeyTestEngine')]"
+            },
+            {
+              "name": "testEngineClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine.azurewebsites.net/api/tests')]"
+            },
+            {
+              "name": "usersClient:ApiKey",
+              "value": "[parameters('apiKeyUsers')]"
+            },
+            {
+              "name": "usersClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-users.azurewebsites.net/api/users')]"
+            },
+            {
+              "name": "jobsClient:ApiKey",
+              "value": "[parameters('apiKeyJobs')]"
+            },
+            {
+              "name": "jobsClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-jobs.azurewebsites.net/api/jobs')]"
+            },
+            {
+              "name": "policiesClient:ApiKey",
+              "value": "[parameters('apiKeyPolicy')]"
+            },
+            {
+              "name": "policiesClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-policy.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "providersClient:ApiKey",
+              "value": "[parameters('apiKeyProviders')]"
+            },
+            {
+              "name": "providersClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-providers.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "publishingClient:ApiKey",
+              "value": "[parameters('apiKeyPublishing')]"
+            },
+            {
+              "name": "publishingClient:ApiEndpoint",
+              "value": "[concat('https://app-', parameters('environmentKey'), '-publishing.azurewebsites.net/api/')]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsOptions:InstrumentationKey",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsights:InstrumentationKey",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "AzureAd:Instance",
+              "value": "[parameters('aadInstance')]"
+            },
+            {
+              "name": "AzureAd:CallbackPath",
+              "value": "/signin-oidc"
+            },
+            {
+              "name": "AzureAd:Domain",
+              "value": "[parameters('aadDomain')]"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "[parameters('aadTenantId')]"
+            },
+            {
+              "name": "AzureAd:ClientId",
+              "value": "[parameters('aadClientId')]"
+            },
+            {
+              "name": "AzureAd:Groups",
+              "value": "[parameters('aadGroups')]"
+            },
+            {
+              "name": "AzureAd:IsEnabled",
+              "value": "[parameters('aadEnabled')]"
+            },
+            {
+              "name": "healthCheck:ApiKey",
+              "value": "[parameters('healthCheckKey')]"
+            },
+            {
+              "name": "AzureSignalRConnectionString",
+              "value": "[concat('Endpoint=https://', variables('signalRName'), '.service.signalr.net;AccessKey=', listKeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalRName')), '2018-10-01').primaryKey, ';Version=1.0')]"
+            },
+            {
+              "name": "features:publishButtonEnabled",
+              "value": "[parameters('publishButtonEnabled')]"
+            },
+            {
+              "name": "features:allocationLineMajorMinorVersioningEnabled",
+              "value": "[parameters('allocationLineMajorMinorVersioningEnabled')]"
+            },
+            {
+              "name": "features:publishAndApprovePageFiltersEnabled",
+              "value": "[parameters('publishAndApprovePageFiltersEnabled')]"
+            },
+            {
+              "name": "features:roleBasedAccessEnabled",
+              "value": "[parameters('enableRoleBasedAccess')]"
+            },
+            {
+              "name": "permissionOptions:AdminGroupId",
+              "value": "[parameters('adminGroupId')]"
+            },
+            {
+              "name": "features:newEditCalculationPageEnabled",
+              "value": "[parameters('EnableNewEditCalculationPage')]"
+            },
+            {
+              "name": "features:newManageDataSourcesPageEnabled",
+              "value": "[parameters('EnableNewManageDataSourcesPage')]"
+            },
+            {
+              "name": "features:providerInformationViewInViewFundingPageEnabled",
+              "value": "[parameters('EnableProviderInformationViewInViewFundingPage')]"
+            },
+            {
+              "name": "features:checkJobStatusForChooseAndRefreshEnabled",
+              "value": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]"
+            },
+            {
+              "name": "features:duplicateCalculationNameCheckEnabled",
+              "value": "[parameters('EnableDuplicateCalculationNameCheck')]"
+            },
+            {
+              "name": "features:searchModeAllEnabled",
+              "value": "[parameters('EnableSearchModeAll')]"
+            },
+            {
+              "name": "features:exceptionMessagesEnabled",
+              "value": "[parameters('EnableExceptionMessages')]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "siteUri": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Web/sites/', variables('webSiteName'))).hostnames[0]]"
+    }
+  }
+}
