@@ -47,8 +47,10 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-				Current = new CalculationVersion { 
-                SourceCode = updateViewModel.SourceCode},
+                Current = new CalculationVersion
+                {
+                    SourceCode = updateViewModel.SourceCode
+                },
             };
 
             calcsClient
@@ -153,9 +155,10 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-				Current = new CalculationVersion { 
-                SourceCode = updateViewModel.SourceCode,
-				}
+                Current = new CalculationVersion
+                {
+                    SourceCode = updateViewModel.SourceCode,
+                }
             };
 
             calcsClient
@@ -189,10 +192,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             PreviewResponse apiResultCalculation = new PreviewResponse()
             {
-                 CompilerOutput = new Build()
-                 {
-                      Success = true,
-                 }
+                CompilerOutput = new Build()
+                {
+                    Success = true,
+                }
             };
 
             calcsClient
@@ -293,7 +296,7 @@ namespace CalculateFunding.Frontend.Controllers
             string calculationId = "5";
 
             PublishStatusEditModel model = new PublishStatusEditModel();
-           
+
             ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
@@ -384,7 +387,7 @@ namespace CalculateFunding.Frontend.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-		private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             return new CalculationController(calcsClient, mapper, authorizationHelper);
         }

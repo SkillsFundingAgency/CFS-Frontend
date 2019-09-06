@@ -11,5 +11,14 @@ namespace CalculateFunding.Frontend.Controllers
         {
             return RedirectToPage("/errors/401");
         }
+
+        [HttpGet]
+        public IActionResult IsAuthenticated()
+        {
+	        if (User.Identity.IsAuthenticated)
+	        { return new OkObjectResult(User.Identity); }
+
+	        return new UnauthorizedResult();
+        }
     }
 }
