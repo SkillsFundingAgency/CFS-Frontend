@@ -232,7 +232,7 @@
     "frontEndCertificateName": "frontendcert",
     "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
     "signalRName": "[concat('sr-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
-    "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01')]"  
+    "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]"  
   },
   "resources": [
     {
