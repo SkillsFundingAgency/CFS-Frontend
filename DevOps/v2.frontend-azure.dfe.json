@@ -498,7 +498,7 @@
               "value": "[parameters('healthCheckKey')]"
             },
             {
-              "name": "AzureSignalRConnectionString",
+              "name": "Azure:SignalR:ConnectionString",
               "value": "[concat('Endpoint=https://', variables('signalRName'), '.service.signalr.net;AccessKey=', listKeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalRName')), '2018-10-01').primaryKey, ';Version=1.0')]"
             },
             {
