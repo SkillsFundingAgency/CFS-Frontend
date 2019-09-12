@@ -1,27 +1,31 @@
 ﻿using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System;
-    using System.Net;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.ViewModels.Calculations;
+    using Common.ApiClient.Models;
     using Microsoft.AspNetCore.Mvc;
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Threading.Tasks;
 
     public class CalculationController : Controller
     {
         private ICalculationsApiClient _calcClient;
+        private ISpecificationsApiClient _specificationsApiClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper, ISpecificationsApiClient specificationsApiClient)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
@@ -30,6 +34,7 @@ namespace CalculateFunding.Frontend.Controllers
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
+            _specificationsApiClient = specificationsApiClient;
         }
 
         [HttpPost]
@@ -127,6 +132,56 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
+        }
+
+        [HttpPost]
+        [Route("api/specs/{specificationId}/calculations/createadditionalcalculation")]
+        public async Task<IActionResult> CreateCalculation(string specificationId, string calculationId, [FromBody] CreateAdditionalCalculationViewModel vm)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
+            {
+                return new ForbidResult();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var specification = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+
+
+
+            CalculationCreateModel createCalculation = _mapper.Map<CalculationCreateModel>(vm);
+
+            createCalculation.SpecificationId = specificationId;
+            createCalculation.Id = calculationId;
+            createCalculation.Name = vm.CalculationName;
+            createCalculation.ValueType = vm.CalculationType;
+
+
+            // TODO: Remove with BUG : 26570
+            var reference = specification.Content.FundingStreams.FirstOrDefault();
+            if (reference != null)
+            {
+	            var fundingStreamId = reference.Id;
+	            createCalculation.FundingStreamId = fundingStreamId;
+            }
+
+            ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while saving calculation. Status code={response.StatusCode}");
+            }
+
         }
     }
 }

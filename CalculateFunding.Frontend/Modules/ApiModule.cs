@@ -145,9 +145,6 @@
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services
-               .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
-
-            services
 	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
             services
@@ -231,8 +228,19 @@
 
             httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
             httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.ApiKey, options.ApiKey);
-            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, userProfile.Fullname);
-            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, userProfile.Id);
+
+            if (string.IsNullOrEmpty(userProfile.Fullname) || string.IsNullOrEmpty(userProfile.Id))
+            {
+	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, "testuser");
+	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, "testid");
+
+            }
+            else
+            {
+	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, userProfile.Fullname);
+	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, userProfile.Id);
+
+            }
 
             httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));

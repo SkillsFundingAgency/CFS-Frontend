@@ -31,6 +31,7 @@
     <None Remove="Scripts\compare.ts" />
     <None Remove="Scripts\component.approveStatusButton.ts" />
     <None Remove="Scripts\confirm.funding-specification.ts" />
+    <None Remove="Scripts\createadditionalcalculation.ts" />
     <None Remove="Scripts\createspecification.ts" />
     <None Remove="Scripts\dataset-relationships.ts" />
     <None Remove="Scripts\createdataset.ts" />
@@ -69,14 +70,14 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.33.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.19" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.9" />
+    <PackageReference Include="CalculateFunding.Common" Version="1.34.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.20" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.8" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.2" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.11" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.3" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.13" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.9" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.3" />
@@ -164,6 +165,7 @@
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
     <TypeScriptCompile Include="Scripts\createspecification.ts" />
+    <TypeScriptCompile Include="Scripts\createadditionalcalculation.ts" />
     <TypeScriptCompile Include="Scripts\search.additionalCalculations.ts" />
     <TypeScriptCompile Include="Scripts\specification.common.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />

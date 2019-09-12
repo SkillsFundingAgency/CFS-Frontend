@@ -113,6 +113,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.CalculationType, opt => opt.Ignore())
                 .ForMember(m => m.PublishStatus, opt => opt.Ignore());
 
+
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>()
                 .ForMember(m => m.CalculationType, opt => opt.Ignore())
                 .ForMember(m => m.Name, opt => opt.Ignore())
@@ -194,6 +195,14 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.ValueType, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
                 .ForMember(m => m.Id, opt => opt.Ignore());
+
+            CreateMap<CreateAdditionalCalculationViewModel, Models.CalculationCreateModel>()
+	            .ForMember(m => m.Name, opt => opt.Ignore())
+	            .ForMember(m => m.Description, opt => opt.Ignore())
+	            .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+	            .ForMember(m => m.ValueType, opt => opt.Ignore())
+	            .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+	            .ForMember(m => m.Id, opt => opt.Ignore());
 
             CreateMap<Specification, SpecificationViewModel>()
                 .ForMember(m => m.Calculations, opt => opt.Ignore());
