@@ -183,5 +183,41 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
         }
+
+        [HttpPost]
+        [Route("api/specs/{specificationId}/calculations/{calculationId}/editadditionalcalculation")]
+        public async Task<IActionResult> editAdditionalCalculation(string specificationId, string calculationId, [FromBody] EditAdditionalCalculationViewModel vm)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
+            {
+                return new ForbidResult();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            CalculationEditModel editCalculation = _mapper.Map<CalculationEditModel>(vm);
+
+            editCalculation.SpecificationId = specificationId;
+            editCalculation.CalculationId = calculationId;
+            editCalculation.Name = vm.CalculationName;
+            editCalculation.ValueType = vm.CalculationType;
+
+            ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, editCalculation);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while saving calculation. Status code={response.StatusCode}");
+            }
+        }
     }
 }

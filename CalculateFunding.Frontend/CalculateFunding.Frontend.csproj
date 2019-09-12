@@ -38,6 +38,7 @@
     <None Remove="Scripts\dataset.common.ts" />
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
+    <None Remove="Scripts\editadditionalcalculation.ts" />
     <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\navbar.ts" />
@@ -164,6 +165,7 @@
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
+    <TypeScriptCompile Include="Scripts\editadditionalcalculation.ts" />
     <TypeScriptCompile Include="Scripts\createspecification.ts" />
     <TypeScriptCompile Include="Scripts\createadditionalcalculation.ts" />
     <TypeScriptCompile Include="Scripts\search.additionalCalculations.ts" />
