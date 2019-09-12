@@ -71,7 +71,7 @@ namespace CalculateFunding.Frontend.Helpers
                 CanEditQaTests = true,
                 CanEditSpecification = true,
                 CanMapDatasets = true,
-                CanPublishFunding = true,
+                CanReleaseFunding = true,
                 CanRefreshFunding = true,
                 SpecificationId = specificationId,
                 UserId = user.GetUserProfile()?.Id,

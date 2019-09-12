@@ -69,7 +69,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanPublishFunding))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanReleaseFunding))
                 .Returns(true);
 
             IResultsApiClient resultsClient = CreateResultsClient();
@@ -124,7 +124,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanPublishFunding))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanReleaseFunding))
                 .Returns(false);
 
             ApprovalController controller = CreateApprovalController(authorizationHelper: authorizationHelper);

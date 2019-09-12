@@ -896,7 +896,7 @@ namespace calculateFunding.approvals {
             })
                 .done((response) => {
                     if (response) {
-                        self.permissions(new SpecificationPermissions(response.canRefreshFunding, response.canApproveFunding, response.canPublishFunding));
+                        self.permissions(new SpecificationPermissions(response.canRefreshFunding, response.canApproveFunding, response.canReleaseFunding));
                     }
                     else {
                         self.notificationMessage("There was a problem loading your permissions for the specification.");

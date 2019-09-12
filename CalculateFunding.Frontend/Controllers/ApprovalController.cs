@@ -46,7 +46,7 @@ namespace CalculateFunding.Frontend.Controllers
                 ModelState.AddModelError(nameof(allocationLines.Status), "The status provided is not a valid destination status");
             }
 
-            SpecificationActionTypes permissionRequired = allocationLines.Status == AllocationLineStatusViewModel.Approved ? SpecificationActionTypes.CanApproveFunding : SpecificationActionTypes.CanPublishFunding;
+            SpecificationActionTypes permissionRequired = allocationLines.Status == AllocationLineStatusViewModel.Approved ? SpecificationActionTypes.CanApproveFunding : SpecificationActionTypes.CanReleaseFunding;
             if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, permissionRequired))
             {
                 return new ForbidResult();

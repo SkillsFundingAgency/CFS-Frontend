@@ -545,7 +545,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             permissions.CanEditQaTests.Should().BeTrue("CanEditQaTests");
             permissions.CanEditSpecification.Should().BeTrue("CanEditSpecification");
             permissions.CanMapDatasets.Should().BeTrue("CanMapDatasets");
-            permissions.CanPublishFunding.Should().BeTrue("CanPublishFunding");
+            permissions.CanReleaseFunding.Should().BeTrue("CanReleaseFunding");
             permissions.CanRefreshFunding.Should().BeTrue("CanRefreshFunding");
         }
 		[TestMethod]
