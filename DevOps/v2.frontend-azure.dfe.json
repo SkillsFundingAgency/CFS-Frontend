@@ -371,7 +371,7 @@
             },
             {
               "name": "specsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-specs.azurewebsites.net/api/')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-specs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             },
             {
               "name": "calcsClient:ApiKey",
@@ -379,7 +379,7 @@
             },
             {
               "name": "calcsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-calcs.azurewebsites.net/api/')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-calcs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             },
             {
               "name": "datasetsClient:ApiKey",
@@ -387,7 +387,7 @@
             },
             {
               "name": "datasetsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-datasets.azurewebsites.net/api/datasets')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api/datasets')]"
             },
             {
               "name": "resultsClient:ApiKey",
@@ -395,7 +395,7 @@
             },
             {
               "name": "resultsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-results.azurewebsites.net/api/results')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-results-',parameters('productVersion'),'.azurewebsites.net/api/results')]"
             },
             {
               "name": "scenariosClient:ApiKey",
@@ -403,7 +403,7 @@
             },
             {
               "name": "scenariosClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-scenarios.azurewebsites.net/api/scenarios')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-scenarios-',parameters('productVersion'),'.azurewebsites.net/api/scenarios')]"
             },
             {
               "name": "testEngineClient:ApiKey",
@@ -411,7 +411,7 @@
             },
             {
               "name": "testEngineClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-testengine.azurewebsites.net/api/tests')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-testengine-',parameters('productVersion'),'.azurewebsites.net/api/tests')]"
             },
             {
               "name": "usersClient:ApiKey",
@@ -419,7 +419,7 @@
             },
             {
               "name": "usersClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-users.azurewebsites.net/api/users')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-users-',parameters('productVersion'),'.azurewebsites.net/api/users')]"
             },
             {
               "name": "jobsClient:ApiKey",
@@ -427,7 +427,7 @@
             },
             {
               "name": "jobsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-jobs.azurewebsites.net/api/jobs')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-jobs-',parameters('productVersion'),'.azurewebsites.net/api/jobs')]"
             },
             {
               "name": "policiesClient:ApiKey",
@@ -435,7 +435,7 @@
             },
             {
               "name": "policiesClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-policy.azurewebsites.net/api/')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-policy-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             },
             {
               "name": "providersClient:ApiKey",
@@ -443,7 +443,7 @@
             },
             {
               "name": "providersClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-providers.azurewebsites.net/api/')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-providers-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             },
             {
               "name": "publishingClient:ApiKey",
@@ -451,7 +451,7 @@
             },
             {
               "name": "publishingClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-', parameters('productVersion'),'-publishing.azurewebsites.net/api/')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-publishing-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
