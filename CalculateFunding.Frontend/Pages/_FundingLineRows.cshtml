@@ -1,5 +1,5 @@
 ﻿@using CalculateFunding.Frontend.ViewModels.Specs
-@using Common.ApiClient.Models
+@using Common.ApiClient.Calcs.Models
 @model CalculateFunding.Frontend.ViewModels.Specs.FundingLineViewModel
 
 @if (!Model.FundingLines.IsNullOrEmpty())
@@ -18,31 +18,32 @@
             int counter = 1;
             foreach (var calculation in fundingLine.Calculations)
             {
-                <tr>
-                    <td class="grey-border-cell"></td>
-                    @if (counter == 1)
-                    {
-                        <td class="calc-spec-title-cell" rowspan="@rowCount">Template Calculation Specification</td>
-                    }
-                    <td>
-                        <a href="/calcs/editCalculation/@calculation.TemplateCalculationId">@calculation.Name</a>
-                    </td>
-                    <td>
-                        @calculation.Type
-                    </td>
-                    <td>
-                        @if (Model.Calculations?.FirstOrDefault(m => m.CalculationId == calculation.TemplateCalculationId.ToString()) != null)
-                        {
-                            @Model.Calculations.FirstOrDefault(m => m.CalculationId == calculation.TemplateCalculationId.ToString()).PublishStatus
-                        }
-                        else
-                        {
-                            @PublishStatus.Draft
-                        }
 
-                    </td>
-                </tr>
-                counter++;
+                CalculationMetadata calculationMetadata = Model.Calculations?.FirstOrDefault(m => string.Equals(m.Name, calculation.Name, StringComparison.CurrentCultureIgnoreCase));
+
+
+                @if (calculationMetadata != null)
+                {
+                    <tr>
+                        <td class="grey-border-cell"></td>
+                        @if (counter == 1)
+                        {
+                            <td class="calc-spec-title-cell" rowspan="@rowCount">Template Calculation Specification</td>
+                        }
+                        <td>
+                            <a href="/calcs/editCalculation/@calculationMetadata.CalculationId">@calculationMetadata.Name</a>
+                        </td>
+                        <td>
+                            @calculationMetadata.ValueType
+                        </td>
+                        <td>
+                            @calculationMetadata.PublishStatus
+
+                        </td>
+                    </tr>
+                    counter++;
+                }
+                
             }
         }
 
