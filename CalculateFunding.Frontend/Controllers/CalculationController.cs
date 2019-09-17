@@ -1,5 +1,10 @@
 ﻿namespace CalculateFunding.Frontend.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Calcs;
     using CalculateFunding.Common.ApiClient.Calcs.Models;
@@ -10,11 +15,6 @@
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Common.ApiClient.Models;
     using Microsoft.AspNetCore.Mvc;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
 
     public class CalculationController : Controller
     {
@@ -53,7 +53,24 @@
                 return BadRequest(ModelState);
             }
 
-            CalculationEditModel update = _mapper.Map<CalculationEditModel>(vm);
+            ApiResponse<Calculation> existingCalculationResponse = await _calcClient.GetCalculationById(calculationId);
+            IActionResult errorResult = existingCalculationResponse.IsSuccessOrReturnFailureResult("Calculation");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+            Calculation existingCalculation = existingCalculationResponse.Content;
+
+            CalculationEditModel update = new CalculationEditModel()
+            {
+                CalculationId = calculationId,
+                Description = existingCalculation.Current.Description,
+                Name = existingCalculation.Name,
+                SpecificationId = specificationId,
+                ValueType = existingCalculation.Current.ValueType,
+                SourceCode = vm.SourceCode,
+            };
+
             ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, update);
 
             if (response.StatusCode == HttpStatusCode.OK)
@@ -165,8 +182,8 @@
             var reference = specification.Content.FundingStreams.FirstOrDefault();
             if (reference != null)
             {
-	            var fundingStreamId = reference.Id;
-	            createCalculation.FundingStreamId = fundingStreamId;
+                var fundingStreamId = reference.Id;
+                createCalculation.FundingStreamId = fundingStreamId;
             }
 
             ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);

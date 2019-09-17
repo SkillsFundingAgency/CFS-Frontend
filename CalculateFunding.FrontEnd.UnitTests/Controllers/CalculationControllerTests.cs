@@ -13,8 +13,8 @@ namespace CalculateFunding.Frontend.Controllers
     using System.Security.Claims;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.UnitTests.Helpers;
     using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -26,12 +26,12 @@ namespace CalculateFunding.Frontend.Controllers
     [TestClass]
     public class CalculationControllerTests
     {
-	    private ISpecificationsApiClient specificationsApiClient;
+        private ISpecificationsApiClient specificationsApiClient;
 
-           [TestInitialize]
-	    public void Initialize()
-	    {
-		    specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+        [TestInitialize]
+        public void Initialize()
+        {
+            specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
         }
 
         [TestMethod]
@@ -51,6 +51,20 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 SourceCode = "Updated source code"
             };
+
+            Calculation existingCalculation = new Calculation()
+            {
+                Id = calculationId,
+                SpecificationId = specificationId,
+                Current = new CalculationVersion
+                {
+                    SourceCode = "Existing source code"
+                },
+            };
+
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, existingCalculation));
 
             Calculation apiResultCalculation = new Calculation()
             {
@@ -123,6 +137,20 @@ namespace CalculateFunding.Frontend.Controllers
             calcsClient
                 .EditCalculation(specificationId, calculationId, Arg.Any<CalculationEditModel>())
                 .Returns(Task.FromResult(new ValidatedApiResponse<Calculation>(HttpStatusCode.ServiceUnavailable, null)));
+
+            Calculation existingCalculation = new Calculation()
+            {
+                Id = calculationId,
+                SpecificationId = specificationId,
+                Current = new CalculationVersion
+                {
+                    SourceCode = "Existing source code"
+                },
+            };
+
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, existingCalculation));
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -397,7 +425,7 @@ namespace CalculateFunding.Frontend.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-		private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper, ISpecificationsApiClient specificationsApiClient)
+        private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper, ISpecificationsApiClient specificationsApiClient)
         {
             return new CalculationController(calcsClient, mapper, authorizationHelper, specificationsApiClient);
         }
