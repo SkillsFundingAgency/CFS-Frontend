@@ -80,12 +80,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (TemplateMetadataContents templateMetadataContents in Model.TemplateData)
+                    @foreach (KeyValuePair<string, TemplateMetadataContents> templateMetadataContents in Model.TemplateData)
                     {
                         var viewModel = new FundingLineViewModel
                         {
                             Calculations = Model.Calculations,
-                            FundingLines = templateMetadataContents.RootFundingLines,
+                            FundingLines = templateMetadataContents.Value.RootFundingLines,
+                            TemplateMapping = Model.TemplateMappings[templateMetadataContents.Key],
+                            FundingStreamId = templateMetadataContents.Key,
                             BorderThicknessMultiplier = 1
                         };
 

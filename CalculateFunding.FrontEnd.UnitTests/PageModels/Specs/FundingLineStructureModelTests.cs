@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
@@ -143,7 +142,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be("Specification not found");
         }
 
-
         [TestMethod]
         public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSpecificationUpdated_ThenBannerPopulated()
         {
@@ -169,6 +167,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             calculationsApiClient
                 .GetCalculations(Arg.Is(specificationId))
                 .Returns(new ApiResponse<IEnumerable<CalculationMetadata>>(HttpStatusCode.OK, calculationMetadatas));
+
+            TemplateMapping templateMapping = new TemplateMapping();
+
+            calculationsApiClient
+	            .GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
+	            .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
 
             FundingLineStructureModel model = CreateFundingLineStructureModel(
                specsApiClient: specsApiClient,
@@ -213,10 +217,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             TemplateMetadataContents templateMetadataContents = new TemplateMetadataContents();
 
-            IEnumerable<TemplateMetadataContents> templateMetadataContentsCollection = new[]
-            {
-                templateMetadataContents
-            };
+            IDictionary<string, TemplateMetadataContents> templateMetadataContentsCollection = new Dictionary<string, TemplateMetadataContents>();
+            templateMetadataContentsCollection.Add("a", templateMetadataContents);
 
             specsApiClient.GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
@@ -237,6 +239,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetCalculations(Arg.Is(specificationId))
                 .Returns(new ApiResponse<IEnumerable<CalculationMetadata>>(HttpStatusCode.OK, calculationMetadatas));
 
+			TemplateMapping templateMapping = new TemplateMapping();
+
+			calculationsApiClient
+				.GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
+				.Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
+
             FundingLineStructureModel model = CreateFundingLineStructureModel(
                specsApiClient: specsApiClient,
                datasetsApiClient: datasetsApiClient,
@@ -256,6 +264,22 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .TemplateData
                 .Should()
                 .BeEquivalentTo(templateMetadataContentsCollection);
+
+            await calculationsApiClient
+	            .Received(specificationSummary.FundingStreams.Count())
+	            .GetTemplateMapping(specificationId, Arg.Any<string>());
+
+            foreach (var fundingStream in specificationSummary.FundingStreams)
+            {
+	            await calculationsApiClient
+		            .Received(1)
+		            .GetTemplateMapping(specificationId, fundingStream.Id);
+
+                model
+                    .TemplateMappings
+		            .Should()
+                    .Contain(fundingStream.Id, templateMapping);
+            }
         }
 
         private FundingLineStructureModel CreateFundingLineStructureModel(
@@ -309,7 +333,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Id = specificationId,
                 Name = "Test Specification",
                 Description = "Test Description",
-                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), }
+                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), new FundingStream("fs2", "Funding Stream 2 Name") }
             };
         }
 
@@ -321,7 +345,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 Name = "Test Specification",
                 FundingPeriod = new Common.Models.Reference("fp1", "funding Period Name"),
                 ApprovalStatus = PublishStatus.Draft,
-                FundingStreams = new[] { new Common.Models.Reference("fs1", "Funding Stream Name") }
+                FundingStreams = new[] { new Common.Models.Reference("fs1", "Funding Stream Name"), new Common.Models.Reference("fs2", "Funding Stream 2 Name") }
             };
 
             return specificationSummary;

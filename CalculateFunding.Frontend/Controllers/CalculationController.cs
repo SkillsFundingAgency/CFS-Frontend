@@ -1,12 +1,9 @@
-﻿using CalculateFunding.Common.ApiClient.Calcs;
-using CalculateFunding.Common.ApiClient.Calcs.Models;
-using CalculateFunding.Common.ApiClient.Specifications;
-using Microsoft.AspNetCore.Authorization;
-using System.Linq;
-
-namespace CalculateFunding.Frontend.Controllers
+﻿namespace CalculateFunding.Frontend.Controllers
 {
     using AutoMapper;
+    using CalculateFunding.Common.ApiClient.Calcs;
+    using CalculateFunding.Common.ApiClient.Calcs.Models;
+    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Helpers;
@@ -15,6 +12,7 @@ namespace CalculateFunding.Frontend.Controllers
     using Microsoft.AspNetCore.Mvc;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
@@ -56,7 +54,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             CalculationEditModel update = _mapper.Map<CalculationEditModel>(vm);
-            ValidatedApiResponse<Common.ApiClient.Calcs.Models.Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, update);
+            ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, update);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -186,7 +184,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/specs/{specificationId}/calculations/{calculationId}/editadditionalcalculation")]
-        public async Task<IActionResult> editAdditionalCalculation(string specificationId, string calculationId, [FromBody] EditAdditionalCalculationViewModel vm)
+        public async Task<IActionResult> EditAdditionalCalculation(string specificationId, string calculationId, [FromBody] EditAdditionalCalculationViewModel vm)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(vm, nameof(vm));

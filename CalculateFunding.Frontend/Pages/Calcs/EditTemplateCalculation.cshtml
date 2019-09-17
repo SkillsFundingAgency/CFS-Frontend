@@ -1,0 +1,170 @@
+﻿@page "{calculationId}"
+@model CalculateFunding.Frontend.Pages.Calcs.EditTemplateCalculationPageModel
+@using System.Web
+@using CalculateFunding.Common.ApiClient.Calcs.Models
+@using CalculateFunding.Frontend.Properties
+@using CalculateFunding.Frontend.Helpers
+@{
+    ViewData["Title"] = "Edit Template Calculation";
+}
+
+@section NavBar {
+    <partial name="_NavbarPartial" />
+}
+
+@section PermissionWarnings
+    {
+    <div id="permissions-banner-editcalc" class="row" style="display:none;" data-bind="visible:!doesUserHavePermissionToApproveOrEdit()">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You are not permitted to make changes to this calculation</p>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section FormBannerLeft{
+
+}
+
+@section FormBannerRight{
+
+}
+
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="/specs/fundinglinestructure/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>Edit template calculation specification</li>
+        </ol>
+    </div>
+}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="row edit-calculation-header form-banner-container">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="hero-description">
+                    Funding Period: @Model.FundingPeriodName
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="hero-title">
+                            Edit template calculation specification
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                        <div class="bannerblue-button-container " id="approve-button-container">
+                            <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group">
+                            <a validationanchor-for="EditModel"></a>
+                            <label asp-for="Calculation.Name">Name</label>
+                            <input asp-for="Calculation.Name" class="form-control" type="text" disabled="disabled">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group">
+                            <a validationanchor-for="EditModel"></a>
+                            <label asp-for="FundingStreamName">Funding Period Name</label>
+                            <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">This calculation is also used in: </span></h4>
+                            <input asp-for="FundingStreamName" class="form-control" type="text" disabled="disabled">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group">
+                            <a validationanchor-for="EditModel"></a>
+                            <label asp-for="Calculation.LastModified">Last saved</label>
+                            <input class="form-control" type="text" disabled="disabled" value="@Model.Calculation.LastModifiedByName on @Model.Calculation.LastModified.ToString(" MMMM dd yyyy") ">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row edit-calculation" id="edit-calculation">
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="edit-calculation-editor-wrapper">
+            <div class="edit-calculation-editor-container">
+                <div class="edit-calculation-container-header">
+                    <strong>Calculation script</strong>
+                </div>
+                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+                <div class="edit-calculation-container-footer spacing-30">
+                    <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+                    <span class="build-output-message">Your calculation's build output must be successful before you can save it.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="build-output no-border">
+            <strong>Build output</strong>
+            <div data-bind="text: buildOutput"></div>
+            <div data-bind="with: compilerResponse" id="compiler-response">
+                Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
+
+                <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                    <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="spacing-15">
+            <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+        </div>
+
+        <div class="spacing-15" data-bind="visible: saveCalculationResult, text: saveCalculationResult"></div>
+
+        <div>
+            <a href="/specs/fundinglinestructure/@Model.SpecificationId" class="govuk-back-link" id="link-back">Back</a>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/edittemplatecalculation.js" type="text/javascript" asp-append-version="true"></script>
+
+    <partial name="_ApproveStatusButtonPartial" />
+
+    <script type="text/javascript">
+    var editTemplateCalculationElement = document.getElementById("edit-calculation");
+    if (editTemplateCalculationElement) {
+        var editTemplateViewModelOptions = {
+            calculationId: "@Model.Calculation.Id",
+            specificationId: "@Model.SpecificationId",
+            existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))",
+            calculationName: "@Model.Calculation.Name",
+            newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled"
+        };
+        var viewModel = new calculateFunding.editTemplateCalculation.EditTemplateCalculationViewModel(editTemplateViewModelOptions);
+        viewModel.loadIntellisenseContext();
+        viewModel.doesUserHavePermissionToApproveOrEdit(@Model.DoesUserHavePermissionToApproveOrEdit);
+        ko.applyBindings(viewModel, editTemplateCalculationElement);
+
+        ko.applyBindings(viewModel, document.getElementById("approve-button-container"));
+        ko.applyBindings(viewModel, document.getElementById("permissions-banner-editcalc"));
+    }
+    </script>
+}

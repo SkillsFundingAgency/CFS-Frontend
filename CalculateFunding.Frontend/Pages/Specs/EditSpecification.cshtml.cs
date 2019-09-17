@@ -56,24 +56,27 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
 
-            if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content != null)
+            if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {
-	            EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
-	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
-		            specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
-
-				EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
-                EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
-                EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
-
-                await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
-
-                return Page();
+	            return new ObjectResult($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}")
+		            {StatusCode = (int) specificationResponse.StatusCode};
             }
-            else
+            if(specificationResponse.Content == null)
             {
-                throw new InvalidOperationException($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}");
+	            return new InternalServerErrorResult($"Blank specification returned");
             }
+
+            EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
+            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
+	            specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+
+			EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
+            EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
+            EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
+
+            await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)

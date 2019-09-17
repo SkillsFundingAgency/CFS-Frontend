@@ -40,6 +40,7 @@
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editadditionalcalculation.ts" />
     <None Remove="Scripts\editcalculation.ts" />
+    <None Remove="Scripts\edittemplatecalculation.ts" />
     <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\navbar.ts" />
     <None Remove="Scripts\notifications.ts" />
@@ -168,6 +169,7 @@
     <TypeScriptCompile Include="Scripts\editadditionalcalculation.ts" />
     <TypeScriptCompile Include="Scripts\createspecification.ts" />
     <TypeScriptCompile Include="Scripts\createadditionalcalculation.ts" />
+    <TypeScriptCompile Include="Scripts\edittemplatecalculation.ts" />
     <TypeScriptCompile Include="Scripts\search.additionalCalculations.ts" />
     <TypeScriptCompile Include="Scripts\specification.common.ts" />
     <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
@@ -212,6 +214,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\Shared\_Layout.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\Specs\EditTemplateCalculation.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\Specs\EditCalculation.cshtml">

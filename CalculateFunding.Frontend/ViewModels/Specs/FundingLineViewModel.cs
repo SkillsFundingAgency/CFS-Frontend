@@ -10,6 +10,10 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
 
         public IEnumerable<CalculationMetadata> Calculations { get; set; }
 
+		public TemplateMapping TemplateMapping { get; set; }
+
+		public string FundingStreamId { get; set; }
+
         public int BorderThicknessMultiplier { get; set; }
     }
 }

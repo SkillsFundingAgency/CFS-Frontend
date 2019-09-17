@@ -225,4 +225,7 @@
   <data name="Datasets" xml:space="preserve">
     <value>Datasets</value>
   </data>
+  <data name="EditTemplateCalculationSpec" xml:space="preserve">
+    <value>Edit template calculation specification</value>
+  </data>
 </root>

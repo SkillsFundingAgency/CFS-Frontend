@@ -7,6 +7,6 @@ namespace CalculateFunding.Frontend.Interfaces.Services
 {
     public interface ITemplateMetadataContentsAssemblerService
     {
-        Task<IEnumerable<TemplateMetadataContents>> Assemble(SpecificationSummary specification);
+        Task<IDictionary<string, TemplateMetadataContents>> Assemble(SpecificationSummary specification);
     }
 }

@@ -231,7 +231,18 @@ namespace CalculateFunding.Frontend.ViewModels
                     Specs.CalculationViewModel>()
                 .ForMember(d => d.LastUpdated, opt => opt.Ignore())
                 .ForMember(d => d.Description, opt => opt.Ignore())
-                .ForMember(d => d.AllocationLine, opt => opt.Ignore());
+                .ForMember(d => d.AllocationLine, opt => opt.Ignore())
+                ;
+
+            CreateMap<CalculationVersion, Calculations.CalculationViewModel>()
+	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+	            .ForMember(d => d.FundingPeriodId, opt => opt.Ignore())
+	            .ForMember(d => d.FundingPeriodName, opt => opt.Ignore())
+	            .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.Date.Date))
+	            .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author.Name))
+	            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
+				;
+
 
             CreateMap<Specification, EditSpecificationViewModel>()
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())

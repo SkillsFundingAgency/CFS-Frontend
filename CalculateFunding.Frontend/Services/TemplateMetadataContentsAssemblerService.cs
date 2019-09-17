@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
@@ -28,11 +29,11 @@ namespace CalculateFunding.Frontend.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<TemplateMetadataContents>> Assemble(SpecificationSummary specification)
+        public async Task<IDictionary<string, TemplateMetadataContents>> Assemble(SpecificationSummary specification)
         {
             Guard.ArgumentNotNull(specification, nameof(specification));
 
-            IList<TemplateMetadataContents> templateMetadataContentsCollection = new List<TemplateMetadataContents>();
+            IDictionary<string, TemplateMetadataContents> templateMetadataContentsCollection = new Dictionary<string, TemplateMetadataContents>();
 
             foreach(Reference fundingStreamReference in specification.FundingStreams)
             {
@@ -48,14 +49,14 @@ namespace CalculateFunding.Frontend.Services
                 {
                     string templateVersion = specification.TemplateIds[fundingStreamId];
 
-                    ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(fundingStreamReference.Id, templateVersion);
+                    ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, templateVersion);
 
                     //AB: We will need to revisit this and throw an exception here but while the data is a bit naf 
-                    //just want to mnake sure we can load the page while testing
+                    //just want to make sure we can load the page while testing
 
                     if (templateMetadataContentsResponse != null && templateMetadataContentsResponse.StatusCode.IsSuccess())
                     {
-                        templateMetadataContentsCollection.Add(templateMetadataContentsResponse.Content);
+                        templateMetadataContentsCollection.Add(fundingStreamId, templateMetadataContentsResponse.Content);
                     }
                 }
             }

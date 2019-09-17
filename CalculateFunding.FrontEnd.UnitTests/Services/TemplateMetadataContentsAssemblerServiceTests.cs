@@ -23,16 +23,14 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             //Arrange
             SpecificationSummary specificationSummary = CreateSpecificationSummary();
-            specificationSummary
-                .TemplateIds = new Dictionary<string, string>();
+            specificationSummary.TemplateIds = new Dictionary<string, string>();
 
             ILogger logger = CreateLogger();
 
             TemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateService(logger: logger);
 
             //Act
-            IEnumerable<TemplateMetadataContents> templateMetadataContents = 
-                await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
+            var templateMetadataContents = await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
 
             //Assert
             templateMetadataContents
@@ -63,8 +61,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             TemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateService(policiesApiClient: policiesApiClient);
 
             //Act
-            IEnumerable<TemplateMetadataContents> templateMetadataContentsCollection =
-                await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
+            var templateMetadataContentsCollection = await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
 
             //Assert
             templateMetadataContentsCollection
@@ -72,7 +69,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .HaveCount(1);
 
             templateMetadataContentsCollection
-                .First()
+                .First().Value
                 .Should()
                 .Be(templateMetadataContents);
         }
@@ -97,8 +94,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             TemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateService(policiesApiClient: policiesApiClient);
 
             //Act
-            IEnumerable<TemplateMetadataContents> templateMetadataContentsCollection =
-                await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
+            var templateMetadataContentsCollection = await templateMetadataContentsAssemblerService.Assemble(specificationSummary);
 
             //Assert
             templateMetadataContentsCollection

@@ -50,10 +50,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public void OnGetAsync_GivenSpecificationIdButResponseIsBadRequest_ThrowsInvalidOperationException()
+        [DataRow(HttpStatusCode.BadRequest)]
+        [DataRow(HttpStatusCode.Conflict)]
+        public async Task OnGetAsync_GivenSpecificationIdButResponseIsBadRequest_ReturnsError(HttpStatusCode responseCode)
         {
             //Arrange
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.BadRequest);
+            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(responseCode);
 
             ISpecsApiClient apiClient = CreateApiClient();
             apiClient
@@ -62,20 +64,27 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
 
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            //Act
+            var result = await pageModel.OnGetAsync(specificationId);
 
-            test
-                .Should()
-                .ThrowExactly<InvalidOperationException>()
-                .Which
-                .Message
-                .Should()
-                .Be($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}");
+			//Assert
+			result.Should().BeOfType(typeof(ObjectResult));
+
+			ObjectResult typedResult = (ObjectResult)result;
+
+			typedResult
+				.StatusCode
+				.Should()
+				.Be((int)responseCode);
+
+			typedResult
+				.Value.ToString()
+				.Should()
+				.Be($"Unable to retreive specification. Status Code = {responseCode}");
         }
 
         [TestMethod]
-        public void OnGetAsync_GivenSpecificationIdWithOKResponseButContentIsNull_ThrowsInvalidOperationException()
+        public async Task OnGetAsync_GivenSpecificationIdWithOKResponseButContentIsNull_ReturnsNoContent()
         {
             //Arrange
             ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
@@ -87,16 +96,17 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
 
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            //Act
+            var result = await pageModel.OnGetAsync(specificationId);
 
-            test
+			//Assert
+            result
                 .Should()
-                .ThrowExactly<InvalidOperationException>()
-                .Which
-                .Message
-                .Should()
-                .Be("Unable to retreive specification. Status Code = OK");
+                .BeOfType(typeof(InternalServerErrorResult));
+			
+			((InternalServerErrorResult)result).Value.ToString()
+				.Should()
+				.Be($"Blank specification returned");
         }
 
         [TestMethod]
@@ -1036,6 +1046,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         {
             return Substitute.For<ISpecsApiClient>();
         }
+
         private static IPoliciesApiClient CreatePoliciesApiClient()
         {
             return Substitute.For<IPoliciesApiClient>();
