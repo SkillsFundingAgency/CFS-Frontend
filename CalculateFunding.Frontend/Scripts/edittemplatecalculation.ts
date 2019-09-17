@@ -185,11 +185,12 @@ namespace calculateFunding.editTemplateCalculation {
                     self.state("redirecting");
 
                     // Redirect back to Manage Calculations page
-                    if (this.options.newEditCalculationPageBeEnabled.length && this.options.newEditCalculationPageBeEnabled.toLowerCase() === "true") {
-                        window.location.href = "/calcs?draftSavedId=" + this.options.calculationId;
+                    if (this.options.newEditCalculationPageBeEnabled.length &&
+                        this.options.newEditCalculationPageBeEnabled.toLowerCase() === "true") {
+                        window.location.href = `/specs/fundinglinestructure/${this.options.specificationId}`;
                     }
                     else {
-                        window.location.href = "/calcs";
+                        window.location.href = "/specs";
                     }
                 });
             }
