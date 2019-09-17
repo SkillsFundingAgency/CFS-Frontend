@@ -73,8 +73,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return fundingPeriodsLookupErrorResult;
             }
 
-            IEnumerable<Reference> fundingPeriods = fundingConfigsLookupTask.Result.Content.Select(fc =>
-                fundingPeriodsLookupTask.Result.Content.FirstOrDefault(m => string.Equals(m.Id, fc.FundingPeriodId, StringComparison.InvariantCultureIgnoreCase)));
+            IEnumerable<Reference> fundingPeriods = fundingPeriodsLookupTask.Result.Content.Where(m => fundingConfigsLookupTask.Result.Content.Any(fc => string.Equals(m.Id, fc.FundingPeriodId, StringComparison.InvariantCultureIgnoreCase)));
 
             return new OkObjectResult(fundingPeriods);
         }
