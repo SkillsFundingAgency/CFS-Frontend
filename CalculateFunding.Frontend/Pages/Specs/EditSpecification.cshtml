@@ -66,7 +66,7 @@
                     <div class="form-group">
                         <label asp-for="EditSpecificationViewModel.FundingStreamId">Funding stream</label>
                         <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">@(Model.EditSpecificationViewModel.IsSelectedForFunding ? "You can't change this as this specification has been chosen for a funding period" : "Changing a funding stream will break the specification's funding calculations")</span></h4>
-                        <select data-bind="event: { change: fundingStreamChanged }, value: selectedFundingStream" asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamId" id="select-funding-stream" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control"></select>
+                        <select data-bind="value: selectedFundingStream" asp-items="@(Model.FundingStreams)" asp-for="EditSpecificationViewModel.FundingStreamId" id="select-funding-stream" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control"></select>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                             <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">You can't change this as this specification has been chosen for a funding period</span></h4>
                         }
 
-                        <select id="select-funding-period" disabled="@(Model.EditSpecificationViewModel.IsSelectedForFunding ? true : false)" class="form-control" asp-for="EditSpecificationViewModel.FundingPeriodId" data-bind="foreach: fundingPeriods">
+                        <select id="select-funding-period" disabled="@Model.EditSpecificationViewModel.IsSelectedForFunding" class="form-control" asp-for="EditSpecificationViewModel.FundingPeriodId" data-bind="foreach: fundingPeriods">
                             <option data-bind="value:id, text: name"></option>
                         </select>
                     </div>

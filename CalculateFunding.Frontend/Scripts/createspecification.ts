@@ -37,6 +37,7 @@ namespace calculateFunding.specification {
 
         constructor() {
             let self = this;
+            
             this.init();
         }
 
@@ -61,27 +62,34 @@ namespace calculateFunding.specification {
             });
 
             this._hubConnection.on("LeaveGroup", (data: string) => {
-                console.log("left group - " + data);
+                console.log(`left group - ${data}`);
             });
 
             console.log("Starting Hub");
             this._hubConnection.start()
-                .then(function () {
-                    self.onConnectedToSignalr(self._hubConnection);
-                    self.connectionRetries = 0;
-                    self.connectionError(false);
+                .then(() => {
+                    this.onConnectedToSignalr(this._hubConnection);
+                    this.connectionRetries = 0;
+                    this.connectionError(false);
                 })
-                .catch(function (error) {
+                .catch(error => {
                     console.error(error.message);
 
-                    if (self.connectionRetries < 3) {
-                        self.connectionRetries++;
-                        setTimeout(self.init, 1000 * (self.connectionRetries));
+                    if (this.connectionRetries < 3) {
+                        this.connectionRetries++;
+                        setTimeout(this.init, 1000 * (this.connectionRetries));
                     }
                     else {
-                        self.connectionError(true);
+                        this.connectionError(true);
                     }
                 });
+
+            self.selectedFundingStream.subscribe((newValue: any) => {
+                console.log(newValue);
+                this.fundingStreamChanged(newValue);
+            });
+
+            this.fundingStreamChanged(this.selectedFundingStream());
         }
 
         startWatchingForAllNotifications(): void {
@@ -169,17 +177,14 @@ namespace calculateFunding.specification {
         protected onJobCompleted(status: CompletionStatus, jobType: string): void {
             console.log("received completed notification - updating search results");
             this.isInProgress(false);
-            window.location.replace("/specs/policies/" + this.specificationId() + "?operationType=SpecificationCreated&operationId=" + this.specificationId());
+            window.location.replace(`/specs/policies/${this.specificationId()}?operationType=SpecificationCreated&operationId=${this.specificationId()}`);
         }
 
 
-        public fundingStreamChanged(providerVersionId: string = null): void {
-            let selectedItem: string = $("#select-funding-stream").val().toString();
-            let selectedText: string = $("#select-funding-stream option:selected").text().toString();
-            this.selectedFundingStream(selectedItem);
+        public fundingStreamChanged(providerVersionId:string): void {
 
             let request = $.ajax({
-                data: JSON.stringify(selectedItem),
+                data: JSON.stringify(providerVersionId),
                 url: "/api/providerversions/getbyfundingstream",
                 dataType: "json",
                 method: "POST",
@@ -192,18 +197,17 @@ namespace calculateFunding.specification {
                 console.log("Search request completed");
                 let results: Array<IProviderVersion> = resultUntyped;
                 this.providerVersions(ko.utils.arrayMap(results, item => {
-                    item.display = selectedText + " from " + new Date(item.targetDate).toLocaleDateString() + " Version " + Number(item.version);
+                    item.display = providerVersionId + " from " + new Date(item.targetDate).toLocaleDateString() + " Version " + Number(item.version);
                     item.description = item.description;
                     return item;
                 }));
                 $("#select-funding-period > option").remove();
 
-                this.populateFundingPeriods(selectedItem);
-                this.selectedProviderVersion(providerVersionId);
+                this.populateFundingPeriods(providerVersionId);
+               this.selectedProviderVersion(providerVersionId);
             });
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
-
                 console.log("Search request failed");
                 this.isInProgress(false);
             });
