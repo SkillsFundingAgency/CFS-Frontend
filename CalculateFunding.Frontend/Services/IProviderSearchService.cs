@@ -8,7 +8,7 @@
 
     public interface IProviderSearchService
     {
-        Task<IEnumerable<ProviderVersion>> GetProviderVersionsByFundingStream(string fundingStreamId);
+        Task<IEnumerable<ProviderVersionMetadata>> GetProviderVersionsByFundingStream(string fundingStreamId);
 
         Task<ProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
     }

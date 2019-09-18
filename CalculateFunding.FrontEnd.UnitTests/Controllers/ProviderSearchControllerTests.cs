@@ -89,6 +89,30 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [TestMethod]
+        public async Task SearchProviders_GivenResultsReturnedFromGetProviderVersionsByFundingStream_ReturnsOK()
+        {
+            // Arrange
+            string fundingStream = "fundingStream";
+
+            ProviderSearchResultViewModel results = new ProviderSearchResultViewModel();
+
+            IProviderSearchService searchService = CreateSearchService();
+            searchService
+                .PerformSearch(Arg.Any<SearchRequestViewModel>())
+                .Returns(results);
+
+            ProviderSearchController controller = CreateController(searchService);
+
+            // Act
+            IActionResult actionResult = await controller.GetProviderVersionsByFundingStream(fundingStream);
+
+            // Asserts
+            actionResult
+                .Should()
+                .BeOfType<OkObjectResult>();
+        }
+
+        [TestMethod]
         public void SearchCalculationProviderResults_GivenNullRequestObject_ThrowsArgumentNullException()
         {
             // Arrange

@@ -34,9 +34,9 @@
             _featureToggle = featureToggle;
         }
 
-        public async Task<IEnumerable<ProviderVersion>> GetProviderVersionsByFundingStream(string fundingStreamId)
+        public async Task<IEnumerable<ProviderVersionMetadata>> GetProviderVersionsByFundingStream(string fundingStreamId)
         {
-            ApiResponse<IEnumerable<ProviderVersion>> providerVersionsResponse = await _providersApiClient.GetProviderVersions(fundingStreamId);
+            ApiResponse<IEnumerable<ProviderVersionMetadata>> providerVersionsResponse = await _providersApiClient.GetProviderVersions(fundingStreamId);
 
             if (providerVersionsResponse?.Content == null)
             {

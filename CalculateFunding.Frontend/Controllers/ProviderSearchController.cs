@@ -32,7 +32,7 @@
         {
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
 
-            IEnumerable<ProviderVersion> result = await _providerSearchService.GetProviderVersionsByFundingStream(fundingStreamId);
+            IEnumerable<ProviderVersionMetadata> result = await _providerSearchService.GetProviderVersionsByFundingStream(fundingStreamId);
             if (result != null)
             {
                 return Ok(result);
