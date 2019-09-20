@@ -1945,6 +1945,12 @@ table {
     }
 }
 
+.filter-container-dropdowns {
+    background-color: #cecece;
+    padding: 20px;
+    font-weight: bold;
+}
+
 .search-loading-container {
     text-align: center;
     margin-bottom: 30px;
@@ -3405,4 +3411,10 @@ a.govuk-back-link:hover {
             margin: 0 15px;
         }
     }
+}
+
+.pagination-label {
+    background-color: $govuk-blue;
+    color: $page-colour;
+    padding: 5px;
 }

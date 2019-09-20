@@ -48,111 +48,114 @@
                 </div>
             </div>
         </div>
-        <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
-            @if (Model.ShowExceptionCountAndFacet)
-            {
-                <div class="col-xs-3 filter-field-heading">Provider type</div>
-                <div class="col-xs-3 filter-field-heading">Provider subtype</div>
-                <div class="col-xs-3 filter-field-heading">Local authority</div>
-                <div class="col-xs-3 filter-field-heading">Results status</div>
-            }
-            else
-            {
-                <div class="col-xs-4 filter-field-heading">Provider type</div>
-                <div class="col-xs-4 filter-field-heading">Provider subtype</div>
-                <div class="col-xs-4 filter-field-heading">Local authority</div>
-            }
-        </div>
-        <div class="row withjs-show" data-bind="visible: searchPerformed">
-            @if (Model.ShowExceptionCountAndFacet)
-            {
-                <div class="col-xs-3">
-                    <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
-                </div>
-                <div class="col-xs-3">
-                    <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
-                </div>
-                <div class="col-xs-3">
-                    <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
-                </div>
-                <div class="col-xs-3">
-                    <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-4">
-                    <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
-                </div>
-                <div class="col-xs-4">
-                    <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
-                </div>
-                <div class="col-xs-4">
-                    <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
-                </div>
-
-            }
-        </div>
     </form>
 }
-
-<div class="row providers-search">
-    <div id="notifications-container" class="col-xs-12">
-        <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus().jobId" style="display:none;">
-            <span class="notifications-undetermined-icon">
-                <i class="material-icons">warning</i>
-            </span>
-            <span>
-                Unable to determine the last job that generated these results.
-            </span>
-            <div class="notifications-panel-bullets">
-                <ul>
-                    <li>This is because the result was pre-existing in the system.</li>
-                </ul>
-            </div>
-        </div>
-        <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().jobId && currentStatus().running" style="display:none;">
-            <span class="notifications-inprogress-icon">
-                <i class="material-icons">warning</i>
-            </span>
-            <span>
-                <span>Calculation is running in the background.</span><span class="float-right notifications-inprogress-status"><span data-bind="text: currentStatus().percentComplete"></span> <img src="~/assets/images/loader.gif" class="notifications-panel-loading-image" /></span>
-            </span>
-            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                <ul>
-                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
-                </ul>
-            </div>
-        </div>
-        <div class="notifications-completed-successful-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
-            <span class="notifications-completed-successful-icon">
-                <i class="material-icons">check</i>
-            </span>
-            <span>Calculation completed successfully.</span><span class="float-right"><span class="notifications-completed-successful-status-bold">Results update: </span><span data-bind="text: currentStatus().statusDateTimeDisplay" class="notifications-completed-successful-status"></span></span>
-            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                <ul>
-                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
-                </ul>
-            </div>
-        </div>
-        <div class="notifications-completed-failed-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
-            <span class="notifications-completed-failed-icon">
-                <i class="material-icons">warning</i>
-            </span>
-            <span>
-                Calculation failed to run.
-            </span>
-            <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
-                <ul>
-                    <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
-                    @if (Model.ShowExceptionCountAndFacet)
-                    {
-                        <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
-                    }
-                </ul>
-            </div>
+<div id="notifications-container" class="col-xs-12">
+    <div class="notifications-undetermined-panel" data-bind="visible: !currentStatus().jobId" style="display:none;">
+        <span class="notifications-undetermined-icon">
+            <i class="material-icons">warning</i>
+        </span>
+        <span>
+            Unable to determine the last job that generated these results.
+        </span>
+        <div class="notifications-panel-bullets">
+            <ul>
+                <li>This is because the result was pre-existing in the system.</li>
+            </ul>
         </div>
     </div>
+    <div class="notifications-inprogress-panel" data-bind="visible: currentStatus().jobId && currentStatus().running" style="display:none;">
+        <span class="notifications-inprogress-icon">
+            <i class="material-icons">warning</i>
+        </span>
+        <span>
+            <span>Calculation is running in the background.</span><span class="float-right notifications-inprogress-status"><span data-bind="text: currentStatus().percentComplete"></span> <img src="~/assets/images/loader.gif" class="notifications-panel-loading-image" /></span>
+        </span>
+        <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+            <ul>
+                <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="notifications-completed-successful-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && currentStatus().completedSuccessfully" style="display:none;">
+        <span class="notifications-completed-successful-icon">
+            <i class="material-icons">check</i>
+        </span>
+        <span>Calculation completed successfully.</span><span class="float-right"><span class="notifications-completed-successful-status-bold">Results update: </span><span data-bind="text: currentStatus().statusDateTimeDisplay" class="notifications-completed-successful-status"></span></span>
+        <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+            <ul>
+                <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="notifications-completed-failed-panel" data-bind="visible: currentStatus().jobId && !currentStatus().running && !currentStatus().completedSuccessfully" style="display:none;">
+        <span class="notifications-completed-failed-icon">
+            <i class="material-icons">warning</i>
+        </span>
+        <span>
+            Calculation failed to run.
+        </span>
+        <div class="notifications-panel-bullets" data-bind="visible: currentStatus">
+            <ul>
+                <li>The calculation was initiated by <span data-bind="text: currentStatus().invoker"></span> on <span data-bind="text: currentStatus().jobCreatedTimeDisplay"></span> is incomplete</li>
+                @if (Model.ShowExceptionCountAndFacet)
+                {
+                    <li id="error-count" data-bind="visible:totalErrorCount() > 0" style="display:none"><span data-bind="text:totalErrorCount"></span><span>&nbsp;provider(s) have calculation <span class="error-highlight">runtime errors</span>, apply "Result status" filter to review errors</span></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<form method="post" action="/results" class="filter-container-dropdowns spacing-15" data-bind="submit: performSearch" id="filter-container-dropdowns" asp-antiforgery="true">
+    <div class="row spacing-15-top withjs-show" data-bind="visible: searchPerformed">
+        @if (Model.ShowExceptionCountAndFacet)
+        {
+            <div class="col-xs-3 filter-field-heading">Provider type</div>
+            <div class="col-xs-3 filter-field-heading">Provider subtype</div>
+            <div class="col-xs-3 filter-field-heading">Local authority</div>
+            <div class="col-xs-3 filter-field-heading">Results status</div>
+        }
+        else
+        {
+            <div class="col-xs-4 filter-field-heading">Provider type</div>
+            <div class="col-xs-4 filter-field-heading">Provider subtype</div>
+            <div class="col-xs-4 filter-field-heading">Local authority</div>
+        }
+    </div>
+    <div class="row withjs-show" data-bind="visible: searchPerformed">
+        @if (Model.ShowExceptionCountAndFacet)
+        {
+            <div class="col-xs-3">
+                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-3">
+                <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
+            </div>
+        }
+        else
+        {
+            <div class="col-xs-4">
+                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+            </div>
+            <div class="col-xs-4">
+                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+            </div>
+
+        }
+    </div>
+</form>
+<div class="row providers-search">
+
 
     <div class="col-xs-12" id="providers-search-container">
         <partial name="_SearchFilterPartial" />
@@ -192,7 +195,7 @@
                             {
                                 <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
                             }
-                        <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.Name</a></h4>
+                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.Name</a></h4>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
                         {
@@ -209,7 +212,7 @@
                                 Updated:
                                 <strong>
                                     <span id="provider-item-last-updated-@providerRow">
-                                        @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)
+                                        @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateFullMonthFormatString)
                                     </span>
                                 </strong>
                             </span>
@@ -289,21 +292,21 @@
                 <span> <strong>Provider</strong></span>
                 @* TODO this needs sorting *@
                 @*<span class="float-right">
-                    @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Funding)
-                    {
-                        <strong>Total funding</strong>
+                        @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Funding)
+                        {
+                            <strong>Total funding</strong>
 
-                    }
-                    else if (Model.Calculation.CalculationType == CalculationTypeViewModel.Number)
-                    {
-                        <strong>Total value</strong>
-                    }
-                </span>*@
+                        }
+                        else if (Model.Calculation.CalculationType == CalculationTypeViewModel.Number)
+                        {
+                            <strong>Total value</strong>
+                        }
+                    </span>*@
             </div>
         </div>
         <div data-bind="visible: isResultsVisible">
             <div class="providers-searchresult-container withjs-show" data-bind="foreach: providerSearchResults">
-                <div class="provider-item-container" data-bind="attr: {'id' : 'provider-item-result-' +$index() }">
+                <div class="provider-item-container " data-bind="attr: {'id' : 'provider-item-result-' +$index() },  css: { 'validation-failed-block' : calculationExceptionType != ''}">
                     <div class="provider-item-header">
                         <strong><span class="float-right" data-bind="text: !calculationExceptionType ? calculationResultDisplay : 'Error', css: {'results-in-progress' : $root.areResultsBeingUpdated() === true, 'error-highlight':calculationExceptionType}"></span></strong>
                         <img src="~/assets/images/loader.gif" data-bind="visible: $root.areResultsBeingUpdated()" class="float-right notifications-panel-loading-image" />
@@ -314,31 +317,19 @@
                             <strong><span data-bind="text: calculationExceptionMessage, attr: { 'id' :'provider-item-exception-'+$index() }"> </span></strong>
                         </span>
                     </div>
-                    <p>
+                    <div>
                         <span class="provider-item-property">
-                            Updated: <strong><span>@Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateTimeFormatString)</span></strong>
+                            Updated: <strong><span>@Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateFullMonthFormatString)</span></strong>
                         </span>
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                         <span class="provider-item-property">
-                            UPIN:&nbsp; <strong> <span data-bind="text: upin != '' ? upin : 'No data found', attr:{  'id' : 'provider-item-upin-'+$index() }"></span> </strong>
+                            UKPRN:<strong> <span data-bind="text: ukprn != '' ? ukprn : 'No data found', attr:{ 'id' : 'provider-item-ukprn-' +$index()}"></span></strong>
                         </span>
-                        <span class="provider-item-property">
-                            &nbsp;UKPRN:&nbsp;<strong> <span data-bind="text: ukprn != '' ? ukprn : 'No data found', attr:{ 'id' : 'provider-item-ukprn-' +$index()}"></span></strong>
-                        </span>
-                        <span class="provider-item-property">
-                            &nbsp;URN:&nbsp;<strong><span data-bind="text: urn != '' ? urn : 'No data found', attr: {'id' : 'provider-item-urn-' +$index()}"></span></strong>
-                        </span>
-                        <span class="provider-item-property">
-                            &nbsp;Establishment number:&nbsp;<strong><span data-bind="text: establishmentNumber > 0 ? establishmentNumber : 'No data found', attr: {'id' : 'provider-item-establishmentnumber-' +$index()}"></span></strong>
-                        </span>
-                    </p>
+                    </div>
                     <div>
                         <span class="provider-item-property">
                             Provider type:&nbsp;<strong><span data-bind="text: providerType, attr: { 'id' : 'provider-item-providertype-'+$index() }"></span></strong>
-                        </span>
-                        <span class="provider-item-property">
-                            &nbsp;Provider subtype:&nbsp;<strong><span data-bind="text: providerSubType, attr:{ 'id' : 'provider-item-providersubtype-' +$index() }"></span></strong>
                         </span>
                     </div>
                     <div>
@@ -399,6 +390,12 @@
         if (filterElement) {
             ko.applyBindings(searchVM, filterElement);
         }
+        var filterElementDropdowns = document.getElementById("filter-container-dropdowns");
+        if (filterElementDropdowns) {
+            ko.applyBindings(searchVM, filterElementDropdowns);
+        }
+
+
         var providerResultsContainer = document.getElementById("providers-search-container");
         if (providerResultsContainer) {
             ko.applyBindings(searchVM, providerResultsContainer);
