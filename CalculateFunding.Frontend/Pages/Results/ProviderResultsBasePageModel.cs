@@ -4,8 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Providers.Models;
+using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Results;
@@ -13,11 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
-using CalculateFunding.Common.ApiClient.Providers;
-using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-using CalculateFunding.Common.ApiClient.Providers.Models;
-using CalculateFunding.Common.ApiClient.Policies;
-using CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
@@ -59,8 +59,8 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public string SpecificationId => SpecificationProviderVersion?.Split("_")[0];
 
-        public string ProviderVersionId => SpecificationProviderVersion?.Split("_").Count() > 1 
-            ? SpecificationProviderVersion?.Split("_")[1] 
+        public string ProviderVersionId => SpecificationProviderVersion?.Split("_").Count() > 1
+            ? SpecificationProviderVersion?.Split("_")[1]
             : null;
 
         public async Task<IActionResult> OnGetAsync(string providerId, string fundingPeriodId = null, string specificationProviderVersion = null)
@@ -106,9 +106,9 @@ namespace CalculateFunding.Frontend.Pages.Results
             else
             {
                 apiResponse = await _providersApiClient.GetProviderByIdFromProviderVersion(ProviderVersionId, providerId);
-                ApiResponse<ProviderVersion> apiResponseMetaData = await _providersApiClient.GetProvidersByVersion(ProviderVersionId);
+                ApiResponse<ProviderVersionMetadata> apiResponseMetaData = await _providersApiClient.GetProviderVersionMetadata(ProviderVersionId);
 
-                if(apiResponseMetaData?.Content != null)
+                if (apiResponseMetaData?.Content != null)
                 {
                     targetDate = apiResponseMetaData?.Content.TargetDate.LocalDateTime.ToShortDateString();
                     version = apiResponseMetaData?.Content.Version;

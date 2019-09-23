@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models.Results
 {

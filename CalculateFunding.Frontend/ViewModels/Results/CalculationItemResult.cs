@@ -29,6 +29,10 @@ namespace CalculateFunding.Frontend.ViewModels.Results
                             return SubTotal.Value.AsFormattedNumber();
                         case CalculationSpecificationType.Baseline:
                             return SubTotal.Value.AsFormattedMoney();
+                        // TODO: Update display format based on template or number type, instead of calculation type
+                        case CalculationSpecificationType.Additional:
+                        case CalculationSpecificationType.Template:
+                            return SubTotal.Value.AsFormattedNumber();
                         default:
                             throw new InvalidOperationException("Unknown calculation type");
                     }

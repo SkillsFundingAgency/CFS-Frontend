@@ -9,5 +9,7 @@ namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
         Number = 0,
         Funding = 10,
         Baseline = 20,
+        Template,
+        Additional,
     }
 }

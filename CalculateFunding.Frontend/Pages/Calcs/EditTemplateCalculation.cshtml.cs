@@ -83,13 +83,14 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
+            SpecificationId = calculation.Content.SpecificationId;
+
             bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, SpecificationId, SpecificationActionTypes.CanEditCalculations);
 
             DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
 
             Calculation = _mapper.Map<CalculationViewModel>(calculation.Content.Current);
 
-            SpecificationId = calculation.Content.SpecificationId;
 
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
 

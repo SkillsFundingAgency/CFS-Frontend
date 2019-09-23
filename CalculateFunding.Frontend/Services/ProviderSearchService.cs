@@ -4,15 +4,15 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+    using CalculateFunding.Common.FeatureToggles;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.ApiClient.Providers.Models;
 
     public class ProviderSearchService : IProviderSearchService
     {
@@ -36,7 +36,7 @@
 
         public async Task<IEnumerable<ProviderVersionMetadata>> GetProviderVersionsByFundingStream(string fundingStreamId)
         {
-            ApiResponse<IEnumerable<ProviderVersionMetadata>> providerVersionsResponse = await _providersApiClient.GetProviderVersions(fundingStreamId);
+            ApiResponse<IEnumerable<ProviderVersionMetadata>> providerVersionsResponse = await _providersApiClient.GetProviderVersionsByFundingStream(fundingStreamId);
 
             if (providerVersionsResponse?.Content == null)
             {

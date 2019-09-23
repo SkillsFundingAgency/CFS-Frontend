@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
@@ -20,9 +23,6 @@ using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Models = CalculateFunding.Common.ApiClient.Calcs.Models;
 
 namespace CalculateFunding.Frontend.ViewModels
@@ -103,15 +103,15 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<Models.Calculation, Calculations.CalculationViewModel>()
-                .ForMember(m => m.Description, opt => opt.Ignore())
+                .ForMember(m => m.Description, opt => opt.MapFrom(p => p.Current.Description))
                 .ForMember(m => m.FundingPeriodId, opt => opt.Ignore())
                 .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
                 .ForMember(m => m.LastModified, opt => opt.Ignore())
                 .ForMember(m => m.Version, opt => opt.Ignore())
                 .ForMember(m => m.LastModifiedByName, opt => opt.Ignore())
-                .ForMember(m => m.SourceCode, opt => opt.Ignore())
-                .ForMember(m => m.CalculationType, opt => opt.Ignore())
-                .ForMember(m => m.PublishStatus, opt => opt.Ignore());
+                .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.Current.SourceCode))
+                .ForMember(m => m.CalculationType, opt => opt.MapFrom(p => p.Current.CalculationType))
+                .ForMember(m => m.PublishStatus, opt => opt.MapFrom(p => p.Current.PublishStatus));
 
 
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>()
@@ -197,19 +197,19 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Id, opt => opt.Ignore());
 
             CreateMap<CreateAdditionalCalculationViewModel, Models.CalculationCreateModel>()
-	            .ForMember(m => m.Name, opt => opt.Ignore())
-	            .ForMember(m => m.Description, opt => opt.Ignore())
-	            .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-	            .ForMember(m => m.ValueType, opt => opt.Ignore())
-	            .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
-	            .ForMember(m => m.Id, opt => opt.Ignore());
+                .ForMember(m => m.Name, opt => opt.Ignore())
+                .ForMember(m => m.Description, opt => opt.Ignore())
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+                .ForMember(m => m.ValueType, opt => opt.Ignore())
+                .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+                .ForMember(m => m.Id, opt => opt.Ignore());
 
             CreateMap<EditAdditionalCalculationViewModel, Models.CalculationEditModel>()
-	            .ForMember(m => m.Name, opt => opt.Ignore())
-	            .ForMember(m => m.Description, opt => opt.Ignore())
-	            .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-	            .ForMember(m => m.CalculationId, opt => opt.Ignore())
-	            .ForMember(m => m.ValueType, opt => opt.Ignore());
+                .ForMember(m => m.Name, opt => opt.Ignore())
+                .ForMember(m => m.Description, opt => opt.Ignore())
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+                .ForMember(m => m.CalculationId, opt => opt.Ignore())
+                .ForMember(m => m.ValueType, opt => opt.Ignore());
 
 
             CreateMap<Specification, SpecificationViewModel>()
@@ -235,13 +235,13 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<CalculationVersion, Calculations.CalculationViewModel>()
-	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
-	            .ForMember(d => d.FundingPeriodId, opt => opt.Ignore())
-	            .ForMember(d => d.FundingPeriodName, opt => opt.Ignore())
-	            .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.Date.Date))
-	            .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author.Name))
-	            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
-				;
+                .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+                .ForMember(d => d.FundingPeriodId, opt => opt.Ignore())
+                .ForMember(d => d.FundingPeriodName, opt => opt.Ignore())
+                .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.Date.Date))
+                .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author.Name))
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
+                ;
 
 
             CreateMap<Specification, EditSpecificationViewModel>()
