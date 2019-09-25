@@ -131,6 +131,12 @@
         "description": "Api key for the Users Service"
       }
     },
+    "AzureConfigurationConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure App Configuration ConnectionString for the Frontend"
+      }
+    },
     "EnableCheckJobStatusForChooseAndRefresh": {
       "type": "bool",
       "metadata": {
@@ -500,6 +506,10 @@
             {
               "name": "Azure:SignalR:ConnectionString",
               "value": "[concat('Endpoint=https://', variables('signalRName'), '.service.signalr.net;AccessKey=', listKeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalRName')), '2018-10-01').primaryKey, ';Version=1.0')]"
+            },
+            {
+              "name": "AzureConfiguration:ConnectionString",
+              "value": "[parameters('AzureConfigurationConnectionString')]"
             },
             {
               "name": "features:publishButtonEnabled",
