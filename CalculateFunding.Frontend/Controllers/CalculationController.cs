@@ -166,26 +166,13 @@
                 return BadRequest(ModelState);
             }
 
-            var specification = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
-
-
-
             CalculationCreateModel createCalculation = _mapper.Map<CalculationCreateModel>(vm);
 
             createCalculation.SpecificationId = specificationId;
             createCalculation.Id = calculationId;
             createCalculation.Name = vm.CalculationName;
             createCalculation.ValueType = vm.CalculationType;
-
-
-            // TODO: Remove with BUG : 26570
-            var reference = specification.Content.FundingStreams.FirstOrDefault();
-            if (reference != null)
-            {
-                var fundingStreamId = reference.Id;
-                createCalculation.FundingStreamId = fundingStreamId;
-            }
-
+            
             ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
 
             if (response.StatusCode == HttpStatusCode.OK)
