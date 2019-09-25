@@ -11,7 +11,7 @@ using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
@@ -52,6 +52,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
 		public Reference FundingPeriod { get; set; }
 
+        public string FundingStreams { get; set; }
+
         public async Task<IActionResult> OnGet(string calculationId)
         {
             if (string.IsNullOrWhiteSpace(calculationId))
@@ -69,6 +71,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             SpecificationId = specificationResponse.Content.Id;
 
+            FundingStreams = JsonConvert.SerializeObject(specificationResponse.Content.FundingStreams);
 
             FundingPeriod = specificationResponse.Content.FundingPeriod;
 

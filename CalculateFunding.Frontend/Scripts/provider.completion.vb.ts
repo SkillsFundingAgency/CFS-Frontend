@@ -126,39 +126,40 @@ namespace calculateFunding.providers {
                                                 range: null,
                                             }
 
-                                            let description = "";
-                                            let friendlyName = "";
+                                            if (self.contextVariables[pathVariable.label.toLowerCase()] === undefined) {
+                                                let description = "";
+                                                let friendlyName = "";
 
-                                            if (typeof variable.description !== "undefined") {
-                                                description = variable.description;
-                                            }
-
-                                            if (typeof variable.friendlyName !== "undefined") {
-                                                friendlyName = variable.friendlyName;
-                                            }
-
-                                            if (description || friendlyName) {
-                                                let documentationValue = "";
-
-                                                if (friendlyName) {
-                                                    documentationValue = "**" + friendlyName + "**";
+                                                if (typeof variable.description !== "undefined") {
+                                                    description = variable.description;
                                                 }
 
-                                                if (description) {
-                                                    if (documentationValue) {
-                                                        documentationValue = documentationValue + "\r\n\r\n";
+                                                if (typeof variable.friendlyName !== "undefined") {
+                                                    friendlyName = variable.friendlyName;
+                                                }
+
+                                                if (description || friendlyName) {
+                                                    let documentationValue = "";
+
+                                                    if (friendlyName) {
+                                                        documentationValue = "**" + friendlyName + "**";
                                                     }
-                                                    documentationValue = documentationValue + description;
+
+                                                    if (description) {
+                                                        if (documentationValue) {
+                                                            documentationValue = documentationValue + "\r\n\r\n";
+                                                        }
+                                                        documentationValue = documentationValue + description;
+                                                    }
+
+                                                    pathVariable.documentation = {
+                                                        value: documentationValue,
+                                                        isTrusted: true,
+                                                    };
                                                 }
 
-                                                pathVariable.documentation = {
-                                                    value: documentationValue,
-                                                    isTrusted: true,
-                                                };
+                                                results.suggestions.push(pathVariable);
                                             }
-
-
-                                            results.suggestions.push(pathVariable);
                                         }
                                     }
                                 }

@@ -130,9 +130,9 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
     });
     describe("when Sum has been typed ", function () {
         var container: calculateFunding.providers.IVariableContainer = {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 type: "",
                 isAggregable: "false",
                 items: {
@@ -157,46 +157,85 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                     }
                 }
             },
-            "calc1": {
-                name: "Calc1",
-                friendlyName: "Calc1",
+            "additionalcalculations": {
+                name: "AdditionalCalculations",
+                friendlyName: "AdditionalCalculations",
                 isAggregable: "true",
-                type: ""
+                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             },
-            "calc2": {
-                name: "Calc2",
-                friendlyName: "Calc2",
+            "psg": {
+                name: "PSG",
+                friendlyName: "PSG",
                 isAggregable: "true",
-                type: ""
-            },
-            "calc3": {
-                name: "Calc3",
-                friendlyName: "Calc3",
-                isAggregable: "true",
-                type: ""
+                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             }
         };
 
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Sum(", container);
-            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Provider").toBeFalsy();
             expect(variables[0].name === "Datasets").toBeTruthy();
             expect(variables[0].items.ds1).toBeTruthy();
             expect(variables[0].items.ds1.items.f1).toBeTruthy();
             expect(variables[0].items.ds1.items.f2).toBeFalsy();
             expect(variables[0].items.ds1.items.f3).toBeTruthy();
             expect(variables[0].items.ds2).toBeFalsy();
-            expect(variables[1].name === "Calc1").toBeTruthy();
-            expect(variables[2].name === "Calc2").toBeTruthy();
-            expect(variables[3].name === "Calc3").toBeTruthy();
+            expect(variables[1].name === "AdditionalCalculations").toBeTruthy();
+            expect(variables[1].items.calc1).toBeTruthy();
+            expect(variables[1].items.calc2).toBeTruthy();
+            expect(variables[1].items.calc3).toBeTruthy();
+            expect(variables[2].name === "PSG").toBeTruthy();
+            expect(variables[2].items.calc1).toBeTruthy();
+            expect(variables[2].items.calc2).toBeTruthy();
+            expect(variables[2].items.calc3).toBeTruthy();
         });
     });
 
     describe("when Avg has been typed ", function () {
         var container: calculateFunding.providers.IVariableContainer = {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 isAggregable: "false",
                 type: "",
                 items: {
@@ -221,44 +260,83 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                     }
                 }
             },
-            "calc1": {
-                name: "Calc1",
-                friendlyName: "Calc1",
+            "additionalcalculations": {
+                name: "AdditionalCalculations",
+                friendlyName: "AdditionalCalculations",
                 isAggregable: "true",
                 type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             },
-            "calc2": {
-                name: "Calc2",
-                friendlyName: "Calc2",
+            "psg": {
+                name: "PSG",
+                friendlyName: "PSG",
                 isAggregable: "true",
                 type: "",
-            },
-            "calc3": {
-                name: "Calc3",
-                friendlyName: "Calc3",
-                isAggregable: "true",
-                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Avg(", container);
-            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Provider").toBeFalsy();
             expect(variables[0].name === "Datasets").toBeTruthy();
             expect(variables[0].items.ds1).toBeTruthy();
             expect(variables[0].items.ds1.items.f1).toBeTruthy();
             expect(variables[0].items.ds1.items.f2).toBeFalsy();
             expect(variables[0].items.ds1.items.f3).toBeTruthy();
             expect(variables[0].items.ds2).toBeFalsy();
-            expect(variables[1].name === "Calc1").toBeTruthy();
-            expect(variables[2].name === "Calc2").toBeTruthy();
-            expect(variables[3].name === "Calc3").toBeTruthy();
+            expect(variables[1].name === "AdditionalCalculations").toBeTruthy();
+            expect(variables[1].items.calc1).toBeTruthy();
+            expect(variables[1].items.calc2).toBeTruthy();
+            expect(variables[1].items.calc3).toBeTruthy();
+            expect(variables[2].name === "PSG").toBeTruthy();
+            expect(variables[2].items.calc1).toBeTruthy();
+            expect(variables[2].items.calc2).toBeTruthy();
+            expect(variables[2].items.calc3).toBeTruthy();
         });
     });
     describe("when Min has been typed ", function () {
         var container: calculateFunding.providers.IVariableContainer= {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 isAggregable: "false",
                 type: "",
                 items: {
@@ -283,44 +361,83 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                     }
                 }
             },
-            "calc1": {
-                name: "Calc1",
-                friendlyName: "Calc1",
+            "additionalcalculations": {
+                name: "AdditionalCalculations",
+                friendlyName: "AdditionalCalculations",
                 isAggregable: "true",
                 type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             },
-            "calc2": {
-                name: "Calc2",
-                friendlyName: "Calc2",
+            "psg": {
+                name: "PSG",
+                friendlyName: "PSG",
                 isAggregable: "true",
                 type: "",
-            },
-            "calc3": {
-                name: "Calc3",
-                friendlyName: "Calc3",
-                isAggregable: "true",
-                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             }
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Min(", container);
-            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Provider").toBeFalsy();
             expect(variables[0].name === "Datasets").toBeTruthy();
             expect(variables[0].items.ds1).toBeTruthy();
             expect(variables[0].items.ds1.items.f1).toBeTruthy();
             expect(variables[0].items.ds1.items.f2).toBeFalsy();
             expect(variables[0].items.ds1.items.f3).toBeTruthy();
             expect(variables[0].items.ds2).toBeFalsy();
-            expect(variables[1].name === "Calc1").toBeTruthy();
-            expect(variables[2].name === "Calc2").toBeTruthy();
-            expect(variables[3].name === "Calc3").toBeTruthy();
+            expect(variables[1].name === "AdditionalCalculations").toBeTruthy();
+            expect(variables[1].items.calc1).toBeTruthy();
+            expect(variables[1].items.calc2).toBeTruthy();
+            expect(variables[1].items.calc3).toBeTruthy();
+            expect(variables[2].name === "PSG").toBeTruthy();
+            expect(variables[2].items.calc1).toBeTruthy();
+            expect(variables[2].items.calc2).toBeTruthy();
+            expect(variables[2].items.calc3).toBeTruthy();
         });
     });
     describe("when Max has been typed ", function () {
         var container: calculateFunding.providers.IVariableContainer = {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 isAggregable: "false",
                 type: "",
                 items: {
@@ -345,45 +462,84 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                     }
                 }
             },
-            "calc1": {
-                name: "Calc1",
-                friendlyName: "Calc1",
+            "additionalcalculations": {
+                name: "AdditionalCalculations",
+                friendlyName: "AdditionalCalculations",
                 isAggregable: "true",
                 type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             },
-            "calc2": {
-                name: "Calc2",
-                friendlyName: "Calc2",
+            "psg": {
+                name: "PSG",
+                friendlyName: "PSG",
                 isAggregable: "true",
                 type: "",
-            },
-            "calc3": {
-                name: "Calc3",
-                friendlyName: "Calc3",
-                isAggregable: "true",
-                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
             }
 
         };
         it("then variable for completion only contains aggregable datasets and fields", function () {
             var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableForAggregatePath("Dim s = Max(", container);
-            expect(variables[0].name === "Providers").toBeFalsy();
+            expect(variables[0].name === "Provider").toBeFalsy();
             expect(variables[0].name === "Datasets").toBeTruthy();
             expect(variables[0].items.ds1).toBeTruthy();
             expect(variables[0].items.ds1.items.f1).toBeTruthy();
             expect(variables[0].items.ds1.items.f2).toBeFalsy();
             expect(variables[0].items.ds1.items.f3).toBeTruthy();
             expect(variables[0].items.ds2).toBeFalsy();
-            expect(variables[1].name === "Calc1").toBeTruthy();
-            expect(variables[2].name === "Calc2").toBeTruthy();
-            expect(variables[3].name === "Calc3").toBeTruthy();
+            expect(variables[1].name === "AdditionalCalculations").toBeTruthy();
+            expect(variables[1].items.calc1).toBeTruthy();
+            expect(variables[1].items.calc2).toBeTruthy();
+            expect(variables[1].items.calc3).toBeTruthy();
+            expect(variables[2].name === "PSG").toBeTruthy();
+            expect(variables[2].items.calc1).toBeTruthy();
+            expect(variables[2].items.calc2).toBeTruthy();
+            expect(variables[2].items.calc3).toBeTruthy();
         });
     });
     describe("when dataset (ds1) is selected ", function () {
         var container: calculateFunding.providers.IVariableContainer = {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 isAggregable: "false",
                 type: "",
                 items: {
@@ -405,6 +561,58 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
                     },
                     ds2: {
                         name: "ds2", isAggregable: "false", friendlyName: "", type: "", items: { f11: { name: "f11", isAggregable: "false", friendlyName: "", type: "", items: {} }, f2: { name: "f22", isAggregable: "false", friendlyName: "", type: "", items: {} }, f3: { name: "f33", isAggregable: "false", friendlyName: "", type: "", items: {} } }
+                    }
+                }
+            },
+            "additionalcalculations": {
+                name: "AdditionalCalculations",
+                friendlyName: "AdditionalCalculations",
+                isAggregable: "true",
+                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
+                    }
+                }
+            },
+            "psg": {
+                name: "PSG",
+                friendlyName: "PSG",
+                isAggregable: "true",
+                type: "",
+                items: {
+                    calc1: {
+                        name: "Calc1",
+                        friendlyName: "Calc1",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc2: {
+                        name: "Calc2",
+                        friendlyName: "Calc2",
+                        isAggregable: "true",
+                        type: ""
+                    },
+                    calc3: {
+                        name: "Calc3",
+                        friendlyName: "Calc3",
+                        isAggregable: "true",
+                        type: ""
                     }
                 }
             }
@@ -417,12 +625,33 @@ describe("VisualBasicIntellisenseProvider - FindDeclaredVariables", function () 
             expect(variables[1].name === "f2").toBeTruthy();
             expect(variables[2].name === "f3").toBeTruthy();
         });
+        it("then calculations are returned", function () {
+            var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariablesForPath("AdditionalCalculations", container);
+            console.log(variables);
+            expect(variables.length === 3).toBeTruthy();
+            expect(variables[0].name === "Calc1").toBeTruthy();
+            expect(variables[1].name === "Calc2").toBeTruthy();
+            expect(variables[2].name === "Calc3").toBeTruthy();
+        });
+        it("then template calculations are returned", function () {
+            var variables = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariablesForPath("PSG", container);
+            console.log(variables);
+            expect(variables.length === 3).toBeTruthy();
+            expect(variables[0].name === "Calc1").toBeTruthy();
+            expect(variables[1].name === "Calc2").toBeTruthy();
+            expect(variables[2].name === "Calc3").toBeTruthy();
+        });
+        it("then calc1 is returned", function () {
+            var variable = calculateFunding.providers.VisualBasicIntellisenseProvider.GetVariableByPath("PSG.calc1", container);
+            console.log(variable);
+            expect(variable.name === "Calc1").toBeTruthy();
+        });
     });
     describe("when dataset (ds2) is selected ", function () {
         var container = {
-            "providers": {
-                name: "Providers",
-                friendlyName: "Providers",
+            "provider": {
+                name: "Provider",
+                friendlyName: "Provider",
                 isAggregable: "false",
                 type: "",
                 items: {

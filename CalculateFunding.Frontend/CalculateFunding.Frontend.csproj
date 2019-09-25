@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
+    <Folder Include="wwwroot\js\Tests\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />

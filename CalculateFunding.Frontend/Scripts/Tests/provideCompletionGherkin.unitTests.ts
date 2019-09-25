@@ -27,7 +27,9 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
         });
 
         it("No completion items returned", function () {
-            let expectedResult: monaco.languages.CompletionItem[] = [];
+            let expectedResult: monaco.languages.CompletionList = {
+                suggestions: []
+            };
 
             // Assert
             expect(result).toEqual(expectedResult);
@@ -52,13 +54,16 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 });
 
                 it("A CompletionItem for given dataset is returned", function () {
+
                     // Assert
-                    let expectedResult: monaco.languages.CompletionItem[] = [{
-                        label: "Test Dataset",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        insertText: "Test Dataset'",
-                        range: null,
-                    }];
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: [{
+                            label: "Test Dataset",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            insertText: "Test Dataset'",
+                            range: null,
+                        }]
+                    };
 
                     expect(result).toEqual(expectedResult);
                 });
@@ -72,7 +77,9 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("No completion items returned", function () {
                     // Assert
-                    let expectedResult: monaco.languages.CompletionItem[] = [];
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
 
                     expect(result).toEqual(expectedResult);
 
@@ -108,26 +115,28 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
                 it("Multiple completion items are returned", function () {
                     // Assert
 
-                    let expectedResult: monaco.languages.CompletionItem[] = [{
-                        label: "Test Dataset 1",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        documentation: "Test Dataset 1 Description",
-                        insertText: "Test Dataset 1'",
-                        range: null,
-                    },
-                    {
-                        label: "Test Dataset 2",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        insertText: "Test Dataset 2'",
-                        range: null,
-                    },
-                    {
-                        label: "Test Dataset 3",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        documentation: null,
-                        insertText: "Test Dataset 3'",
-                        range: null,
-                    }];
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: [{
+                            label: "Test Dataset 1",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            documentation: "Test Dataset 1 Description",
+                            insertText: "Test Dataset 1'",
+                            range: null,
+                        },
+                        {
+                            label: "Test Dataset 2",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            insertText: "Test Dataset 2'",
+                            range: null,
+                        },
+                        {
+                            label: "Test Dataset 3",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            documentation: null,
+                            insertText: "Test Dataset 3'",
+                            range: null,
+                        }]
+                    };
 
                     expect(result).toEqual(expectedResult);
 
@@ -163,20 +172,22 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("Expected completion items returned for dataset fields", function () {
                     // Assert
-                    let expectedResult: monaco.languages.CompletionItem[] = [{
-                        label: "Field 1",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        detail: "String",
-                        insertText: "Field 1'",
-                        range: null,
-                    },
-                    {
-                        label: "Field 2",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        detail: "Decimal",
-                        insertText: "Field 2'",
-                        range: null,
-                    }];
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: [{
+                            label: "Field 1",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            detail: "String",
+                            insertText: "Field 1'",
+                            range: null,
+                        },
+                        {
+                            label: "Field 2",
+                            kind: monaco.languages.CompletionItemKind.Field,
+                            detail: "Decimal",
+                            insertText: "Field 2'",
+                            range: null,
+                        }]
+                    };
 
                     expect(result).toEqual(expectedResult);
                 });
@@ -209,8 +220,12 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("No completion items returned", function () {
                     // Assert                    
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
+
                     expect(cip.provideCompletionItems).toHaveBeenCalled();
-                    expect(result).toEqual([]);
+                    expect(result).toEqual(expectedResult);
                 });
             });
             describe("When previous dataset given and no fields exist", () => {
@@ -238,8 +253,10 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("An empty list of completion items are returned", function () {
                     // Assert
-                    expect(result).toEqual([]);
-
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
+                    expect(result).toEqual(expectedResult);
                     expect(cip.provideCompletionItems).toHaveBeenCalled();
                 });
             });
@@ -269,27 +286,29 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("Expected completion items returned for calculation names", function () {
                     // Assert
-                    let expectedResult: monaco.languages.CompletionItem[] = [{
-                        label: "Calc 1",
-                        kind: monaco.languages.CompletionItemKind.Method,
-                        documentation: "Description for Calc 1",
-                        insertText: "Calc 1'",
-                        range: null,
-                    },
-                    {
-                        label: "Calc 2",
-                        kind: monaco.languages.CompletionItemKind.Method,
-                        documentation: "Description for Calc 2",
-                        insertText: "Calc 2'",
-                        range: null,
-                    },
-                    {
-                        label: "Calc 3",
-                        kind: monaco.languages.CompletionItemKind.Method,
-                        documentation: "Description for Calc 3",
-                        insertText: "Calc 3'",
-                        range: null,
-                    }];
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: [{
+                            label: "Calc 1",
+                            kind: monaco.languages.CompletionItemKind.Method,
+                            documentation: "Description for Calc 1",
+                            insertText: "Calc 1'",
+                            range: null,
+                        },
+                        {
+                            label: "Calc 2",
+                            kind: monaco.languages.CompletionItemKind.Method,
+                            documentation: "Description for Calc 2",
+                            insertText: "Calc 2'",
+                            range: null,
+                        },
+                        {
+                            label: "Calc 3",
+                            kind: monaco.languages.CompletionItemKind.Method,
+                            documentation: "Description for Calc 3",
+                            insertText: "Calc 3'",
+                            range: null,
+                        }]
+                    };
 
                     expect(result).toEqual(expectedResult);
                 });
@@ -309,8 +328,9 @@ describe("GherkinIntellisenseProvider - provideCompletionItems", function () {
 
                 it("Expected completion items returned for calculation names", function () {
                     // Assert
-                    let expectedResult: monaco.languages.CompletionItem[] = [];
-
+                    let expectedResult: monaco.languages.CompletionList = {
+                        suggestions: []
+                    };
                     expect(result).toEqual(expectedResult);
                 });
             });

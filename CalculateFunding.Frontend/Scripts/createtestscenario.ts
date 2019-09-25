@@ -338,7 +338,7 @@ namespace calculateFunding.createTestScenario {
                         };
 
                         let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
-                            return item.name === "Calculations";
+                            return item.name === "AdditionalCalculations";
                         });
 
                         if (calculationType) {

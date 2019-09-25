@@ -146,6 +146,7 @@
             calculationId: "@Model.Calculation.Id",
             calculationName: "@Model.Calculation.Name",
             specificationId: "@Model.SpecificationId",
+            fundingStreams: @Html.Raw(Model.FundingStreams),
             newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled",
             existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.Current.SourceCode))"
         };

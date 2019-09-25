@@ -143,6 +143,7 @@
         var createViewModelOptions = {
             calculationId: "temp-calc-id",
             specificationId: "@Model.SpecificationId",
+            fundingStreams: @Html.Raw(Model.FundingStreams),
             newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled"
         };
 

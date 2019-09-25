@@ -59,6 +59,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public string FundingStreamName { get; set; }
 
+        public string FundingStreamId { get; set; }
+
         public string FundingPeriodName { get; set; }
 
         public string SpecificationName { get; set; }
@@ -103,6 +105,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             if (specificationResponse != null)
             {
                 FundingStreamName = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Name;
+                FundingStreamId = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Id;
                 FundingPeriodName = specificationResponse.Content.FundingPeriod.Name;
             }
 

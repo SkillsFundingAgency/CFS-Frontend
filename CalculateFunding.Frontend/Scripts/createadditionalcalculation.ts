@@ -216,7 +216,8 @@ namespace calculateFunding.createadditionalcalculation {
                     url: "/api/specs/" + this.options.specificationId + "/codeContext",
                     dataType: "json",
                     method: "GET",
-                    contentType: "application/json"
+                    contentType: "application/json",
+                    context: { options: this.options }
                 });
 
                 let self = this;
@@ -234,8 +235,9 @@ namespace calculateFunding.createadditionalcalculation {
 
                     let variables: calculateFunding.providers.IVariableContainer = {};
                     let functions: calculateFunding.providers.ILocalFunctionContainer = {};
-                    let calculationType: common.ITypeInformationResponse = ko.utils.arrayFirst(result, (item: common.ITypeInformationResponse) => {
-                        return item.name === "Calculations";
+                    let options: ICreateAdditionalCalculationViewModelOptions = this.options;
+                    let calculationTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
+                        return item.name === "AdditionalCalculations" || options.fundingStreams.filter((value) => { return item.name.toLowerCase() === value.id.toLowerCase() + 'calculations'  }).length > 0;
                     });
                     let dataTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
                         return item.type === "DefaultType";
@@ -245,51 +247,75 @@ namespace calculateFunding.createadditionalcalculation {
                         return item.type === "Keyword";
                     });
 
-                    if (calculationType) {
+                    ko.utils.arrayForEach(calculationTypes, (calculationType: common.ITypeInformationResponse) => {
+                        let functionvariables: calculateFunding.providers.IVariableContainer = {};
+                        if (calculationType) {
 
-                        // Local Functions
-                        for (let m in calculationType.methods) {
-                            let currentMethod: calculateFunding.common.IMethodInformationResponse = calculationType.methods[m];
+                            // Local Functions
+                            for (let m in calculationType.methods) {
+                                let currentMethod: calculateFunding.common.IMethodInformationResponse = calculationType.methods[m];
 
-                            if (currentMethod.friendlyName !== self.options.calculationName) {
-                                let functionInformation: calculateFunding.providers.ILocalFunction = new calculateFunding.providers.VisualBasicSub({
-                                    label: currentMethod.name,
-                                    description: currentMethod.description,
-                                    returnType: currentMethod.returnType,
-                                    parameters: [],
-                                    friendlyName: currentMethod.friendlyName,
-                                    isCustom: currentMethod.isCustom
-                                });
-
-                                for (let p in currentMethod.parameters) {
-                                    let parameter = currentMethod.parameters[p];
-                                    let parameterInformation: calculateFunding.providers.IFunctionParameter = {
-                                        name: parameter.name,
-                                        description: parameter.description,
-                                        type: parameter.type,
-                                    };
-
-                                    functionInformation.parameters.push(parameterInformation);
-                                }
-                                //this is implicity feature toggled as determined in the type information set from the back end
-                                if (functionInformation.isCustom) {
-
-                                    let variable: providers.IVariable = {
-                                        name: currentMethod.name,
+                                if (currentMethod.friendlyName !== self.options.calculationName) {
+                                    let functionInformation: calculateFunding.providers.ILocalFunction = new calculateFunding.providers.VisualBasicSub({
+                                        label: currentMethod.name,
+                                        description: currentMethod.description,
+                                        returnType: currentMethod.returnType,
+                                        parameters: [],
                                         friendlyName: currentMethod.friendlyName,
-                                        description: currentMethod.description + " function aggregate",
-                                        type: currentMethod.returnType,
-                                        items: {},
-                                        isAggregable: "true"
-                                    };
+                                        isCustom: currentMethod.isCustom
+                                    });
 
-                                    variables[variable.name.toLowerCase()] = variable;
+                                    for (let p in currentMethod.parameters) {
+                                        let parameter = currentMethod.parameters[p];
+                                        let parameterInformation: calculateFunding.providers.IFunctionParameter = {
+                                            name: parameter.name,
+                                            description: parameter.description,
+                                            type: parameter.type,
+                                        };
+
+                                        functionInformation.parameters.push(parameterInformation);
+                                    }
+
+                                    //this is implicity feature toggled as determined in the type information set from the back end
+                                    if (functionInformation.isCustom) {
+
+                                        let variable: providers.IVariable = {
+                                            name: currentMethod.name,
+                                            friendlyName: currentMethod.friendlyName,
+                                            description: currentMethod.description,
+                                            type: currentMethod.returnType,
+                                            items: {},
+                                            isAggregable: "true"
+                                        };
+
+                                        functionvariables[variable.name.toLowerCase()] = variable;
+                                    }
+                                    else {
+                                        functions[functionInformation.label.toLowerCase()] = functionInformation;
+                                    }
                                 }
-
-                                functions[functionInformation.label.toLowerCase()] = functionInformation;
                             }
                         }
-                    }
+
+                        // Variables
+                        for (let v in calculationType.properties) {
+                            let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
+                            let variable: providers.IVariable = CreateAdditionalCalculationViewModel.convertPropertyInformationReponseToVariable(propertyInfo, result);
+                            let variableSet: boolean;
+
+                            if (calculationType.name === variable.type) {
+                                for (let i in functionvariables) {
+                                    if (functionvariables[i].type === calculationType.name) {
+                                        variable.items[i] = functionvariables[i];
+                                    }
+                                }
+                            };
+
+                            if (variables[variable.name.toLowerCase()] === undefined || variableSet) {
+                                variables[variable.name.toLowerCase()] = variable;
+                            }
+                        }
+                    });
 
                     let defaultTypes: providers.IDefaultTypeContainer = {};
 
@@ -317,23 +343,16 @@ namespace calculateFunding.createadditionalcalculation {
                         }
                     }
 
-                    // Variables
-                    for (let v in calculationType.properties) {
-                        let propertyInfo: common.IPropertyInformationResponse = calculationType.properties[v];
-                        let variable: providers.IVariable = CreateAdditionalCalculationViewModel.convertPropertyInformationReponseToVariable(propertyInfo, result);
-
-                        variables[variable.name.toLowerCase()] = variable;
-                    }
-
                     self.codeContext.setContextVariables(variables);
                     self.codeContext.setLocalFunctions(functions);
                     self.codeContext.setDefaultTypes(defaultTypes);
                     self.codeContext.setKeywords(keywords);
+
                 });
             }
         }
 
-        private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>): providers.IVariable {
+        private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>, level? : number): providers.IVariable {
             let variable: providers.IVariable = {
                 name: property.name,
                 friendlyName: property.friendlyName,
@@ -343,14 +362,21 @@ namespace calculateFunding.createadditionalcalculation {
                 isAggregable: property.isAggregable
             };
 
+            if (level === undefined) {
+                level = 0;
+            }
+
             let typeInformation = ko.utils.arrayFirst(types, (item: common.ITypeInformationResponse) => {
                 return item.name === variable.type;
             });
 
             if (typeInformation) {
+                level++;
                 for (let i in typeInformation.properties) {
-                    let childVariable: providers.IVariable = CreateAdditionalCalculationViewModel.convertPropertyInformationReponseToVariable(typeInformation.properties[i], types);
-                    variable.items[childVariable.name.toLowerCase()] = childVariable;
+                    if (level === 1) {
+                        let childVariable: providers.IVariable = CreateAdditionalCalculationViewModel.convertPropertyInformationReponseToVariable(typeInformation.properties[i], types, level);
+                        variable.items[childVariable.name.toLowerCase()] = childVariable;
+                    }
                 }
             }
 
@@ -368,9 +394,15 @@ namespace calculateFunding.createadditionalcalculation {
     export interface ICreateAdditionalCalculationViewModelOptions {
         calculationId: string,
         specificationId: string,
+        fundingStreams: ICreateAdditionalCalculationViewModelFundingStrteam[],
         existingSourceCode: string,
         calculationName: string,
         newEditCalculationPageBeEnabled: string;
+    }
+
+    export interface ICreateAdditionalCalculationViewModelFundingStrteam {
+        id: string,
+        name: string
     }
 
     export interface IPreviewCompileResultReponse {
