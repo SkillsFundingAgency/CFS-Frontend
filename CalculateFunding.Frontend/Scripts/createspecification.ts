@@ -146,6 +146,10 @@ namespace calculateFunding.specification {
 
             viewModel.currentStatus(status);
 
+            if (status.completedSuccessfully) {
+                this.onJobCompleted(CompletionStatus.Succeeded, notification.jobType);
+            }
+
             if (!notification.parentJobId && notification.runningStatus === RunningStatus.Completed) {
                 this.isInProgress(false);
             }
@@ -176,8 +180,7 @@ namespace calculateFunding.specification {
 
         protected onJobCompleted(status: CompletionStatus, jobType: string): void {
             console.log("received completed notification - updating search results");
-            this.isInProgress(false);
-            window.location.replace(`/specs/policies/${this.specificationId()}?operationType=SpecificationCreated&operationId=${this.specificationId()}`);
+            window.location.replace(`/specs/fundinglinestructure/${this.specificationId()}`);
         }
 
 

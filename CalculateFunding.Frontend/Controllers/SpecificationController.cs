@@ -167,7 +167,6 @@ namespace CalculateFunding.Frontend.Controllers
             if (result.StatusCode.IsSuccess())
             {
 				return new OkObjectResult(result.Content);
-                //return Redirect($"/specs/policies/{result.Content.Id}?operationType=SpecificationCreated&operationId={result.Content.Id}");
             }
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {
