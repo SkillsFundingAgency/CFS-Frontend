@@ -12,6 +12,8 @@ using CalculateFunding.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Common.Identity.Authorization.Models;
 
 namespace CalculateFunding.Frontend.Pages.Calcs
 {
@@ -20,18 +22,22 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private ISpecificationsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
+        private readonly IAuthorizationHelper _authorizationHelper;     
 
-        public CreateAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features)
+        public CreateAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features,
+            IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(features, nameof(features));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));         
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
             ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
+            _authorizationHelper = authorizationHelper;         
         }
 
         public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
@@ -72,6 +78,10 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             FundingStreams = JsonConvert.SerializeObject(specificationResponse.Content.FundingStreams);
 
             FundingPeriod = specificationResponse.Content.FundingPeriod;
+
+            bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, FundingStreams, SpecificationActionTypes.CanCreateCalculations);
+
+            DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
 
             if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
             {
