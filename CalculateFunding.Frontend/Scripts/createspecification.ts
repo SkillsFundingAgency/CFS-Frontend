@@ -186,6 +186,12 @@ namespace calculateFunding.specification {
 
         public fundingStreamChanged(providerVersionId:string): void {
 
+            if (providerVersionId == undefined || providerVersionId == null || providerVersionId.length <= 0) {
+                //only request provider versions if a funding stream has been selected
+                console.log("Backing out of provider version search request as no funding stream selected");
+                return;
+            }
+
             let request = $.ajax({
                 data: JSON.stringify(providerVersionId),
                 url: "/api/providerversions/getbyfundingstream",
