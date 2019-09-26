@@ -1,5 +1,5 @@
-﻿using CalculateFunding.Frontend.Helpers;
-using System;
+﻿using System;
+using CalculateFunding.Frontend.Helpers;
 
 namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
@@ -9,6 +9,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
         public string Name { get; set; }
         public string FundingStreamId { get; set; }
         public string SpecificationId { get; set; }
+        public string SpecificationName { get; set; }
         public string ValueType { get; set; }
         public string CalculationType { get; set; }
         public string Namespace { get; set; }
@@ -19,7 +20,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public string LastUpdatedDateDisplay
         {
-            get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateFullMonthFormatString) : "Unknown" ; }
+            get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown"; }
         }
     }
 }

@@ -281,6 +281,7 @@
         }
 
         [TestMethod]
+        [Ignore("There are no allocation lines anymore, so this should be removed when the page is changed")]
         public async Task OnGetAsync_WhenGettingProviderResultsIsSuccess_AllocationDetails_Populated()
         {
             // Arrange

@@ -6,8 +6,13 @@ namespace CalculateFunding.Frontend.Pages.Results
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
+    using CalculateFunding.Common.ApiClient.Policies.Models;
+    using CalculateFunding.Common.ApiClient.Providers;
+    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+    using CalculateFunding.Common.Models;
+    using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -18,14 +23,12 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Serilog;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 
     public class ProviderScenarioResultsPageModel : PageModel
     {
         private ILogger _logger;
         private ISpecsApiClient _specsApiClient;
+        private IPoliciesApiClient _policiesApiClient;
         private IMapper _mapper;
         private readonly IResultsApiClient _resultsApiClient;
         private readonly IProvidersApiClient _providersApiClient;
@@ -37,6 +40,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             IProvidersApiClient providersApiClient,
             IMapper mapper,
             ISpecsApiClient specsApiClient,
+            IPoliciesApiClient policiesApiClient,
             ILogger logger)
 
         {
@@ -45,6 +49,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
 
             _testScenarioSearchService = testScenarioSearchService;
@@ -52,6 +57,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             _providersApiClient = providersApiClient;
             _mapper = mapper;
             _specsApiClient = specsApiClient;
+            _policiesApiClient = policiesApiClient;
             _logger = logger;
         }
 
@@ -82,10 +88,10 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         public TestScenarioSearchResultViewModel TestScenarioSearchResults { get; set; }
 
-        public string SpecificationId =>  SpecificationProviderVersion?.Split("_")[0];
+        public string SpecificationId => SpecificationProviderVersion?.Split("_")[0];
 
-        public string ProviderVersionId => SpecificationProviderVersion?.Split("_").Count() > 1 
-            ? SpecificationProviderVersion?.Split("_")[1] 
+        public string ProviderVersionId => SpecificationProviderVersion?.Split("_").Count() > 1
+            ? SpecificationProviderVersion?.Split("_")[1]
             : null;
 
         public async Task<IActionResult> OnGetAsync(string providerId, int? pageNumber, string searchTerm = null, string fundingPeriodId = null, string specificationProviderVersion = null)
@@ -162,11 +168,11 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<FundingPeriod>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
 
-            if (periodsResponse.StatusCode != HttpStatusCode.OK)
+            if (periodsResponse == null || periodsResponse.StatusCode != HttpStatusCode.OK || periodsResponse.Content == null)
             {
-                throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to retreive Periods: Status Code = {periodsResponse?.StatusCode}");
             }
             IEnumerable<Reference> fundingPeriods = periodsResponse.Content;
 

@@ -7,9 +7,10 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
+    using CalculateFunding.Common.ApiClient.Policies.Models;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.Models;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
@@ -49,24 +50,24 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
-
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient);
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> fundingPeriods = null;
+            IEnumerable<FundingPeriod> fundingPeriods = null;
 
             providersApiClient.GetProviderByIdFromMaster(Arg.Any<string>())
                 .Returns(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, provider));
 
             SearchRequestViewModel searchRequest = CreateSearchRequest();
 
-            specsClient.GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.NotFound, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             // Act
             Func<Task> test = async () => await providerScenarioResultsPageModel.OnGetAsync("2", 1, "", "1819", "1");
@@ -74,7 +75,8 @@
             // Assert
             test
                .Should()
-               .ThrowExactly<System.InvalidOperationException>().WithMessage("Unable to retreive Periods: Status Code = NotFound");
+               .ThrowExactly<System.InvalidOperationException>()
+               .WithMessage("Unable to retreive Periods: Status Code = OK");
         }
 
         [TestMethod]
@@ -83,21 +85,20 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
-
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient);
 
             ProviderVersionSearchResult provider = CreateProvider();
-
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<FundingPeriod> fundingPeriods = GetExampleFundingPeriods();
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
-            specsClient.GetFundingPeriods()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
@@ -117,9 +118,30 @@
                 .Should()
                  .BeOfType<PageResult>();
 
-            await specsClient
+            await policiesApiClient
                 .Received(1)
                 .GetFundingPeriods();
+        }
+
+        private static IEnumerable<FundingPeriod> GetExampleFundingPeriods()
+        {
+            return new[] {
+                new FundingPeriod()
+                {
+                    Name = "2016-2017",
+                    Id = "1617",
+                },
+                new FundingPeriod()
+                {
+                    Name = "2017-2018",
+                    Id = "1718",
+                },
+                new FundingPeriod()
+                {
+                    Name = "2018-2019",
+                    Id = "1819",
+                },
+            };
         }
 
         [TestMethod]
@@ -128,21 +150,21 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
-
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient);
 
             ProviderVersionSearchResult provider = null;
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
+            IEnumerable<FundingPeriod> fundingPeriods = GetExampleFundingPeriods();
 
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
-            specsClient.GetFundingPeriods()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+               .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
@@ -169,21 +191,21 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient, providersApiClient: providersApiClient);
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
-
+            IEnumerable<FundingPeriod> fundingPeriods = GetExampleFundingPeriods();
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
-            specsClient.GetFundingPeriods()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecificationIdsForProvider("2")
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
@@ -219,17 +241,17 @@
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
-
+            IEnumerable<FundingPeriod> fundingPeriods = GetExampleFundingPeriods();
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
-            specsClient.GetFundingPeriods()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                          .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
@@ -258,7 +280,7 @@
             searchService.PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(results);
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient);
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
@@ -286,19 +308,18 @@
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
-
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ISpecsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
             ProviderVersionSearchResult provider = CreateProvider();
 
-            IEnumerable<Reference> fundingPeriods = new[] { new Reference("1617", "2016-2017"), new Reference("1718", "2017-2018"), new Reference("1819", "2018-2019") };
-
+            IEnumerable<FundingPeriod> fundingPeriods = GetExampleFundingPeriods();
             IEnumerable<string> specSummary = GetSpecificationsWithResults();
 
-            specsClient.GetFundingPeriods()
-               .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+            policiesApiClient.GetFundingPeriods()
+                          .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             resultsApiClient.GetSpecificationIdsForProvider(Arg.Any<string>())
                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, specSummary));
@@ -358,7 +379,7 @@
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
                 .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
 
-            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient);
+            ProviderScenarioResultsPageModel providerScenarioResultsPageModel = CreatePageModel(searchService, resultsApiClient, providersApiClient, specsApiClient: specsClient, policiesApiClient: policiesApiClient);
 
             //Act
             IActionResult actionResult = await providerScenarioResultsPageModel.OnGetAsync("1", 1, "", "1819", specificationId);
@@ -468,6 +489,11 @@
             return Substitute.For<ISpecsApiClient>();
         }
 
+        private static IPoliciesApiClient CreatePoliciesApiClient()
+        {
+            return Substitute.For<IPoliciesApiClient>();
+        }
+
         private static IMapper CreateMapper()
         {
             return MappingHelper.CreateFrontEndMapper();
@@ -483,6 +509,7 @@
                 IResultsApiClient resultsApiClient = null,
                 IProvidersApiClient providersApiClient = null,
                 ISpecsApiClient specsApiClient = null,
+                IPoliciesApiClient policiesApiClient = null,
                 IMapper mapper = null,
                 ILogger logger = null)
         {
@@ -492,6 +519,7 @@
             providersApiClient ?? CreateProvidersApiClient(),
             mapper ?? CreateMapper(),
             specsApiClient ?? CreateSpecsApiClient(),
+            policiesApiClient ?? CreatePoliciesApiClient(),
             logger ?? CreateLogger());
         }
 
