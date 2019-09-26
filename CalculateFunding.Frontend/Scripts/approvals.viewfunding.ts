@@ -7,10 +7,10 @@ namespace calculateFunding.approvals {
         public isLoadingVisible: KnockoutComputed<boolean>;
 
         public FundingPeriods: KnockoutObservableArray<FundingPeriodResponse> = ko.observableArray();
-        public Specifications: KnockoutObservableArray<SpecificationResponse> = ko.observableArray();
         public FundingStreams: KnockoutObservableArray<FundingStreamResponse> = ko.observableArray();
         public selectedFundingPeriod: KnockoutObservable<FundingPeriodResponse> = ko.observable();
         public selectedSpecification: KnockoutObservable<SpecificationResponse> = ko.observable();
+        public selectedSpecificationName: KnockoutComputed<string>;
         public selectedFundingStream: KnockoutObservable<FundingStreamResponse> = ko.observable();
         public pageState: KnockoutObservable<string> = ko.observable("initial");
         public workingMessage: KnockoutObservable<string> = ko.observable(null);
@@ -30,6 +30,7 @@ namespace calculateFunding.approvals {
         public approveSearchModel = new calculateFunding.approvals.ApproveAndPublishSearchViewModel();
         public permissions: KnockoutObservable<SpecificationPermissions> = ko.observable(new SpecificationPermissions(false, false, false));
         public selectedProviderView: KnockoutObservable<PublishedProviderResultViewModel> = ko.observable();
+        public fundingPeriodStreams: Array<FundingPeriodStreams>;
         public providerViewSelectedTab: KnockoutObservable<ProviderViewSelectedTab> = ko.observable();
         public profileResults: KnockoutObservableArray<ProfileResultsViewModel> = ko.observableArray();
         public profileResult: KnockoutObservable<ProfileResultsViewModel> = ko.observable();
@@ -75,6 +76,9 @@ namespace calculateFunding.approvals {
             else if (typeof settings.specificationsUrl !== "undefined" && !settings.specificationsUrl) {
                 throw "Settings must contain the specifications query url";
             }
+            else if (typeof settings.specificationsFilteredUrl !== "undefined" && !settings.specificationsFilteredUrl) {
+                throw "Settings must contain the specifications filter query url";
+            }
             else if (typeof settings.permissionsUrl !== "undefined" && !settings.permissionsUrl) {
                 throw "Settings must contain the permissions query url";
             }
@@ -101,14 +105,46 @@ namespace calculateFunding.approvals {
                 return self.messageTemplateData;
             });
 
-            /** Request to get the funding periods */
-            this.loadFundingPeriods();
+            /** Request to get the funding streams */
+            this.loadFundingStreams();
+
+            this.selectedFundingStream.subscribe(function () {
+                let fundingPeriods: Array<FundingPeriodResponse> = Array<FundingPeriodResponse>();
+                if (self.selectedFundingStream() !== undefined && self.selectedFundingStream().name !== "Select") {
+                    let fundingPeriodRequest = $.ajax({
+                        url: self.settings.fundingPeriodUrl,
+                        dataType: "json",
+                        method: "get",
+                        contentType: "application/json",
+                    })
+                        .done(function (response:Array<FundingPeriodResponse>) {
+                                ko.utils.arrayForEach(self.fundingPeriodStreams, function (fundingStreamPeriod: FundingPeriodStreams) {
+                                if (fundingPeriods.filter((filterperiod) => filterperiod.id == fundingStreamPeriod.fundingPeriod.id).length == 0 && fundingStreamPeriod.fundingStreams.filter((stream) => {
+                                    return stream.id == self.selectedFundingStream().id;
+                                }).length > 0) {
+                                    let matchingPeriods: Array<FundingPeriodResponse> = ko.utils.arrayFilter(response, (item) => item.period == fundingStreamPeriod.fundingPeriod.name);
+                                    if (matchingPeriods != undefined) {
+                                        fundingPeriods = fundingPeriods.concat(matchingPeriods.filter((matchingPeriod: FundingPeriodResponse) => fundingPeriods.filter((current) => current.id == matchingPeriod.id).length === 0));
+                                    }
+                                }
+                                });
+
+                            self.FundingPeriods(fundingPeriods);
+                        })
+                        .fail((response) => {
+                            self.notificationMessage("There was a problem retreiving the funding periods, please try again");
+                            self.notificationStatus("error");
+                        })
+
+                    
+                }
+            });
 
             /** When a funding period is selected then load the specifications for that funding period */
             this.selectedFundingPeriod.subscribe(function () {
                 if (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().value !== "Select") {
                     /** Load Specifications in the specification dropdown */
-                    let getSpecificationForSelectedPeriodUrl = self.settings.specificationsUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id);
+                    let getSpecificationForSelectedPeriodUrl = self.settings.specificationsFilteredUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id).replace("{fundingStreamId}", self.selectedFundingStream().id);
                     let specificationRequest = $.ajax({
                         url: getSpecificationForSelectedPeriodUrl,
                         dataType: "json",
@@ -118,22 +154,10 @@ namespace calculateFunding.approvals {
                         .done(function (response) {
                             let newSpecificationArray = Array<SpecificationResponse>();
                             ko.utils.arrayForEach(response, function (item: any) {
-                                let specResponse = new SpecificationResponse(item.id, item.name, item.publishedResultsRefreshedAt, item.fundingStreams);
+                                let specResponse = new SpecificationResponse(item.id, item.name, item.fundingPeriod, item.publishedResultsRefreshedAt, item.fundingStreams);
                                 newSpecificationArray.push(specResponse);
                             });
-                            self.Specifications(newSpecificationArray);
-
-                            // If query string contains a specification id then try and pre-select it
-                            let givenSpec: string = self.getQueryStringValue("specificationId");
-                            if (givenSpec) {
-                                let foundItem = ko.utils.arrayFirst(newSpecificationArray, function (item) {
-                                    return item.id == givenSpec;
-                                });
-
-                                if (foundItem) {
-                                    self.selectedSpecification(foundItem);
-                                }
-                            }
+                            self.selectedSpecification(newSpecificationArray[0]);
                         })
                         .fail((response) => {
                             self.notificationMessage("There was a problem retreiving the Specifications, please try again.");
@@ -141,22 +165,16 @@ namespace calculateFunding.approvals {
                         });
                 }
                 else {
-                    self.Specifications([]);
+                    self.selectedSpecification();
                 }
             });
 
-            /** When a specification is selected then load the funding streams for that specification */
-            self.selectedSpecification.subscribe(function () {
-                if (self.selectedSpecification() !== undefined && self.selectedFundingPeriod().value !== "Select") {
-                    let newFundingStreamArray = Array<FundingStreamResponse>();
-                    let spec = ko.utils.arrayFirst(self.Specifications(),
-                        function (item: SpecificationResponse) {
-                            return (item.id === self.selectedSpecification().id);
-                        });
-                    self.FundingStreams(spec.fundingstreams);
+            self.selectedSpecificationName = ko.computed(function () {
+                if (self.selectedSpecification()) {
+                    return self.selectedSpecification().name;
                 }
                 else {
-                    self.FundingStreams([]);
+                    return "";
                 }
             });
 
@@ -1001,40 +1019,45 @@ namespace calculateFunding.approvals {
                 this.totalNumberAllocationLines(numberAllocationLines);
             }
         }
-
-        public loadFundingPeriods() {
+        public loadFundingStreams() {
             let self = this;
 
-            let fundingPeriodRequest = $.ajax({
-                url: this.settings.fundingPeriodUrl,
+            let specificationRequest = $.ajax({
+                url: this.settings.specificationsUrl,
                 dataType: "json",
                 method: "get",
                 contentType: "application/json",
             })
                 .done(function (response) {
-                    let newPeriodArray = Array<FundingPeriodResponse>();
-                    ko.utils.arrayForEach(response, function (item: any) {
-                        let fpPeriodResponse = new FundingPeriodResponse(item.id, item.name);
-                        newPeriodArray.push(fpPeriodResponse);
-                    });
-                    self.FundingPeriods(newPeriodArray);
+                    let newSpecificationArray: Array<SpecificationResponse> = Array<SpecificationResponse>();
+                    let newStreamArray: Array<FundingStreamResponse> = Array<FundingStreamResponse>();
+                    self.fundingPeriodStreams = Array<FundingPeriodStreams>();
+                    ko.utils.arrayForEach(response, function (item: SpecificationResponse) {
+                        newSpecificationArray.push(item);
+                        self.fundingPeriodStreams.push(new FundingPeriodStreams(item.fundingPeriod, item.fundingStreams));
 
-                    // If the query string contains a funding period then try and pre-select it
-                    let givenPeriod: string = self.getQueryStringValue("fundingPeriodId");
-                    if (givenPeriod) {
-                        let foundItem = ko.utils.arrayFirst(newPeriodArray, function (item) {
-                            return item.id == givenPeriod;
+                        newStreamArray = newStreamArray.concat(item.fundingStreams.filter((stream:FundingStreamResponse) => newStreamArray.filter((current) => current.id == stream.id).length === 0));
+                    });
+
+                    self.FundingStreams(newStreamArray);
+
+                    // If the query string contains a funding stream then try and pre-select it
+                    let givenStream: string = self.getQueryStringValue("fundingStreamId");
+                    if (givenStream) {
+                        let foundItem = ko.utils.arrayFirst(newStreamArray, function (item) {
+                            return item.id == givenStream;
                         });
 
                         if (foundItem) {
-                            self.selectedFundingPeriod(foundItem);
+                            self.selectedFundingStream(foundItem);
                         }
                     }
                 })
+
                 .fail((response) => {
-                    self.notificationMessage("There was a problem retreiving the funding periods, please try again");
-                    self.notificationStatus("error");
-                })
+                self.notificationMessage("There was a problem retreiving the funding streams, please try again");
+                self.notificationStatus("error");
+            })
         }
 
         private getQueryStringValue(key: string) {
@@ -1266,6 +1289,7 @@ namespace calculateFunding.approvals {
         checkPublishResultsStatusUrl: string;
         fundingPeriodUrl: string;
         specificationsUrl: string;
+        specificationsFilteredUrl: string;
         fundingStreamsUrl: string;
         permissionsUrl: string;
         latestJobUrl: string;
@@ -1419,25 +1443,31 @@ namespace calculateFunding.approvals {
 
     /** Funding period dropdown options */
     export class FundingPeriodResponse {
-        constructor(id: string, value: string) {
+        constructor(id: string, value: string, name: string, period: string) {
             this.id = id;
             this.value = value;
+            this.name = name;
+            this.period = period;
         }
         id: string;
         value: string;
+        name: string;
+        period: string;
     }
 
     /** Specification dropdown options  */
     export class SpecificationResponse {
-        constructor(id: string, value: string, publishedResultsRefreshedAt: Date, fundingStreams: Array<any>) {
+        constructor(id: string, name: string, fundingPeriod: FundingPeriodResponse, publishedResultsRefreshedAt: Date, fundingStreams: Array<FundingStreamResponse>) {
             this.id = id;
-            this.value = value;
+            this.name = name;
+            this.fundingPeriod = fundingPeriod;
             this.publishedResultsRefreshedAt(publishedResultsRefreshedAt);
-            this.fundingstreams = fundingStreams;
+            this.fundingStreams = fundingStreams;
         }
         id: string;
-        value: string;
-        fundingstreams: Array<FundingStreamResponse>;
+        name: string;
+        fundingPeriod: FundingPeriodResponse;
+        fundingStreams: Array<FundingStreamResponse>;
         publishedResultsRefreshedAt: KnockoutObservable<Date> = ko.observable();
 
         publishedResultsRefreshedAtDisplay: KnockoutComputed<string> = ko.computed(function () {
@@ -1460,6 +1490,16 @@ namespace calculateFunding.approvals {
         }
         id: string;
         name: string;
+    }
+
+    export class FundingPeriodStreams {
+        constructor(fundingPeriod: FundingPeriodResponse, fundingStreams: Array<FundingStreamResponse>) {
+            this.fundingPeriod = fundingPeriod;
+            this.fundingStreams = fundingStreams;
+        }
+
+        fundingPeriod: FundingPeriodResponse;
+        fundingStreams: Array<FundingStreamResponse>;
     }
 
     /** Permissions for the specification */

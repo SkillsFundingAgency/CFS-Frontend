@@ -198,8 +198,8 @@
   <data name="EditPolicy" xml:space="preserve">
     <value>Edit policy</value>
   </data>
-  <data name="ApproveAndPublishFunding" xml:space="preserve">
-    <value>Approve and publish funding</value>
+  <data name="ApproveAndReleaseFunding" xml:space="preserve">
+    <value>Choose specification</value>
   </data>
   <data name="ConfirmSelection" xml:space="preserve">
     <value>Confirm selection</value>

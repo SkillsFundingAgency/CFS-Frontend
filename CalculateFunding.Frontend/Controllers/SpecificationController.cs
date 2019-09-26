@@ -68,12 +68,51 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(result);
         }
 
+        [Route("api/specs/specifications-selected-for-funding")]
+        public async Task<IActionResult> GetSpecificationsSelectedForFunding()
+        {
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFunding();
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content.OrderBy(c => c.Name));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
         [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsForFundingByPeriod(string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFundingByPeriod(fundingPeriodId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content.OrderBy(c => c.Name));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}")]
+        public async Task<IActionResult> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {

@@ -3,7 +3,7 @@
 @using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
 @{
-    ViewData["Title"] = "Approve and publish funding";
+    ViewData["Title"] = "Approve and release funding";
 }
 
 @section NavBar {
@@ -41,7 +41,7 @@
         <ol>
             <li><a href="~/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/approvals">@BreadcrumbText.FundingApprovals</a></li>
-            <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndPublishFunding</a></li>
+            <li><a href="/approvals/viewfunding">@BreadcrumbText.ApproveAndReleaseFunding</a></li>
             <li data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown', visible: pageState() === 'main'"></li>
         </ol>
     </div>
@@ -53,7 +53,7 @@
             <div class="funding-stream-info-holder">
                 <h2 class="hero-description-skinny bold" data-bind="text:selectedSpecification() ? selectedSpecification().value : 'unknown'"></h2>
                 <p>
-                    <span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'" class="funding-period"></span>
+                    <span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().name : 'unknown'" class="funding-period"></span>
                     <span class="funding-stream-text">
                         Funding stream:
                         <span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'" class="funding-stream-value"></span>
@@ -152,8 +152,8 @@
     <div class="viewfunding-page-header spacing-15">
         <div data-bind="visible: pageState() === 'initial'">
             <div>
-                <h1 class="hero-title">Approve and Publish funding</h1>
-                <h2 class="hero-description"> You can approve and publish the chosen specification.</h2>
+                <h1 class="hero-title">Approve and Release funding</h1>
+                <h2 class="hero-description">You can approve and release the chosen specification</h2>
             </div>
 
         </div>
@@ -164,13 +164,13 @@
         </div>
         <div data-bind="visible: pageState() === 'main'" class="viewfunding-page-buttons">
             <button style="margin-right: 15px;" id="approve" class="btn approvalstatus-button approvalstatus-button-approve" data-bind="enable: canApprove, click: confirmApprove">Approve</button>
-            <button id="publish" class="btn approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: confirmPublish">Publish</button>
+            <button id="publish" class="btn approvalstatus-button approvalstatus-button-publish" data-bind="enable: canPublish, click: confirmPublish">Release</button>
         </div>
         <div data-bind="visible: pageState() === 'confirmApproval' || pageState() === 'working-confirmApproval'">
             <h1 class="hero-title-skinny">Approve confirmation for the selected provider funding</h1>
         </div>
         <div data-bind="visible: pageState() === 'confirmPublish' || pageState() === 'working-confirmPublish'">
-            <h1 class="hero-title-skinny">Publish confirmation for the selected provider funding</h1>
+            <h1 class="hero-title-skinny">Release confirmation for the selected provider funding</h1>
         </div>
     </div>
 }
@@ -198,7 +198,7 @@
 
     <div data-bind="visible: notificationStatus() === 'refreshUpdated'" class="notification-panel-updated">
         <div class="notification-panel-updated-text">
-            <h4 class="material-icons-content-container"><i class="material-icons">check</i> <span><strong>Allocation line funding values refreshed successfully</strong></span></h4><br /><span class="notification-panel-updated-info-text"><span data-bind="text: updatedCount()"></span> Allocation line funding values updated</span> <span class="notification-panel-updated-info-text-small">you need to approve the funding allocation line total before publish</span>
+            <h4 class="material-icons-content-container"><i class="material-icons">check</i> <span><strong>Allocation line funding values refreshed successfully</strong></span></h4><br /><span class="notification-panel-updated-info-text"><span data-bind="text: updatedCount()"></span> Allocation line funding values updated</span> <span class="notification-panel-updated-info-text-small">you need to approve the funding allocation line total before release</span>
         </div>
     </div>
 
@@ -211,25 +211,25 @@
     <div data-bind="visible: pageState() === 'initial'" class="row">
         <div class="col-sm-9 col-md-6">
             <div class="form-group">
-                <label>Select funding period:</label>
-                <div>
-                    <select class="form-control" id="fundingperiod" data-bind="options: FundingPeriods, value:selectedFundingPeriod, optionsText: 'value', optionsCaption:'Please select'"></select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Select specification:</label>
-                <div>
-                    <select class="form-control" id="specification" data-bind="options: Specifications, value:selectedSpecification, optionsText: 'value', optionsCaption: 'Please select', enable: selectedFundingPeriod()"></select>
-                </div>
-            </div>
-            <div class="form-group">
                 <label>Select funding stream:</label>
                 <div>
-                    <select class="form-control" id="fundingstreams" data-bind="options: FundingStreams, value:selectedFundingStream, optionsText: 'name', optionsCaption: 'Please select', enable: selectedSpecification()"></select>
+                    <select class="form-control" id="fundingstreams" data-bind="options: FundingStreams, value:selectedFundingStream, optionsText: 'name', optionsCaption: 'Please select'"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Select funding period:</label>
+                <div>
+                    <select class="form-control" id="fundingperiod" data-bind="options: FundingPeriods, value:selectedFundingPeriod, optionsText: 'name', optionsCaption:'Please select', enable: selectedFundingStream()"></select>
+                </div>
+            </div>
+            <div class="form-group" data-bind="visible:selectedFundingPeriod()">
+                <label>Specification:</label>
+                <div>
+                    <input type="text" class="form-control" id="specification"  disabled="disabled" data-bind="value:selectedSpecificationName, visible:selectedFundingPeriod()"/>
                 </div>
             </div>
             <div>
-                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span>Only one funding stream can be approved or published at a time</span></h4>
+                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span>Only one funding stream can be approved or released at a time</span></h4>
             </div>
             <div class="row">
                 <div class="col-sm-12">
@@ -331,7 +331,7 @@
                     <th class="text-center sub-heading min-width-xs status-column">New</th>
                     <th class="text-center sub-heading min-width-xs status-column">Approved</th>
                     <th class="text-center sub-heading min-width-xs status-column">Updated</th>
-                    <th class="text-center sub-heading min-width-xs status-column">Published</th>
+                    <th class="text-center sub-heading min-width-xs status-column">Released</th>
                 </tr>
             </thead>
 
@@ -450,16 +450,16 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td>Funding Stream</td>
+                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                        </tr>
+                        <tr class="topborderonly">
                             <td>Funding Period</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
+                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().name : 'unknown'"></span></td>
                         </tr>
                         <tr class="nobottomborder">
                             <td>Specification Selected</td>
-                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="topborderonly">
-                            <td>Funding Stream</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().name : 'unknown'"></span></td>
                         </tr>
                         <!-- ko foreach: approvalDetails().allocationLinesRollup -->
                         <tr class="nobottomborder">
@@ -491,7 +491,7 @@
             <span>Once Approved:</span>
             <ol>
                 <li>Funding values will be available to the profiling service</li>
-                <li>Funding values <strong>will not</strong> be published or paid to providers</li>
+                <li>Funding values <strong>will not</strong> be released or paid to providers</li>
             </ol>
             <div class="confirmapproval-warning">
                 <div class="confirmapproval-warning-icon">
@@ -520,7 +520,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Number of providers to publish</td>
+                            <td>Number of providers to release</td>
                             <td><span data-bind="text: publishDetails().numberOfProviders"></span></td>
                         </tr>
                         <tr data-bind="template: { name: 'list-expander-template', data: { title: 'Provider types selected', list: publishDetails().providerTypes } }" class="expander-control"></tr>
@@ -539,16 +539,16 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td>Funding Stream</td>
+                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                        </tr>
+                        <tr class="topborderonly">
                             <td>Funding Period</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().value : 'unknown'"></span></td>
+                            <td colspan="2"><span data-bind="text: selectedFundingPeriod() ? selectedFundingPeriod().name : 'unknown'"></span></td>
                         </tr>
                         <tr class="nobottomborder">
                             <td>Specification Selected</td>
-                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().value : 'unknown'"></span></td>
-                        </tr>
-                        <tr class="topborderonly">
-                            <td>Funding Stream</td>
-                            <td colspan="2"><span data-bind="text: selectedFundingStream() ? selectedFundingStream().name : 'unknown'"></span></td>
+                            <td colspan="2"><span data-bind="text: selectedSpecification() ? selectedSpecification().name : 'unknown'"></span></td>
                         </tr>
                         <!-- ko foreach: publishDetails().allocationLinesRollup -->
                         <tr class="nobottomborder">
@@ -577,7 +577,7 @@
             </div>
         </div>
         <div class="confirmpublish-confirmation">
-            <span>Once Published:</span>
+            <span>Once Released:</span>
             <ol>
                 <li>Funding values will be available to the profiling service</li>
                 <li>Funding values <strong>will be</strong> available for providers to view via the ESFS</li>
@@ -588,11 +588,11 @@
                     <i class="material-icons">error</i>
                 </div>
                 <div>
-                    <strong>Published funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved and republished.</strong>
+                    <strong>Released funding values can change when data or calculations are altered. If the funding values change their statuses will become 'updated' and they will need to be reapproved and rereleased.</strong>
                 </div>
             </div>
             <div class="confirmpublish-buttons">
-                <button id="publish" data-bind="click: publish" class="button approvalstatus-button approvalstatus-button-approve">Confirm publish</button>
+                <button id="publish" data-bind="click: publish" class="button approvalstatus-button approvalstatus-button-approve">Confirm release</button>
                 <a href="#" data-bind="click: dismissConfirmPage">Back</a>
             </div>
         </div>
@@ -638,8 +638,9 @@
         "refreshPublishedResultsUrl": "/api/specs/{specificationId}/refresh-published-results",
         "checkPublishResultsStatusUrl": "/api/specs/{specificationId}/check-publish-result-status",
         "fundingPeriodUrl": "/api/policy/fundingperiods",
-        "specificationsUrl": "/api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}",
-        "fundingStreamsUrl": "/api/specs/get-fundingstreams-for-specification/{specificationId}",
+        "specificationsUrl": "/api/specs/specifications-selected-for-funding",
+        "specificationsFilteredUrl": "/api/specs/specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}",
+        "fundingStreamsUrl": "/api/policy/fundingstreams",
         "permissionsUrl": "/api/users/effectivepermissions/{specificationId}",
         "latestJobUrl": "/api/jobs/{specificationId}/latest/{jobTypes}"
     };
