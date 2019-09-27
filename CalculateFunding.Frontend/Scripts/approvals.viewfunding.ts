@@ -122,7 +122,7 @@ namespace calculateFunding.approvals {
                                 if (fundingPeriods.filter((filterperiod) => filterperiod.id == fundingStreamPeriod.fundingPeriod.id).length == 0 && fundingStreamPeriod.fundingStreams.filter((stream) => {
                                     return stream.id == self.selectedFundingStream().id;
                                 }).length > 0) {
-                                    let matchingPeriods: Array<FundingPeriodResponse> = ko.utils.arrayFilter(response, (item) => item.period == fundingStreamPeriod.fundingPeriod.name);
+                                    let matchingPeriods: Array<FundingPeriodResponse> = ko.utils.arrayFilter(response, (item) => item.period == fundingStreamPeriod.fundingPeriod.name && item.id == fundingStreamPeriod.fundingPeriod.id);
                                     if (matchingPeriods != undefined) {
                                         fundingPeriods = fundingPeriods.concat(matchingPeriods.filter((matchingPeriod: FundingPeriodResponse) => fundingPeriods.filter((current) => current.id == matchingPeriod.id).length === 0));
                                     }
@@ -135,38 +135,17 @@ namespace calculateFunding.approvals {
                             self.notificationMessage("There was a problem retreiving the funding periods, please try again");
                             self.notificationStatus("error");
                         })
-
-                    
                 }
             });
 
-            /** When a funding period is selected then load the specifications for that funding period */
+            /** When a funding period is selected then load the specifications for that funding period and funding stream*/
             this.selectedFundingPeriod.subscribe(function () {
-                if (self.selectedFundingPeriod() !== undefined && self.selectedFundingPeriod().value !== "Select") {
-                    /** Load Specifications in the specification dropdown */
-                    let getSpecificationForSelectedPeriodUrl = self.settings.specificationsFilteredUrl.replace("{fundingPeriodId}", self.selectedFundingPeriod().id).replace("{fundingStreamId}", self.selectedFundingStream().id);
-                    let specificationRequest = $.ajax({
-                        url: getSpecificationForSelectedPeriodUrl,
-                        dataType: "json",
-                        method: "get",
-                        contentType: "application/json",
-                    })
-                        .done(function (response) {
-                            let newSpecificationArray = Array<SpecificationResponse>();
-                            ko.utils.arrayForEach(response, function (item: any) {
-                                let specResponse = new SpecificationResponse(item.id, item.name, item.fundingPeriod, item.publishedResultsRefreshedAt, item.fundingStreams);
-                                newSpecificationArray.push(specResponse);
-                            });
-                            self.selectedSpecification(newSpecificationArray[0]);
-                        })
-                        .fail((response) => {
-                            self.notificationMessage("There was a problem retreiving the Specifications, please try again.");
-                            self.notificationStatus("error");
-                        });
-                }
-                else {
-                    self.selectedSpecification();
-                }
+                self.PopulateSpecification(self);
+            });
+
+            /** When a funding stream is selected then load the specifications for that funding stream and funding period */
+            this.selectedFundingStream.subscribe(function () {
+                self.PopulateSpecification(self);
             });
 
             self.selectedSpecificationName = ko.computed(function () {
@@ -190,6 +169,34 @@ namespace calculateFunding.approvals {
             this.pageState('providerView');
             this.providerViewSelectedTab(ProviderViewSelectedTab.ProviderInfo);
             this.selectedProviderView(providerModel);
+        }
+
+        public PopulateSpecification(fundingModel: ViewFundingViewModel): void {
+            if (fundingModel.selectedFundingPeriod() !== undefined && fundingModel.selectedFundingPeriod().value !== "Select" && fundingModel.selectedFundingStream() !== undefined && fundingModel.selectedFundingStream().name !== "Select") {
+                /** Load Specifications in the specification dropdown */
+                let getSpecificationForSelectedPeriodUrl = fundingModel.settings.specificationsFilteredUrl.replace("{fundingPeriodId}", fundingModel.selectedFundingPeriod().id).replace("{fundingStreamId}", fundingModel.selectedFundingStream().id);
+                let specificationRequest = $.ajax({
+                    url: getSpecificationForSelectedPeriodUrl,
+                    dataType: "json",
+                    method: "get",
+                    contentType: "application/json",
+                })
+                    .done(function (response) {
+                        let newSpecificationArray = Array<SpecificationResponse>();
+                        ko.utils.arrayForEach(response, function (item: any) {
+                            let specResponse = new SpecificationResponse(item.id, item.name, item.fundingPeriod, item.publishedResultsRefreshedAt, item.fundingStreams);
+                            newSpecificationArray.push(specResponse);
+                        });
+                        fundingModel.selectedSpecification(newSpecificationArray[0]);
+                    })
+                    .fail((response) => {
+                        fundingModel.notificationMessage("There was a problem retreiving the Specifications, please try again.");
+                        fundingModel.notificationStatus("error");
+                    });
+            }
+            else {
+                fundingModel.selectedSpecification();
+            }
         }
 
         public LoadProfileResult(providerId: string, specificationId: string, fundingStreamId: string): void {

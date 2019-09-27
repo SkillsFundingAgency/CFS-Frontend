@@ -222,10 +222,10 @@
                     <select class="form-control" id="fundingperiod" data-bind="options: FundingPeriods, value:selectedFundingPeriod, optionsText: 'name', optionsCaption:'Please select', enable: selectedFundingStream()"></select>
                 </div>
             </div>
-            <div class="form-group" data-bind="visible:selectedFundingPeriod()">
+            <div class="form-group" data-bind="visible:selectedSpecification()">
                 <label>Specification:</label>
                 <div>
-                    <input type="text" class="form-control" id="specification"  disabled="disabled" data-bind="value:selectedSpecificationName, visible:selectedFundingPeriod()"/>
+                    <input type="text" class="form-control" id="specification"  disabled="disabled" data-bind="value:selectedSpecificationName, visible:selectedSpecification()"/>
                 </div>
             </div>
             <div>
@@ -233,7 +233,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <p class="form-submit-container"><button type="button" class="button" id="ViewFunding" data-bind="click: viewFunding, enable: selectedFundingStream()">View funding</button> </p>
+                    <p class="form-submit-container"><button type="button" class="button" id="ViewFunding" data-bind="click: viewFunding, enable: selectedSpecification()">View funding</button> </p>
                 </div>
             </div>
             <div id="view-funding-wait-control" style="display:none; text-align:center" class="col-sm-9 col-md-6">
