@@ -6,14 +6,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Serilog;
+using OldSpecsSummary = CalculateFunding.Frontend.Clients.SpecsClient.Models.SpecificationSummary;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers
@@ -164,10 +165,50 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 allowedFundingStreams = allowedFundingStreams.Where(p => p.CanCreateQaTests);
             }
-			else if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
+            else if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
             {
-				allowedFundingStreams = allowedFundingStreams.Where(p => p.CanChooseFunding);
-			}
+                allowedFundingStreams = allowedFundingStreams.Where(p => p.CanChooseFunding);
+            }
+            else
+            {
+                throw new NotSupportedException($"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
+            }
+
+            IEnumerable<string> allowedFundingStreamIds = allowedFundingStreams.Select(p => p.FundingStreamId);
+
+            return specifications.Where(s => !s.FundingStreams.Select(fs => fs.Id).Except(allowedFundingStreamIds).Any());
+        }
+
+        public async Task<IEnumerable<OldSpecsSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<OldSpecsSummary> specifications, SpecificationActionTypes permissionRequired)
+        {
+            Guard.ArgumentNotNull(user, nameof(user));
+            Guard.ArgumentNotNull(specifications, nameof(specifications));
+
+            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            {
+                return specifications;
+            }
+
+            string userId = VerifyObjectIdentifierClaimTypePresent(user);
+
+            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+
+            if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                return Enumerable.Empty<OldSpecsSummary>();
+            }
+
+            IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
+
+            if (permissionRequired == SpecificationActionTypes.CanCreateQaTests)
+            {
+                allowedFundingStreams = allowedFundingStreams.Where(p => p.CanCreateQaTests);
+            }
+            else if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
+            {
+                allowedFundingStreams = allowedFundingStreams.Where(p => p.CanChooseFunding);
+            }
             else
             {
                 throw new NotSupportedException($"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
@@ -211,7 +252,7 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 _logger.Error("Failed to get effective permissions for user ({user}) - {statuscode}", user.Identity.Name, response.StatusCode);
 
-                
+
                 return new Common.ApiClient.Users.Models.EffectiveSpecificationPermission
                 {
                     CanAdministerFundingStream = false,
@@ -235,7 +276,7 @@ namespace CalculateFunding.Frontend.Helpers
                 return response.Content;
             }
         }
-		
+
         private static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal user)
         {
             if (!user.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType))

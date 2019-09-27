@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -79,7 +79,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.4" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.15" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.5" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.6" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.7" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.11" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.3" />

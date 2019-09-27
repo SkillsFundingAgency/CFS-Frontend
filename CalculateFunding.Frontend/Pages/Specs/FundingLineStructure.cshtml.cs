@@ -7,11 +7,12 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -26,7 +27,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class FundingLineStructureModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
@@ -35,7 +36,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
         private readonly ICalculationsApiClient _calculationsApiClient;
 
         public FundingLineStructureModel(
-            ISpecsApiClient specsClient,
+            ISpecificationsApiClient specsClient,
             IDatasetsApiClient datasetsClient,
             ILogger logger,
             IMapper mapper,
@@ -85,7 +86,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 	                return new PreconditionFailedResult("Operation ID not provided");
                 }
 
-                Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummary(specificationId);
+                Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummaryById(specificationId);
 
                 Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaResponseTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(specificationId);
 
@@ -112,9 +113,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
                     return new NotFoundObjectResult("Specification not found");
                 }
 
-                this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
+                this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
-                Common.ApiClient.Specifications.Models.SpecificationSummary specificationSummary = _mapper.Map<Common.ApiClient.Specifications.Models.SpecificationSummary>(specificationResponse.Content);
+                SpecificationSummary specificationSummary = _mapper.Map<SpecificationSummary>(specificationResponse.Content);
 
                 Specification = new SpecificationViewModel
                 {

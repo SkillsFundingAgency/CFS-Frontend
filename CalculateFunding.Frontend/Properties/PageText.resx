@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AssignDatasetSchemaText" xml:space="preserve">
-    <value>Assign dataset schema for calculation specfication</value>
+    <value>Assign dataset schema for calculation specification</value>
   </data>
   <data name="CalculateFunding" xml:space="preserve">
     <value>Calculate funding</value>
@@ -127,7 +127,7 @@
     <value>Calculate funding, quality assure the results or approve funding.</value>
   </data>
   <data name="ChooseFundingSpecWarningText" xml:space="preserve">
-    <value>Select a funding stream to see approved specifications</value>
+    <value>Select a funding stream and funding period to see approved specifications</value>
   </data>
   <data name="FundingStreams" xml:space="preserve">
     <value>Funding streams</value>

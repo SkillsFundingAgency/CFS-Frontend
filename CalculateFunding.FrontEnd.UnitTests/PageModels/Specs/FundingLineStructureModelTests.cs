@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -23,6 +24,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
+using SpecificationSummary = CalculateFunding.Common.ApiClient.Specifications.Models.SpecificationSummary;
 
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
@@ -36,11 +38,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task FundingLineStructureModel_OnGet_WhenSpecificationResponseIsNull_ThenInternalServerErrorReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns((ApiResponse<SpecificationSummary>) null);
 
             datasetsApiClient
@@ -75,11 +77,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task FundingLineStructureModel_OnGet_WhenDataSchemaResponseIsNull_ThenReturnsInternalServerError()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             datasetsApiClient
@@ -114,11 +116,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task FundingLineStructureModel_OnGet_WhenSpecificationResponseIsNotFound_ThenNotFoundReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, null));
 
             datasetsApiClient
@@ -146,7 +148,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task PoliciesPageModel_OnGet_WhenOperationTypeIsSpecificationUpdated_ThenBannerPopulated()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
             ILogger logger = CreateLogger();
@@ -155,7 +157,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             Specification specification = CreateSpecificationForBannerChecks();
 
-            specsApiClient.GetSpecificationSummary(Arg.Is(specificationId))
+            specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             datasetsApiClient
@@ -206,7 +208,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task PoliciesPageModel_OnGet_WhenTeplateDataFetch_ThenPopulatesTemplateData()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             ICalculationsApiClient calculationsApiClient = CreateCalculationsApiClient();
             ILogger logger = CreateLogger();
@@ -220,7 +222,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             IDictionary<string, TemplateMetadataContents> templateMetadataContentsCollection = new Dictionary<string, TemplateMetadataContents>();
             templateMetadataContentsCollection.Add("a", templateMetadataContents);
 
-            specsApiClient.GetSpecificationSummary(Arg.Is(specificationId))
+            specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             datasetsApiClient
@@ -283,7 +285,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         private FundingLineStructureModel CreateFundingLineStructureModel(
-           ISpecsApiClient specsApiClient = null,
+           ISpecificationsApiClient specsApiClient = null,
            IDatasetsApiClient datasetsApiClient = null,
            ILogger logger = null,
            IAuthorizationHelper authorizationHelper = null,
@@ -301,9 +303,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 );
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IDatasetsApiClient CreateDatasetsApiClient()

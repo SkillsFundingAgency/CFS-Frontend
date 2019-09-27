@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using OldSpecsSummary = CalculateFunding.Frontend.Clients.SpecsClient.Models.SpecificationSummary;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers
@@ -54,6 +55,14 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(specifications);
         }
 
+        public async Task<IEnumerable<OldSpecsSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<OldSpecsSummary> content, SpecificationActionTypes canCreateQaTests)
+        {
+            Guard.ArgumentNotNull(user, nameof(user));
+            Guard.ArgumentNotNull(content, nameof(content));
+
+            return await Task.FromResult(content);
+        }
+
         public async Task<Common.ApiClient.Users.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));
@@ -77,5 +86,7 @@ namespace CalculateFunding.Frontend.Helpers
                 UserId = user.GetUserProfile()?.Id,
             });
         }
+
+
     }
 }

@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Assign dataset schema for calculation specfication.
+        ///   Looks up a localized string similar to Assign dataset schema for calculation specification.
         /// </summary>
         public static string AssignDatasetSchemaText {
             get {
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select a funding stream to see approved specifications.
+        ///   Looks up a localized string similar to Select a funding stream and funding period to see approved specifications.
         /// </summary>
         public static string ChooseFundingSpecWarningText {
             get {
