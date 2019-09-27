@@ -33,7 +33,14 @@
     </div>
 }
 @section BannerRight{
-    <a href="/calcs/editCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
+    @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+    {
+        <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
+    } 
+    @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+    {
+        <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
+    } 
 }
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
