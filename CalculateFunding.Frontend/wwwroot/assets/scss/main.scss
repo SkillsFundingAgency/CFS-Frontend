@@ -717,10 +717,6 @@ blockquote {
 
     .calculations-table {
 
-        thead {
-            border-bottom: 2px solid #000 !important;
-        }
-
         tr {
             border-bottom: 1px solid #ccc !important;
         }
@@ -1640,7 +1636,7 @@ table {
     }
 
     thead {
-        border-bottom: 2px solid $border-colour !important;
+        
     }
 }
 
