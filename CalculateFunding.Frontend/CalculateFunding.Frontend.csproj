@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
-    <TypeScriptToolsVersion>2.9</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.6</TypeScriptToolsVersion>
     <CodeAnalysisRuleSet>CalculateFunding.ruleset</CodeAnalysisRuleSet>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
@@ -46,6 +46,7 @@
     <None Remove="Scripts\notifications.ts" />
     <None Remove="Scripts\provider.completion.gherkin.ts" />
     <None Remove="Scripts\provider.completion.vb.ts" />
+    <None Remove="Scripts\releasetimetable.ts" />
     <None Remove="Scripts\search.additionalCalculations.ts" />
     <None Remove="Scripts\search.calcuation-results.ts" />
     <None Remove="Scripts\search.calcuations.ts" />
@@ -77,9 +78,11 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.14" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.10" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.2" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.15" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.6" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.9" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.7" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.11" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.3" />
@@ -167,6 +170,7 @@
     <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
     <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
     <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
+    <TypeScriptCompile Include="Scripts\releasetimetable.ts" />
     <TypeScriptCompile Include="Scripts\editadditionalcalculation.ts" />
     <TypeScriptCompile Include="Scripts\createspecification.ts" />
     <TypeScriptCompile Include="Scripts\createadditionalcalculation.ts" />

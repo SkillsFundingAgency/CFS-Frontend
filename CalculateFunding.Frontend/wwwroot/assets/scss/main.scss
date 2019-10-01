@@ -3414,3 +3414,29 @@ a.govuk-back-link:hover {
     color: $page-colour;
     padding: 5px;
 }
+
+input {
+    &.two-character {
+        width: 50px;
+        text-align: center;
+        border: 2px solid #555;
+        padding: 10px;
+        display: block;
+    }
+
+    &.four-character {
+        width: 70px;
+        text-align: center;
+        border: 2px solid #555;
+        padding: 10px;
+        display: block;
+    }
+
+    &.six-character {
+        width: 95px;
+        text-align: center;
+        border: 2px solid #555;
+        padding: 10px;
+        display: block;
+    }
+}

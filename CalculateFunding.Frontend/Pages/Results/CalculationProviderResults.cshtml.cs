@@ -103,7 +103,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         private async Task PerformSearch(string calculationId, int? pageNumber, string searchTerm)
         {
 
-            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel
             {
                 PageNumber = pageNumber ?? 1,
                 IncludeFacets = false,

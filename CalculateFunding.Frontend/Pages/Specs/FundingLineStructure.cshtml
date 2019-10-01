@@ -64,6 +64,9 @@
                 </span>
             </a>
         </li>
+        <li class="nav-item">
+            <a id="nav-policy-tab" href="/specs/releasetimetable/@Model.Specification.Id" role="tab" aria-selected="true">Release timetable</a>
+        </li>
         <li class="nav-item-right" id="approve-status">
             <approve-status-button params="publishStatus : '@Model.Specification.PublishStatus', stateChangeUrl : '/api/specs/@Model.Specification.Id/status', canApprove : canApproveSpec"></approve-status-button>
         </li>

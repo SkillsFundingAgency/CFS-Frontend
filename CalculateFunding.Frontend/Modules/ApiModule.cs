@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.Modules
+﻿using CalculateFunding.Common.ApiClient.Publishing;
+
+namespace CalculateFunding.Frontend.Modules
 {
     using CalculateFunding.Common.ApiClient;
     using CalculateFunding.Common.ApiClient.Calcs;
@@ -176,6 +178,8 @@
 
             services
               .AddSingleton<Common.ApiClient.Specifications.ISpecificationsApiClient, Common.ApiClient.Specifications.SpecificationsApiClient>();
+
+            services.AddSingleton<IPublishingApiClient, PublishingApiClient>();
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)
