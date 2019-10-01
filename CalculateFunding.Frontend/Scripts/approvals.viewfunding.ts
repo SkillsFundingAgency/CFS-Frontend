@@ -99,7 +99,7 @@ namespace calculateFunding.approvals {
             self.filteredResultsSelectedAllocationTotal.extend({ deferred: true });
             self.filteredResultsSelectedAllocationTotalDisplay.extend({ deferred: true });
 
-            self.pageState() == "initial";
+            self.pageState() === "initial";
 
             self.bodyData = ko.computed(function () {
                 return self.messageTemplateData;
@@ -112,29 +112,43 @@ namespace calculateFunding.approvals {
                 let fundingPeriods: Array<FundingPeriodResponse> = Array<FundingPeriodResponse>();
                 if (self.selectedFundingStream() !== undefined && self.selectedFundingStream().name !== "Select") {
                     let fundingPeriodRequest = $.ajax({
-                        url: self.settings.fundingPeriodUrl,
-                        dataType: "json",
-                        method: "get",
-                        contentType: "application/json",
-                    })
-                        .done(function (response:Array<FundingPeriodResponse>) {
-                                ko.utils.arrayForEach(self.fundingPeriodStreams, function (fundingStreamPeriod: FundingPeriodStreams) {
-                                if (fundingPeriods.filter((filterperiod) => filterperiod.id == fundingStreamPeriod.fundingPeriod.id).length == 0 && fundingStreamPeriod.fundingStreams.filter((stream) => {
-                                    return stream.id == self.selectedFundingStream().id;
-                                }).length > 0) {
-                                    let matchingPeriods: Array<FundingPeriodResponse> = ko.utils.arrayFilter(response, (item) => item.period == fundingStreamPeriod.fundingPeriod.name && item.id == fundingStreamPeriod.fundingPeriod.id);
-                                    if (matchingPeriods != undefined) {
-                                        fundingPeriods = fundingPeriods.concat(matchingPeriods.filter((matchingPeriod: FundingPeriodResponse) => fundingPeriods.filter((current) => current.id == matchingPeriod.id).length === 0));
+                            url: self.settings.fundingPeriodUrl,
+                            dataType: "json",
+                            method: "get",
+                            contentType: "application/json",
+                        })
+                        .done(function(response: Array<FundingPeriodResponse>) {
+                            ko.utils.arrayForEach(self.fundingPeriodStreams,
+                                function(fundingStreamPeriod: FundingPeriodStreams) {
+                                    if (fundingPeriods
+                                        .filter((filterperiod) => filterperiod.id ==
+                                            fundingStreamPeriod.fundingPeriod.id).length ==
+                                        0 &&
+                                        fundingStreamPeriod.fundingStreams.filter((stream) => {
+                                            return stream.id == self.selectedFundingStream().id;
+                                        }).length >
+                                        0) {
+                                        let matchingPeriods: Array<FundingPeriodResponse> =
+                                            ko.utils.arrayFilter(response,
+                                                (item) => item.period == fundingStreamPeriod.fundingPeriod.name &&
+                                                item.id == fundingStreamPeriod.fundingPeriod.id);
+                                        if (matchingPeriods != undefined) {
+                                            fundingPeriods =
+                                                fundingPeriods.concat(matchingPeriods.filter(
+                                                    (matchingPeriod: FundingPeriodResponse) => fundingPeriods
+                                                    .filter((current) => current.id == matchingPeriod.id).length ===
+                                                    0));
+                                        }
                                     }
-                                }
                                 });
 
                             self.FundingPeriods(fundingPeriods);
                         })
                         .fail((response) => {
-                            self.notificationMessage("There was a problem retreiving the funding periods, please try again");
+                            self.notificationMessage(
+                                "There was a problem retreiving the funding periods, please try again");
                             self.notificationStatus("error");
-                        })
+                        });
                 }
             });
 
@@ -673,6 +687,9 @@ namespace calculateFunding.approvals {
             let publishVM = new ConfirmPublishApproveViewModel();
             let selectedProviders: Array<string> = [];
             let selectedAuthorities: Array<string> = [];
+
+            // if checkAll checkbox is selected, then the action to apply all to KO will happen here.
+
             for (let i = 0; i < this.allProviderResults().length; i++) {
                 let providerResult = this.allProviderResults()[i];
                 let providerHasSelectedAllocations: boolean;
