@@ -319,6 +319,13 @@ namespace calculateFunding.specification {
                     console.log("Watching for specId: " + this.specificationId());
                 });
             }
+            else {
+                this.scrollWindowTop();
+            }
+        }
+
+        public scrollWindowTop() {
+            $(window).scrollTop(0);
         }
 
         public checkValidSubmission() {

@@ -46,11 +46,13 @@
                     <strong>Check that you have answered the questions correctly</strong>
                 </p>
                 <ul>
-                    <li><a href="" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
-                    <li><a href="" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
-                    <li><a href="" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
-                    <li><a href="" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
+                    <li><a href="#specificationName" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
+                    <li><a href="#description" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
+                    <li><a href="#select-funding-stream" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding stream</a></li>
+                    <li><a href="#select-funding-period" data-bind="css: fundingPeriodIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
+                    <li><a href="#providerVersionIdSelect" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
                 </ul>
+                
             </div>
             <div class="hidden" data-bind="css: formError() === true ? 'visible' : 'hidden'">
                 <p>
@@ -69,7 +71,7 @@
                     <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
                     <input id="specificationName" class="form-control" type="text" data-bind="value: name">
                 </div>
-            </div>
+            </div>          
             <div>
                 <div data-bind="css: fundingStreamIdValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
@@ -107,7 +109,7 @@
                 <div data-bind="css: descriptionValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea rows="10" class="form-control" data-bind="value: description"></textarea>
+                        <textarea id="description" rows="10" class="form-control" data-bind="value: description"></textarea>
                     </div>
                 </div>
             </div>
@@ -130,7 +132,7 @@
     <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/select2.min.js" type="text/javascript" asp-append-version="true"></script>
     <script asp-src-include="~/assets/libs/js/signalr.min.js"></script>
-    <script src="~/js/createspecification.js"></script>
+    <script src="~/js/createspecification.js"></script>    
     <script type="text/javascript">
         var vm = new calculateFunding.specification.CreateSpecificationViewModel();
         vm.isInProgress(false);
@@ -138,9 +140,9 @@
         if (createSpecificationContainer) {
             ko.applyBindings(vm, createSpecificationContainer);
         }
-
         vm.getFundingStream();
         vm.fundingStreamChanged();
+
     </script>
     <script asp-src-include="~/js/submit.disabler.js" asp-append-version="true" type="text/javascript"></script>
 }
