@@ -6,10 +6,10 @@ namespace CalculateFunding.Frontend.Pages.Results
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.Utility;
+    using Common.ApiClient.Models;
+    using Extensions;
+    using Common.ApiClient.Specifications;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;

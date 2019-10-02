@@ -1,5 +1,5 @@
-﻿using CalculateFunding.Common.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+﻿using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.Models;
 
 namespace CalculateFunding.Frontend.Clients.ResultsClient.Models.Results
 {

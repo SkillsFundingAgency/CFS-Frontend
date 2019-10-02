@@ -1,5 +1,3 @@
-﻿using CalculateFunding.Common.ApiClient.Publishing;
-
 namespace CalculateFunding.Frontend.Modules
 {
     using CalculateFunding.Common.ApiClient;
@@ -10,11 +8,12 @@ namespace CalculateFunding.Frontend.Modules
     using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Users;
+    using CalculateFunding.Common.ApiClient.Publishing;
+    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Clients.DatasetsClient;
     using CalculateFunding.Frontend.Clients.ResultsClient;
     using CalculateFunding.Frontend.Clients.ScenariosClient;
-    using CalculateFunding.Frontend.Clients.SpecsClient;
     using CalculateFunding.Frontend.Clients.TestEngineClient;
     using CalculateFunding.Frontend.Core.Ioc;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -176,10 +175,9 @@ namespace CalculateFunding.Frontend.Modules
             services
                 .AddSingleton<IJobsApiClient, JobsApiClient>();
 
-            services
-              .AddSingleton<Common.ApiClient.Specifications.ISpecificationsApiClient, Common.ApiClient.Specifications.SpecificationsApiClient>();
-
             services.AddSingleton<IPublishingApiClient, PublishingApiClient>();
+
+            services.AddSingleton<ISpecificationsApiClient, SpecificationsApiClient>();
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)

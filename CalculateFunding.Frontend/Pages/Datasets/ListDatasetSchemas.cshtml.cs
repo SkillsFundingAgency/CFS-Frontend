@@ -7,8 +7,9 @@
     using AutoMapper;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Specifications;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
     using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Properties;

@@ -2,10 +2,10 @@
 {
     using System.Threading.Tasks;
     using CalculateFunding.Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Specifications;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
     using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
     using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Specs;

@@ -4,15 +4,15 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.Utility;
+    using Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Specs;
+    using ViewModels.Specs;
     using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
+    using Common.FeatureToggles;
+    using Common.ApiClient.Specifications.Models;
 
     public class SpecificationSearchService : ISpecificationSearchService
     {

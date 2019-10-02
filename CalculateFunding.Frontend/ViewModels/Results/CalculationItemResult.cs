@@ -1,20 +1,15 @@
 ﻿using System;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
     public class CalculationItemResult
     {
         public string Calculation { get; set; }
-
         public CalculationSpecificationType CalculationType { get; set; }
-
         public string CalculationExceptionType { get; set; }
-
         public string CalculationExceptionMessage { get; set; }
-
         public decimal? SubTotal { get; set; }
-
         public string TotalFormatted
         {
             get

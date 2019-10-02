@@ -7,8 +7,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.ApiClient.Specifications;
+    using Extensions;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Specs;
     using CalculateFunding.Frontend.ViewModels.Common;

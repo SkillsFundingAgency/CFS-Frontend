@@ -4,6 +4,8 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
@@ -81,7 +83,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
 
-            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.Id);
+            ApiResponse<CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.Content.SpecificationId, calculation.Content.Id);
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
@@ -92,7 +94,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             SpecificationId = calculation.Content.SpecificationId;
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
 
-            ApiResponse<Clients.SpecsClient.Models.SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(SpecificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(SpecificationId);
 
             if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
             {

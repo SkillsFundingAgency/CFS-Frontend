@@ -5,15 +5,17 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Policies.Models;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.Models;
+    using Common.ApiClient.Models;
+    using Common.ApiClient.Policies;
+    using Common.ApiClient.Policies.Models;
+    using Common.ApiClient.Providers;
+    using Common.ApiClient.Providers.Models.Search;
+    using Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications.Models;
+    using Common.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Helpers;
+    using Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Results;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
@@ -148,7 +150,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");
@@ -208,7 +210,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2_3");
@@ -268,7 +270,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             Func<Task> test = async () => await providerAllocPageModel.OnGetAsync("2", "1617", "2");
@@ -327,7 +329,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2_3");
@@ -379,11 +381,11 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await providerAllocPageModel.OnGetAsync("2", "1617", "2");

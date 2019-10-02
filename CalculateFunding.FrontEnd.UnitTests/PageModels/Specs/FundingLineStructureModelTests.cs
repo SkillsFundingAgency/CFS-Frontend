@@ -6,10 +6,11 @@ using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -25,7 +26,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
 using SpecificationSummary = CalculateFunding.Common.ApiClient.Specifications.Models.SpecificationSummary;
-
 
 namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 {

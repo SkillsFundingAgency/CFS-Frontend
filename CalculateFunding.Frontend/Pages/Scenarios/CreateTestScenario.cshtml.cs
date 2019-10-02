@@ -1,13 +1,14 @@
 namespace CalculateFunding.Frontend.Pages.Scenarios
 {
     using AutoMapper;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.Identity.Authorization.Models;
+    using Common.Utility;
+    using Common.ApiClient.Models;
+    using Helpers;
+    using Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
+    using Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;

@@ -11,10 +11,10 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Calcs;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using FluentAssertions;
@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
-using Models = CalculateFunding.Frontend.Clients.SpecsClient.Models;
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
@@ -144,7 +143,7 @@ End Function";
                 .GetCalculationById(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(responseStatusCode == 0
                     ? null
-                    : new ApiResponse<Models.CalculationCurrentVersion>(responseStatusCode));
+                    : new ApiResponse<CalculationCurrentVersion>(responseStatusCode));
 
             ComparePageModel compPageModel = new ComparePageModel(specsClient, calcsClient, mapper);
 
@@ -185,7 +184,7 @@ End Function";
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            Models.CalculationCurrentVersion specCalculation = new Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -195,7 +194,7 @@ End Function";
 
             specsClient
                 .GetCalculationById(specificationId, calculationId)
-                .Returns(new ApiResponse<Models.CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
 
             Reference author = new Reference("1", "Matt Vallily");
 
@@ -273,7 +272,7 @@ End Function";
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            Models.CalculationCurrentVersion specCalculation = new Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -283,7 +282,7 @@ End Function";
 
             specsClient
                .GetCalculationById(expectedCalculation.SpecificationId, calculationId)
-               .Returns(new ApiResponse<Models.CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
+               .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
 
             List<CalculationVersion> calculationVersions = new List<CalculationVersion>();
 

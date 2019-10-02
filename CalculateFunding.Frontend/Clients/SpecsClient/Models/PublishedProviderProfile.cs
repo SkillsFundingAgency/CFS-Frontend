@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using CalculateFunding.Common.ApiClient.Profiling.Models;
 
 namespace CalculateFunding.Frontend.Clients.SpecsClient.Models
 {

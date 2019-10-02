@@ -133,13 +133,26 @@ namespace calculateFunding.specification {
                 this.onJobStarted(notification.jobType);
             }
 
+            if (notification.itemCount != null && notification.itemCount != undefined && notification.itemCount !== 0) {
+                this.showCreatingCalcs(true);
+                status.itemCount = notification.itemCount;
+                // a temporary workaround until figuring out why data binding is not working
+                $("#calculationTotalCount").text(notification.itemCount);
+                if (notification.overallItemsProcessed === null || notification.overallItemsProcessed === undefined)
+                    $("#calculationProcessed").text(0);
+            }
+            if (notification.overallItemsProcessed !== null && notification.overallItemsProcessed !== undefined) {
+                this.showCreatingCalcs(true);
+                status.overallItemsProcessed = notification.overallItemsProcessed;
+                // a temporary workaround until figuring out why data binding is not working
+                $("#calculationProcessed").text(notification.overallItemsProcessed);
+            }
+
             status.jobId = notification.jobId;
             status.completedSuccessfully = notification.completionStatus === CompletionStatus.Succeeded;
             status.invoker = notification.invokerUserDisplayName;
-            status.itemCount = notification.itemCount;
             status.outcome = notification.outcome;
             status.overallItemsFailed = notification.overallItemsFailed;
-            status.overallItemsProcessed = notification.overallItemsProcessed;
             status.overallitemsSucceeded = notification.overallitemsSucceeded;
             status.running = notification.runningStatus !== RunningStatus.Completed;
             status.statusDateTime(notification.statusDateTime);
@@ -313,7 +326,6 @@ namespace calculateFunding.specification {
                     console.log(this.specificationId());
 
                     this.showCreatingSpec(false);
-                    this.showCreatingCalcs(true);
 
                     this.startWatchingForSpecificationNotifications(this.specificationId());
                     console.log("Watching for specId: " + this.specificationId());

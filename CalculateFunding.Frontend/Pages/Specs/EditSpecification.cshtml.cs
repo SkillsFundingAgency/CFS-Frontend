@@ -7,16 +7,16 @@ using AutoMapper;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Specs
@@ -148,7 +148,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 IEnumerable<PolicyModels.FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
                 IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
 
-                IEnumerable<PolicyModels.FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new FundingStreamComparer());
+                IEnumerable<PolicyModels.FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new PolicyModels.FundingStreamComparer());
                 IEnumerable <SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
                 {
                     Value = m.Id,

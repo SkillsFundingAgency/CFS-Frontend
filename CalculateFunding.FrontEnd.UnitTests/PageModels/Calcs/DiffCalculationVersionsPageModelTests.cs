@@ -7,9 +7,9 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Calcs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -124,7 +124,7 @@ End Function";
             IEnumerable<int> versions = new List<int> { 1, 2 };
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -138,7 +138,7 @@ End Function";
 
             specsClient
              .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.NotFound, specCalculation));
+             .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.NotFound, specCalculation));
 
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
@@ -179,7 +179,7 @@ End Function";
             IEnumerable<int> versions = new List<int> { 1 };  // Not passing two versionIDs in the versions array
             string calculationId = "1";
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -193,7 +193,7 @@ End Function";
 
             specsClient
              .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<CalculateFunding.Frontend.Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
+             .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
             DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
 
             // Act
@@ -235,7 +235,7 @@ End Function";
 
             IEnumerable<int> versions = new List<int> { 1, 2 };
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
             {
                 Id = "1",
                 Name = "Test spec",
@@ -271,7 +271,7 @@ End Function";
 
             specsClient
                 .GetCalculationById(specificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
 
             calcsClient
                 .GetMultipleVersionsByCalculationId(versions, calculationId)

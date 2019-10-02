@@ -11,6 +11,8 @@ namespace CalculateFunding.Frontend.Pages.Results
     using CalculateFunding.Common.ApiClient.Policies.Models;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+    using CalculateFunding.Common.ApiClient.Specifications;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
     using CalculateFunding.Common.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Extensions;
@@ -197,11 +199,11 @@ namespace CalculateFunding.Frontend.Pages.Results
             {
                 IEnumerable<string> specificationIds = specResponse.Content;
 
-                Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary> specificationSummaries = new Dictionary<string, Clients.SpecsClient.Models.SpecificationSummary>();
+                Dictionary<string, SpecificationSummary> specificationSummaries = new Dictionary<string, SpecificationSummary>();
 
                 if (specificationIds.Any())
                 {
-                    ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>> specificationSummaryLookup = await _specsApiClient.GetSpecificationSummaries(specificationIds);
+                    ApiResponse<IEnumerable<SpecificationSummary>> specificationSummaryLookup = await _specsApiClient.GetSpecificationSummaries(specificationIds);
                     if (specificationSummaryLookup == null)
                     {
                         throw new InvalidOperationException("Specification Summary Lookup returned null");
@@ -214,7 +216,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
                     if (!specificationSummaryLookup.Content.IsNullOrEmpty())
                     {
-                        foreach (Clients.SpecsClient.Models.SpecificationSummary specSummary in specificationSummaryLookup.Content)
+                        foreach (SpecificationSummary specSummary in specificationSummaryLookup.Content)
                         {
                             specificationSummaries.Add(specSummary.Id, specSummary);
                         }

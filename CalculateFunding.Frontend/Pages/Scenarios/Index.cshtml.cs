@@ -1,6 +1,5 @@
 namespace CalculateFunding.Frontend.Pages.Scenarios
 {
-    // using Serilog;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -8,8 +7,8 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     using System.Threading.Tasks;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Common.ApiClient.Specifications;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
     using CalculateFunding.Frontend.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Scenarios;
@@ -23,9 +22,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     public class IndexModel : PageModel
     {
         private readonly IScenarioSearchService _scenarioSearchservice;
-
         private readonly ISpecsApiClient _specsClient;
-
         private readonly IPoliciesApiClient _policiesApiClient;
 
         public IndexModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IScenarioSearchService scenariosSearchService)

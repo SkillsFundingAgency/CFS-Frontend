@@ -1,20 +1,16 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Results
 {
     using System;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
+    using CalculateFunding.Common.ApiClient.Calcs.Models;
+    using Helpers;
 
     public class CalculationProviderResultSearchResultItemViewModel : ProviderSearchResultItemViewModel
     {
         public CalculationSpecificationType CalculationType { get; set; }
-
-        public Decimal? CalculationResult { get; set; }
-
+		public Decimal? CalculationResult { get; set; }
         public string CalculationExceptionType { get; set; }
-
-        public string CalculationExceptionMessage { get; set; }
-
-        public string CalculationResultDisplay
+		public string CalculationExceptionMessage { get; set; }
+		public string CalculationResultDisplay
         {
             get
             {
@@ -38,9 +34,7 @@
                 }
             }
         }
-
-        public DateTimeOffset? LastUpdatedDate { get; set; }
-
+		public DateTimeOffset? LastUpdatedDate { get; set; }
         public string LastUpdatedDateDisplay
         {
             get

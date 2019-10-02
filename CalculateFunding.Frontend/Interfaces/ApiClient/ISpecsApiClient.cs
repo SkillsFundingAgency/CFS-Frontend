@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+using FundingStream = CalculateFunding.Common.ApiClient.Policies.Models.FundingStream;
 
 namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {

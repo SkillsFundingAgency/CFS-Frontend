@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 
 namespace CalculateFunding.Frontend.PageModels.Results
 {
@@ -117,16 +119,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -404,16 +406,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -501,16 +503,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -595,16 +597,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -685,16 +687,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -810,16 +812,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -958,16 +960,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -1050,16 +1052,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,
@@ -1142,16 +1144,16 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, Enumerable.Empty<SpecificationSummary>()));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
             };
 
             specsApiClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(
                 calculationProviderResultsSearchService,

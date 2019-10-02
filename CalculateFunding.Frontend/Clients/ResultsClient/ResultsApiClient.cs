@@ -1,13 +1,13 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ResultsClient
 {
-    using CalculateFunding.Common.ApiClient;
+    using Common.ApiClient;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Interfaces;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
+    using Common.Utility;
+    using Models;
+    using Models.Results;
+    using Interfaces.ApiClient;
     using Serilog;
     using System.Collections.Generic;
     using System.Net;
@@ -18,7 +18,7 @@
     public class ResultsApiClient : BaseApiClient, IResultsApiClient
     {
         public ResultsApiClient(IHttpClientFactory httpClientFactory, ILogger logger, ICancellationTokenProvider cancellationTokenProvider)
-            : base(httpClientFactory, Common.ApiClient.HttpClientKeys.Results, logger, cancellationTokenProvider)
+            : base(httpClientFactory, HttpClientKeys.Results, logger, cancellationTokenProvider)
         {
         }
 

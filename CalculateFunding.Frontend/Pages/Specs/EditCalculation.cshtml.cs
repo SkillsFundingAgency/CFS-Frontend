@@ -6,13 +6,14 @@
 	using System.Net;
 	using System.Threading.Tasks;
 	using AutoMapper;
-	using CalculateFunding.Common.ApiClient.Models;
-	using CalculateFunding.Common.Identity.Authorization.Models;
-	using CalculateFunding.Common.Utility;
-	using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-	using CalculateFunding.Frontend.Extensions;
-	using CalculateFunding.Frontend.Helpers;
-	using CalculateFunding.Frontend.Interfaces.ApiClient;
+	using Common.ApiClient.Models;
+	using CalculateFunding.Common.ApiClient.Calcs.Models;
+	using CalculateFunding.Common.ApiClient.Specifications;
+	using Common.Identity.Authorization.Models;
+	using Common.Utility;
+	using CalculateFunding.Common.ApiClient.Specifications.Models;
+	using Extensions;
+	using Helpers;
 	using CalculateFunding.Frontend.ViewModels.Specs;
 	using Microsoft.AspNetCore.Mvc;
 	using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -200,7 +201,7 @@
 
 			if (specification.FundingStreams != null)
 			{
-				foreach (FundingStream fundingStream in specification.FundingStreams)
+				foreach (var fundingStream in specification.FundingStreams)
 				{
 					result.AddRange(fundingStream.AllocationLines.Select(m => new SelectListItem
 					{

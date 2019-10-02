@@ -7,8 +7,9 @@
 	using AutoMapper;
 	using Common.Utility;
 	using Common.ApiClient.Models;
+	using Common.ApiClient.Specifications;
+	using Common.ApiClient.Specifications.Models;
 	using Clients.DatasetsClient.Models;
-	using Clients.SpecsClient.Models;
 	using Interfaces.ApiClient;
 	using ViewModels.Datasets;
 	using ViewModels.Specs;

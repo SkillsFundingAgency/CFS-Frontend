@@ -1,5 +1,4 @@
-﻿
-namespace CalculateFunding.Frontend.UnitTests.PageModels.Scenarios
+﻿namespace CalculateFunding.Frontend.UnitTests.PageModels.Scenarios
 {
     using System;
     using System.Collections.Generic;
@@ -7,16 +6,17 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Scenarios
     using System.Security.Claims;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using Common.ApiClient.Models;
+    using Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications.Models;
+    using Common.Identity.Authorization.Models;
+    using Common.Models;
+    using Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Scenarios;
-    using CalculateFunding.Frontend.UnitTests.Helpers;
+    using Helpers;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;

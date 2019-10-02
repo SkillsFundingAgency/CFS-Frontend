@@ -5,6 +5,8 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -88,7 +90,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specsCalculation = new CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -101,9 +103,9 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
-            Clients.SpecsClient.Models.SpecificationSummary specificationSummary = new Clients.SpecsClient.Models.SpecificationSummary()
+            SpecificationSummary specificationSummary = new SpecificationSummary()
             {
                 Id = specificationId,
                 Name = specificationName
@@ -111,7 +113,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetSpecificationSummary(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
@@ -163,7 +165,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specsCalculation = new CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -176,7 +178,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper);
 
@@ -312,7 +314,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specsCalculation = new CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -325,7 +327,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             EditCalculationPageModel pageModel = CreatePageModel(specsClient: specsClient, calcsClient: calcsClient, mapper: mapper, features: featureToggle, resultsApiClient: resultsApiClient);
 
@@ -375,7 +377,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
                 }
             };
 
-            Clients.SpecsClient.Models.CalculationCurrentVersion specsCalculation = new Clients.SpecsClient.Models.CalculationCurrentVersion()
+            CalculationCurrentVersion specsCalculation = new CalculationCurrentVersion()
             {
                 Id = calculationId,
                 Name = "Specs Calculation",
@@ -388,7 +390,7 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 
             specsClient
                 .GetCalculationById(calcsCalculation.SpecificationId, calculationId)
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
+                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specsCalculation));
 
             ApiResponse<bool> hasCalcsResponse = new ApiResponse<bool>(HttpStatusCode.OK, true);
 

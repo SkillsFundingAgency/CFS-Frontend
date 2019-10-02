@@ -6,16 +6,19 @@
     using System.Net;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Policies.Models;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Models;
+    using Common.ApiClient.Models;
+    using Common.ApiClient.Policies;
+    using Common.ApiClient.Policies.Models;
+    using Common.ApiClient.Providers;
+    using Common.ApiClient.Providers.Models.Search;
+    using CalculateFunding.Common.ApiClient.Calcs.Models;
+    using Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications.Models;
+    using Common.FeatureToggles;
+    using Common.Models;
     using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Helpers;
+    using Interfaces.ApiClient;
     using CalculateFunding.Frontend.Pages.Results;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
@@ -156,7 +159,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -217,7 +220,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             Func<Task> test = async () => await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -277,7 +280,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -340,7 +343,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -350,9 +353,9 @@
 
             provideCalcPageModel.ViewModel.CalculationItems.Should().HaveSameCount(calResult);
 
-            provideCalcPageModel.ViewModel.CalculationItems.First().CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Number);
+            provideCalcPageModel.ViewModel.CalculationItems.First().CalculationType.Should().Be(CalculationSpecificationType.Number);
 
-            provideCalcPageModel.ViewModel.CalculationItems.Last().CalculationType.Should().Be(Clients.SpecsClient.Models.CalculationSpecificationType.Funding);
+            provideCalcPageModel.ViewModel.CalculationItems.Last().CalculationType.Should().Be(CalculationSpecificationType.Funding);
         }
 
         [TestMethod]
@@ -399,7 +402,7 @@
 
             specsClient
                 .GetSpecificationSummaries(Arg.Any<IEnumerable<string>>())
-                .Returns(new ApiResponse<IEnumerable<Clients.SpecsClient.Models.SpecificationSummary>>(HttpStatusCode.OK, new List<Clients.SpecsClient.Models.SpecificationSummary>()));
+                .Returns(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, new List<SpecificationSummary>()));
 
             // Act
             IActionResult result = await provideCalcPageModel.OnGetAsync("2", "1617", "2");
@@ -498,13 +501,13 @@
             {
                 Calculation = new Reference { Id = "1", Name = "Calc 1" },
                 Value = 234234234,
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Number
+                CalculationType = CalculationSpecificationType.Number
             };
             CalculationResultItem cal2 = new CalculationResultItem()
             {
                 Calculation = new Reference { Id = "2", Name = "Calc 2" },
                 Value = 4234234,
-                CalculationType = Clients.SpecsClient.Models.CalculationSpecificationType.Funding,
+                CalculationType = CalculationSpecificationType.Funding,
                 ExceptionType = "Exception",
                 ExceptionMessage = "An exception has occured."
             };

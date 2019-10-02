@@ -6,9 +6,9 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
@@ -57,7 +57,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            ApiResponse<Clients.SpecsClient.Models.CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
+            ApiResponse<CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
 
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {

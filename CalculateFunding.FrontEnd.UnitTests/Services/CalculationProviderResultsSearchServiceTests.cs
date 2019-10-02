@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Services;
@@ -16,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
 
 namespace CalculateFunding.Frontend.UnitTests.Services
 {

@@ -1,9 +1,9 @@
 ﻿namespace CalculateFunding.Frontend.Interfaces.ApiClient
 {
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using Clients.ResultsClient.Models;
+    using Clients.ResultsClient.Models.Results;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;

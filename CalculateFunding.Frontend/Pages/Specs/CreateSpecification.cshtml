@@ -123,7 +123,7 @@
         <h2>Please wait, this can take several minutes.</h2>
         <img src="~/assets/images/loading.svg" alt="Processing" />
         <h2 data-bind="visible: showCreatingSpec">Creating specification</h2>
-        <h2 data-bind="visible: showCreatingCalcs">Creating calculation <span data-bind="text: currentStatus.overallItemsProcessed"></span> of <span data-bind="text: currentStatus.itemCount"></span></h2>
+        <h2 data-bind="visible: showCreatingCalcs">Creating calculation <span id="calculationProcessed" data-bind="text: currentStatus.overallItemsProcessed"></span> of <span id="calculationTotalCount" data-bind="text: currentStatus.itemCount"></span></h2>
     </div>
 </div>
 

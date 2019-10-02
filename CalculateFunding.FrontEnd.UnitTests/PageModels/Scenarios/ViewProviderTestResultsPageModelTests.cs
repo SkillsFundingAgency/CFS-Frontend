@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 
 namespace CalculateFunding.Frontend.PageModels.Scenarios
 {
@@ -113,7 +115,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ISpecsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
                 .GetSpecificationSummary(Arg.Any<string>())
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient: specsApiClient);
 
@@ -212,7 +214,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ISpecsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
                 .GetSpecificationSummary(Arg.Any<string>())
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient);
 
@@ -424,7 +426,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ISpecsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
                 .GetSpecificationSummary(Arg.Any<string>())
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(
                 resultsService, testEngineApiClient,
@@ -488,7 +490,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ISpecsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
                 .GetSpecificationSummary(Arg.Any<string>())
-                .Returns(new ApiResponse<Clients.SpecsClient.Models.SpecificationSummary>(HttpStatusCode.OK, new Clients.SpecsClient.Models.SpecificationSummary()));
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(
                 resultsService, testEngineApiClient, 

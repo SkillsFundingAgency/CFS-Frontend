@@ -6,9 +6,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Clients.SpecsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
@@ -348,9 +348,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-                new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-                new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+                new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+                new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -384,9 +384,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-                new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-                new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+                new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+                new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -420,7 +420,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" }, new PolicyModels.FundingStream { Id = "fs2" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -454,7 +454,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" }, new PolicyModels.FundingStream { Id = "fs2" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -488,9 +488,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             // Arrange
             IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
             {
-                new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-                new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-                new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+                new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+                new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+                new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
             };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
@@ -554,9 +554,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			// Arrange
 			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
 			{
-				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-				new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
 			};
 			string userId = "testuser";
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -590,9 +590,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			// Arrange
 			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
 			{
-				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-				new SpecificationSummary { Id = "spec3", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = "spec3", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
 			};
 			string userId = "testuser";
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -629,9 +629,9 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 
 			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
 			{
-				new SpecificationSummary { Id = spec1Id, FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" } } },
-				new SpecificationSummary { Id = "spec2", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs2" } } },
-				new SpecificationSummary { Id = spec3Id, FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs3" } } }
+				new SpecificationSummary { Id = spec1Id, FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" } } },
+				new SpecificationSummary { Id = "spec2", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs2" } } },
+				new SpecificationSummary { Id = spec3Id, FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs3" } } }
 			};
 			string userId = "testuser";
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -675,7 +675,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			// Arrange
 			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
 			{
-				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" }, new PolicyModels.FundingStream { Id = "fs2" } } }
 			};
 			string userId = "testuser";
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);
@@ -708,7 +708,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 			// Arrange
 			IEnumerable<SpecificationSummary> specifications = new List<SpecificationSummary>
 			{
-				new SpecificationSummary { Id = "spec1", FundingStreams = new List<FundingStream>{ new FundingStream { Id = "fs1" }, new FundingStream { Id = "fs2" } } }
+				new SpecificationSummary { Id = "spec1", FundingStreams = new List<PolicyModels.FundingStream>{ new PolicyModels.FundingStream { Id = "fs1" }, new PolicyModels.FundingStream { Id = "fs2" } } }
 			};
 			string userId = "testuser";
 			ClaimsPrincipal user = BuildClaimsPrincipal(userId);

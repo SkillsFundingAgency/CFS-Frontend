@@ -1,7 +1,6 @@
 ﻿// <copyright file="SpecificationSearchServiceTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
-
 namespace CalculateFunding.Frontend.Services
 {
     using System;
@@ -10,14 +9,14 @@ namespace CalculateFunding.Frontend.Services
     using System.Net.Http;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.ApiClient.Models;
+    using CalculateFunding.Common.ApiClient.Specifications;
+    using CalculateFunding.Common.ApiClient.Specifications.Models;
+    using Common.FeatureToggles;
+    using Helpers;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Specs;
+    using ViewModels.Specs;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;

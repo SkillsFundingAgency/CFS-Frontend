@@ -5,8 +5,9 @@
 namespace CalculateFunding.Frontend.TestData
 {
     using System.Collections.Generic;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.SpecsClient.Models;
+    using Common.Models;
+    using Common.ApiClient.Policies.Models;
+    using Common.ApiClient.Specifications.Models;
 
     public static class SpecificationTestData
     {
