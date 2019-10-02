@@ -375,7 +375,7 @@ namespace calculateFunding.editTemplateCalculation {
             if (typeInformation) {
                 level++;
                 for (let i in typeInformation.properties) {
-                    if (level === 1) {
+                    if (level <= 2) {
                         let childVariable: providers.IVariable = EditTemplateCalculationViewModel.convertPropertyInformationReponseToVariable(typeInformation.properties[i], types, level);
                         variable.items[childVariable.name.toLowerCase()] = childVariable;
                     }
