@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Common.Models;
-using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Results;
@@ -29,21 +27,21 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
         public async Task TestScenarioResults_OnGetAsync_WhenRequestedWithDefaultOptions_ThenPageIsReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ITestScenarioResultsService testScenarioResultsService = CreateScenarioResultsService();
 
-            List<Reference> fundingPeriods = new List<Reference>
+            List<FundingPeriod> fundingPeriods = new List<FundingPeriod>
             {
-                new Reference("1617", "2016/2017"),
-                new Reference("1718", "2017/2018"),
-                new Reference("1819", "2018/2019")
+                new FundingPeriod{ Id ="1617", Name = "2016/2017" },
+                new FundingPeriod{ Id ="1718", Name = "2017/2018" },
+                new FundingPeriod{ Id ="1819", Name = "2018/2019" }
             };
 
-            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
+            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, policiesApiClient);
 
-            specsApiClient
+            policiesApiClient
                  .GetFundingPeriods()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+                 .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -114,21 +112,21 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
         public async Task TestScenarioResults_OnGetAsync_WhenRequestedWithSecondPage_ThenPageIsReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ITestScenarioResultsService testScenarioResultsService = CreateScenarioResultsService();
 
-            List<Reference> fundingPeriods = new List<Reference>
+            List<FundingPeriod> fundingPeriods = new List<FundingPeriod>
             {
-                new Reference("1617", "2016/2017"),
-                new Reference("1718", "2017/2018"),
-                new Reference("1819", "2018/2019")
+                new FundingPeriod{ Id ="1617", Name = "2016/2017" },
+                new FundingPeriod{ Id ="1718", Name = "2017/2018" },
+                new FundingPeriod{ Id ="1819", Name = "2018/2019" }
             };
 
-            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
+            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, policiesApiClient);
 
-            specsApiClient
+            policiesApiClient
                  .GetFundingPeriods()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+                 .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -199,23 +197,23 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
         public async Task TestScenarioResults_OnGetAsync_WhenRequestedWithSearchTerm_ThenPageIsReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             ITestScenarioResultsService testScenarioResultsService = CreateScenarioResultsService();
 
             string searchTerm = "searchTerm";
 
-            List<Reference> fundingPeriods = new List<Reference>
+            List<FundingPeriod> fundingPeriods = new List<FundingPeriod>
             {
-                new Reference("1617", "2016/2017"),
-                new Reference("1718", "2017/2018"),
-                new Reference("1819", "2018/2019")
+                new FundingPeriod{ Id ="1617", Name = "2016/2017" },
+                new FundingPeriod{ Id ="1718", Name = "2017/2018" },
+                new FundingPeriod{ Id ="1819", Name = "2018/2019" }
             };
 
-            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, specsApiClient);
+            TestScenarioResultsPageModel pageModel = CreatePageModel(testScenarioResultsService, policiesApiClient);
 
-            specsApiClient
+            policiesApiClient
                  .GetFundingPeriods()
-                 .Returns(new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods));
+                 .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
             TestScenarioResultViewModel testScenarioResultViewModel = new TestScenarioResultViewModel()
             {
@@ -288,16 +286,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
 
         private static TestScenarioResultsPageModel CreatePageModel(
             ITestScenarioResultsService resultsService = null,
-            ISpecsApiClient specsApiClient = null,
-            ILogger logger = null
-,
-            IMapper mapper = null)
+            IPoliciesApiClient policiesApiClient = null)
         {
             return new TestScenarioResultsPageModel(
                 resultsService ?? CreateScenarioResultsService(),
-                specsApiClient ?? CreateSpecsApiClient(),
-                logger ?? CreateLogger(),
-                mapper ?? MappingHelper.CreateFrontEndMapper());
+                policiesApiClient ?? CreatePoliciesApiClient());
         }
 
         private static ITestScenarioResultsService CreateScenarioResultsService()
@@ -305,9 +298,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Results
             return Substitute.For<ITestScenarioResultsService>();
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static IPoliciesApiClient CreatePoliciesApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<IPoliciesApiClient>();
         }
 
         private static ITestEngineApiClient CreateTestEngineApiClient()

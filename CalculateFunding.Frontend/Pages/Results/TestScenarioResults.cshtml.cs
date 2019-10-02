@@ -5,11 +5,9 @@ namespace CalculateFunding.Frontend.Pages.Results
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using AutoMapper;
     using Common.Utility;
     using Common.ApiClient.Models;
     using Extensions;
-    using Common.ApiClient.Specifications;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
@@ -18,30 +16,23 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using Serilog;
     using CalculateFunding.Common.Models;
+    using CalculateFunding.Common.ApiClient.Policies;
+    using CalculateFunding.Common.ApiClient.Policies.Models;
 
     public class TestScenarioResultsPageModel : PageModel
     {
-
         private readonly ITestScenarioResultsService _testScenarioResultsService;
-        private readonly IMapper _mapper;
-        private readonly ISpecsApiClient _specsApiClient;
-        private readonly ILogger _logger;
+        private readonly IPoliciesApiClient _policiesApiClient;
 
-        public TestScenarioResultsPageModel(ITestScenarioResultsService testScenarioResultsService, ISpecsApiClient specsApiClient, ILogger logger, IMapper mapper)
+        public TestScenarioResultsPageModel(ITestScenarioResultsService testScenarioResultsService, IPoliciesApiClient policiesApiClient)
         {
             Guard.ArgumentNotNull(testScenarioResultsService, nameof(testScenarioResultsService));
-            Guard.ArgumentNotNull(mapper, nameof(mapper));
-            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
-            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
 
             _testScenarioResultsService = testScenarioResultsService;
-            _mapper = mapper;
-            _specsApiClient = specsApiClient;
-            _logger = logger;
+            _policiesApiClient = policiesApiClient;
         }
-
 
         [BindProperty]
         public string SearchTerm { get; set; }
@@ -105,7 +96,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateFundingPeriods(string fundingPeriodId = null)
         {
-            ApiResponse<IEnumerable<Reference>> periodsResponse = await _specsApiClient.GetFundingPeriods();
+            ApiResponse<IEnumerable<FundingPeriod>> periodsResponse = await _policiesApiClient.GetFundingPeriods();
             if (periodsResponse == null)
             {
                 throw new InvalidOperationException($"Unable to retreive Periods: response was null");
