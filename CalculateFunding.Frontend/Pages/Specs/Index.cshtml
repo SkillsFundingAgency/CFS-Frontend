@@ -149,15 +149,6 @@
             <p>Loading specifications</p>
         </div>
 
-        @if (!Model.SearchResults.Specifications.AnyWithNullCheck())
-        {
-            <div class="noresults-panel spacing-30">
-                <span class="noresults-panel-text">
-                    <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
-                </span>
-            </div>
-        }
-
         <div class="noresults-panel spacing-30 withjs-show" data-bind="visible: specifications().length === 0">
             <span class="noresults-panel-text">
                 <i class="material-icons">error</i> No specifications found. <a href="/specs/CreateSpecification">Create a specification</a>.
