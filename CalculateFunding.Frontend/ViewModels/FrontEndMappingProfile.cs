@@ -106,13 +106,12 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Description, opt => opt.MapFrom(p => p.Current.Description))
                 .ForMember(m => m.FundingPeriodId, opt => opt.Ignore())
                 .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
-                .ForMember(m => m.LastModified, opt => opt.Ignore())
+                .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.Current.Date))
                 .ForMember(m => m.Version, opt => opt.Ignore())
                 .ForMember(m => m.LastModifiedByName, opt => opt.Ignore())
                 .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.Current.SourceCode))
                 .ForMember(m => m.CalculationType, opt => opt.MapFrom(p => p.Current.CalculationType))
                 .ForMember(m => m.PublishStatus, opt => opt.MapFrom(p => p.Current.PublishStatus));
-
 
             CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>()
                 .ForMember(m => m.CalculationType, opt => opt.Ignore())
