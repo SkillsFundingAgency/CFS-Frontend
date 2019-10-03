@@ -45,10 +45,10 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="row edit-calculation-header form-banner-container">
-                <div class="col-xs-12">
+                <div class="col-md-7 col-xs-12">
                     <div class="row">
-                        <div class="col-xs-9">
-                            <strong>Funding Period : @Model.FundingPeriod.Name</strong>
+                        <div class="col-xs-12">
+                            <strong>Funding Period : @Model.FundingPeriod.Name.FundingPeriodString()</strong>
                             <div class="hero-title">
                                 Edit additional calculation
                             </div>
@@ -78,7 +78,8 @@
                                 <label asp-for="EditModel.ValueType">Value type</label>
                                 <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
 
-                                <select asp-for="EditModel.ValueType" class="form-control" data-bind="value: calculationValueType">
+                                <select asp-for="EditModel.ValueType" class="form-control select-calculation-type" data-bind="value: calculationValueType">  
+                                    <option value="" disabled selected>Select a funding type</option>
                                     <option value="Percentage">Percentage</option>
                                     <option value="Number">Number</option>
                                     <option value="Currency">Currency</option>

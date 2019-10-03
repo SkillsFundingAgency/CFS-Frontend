@@ -111,8 +111,9 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
-                IEnumerable<PolicyModels.FundingStream> fundingStreams = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
-
+                IEnumerable<PolicyModels.FundingStream> fundingStreams = 
+                    await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
+                                
                 FundingStreams = fundingStreams.Select(m => new SelectListItem
                 {
                     Value = m.Id,

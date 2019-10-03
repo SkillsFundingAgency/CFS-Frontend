@@ -6,7 +6,7 @@
         <p class="hero-text-bold">@PageText.SpecificationName:</p>
         <h1 class="hero-title-headed">@Model.Name</h1>
         <p class="hero-text-bold">@PageText.FundingPeriod:</p>
-        <p class="hero-subtext">@Model.FundingPeriod.Name</p>
+        <p class="hero-subtext">@Model.FundingPeriod.Name.FundingPeriodString()</p>
         <p class="hero-text-bold">@PageText.FundingStreams:</p>
         @foreach (var fundingStream in Model.FundingStreams)
         {

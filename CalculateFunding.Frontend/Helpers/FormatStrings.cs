@@ -11,5 +11,15 @@
         public const string TimeFormatString = "HH:mm";
 
         public const string MoneyFormatString = "{0:n}";
+
+        public static string FundingPeriodString(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input) || input.Length!=4 )
+            {
+                return input;
+            }
+            
+            return $"20{input.Substring(0,2)}/{input.Substring(2,2)}";
+        }
     }
 }
