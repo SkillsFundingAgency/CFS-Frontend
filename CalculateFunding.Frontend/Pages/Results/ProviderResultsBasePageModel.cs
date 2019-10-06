@@ -15,6 +15,7 @@ using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -51,6 +52,8 @@ namespace CalculateFunding.Frontend.Pages.Results
         public IEnumerable<SelectListItem> FundingPeriods { get; set; }
 
         public IEnumerable<SelectListItem> Specifications { get; set; }
+
+
 
         [BindProperty]
         public string FundingPeriodId { get; set; }
