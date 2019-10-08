@@ -121,6 +121,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 {
                     Id = specificationSummary.Id,
                     Name = specificationSummary.Name,
+                    Description = specificationSummary.Description,
                     FundingPeriod = new ReferenceViewModel(specificationSummary.FundingPeriod.Id, specificationSummary.FundingPeriod.Name),
                     FundingStreams = specificationSummary.FundingStreams.Select(m => new ReferenceViewModel(m.Id, m.Name)),
                     PublishStatus = (PublishStatusViewModel)Enum.Parse(typeof(PublishStatusViewModel), specificationSummary.ApprovalStatus.ToString())

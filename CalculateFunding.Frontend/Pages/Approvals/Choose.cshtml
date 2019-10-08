@@ -50,26 +50,30 @@
     <form action="/approvals/choose" method="get">
         <div class="table-filter-container">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                <div class="col-md-4">
                     Funding stream
-                    
+
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-2 col-lg-4">
+                <div class="col-md-4 col-md-offset-1">
                     Funding period
-                    
-                </div>
-                <div class="col-xs-12 col-sm-1 col-md-2 col-lg-2">
-                    <button type="submit" class="btn btn-primary" id="nojs-submit-button">Go</button>
-                    <script type="text/javascript">document.getElementById("nojs-submit-button").style.display = "none";</script>
-                </div>
+
+                </div>                
             </div>
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4"><select asp-items="Model.FundingStreams" name="fundingStream" id="fundingStream">
-    <option value="" selected></option>
-</select></div>
-                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4"><select asp-items="Model.FundingPeriods" name="fundingPeriod" id="fundingPeriod">
-    <option value="" selected></option>
-</select></div>
+                <div class="col-md-4 col-xs-12">
+                    <select asp-items="Model.FundingStreams" name="fundingStream" id="fundingStream">
+                        <option value="" selected></option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-xs-12 col-md-offset-1 funding-period">
+                    <select asp-items="Model.FundingPeriods" name="fundingPeriod" id="fundingPeriod">
+                        <option value="" selected></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary" id="nojs-submit-button" style="padding: 9px 12px;">Go</button>
+                    <script type="text/javascript">document.getElementById("nojs-submit-button").style.display = "none";</script>
+                </div>
             </div>
         </div>
     </form>
@@ -81,14 +85,15 @@
                 <th>Provider QA coverage</th>
                 <th>QA tests passed</th>
                 <th>Calculations approved</th>
-                <th>@{
+                <th>
+                    @{
                         var viewFunding = Model.Specifications.Any(x => x.IsSelectedForFunding) ? "View funding" : "Choose";
-                    }
+                }
                 @viewFunding
-                    </th>
-            </tr>
-        </thead>
-        <tbody>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
         @{ bool containsSelectedSpec = Model.Specifications.Any(x => x.IsSelectedForFunding); }
         @foreach (ChooseApprovalSpecificationViewModel specification in Model.Specifications)
         {
@@ -126,17 +131,17 @@
                 </td>
             </tr>
         }
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    @if (!Model.Specifications.Any())
-    {
-        <div class="noresults-panel spacing-10">
-            <span class="noresults-panel-text">
-                <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ? @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
-            </span>
-        </div>
-    }
+@if (!Model.Specifications.Any())
+{
+    <div class="noresults-panel spacing-10">
+        <span class="noresults-panel-text">
+            <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ? @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
+        </span>
+    </div>
+}
 
 </div>
 
@@ -157,4 +162,6 @@
         ko.applyBindings(vfVM);
 
     </script>
+
+
 }
