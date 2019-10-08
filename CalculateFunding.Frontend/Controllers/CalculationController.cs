@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.Controllers
+﻿using CalculateFunding.Frontend.Extensions;
+
+namespace CalculateFunding.Frontend.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -152,17 +154,14 @@
         [Route("api/specs/{specificationId}/calculations/createadditionalcalculation")]
         public async Task<IActionResult> CreateCalculation(string specificationId, string calculationId, [FromBody] CreateAdditionalCalculationViewModel vm)
         {
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(vm, nameof(vm));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
             {
                 return new ForbidResult();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
             }
 
             CalculationCreateModel createCalculation = _mapper.Map<CalculationCreateModel>(vm);
@@ -171,18 +170,15 @@
             createCalculation.Id = calculationId;
             createCalculation.Name = vm.CalculationName;
             createCalculation.ValueType = vm.CalculationType;
-            
+
             ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
             }
-            else
-            {
-                throw new InvalidOperationException($"An error occurred while saving calculation. Status code={response.StatusCode}");
-            }
 
+			return BadRequest($"An error occurred while saving calculation. Please check and try again.");
         }
 
         [HttpPost]

@@ -9,9 +9,10 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 		public string SourceCode { get; set; }
 
 		[Required(ErrorMessage = "Calculation name is required")]
+		[MinLength(length:1, ErrorMessage = "Please provide a calculation name.")]
 		public string CalculationName { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "Calculation type is required")]
 		public CalculationValueType CalculationType { get; set; }
 	}
 }

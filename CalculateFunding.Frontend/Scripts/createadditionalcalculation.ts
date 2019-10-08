@@ -8,9 +8,9 @@ namespace calculateFunding.createadditionalcalculation {
 
         public sourceCode: KnockoutObservable<string> = ko.observable();
 
-        public calculationName: KnockoutObservable<string> = ko.observable();
+        public calculationName: KnockoutObservable<string> = ko.observable("");
 
-        public calculationValueType: KnockoutObservable<string> = ko.observable();
+        public calculationValueType: KnockoutObservable<string> = ko.observable("");
 
         public canBuildCalculation: KnockoutComputed<boolean>;
 
@@ -41,6 +41,13 @@ namespace calculateFunding.createadditionalcalculation {
         public calculationNameIsValid: KnockoutObservable<boolean> = ko.observable(true);
 
         public calculationNameMessage: KnockoutObservable<string> = ko.observable();
+
+        public calculationTypeIsValid: KnockoutObservable<boolean> = ko.observable(true);
+
+        public calculationTypeMessage: KnockoutObservable<string> = ko.observable();
+
+        public errorMessage : KnockoutObservable<string> = ko.observable("");
+
 
         constructor(options: ICreateAdditionalCalculationViewModelOptions) {
             if (!options.calculationId) {
@@ -75,6 +82,7 @@ namespace calculateFunding.createadditionalcalculation {
             });
 
             this.canSaveCalculation = ko.computed(() => {
+
                 // Does the user have permission
                 //if (!self.doesUserHavePermissionToApproveOrEdit()) {
                 //    return false;
@@ -85,12 +93,16 @@ namespace calculateFunding.createadditionalcalculation {
                     return false;
                 }
 
-                // Disable save if content is the same as existing verion
+                // Disable save if content is the same as existing version
                 if (self.sourceCode() == self.initialCodeContents) {
                     return false;
                 }
 
                 if (this.state() !== "idle") {
+                    return false;
+                }
+
+                if (!this.checkFormValidation()) {
                     return false;
                 }
 
@@ -120,12 +132,37 @@ namespace calculateFunding.createadditionalcalculation {
                 });
         }
 
+        public checkFormValidation() {
+            let success = true;
+            
+
+            // Is Calculation Value unselected
+            if (this.calculationValueType() === "" || this.calculationValueType == undefined) {
+                this.calculationTypeIsValid(false);
+                success = false;
+            } else {
+                this.calculationTypeIsValid(true);
+            }
+
+            // Is Calculation name empty
+            if (this.calculationName() === "" || this.calculationName == undefined) {
+                this.calculationNameIsValid(false);
+                success = false;
+            } else {
+                this.calculationNameIsValid(true);
+            }
+
+            return success;
+        }
+
         public buildCalculation() {
             if (this.state() === "idle") {
                 this.state("buildingCalculation");
                 this.buildOutput("Compiling...");
                 this.compilerResponse(null);
                 this.calculationBuilt(false);
+
+
 
                 let data = {
                     calculationId: this.options.calculationId,
@@ -165,9 +202,11 @@ namespace calculateFunding.createadditionalcalculation {
         }
 
         public saveCalculation() {
-            if (this.state() === "idle" && this.canSaveCalculation()) {
+            if (this.state() === "idle" && this.canSaveCalculation() && this.checkFormValidation()) {
                 this.calculationNameIsValid(true);
                 this.calculationNameMessage("");
+                this.calculationTypeIsValid(true);
+                this.calculationTypeMessage("");
 
                 this.state("savingcalculation");
                 let data = {
@@ -187,6 +226,8 @@ namespace calculateFunding.createadditionalcalculation {
                 let self = this;
 
                 request.fail((error) => {
+                    this.errorMessage(error.responseText);
+                    window.location.href = "#errorMessage";
                     let errorMessage = "Error saving calculation:\n";
                     errorMessage += "Status: " + error.status;
                     self.saveCalculationResult(errorMessage);
@@ -237,7 +278,7 @@ namespace calculateFunding.createadditionalcalculation {
                     let functions: calculateFunding.providers.ILocalFunctionContainer = {};
                     let options: ICreateAdditionalCalculationViewModelOptions = this.options;
                     let calculationTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
-                        return item.name === "AdditionalCalculations" || options.fundingStreams.filter((value) => { return item.name.toLowerCase() === value.id.toLowerCase() + 'calculations'  }).length > 0;
+                        return item.name === "AdditionalCalculations" || options.fundingStreams.filter((value) => { return item.name.toLowerCase() === value.id.toLowerCase() + 'calculations' }).length > 0;
                     });
                     let dataTypes: common.ITypeInformationResponse[] = ko.utils.arrayFilter(result, (item: common.ITypeInformationResponse) => {
                         return item.type === "DefaultType";
@@ -352,7 +393,7 @@ namespace calculateFunding.createadditionalcalculation {
             }
         }
 
-        private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>, level? : number): providers.IVariable {
+        private static convertPropertyInformationReponseToVariable(property: common.IPropertyInformationResponse, types: Array<common.ITypeInformationResponse>, level?: number): providers.IVariable {
             let variable: providers.IVariable = {
                 name: property.name,
                 friendlyName: property.friendlyName,
