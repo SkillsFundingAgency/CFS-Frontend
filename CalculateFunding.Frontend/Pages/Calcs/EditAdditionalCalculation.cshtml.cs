@@ -8,7 +8,9 @@ using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
@@ -19,18 +21,25 @@ namespace CalculateFunding.Frontend.Pages.Calcs
     {
         private ISpecificationsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
+        private readonly IAuthorizationHelper _authorizationHelper;
         private IMapper _mapper;
 
-        public EditAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features)
+        public EditAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, 
+	        ICalculationsApiClient calcClient, 
+	        IMapper mapper, 
+	        IFeatureToggle features, 
+	        IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(features, nameof(features));
+			Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
+            _authorizationHelper = authorizationHelper;
             ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
 
@@ -68,16 +77,22 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             Calculation = calculationResponse.Content;
 
             ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(Calculation.SpecificationId);
+            
+            SpecificationSummary specificationSummary = specificationResponse?.Content;
 
-            SpecificationId = specificationResponse.Content.Id;
-
-            FundingStreams = JsonConvert.SerializeObject(specificationResponse.Content.FundingStreams);
-
-            FundingPeriod = specificationResponse.Content.FundingPeriod;
-
-            if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
+            if (specificationResponse?.StatusCode == HttpStatusCode.OK)
             {
-                SpecificationName = specificationResponse.Content.Name;
+                SpecificationName = specificationSummary.Name;
+            
+                SpecificationId = specificationSummary.Id;
+
+                FundingStreams = JsonConvert.SerializeObject(specificationSummary.FundingStreams);
+
+                FundingPeriod = specificationSummary.FundingPeriod;
+                
+                bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, SpecificationName, SpecificationActionTypes.CanEditCalculations);
+
+                DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
             }
             else
             {
