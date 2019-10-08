@@ -30,8 +30,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private readonly ICalculationSearchService _calculationSearchService;
 
         public AdditionalCalculationsModel(
-            ISpecsApiClient specsClient, 
-            IDatasetsApiClient datasetsClient, 
+            ISpecsApiClient specsClient,
+            IDatasetsApiClient datasetsClient,
             IMapper mapper,
             ICalculationSearchService calculationSearchService)
         {
@@ -101,7 +101,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 Filters = new Dictionary<string, string[]>
                 {
                     { "CalculationType", new string[]{ "Additional" } },
-                    { "SpecificationId", new string[]{ specificationId } }
+                    { "SpecificationId", new string[]{ specificationId } },
+                    { "specificationName", new string[]{ Specification?.Name } }
                 },
                 PageNumber = pageNumber ?? 1,
                 SearchTerm = searchTerm,
