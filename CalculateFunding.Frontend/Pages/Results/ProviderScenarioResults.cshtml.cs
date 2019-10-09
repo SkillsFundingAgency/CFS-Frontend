@@ -120,14 +120,8 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             Task<ApiResponse<ProviderVersionSearchResult>> apiResponseTask = _providersApiClient.GetProviderByIdFromMaster(providerId);
 
-
             await TaskHelper.WhenAllAndThrow(populatePeriodsTask, apiResponseTask);
-
-            if (string.IsNullOrWhiteSpace(fundingPeriodId))
-            {
-                fundingPeriodId = FundingPeriods?.First().Value;
-            }
-
+        
             FundingPeriodId = fundingPeriodId;
 
             await PopulateSpecifications(providerId, SpecificationId);
@@ -188,7 +182,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Value = m.Id,
                 Text = m.Name,
                 Selected = m.Id == fundingPeriodId
-            }).ToList();
+            }).ToList().OrderBy(s => s.Text);
         }
 
         private async Task PopulateSpecifications(string providerId, string specificationId)

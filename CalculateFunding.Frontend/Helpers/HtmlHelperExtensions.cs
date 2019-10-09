@@ -6,18 +6,18 @@
 	    {
 		    if (textType == "Number")
 		    {
-			    return text?.ToString("N0");
+			    return text?.ToString("N0") ?? "Excluded"; 
 
 		    }
 
 		    if (textType == "Percentage")
 		    {
-			    return text?.ToString("P0");
+			    return text?.ToString("P0") ?? "Excluded";
             }
 
 		    if (textType == "Currency")
 		    {
-			    return text?.ToString("C0");
+			    return text?.ToString("C0") ?? "Excluded";
             }
 
 		    return "";

@@ -84,12 +84,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateAsync(string providerId, string fundingPeriodId = null, string specificationProviderVersion = null)
         {
-            await PopulatePeriods(fundingPeriodId);
-
-            if (string.IsNullOrWhiteSpace(fundingPeriodId))
-            {
-                fundingPeriodId = FundingPeriods?.First().Value;
-            }
+            await PopulatePeriods(fundingPeriodId);          
 
             FundingPeriodId = fundingPeriodId;
 
@@ -198,7 +193,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Value = m.Id,
                 Text = m.Name,
                 Selected = m.Id == fundingPeriodId
-            }).ToList();
+            }).ToList().OrderBy(s => s.Text);
         }
 
         private async Task PopulateSpecifications(string providerId, string specificationId)
