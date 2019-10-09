@@ -40,112 +40,124 @@
         </ol>
     </div>
 }
- <div id="createAdditionalCalc">
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="row edit-calculation-header form-banner-container">
-                        <div class="col-md-7 col-xs-12">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <strong>Funding Period : @Model.FundingPeriod.Name.FundingPeriodString()</strong>
-                                    <div class="hero-title">
-                                        Create additional calculation
-                                    </div>
-                                </div>
-                                <div class="bannerblue-button-container edit-calculation-status-container col-xs-3" id="approve-button-container">
-                                    @*<approve-status-button params="publishStatus : '@Model.Calculation.Current.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>*@
-                                </div>
+<div id="createAdditionalCalc">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row edit-calculation-header form-banner-container">
+                <div class="col-md-7 col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <strong>Funding Period : @Model.FundingPeriod.Name.FundingPeriodString()</strong>
+                            <div class="hero-title">
+                                Create additional calculation
+                            </div>
+                        </div>
+                        <div class="bannerblue-button-container edit-calculation-status-container col-xs-3" id="approve-button-container">
+                            @*<approve-status-button params="publishStatus : '@Model.Calculation.Current.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>*@
+                        </div>
 
-                            </div>
-                            <div class="error-summary" data-bind="hidden: errorMessage() == ''">
-                                <a name="errorMessage"></a><span class="error-message" data-bind="text: errorMessage()"></span>
-                            </div>
-                            <div>
-                                <div>
-                                    <div class="form-group" data-bind="css: !calculationNameIsValid() ? 'validation-failed-block': ' '">
-                                        <a validationanchor-for="CreateModel.Name"></a>
-                                        <label asp-for="CreateModel.Name">Name</label>
-                                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
-                                        <input asp-for="CreateModel.Name" class="form-control" type="text"  data-bind="value: calculationName">
-                                        <div data-bind="hidden: calculationNameIsValid">
-                                            <span class="validation-failed-label" data-bind="text: calculationNameMessage, css: !calculationNameIsValid() ? 'validation-failed-': ' '"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div>
-                                    <div class="form-group" data-bind="css: !calculationTypeIsValid() ? 'validation-failed-block': ' '">
-                                        <label asp-for="CreateModel.ValueType">Value type</label>
-                                        <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
-
-                                        <select asp-for="CreateModel.ValueType" class="form-control select-calculation-type" data-bind="value: calculationValueType">
-                                            <option value="" disabled selected>Select a funding type</option>
-                                            <option value="Percentage">Percentage</option>
-                                            <option value="Number">Number</option>
-                                            <option value="Currency">Currency</option>
-                                        </select>
-                                        <div data-bind="hidden: calculationTypeIsValid">
-                                            <span class="validation-failed-label" data-bind="text: calculationTypeMessage, css: !calculationTypeIsValid() ? 'validation-failed-': ' '"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="hidden" data-bind="css: formValid() === false ? 'validation-summary-errors' : 'hidden'">
+                        <h3 class="heading-large">There is a problem</h3>
+                        <div class="hidden" data-bind="css: formValid() === false ? 'visible' : 'hidden'">
+                            <p>
+                                <strong>Check that you have answered the questions correctly</strong>
+                            </p>
+                            <ul>
+                                <li><a href="#calculationName" data-bind="css: calculationNameIsValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
+                                <li><a href="#calculationValue" data-bind="css: calculationTypeIsValid() === false ? 'validation-summary-link' : 'hidden'">You must select a value type</a></li>
+                            </ul>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row edit-calculation" id="edit-calculation">
-
-                <div class="col-xs-12 edit-calculation-editor-wrapper">
-                    <div class="edit-calculation-editor-container">
-                        <div class="edit-calculation-container-header">
-                            <strong>Calculation script</strong>
-                        </div>
-                        <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
-
-                        <div class="edit-calculation-container-footer spacing-30">
-                            <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
-                            <span class="build-output-message"><i class="material-icons material-icons-left">info</i>Your calculation's build output must be successful before you can save it.</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-12">
-                    <div class="build-output no-border">
-                        <strong>Build output</strong>
-                        <div data-bind="text: buildOutput"></div>
-                        <div data-bind="with: compilerResponse" id="compiler-response">
-                            Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
-
-                            <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
-                                <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="spacing-15">
-                        <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+                    <div class="error-summary" data-bind="hidden: errorMessage() == ''">
+                        <a name="errorMessage"></a><span class="error-message" data-bind="text: errorMessage()"></span>
                     </div>
                     <div>
-                        <a href="/specs/fundinglinestructure/@Model.SpecificationId" class="govuk-back-link" id="link-back">Back</a>
+                        <div>
+                            <div class="form-group" data-bind="css: !calculationNameIsValid() ? 'validation-failed-block': ' '">
+                                <a validationanchor-for="CreateModel.Name"></a>
+                                <label asp-for="CreateModel.Name">Name</label>
+                                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Use a descriptive unique name other users can understand</span></h4>
+                                <input asp-for="CreateModel.Name" class="form-control" type="text" data-bind="value: calculationName">
+                                <div data-bind="hidden: calculationNameIsValid">
+                                    <span class="validation-failed-label" data-bind="text: calculationNameMessage, css: !calculationNameIsValid() ? 'validation-failed-': ' '"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div class="form-group" data-bind="css: !calculationTypeIsValid() ? 'validation-failed-block': ' '">
+                                <label asp-for="CreateModel.ValueType">Value type</label>
+                                <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a value type</span></h4>
+
+                                <select asp-for="CreateModel.ValueType" class="form-control select-calculation-type" data-bind="value: calculationValueType">
+                                    <option value="" disabled selected>Select a funding type</option>
+                                    <option value="Percentage">Percentage</option>
+                                    <option value="Number">Number</option>
+                                    <option value="Currency">Currency</option>
+                                </select>
+                                <div data-bind="hidden: calculationTypeIsValid">
+                                    <span class="validation-failed-label" data-bind="text: calculationTypeMessage, css: !calculationTypeIsValid() ? 'validation-failed-': ' '"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row edit-calculation" id="edit-calculation">
+
+        <div class="col-xs-12 edit-calculation-editor-wrapper">
+            <div class="edit-calculation-editor-container">
+                <div class="edit-calculation-container-header">
+                    <strong>Calculation script</strong>
+                </div>
+                <div id="monacoeditor" class="monaco-editor-container" data-bind="monacoEditor: sourceCode, monacoEditorOptions: {editorCreatedCallback: function(){registerMonacoProviders($root)}}"></div>
+
+                <div class="edit-calculation-container-footer spacing-30">
+                    <input type="button" class="button-calculation" value="Build calculation" data-bind="click: buildCalculation, disable: !canBuildCalculation()" id="build-calculation-button" />
+                    <span class="build-output-message"><i class="material-icons material-icons-left">info</i>Your calculation's build output must be successful before you can save it.</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="build-output no-border">
+                <strong>Build output</strong>
+                <div data-bind="text: buildOutput"></div>
+                <div data-bind="with: compilerResponse" id="compiler-response">
+                    Code compiled successfully: <span data-bind="text: compilerOutput.success"></span>
+
+                    <div class="compiler-messages" data-bind="foreach: compilerOutput.compilerMessages">
+                        <span data-bind="text: severity"></span>: <span data-bind="text: message"></span>
                     </div>
                 </div>
             </div>
 
+            <div class="spacing-15">
+                <input type="button" class="button" value="Save calculation" data-bind="click: saveCalculation, enable: canSaveCalculation" id="save-calculation-button" />
+            </div>
+            <div>
+                <a href="/specs/fundinglinestructure/@Model.SpecificationId" class="govuk-back-link" id="link-back">Back</a>
+            </div>
         </div>
+    </div>
+
+</div>
 
 
-        @section scripts{
-            <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
-            <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
-            <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
-            <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
-            <script asp-src-include="~/js/createadditionalcalculation.js" type="text/javascript" asp-append-version="true"></script>
+@section scripts{
+    <script asp-src-include="~/assets/libs/js/knockout-latest.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/assets/libs/js/monaco/vs/loader.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/provider.completion.vb.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/bindingHandler.monacoEditor.js" type="text/javascript" asp-append-version="true"></script>
+    <script asp-src-include="~/js/createadditionalcalculation.js" type="text/javascript" asp-append-version="true"></script>
 
-            <partial name="_ApproveStatusButtonPartial" />
+    <partial name="_ApproveStatusButtonPartial" />
 
-            <script type="text/javascript">
+    <script type="text/javascript">
     var createCalculationElement = document.getElementById("createAdditionalCalc");
     if (createCalculationElement) {
         var createViewModelOptions = {
@@ -162,6 +174,6 @@
         ko.applyBindings(viewModel, createCalculationElement);
 
         ko.applyBindings(viewModel, document.getElementById("permissions-banner-editcalc"));
-                }              
-            </script>
-        }
+                }
+    </script>
+}

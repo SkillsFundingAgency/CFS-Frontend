@@ -46,8 +46,10 @@ namespace calculateFunding.createadditionalcalculation {
 
         public calculationTypeMessage: KnockoutObservable<string> = ko.observable();
 
-        public errorMessage : KnockoutObservable<string> = ko.observable("");
-
+        public errorMessage: KnockoutObservable<string> = ko.observable("");
+        public formValid: KnockoutObservable<boolean> = ko.observable();
+        public nameValid: KnockoutObservable<boolean> = ko.observable();
+        public valueValid: KnockoutObservable<boolean> = ko.observable();
 
         constructor(options: ICreateAdditionalCalculationViewModelOptions) {
             if (!options.calculationId) {
@@ -134,12 +136,11 @@ namespace calculateFunding.createadditionalcalculation {
 
         public checkFormValidation() {
             let success = true;
-            
+            this.formValid(true);
 
             // Is Calculation Value unselected
             if (this.calculationValueType() === "" || this.calculationValueType == undefined) {
                 this.calculationTypeIsValid(false);
-                success = false;
             } else {
                 this.calculationTypeIsValid(true);
             }
@@ -147,11 +148,15 @@ namespace calculateFunding.createadditionalcalculation {
             // Is Calculation name empty
             if (this.calculationName() === "" || this.calculationName == undefined) {
                 this.calculationNameIsValid(false);
-                success = false;
             } else {
                 this.calculationNameIsValid(true);
             }
 
+            if (!this.calculationNameIsValid() || !this.calculationTypeIsValid()) {
+                this.formValid(false);
+                success = false;
+            }
+            
             return success;
         }
 
@@ -202,6 +207,7 @@ namespace calculateFunding.createadditionalcalculation {
         }
 
         public saveCalculation() {
+            this.errorMessage("");
             if (this.state() === "idle" && this.canSaveCalculation() && this.checkFormValidation()) {
                 this.calculationNameIsValid(true);
                 this.calculationNameMessage("");
