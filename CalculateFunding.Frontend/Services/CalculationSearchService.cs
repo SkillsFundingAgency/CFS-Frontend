@@ -64,7 +64,7 @@ namespace CalculateFunding.Frontend.Services
             {
                 TotalResults = calculationsResult.Content.TotalCount,
                 CurrentPage = requestOptions.Page,
-                Calculations = calculationsResult.Content.Results.Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
+                Calculations = calculationsResult.Content.Results.Where(c=> c.CalculationType != "Template").Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();

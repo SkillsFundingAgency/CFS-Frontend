@@ -10,7 +10,7 @@
 
         private searchCompleted: (resultUntyped: any) => void;
 
-        constructor(specificationId: string) {
+        constructor(specificationId: string, specificationName: string) {
             super();
 
             let self = this;
@@ -43,6 +43,14 @@
                 };
 
                 filters.push(calcTypeFilter);
+
+                let specNameFilter: calculateFunding.search.SearchFilter =
+                {
+                    name: "specificationName",
+                    term: specificationName
+                };
+
+                filters.push(specNameFilter);
 
                 return filters;
             });
