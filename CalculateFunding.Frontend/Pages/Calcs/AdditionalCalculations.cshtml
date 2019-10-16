@@ -111,8 +111,10 @@
                         int rowId = 0;
                     }
 
-                    @foreach (CalculationSearchResultItemViewModel calculation in Model.CalculationSearchResults.Calculations)
+                    @if (!Model.CalculationSearchResults.Calculations.IsNullOrEmpty())
                     {
+                        foreach (CalculationSearchResultItemViewModel calculation in Model.CalculationSearchResults.Calculations)
+                        {
                         <tr>
                             <td>
                                 <a href="/calcs/editAdditionalCalculation/@calculation.Id">@calculation.Name</a>
@@ -121,7 +123,8 @@
                             <td>@calculation.ValueType</td>
                             <td>@calculation.LastUpdatedDateDisplay</td>
                         </tr>
-                        rowId++;
+                            rowId++;
+                        }
                     }
                 </tbody>
 

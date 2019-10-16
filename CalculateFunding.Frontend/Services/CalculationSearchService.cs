@@ -62,13 +62,13 @@ namespace CalculateFunding.Frontend.Services
 
             CalculationSearchResultViewModel result = new CalculationSearchResultViewModel
             {
-                TotalResults = calculationsResult.Content.TotalCount,
+                TotalResults = calculationsResult.Content?.TotalCount ?? 0,
                 CurrentPage = requestOptions.Page,
-                Calculations = calculationsResult.Content.Results.Where(c=> c.CalculationType != "Template").Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
+                Calculations = calculationsResult.Content?.Results?.Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-            if (calculationsResult.Content.Facets != null)
+            if (calculationsResult.Content != null && calculationsResult.Content.Facets != null)
             {
                 searchFacets.AddRange(calculationsResult.Content.Facets.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)));
             }
@@ -86,15 +86,15 @@ namespace CalculateFunding.Frontend.Services
                 result.EndItemNumber = result.StartItemNumber + requestOptions.PageSize - 1;
             }
 
-            if (result.EndItemNumber > calculationsResult.Content.TotalCount)
+            if (result.EndItemNumber > result.TotalResults)
             {
-                result.EndItemNumber = calculationsResult.Content.TotalCount;
+                result.EndItemNumber = result.TotalResults;
             }
 
             int totalPages = 0;
-            if (calculationsResult.Content.TotalCount > 0)
+            if (result.TotalResults > 0)
             {
-                totalPages = requestOptions.PageSize % calculationsResult.Content.TotalCount;
+                totalPages = requestOptions.PageSize % result.TotalResults;
             }
 
             result.PagerState = new PagerState(requestOptions.Page, totalPages, 4);

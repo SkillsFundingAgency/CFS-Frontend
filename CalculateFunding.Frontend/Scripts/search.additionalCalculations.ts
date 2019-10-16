@@ -62,8 +62,9 @@
             self.searchCompleted = (resultUntyped: any) => {
                 if (resultUntyped) {
                     let result: ICalculationsSearchResultResponse = resultUntyped;
-                    self.calculations(result.calculations);
-
+                    if (result.calculations != null) {
+                        self.calculations(result.calculations);
+                    }
                     self.populateCommonSearchResultProperties(result);
                 }
             }
