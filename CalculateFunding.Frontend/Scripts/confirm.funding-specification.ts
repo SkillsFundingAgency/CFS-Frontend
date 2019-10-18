@@ -4,7 +4,6 @@
 
         private specificationId: string;
         private fundingPeriodId: string;
-        private fundingStreamId: string;
 
         constructor(options: IConfirmationViewModelConstructorParameters) {
 
@@ -18,7 +17,6 @@
 
                 self.specificationId = options.specificationId;
                 self.fundingPeriodId = options.fundingPeriodId;
-                self.fundingStreamId = options.fundingStreamId;
             }
         }
 
@@ -43,7 +41,7 @@
                 type: "POST",
                 url: url,
                 success: function () {
-                    self.Redirect(self.specificationId, self.fundingPeriodId, self.fundingStreamId)
+                    self.Redirect(self.specificationId, self.fundingPeriodId)
                 },
                 error: self.Error
             });
@@ -71,11 +69,9 @@
             $("#wait-state-container").hide();
         }
 
-        private Redirect(specificationId: string, fundingPeriodId: string, fundingStreamId: string): void {
+        private Redirect(specificationId: string, fundingPeriodId: string): void {
 
-            let operationType = "SpecificationChosen"
-
-            let redirectUrl = "/approvals/choose?fundingPeriod=" + fundingPeriodId + "&fundingStream=" + fundingStreamId + "&opertionType=" + operationType + "&operationId=" + specificationId;
+            let redirectUrl = "/approvals/choose?fundingPeriod=" + fundingPeriodId + "&specificationId=" + specificationId;
 
             document.location.href = redirectUrl;
         }
@@ -93,7 +89,6 @@
     export interface IConfirmationViewModelConstructorParameters {
         specificationId: string;
         fundingPeriodId: string;
-        fundingStreamId: string;
     }
 
 }

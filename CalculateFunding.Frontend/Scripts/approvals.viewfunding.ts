@@ -1465,57 +1465,6 @@ namespace calculateFunding.approvals {
         }
     }
 
-    /** Funding period dropdown options */
-    export class FundingPeriodResponse {
-        constructor(id: string, value: string, name: string, period: string) {
-            this.id = id;
-            this.value = value;
-            this.name = name;
-            this.period = period;
-        }
-        id: string;
-        value: string;
-        name: string;
-        period: string;
-    }
-
-    /** Specification dropdown options  */
-    export class SpecificationResponse {
-        constructor(id: string, name: string, fundingPeriod: FundingPeriodResponse, publishedResultsRefreshedAt: Date, fundingStreams: Array<FundingStreamResponse>) {
-            this.id = id;
-            this.name = name;
-            this.fundingPeriod = fundingPeriod;
-            this.publishedResultsRefreshedAt(publishedResultsRefreshedAt);
-            this.fundingStreams = fundingStreams;
-        }
-        id: string;
-        name: string;
-        fundingPeriod: FundingPeriodResponse;
-        fundingStreams: Array<FundingStreamResponse>;
-        publishedResultsRefreshedAt: KnockoutObservable<Date> = ko.observable();
-
-        publishedResultsRefreshedAtDisplay: KnockoutComputed<string> = ko.computed(function () {
-            if (this.publishedResultsRefreshedAt()) {
-                let date: Date = new Date(this.publishedResultsRefreshedAt());
-                let dateOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-                return date.toLocaleString('en-GB', dateOptions);
-            }
-            else {
-                return 'Not available';
-            }
-        }, this);
-    }
-
-    /** Funding stream dropdown options  */
-    export class FundingStreamResponse {
-        constructor(id: string, name: string) {
-            this.id = id;
-            this.name = name;
-        }
-        id: string;
-        name: string;
-    }
-
     export class FundingPeriodStreams {
         constructor(fundingPeriod: FundingPeriodResponse, fundingStreams: Array<FundingStreamResponse>) {
             this.fundingPeriod = fundingPeriod;

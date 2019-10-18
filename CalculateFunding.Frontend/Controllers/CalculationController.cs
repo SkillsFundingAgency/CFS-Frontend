@@ -182,6 +182,24 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
+        [Route("api/calcs/status-counts")]
+        public async Task<IActionResult> GetCalculationStatusCounts([FromBody] SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
+
+            ApiResponse<IEnumerable<CalculationStatusCounts>> response = await _calcClient.GetCalculationStatusCounts(specificationIds);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
+
+        [HttpPost]
         [Route("api/specs/{specificationId}/calculations/{calculationId}/editadditionalcalculation")]
         public async Task<IActionResult> EditAdditionalCalculation(string specificationId, string calculationId, [FromBody] EditAdditionalCalculationViewModel vm)
         {

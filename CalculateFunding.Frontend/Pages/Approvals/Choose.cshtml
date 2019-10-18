@@ -1,5 +1,8 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Approvals.ChoosePageModel
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.AspNetCore.Hosting
+@using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
 @using CalculateFunding.Frontend.ViewModels.Approvals
 @{
@@ -24,25 +27,48 @@
     <h1 class="hero-title">Choose funding specification</h1>
 }
 
-@if (!Model.IsSpecificationSelectedForThisFunding && Model.ShouldDisplayPermissionsBanner)
-{
-    @section PermissionWarnings
+@section PermissionWarnings
         {
-        <div class="row">
-            <div class="col-xs-12 permission-warning-banner">
-                <div class="permission-warning-inner">
-                    <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You may not be able to choose some of the specifiations listed</p>
-                </div>
+    <!-- ko if:!isSpecificationSelectedForThisFunding() && showSecurityBanner() -->
+    <div class="row">
+        <div class="col-xs-12 permission-warning-banner">
+            <div class="permission-warning-inner">
+                <p class="permission-warning-text"><i class="material-icons permission-warning-icon">warning</i>You may not be able to choose some of the specifiations listed</p>
             </div>
         </div>
-    }
+    </div>
+    <!-- /ko -->
 }
+<!-- ko if: pageBannerOperation() != undefined -->
+<div class="notification-panel">
+    <div data-bind="css: { 'notification-panel-firstline': pageBannerOperation().displayOperationActionSummary(), 'notification-panel-oneblock': !pageBannerOperation().displayOperationActionSummary() }">
+        <span class="notification-panel-text">
+            <i class="material-icons">check</i>
+            <!-- ko if: pageBannerOperation().actionText() != "" && pageBannerOperation().actionUrl() != "" -->
+            <a data-bind="attr:{href:pageBannerOperation().actionUrl()}, text:pageBannerOperation().entityName()"></a>
+            <!-- /ko -->
+            <!-- ko if: pageBannerOperation().actionText() == "" || pageBannerOperation().actionUrl() == "" -->
+            <span data-bind="text:pageBannerOperation().entityName()"></span>
+            <!-- /ko -->
+            <!-- ko if: pageBannerOperation().entityType() != "" -->
+            <span data-bind="text:pageBannerOperation().operationAction()"></span>
+            <!-- /ko -->
+        </span>
+        <!-- ko if: pageBannerOperation().actionText() != "" && pageBannerOperation().secondaryActionUrl() != "" -->
+        <a data-bind="attr:{href:pageBannerOperation().secondaryActionUrl()}, text:pageBannerOperation().actionText()"></a>
+        <!-- /ko -->
+        <!-- ko if: (pageBannerOperation().actionText() == "" || pageBannerOperation().secondaryActionUrl() == "") && pageBannerOperation().actionText() != "" && pageBannerOperation().actionUrl() != "" -->
+        <a data-bind="attr:{href:pageBannerOperation().actionUrl()}, text:pageBannerOperation().actionText()"></a>
+        <!-- /ko -->
+    </div>
 
-@if (Model.PageBannerOperation != null)
-{
-    <partial name="_PageBannerOperationPartial" model="Model.PageBannerOperation" />
-}
-
+    <!-- ko if: pageBannerOperation().displayOperationActionSummary() -->
+    <div class="notification-panel-summary">
+        <span class="notification-panel-summary-text" data-bind="text:pageBannerOperation().operationActionSummaryText()"></span>
+    </div>
+    <!-- /ko -->
+</div>
+<!-- /ko -->
 
 <partial name="_CheckLastJobStatusTemplatesPartial" />
 
@@ -57,17 +83,15 @@
                 <div class="col-md-4 col-md-offset-1">
                     Funding period
 
-                </div>                
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-4 col-xs-12">
-                    <select asp-items="Model.FundingStreams" name="fundingStream" id="fundingStream">
-                        <option value="" selected></option>
+                    <select data-bind="multiselect2: {nonSelectedText: 'Select calculation type', buttonWidth: '100%', disableIfEmpty: true}, options: fundingStreams, optionsText: 'name', optionsValue: 'id', selectedOptions: selectedFundingStreams" name="fundingStream" id="fundingStream" multiple>
                     </select>
                 </div>
                 <div class="col-md-4 col-xs-12 col-md-offset-1 funding-period">
-                    <select asp-items="Model.FundingPeriods" name="fundingPeriod" id="fundingPeriod">
-                        <option value="" selected></option>
+                    <select data-bind="options: fundingPeriods, value:selectedFundingPeriod, optionsText: 'name', optionsCaption: 'Please select'" name="fundingPeriod" id="fundingPeriod">
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -86,82 +110,85 @@
                 <th>QA tests passed</th>
                 <th>Calculations approved</th>
                 <th>
-                    @{
-                        var viewFunding = Model.Specifications.Any(x => x.IsSelectedForFunding) ? "View funding" : "Choose";
-                }
-                @viewFunding
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @{ bool containsSelectedSpec = Model.Specifications.Any(x => x.IsSelectedForFunding); }
-        @foreach (ChooseApprovalSpecificationViewModel specification in Model.Specifications)
-        {
-            if (containsSelectedSpec && !specification.IsSelectedForFunding)
-            {
-                continue;
-            }
+                    <!-- ko ifnot: isSpecificationSelectedForThisFunding -->View funding<!-- /ko -->
+                    <!-- ko if: isSpecificationSelectedForThisFunding -->Choose<!-- /ko -->
+                </th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: specifications">
             <tr>
-                <td class="highlight-background"><span class="highlight-title">@specification.Name</span></td>
-                <td rowspan="2" class="@specification.ApprovalStatusCssClass text-center"><strong>@specification.ApprovalStatus</strong></td>
-                <td rowspan="2" class="text-center">@specification.ProviderQaCoverage%</td>
-                <td rowspan="2" class="text-center">@specification.QaTestsPassed/@specification.QaTestsTotal</td>
-                <td rowspan="2" class="text-center">@specification.CalculationsApproved/@specification.CalculationsTotal</td>
+                <td class="highlight-background"><span class="highlight-title" data-bind="text:name"></span></td>
+                <td rowspan="2" class="text-center" data-bind="class:approvalStatusCssClass"><strong data-bind="text:approvalStatus"></strong></td>
+                <td rowspan="2" class="text-center" data-bind="text:providerQaCoverage"></td>
+                <td rowspan="2" class="text-center"><span data-bind="text:QaTestsPassed"></span>/<span data-bind="text:QaTestsTotal"></span></td>
+                <td rowspan="2" class="text-center"><span data-bind="text:CalculationsApproved"></span>/<span data-bind="text:CalculationsTotal"></span></td>
                 <td rowspan="2" class="text-center">
-                    @if (specification.IsSelectedForFunding)
-                    {
-                        <a class="target-viewfunding" href="/approvals/viewfunding?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId"><i class="glyphicon glyphicon-eye-open"></i></a>
-                    }
-                    else if (specification.CanBeChosen)
-                    {
-                        <a data-bind="click: function(){$root.checkLastJobStatus('@specification.Id', '/approvals/confirm?specificationId=@specification.Id&fundingPeriodId=@Model.SelectedFundingPeriodId&fundingStreamId=@Model.SelectedFundingStreamId')}" class="btn btn-choose target-choose">Choose</a>
-                    }
-                    else
-                    {
-                        <button class="btn btn-disabled btn-choose" href="#" disabled>Choose</button>
-                    }
+                    <!-- ko if: isSelectedForFunding -->
+                    <a class="target-viewfunding" data-bind="attr:{href:'/approvals/viewfunding?specificationId=' + $data.id + '&fundingPeriodId=' + $root.selectedFundingPeriod().id}" href=""><i class="glyphicon glyphicon-eye-open"></i></a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: isSelectedForFunding -->
+                    <!-- ko if: canBeChosen && !$root.isSpecificationSelectedForThisFunding() -->
+                    <a data-bind="click: function(){$root.checkLastJobStatus($data.id, '/approvals/confirm?specificationId=' + $data.id + '&fundingPeriodId=' + $root.selectedFundingPeriod().id)}" class="btn btn-choose target-choose">Choose</a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: canBeChosen && !$root.isSpecificationSelectedForThisFunding() -->
+                    <button class="btn btn-disabled btn-choose" href="#" disabled>Choose</button>
+                    <!-- /ko -->
+                    <!-- /ko -->
                 </td>
             </tr>
             <tr>
-                <td colspan="2">
-                    @foreach (var fundingStream in specification.FundingStreams)
-                    {
-                        <div class="choose-funding-stream">@fundingStream.Name</div>
-                    }
-                </td>
+                <td><div class="choose-funding-stream" data-bind="foreach:fundingStreams"><span data-bind="text:name"></span></div></td>
             </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
-@if (!Model.Specifications.Any())
-{
+    <!-- ko if: specifications().length == 0 -->
     <div class="noresults-panel spacing-10">
         <span class="noresults-panel-text">
-            <i class="material-icons">warning</i> @(string.IsNullOrWhiteSpace(Model.SelectedFundingStreamId) ? @PageText.ChooseFundingSpecWarningText : "No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.")
+            <i class="material-icons">warning</i> <!-- ko if: selectedFundingStreams().length == 0 || selectedFundingPeriod() == undefined --> @PageText.ChooseFundingSpecWarningText <!-- /ko --> <!-- ko ifnot: selectedFundingStreams().length == 0 || selectedFundingPeriod() == undefined -->No approved specifications with funding found. Select a different funding stream or approve a specification for this funding stream.<!-- /ko -->
         </span>
     </div>
-}
-
+    <!-- /ko -->
 </div>
 
 @section scripts{
 
     <script type="text/javascript" asp-src-include="~/assets/libs/js/knockout-latest.js" asp-append-version="true"></script>
-
-    <script asp-src-include="~/js/approvals.choose.js" asp-append-version="true" type="text/javascript"></script>
+    @if (!hostingEnv.IsDevelopment())
+    {
+        <script asp-src-include="~/assetsjs/bootstrap-multiselect-*.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    else
+    {
+        <script asp-src-include="~/assets/js/bootstrap-multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    }
+    <script asp-src-include="~/js/bindingHandler.multiselect.js" asp-append-version="true" type="text/javascript"></script>
+    <script asp-src-include="~/js/approvals.js" asp-append-version="true" type="text/javascript"></script>
 
     <script asp-src-include="~/js/approvals.chooseforfunding.js" asp-append-version="true" type="text/javascript"></script>
 
     <script asp-src-include="~/assets/libs/js/knockstrap.min.js" asp-append-version="true" type="text/javascript"></script>
 
     <script type="text/javascript">
+        var settings = {
+            "antiforgeryToken": "@this.HttpContext.GetAntiforgeryToken()",
+            "fundingPeriodUrl": "/api/policy/fundingperiods",
+            "fundingStreamsUrl": "/api/policy/fundingstreams",
+            "specificationsUrl": "/api/specs/specification-summary-by-id/{specificationId}",
+            "specificationsFilteredUrl": "/api/specs/specifications-by-fundingperiod-and-fundingstream-trimmed/{fundingPeriodId}/{fundingStreamId}",
+            "calculationStatusCountUrl": "/api/calcs/status-counts",
+            "testScenarioQueryUrl": "api/tests/get-testscenario-result-counts-for-specifications"
+        };
 
-        var vfVM = new calculateFunding.approvals.CheckLastJobStatusViewModel();
+        var vfVM = new calculateFunding.approvals.ChooseFundingViewModel(settings);
 
         ko.applyBindings(vfVM);
 
     </script>
 
 
+}
+
+@section styles{
+    <link rel="stylesheet" asp-href-include="~/assets/libs/css/bootstrap-multiselect.css" asp-append-version="true" />
 }

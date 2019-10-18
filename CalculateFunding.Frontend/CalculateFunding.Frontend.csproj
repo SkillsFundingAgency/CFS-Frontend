@@ -18,8 +18,8 @@
     <Content Remove="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Scripts\approvals.choose.ts" />
     <None Remove="Scripts\approvals.chooseforfunding.ts" />
+    <None Remove="Scripts\approvals.ts" />
     <None Remove="Scripts\approvals.viewfunding.ts" />
     <None Remove="Scripts\bindingHandler.approvePublishRow.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
@@ -169,7 +169,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\approvals.chooseforfunding.ts" />
     <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
-    <TypeScriptCompile Include="Scripts\approvals.choose.ts" />
+    <TypeScriptCompile Include="Scripts\approvals.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.approvePublishRow.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />

@@ -28,21 +28,16 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
         public string FundingPeriodId { get; set; }
 
-        public string FundingStreamId { get; set; }
-
         public SpecificationSummaryViewModel SpecificationViewModel { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string specificationId, string fundingPeriodId, string fundingStreamId)
+        public async Task<IActionResult> OnGetAsync(string specificationId, string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
             SpecificationId = specificationId;
 
             FundingPeriodId = fundingPeriodId;
-
-            FundingStreamId = fundingStreamId;
 
             ApiResponse<Specification> specificationLookupTask = await _specsClient.GetSpecification(specificationId);
 

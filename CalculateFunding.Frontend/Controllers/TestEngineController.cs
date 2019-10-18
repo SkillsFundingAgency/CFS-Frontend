@@ -96,5 +96,23 @@ namespace CalculateFunding.Frontend.Controllers
                 return errorResult;
             }
         }
+
+        [HttpPost]
+        [Route("api/tests/get-testscenario-result-counts-for-specifications")]
+        public async Task<IActionResult> GetTestScenarioCountsForSpecifications([FromBody] SpecificationIdsRequestModel specificationIds)
+        {
+            Guard.ArgumentNotNull(specificationIds, nameof(specificationIds));
+
+            ApiResponse<IEnumerable<SpecificationTestScenarioResultCounts>> response = await _testEngineApiClient.GetTestScenarioCountsForSpecifications(specificationIds);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
     }
 }

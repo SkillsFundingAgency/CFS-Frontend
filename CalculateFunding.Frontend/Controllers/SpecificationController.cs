@@ -19,14 +19,16 @@ namespace CalculateFunding.Frontend.Controllers
     public class SpecificationController : Controller
     {
         private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public SpecificationController(ISpecsApiClient specsApiClient, IAuthorizationHelper authorizationHelper)
+        public SpecificationController(ISpecsApiClient specsApiClient, ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsApiClient;
+            _specificationsApiClient = specificationsApiClient;
             _authorizationHelper = authorizationHelper;
         }
 
@@ -113,6 +115,51 @@ namespace CalculateFunding.Frontend.Controllers
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/specifications-by-fundingperiod-and-fundingstream-trimmed/{fundingPeriodId}/{fundingStreamId}")]
+        public async Task<IActionResult> GetApprovedSpecificationsTrimmed(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                IEnumerable<SpecificationSummary> specificationSummaries = apiResponse.Content;
+                IEnumerable<SpecificationSummary> specificationSummariesTrimmed = await _authorizationHelper.SecurityTrimList(User, specificationSummaries, SpecificationActionTypes.CanChooseFunding);
+                
+                return Ok(specificationSummaries.OrderBy(c => c.Name).Select(_ => (_, specificationSummariesTrimmed.Any(trimmedSpec => trimmedSpec.Id == _.Id) == true ? true : false)));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/specification-summary-by-id/{specificationId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetSpecificationById(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<SpecificationSummary> apiResponse = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content);
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)

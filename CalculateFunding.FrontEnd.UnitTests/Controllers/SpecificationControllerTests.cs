@@ -29,12 +29,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+
             specsClient
                 .UpdatePublishStatus(Arg.Is(specificationId), Arg.Is(model))
                 .Returns(response);
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveSpecification);
-            SpecificationController controller = CreateSpecificationController(specsClient, authorizationHelper);
+            SpecificationController controller = CreateSpecificationController(specsClient, specificationsApiClient, authorizationHelper);
 
             // Act
             Func<Task> test = async () => await controller.EditSpecificationStatus(specificationId, model);
@@ -58,12 +60,13 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
             specsClient
                 .UpdatePublishStatus(Arg.Is(specificationId), Arg.Is(model))
                 .Returns(response);
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveSpecification);
-            SpecificationController controller = CreateSpecificationController(specsClient, authorizationHelper);
+            SpecificationController controller = CreateSpecificationController(specsClient, specificationsApiClient, authorizationHelper);
 
             // Act
             IActionResult result = await controller.EditSpecificationStatus(specificationId, model);
@@ -91,6 +94,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
             specsClient
                 .UpdatePublishStatus(Arg.Is(specificationId), Arg.Is(model))
                 .Returns(response);
@@ -98,7 +102,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveSpecification))
                 .Returns(false);
-            SpecificationController controller = CreateSpecificationController(specsClient, authorizationHelper);
+            SpecificationController controller = CreateSpecificationController(specsClient, specificationsApiClient, authorizationHelper);
 
             // Act
             IActionResult result = await controller.EditSpecificationStatus(specificationId, model);
@@ -114,11 +118,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             string specificationId = "5";
 
             ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanChooseFunding))
                 .Returns(false);
-            SpecificationController controller = CreateSpecificationController(specsClient, authorizationHelper);
+            SpecificationController controller = CreateSpecificationController(specsClient, specificationsApiClient, authorizationHelper);
 
             // Act
             IActionResult result = await controller.SelectSpecificationForFunding(specificationId);
@@ -127,9 +132,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private static SpecificationController CreateSpecificationController(ISpecsApiClient specsClient, IAuthorizationHelper authorizationHelper)
+        private static SpecificationController CreateSpecificationController(ISpecsApiClient specsClient, ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
         {
-            return new SpecificationController(specsClient, authorizationHelper);
+            return new SpecificationController(specsClient, specificationsApiClient, authorizationHelper);
         }
 	}
 }
