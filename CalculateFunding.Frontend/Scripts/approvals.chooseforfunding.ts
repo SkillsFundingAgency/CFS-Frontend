@@ -103,9 +103,12 @@
         }
 
         public PopulateSpecifications(fundingModel: ChooseFundingViewModel): void {
+            fundingModel.specifications([]);
+            fundingModel.isSpecificationSelectedForThisFunding(false);
+            fundingModel.showSecurityBanner(false);
+            fundingModel.pageBannerOperation(null);
             if (fundingModel.selectedFundingPeriod() !== undefined && fundingModel.selectedFundingPeriod().value !== "Select" && fundingModel.selectedFundingStreams() !== undefined) {
             /** Load Specifications in the specification dropdown */
-                fundingModel.specifications([]);
                 ko.utils.arrayForEach(fundingModel.selectedFundingStreams(), function (item: any) {
                     let getSpecificationForSelectedPeriodUrl = fundingModel.settings.specificationsFilteredUrl.replace("{fundingPeriodId}", fundingModel.selectedFundingPeriod().id).replace("{fundingStreamId}", item);
                     let specificationRequest = $.ajax({
@@ -196,9 +199,6 @@
                             fundingModel.notificationStatus("error");
                         });
                 });
-            }
-            else {
-                fundingModel.specifications([]);
             }
         }
 
