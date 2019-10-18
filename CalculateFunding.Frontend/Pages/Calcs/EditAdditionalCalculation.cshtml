@@ -147,6 +147,7 @@
         var editViewModelOptions = {
             calculationId: "@Model.Calculation.Id",
             calculationName: "@Model.Calculation.Name",
+            calculationValueType:"@Model.Calculation.Current.ValueType.ToString()",
             specificationId: "@Model.SpecificationId",
             fundingStreams: @Html.Raw(Model.FundingStreams),
             newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled",

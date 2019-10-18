@@ -76,6 +76,16 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             Calculation = calculationResponse.Content;
 
+			EditModel = new CalculationEditModel
+			{
+				CalculationId = calculationId,
+				Description = Calculation.Description,
+				Name = Calculation.Name,
+				SourceCode = Calculation.Current.SourceCode,
+				SpecificationId = Calculation.SpecificationId,
+				ValueType = Calculation.Current.ValueType
+            };
+
             ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(Calculation.SpecificationId);
             
             SpecificationSummary specificationSummary = specificationResponse?.Content;

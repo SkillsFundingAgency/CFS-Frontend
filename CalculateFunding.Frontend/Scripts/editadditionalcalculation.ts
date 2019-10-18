@@ -60,6 +60,7 @@ namespace calculateFunding.editadditionalcalculation {
             this.initialCodeContents = options.existingSourceCode;
             this.sourceCode(options.existingSourceCode);
             this.calculationName(options.calculationName);
+            this.calculationValueType(options.calculationValueType);
 
             let self = this;
 
@@ -416,6 +417,7 @@ namespace calculateFunding.editadditionalcalculation {
         fundingStreams: IEditAdditionalCalculationViewModelFundingStream[],
         existingSourceCode: string,
         calculationName: string,
+        calculationValueType: string,
         newEditCalculationPageBeEnabled: string;
     }
 
