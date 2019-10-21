@@ -4,22 +4,21 @@ using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculationType = CalculateFunding.Common.ApiClient.Results.Models.CalculationType;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Frontend.ViewModels.Results;
+using Serilog;
+using System.Linq;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using Serilog;
-    using System.Linq;
-
     public class ProviderCalcsResultsPageModel : ProviderResultsBasePageModel
     {
-        private IFeatureToggle _featureToggle;
+        private readonly IFeatureToggle _featureToggle;
 
         public int CalculationErrorCount { get; set; }
 
@@ -44,7 +43,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                      );
         }
         
-        //temp hack moving to nuget api client and need place holder enum maps 
+        //TODO; temp hack moving to nuget api client and need place holder enum maps 
         private static readonly IDictionary<CalculationType, CalculationSpecificationType> CalculationTypeMapping = new Dictionary<CalculationType, CalculationSpecificationType>
         {
 	        {CalculationType.Additional, CalculationSpecificationType.Additional},

@@ -1,39 +1,37 @@
 using CalculateFunding.Common.ApiClient.Results;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Results;
+using CalculateFunding.Frontend.ViewModels.TestEngine;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Policies.Models;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.ApiClient.Specifications.Models;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using CalculateFunding.Frontend.ViewModels.TestEngine;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Serilog;
-
     public class ProviderScenarioResultsPageModel : PageModel
     {
-        private ILogger _logger;
-        private ISpecsApiClient _specsApiClient;
-        private IPoliciesApiClient _policiesApiClient;
-        private IMapper _mapper;
+        private readonly ILogger _logger;
+        private readonly ISpecsApiClient _specsApiClient;
+        private readonly IPoliciesApiClient _policiesApiClient;
+        private readonly IMapper _mapper;
         private readonly IResultsApiClient _resultsApiClient;
         private readonly IProvidersApiClient _providersApiClient;
         private readonly ITestScenarioSearchService _testScenarioSearchService;

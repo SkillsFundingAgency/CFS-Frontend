@@ -104,10 +104,7 @@
                         <tr>
                             <td>@result.Name</td>
                             <td>@result.ValueType</td>
-                            <td>
-                                @HtmlHelperExtensions.FormatCalculationTypeText(result.Value, result.ValueType)
-                            </td>
-
+                            <td>@result.Value.AsFormatCalculationTypeText(result.ValueType)</td>
                         </tr>
                     }
                     </tbody>

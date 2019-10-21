@@ -2,24 +2,23 @@
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.Models.Search;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Results;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Services
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using Serilog;
-
     public class CalculationProviderResultsSearchService : ICalculationProviderResultsSearchService
     {
-        private IResultsApiClient _resultsClient;
-        private IMapper _mapper;
-        private ILogger _logger;
+        private readonly IResultsApiClient _resultsClient;
+        private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public CalculationProviderResultsSearchService(IResultsApiClient resultsApiClient, IMapper mapper, ILogger logger)
         {

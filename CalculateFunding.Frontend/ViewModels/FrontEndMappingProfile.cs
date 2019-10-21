@@ -31,34 +31,13 @@ namespace CalculateFunding.Frontend.ViewModels
     {
         public FrontEndMappingProfile()
         {
-            this.MapCommon();
-            this.MapDatasets();
-            this.MapResults();
-            this.MapSpecs();
-            this.MapCalcs();
-            this.MapScenario();
-            this.MapTestEngine();
-//            this.MapApprovals();
-        }
-
-        [Obsolete]
-        private void MapApprovals()
-        {
-//            CreateMap<PublishedProviderResult, PublishedProviderResultViewModel>()
-//                .ForMember(m => m.TestCoveragePercent, opt => opt.Ignore())
-//                .ForMember(m => m.TestsPassed, opt => opt.Ignore())
-//                .ForMember(m => m.TestsTotal, opt => opt.Ignore());
-//
-//            CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
-//            CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
-//
-//            CreateMap<AllocationLineStatusViewModel, AllocationLineStatus>();
-//
-//            CreateMap<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateResponseViewModel>()
-//                .ForMember(m => m.UpdatedProviders, opt => opt.MapFrom(f => f.UpdatedProviderIds));
-//
-//            CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
-//            CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
+            MapCommon();
+            MapDatasets();
+            MapResults();
+            MapSpecs();
+            MapCalcs();
+            MapScenario();
+            MapTestEngine();
         }
 
         private void MapResults()
@@ -308,7 +287,7 @@ namespace CalculateFunding.Frontend.ViewModels
 
         private void MapTestEngine()
         {
-            this.CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()
+            CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<TestScenarioSearchResultItem, TestScenarioSearchResultItemViewModel>()
@@ -321,7 +300,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 }
             });
 
-            this.CreateMap<ResultCounts, ResultCountsViewModel>();
+            CreateMap<ResultCounts, ResultCountsViewModel>();
         }
 
         private void MapScenario()
@@ -333,14 +312,14 @@ namespace CalculateFunding.Frontend.ViewModels
                      destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
                  });
 
-            this.CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
+            CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
                     .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<TestScenario, TestScenarioViewModel>();
 
             //CreateMap<CurrentScenarioVersion, CurrentScenarioVersionViewModel>();
 
-            this.CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
+            CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
               .ForMember(m => m.SpecificationId, opt => opt.Ignore())
               .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
               .ForMember(m => m.Id, opt => opt.Ignore());
