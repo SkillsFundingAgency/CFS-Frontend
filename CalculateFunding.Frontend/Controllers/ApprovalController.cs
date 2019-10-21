@@ -1,18 +1,19 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
+//using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
+//using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.ViewModels.Approvals;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Results;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -36,57 +37,14 @@ namespace CalculateFunding.Frontend.Controllers
             _authorizationHelper = authorizationHelper;
         }
 
+        [Obsolete]
         [Route("api/specs/{specificationId}/allocationlineapprovalstatus")]
         [HttpPut]
         public async Task<IActionResult> UpdateApprovalStatusForAllocationLine([FromRoute]string specificationId, [FromBody]PublishedAllocationLineResultStatusUpdateViewModel allocationLines)
         {
-            Guard.ArgumentNotNull(allocationLines, nameof(allocationLines));
+			//TODO; the old implementation used allocation lines and was obsolete
 
-            if (allocationLines.Status != AllocationLineStatusViewModel.Approved && allocationLines.Status != AllocationLineStatusViewModel.Published)
-            {
-                ModelState.AddModelError(nameof(allocationLines.Status), "The status provided is not a valid destination status");
-            }
-
-            SpecificationActionTypes permissionRequired = allocationLines.Status == AllocationLineStatusViewModel.Approved ? SpecificationActionTypes.CanApproveFunding : SpecificationActionTypes.CanReleaseFunding;
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, permissionRequired))
-            {
-                return new ForbidResult();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            PublishedAllocationLineResultStatusUpdateModel updateModel = new PublishedAllocationLineResultStatusUpdateModel()
-            {
-                Status = _mapper.Map<AllocationLineStatus>(allocationLines.Status),
-            };
-
-            Dictionary<string, PublishedAllocationLineResultStatusUpdateProviderModel> updateProviders = new Dictionary<string, PublishedAllocationLineResultStatusUpdateProviderModel>();
-            foreach (PublishedAllocationLineResultStatusUpdateProviderViewModel updateItem in allocationLines.Providers)
-            {
-                PublishedAllocationLineResultStatusUpdateProviderModel providerUpdateModel = null;
-                if (!updateProviders.ContainsKey(updateItem.ProviderId))
-                {
-                    providerUpdateModel = new PublishedAllocationLineResultStatusUpdateProviderModel()
-                    {
-                        ProviderId = updateItem.ProviderId,
-                    };
-
-                    updateProviders.Add(updateItem.ProviderId, providerUpdateModel);
-                    updateModel.AddProvider(providerUpdateModel);
-                }
-                else
-                {
-                    providerUpdateModel = updateProviders[updateItem.ProviderId];
-                }
-
-                providerUpdateModel.AddAllocationLine(updateItem.AllocationLineId);
-            }
-
-            await _resultsClient.UpdatePublishedAllocationLineStatus(specificationId, updateModel);
-            return Ok();
+	        return StatusCode((int)HttpStatusCode.Gone);
         }
 
         [Route("api/specs/{specificationId}/refresh-published-results")]
@@ -139,38 +97,22 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [Obsolete]
         [Route("/api/results/get-published-provider-results-for-funding-stream")]
         public async Task<IActionResult> GetPublishedProviderResultsForFundingStream([FromQuery]string fundingPeriodId, [FromQuery]string specificationId, [FromQuery] string fundingStreamId)
         {
-            Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+	        //TODO; the old implementation used allocation lines and was obsolete
 
-            ApiResponse<IEnumerable<PublishedProviderResult>> publishedProviderResponse = await _resultsClient.GetPublishedProviderResults(fundingPeriodId, specificationId, fundingStreamId);
-            IActionResult errorResult = publishedProviderResponse.IsSuccessOrReturnFailureResult("Getting published provider results for funding stream");
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok(publishedProviderResponse.Content);
+            return StatusCode((int)HttpStatusCode.Gone);
         }
 
+        [Obsolete]
         [Route("/api/results/published-provider-profile/providerId/{providerId}/specificationId/{specificationId}/fundingStreamId/{fundingStreamId}")]
         public async Task<IActionResult> PublishedProviderProfile([FromRoute] string providerId, [FromRoute] string specificationId, [FromRoute] string fundingStreamId)
         {
-            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+	        //TODO; the old implementation used allocation lines and was obsolete
 
-            ApiResponse<IEnumerable<PublishedProviderProfile>> callResult = await _resultsClient.GetPublishedProviderProfile(providerId, specificationId, fundingStreamId);
-
-            var errorResult = callResult.IsSuccessOrReturnFailureResult("PublishedProviderProfile");
-            if (errorResult != null) return errorResult;
-
-            var publishedProviderProfileViewModel = _mapper.Map<IEnumerable<PublishedProviderProfileViewModel>>(callResult.Content);
-
-            return Ok(publishedProviderProfileViewModel);
+            return StatusCode((int)HttpStatusCode.Gone);
         }
     }
 }

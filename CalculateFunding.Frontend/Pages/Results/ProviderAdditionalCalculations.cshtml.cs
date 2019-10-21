@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.Pages.Results
+﻿using System.Linq;
+using CalculateFunding.Common.ApiClient.Results;
+
+namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Calcs;
@@ -7,11 +10,10 @@
     using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Calculations;
     using Serilog;
     using System.Collections.Generic;
+    using CalculateFunding.Common.ApiClient.Results.Models;
 
 
     public class ProviderAdditionalCalculationsPageModel : ProviderResultsBasePageModel
@@ -28,23 +30,20 @@
 	        _calculationsApiClient = calculationsApiClient;
         }
 
-        public override void PopulateResults(ApiResponse<ProviderResults> providerResponse)
+        public override void PopulateResults(ApiResponse<ProviderResult> providerResponse)
         {
 			AdditionalCalculationList =new List<ProviderCalculationItemViewModel>();
 
-			foreach (var calculationResultItem in providerResponse.Content.CalculationResults)
+			foreach (var calculationResultItem in providerResponse.Content.CalculationResults.Where(_ => _.CalculationType == Common.ApiClient.Results.Models.CalculationType.Additional))
 			{
-				if (calculationResultItem.CalculationType == CalculationSpecificationType.Additional)
+				var calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
+				
+				AdditionalCalculationList.Add(new ProviderCalculationItemViewModel
 				{
-					var calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
-					
-					AdditionalCalculationList.Add(new ProviderCalculationItemViewModel
-					{
-						Name = calculationResultItem.Calculation.Name,
-						ValueType = calculation.Content.Current.ValueType.ToString(),
-						Value = calculationResultItem.Value
-					});
-				}
+					Name = calculationResultItem.Calculation.Name,
+					ValueType = calculation.Content.Current.ValueType.ToString(),
+					Value = calculationResultItem.Value
+				});
 			}
         }
     }

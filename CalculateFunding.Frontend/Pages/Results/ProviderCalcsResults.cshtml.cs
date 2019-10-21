@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculationType = CalculateFunding.Common.ApiClient.Results.Models.CalculationType;
+
 namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
@@ -6,8 +13,6 @@ namespace CalculateFunding.Frontend.Pages.Results
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
     using System.Linq;
@@ -24,7 +29,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             _featureToggle = featureToggle;
         }
 
-        public override void PopulateResults(ApiResponse<ProviderResults> providerResponse)
+        public override void PopulateResults(ApiResponse<ProviderResult> providerResponse)
         {
             this.CalculationErrorCount = providerResponse.Content.CalculationResults.Where(m => !string.IsNullOrWhiteSpace(m.ExceptionType) && _featureToggle.IsExceptionMessagesEnabled()).Count();
             ViewModel.CalculationItems = providerResponse.Content.CalculationResults.Select(m =>
@@ -34,9 +39,23 @@ namespace CalculateFunding.Frontend.Pages.Results
                              SubTotal = m.Value,
                              CalculationExceptionType = _featureToggle.IsExceptionMessagesEnabled() ? m.ExceptionType : string.Empty,
                              CalculationExceptionMessage = _featureToggle.IsExceptionMessagesEnabled() ? m.ExceptionMessage : string.Empty,
-                             CalculationType = m.CalculationType
+                             CalculationType = AsCalculationSpecificationType(m.CalculationType)
                          }
                      );
+        }
+        
+        //temp hack moving to nuget api client and need place holder enum maps 
+        private static readonly IDictionary<CalculationType, CalculationSpecificationType> CalculationTypeMapping = new Dictionary<CalculationType, CalculationSpecificationType>
+        {
+	        {CalculationType.Additional, CalculationSpecificationType.Additional},
+	        {CalculationType.Template, CalculationSpecificationType.Template},
+        };
+
+        private static CalculationSpecificationType AsCalculationSpecificationType(CalculationType calculationType)
+        {
+	        return CalculationTypeMapping.TryGetValue(calculationType, out CalculationSpecificationType calculationSpecificationType)
+		        ? calculationSpecificationType
+		        : throw new ArgumentOutOfRangeException();
         }
 
     }

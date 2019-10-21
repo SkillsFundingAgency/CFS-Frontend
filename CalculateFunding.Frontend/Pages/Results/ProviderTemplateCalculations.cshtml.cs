@@ -1,7 +1,11 @@
 ﻿
 
+using System.Linq;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculationType = CalculateFunding.Common.ApiClient.Results.Models.CalculationType;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
@@ -10,8 +14,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+
     using Serilog;
     using System.Collections.Generic;
     using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -31,23 +34,20 @@ namespace CalculateFunding.Frontend.Pages.Results
 	        _calculationsApiClient = calculationsApiClient;
         }
 
-        public override void PopulateResults(ApiResponse<ProviderResults> providerResponse)
+        public override void PopulateResults(ApiResponse<ProviderResult> providerResponse)
         {
 	        TemplateCalculationList = new List<ProviderCalculationItemViewModel>();
 
-	        foreach (var calculationResultItem in providerResponse.Content.CalculationResults)
+	        foreach (CalculationResult calculationResultItem in providerResponse.Content.CalculationResults.Where(_ => _.CalculationType == CalculationType.Template))
 	        {
-		        if (calculationResultItem.CalculationType == CalculationSpecificationType.Template)
-		        {
-			        var calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
+		        ApiResponse<Calculation> calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
 
-			        TemplateCalculationList.Add(new ProviderCalculationItemViewModel
-			        {
-				        Name = calculationResultItem.Calculation.Name,
-				        ValueType = calculation.Content.Current.ValueType.ToString(),
-				        Value = calculationResultItem.Value
-			        });
-		        }
+		        TemplateCalculationList.Add(new ProviderCalculationItemViewModel
+		        {
+			        Name = calculationResultItem.Calculation.Name,
+			        ValueType = calculation.Content.Current.ValueType.ToString(),
+			        Value = calculationResultItem.Value
+		        });
 	        }
         }
     }

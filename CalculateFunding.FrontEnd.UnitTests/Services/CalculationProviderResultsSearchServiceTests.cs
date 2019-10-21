@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
@@ -13,9 +11,13 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.UnitTests.Services
 {
@@ -33,8 +35,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
 
             resultClient
-                .When(a => a.FindCalculationProviderResults(Arg.Any<SearchFilterRequest>()))
-                .Do(x => { throw new HttpRequestException(); });
+                .When(a => a.SearchCalculationProviderResults(Arg.Any<SearchModel>()))
+                .Do(x => throw new HttpRequestException());
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -57,11 +59,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
 
-            PagedResult<CalculationProviderResultSearchResultItem> expectedServiceResult = null;
-
             resultClient
-                .FindCalculationProviderResults(Arg.Any<SearchFilterRequest>())
-                .Returns(expectedServiceResult);
+                .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+                .Returns((ApiResponse<CalculationProviderResultSearchResults>)null);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -86,11 +86,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationProviderResultSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
             resultClient
-                .FindCalculationProviderResults(Arg.Any<SearchFilterRequest>())
-                .Returns(itemResult);
+	            .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+	            .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -107,7 +107,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Id
                 .Should()
                 .Be("10");
-
+ 
             first
                 .CalculationType
                 .Should()
@@ -148,11 +148,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             int numberOfItems = 25;
 
-            PagedResult<CalculationProviderResultSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
             resultClient
-                .FindCalculationProviderResults(Arg.Any<SearchFilterRequest>())
-                .Returns(itemResult);
+	            .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+	            .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -176,32 +176,32 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             int numberOfItems = 25;
 
-            IEnumerable<SearchFacet> facets = new[]
+            IEnumerable<Facet> facets = new[]
             {
-                new SearchFacet
+                new Facet
                 {
                     Name = "facet 1",
                     FacetValues = new[]
                     {
-                        new SearchFacetValue { Name = "f1", Count = 5 }
+                        new FacetValue { Name = "f1", Count = 5 }
                     }
                 },
-                new SearchFacet
+                new Facet
                 {
                     Name = "facet 2",
                     FacetValues = new[]
                     {
-                        new SearchFacetValue { Name = "f2", Count = 11 },
-                        new SearchFacetValue { Name = "f3", Count = 1 }
+                        new FacetValue { Name = "f2", Count = 11 },
+                        new FacetValue { Name = "f3", Count = 1 }
                     }
                 }
             };
 
-            PagedResult<CalculationProviderResultSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems, facets);
 
             resultClient
-                .FindCalculationProviderResults(Arg.Any<SearchFilterRequest>())
-                .Returns(itemResult);
+                .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+                .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -271,37 +271,34 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return Substitute.For<ILogger>();
         }
 
-        PagedResult<CalculationProviderResultSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+        CalculationProviderResultSearchResults GenerateSearchResults(int numberOfItems, IEnumerable<Facet> facets = null)
         {
-            PagedResult<CalculationProviderResultSearchResultItem> result = new PagedResult<CalculationProviderResultSearchResultItem>();
-            List<CalculationProviderResultSearchResultItem> items = new List<CalculationProviderResultSearchResultItem>();
+	        CalculationProviderResultSearchResults result = new CalculationProviderResultSearchResults();
+            List<CalculationProviderResultSearchResult> items = new List<CalculationProviderResultSearchResult>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new CalculationProviderResultSearchResultItem()
+                items.Add(new CalculationProviderResultSearchResult
                 {
                     Id = $"{i + 10}",
-                    Name = $"prov-{i + 1}",
+                    CalculationName = $"prov-{i + 1}",
                     CalculationResult = i + 1,
                     CalculationType = "Number"
                 });
             }
 
-            items.Add(new CalculationProviderResultSearchResultItem()
+            items.Add(new CalculationProviderResultSearchResult
             {
                 Id = $"{numberOfItems + 10}",
-                Name = $"prov-{numberOfItems + 1}",
+                CalculationName = $"prov-{numberOfItems + 1}",
                 CalculationResult = numberOfItems + 1,
                 CalculationType = "Number",
                 CalculationExceptionType = "Exception",
                 CalculationExceptionMessage = "An exception has occurred"
             });
 
-            result.Items = items.AsEnumerable();
-            result.PageNumber = 1;
-            result.PageSize = 50;
-            result.TotalItems = numberOfItems + 1;
-            result.TotalPages = 1;
-            result.TotalErrorItems = 1;
+            result.Results = items.AsEnumerable();
+            result.TotalCount = numberOfItems + 1;
+            result.TotalErrorCount = 1;
             result.Facets = facets;
 
             return result;

@@ -10,12 +10,11 @@ using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models.Results;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
-using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -33,7 +32,12 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly ISpecsApiClient _specsApiClient;
         private readonly ILogger _logger;
 
-        public ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger)
+        protected ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, 
+	        IProvidersApiClient providersApiClient, 
+	        IPoliciesApiClient policiesApiClient, 
+	        IMapper mapper, 
+	        ISpecsApiClient specsApiClient, 
+	        ILogger logger)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
@@ -158,7 +162,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             if (!string.IsNullOrWhiteSpace(SpecificationId))
             {
-                ApiResponse<ProviderResults> providerResponse = await _resultsApiClient.GetProviderResults(providerId, SpecificationId);
+                ApiResponse<ProviderResult> providerResponse = await _resultsApiClient.GetProviderResults(providerId, SpecificationId);
 
                 if (providerResponse.StatusCode == HttpStatusCode.OK && providerResponse.Content != null)
                 {
@@ -171,7 +175,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             }
         }
 
-        public abstract void PopulateResults(ApiResponse<ProviderResults> providerResponse);
+        public abstract void PopulateResults(ApiResponse<ProviderResult> providerResponse);
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {
@@ -189,11 +193,12 @@ namespace CalculateFunding.Frontend.Pages.Results
             }
 
             FundingPeriods = fundingPeriods.Select(m => new SelectListItem
-            {
-                Value = m.Id,
-                Text = m.Name,
-                Selected = m.Id == fundingPeriodId
-            }).ToList().OrderBy(s => s.Text);
+	            {
+		            Value = m.Id,
+		            Text = m.Name,
+		            Selected = m.Id == fundingPeriodId
+	            }).OrderBy(s => s.Text)
+	            .ToList();
         }
 
         private async Task PopulateSpecifications(string providerId, string specificationId)
@@ -265,7 +270,6 @@ namespace CalculateFunding.Frontend.Pages.Results
             {
                 throw new InvalidOperationException($"Unable to retrieve provider result Specifications: Status Code = {specResponse.StatusCode}");
             }
-
         }
     }
 }

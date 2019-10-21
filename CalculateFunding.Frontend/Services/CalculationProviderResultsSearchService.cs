@@ -1,4 +1,9 @@
-﻿namespace CalculateFunding.Frontend.Services
+﻿using System;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Common.Models.Search;
+
+namespace CalculateFunding.Frontend.Services
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -6,8 +11,6 @@
     using AutoMapper;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ResultsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
     using Serilog;
@@ -31,22 +34,18 @@
 
         public async Task<CalculationProviderResultSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
-            SearchFilterRequest requestOptions = new SearchFilterRequest()
+	        int pageNumber = request.PageNumber.GetValueOrDefault(1);
+	        int pageSize = request.PageSize.GetValueOrDefault(50);
+	        
+	        ApiResponse<CalculationProviderResultSearchResults> searchRequestResult = await _resultsClient.SearchCalculationProviderResults(new SearchModel
             {
-                Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
-                PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
-                SearchTerm = request.SearchTerm,
-                IncludeFacets = request.IncludeFacets,
-                ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors" ? true : false),
-                Filters = request.Filters
-            };
-
-            if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
-            {
-                requestOptions.Page = request.PageNumber.Value;
-            }
-
-            PagedResult<CalculationProviderResultSearchResultItem> searchRequestResult = await _resultsClient.FindCalculationProviderResults(requestOptions);
+	            PageNumber = pageNumber,
+	            Top = pageSize,
+	            SearchTerm = request.SearchTerm,
+	            IncludeFacets = request.IncludeFacets,
+	            ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors" ? true : false),
+	            Filters = request.Filters
+            });
 
             if (searchRequestResult == null)
             {
@@ -54,18 +53,20 @@
                 return null;
             }
 
+            CalculationProviderResultSearchResults calculationProviderResultSearchResults = searchRequestResult.Content;
+            
             CalculationProviderResultSearchResultViewModel result = new CalculationProviderResultSearchResultViewModel
             {
-                TotalResults = searchRequestResult.TotalItems,
-                CurrentPage = searchRequestResult.PageNumber,
-                TotalErrorResults = searchRequestResult.TotalErrorItems
+                TotalResults = calculationProviderResultSearchResults.TotalCount,
+                CurrentPage = pageNumber,
+                TotalErrorResults = calculationProviderResultSearchResults.TotalErrorCount
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
 
-            if (searchRequestResult.Facets != null)
+            if (calculationProviderResultSearchResults.Facets != null)
             {
-                foreach (SearchFacet facet in searchRequestResult.Facets)
+                foreach (Facet facet in calculationProviderResultSearchResults.Facets)
                 {
                     searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
                 }
@@ -75,7 +76,7 @@
 
             List<CalculationProviderResultSearchResultItemViewModel> itemResults = new List<CalculationProviderResultSearchResultItemViewModel>();
 
-            foreach (CalculationProviderResultSearchResultItem searchresult in searchRequestResult.Items)
+            foreach (CalculationProviderResultSearchResult searchresult in calculationProviderResultSearchResults.Results)
             {
                 itemResults.Add(_mapper.Map<CalculationProviderResultSearchResultItemViewModel>(searchresult));
             }
@@ -89,16 +90,16 @@
             }
             else
             {
-                result.StartItemNumber = ((requestOptions.Page - 1) * requestOptions.PageSize) + 1;
-                result.EndItemNumber = result.StartItemNumber + requestOptions.PageSize - 1;
+                result.StartItemNumber = ((pageNumber - 1) * pageSize) + 1;
+                result.EndItemNumber = result.StartItemNumber + pageSize - 1;
             }
 
-            if (result.EndItemNumber > searchRequestResult.TotalItems)
+            if (result.EndItemNumber > calculationProviderResultSearchResults.TotalCount)
             {
-                result.EndItemNumber = searchRequestResult.TotalItems;
+                result.EndItemNumber = calculationProviderResultSearchResults.TotalCount;
             }
 
-            result.PagerState = new PagerState(requestOptions.Page, searchRequestResult.TotalPages, 4);
+            result.PagerState = new PagerState(pageNumber, (int) Math.Ceiling(calculationProviderResultSearchResults.TotalCount/(double)pageSize), 4);
 
             return result;
         }

@@ -6,16 +6,16 @@ using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.ResultsClient.Models;
 using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Approvals;
-using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Calculations; 
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using CalculateFunding.Frontend.ViewModels.Jobs;
@@ -38,26 +38,27 @@ namespace CalculateFunding.Frontend.ViewModels
             this.MapCalcs();
             this.MapScenario();
             this.MapTestEngine();
-            this.MapApprovals();
+//            this.MapApprovals();
         }
 
+        [Obsolete]
         private void MapApprovals()
         {
-            CreateMap<PublishedProviderResult, PublishedProviderResultViewModel>()
-                .ForMember(m => m.TestCoveragePercent, opt => opt.Ignore())
-                .ForMember(m => m.TestsPassed, opt => opt.Ignore())
-                .ForMember(m => m.TestsTotal, opt => opt.Ignore());
-
-            CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
-            CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
-
-            CreateMap<AllocationLineStatusViewModel, AllocationLineStatus>();
-
-            CreateMap<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateResponseViewModel>()
-                .ForMember(m => m.UpdatedProviders, opt => opt.MapFrom(f => f.UpdatedProviderIds));
-
-            CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
-            CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
+//            CreateMap<PublishedProviderResult, PublishedProviderResultViewModel>()
+//                .ForMember(m => m.TestCoveragePercent, opt => opt.Ignore())
+//                .ForMember(m => m.TestsPassed, opt => opt.Ignore())
+//                .ForMember(m => m.TestsTotal, opt => opt.Ignore());
+//
+//            CreateMap<PublishedFundingStreamResult, PublishedFundingStreamResultViewModel>();
+//            CreateMap<PublishedAllocationLineResult, PublishedAllocationLineResultViewModel>();
+//
+//            CreateMap<AllocationLineStatusViewModel, AllocationLineStatus>();
+//
+//            CreateMap<PublishedAllocationLineResultStatusUpdateResponseModel, PublishedAllocationLineResultStatusUpdateResponseViewModel>()
+//                .ForMember(m => m.UpdatedProviders, opt => opt.MapFrom(f => f.UpdatedProviderIds));
+//
+//            CreateMap<AllocationLineSummary, AllocationLineSummaryViewModel>();
+//            CreateMap<FundingStreamSummary, FundingStreamSummaryViewModel>();
         }
 
         private void MapResults()
@@ -87,7 +88,13 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Failures, opt => opt.MapFrom(v => 0))
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
-            CreateMap<CalculationProviderResultSearchResultItem, CalculationProviderResultSearchResultItemViewModel>();
+            CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
+	            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CalculationName))
+	            .ForMember(dest => dest.DateOpened, opt => opt.MapFrom(src => src.OpenDate))
+	            .ForMember(dest => dest.LocalAuthorityChangeDate, opt => opt.Ignore())
+	            .ForMember(dest => dest.PreviousLocalAuthority, opt => opt.Ignore())
+	            .ForMember(dest => dest.DateClosed, opt => opt.Ignore())
+	            .ForMember(dest => dest.ConvertDate, opt => opt.Ignore());
 
             CreateMap<PublishedProviderProfile, PublishedProviderProfileViewModel>();
 

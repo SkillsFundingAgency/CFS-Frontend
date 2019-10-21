@@ -1,34 +1,34 @@
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CalculateFunding.Common.ApiClient;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.ApiClient.Jobs;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Publishing;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Users;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Clients.DatasetsClient;
+using CalculateFunding.Frontend.Clients.ScenariosClient;
+using CalculateFunding.Frontend.Clients.TestEngineClient;
+using CalculateFunding.Frontend.Core.Ioc;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
+using CalculateFunding.Frontend.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Polly;
+
 namespace CalculateFunding.Frontend.Modules
 {
-    using CalculateFunding.Common.ApiClient;
-    using CalculateFunding.Common.ApiClient.Calcs;
-    using CalculateFunding.Common.ApiClient.Interfaces;
-    using CalculateFunding.Common.ApiClient.Jobs;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Providers;
-    using CalculateFunding.Common.ApiClient.Users;
-    using CalculateFunding.Common.ApiClient.Publishing;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Clients.DatasetsClient;
-    using CalculateFunding.Frontend.Clients.ResultsClient;
-    using CalculateFunding.Frontend.Clients.ScenariosClient;
-    using CalculateFunding.Frontend.Clients.TestEngineClient;
-    using CalculateFunding.Frontend.Core.Ioc;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using Microsoft.Extensions.DependencyInjection;
-    using Polly;
-    using System;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-
-    public class ApiModule : ServiceCollectionModuleBase
+	public class ApiModule : ServiceCollectionModuleBase
     {
         public override void Configure(IServiceCollection services)
         {
-            TimeSpan[] retryTimeSpans = new[] { TimeSpan.FromMilliseconds(500), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5) };
+            TimeSpan[] retryTimeSpans = { TimeSpan.FromMilliseconds(500), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5) };
             int numberOfExceptionsBeforeCircuitBreaker = 100;
             TimeSpan circuitBreakerFailurePeriod = TimeSpan.FromMinutes(1);
 

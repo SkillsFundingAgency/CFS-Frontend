@@ -1,3 +1,5 @@
+using CalculateFunding.Common.ApiClient.Results;
+
 namespace CalculateFunding.Frontend.Pages.Results
 {
     using System;
