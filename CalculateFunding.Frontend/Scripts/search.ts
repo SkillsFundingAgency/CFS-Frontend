@@ -58,6 +58,7 @@
 
         public isLoading: KnockoutComputed<boolean>;
         public isResultsVisible: KnockoutComputed<boolean>;
+        public includeFacets: boolean = true;
 
         public startItemNumber: KnockoutObservable<number> = ko.observable();
         public endItemNumber: KnockoutObservable<number> = ko.observable();
@@ -171,7 +172,7 @@
                 let searchRequestData: calculateFunding.common.ISearchRequest = {
                     pageNumber: queryPageNumber,
                     searchTerm: this.searchTerm(),
-                    includeFacets: true,
+                    includeFacets: this.includeFacets,
                     filters: filters,
                     errorToggle: this.selectedErrorToggle(),
                     pageSize: this.pageSize()

@@ -10,7 +10,7 @@
 
         private searchCompleted: (resultUntyped: any) => void;
 
-        constructor(specificationId: string, specificationName: string) {
+        constructor(specificationId: string) {
             super();
 
             let self = this;
@@ -20,6 +20,8 @@
             }
 
             this.selectedSpecification(specificationId);
+
+            this.includeFacets = false;
 
             this.canPerformSearch = ko.pureComputed(() => {
                 return self.state() === "idle";
@@ -43,14 +45,6 @@
                 };
 
                 filters.push(calcTypeFilter);
-
-                let specNameFilter: calculateFunding.search.SearchFilter =
-                {
-                    name: "specificationName",
-                    term: specificationName
-                };
-
-                filters.push(specNameFilter);
 
                 return filters;
             });
