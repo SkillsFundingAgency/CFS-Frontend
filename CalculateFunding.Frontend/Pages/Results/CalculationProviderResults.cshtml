@@ -317,7 +317,14 @@
                     <div class="provider-item-header">
                         <strong><span class="float-right" data-bind="text: !calculationExceptionType ? calculationResultDisplay : 'Error', css: {'results-in-progress' : $root.areResultsBeingUpdated() === true, 'error-highlight':calculationExceptionType}"></span></strong>
                         <img src="~/assets/images/loader.gif" data-bind="visible: $root.areResultsBeingUpdated()" class="float-right notifications-panel-loading-image" />
-                        <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderCalcsResults?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
+                        @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+                        {
+                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderAdditionalCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
+                        } 
+                        @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+                        {
+                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderTemplateCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
+                        } 
                     </div>
                     <div>
                         <span class="provider-item-property error-highlight" data-bind="visible: calculationExceptionType != ''">
