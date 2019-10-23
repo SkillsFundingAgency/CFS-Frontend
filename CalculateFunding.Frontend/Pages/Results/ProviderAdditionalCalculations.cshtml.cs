@@ -5,7 +5,6 @@ namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Calcs;
-    using CalculateFunding.Common.ApiClient.Calcs.Models;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.ApiClient.Policies;
     using CalculateFunding.Common.ApiClient.Providers;
@@ -14,12 +13,13 @@ namespace CalculateFunding.Frontend.Pages.Results
     using Serilog;
     using System.Collections.Generic;
     using CalculateFunding.Common.ApiClient.Results.Models;
-
+    using System.Threading.Tasks;
 
     public class ProviderAdditionalCalculationsPageModel : ProviderResultsBasePageModel
     {
         private ILogger _logger;
         private ICalculationsApiClient _calculationsApiClient;
+        private IResultsApiClient _resultsApiClient;
         public List<ProviderCalculationItemViewModel> AdditionalCalculationList;
 
 
@@ -28,13 +28,19 @@ namespace CalculateFunding.Frontend.Pages.Results
         {
 	        _logger = logger;
 	        _calculationsApiClient = calculationsApiClient;
+            _resultsApiClient = resultsApiClient;
+        }
+
+        public override async Task<ApiResponse<ProviderResult>> GetProviderResult(string providerId, string specificationId)
+        {
+            return await _resultsApiClient.GetProviderResultByCalculationTypeAdditional(providerId, specificationId);
         }
 
         public override void PopulateResults(ApiResponse<ProviderResult> providerResponse)
         {
 			AdditionalCalculationList =new List<ProviderCalculationItemViewModel>();
 
-			foreach (var calculationResultItem in providerResponse.Content.CalculationResults.Where(_ => _.CalculationType == Common.ApiClient.Results.Models.CalculationType.Additional))
+			foreach (var calculationResultItem in providerResponse.Content.CalculationResults)
 			{
 				var calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
 				

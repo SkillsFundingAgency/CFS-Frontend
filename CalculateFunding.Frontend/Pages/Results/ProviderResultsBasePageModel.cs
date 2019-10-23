@@ -32,12 +32,12 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly ISpecsApiClient _specsApiClient;
         private readonly ILogger _logger;
 
-        protected ProviderResultsBasePageModel(IResultsApiClient resultsApiClient, 
-	        IProvidersApiClient providersApiClient, 
-	        IPoliciesApiClient policiesApiClient, 
-	        IMapper mapper, 
-	        ISpecsApiClient specsApiClient, 
-	        ILogger logger)
+        protected ProviderResultsBasePageModel(IResultsApiClient resultsApiClient,
+            IProvidersApiClient providersApiClient,
+            IPoliciesApiClient policiesApiClient,
+            IMapper mapper,
+            ISpecsApiClient specsApiClient,
+            ILogger logger)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
@@ -88,7 +88,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
         private async Task PopulateAsync(string providerId, string fundingPeriodId = null, string specificationProviderVersion = null)
         {
-            await PopulatePeriods(fundingPeriodId);          
+            await PopulatePeriods(fundingPeriodId);
 
             FundingPeriodId = fundingPeriodId;
 
@@ -162,7 +162,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             if (!string.IsNullOrWhiteSpace(SpecificationId))
             {
-                ApiResponse<ProviderResult> providerResponse = await _resultsApiClient.GetProviderResults(providerId, SpecificationId);
+                ApiResponse<ProviderResult> providerResponse = await GetProviderResult(providerId, SpecificationId);
 
                 if (providerResponse.StatusCode == HttpStatusCode.OK && providerResponse.Content != null)
                 {
@@ -173,6 +173,11 @@ namespace CalculateFunding.Frontend.Pages.Results
                     _logger.Warning("There were no providers for the given specification Id " + SpecificationId);
                 }
             }
+        }
+
+        public virtual async Task<ApiResponse<ProviderResult>> GetProviderResult(string providerId, string specificationId)
+        {
+            return await _resultsApiClient.GetProviderResults(providerId, SpecificationId);
         }
 
         public abstract void PopulateResults(ApiResponse<ProviderResult> providerResponse);
