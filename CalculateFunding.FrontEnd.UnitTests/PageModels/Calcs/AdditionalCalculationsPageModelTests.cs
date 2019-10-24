@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -37,8 +39,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, null));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             AdditionalCalculationsModel additionalCalculationsModel = CreateAdditionalCalculationsModel(specsApiClient, datasetsApiClient);
 
@@ -66,8 +68,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.NotFound, null));
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.NotFound, null));
 
             AdditionalCalculationsModel additionalCalculationsModel = CreateAdditionalCalculationsModel(specsApiClient, datasetsApiClient);
 
@@ -88,7 +90,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task AdditionalCalculationsModel_OnGet_GivenResultsFoundInSearch_ReturnsPage()
         {
             // Arrange
-            IEnumerable<DatasetSchemasAssigned> datasetSchemas = Enumerable.Empty<DatasetSchemasAssigned>();
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemas = Enumerable.Empty<DatasetSpecificationRelationshipViewModel>();
 
             CalculationSearchResultViewModel calculationSearchResultViewModel = new CalculationSearchResultViewModel
             {
@@ -110,8 +112,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemas));
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemas));
 
             AdditionalCalculationsModel additionalCalculationsModel = CreateAdditionalCalculationsModel(
                 specsApiClient, datasetsApiClient, calculationSearchService: calculationSearchService);

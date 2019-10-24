@@ -1,18 +1,21 @@
-﻿namespace CalculateFunding.Frontend.Services
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Serilog;
-    using CalculateFunding.Common.FeatureToggles;
+﻿using System;
+using CalculateFunding.Common.ApiClient.DataSets;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Serilog;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Models.Search;
+using SearchMode = CalculateFunding.Common.ApiClient.Models.SearchMode;
 
+namespace CalculateFunding.Frontend.Services
+{
     public class DatasetDefinitionSearchService : IDatasetDefinitionSearchService
     {
         private IDatasetsApiClient _datasetsClient;
@@ -35,38 +38,38 @@
 
         public async Task<DatasetDefinitionSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
-            SearchFilterRequest requestOptions = new SearchFilterRequest()
+	        int pageNumber = Math.Max(1, request.PageNumber.GetValueOrDefault(1));
+	        int pageSize = request.PageSize.GetValueOrDefault(50);
+	        
+	        SearchModel requestOptions = new SearchModel
             {
-                Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
-                PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
+                PageNumber = pageNumber,
+                Top = pageSize,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
+                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? Common.Models.Search.SearchMode.All : Common.Models.Search.SearchMode.Any
             };
 
-            if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
-            {
-                requestOptions.Page = request.PageNumber.Value;
-            }
-
-            PagedResult<DatasetDefinitionSearchResultItem> searchRequestResult = await _datasetsClient.FindDatasetDefinitions(requestOptions);
+	        ApiResponse<SearchResults<DatasetDefinitionIndex>> searchRequestResult = await _datasetsClient.SearchDatasetDefinitions(requestOptions);
             if (searchRequestResult == null)
             {
                 _logger.Error("Find datasets HTTP request failed");
                 return null;
             }
 
+            SearchResults<DatasetDefinitionIndex> searchResults = searchRequestResult.Content;
+            
             DatasetDefinitionSearchResultViewModel result = new DatasetDefinitionSearchResultViewModel
             {
-                TotalResults = searchRequestResult.TotalItems,
-                CurrentPage = searchRequestResult.PageNumber,
+                TotalResults = searchResults.TotalCount,
+                CurrentPage = pageNumber,
             };
 
             List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-            if (searchRequestResult.Facets != null)
+            if (searchResults.Facets != null)
             {
-                foreach (SearchFacet facet in searchRequestResult.Facets)
+                foreach (SearchFacet facet in searchResults.Facets)
                 {
                     searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
                 }
@@ -76,7 +79,7 @@
 
             List<DatasetDefinitionSearchResultItemViewModel> itemResults = new List<DatasetDefinitionSearchResultItemViewModel>();
 
-            foreach (DatasetDefinitionSearchResultItem searchResult in searchRequestResult.Items)
+            foreach (DatasetDefinitionIndex searchResult in searchResults.Results)
             {
                 itemResults.Add(_mapper.Map<DatasetDefinitionSearchResultItemViewModel>(searchResult));
             }
@@ -89,16 +92,16 @@
             }
             else
             {
-                result.StartItemNumber = ((requestOptions.Page - 1) * requestOptions.PageSize) + 1;
-                result.EndItemNumber = result.StartItemNumber + requestOptions.PageSize - 1;
+                result.StartItemNumber = ((pageNumber - 1) * pageSize) + 1;
+                result.EndItemNumber = result.StartItemNumber + pageSize - 1;
             }
 
-            if (result.EndItemNumber > searchRequestResult.TotalItems)
+            if (result.EndItemNumber > searchResults.TotalCount)
             {
-                result.EndItemNumber = searchRequestResult.TotalItems;
+                result.EndItemNumber = searchResults.TotalCount;
             }
 
-            result.PagerState = new PagerState(requestOptions.Page, searchRequestResult.TotalPages, 4);
+            result.PagerState = new PagerState(pageNumber, (int)Math.Ceiling(searchResults.TotalCount/(double)pageSize), 4);
 
             return result;
         }

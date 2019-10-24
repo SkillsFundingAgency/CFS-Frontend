@@ -1,21 +1,22 @@
-﻿namespace CalculateFunding.Frontend.Pages.Datasets
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Pages.Datasets
+{
     public class SelectSourceDatasetPageModel : PageModel
     {
         private readonly IDatasetsApiClient _datasetClient;
@@ -41,7 +42,7 @@
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = await _datasetClient.GetDatasourcesByRelationshipId(relationshipId);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
 
             if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
             {
@@ -49,7 +50,7 @@
                 return NotFound();
             }
 
-            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets);
+            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
 
             SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
 
@@ -67,7 +68,7 @@
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = await _datasetClient.GetDatasourcesByRelationshipId(relationshipId);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
 
             if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
             {
@@ -75,7 +76,7 @@
                 return NotFound();
             }
 
-	        IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content, SpecificationActionTypes.CanMapDatasets);
+	        IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
 	        if (!IsAuthorizedToMap)
             {
                 return new ForbidResult();
@@ -104,14 +105,14 @@
                 return new StatusCodeResult(500);
             }
 
-            AssignDatasetVersion assignDatasetVersion = new AssignDatasetVersion
+            AssignDatasourceModel assignDatasetVersion = new AssignDatasourceModel
             {
                 RelationshipId = relationshipId,
                 DatasetId = datasetVersionArray[0],
                 Version = Convert.ToInt32(datasetVersionArray[1])
             };
 
-            HttpStatusCode httpStatusCode = await _datasetClient.AssignDataSourceVersionToRelationship(assignDatasetVersion);
+            HttpStatusCode httpStatusCode = await _datasetClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
 
             if (httpStatusCode.IsSuccess())
             {
@@ -123,23 +124,23 @@
             return new StatusCodeResult(500);
         }
 
-        private SelectDataSourceViewModel PopulateViewModel(SelectDataSourceModel selectDatasourceModel)
+        private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
         {
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel
             {
-                SpecificationId = selectDatasourceModel.SpecificationId,
-                SpecificationName = selectDatasourceModel.SpecificationName,
-                RelationshipId = selectDatasourceModel.RelationshipId,
-                DefinitionId = selectDatasourceModel.DefinitionId,
-                DefinitionName = selectDatasourceModel.DefinitionName,
-                RelationshipName = selectDatasourceModel.RelationshipName
+	            SpecificationId = selectDatasourceModel.SpecificationId,
+	            SpecificationName = selectDatasourceModel.SpecificationName,
+	            RelationshipId = selectDatasourceModel.RelationshipId,
+	            DefinitionId = selectDatasourceModel.DefinitionId,
+	            DefinitionName = selectDatasourceModel.DefinitionName,
+	            RelationshipName = selectDatasourceModel.RelationshipName
             };
 
             List<DatasetVersionsViewModel> datasets = new List<DatasetVersionsViewModel>();
 
             if (!selectDatasourceModel.Datasets.IsNullOrEmpty())
             {
-                foreach (DatasetVersionsModel datasetVersionModel in selectDatasourceModel.Datasets)
+                foreach (DatasetVersions datasetVersionModel in selectDatasourceModel.Datasets)
                 {
                     datasets.Add(new DatasetVersionsViewModel
                     {

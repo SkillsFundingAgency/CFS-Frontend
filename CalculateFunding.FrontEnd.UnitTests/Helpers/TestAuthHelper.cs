@@ -42,6 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         {
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(permissionRequired)).Returns(returns);
+            authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(permissionRequired)).Returns(returns);
             return authHelper;
         }
 

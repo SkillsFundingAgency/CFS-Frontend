@@ -1,34 +1,35 @@
 ﻿// <copyright file="AssignDatasetSchemaPageModelTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
+
+using CalculateFunding.Common.ApiClient.DataSets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Pages.Datasets;
+using CalculateFunding.Frontend.UnitTests.Helpers;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using Common.ApiClient.Models;
-    using Common.Identity.Authorization.Models;
-    using Common.Models;
-    using Common.ApiClient.Specifications;
-    using Common.ApiClient.Specifications.Models;
-    using Clients.DatasetsClient.Models;
-    using Helpers;
-    using Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Pages.Datasets;
-    using CalculateFunding.Frontend.UnitTests.Helpers;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
-
     [TestClass]
     public class AssignDatasetSchemaPageModelTests
     {
@@ -112,7 +113,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = new List<DatasetDefinition> { d1, d2 };
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, dataDefn));
 
             // Act
@@ -175,7 +176,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = new List<DatasetDefinition> { d1, d2 };
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, dataDefn));
 
             // Act
@@ -228,7 +229,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = new List<DatasetDefinition> { d1, d2 };
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, dataDefn));
 
             // Act
@@ -274,7 +275,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = null;
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.NotFound, dataDefn));
 
             // Act
@@ -327,7 +328,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = null;
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, dataDefn));
 
             // Act
@@ -387,7 +388,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             IEnumerable<DatasetDefinition> dataDefn = new List<DatasetDefinition> { d1, d2 };
 
             datasetClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, dataDefn));
 
             // Act
@@ -427,7 +428,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
@@ -471,11 +472,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+                .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+                .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
@@ -519,11 +520,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
@@ -561,11 +562,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
@@ -613,11 +614,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.NotFound));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.NotFound));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
@@ -663,11 +664,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
@@ -718,11 +719,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
@@ -793,11 +794,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
@@ -839,11 +840,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
             mockDatasetsApiClient
-                .GetDataDefinitions()
-                .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
+	            .GetDatasetDefinitions()
+	            .Returns(new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.OK, GetDummyDataDefinitions()));
             mockDatasetsApiClient
-                .AssignDatasetSchema(Arg.Any<AssignDatasetSchemaModel>())
-                .Returns(HttpStatusCode.OK);
+	            .CreateRelationship(Arg.Any<CreateDefinitionSpecificationRelationshipModel>())
+	            .Returns(new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK));
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper

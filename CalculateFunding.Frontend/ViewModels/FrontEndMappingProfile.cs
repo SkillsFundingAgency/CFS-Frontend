@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
@@ -243,17 +244,19 @@ namespace CalculateFunding.Frontend.ViewModels
 
         private void MapDatasets()
         {
-            CreateMap<DatasetSearchResultItem, DatasetSearchResultItemViewModel>()
+            CreateMap<DatasetIndex, DatasetSearchResultItemViewModel>()
                .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
-               .AfterMap((DatasetSearchResultItem source, DatasetSearchResultItemViewModel destination) =>
+               .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate))
+               .AfterMap((DatasetIndex source, DatasetSearchResultItemViewModel destination) =>
                {
-                   destination.LastUpdatedDisplay = source.LastUpdated.ToString(FormatStrings.DateTimeFormatString);
+                   destination.LastUpdatedDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
                });
 
-            CreateMap<DatasetDefinitionSearchResultItem, DatasetDefinitionSearchResultItemViewModel>()
+            CreateMap<DatasetDefinitionIndex, DatasetDefinitionSearchResultItemViewModel>()
                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore());
+            CreateMap<DatasetVersionIndex, DatasetVersionSearchResultModel>();
 
-            CreateMap<AssignDatasetSchemaViewModel, AssignDatasetSchemaModel>()
+            CreateMap<AssignDatasetSchemaViewModel, CreateDefinitionSpecificationRelationshipModel>()
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
@@ -273,16 +276,17 @@ namespace CalculateFunding.Frontend.ViewModels
                  }
              });
 
-            CreateMap<DatasetVersionResponse, DatasetVersionFullViewModel>()
+            CreateMap<DatasetVersionResponseViewModel, DatasetVersionFullViewModel>()
                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-               .AfterMap((DatasetVersionResponse source, DatasetVersionFullViewModel destination) =>
+               .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.PublishStatus))
+               .AfterMap((DatasetVersionResponseViewModel source, DatasetVersionFullViewModel destination) =>
                {
                    destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
                });
 
             CreateMap<DatasetValidationStatusModel, DatasetValidationStatusViewModel>();
-            CreateMap<DatasetCreateUpdateResponseModel, DatasetCreateUpdateResponseViewModel>();
-            CreateMap<DatasetValidationStatusOperation, DatasetValidationStatusOperationViewModel>();
+            CreateMap<DatasetValidationStatus, DatasetValidationStatusOperationViewModel>();
+            CreateMap<CreateDefinitionSpecificationRelationshipModel, AssignDatasetSchemaViewModel>();
         }
 
         private void MapTestEngine()

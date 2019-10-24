@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -14,6 +15,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 	public class DatasetHistoryModel : PageModel
 	{
 		private readonly IDatasetSearchService _searchService;
+		private readonly IMapper _mapper;
 
 		public string DatasetId { get; set; }
 
@@ -21,9 +23,10 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
 		public DatasetVersionSearchResultViewModel DatasetSearchResultViewModel { get; set; }
 
-		public DatasetHistoryModel(IDatasetSearchService searchService)
+		public DatasetHistoryModel(IDatasetSearchService searchService, IMapper mapper)
 		{
 			_searchService = searchService;
+			_mapper = mapper;
 		}
 
 		public async Task<IActionResult> OnGetAsync(string datasetId, int pageNumber = 1, int pageSize = 20)
@@ -56,7 +59,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
 			if (searchResult?.Results?.AnyWithNullCheck() == true && currentSearchResult?.Results?.AnyWithNullCheck() == true)
 			{
-				Current = currentSearchResult.Results.First();
+				Current = _mapper.Map<DatasetVersionSearchResultModel>(currentSearchResult.Results.First());
 
 				DatasetSearchResultViewModel = searchResult;
 

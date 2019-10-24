@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.UnitTests.Controllers
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+
+namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
     using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,11 +42,11 @@
             //Arrange
             const string schemaName = "test schema";
 
-            ApiResponse<DownloadDatasetSchemaResponse> apiResponse = new ApiResponse<DownloadDatasetSchemaResponse>(HttpStatusCode.NotFound);
+            ApiResponse<DatasetSchemaSasUrlResponseModel> apiResponse = new ApiResponse<DatasetSchemaSasUrlResponseModel>(HttpStatusCode.NotFound);
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionId == schemaName))
+                .GetDatasetSchemaSasUrl(Arg.Is<DatasetSchemaSasUrlRequestModel>(m => m.DatasetDefinitionId == schemaName))
                 .Returns(apiResponse);
 
             DownloadDatasetSchemaController controller = CreateController(apiClient);
@@ -65,16 +68,16 @@
 
             const string schemaUrl = "http://wherever";
 
-            DownloadDatasetSchemaResponse downloadDatasetSchemaResponse = new DownloadDatasetSchemaResponse
+            DatasetSchemaSasUrlResponseModel downloadDatasetSchemaResponse = new DatasetSchemaSasUrlResponseModel
             {
                 SchemaUrl = schemaUrl
             };
 
-            ApiResponse<DownloadDatasetSchemaResponse> apiResponse = new ApiResponse<DownloadDatasetSchemaResponse>(HttpStatusCode.OK, downloadDatasetSchemaResponse);
+            ApiResponse<DatasetSchemaSasUrlResponseModel> apiResponse = new ApiResponse<DatasetSchemaSasUrlResponseModel>(HttpStatusCode.OK, downloadDatasetSchemaResponse);
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDatasetSchemaUrl(Arg.Is<DownloadDatasetSchemaRequest>(m => m.DatasetDefinitionId == schemaName))
+                .GetDatasetSchemaSasUrl(Arg.Is<DatasetSchemaSasUrlRequestModel>(m => m.DatasetDefinitionId == schemaName))
                 .Returns(apiResponse);
 
             DownloadDatasetSchemaController controller = CreateController(apiClient);

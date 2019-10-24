@@ -4,6 +4,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
@@ -71,8 +73,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -125,8 +127,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, null));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -151,8 +153,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.NotFound, null));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.NotFound, null));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -180,8 +182,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.InternalServerError, null));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -210,8 +212,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns((ApiResponse<Specification>)null);
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -244,8 +246,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns((ApiResponse<IEnumerable<DatasetSchemasAssigned>>)null);
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns((ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>)null);
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -278,8 +280,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.SpecificationUpdated, specificationId);
@@ -319,8 +321,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationCreated, "calc1");
@@ -360,8 +362,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, "calc1");
@@ -401,8 +403,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, PoliciesPageBannerOperationType.CalculationUpdated, null);
@@ -441,8 +443,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             // Act
             IActionResult result = await policiesModel.OnGet(specificationId, null, null);
@@ -476,8 +478,8 @@ namespace CalculateFunding.Frontend.PageModels.Specs
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanApproveSpecification))
                 .Returns(false);

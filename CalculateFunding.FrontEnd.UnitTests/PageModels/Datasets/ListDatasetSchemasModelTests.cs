@@ -1,29 +1,32 @@
 ﻿// <copyright file="ListDatasetSchemasModelTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
+
+using CalculateFunding.Common.ApiClient.DataSets;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Pages.Datasets;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using Common.ApiClient.Models;
-    using Common.Models;
-    using Common.ApiClient.Policies.Models;
-    using Common.ApiClient.Specifications;
-    using Common.ApiClient.Specifications.Models;
-    using Clients.DatasetsClient.Models;
-    using Helpers;
-    using Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Pages.Datasets;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
+
 
     [TestClass]
     public class ListDatasetSchemasModelTests
@@ -51,51 +54,70 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             .GetSpecification(specificationId)
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
-            List<DatasetSchemasAssigned> datasetSchemasAssigned = new List<DatasetSchemasAssigned>()
+            List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
-                new DatasetSchemasAssigned()
+                new DatasetSpecificationRelationshipViewModel()
                 {
-                    Id = "ds1",
-                    Name = "Dataset Schema 1",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition = new Reference("1234", "Definition 1234"),
-                    Description = "Datasets Schema 1 Description",
-                    UsedInDataAggregations = false,
+	                Id = "ds1",
+	                Name = "Dataset Schema 1",
+	                IsProviderData = false,
+	                Definition = new DatasetDefinitionViewModel
+	                {
+		                Id = "1234",
+		                Name = "Definition 1234",
+	                },
+	                RelationshipDescription = "Datasets Schema 1 Description",
                 },
-                new DatasetSchemasAssigned()
+                new DatasetSpecificationRelationshipViewModel()
                 {
-                    Id = "ds2",
-                    Name = "Dataset Schema Two",
-                    Description = "Datasets Schema Two Description",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition = new Reference("2345", "Definition 2345"),
+	                Id = "ds2",
+	                Name = "Dataset Schema Two",
+	                IsProviderData = false,
+	                Definition = new DatasetDefinitionViewModel
+	                {
+		                Id = "2345",
+		                Name = "Definition 2345",
+	                },
+	                RelationshipDescription = "Datasets Schema Two Description",
                 },
-                new DatasetSchemasAssigned()
+                new DatasetSpecificationRelationshipViewModel()
                 {
-                    Id = "ds3",
-                    Name = "Dataset Schema 3",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition =  new Reference("5555", "Definition Grouped"),
-                } ,
-                new DatasetSchemasAssigned()
-                {
-                    Id = "ds4",
-                    Name = "Grouped with same schema",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition = new Reference("5555", "Definition Grouped"),
+	                Id = "ds3",
+	                Name = "Dataset Schema 3",
+	                IsProviderData = false,
+	                Definition = new DatasetDefinitionViewModel
+	                {
+		                Id = "5555",
+		                Name = "Definition Grouped",
+	                },
                 },
-                new DatasetSchemasAssigned()
+                new DatasetSpecificationRelationshipViewModel()
                 {
-                    Id = "providerDs",
-                    Name = "Provider Dataset",
-                    IsSetAsProviderData = true,
-                    DatasetDefinition = new Reference("5678", "Provider Dataset Definition"),
-                }
+	                Id = "ds4",
+	                Name = "Grouped with same schema",
+	                IsProviderData = false,
+	                Definition = new DatasetDefinitionViewModel
+	                {
+		                Id = "5555",
+		                Name = "Definition Grouped",
+	                },
+                },
+                new DatasetSpecificationRelationshipViewModel()
+                {
+	                Id = "providerDs",
+	                Name = "Provider Dataset",
+	                IsProviderData = true,
+	                Definition = new DatasetDefinitionViewModel
+	                {
+		                Id = "5678",
+		                Name = "Provider Dataset Definition",
+	                },
+                },
             };
 
             datasetClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -113,15 +135,15 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                    Id = datasetSchemasAssigned[0].DatasetDefinition.Id,
-                    Name = datasetSchemasAssigned[0].DatasetDefinition.Name,
+                    Id = datasetSchemasAssigned[0].Definition.Id,
+                    Name = datasetSchemasAssigned[0].Definition.Name,
                     Datasets = new List<AssignedDatasetViewModel>()
                     {
                          new AssignedDatasetViewModel()
                          {
                             Id = datasetSchemasAssigned[0].Id,
                             Name= datasetSchemasAssigned[0].Name,
-                            Description = datasetSchemasAssigned[0].Description,
+                            Description = datasetSchemasAssigned[0].RelationshipDescription,
                             IsSetAsProviderData = false
                          }
                     },
@@ -129,37 +151,37 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
                 new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                    Id = datasetSchemasAssigned[1].DatasetDefinition.Id,
-                    Name = datasetSchemasAssigned[1].DatasetDefinition.Name,
+                    Id = datasetSchemasAssigned[1].Definition.Id,
+                    Name = datasetSchemasAssigned[1].Definition.Name,
                     Datasets = new List<AssignedDatasetViewModel>()
                     {
                          new AssignedDatasetViewModel()
                          {
                             Id = datasetSchemasAssigned[1].Id,
                             Name= datasetSchemasAssigned[1].Name,
-                            Description = datasetSchemasAssigned[1].Description,
+                            Description = datasetSchemasAssigned[1].RelationshipDescription,
                             IsSetAsProviderData = false,
                          }
                     },
                 },
                 new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                    Id = datasetSchemasAssigned[2].DatasetDefinition.Id,
-                    Name = datasetSchemasAssigned[2].DatasetDefinition.Name,
+                    Id = datasetSchemasAssigned[2].Definition.Id,
+                    Name = datasetSchemasAssigned[2].Definition.Name,
                     Datasets = new List<AssignedDatasetViewModel>()
                 {
                      new AssignedDatasetViewModel()
                      {
                         Id = datasetSchemasAssigned[2].Id,
                         Name= datasetSchemasAssigned[2].Name,
-                        Description = datasetSchemasAssigned[2].Description,
+                        Description = datasetSchemasAssigned[2].RelationshipDescription,
                         IsSetAsProviderData = false
                      },
                      new AssignedDatasetViewModel()
                      {
                         Id = datasetSchemasAssigned[3].Id,
                         Name= datasetSchemasAssigned[3].Name,
-                        Description = datasetSchemasAssigned[3].Description,
+                        Description = datasetSchemasAssigned[3].RelationshipDescription,
                         IsSetAsProviderData = false
                      }
                 },
@@ -167,15 +189,15 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
                 new AssignedDataDefinitionToSpecificationViewModel()
                 {
-                    Id = datasetSchemasAssigned[4].DatasetDefinition.Id,
-                    Name = datasetSchemasAssigned[4].DatasetDefinition.Name,
+                    Id = datasetSchemasAssigned[4].Definition.Id,
+                    Name = datasetSchemasAssigned[4].Definition.Name,
                     Datasets = new List<AssignedDatasetViewModel>()
                 {
                      new AssignedDatasetViewModel()
                      {
                         Id = datasetSchemasAssigned[4].Id,
                         Name= datasetSchemasAssigned[4].Name,
-                        Description = datasetSchemasAssigned[4].Description,
+                        Description = datasetSchemasAssigned[4].RelationshipDescription,
                         IsSetAsProviderData = true
                      }
                 },
@@ -210,29 +232,37 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             .GetSpecification(specificationId)
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
-            List<DatasetSchemasAssigned> datasetSchemasAssigned = new List<DatasetSchemasAssigned>()
+            List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
-                new DatasetSchemasAssigned()
-                {
-                    Id = "ds1",
-                    Name = "Dataset Schema 1",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition = new Reference("1234", "Definition 1234"),
-                    Description = "Datasets Schema 1 Description",
-                    UsedInDataAggregations = false,
-                },
-                new DatasetSchemasAssigned()
-                {
-                    Id = "providerDs",
-                    Name = "Provider Dataset",
-                    IsSetAsProviderData = true,
-                    DatasetDefinition = new Reference("5678", "Provider Dataset Definition"),
-                }
+	            new DatasetSpecificationRelationshipViewModel()
+	            {
+		            Id = "ds15",
+		            Name = "Dataset Schema 15",
+		            IsProviderData = true,
+		            Definition = new DatasetDefinitionViewModel
+		            {
+			            Id = "12345",
+			            Name = "Definition 12345",
+		            },
+		            RelationshipDescription = "Datasets Schema 1 Description",
+	            },
+	            new DatasetSpecificationRelationshipViewModel()
+	            {
+		            Id = "ds16",
+		            Name = "Dataset Schema 16",
+		            IsProviderData = false,
+		            Definition = new DatasetDefinitionViewModel
+		            {
+			            Id = "12346",
+			            Name = "Definition 12346",
+		            },
+		            RelationshipDescription = "Datasets Schema 1 Description6",
+	            },
             };
 
             datasetClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -271,22 +301,25 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             .GetSpecification(specificationId)
                 .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
 
-            List<DatasetSchemasAssigned> datasetSchemasAssigned = new List<DatasetSchemasAssigned>()
+            List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
-                new DatasetSchemasAssigned()
-                {
-                    Id = "ds1",
-                    Name = "Dataset Schema 1",
-                    IsSetAsProviderData = false,
-                    DatasetDefinition = new Reference("1234", "Definition 1234"),
-                    Description = "Datasets Schema 1 Description",
-                    UsedInDataAggregations = false,
-                }
+	            new DatasetSpecificationRelationshipViewModel()
+	            {
+		            Id = "ds15",
+		            Name = "Dataset Schema 15",
+		            IsProviderData = false,
+		            Definition = new DatasetDefinitionViewModel
+		            {
+			            Id = "12345",
+			            Name = "Definition 12345",
+		            },
+		            RelationshipDescription = "Datasets Schema 1 Description",
+	            },
             };
 
             datasetClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssigned.AsEnumerable()));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -428,8 +461,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
             datasetClient
-            .GetAssignedDatasetSchemasForSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.NotFound, null));
+            .GetRelationshipsBySpecificationId(expectedSpecificationId)
+            .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.NotFound, null));
 
             // Act
             IActionResult result = await listDatasetSchemasPageModel.OnGet(expectedSpecificationId);

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Pages.Datasets;
@@ -33,9 +35,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				SearchTerm = null
 			};
 
-			IEnumerable<DatasetVersionSearchResultModel> datasetVersionModels = new List<DatasetVersionSearchResultModel>()
+			IEnumerable<DatasetVersionIndex> datasetVersionModels = new List<DatasetVersionIndex>()
 			{
-				new DatasetVersionSearchResultModel()
+				new DatasetVersionIndex()
 			};
 
 			IDatasetSearchService mockDatasetSearchService = Substitute.For<IDatasetSearchService>();
@@ -46,7 +48,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				.PerformSearchDatasetVersion(Arg.Is<SearchRequestViewModel>(sr => sr.PageSize == 1))
 				.Returns(new DatasetVersionSearchResultViewModel(datasetVersionModels, 20, 1, 1, 1));
 
-			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService);
+			IMapper mapper = Substitute.For<IMapper>();
+			mapper.Map<DatasetVersionSearchResultModel>(datasetVersionModels.First())
+				.Returns(new DatasetVersionSearchResultModel());
+			
+			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService, mapper);
 
 			// Act
 			IActionResult result = await datasetHistoryModel.OnGetAsync(datasetidvalue, 1, 20);
@@ -65,6 +71,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 			datasetHistoryModel
 				.DatasetId
 				.Should().Be(datasetidvalue);
+
+			mapper
+				.Received(1)
+				.Map<DatasetVersionSearchResultModel>(datasetVersionModels.First());
+
 		}
 
 		[TestMethod]
@@ -91,7 +102,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				.PerformSearchDatasetVersion(Arg.Is<SearchRequestViewModel>(sr => sr.PageSize == 1))
 				.Returns((DatasetVersionSearchResultViewModel)null);
 
-			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService);
+			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService, Substitute.For<IMapper>());
 
 			// Act
 			IActionResult result = await datasetHistoryModel.OnGetAsync(datasetidvalue, 1, 20);
@@ -116,9 +127,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				SearchTerm = null
 			};
 
-			IEnumerable<DatasetVersionSearchResultModel> datasetVersionModels = new List<DatasetVersionSearchResultModel>()
+			IEnumerable<DatasetVersionIndex> datasetVersionModels = new List<DatasetVersionIndex>()
 			{
-				new DatasetVersionSearchResultModel()
+				new DatasetVersionIndex()
 			};
 
 			IDatasetSearchService mockDatasetSearchService = Substitute.For<IDatasetSearchService>();
@@ -127,9 +138,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				.Returns(new DatasetVersionSearchResultViewModel(datasetVersionModels, 1, 1, 1, 20));
 			mockDatasetSearchService
 				.PerformSearchDatasetVersion(Arg.Is<SearchRequestViewModel>(sr => sr.PageSize == 1))
-				.Returns(new DatasetVersionSearchResultViewModel(Enumerable.Empty<DatasetVersionSearchResultModel>(), 20, 1, 1, 1));
+				.Returns(new DatasetVersionSearchResultViewModel(Enumerable.Empty<DatasetVersionIndex>(), 20, 1, 1, 1));
 
-			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService);
+			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService, Substitute.For<IMapper>());
 
 			// Act
 			IActionResult result = await datasetHistoryModel.OnGetAsync(datasetidvalue, 1, 20);
@@ -154,20 +165,20 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 				SearchTerm = null
 			};
 
-			IEnumerable<DatasetVersionSearchResultModel> datasetVersionModels = new List<DatasetVersionSearchResultModel>()
+			IEnumerable<DatasetVersionIndex> datasetVersionModels = new List<DatasetVersionIndex>()
 			{
-				new DatasetVersionSearchResultModel()
+				new DatasetVersionIndex()
 			};
 
 			IDatasetSearchService mockDatasetSearchService = Substitute.For<IDatasetSearchService>();
 			mockDatasetSearchService
 				.PerformSearchDatasetVersion(Arg.Is<SearchRequestViewModel>(sr => sr.PageSize == 20))
-				.Returns(new DatasetVersionSearchResultViewModel(Enumerable.Empty<DatasetVersionSearchResultModel>(), 1, 1, 1, 20));
+				.Returns(new DatasetVersionSearchResultViewModel(Enumerable.Empty<DatasetVersionIndex>(), 1, 1, 1, 20));
 			mockDatasetSearchService
 				.PerformSearchDatasetVersion(Arg.Is<SearchRequestViewModel>(sr => sr.PageSize == 1))
 				.Returns(new DatasetVersionSearchResultViewModel(datasetVersionModels, 20, 1, 1, 1));
 
-			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService);
+			DatasetHistoryModel datasetHistoryModel = new DatasetHistoryModel(mockDatasetSearchService, Substitute.For<IMapper>());
 
 			// Act
 			IActionResult result = await datasetHistoryModel.OnGetAsync(datasetidvalue, 1, 20);

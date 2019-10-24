@@ -1,25 +1,25 @@
-﻿namespace CalculateFunding.Frontend.Pages.Specs
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using Common.Identity.Authorization.Models;
-    using Common.ApiClient.Specifications;
-    using Common.ApiClient.Specifications.Models;
-    using Common.Utility;
-    using Common.ApiClient.Models;
-    using Clients.DatasetsClient.Models;
-    using Extensions;
-    using Helpers;
-    using Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Pages.Specs
+{
     public class ReleaseTimetableModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
@@ -57,13 +57,13 @@
 
             Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
 
-            Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaResponseTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(specificationId);
+            Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaResponseTask = _datasetsClient.GetRelationshipsBySpecificationId(specificationId);
 
             await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
             ApiResponse<Specification> specificationResponse = specificationResponseTask.Result;
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 
             if (specificationResponse == null)
             {
@@ -113,7 +113,7 @@
                     new List<CalculationViewModel>() :
                     specificationResponse.Content.Calculations.Select(m => _mapper.Map<CalculationViewModel>(m)).ToList();
 
-            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
+            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
             return Page();
         }

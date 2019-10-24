@@ -1,17 +1,17 @@
-﻿namespace CalculateFunding.Frontend.Controllers
-{
-    using Serilog;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc;
-    using FluentAssertions;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Common.ApiClient.Models;
-    using System.Net;
-    using System;
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using Serilog;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using FluentAssertions;
+using CalculateFunding.Common.ApiClient.Models;
+using System.Net;
+using System;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 
+namespace CalculateFunding.Frontend.Controllers
+{
     [TestClass]
     public class DownloadDataSourceControllerTests
     {
@@ -43,10 +43,10 @@
             IDatasetsApiClient dataClient = CreateApiClient();
             ILogger logger = CreateLogger();
 
-            ApiResponse<DownloadDatasourceModel> response = new ApiResponse<DownloadDatasourceModel>(HttpStatusCode.NoContent);
+            ApiResponse<DatasetDownloadModel> response = new ApiResponse<DatasetDownloadModel>(HttpStatusCode.NoContent);
 
             dataClient
-                .GetDatasourceDownload(datasourceId)
+                .DownloadDatasetFile(datasourceId)
                 .Returns(response);
 
             DownloadDatasourceController controller = new DownloadDatasourceController(dataClient, logger);
@@ -69,17 +69,17 @@
             IDatasetsApiClient dataClient = CreateApiClient();
             ILogger logger = CreateLogger();
 
-            DownloadDatasourceModel urlResults = new DownloadDatasourceModel()
+            DatasetDownloadModel urlResults = new DatasetDownloadModel()
             {
                 Url = "test"
             };
 
-            ApiResponse<DownloadDatasourceModel> response = new ApiResponse<DownloadDatasourceModel>(HttpStatusCode.OK, urlResults);
+            ApiResponse<DatasetDownloadModel> response = new ApiResponse<DatasetDownloadModel>(HttpStatusCode.OK, urlResults);
 
             DownloadDatasourceController controller = new DownloadDatasourceController(dataClient, logger);
 
             dataClient
-           .GetDatasourceDownload(datasourceId)
+           .DownloadDatasetFile(datasourceId)
            .Returns(response);
             //Act
             IActionResult actionResult = await controller.Download(datasourceId);

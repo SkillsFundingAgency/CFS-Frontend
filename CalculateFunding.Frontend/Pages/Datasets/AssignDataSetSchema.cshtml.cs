@@ -1,26 +1,26 @@
-﻿namespace CalculateFunding.Frontend.Pages.Datasets
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.ApiClient.Specifications.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
+namespace CalculateFunding.Frontend.Pages.Datasets
+{
     public class AssignDatasetSchemaPageModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
@@ -90,7 +90,7 @@
                 FundingPeriodId = specContent.FundingPeriod.Id;
                 FundingPeriodName = specContent.FundingPeriod.Name;
 
-                ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
+                ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDatasetDefinitions();
 
                 if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
                 {
@@ -148,7 +148,7 @@
 
 			if (!string.IsNullOrWhiteSpace(AssignDatasetSchemaViewModel.Name))
             {
-                ApiResponse<DatasetSchemasAssigned> existingRelationshipResponse = await _datasetsClient.GetAssignedDatasetSchemasForSpecificationAndRelationshipName(specificationId, AssignDatasetSchemaViewModel.Name);
+                ApiResponse<IEnumerable<DefinitionSpecificationRelationship>> existingRelationshipResponse = await _datasetsClient.GetRelationshipBySpecificationIdAndName(specificationId, AssignDatasetSchemaViewModel.Name);
 
                 if (existingRelationshipResponse.StatusCode != HttpStatusCode.NotFound)
                 {
@@ -162,7 +162,7 @@
                 {
                     SpecificationSummary specContent = specificationResponse.Content;
 
-                    ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDataDefinitions();
+                    ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse = await _datasetsClient.GetDatasetDefinitions();
 
                     if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
                     {
@@ -197,23 +197,21 @@
                 }
             }
 
-            AssignDatasetSchemaModel datasetSchema = _mapper.Map<AssignDatasetSchemaModel>(AssignDatasetSchemaViewModel);
+			CreateDefinitionSpecificationRelationshipModel datasetSchema = _mapper.Map<CreateDefinitionSpecificationRelationshipModel>(AssignDatasetSchemaViewModel);
 
             datasetSchema.SpecificationId = specificationId;
 
-            HttpStatusCode newAssignDatasetResponse = await _datasetsClient.AssignDatasetSchema(datasetSchema);
+            ApiResponse<DefinitionSpecificationRelationship> newAssignDatasetResponse = await _datasetsClient.CreateRelationship(datasetSchema);
 
-            if (newAssignDatasetResponse.Equals(HttpStatusCode.OK))
+            if (newAssignDatasetResponse?.StatusCode == HttpStatusCode.OK)
             {
                 return Redirect($"/datasets/ListDatasetSchemas/{specificationId}");
             }
-            else
-            {
-                return new StatusCodeResult(500);
-            }
+
+            return new StatusCodeResult(500);
         }
 
-        public void PopulateDatasetSchemas(IEnumerable<DatasetDefinition> datsetDefn)
+        private void PopulateDatasetSchemas(IEnumerable<DatasetDefinition> datsetDefn)
         {
             Guard.ArgumentNotNull(datsetDefn, nameof(datsetDefn));
 

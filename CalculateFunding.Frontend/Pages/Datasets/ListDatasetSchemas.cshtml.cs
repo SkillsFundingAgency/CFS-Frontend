@@ -1,23 +1,23 @@
-﻿namespace CalculateFunding.Frontend.Pages.Datasets
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.ApiClient.Specifications.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Properties;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
+namespace CalculateFunding.Frontend.Pages.Datasets
+{
     public class ListDatasetSchemasModel : PageModel
     {
         private readonly ISpecsApiClient _specsClient;
@@ -49,12 +49,12 @@
             }
 
             Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
-            Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaResponseTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(specificationId);
+            Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaResponseTask = _datasetsClient.GetRelationshipsBySpecificationId(specificationId);
 
             await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
             ApiResponse<Specification> specificationResponse = specificationResponseTask.Result;
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 
             if (specificationResponse.StatusCode == HttpStatusCode.NotFound)
             {
@@ -80,39 +80,39 @@
 
             Dictionary<string, AssignedDataDefinitionToSpecificationViewModel> dataDefinitions = new Dictionary<string, AssignedDataDefinitionToSpecificationViewModel>();
             Dictionary<string, List<AssignedDatasetViewModel>> datasets = new Dictionary<string, List<AssignedDatasetViewModel>>();
-            foreach (DatasetSchemasAssigned datasetSchema in datasetSchemaResponse.Content.OrderBy(d => d.Name))
+            foreach (DatasetSpecificationRelationshipViewModel datasetSchema in datasetSchemaResponse.Content.OrderBy(d => d.Name))
             {
-                if (!dataDefinitions.ContainsKey(datasetSchema.DatasetDefinition.Id))
+                if (!dataDefinitions.ContainsKey(datasetSchema.Definition.Id))
                 {
-                    if (!datasets.ContainsKey(datasetSchema.DatasetDefinition.Id))
+                    if (!datasets.ContainsKey(datasetSchema.Definition.Id))
                     {
-                        datasets.Add(datasetSchema.DatasetDefinition.Id, new List<AssignedDatasetViewModel>());
+                        datasets.Add(datasetSchema.Definition.Id, new List<AssignedDatasetViewModel>());
                     }
 
                     AssignedDataDefinitionToSpecificationViewModel definition = new AssignedDataDefinitionToSpecificationViewModel()
                     {
-                        Id = datasetSchema.DatasetDefinition.Id,
-                        Name = datasetSchema.DatasetDefinition.Name,
-                        Datasets = datasets[datasetSchema.DatasetDefinition.Id],
+                        Id = datasetSchema.Definition.Id,
+                        Name = datasetSchema.Definition.Name,
+                        Datasets = datasets[datasetSchema.Definition.Id],
                     };
 
-                    dataDefinitions.Add(datasetSchema.DatasetDefinition.Id, definition);
+                    dataDefinitions.Add(datasetSchema.Definition.Id, definition);
                 }
 
                 AssignedDatasetViewModel dataset = new AssignedDatasetViewModel()
                 {
                     Id = datasetSchema.Id,
                     Name = datasetSchema.Name,
-                    Description = datasetSchema.Description,
-                    IsSetAsProviderData = datasetSchema.IsSetAsProviderData
+                    Description = datasetSchema.RelationshipDescription,
+                    IsSetAsProviderData = datasetSchema.IsProviderData
                 };
 
-                datasets[datasetSchema.DatasetDefinition.Id].Add(dataset);
+                datasets[datasetSchema.Definition.Id].Add(dataset);
             }
 
             DatasetDefinitions = dataDefinitions.Values.OrderBy(d => d.Name).AsEnumerable();
 
-            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
+            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
             return Page();
         }

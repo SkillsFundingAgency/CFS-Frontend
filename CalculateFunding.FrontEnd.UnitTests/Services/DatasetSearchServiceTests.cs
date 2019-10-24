@@ -2,26 +2,29 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.Models.Search;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+
 namespace CalculateFunding.Frontend.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using FluentAssertions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
-
     [TestClass]
     public class DatasetSearchServiceTests
     {
@@ -37,7 +40,7 @@ namespace CalculateFunding.Frontend.Services
             IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
 
             datasetClient
-                .When(a => a.FindDatasets(Arg.Any<SearchFilterRequest>()))
+                .When(a => a.SearchDatasets(Arg.Any<SearchModel>()))
                 .Do(x => { throw new HttpRequestException(); });
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -63,10 +66,10 @@ namespace CalculateFunding.Frontend.Services
 
             IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
 
-            PagedResult<DatasetSearchResultItem> expectedServiceResult = null;
+            ApiResponse<SearchResults<DatasetIndex>> expectedServiceResult = null;
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(expectedServiceResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -91,10 +94,10 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems);
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -129,10 +132,10 @@ namespace CalculateFunding.Frontend.Services
                 new SearchFacet(), new SearchFacet()
             };
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems, facets);
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -185,10 +188,10 @@ namespace CalculateFunding.Frontend.Services
                 }
             };
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems, facets);
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -230,10 +233,10 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 0;
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems);
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -259,10 +262,10 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems);
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -288,18 +291,17 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 25;
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 75;
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems);
+            itemResult.Content.TotalCount = 75;
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel()
             {
                 PageNumber = 2,
+                PageSize = 50
             };
 
             // Act
@@ -323,18 +325,17 @@ namespace CalculateFunding.Frontend.Services
 
             int numberOfItems = 50;
 
-            PagedResult<DatasetSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
-            itemResult.PageNumber = 2;
-            itemResult.PageSize = 50;
-            itemResult.TotalItems = 175;
+            ApiResponse<SearchResults<DatasetIndex>> itemResult = GenerateSearchResult(numberOfItems);
+            itemResult.Content.TotalCount = 175;
 
             datasetClient
-                .FindDatasets(Arg.Any<SearchFilterRequest>())
+                .SearchDatasets(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel()
             {
                 PageNumber = 2,
+                PageSize = 50
             };
 
             // Act
@@ -344,37 +345,6 @@ namespace CalculateFunding.Frontend.Services
             results.StartItemNumber.Should().Be(51);
             results.EndItemNumber.Should().Be(100);
         }
-
-	    [TestMethod]
-	    public async Task PerformSearchDatasetVersion_GivenClientReturnsResult_ShouldReturnCorrectlyMappedResult()
-	    {
-			// Arrange
-		    IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
-		    ILogger mockLogger = Substitute.For<ILogger>();
-		    IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
-
-		    PagedResult<DatasetVersionSearchResultModel> itemResult = GeneratedPagedResultsDatasetVersionSearchResultModel(50);
-		    itemResult.PageNumber = 2;
-		    itemResult.PageSize = 50;
-		    itemResult.TotalItems = 175;
-
-		    mockDatasetsApiClient
-			    .FindDatasetsVersions(Arg.Any<SearchFilterRequest>())
-			    .Returns(itemResult);
-
-			// Act
-			DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
-
-			// Assert
-		    datasetVersionSearchResultViewModel.Should().NotBeNull();
-		    datasetVersionSearchResultViewModel.Results.Count().Should().Be(50);
-		    datasetVersionSearchResultViewModel.TotalResults.Should().Be(175);
-		    datasetVersionSearchResultViewModel.CurrentPage.Should().Be(2);
-		    datasetVersionSearchResultViewModel.PageSize.Should().Be(50);
-	    }
 
 	    [TestMethod]
 	    public async Task PerformSearchDatasetVersion_GivenClientReturnsEmptyResult_ShouldReturnCorrectlyMappedResult()
@@ -388,8 +358,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
 
 		    mockDatasetsApiClient
-			    .FindDatasetsVersions(Arg.Any<SearchFilterRequest>())
-			    .Returns((PagedResult<DatasetVersionSearchResultModel>)null);
+			    .SearchDatasets(Arg.Any<SearchModel>())
+			    .Returns((ApiResponse<SearchResults<DatasetIndex>>)null);
 
 		    // Act
 		    DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
@@ -416,7 +386,7 @@ namespace CalculateFunding.Frontend.Services
             await
                 mockDatasetsApiClient
                     .Received(1)
-                    .FindDatasetsVersions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
+                    .SearchDatasetVersion(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.Any));
         }
 
         [TestMethod]
@@ -437,7 +407,7 @@ namespace CalculateFunding.Frontend.Services
             await
                 mockDatasetsApiClient
                     .Received(1)
-                    .FindDatasetsVersions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
+                    .SearchDatasetVersion(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.All));
         }
 
         [TestMethod]
@@ -458,7 +428,7 @@ namespace CalculateFunding.Frontend.Services
             await
                 mockDatasetsApiClient
                     .Received(1)
-                    .FindDatasets(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
+                    .SearchDatasets(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.Any));
         }
 
         [TestMethod]
@@ -479,55 +449,49 @@ namespace CalculateFunding.Frontend.Services
             await
                 mockDatasetsApiClient
                     .Received(1)
-                    .FindDatasets(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
+                    .SearchDatasets(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.All));
         }
 
-        private PagedResult<DatasetSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+        private ApiResponse<SearchResults<DatasetIndex>> GenerateSearchResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
-            PagedResult<DatasetSearchResultItem> result = new PagedResult<DatasetSearchResultItem>();
-            List<DatasetSearchResultItem> items = new List<DatasetSearchResultItem>();
+	        SearchResults<DatasetIndex> result = new SearchResults<DatasetIndex>();
+            List<DatasetIndex> items = new List<DatasetIndex>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new DatasetSearchResultItem()
+                items.Add(new DatasetIndex()
                 {
                     Id = $"{i + 10}",
                     Name = $"Dataset {i + 1}",
                     Status = "Unknown",
-                    LastUpdated = new DateTime(2018, 2, 6, 15, 31, 0),
+                    LastUpdatedDate = new DateTime(2018, 2, 6, 15, 31, 0),
                 });
             }
 
-            result.Items = items.AsEnumerable();
-            result.PageNumber = 1;
-            result.PageSize = 50;
-            result.TotalItems = numberOfItems;
-            result.TotalPages = 1;
+            result.Results = items.AsEnumerable();
+            result.TotalCount = numberOfItems;
             result.Facets = facets;
 
-            return result;
+            return new ApiResponse<SearchResults<DatasetIndex>>(HttpStatusCode.OK, result);
         }
 
-	    private PagedResult<DatasetVersionSearchResultModel> GeneratedPagedResultsDatasetVersionSearchResultModel(int numberOfItems)
+	    private ApiResponse<SearchResults<DatasetVersionIndex>> GeneratedPagedResultsDatasetVersionSearchResultModel(int numberOfItems)
 	    {
-		    PagedResult<DatasetVersionSearchResultModel> result = new PagedResult<DatasetVersionSearchResultModel>();
-		    List<DatasetVersionSearchResultModel> items = new List<DatasetVersionSearchResultModel>();
+		    SearchResults<DatasetVersionIndex> result = new SearchResults<DatasetVersionIndex>();
+		    List<DatasetVersionIndex> items = new List<DatasetVersionIndex>();
 		    for (int i = 0; i < numberOfItems; i++)
 		    {
-			    items.Add(new DatasetVersionSearchResultModel()
+			    items.Add(new DatasetVersionIndex()
 			    {
 				    Id = $"{i + 10}",
 				    Name = $"Dataset {i + 1}"
 			    });
 		    }
 
-		    result.Items = items.AsEnumerable();
-		    result.PageNumber = 1;
-		    result.PageSize = 50;
-		    result.TotalItems = numberOfItems;
-		    result.TotalPages = 1;
+		    result.Results = items.AsEnumerable();
+		    result.TotalCount = numberOfItems;
 		    result.Facets = null;
 
-		    return result;
+		    return new ApiResponse<SearchResults<DatasetVersionIndex>>(HttpStatusCode.OK, result);
 		}
 
         private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)

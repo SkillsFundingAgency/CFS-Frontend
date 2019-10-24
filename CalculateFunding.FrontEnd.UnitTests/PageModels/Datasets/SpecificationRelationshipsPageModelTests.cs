@@ -20,6 +20,8 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
@@ -101,11 +103,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.BadRequest);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.BadRequest);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
             datasetsApiClient
-                .GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(relationshipsResponse);
 
             ILogger logger = CreateLogger();
@@ -154,11 +156,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
             datasetsApiClient
-                .GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(relationshipsResponse);
 
             ILogger logger = CreateLogger();
@@ -207,14 +209,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 .GetSpecificationSummary(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            IEnumerable<DatasetSpecificationRelationshipModel> relationships = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> relationships = new[]
             {
-                new DatasetSpecificationRelationshipModel
+                new DatasetSpecificationRelationshipViewModel
                 {
                     DatasetId = "any-ds-id",
                     DatasetName = "any ds name",
                     RelationshipDescription = "any relationship description",
-                    Definition = new SpecificationDataDefinitionRelationshipModel
+                    Definition = new DatasetDefinitionViewModel
                     {
                         Id = "def-id",
                         Name = "def name",
@@ -227,11 +229,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 }
             };
 
-	        ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK, relationships);
+	        ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, relationships);
 
 			IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
             datasetsApiClient
-                .GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(relationshipsResponse);
 
 			ILogger logger = CreateLogger();
@@ -328,14 +330,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 				.GetSpecificationSummary(Arg.Is(specificationId))
 				.Returns(specificationResponse);
 
-			IEnumerable<DatasetSpecificationRelationshipModel> relationships = new[]
+			IEnumerable<DatasetSpecificationRelationshipViewModel> relationships = new[]
 			{
-				new DatasetSpecificationRelationshipModel
+				new DatasetSpecificationRelationshipViewModel
 				{
 					DatasetId = "any-ds-id",
 					DatasetName = "any ds name",
 					RelationshipDescription = "any relationship description",
-					Definition = new SpecificationDataDefinitionRelationshipModel
+					Definition = new DatasetDefinitionViewModel
 					{
 						Id = "def-id",
 						Name = "def name",
@@ -348,11 +350,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 				}
 			};
 
-			ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipModel>>(HttpStatusCode.OK, relationships);
+			ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, relationships);
 
 			IDatasetsApiClient datasetsApiClient = CreateDatasetApiClient();
 			datasetsApiClient
-				.GetDatasetSpecificationRelationshipsBySpecificationId(Arg.Is(specificationId))
+				.GetRelationshipsBySpecificationId(Arg.Is(specificationId))
 				.Returns(relationshipsResponse);
 
 			ILogger logger = CreateLogger();

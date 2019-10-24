@@ -4,6 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Policies.Models;
@@ -46,8 +48,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns((ApiResponse<SpecificationSummary>) null);
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             ILogger logger = CreateLogger();
 
@@ -85,8 +87,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(specificationId)
-                .Returns((ApiResponse<IEnumerable<DatasetSchemasAssigned>>) null);
+                .GetRelationshipsBySpecificationId(specificationId)
+                .Returns((ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>) null);
 
             ILogger logger = CreateLogger();
 
@@ -124,8 +126,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, null));
 
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
+                .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             FundingLineStructureModel model = CreateFundingLineStructureModel(
                 specsApiClient: specsApiClient,
@@ -161,8 +163,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             IEnumerable<CalculationMetadata> calculationMetadatas = Enumerable.Empty<CalculationMetadata>();
 
@@ -226,8 +228,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             datasetsApiClient
-               .GetAssignedDatasetSchemasForSpecification(specificationId)
-               .Returns(new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSchemasAssigned>()));
+               .GetRelationshipsBySpecificationId(specificationId)
+               .Returns(new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, Enumerable.Empty<DatasetSpecificationRelationshipViewModel>()));
 
             ITemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateTemplateMetadataContentsAssemblerService();
 

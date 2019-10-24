@@ -4,6 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
@@ -132,7 +134,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             }
 
             Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummary(Calculation.SpecificationId);
-            Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(Calculation.SpecificationId);
+            Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaTask = _datasetsClient.GetRelationshipsBySpecificationId(Calculation.SpecificationId);
             Task<ApiResponse<JobSummary>> latestJobTask = _jobsClient.GetLatestJobForSpecification(Calculation.SpecificationId, new[] { JobTypes.CalculationInstruct, JobTypes.CalculationAggregration });
 
             await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask, latestJobTask);
@@ -152,7 +154,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                 }
             }
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaTask.Result;
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaTask.Result;
 
             if (datasetSchemaResponse == null || (!datasetSchemaResponse.StatusCode.IsSuccess() || datasetSchemaResponse.Content == null))
             {
@@ -172,7 +174,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             Specification = _mapper.Map<SpecificationSummaryViewModel>(specResponse.Content);
 
-            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
+            HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
             if (HasProviderDatasetsAssigned)
             {

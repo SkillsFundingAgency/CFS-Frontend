@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
 	public class DatasetVersionSearchResultViewModel : SearchResultViewModel
 	{
-		public DatasetVersionSearchResultViewModel(IEnumerable<DatasetVersionSearchResultModel> results, int totalCount, int currentPage, int totalPages, int pageSize) : base(totalCount, currentPage)
+		public DatasetVersionSearchResultViewModel(IEnumerable<DatasetVersionIndex> results, 
+			int totalCount, 
+			int currentPage, 
+			int totalPages, 
+			int pageSize) 
+			: base(totalCount, currentPage)
 		{
 			Results = results;
 			PagerState = new PagerState(currentPage, totalPages);
@@ -34,8 +40,8 @@ namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 			}
 		}
 
-		public IEnumerable<DatasetVersionSearchResultModel> Results { get; set; }
+		public IEnumerable<DatasetVersionIndex> Results { get; }
 
-		public int PageSize { get; set; }
+		public int PageSize { get; }
 	}
 }

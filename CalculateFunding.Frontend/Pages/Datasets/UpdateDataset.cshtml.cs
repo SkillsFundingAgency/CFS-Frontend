@@ -1,18 +1,18 @@
+using CalculateFunding.Common.ApiClient.DataSets;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
+
 namespace CalculateFunding.Frontend.Pages.Datasets
 {
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Serilog;
-
     public class UpdateDatasetPageModel : PageModel
     {
         private readonly IDatasetsApiClient _datasetsClient;
@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
         {
             Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
 
-            ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetsClient.GetCurrentDatasetVersionByDatasetId(datasetId);
+            ApiResponse<DatasetVersionResponseViewModel> datasetVersionResponse = await _datasetsClient.GetCurrentDatasetVersionByDatasetId(datasetId);
             if (datasetVersionResponse == null)
             {
                 return new InternalServerErrorResult("Datasets verion API response was null");

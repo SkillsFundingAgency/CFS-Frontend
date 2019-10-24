@@ -1,17 +1,19 @@
-﻿namespace CalculateFunding.Frontend.Pages.Datasets
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using CalculateFunding.Common.FeatureToggles;
+
+namespace CalculateFunding.Frontend.Pages.Datasets
 {
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using CalculateFunding.Common.FeatureToggles;
+
 
     public class ManageDatasetsPageModel : PageModel
     {
@@ -63,7 +65,7 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
-                ApiResponse<DatasetVersionResponse> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
+                ApiResponse<DatasetVersionResponseViewModel> datasetVersionResponse = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(operationId);
 
                 IActionResult errorResult = datasetVersionResponse.IsSuccessOrReturnFailureResult("Dataset");
 
@@ -72,16 +74,16 @@
                     return errorResult;
                 }
 
-                DatasetVersionResponse DatsetVersion = datasetVersionResponse.Content;
+                DatasetVersionResponseViewModel version = datasetVersionResponse.Content;
 
                 PageBanner = new PageBannerOperation()
                 {
-                    EntityName = DatsetVersion.Name,
+                    EntityName = version.Name,
                     EntityType = "Data Source",
                     OperationId = operationId,
                     DisplayOperationActionSummary = true,
-                    CurrentDataSourceRows = DatsetVersion.CurrentDataSourceRows,
-                    PreviousDataSourceRows = DatsetVersion.PreviousDataSourceRows,
+                    CurrentDataSourceRows = version.CurrentDataSourceRows,
+                    PreviousDataSourceRows = version.PreviousDataSourceRows,
                     SecondaryActionUrl = $"/datasets/updatedataset?datasetId={operationId}",
                 };
 

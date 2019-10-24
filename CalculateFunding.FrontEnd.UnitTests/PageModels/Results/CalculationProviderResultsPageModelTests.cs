@@ -4,8 +4,6 @@ using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.FeatureToggles;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Results;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -21,6 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 
@@ -102,19 +102,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
@@ -185,19 +185,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.BadRequest);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.BadRequest);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
@@ -250,19 +250,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
@@ -315,19 +315,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = null;
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = null;
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
@@ -367,19 +367,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
@@ -464,19 +464,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
@@ -561,19 +561,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = false
+                    IsProviderData = false
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
@@ -648,19 +648,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
@@ -795,19 +795,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
@@ -878,19 +878,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.BadRequest);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.BadRequest);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultsPageModel pageModel = CreatePageModel(calculationProviderResultsSearchService, calculationsApiClient, mapper: mapper, datasetsApiClient: datasetsApiClient);
@@ -943,19 +943,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
 
             ICalculationProviderResultsSearchService calculationProviderResultsSearchService = CreateResultsSearchService();
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
             {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             ISpecsApiClient specsApiClient = CreateSpecsApiClient();
@@ -1013,19 +1013,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel
@@ -1105,19 +1105,19 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 SpecificationId = specificationId
             };
 
-            IEnumerable<DatasetSchemasAssigned> datasetSchemasAssignedList = new[]
+            IEnumerable<DatasetSpecificationRelationshipViewModel> datasetSchemasAssignedList = new[]
            {
-                new DatasetSchemasAssigned
+                new DatasetSpecificationRelationshipViewModel
                 {
-                    IsSetAsProviderData = true
+                    IsProviderData = true
                 }
             };
 
-            ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSchemasAssigned>>(HttpStatusCode.OK, datasetSchemasAssignedList);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK, datasetSchemasAssignedList);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetAssignedDatasetSchemasForSpecification(Arg.Is(specificationId))
+                .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
                 .Returns(datasetSchemaResponse);
 
             CalculationProviderResultSearchResultViewModel calculationProviderResultSearchResultViewModel = new CalculationProviderResultSearchResultViewModel

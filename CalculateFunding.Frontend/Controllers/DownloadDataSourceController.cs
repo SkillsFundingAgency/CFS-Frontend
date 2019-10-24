@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.Controllers
+﻿using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+
+namespace CalculateFunding.Frontend.Controllers
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -28,7 +31,7 @@
 
             // DATA SOURCE NAME_VERSION number_STATUS.xl
 
-            ApiResponse<DownloadDatasourceModel> apiResponse = await _datasetApiClient.GetDatasourceDownload(datasetId, datasetVersion);
+            ApiResponse<DatasetDownloadModel> apiResponse = await _datasetApiClient.DownloadDatasetFile(datasetId, datasetVersion?.ToString());
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.Url))
             {

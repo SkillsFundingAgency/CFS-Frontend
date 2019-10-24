@@ -1,25 +1,27 @@
 ﻿// <copyright file="DatasetControllerTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
+
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using Serilog;
+
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-    using Serilog;
-
     [TestClass]
     public class DatasetControllerTests
     {
@@ -44,17 +46,16 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task SaveDataset_GivenViewModelIsNotNullButResponseContainsModelErrors_ReturnsBadRequest()
         {
             // Arrange
-            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest);
-            response.ModelState = new Dictionary<string, IEnumerable<string>>
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest)
             {
-                { "Name", new [] {"Invalid name" } }
+	            ModelState = new Dictionary<string, IEnumerable<string>> {{"Name", new[] {"Invalid name"}}}
             };
 
             CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -84,7 +85,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -126,7 +127,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .CreateDataset(Arg.Any<CreateNewDatasetModel>())
+                .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -179,7 +180,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .ValidateDataset(Arg.Is(viewModel))
+                .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
                 .Returns(response);
 
             ILogger logger = CreateLogger();
@@ -213,8 +214,8 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .ValidateDataset(Arg.Is(viewModel))
-                .Returns(response);
+	            .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
+	            .Returns(response);
 
             ILogger logger = CreateLogger();
 
@@ -240,10 +241,10 @@ namespace CalculateFunding.Frontend.Controllers
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
 
-            DatasetValidationStatusModel statusModel = new DatasetValidationStatusModel()
+            DatasetValidationStatusModel statusModel = new DatasetValidationStatusModel
             {
                 ValidationFailures = new Dictionary<string, IEnumerable<string>>(),
-                CurrentOperation = DatasetValidationStatusOperation.Processing,
+                CurrentOperation = DatasetValidationStatus.Processing,
                 DatasetId = "datasetId",
                 ErrorMessage = "errorMessage",
                 OperationId = "operationId",
@@ -262,8 +263,8 @@ namespace CalculateFunding.Frontend.Controllers
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .ValidateDataset(Arg.Is(viewModel))
-                    .Returns(response);
+	            .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
+	            .Returns(response);
 
             ILogger logger = CreateLogger();
 

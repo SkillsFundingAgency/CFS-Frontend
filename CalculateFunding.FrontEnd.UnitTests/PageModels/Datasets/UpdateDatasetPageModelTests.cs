@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -29,14 +31,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             string datasetId = "ds1";
 
-            DatasetVersionResponse datasetVersionResponse = new DatasetVersionResponse()
+            DatasetVersionResponseViewModel datasetVersionResponse = new DatasetVersionResponseViewModel()
             {
                 Id = "ds1",
             };
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, datasetVersionResponse));
+                .Returns(new ApiResponse<DatasetVersionResponseViewModel>(HttpStatusCode.OK, datasetVersionResponse));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);
@@ -50,7 +52,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             pageModel.DatasetVersion
                 .Should()
-                .BeEquivalentTo(datasetVersionResponse, c => c.WithAutoConversion());
+                .BeEquivalentTo(datasetVersionResponse, c => c.WithAutoConversion()
+	                .Excluding(_ => _.PublishStatus)
+	                .Excluding(_ => _.LastUpdatedDate));
         }
 
         [TestMethod]
@@ -65,7 +69,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns((ApiResponse<DatasetVersionResponse>)null);
+                .Returns((ApiResponse<DatasetVersionResponseViewModel>)null);
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);
@@ -91,7 +95,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.InternalServerError, null));
+                .Returns(new ApiResponse<DatasetVersionResponseViewModel>(HttpStatusCode.InternalServerError, null));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);
@@ -117,7 +121,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
 
             datasetsApiClient
                 .GetCurrentDatasetVersionByDatasetId(datasetId)
-                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, null));
+                .Returns(new ApiResponse<DatasetVersionResponseViewModel>(HttpStatusCode.OK, null));
 
             // Act
             IActionResult result = await pageModel.OnGetAsync(datasetId);

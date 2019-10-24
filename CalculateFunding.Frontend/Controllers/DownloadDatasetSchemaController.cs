@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -23,12 +25,12 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(schemaId, nameof(schemaId));
 
-            DownloadDatasetSchemaRequest downloadDatasetSchemaRequest = new DownloadDatasetSchemaRequest
+            DatasetSchemaSasUrlRequestModel downloadDatasetSchemaRequest = new DatasetSchemaSasUrlRequestModel
             {
                 DatasetDefinitionId = schemaId
             };
 
-            ApiResponse<DownloadDatasetSchemaResponse> apiResponse = await _datasetApiClient.GetDatasetSchemaUrl(downloadDatasetSchemaRequest);
+            ApiResponse<DatasetSchemaSasUrlResponseModel> apiResponse = await _datasetApiClient.GetDatasetSchemaSasUrl(downloadDatasetSchemaRequest);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.SchemaUrl))
             {

@@ -2,22 +2,22 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Pages.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Pages.Datasets;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
-
     [TestClass]
     public class CreateDatasetPageModelTests
     {
@@ -30,7 +30,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(response);
 
             CreateDatasetPageModel pageModel = CreatePageModel(apiClient);
@@ -62,7 +62,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetDataDefinitions()
+                .GetDatasetDefinitions()
                 .Returns(response);
 
             CreateDatasetPageModel pageModel = CreatePageModel(apiClient);

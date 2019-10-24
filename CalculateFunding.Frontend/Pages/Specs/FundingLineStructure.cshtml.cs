@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -88,13 +88,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummaryById(specificationId);
 
-                Task<ApiResponse<IEnumerable<DatasetSchemasAssigned>>> datasetSchemaResponseTask = _datasetsClient.GetAssignedDatasetSchemasForSpecification(specificationId);
+                Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaResponseTask = _datasetsClient.GetRelationshipsBySpecificationId(specificationId);
 
                 await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
                 ApiResponse<SpecificationSummary> specificationResponse = specificationResponseTask.Result;
 
-                ApiResponse<IEnumerable<DatasetSchemasAssigned>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
+                ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 
                 if (specificationResponse == null)
                 {
@@ -140,7 +140,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 this.TemplateMappings = await SetTemplateMappings(specificationId);
 
-                HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsSetAsProviderData);
+                HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
                 if (operationType.HasValue)
                 {

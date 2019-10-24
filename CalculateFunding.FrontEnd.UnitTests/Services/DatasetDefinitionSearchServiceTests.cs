@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -16,6 +20,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
+using SearchMode = CalculateFunding.Common.ApiClient.Models.SearchMode;
 
 namespace CalculateFunding.Frontend.UnitTests.Services
 {
@@ -33,7 +38,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             DatasetDefinitionSearchService searchService = CreateSearchService(apiClient, mapper, logger);
 
             apiClient
-                .When(a => a.FindDatasetDefinitions(Arg.Any<SearchFilterRequest>()))
+                .When(a => a.SearchDatasetDefinitions(Arg.Any<SearchModel>()))
                 .Do(x => { throw new HttpRequestException(); });
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -57,10 +62,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             DatasetDefinitionSearchService searchService = CreateSearchService(apiClient, mapper, logger);
 
-            PagedResult<DatasetDefinitionSearchResultItem> expectedServiceResult = null;
+            ApiResponse<SearchResults<DatasetDefinitionIndex>> expectedServiceResult = null;
 
             apiClient
-                .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>())
+                .SearchDatasetDefinitions(Arg.Any<SearchModel>())
                 .Returns(expectedServiceResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -86,10 +91,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             int numberOfItems = 25;
 
-            PagedResult<DatasetDefinitionSearchResultItem> itemResult = GeneratePagedResult(numberOfItems);
+            ApiResponse<SearchResults<DatasetDefinitionIndex>> itemResult = GenerateSearchResult(numberOfItems);
 
             apiClient
-                .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>())
+                .SearchDatasetDefinitions(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -113,7 +118,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             await apiClient
                 .Received(1)
-                .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>());
+                .SearchDatasetDefinitions(Arg.Any<SearchModel>());
         }
 
         [TestMethod]
@@ -149,10 +154,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 }
             };
 
-            PagedResult<DatasetDefinitionSearchResultItem> itemResult = GeneratePagedResult(numberOfItems, facets);
+            ApiResponse<SearchResults<DatasetDefinitionIndex>> itemResult = GenerateSearchResult(numberOfItems, facets);
 
             apiClient
-                .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>())
+                .SearchDatasetDefinitions(Arg.Any<SearchModel>())
                 .Returns(itemResult);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
@@ -201,7 +206,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             await apiClient
                 .Received(1)
-                .FindDatasetDefinitions(Arg.Any<SearchFilterRequest>());
+                .SearchDatasetDefinitions(Arg.Any<SearchModel>());
         }
 
         [TestMethod]
@@ -219,9 +224,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             // Assert
             await
-                apiClient
-                    .Received(1)
-                    .FindDatasetDefinitions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
+	            apiClient
+		            .Received(1)
+		            .SearchDatasetDefinitions(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.Any));
         }
 
         [TestMethod]
@@ -242,7 +247,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             await
                 apiClient
                     .Received(1)
-                    .FindDatasetDefinitions(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
+                    .SearchDatasetDefinitions(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.All));
         }
 
         static DatasetDefinitionSearchService CreateSearchService(IDatasetsApiClient apiClient = null, IMapper mapper = null, ILogger logger = null, IFeatureToggle featureToggle = null)
@@ -279,13 +284,13 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return featureToggle;
         }
 
-        PagedResult<DatasetDefinitionSearchResultItem> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
+        ApiResponse<SearchResults<DatasetDefinitionIndex>> GenerateSearchResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
-            PagedResult<DatasetDefinitionSearchResultItem> result = new PagedResult<DatasetDefinitionSearchResultItem>();
-            List<DatasetDefinitionSearchResultItem> items = new List<DatasetDefinitionSearchResultItem>();
+            SearchResults<DatasetDefinitionIndex> result = new SearchResults<DatasetDefinitionIndex>();
+            List<DatasetDefinitionIndex> items = new List<DatasetDefinitionIndex>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new DatasetDefinitionSearchResultItem()
+                items.Add(new DatasetDefinitionIndex()
                 {
                     Id = $"{i + 10}",
                     Name = $"ds-{i + 1}",
@@ -295,14 +300,11 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 });
             }
 
-            result.Items = items.AsEnumerable();
-            result.PageNumber = 1;
-            result.PageSize = 50;
-            result.TotalItems = numberOfItems;
-            result.TotalPages = 1;
+            result.Results = items.AsEnumerable();
+            result.TotalCount = numberOfItems;
             result.Facets = facets;
 
-            return result;
+            return new ApiResponse<SearchResults<DatasetDefinitionIndex>>(HttpStatusCode.OK, result);
         }
     }
 }

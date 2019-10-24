@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -45,12 +47,12 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenRelationshipIdButGettingSourceModelReturnedInternalServerError_Returns404()
         {
             // Arrange
-            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError, model);
+            SelectDatasourceModel model = new SelectDatasourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.InternalServerError, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -74,11 +76,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenRelationshipIdAndGettingSourceModelReturnsOkButNullContent_Returns404()
         {
             // Arrange
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -102,13 +104,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenRelationshipIdAndGetsModelWithoutDatasets_Returns200()
         {
             // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel();
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -128,22 +130,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenRelationshipIdAndGetsModelWithDatasets_Returns200()
         {
             // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
-            sourceModel.Datasets = new[]
-            {
-                new DatasetVersionsModel
-                {
-                    Id = "ds-id",
-                    Name = "ds name",
-                    Versions = new[] { 1 }
-                }
-            };
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel {Datasets = new[] {new DatasetVersions {Id = "ds-id", Name = "ds name", Versions = new[] {1}}}};
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -174,10 +167,10 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenUserDoesNotHaveMapDatasetsPermission_ThenReturnPageResultWithAuthorizedToEditFlagSetToFalse()
         {
 	        // Arrange
-	        SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+	        SelectDatasourceModel sourceModel = new SelectDatasourceModel();
 	        sourceModel.Datasets = new[]
 	        {
-		        new DatasetVersionsModel
+		        new DatasetVersions
 		        {
 			        Id = "ds-id",
 			        Name = "ds name",
@@ -185,11 +178,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		        }
 	        };
 
-	        ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+	        ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
 	        IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 	        datasetsApiClient
-		        .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+		        .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
 		        .Returns(sourcesResponse);
 
 	        ILogger logger = CreateLogger();
@@ -229,12 +222,12 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenDatasetVersionIsNullAndGettingRelationshipReturnsInternalServerError_Returns404()
         {
             // Arrange
-            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.InternalServerError, model);
+            SelectDatasourceModel model = new SelectDatasourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.InternalServerError, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -258,13 +251,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenDatasetVersionIUsNullAndRelationshipIdAndGetsModelWithoutDatasets_Returns200()
         {
             // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel();
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -288,12 +281,12 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenDatasetVersionIsInvalid_Returns500()
         {
             // Arrange
-            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
+            SelectDatasourceModel model = new SelectDatasourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -328,13 +321,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenDataetVersionIUsNullAndRelationshipIdAndGetsModelWithoutDatasets_Returns200()
         {
             // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel();
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();
@@ -358,17 +351,17 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenValidDatsetVersionButSavingIsUnsuccessful_Returns500()
         {
             // Arrange
-            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
+            SelectDatasourceModel model = new SelectDatasourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             datasetsApiClient
-                .AssignDataSourceVersionToRelationship(Arg.Any<AssignDatasetVersion>())
-                .Returns(HttpStatusCode.InternalServerError);
+	            .AssignDatasourceVersionToRelationship(Arg.Any<AssignDatasourceModel>())
+	            .Returns(HttpStatusCode.InternalServerError);
 
             ILogger logger = CreateLogger();
 
@@ -402,17 +395,17 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenValidDatsetVersionAndSavingIsUnsuccessful_ReturnsRedirect()
         {
             // Arrange
-            SelectDataSourceModel model = new SelectDataSourceModel { SpecificationId = "abc123" };
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, model);
+            SelectDatasourceModel model = new SelectDatasourceModel { SpecificationId = "abc123" };
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, model);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             datasetsApiClient
-                .AssignDataSourceVersionToRelationship(Arg.Any<AssignDatasetVersion>())
-                .Returns(HttpStatusCode.NoContent);
+	            .AssignDatasourceVersionToRelationship(Arg.Any<AssignDatasourceModel>())
+	            .Returns(HttpStatusCode.NoContent);
 
             ILogger logger = CreateLogger();
 
@@ -442,13 +435,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnPostAsync_GivenUserDoesNotHaveMapDatasetsPermission_Returns403()
         {
             // Arrange
-            SelectDataSourceModel sourceModel = new SelectDataSourceModel();
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel();
 
-            ApiResponse<SelectDataSourceModel> sourcesResponse = new ApiResponse<SelectDataSourceModel>(HttpStatusCode.OK, sourceModel);
+            ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
             datasetsApiClient
-                .GetDatasourcesByRelationshipId(Arg.Is(relationshipId))
+                .GetDataSourcesByRelationshipId(Arg.Is(relationshipId))
                 .Returns(sourcesResponse);
 
             ILogger logger = CreateLogger();

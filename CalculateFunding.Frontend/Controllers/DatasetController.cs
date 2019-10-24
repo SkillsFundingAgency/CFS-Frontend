@@ -1,18 +1,19 @@
-﻿namespace CalculateFunding.Frontend.Controllers
-{
-    using System.Linq;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-    using Serilog;
+﻿using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
+namespace CalculateFunding.Frontend.Controllers
+{
     public class DatasetController : Controller
     {
         private readonly IDatasetsApiClient _datasetApiClient;
@@ -32,11 +33,11 @@
 
         [HttpPost]
         [Route("api/datasets")]
-        async public Task<IActionResult> SaveDataset([FromBody]CreateDatasetViewModel vm)
+        public async Task<IActionResult> SaveDataset([FromBody]CreateDatasetViewModel vm)
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
 
-            ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.CreateDataset(new CreateNewDatasetModel
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.CreateNewDataset(new CreateNewDatasetModel
             {
                 Name = vm.Name,
                 DefinitionId = vm.DataDefinitionId,
@@ -76,7 +77,7 @@
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.UpdateDatasetVersion(new DatasetVersionUpdateModel
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.DatasetVersionUpdate(new DatasetVersionUpdateModel
             {
                 DatasetId = datasetId,
                 Filename = vm.Filename
@@ -105,7 +106,7 @@
 
         [HttpPost]
         [Route("api/datasets/validate-dataset")]
-        async public Task<IActionResult> ValidateDataset([FromBody]ValidateDatasetModel vm)
+        public async Task<IActionResult> ValidateDataset([FromBody]ValidateDatasetModel vm)
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
 
@@ -114,7 +115,14 @@
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<DatasetValidationStatusModel> apiResponse = await _datasetApiClient.ValidateDataset(vm);
+            ValidatedApiResponse<DatasetValidationStatusModel> apiResponse = await _datasetApiClient.ValidateDataset(new GetDatasetBlobModel
+            {
+				DatasetId    = vm.DatasetId,
+				Version = vm.Version,
+				Filename = vm.Filename,
+				Description = vm.Description,
+				Comment = vm.Comment
+            });
 
             if (apiResponse == null)
             {
@@ -148,7 +156,7 @@
                 return new BadRequestObjectResult("Missing operationId");
             }
 
-            ApiResponse<DatasetValidationStatusModel> statusResponse = await _datasetApiClient.GetDatasetValidateStatus(operationId);
+            ApiResponse<DatasetValidationStatusModel> statusResponse = await _datasetApiClient.GetValidateDatasetStatus(operationId);
             if (statusResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 return new NotFoundObjectResult("Validation status not found");

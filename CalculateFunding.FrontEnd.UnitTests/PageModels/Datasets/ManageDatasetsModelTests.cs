@@ -1,25 +1,25 @@
-﻿namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.FeatureToggles;
-    using CalculateFunding.Common.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using CalculateFunding.Frontend.Pages.Datasets;
-    using CalculateFunding.Frontend.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NSubstitute;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.FeatureToggles;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Pages.Datasets;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
 
+namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
+{
     [TestClass]
     public class ManageDatasetsModelTests
     {
@@ -367,10 +367,10 @@
 
             string datasetId = "Dataset1";
 
-            DatasetVersionResponse datasetVersionResponse = CreateDatasetResponseForBannerChecks(datasetId);
+            DatasetVersionResponseViewModel datasetVersionResponse = CreateDatasetResponseForBannerChecks(datasetId);
 
             datasetsApiClient.GetCurrentDatasetVersionByDatasetId(Arg.Any<string>())
-                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, datasetVersionResponse));
+                .Returns(new ApiResponse<DatasetVersionResponseViewModel>(HttpStatusCode.OK, datasetVersionResponse));
 
             //Act
             IActionResult result = await DatasetModel.OnGetAsync(null, null, DatasetPageBannerOperationType.DatasetUpdated, "Dataset1");
@@ -422,10 +422,10 @@
 
             string datasetId = "Dataset1";
 
-            DatasetVersionResponse datasetVersionResponse = CreateDatasetResponseForBannerChecks(datasetId);
+            DatasetVersionResponseViewModel datasetVersionResponse = CreateDatasetResponseForBannerChecks(datasetId);
 
             datasetsApiClient.GetCurrentDatasetVersionByDatasetId(Arg.Any<string>())
-                .Returns(new ApiResponse<DatasetVersionResponse>(HttpStatusCode.OK, datasetVersionResponse));
+                .Returns(new ApiResponse<DatasetVersionResponseViewModel>(HttpStatusCode.OK, datasetVersionResponse));
 
             //Act
             IActionResult result = await DatasetModel.OnGetAsync(null, null, DatasetPageBannerOperationType.DatasetCreated, "Dataset1");
@@ -451,16 +451,16 @@
                 });
         }
 
-        private static DatasetVersionResponse CreateDatasetResponseForBannerChecks(string datasetId)
+        private static DatasetVersionResponseViewModel CreateDatasetResponseForBannerChecks(string datasetId)
         {
-            return new DatasetVersionResponse()
+            return new DatasetVersionResponseViewModel()
             {
                 BlobName = "datasetblob",
                 Id = "DatasetId",
                 Name = "Test Dataset",
                 Description = "Test Description",
                 Comment = "Test Comment",
-                Status = "Draft",
+                PublishStatus = PublishStatus.Draft,
                 Author = new Reference("1", "Test User"),
                 Version = 1,
                 Definition = new Reference("1", "Test Definition"),
