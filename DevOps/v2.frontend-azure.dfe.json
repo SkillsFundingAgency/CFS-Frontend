@@ -392,7 +392,7 @@
             },
             {
               "name": "datasetsClient:ApiEndpoint",
-              "value": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api/datasets')]"
+              "value": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api')]"
             },
             {
               "name": "resultsClient:ApiKey",
