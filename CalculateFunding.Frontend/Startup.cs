@@ -1,6 +1,7 @@
 ﻿namespace CalculateFunding.Frontend
 {
     using System;
+    using System.IO;
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Authorization;
+    using Microsoft.AspNetCore.Rewrite;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -162,6 +164,15 @@
                         return Task.CompletedTask;
                     });
                 });
+            }
+
+            using (StreamReader iisUrlRewriteStreamReader = File.OpenText("spa-url-rewrite.xml"))
+            {
+                RewriteOptions options = new RewriteOptions();
+                options.AddRewrite("^app$", "app/index.html", true);
+                options.AddIISUrlRewrite(iisUrlRewriteStreamReader);
+
+                app.UseRewriter(options);
             }
 
             app.UseStaticFiles(new StaticFileOptions()

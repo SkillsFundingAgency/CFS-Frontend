@@ -1,6 +1,7 @@
 {
   "name": "calculatefunding-web",
   "version": "0.1.0",
+  "homepage": "/app",
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.18",

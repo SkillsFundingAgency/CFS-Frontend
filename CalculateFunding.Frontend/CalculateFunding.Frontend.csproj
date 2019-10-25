@@ -65,6 +65,7 @@
     <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
     <None Remove="Scripts\Tests\list-provider-test-results.ts" />
     <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
+    <None Remove="spa-url-rewrite.xml" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
@@ -119,6 +120,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Interfaces\ApiClient\ISpecsApiClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="spa-url-rewrite.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\BreadcrumbText.Designer.cs">
