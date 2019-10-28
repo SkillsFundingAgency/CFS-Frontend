@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -26,8 +28,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IResultsApiClient _resultsApiClient;
-
-
+		
         public EditTemplateCalculationPageModel(ISpecsApiClient specsClient,
             ICalculationsApiClient calcClient,
             IMapper mapper,
@@ -77,49 +78,73 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new BadRequestObjectResult(ErrorMessages.CalculationIdNullOrEmpty);
             }
 
-            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
-
-            ApiResponse<Calculation> calculation = await _calcClient.GetCalculationById(calculationId);
-
-            if (calculation == null || calculation.StatusCode != HttpStatusCode.OK)
+            try
             {
-                return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
+                await GetCalculation(calculationId);
+            }
+            catch (HttpCallException hex)
+            {
+                return (hex.StatusCode == HttpStatusCode.NotFound)
+                    ? new NotFoundObjectResult(hex.Message)
+                    : new ObjectResult(hex.Message) { StatusCode = (int)HttpStatusCode.InternalServerError };
             }
 
-            SpecificationId = calculation.Content.SpecificationId;
+            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
 
             bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, SpecificationId, SpecificationActionTypes.CanEditCalculations);
 
             DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
 
-            Calculation = _mapper.Map<CalculationViewModel>(calculation.Content.Current);
+            await HandleSpecificationSummary(SpecificationId);
 
+            await EnableEditCalculationPage(ShouldNewEditCalculationPageBeEnabled, Calculation.Id);
 
-            EditModel = _mapper.Map<CalculationEditViewModel>(calculation.Content);
-
-            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(SpecificationId);
-
-            SpecificationName = (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
-                ? specificationResponse.Content.Name
-                : "Unknown";
-
-            if (specificationResponse != null)
-            {
-                FundingStreamName = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Name;
-                FundingStreamId = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Id;
-                FundingPeriodName = specificationResponse.Content.FundingPeriod.Name;
-            }
-
-            if (ShouldNewEditCalculationPageBeEnabled)
-            {
-                ApiResponse<bool> hasCalculationResponse = await _resultsApiClient.HasCalculationResults(Calculation.Id);
-
-                if (hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    CalculationHasResults = hasCalculationResponse.Content;
-                }
-            }
             return Page();
+        }
+
+        public async Task GetCalculation(string calculationId)
+        {
+            ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
+
+            if (calculationResponse == null || calculationResponse.StatusCode != HttpStatusCode.OK)
+            {
+                throw new HttpCallException(calculationResponse?.StatusCode ?? HttpStatusCode.NotFound, ErrorMessages.CalculationNotFoundInCalcsService);
+            }
+
+            Calculation calculation = calculationResponse.Content;
+
+            SpecificationId = calculation.SpecificationId;
+            Calculation = _mapper.Map<CalculationViewModel>(calculation.Current);
+            EditModel = _mapper.Map<CalculationEditViewModel>(calculation);
+        }
+
+        public async Task<bool> EnableEditCalculationPage(bool shouldNewEditCalculationPageBeEnabled, string calculationId)
+        {
+            if (!shouldNewEditCalculationPageBeEnabled) return false;
+
+            ApiResponse<bool> hasCalculationResponse = await _resultsApiClient.HasCalculationResults(calculationId);
+
+            if (hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return hasCalculationResponse.Content;
+            }
+
+            return false;
+        }
+
+        public async Task HandleSpecificationSummary(string specificationId)
+        {
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+
+            if (specificationResponse?.StatusCode != HttpStatusCode.OK)
+            {
+	            throw new Exception($"Bad response received from specification API: {specificationResponse?.StatusCode.ToString() ?? "No response"}");
+            }
+
+            SpecificationName = specificationResponse.Content.Name;
+            FundingStreamName = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Name;
+            FundingStreamId = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Id;
+            FundingPeriodName = specificationResponse.Content.FundingPeriod.Name;
         }
     }
 }
