@@ -1,6 +1,4 @@
-﻿using CalculateFunding.Frontend.Extensions;
-
-namespace CalculateFunding.Frontend.Controllers
+﻿namespace CalculateFunding.Frontend.Controllers
 {
     using System;
     using System.Collections.Generic;
