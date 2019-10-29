@@ -87,27 +87,29 @@ namespace calculateFunding.releasetimetable {
 
                         let result: IReleaseTimetable = response;
 
-                        let statementDate: Date = new Date(result.content.externalPublicationDate);
-                        let paymentDate: Date = new Date(result.content.earliestPaymentAvailableDate);
+                        if (result.content.externalPublicationDate) {
+                            let statementDate: Date = new Date(result.content.externalPublicationDate);
 
-                        let statementHours: string = statementDate.getHours() < 10 ? `0${statementDate.getHours()}` : `${statementDate.getHours()}`;
-                        let paymentHours: string = paymentDate.getHours() < 10 ? `0${paymentDate.getHours()}` : `${paymentDate.getHours()}`;
+                            let statementHours: string = statementDate.getHours() < 10 ? `0${statementDate.getHours()}` : `${statementDate.getHours()}`;
+                            let statementMinutes: string = statementDate.getMinutes() < 10 ? `0${statementDate.getMinutes()}` : `${statementDate.getMinutes()}`;
 
-                        let statementMinutes: string = statementDate.getMinutes() < 10 ? `0${statementDate.getMinutes()}` : `${statementDate.getMinutes()}`;
-                        let paymentMinutes: string = paymentDate.getMinutes() < 10 ? `0${paymentDate.getMinutes()}` : `${paymentDate.getMinutes()}`;
+                            this.statementDay(statementDate.getDate());
+                            this.statementMonth(statementDate.getMonth() + 1);
+                            this.statementYear(statementDate.getFullYear());
+                            this.statementTime(`${statementHours}:${statementMinutes}`);
+                        }
 
-                        this.statementDay(statementDate.getDate());
-                        this.statementMonth(statementDate.getMonth()+1);
-                        this.statementYear(statementDate.getFullYear());
-                        this.statementTime(`${statementHours}:${statementMinutes}`);
+                        if (result.content.earliestPaymentAvailableDate) {
+                            let paymentDate: Date = new Date(result.content.earliestPaymentAvailableDate);
 
-                        this.fundingDay(paymentDate.getDate());
-                        this.fundingMonth(paymentDate.getMonth()+1);
-                        this.fundingYear(paymentDate.getFullYear());
-                        this.fundingTime(`${paymentHours}:${paymentMinutes}`);
+                            let paymentHours: string = paymentDate.getHours() < 10 ? `0${paymentDate.getHours()}` : `${paymentDate.getHours()}`;
+                            let paymentMinutes: string = paymentDate.getMinutes() < 10 ? `0${paymentDate.getMinutes()}` : `${paymentDate.getMinutes()}`;
 
-                        this.saveSuccessful(true);
-                        this.saveError(false);
+                            this.fundingDay(paymentDate.getDate());
+                            this.fundingMonth(paymentDate.getMonth() + 1);
+                            this.fundingYear(paymentDate.getFullYear());
+                            this.fundingTime(`${paymentHours}:${paymentMinutes}`);
+                        }
                     }
                     self.state("idle");
                 });
