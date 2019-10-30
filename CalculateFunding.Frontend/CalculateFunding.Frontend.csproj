@@ -8,8 +8,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningsAsErrors />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -20,8 +18,6 @@
   <ItemGroup>
     <None Remove="Scripts\approvals.chooseforfunding.ts" />
     <None Remove="Scripts\approvals.ts" />
-    <None Remove="Scripts\approvals.viewfunding.ts" />
-    <None Remove="Scripts\bindingHandler.approvePublishRow.ts" />
     <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
     <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
     <None Remove="Scripts\bindingHandler.multiselect.ts" />
@@ -39,7 +35,6 @@
     <None Remove="Scripts\diffeditoroptions.d.ts" />
     <None Remove="Scripts\edit.specification.ts" />
     <None Remove="Scripts\editadditionalcalculation.ts" />
-    <None Remove="Scripts\editcalculation.ts" />
     <None Remove="Scripts\edittemplatecalculation.ts" />
     <None Remove="Scripts\expander.ts" />
     <None Remove="Scripts\navbar.ts" />
@@ -75,18 +70,16 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common" Version="1.34.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.22" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.17" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.18" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.External" Version="1.0.2" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.10" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.6" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.11" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.7" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.8" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.7" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.17" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.10" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.7" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.18" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.14" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.8" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.11" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.3" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
@@ -175,9 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\approvals.chooseforfunding.ts" />
-    <TypeScriptCompile Include="Scripts\approvals.viewfunding.ts" />
     <TypeScriptCompile Include="Scripts\approvals.ts" />
-    <TypeScriptCompile Include="Scripts\bindingHandler.approvePublishRow.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
     <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
@@ -206,7 +197,6 @@
     <TypeScriptCompile Include="Scripts\search.datasets.ts" />
     <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
     <TypeScriptCompile Include="Scripts\search.calcuations.ts" />
-    <TypeScriptCompile Include="Scripts\editcalculation.ts" />
     <TypeScriptCompile Include="Scripts\compare.ts" />
     <TypeScriptCompile Include="Scripts\common.d.ts" />
     <TypeScriptCompile Include="Scripts\search.providers.ts" />

@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Frontend.Controllers;
+﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.UnitTests
 {
@@ -34,7 +34,6 @@ namespace CalculateFunding.Frontend.UnitTests
 
             // Assert
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-            ResolveType<ApprovalController>(serviceProvider).Should().NotBeNull(nameof(ApprovalController));
             ResolveType<CalculationController>(serviceProvider).Should().NotBeNull(nameof(CalculationController));
             ResolveType<CalculationSearchController>(serviceProvider).Should().NotBeNull(nameof(CalculationSearchController));
             ResolveType<DatasetController>(serviceProvider).Should().NotBeNull(nameof(DatasetController));

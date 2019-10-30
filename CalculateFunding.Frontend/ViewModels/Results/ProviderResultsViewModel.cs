@@ -8,8 +8,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
     {
         public ProviderResultsViewModel()
         {
-            AllocationLineItems = Enumerable.Empty<AllocationLineResult>();
-
             CalculationItems = Enumerable.Empty<CalculationItemResult>();
 
             ScenarioItems = Enumerable.Empty<ScenarioItemResult>();
@@ -77,11 +75,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         {
             get
             {
-                if (!AllocationLineItems.IsNullOrEmpty())
-                {
-                    return AllocationLineItems.Sum(m => m.SubTotal);
-                }
-
                 return 0;
             }
         }
@@ -100,8 +93,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
                 }
             }
         }
-
-        public IEnumerable<AllocationLineResult> AllocationLineItems { get; set; }
 
         public IEnumerable<CalculationItemResult> CalculationItems { get; set; }
 

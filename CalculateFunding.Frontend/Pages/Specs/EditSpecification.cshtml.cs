@@ -4,9 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
@@ -14,21 +17,18 @@ using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using CalculateFunding.Common.ApiClient.Policies;
-using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Common.ApiClient.Specifications.Models;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class EditSpecificationPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditSpecificationPageModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public EditSpecificationPageModel(ISpecificationsApiClient specsClient, IPoliciesApiClient policiesApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
@@ -48,29 +48,30 @@ namespace CalculateFunding.Frontend.Pages.Specs
         [BindProperty]
         public EditSpecificationViewModel EditSpecificationViewModel { get; set; }
 
-	    public bool IsAuthorizedToEdit { get; set; }
+        public bool IsAuthorizedToEdit { get; set; }
 
-		public async Task<IActionResult> OnGetAsync(string specificationId)
+        public async Task<IActionResult> OnGetAsync(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<Specification> specificationResponse = await _specsClient.GetSpecification(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {
-	            return new ObjectResult($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}")
-		            {StatusCode = (int) specificationResponse.StatusCode};
+                return new ObjectResult($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}")
+                { StatusCode = (int)specificationResponse.StatusCode };
             }
-            if(specificationResponse.Content == null)
+            if (specificationResponse.Content == null)
             {
-	            return new InternalServerErrorResult($"Blank specification returned");
+                return new InternalServerErrorResult($"Blank specification returned");
             }
 
             EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
-            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
-	            specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
 
-			EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
+            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
+                specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+
+            EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
             EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
             EditSpecificationViewModel.OriginalFundingPeriodId = EditSpecificationViewModel.FundingPeriodId;
 
@@ -81,16 +82,16 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
-			IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
+            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
 
-			if (!IsAuthorizedToEdit)
+            if (!IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }
 
             if (!string.IsNullOrWhiteSpace(EditSpecificationViewModel.Name) && EditSpecificationViewModel.Name != EditSpecificationViewModel.OriginalSpecificationName)
             {
-                ApiResponse<Specification> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(EditSpecificationViewModel.Name);
+                ApiResponse<SpecificationSummary> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(EditSpecificationViewModel.Name);
 
                 if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
                 {
@@ -115,8 +116,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             EditSpecificationModel specification = _mapper.Map<EditSpecificationModel>(EditSpecificationViewModel);
 
-            HttpStatusCode editResult = await _specsClient.UpdateSpecification(specificationId, specification);
-            if (editResult == HttpStatusCode.OK)
+            ValidatedApiResponse<SpecificationSummary> editResult = await _specsClient.UpdateSpecification(specificationId, specification);
+            if (editResult.StatusCode == HttpStatusCode.OK)
             {
                 if (returnPage == EditSpecificationRedirectAction.ManagePolicies)
                 {
@@ -127,9 +128,16 @@ namespace CalculateFunding.Frontend.Pages.Specs
                     return Redirect($"/specs?operationType=SpecificationUpdated&operationId={specificationId}");
                 }
             }
+            else if (editResult.StatusCode == HttpStatusCode.BadRequest)
+            {
+                editResult.AddValidationResultErrors(ModelState);
+
+                await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
+                return Page();
+            }
             else
             {
-                return new InternalServerErrorResult($"Unable to update specification. API returned '{editResult}'");
+                return new InternalServerErrorResult($"Unable to update specification. API returned '{editResult?.StatusCode}'");
             }
         }
 
@@ -149,7 +157,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
 
                 IEnumerable<PolicyModels.FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new PolicyModels.FundingStreamComparer());
-                IEnumerable <SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
+                IEnumerable<SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
                 {
                     Value = m.Id,
                     Text = m.Name,

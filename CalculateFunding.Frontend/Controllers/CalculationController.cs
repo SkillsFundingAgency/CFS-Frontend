@@ -7,7 +7,6 @@
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Calcs;
     using CalculateFunding.Common.ApiClient.Calcs.Models;
-    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Helpers;
@@ -18,11 +17,10 @@
     public class CalculationController : Controller
     {
         private ICalculationsApiClient _calcClient;
-        private ISpecificationsApiClient _specificationsApiClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper, ISpecificationsApiClient specificationsApiClient)
+        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
@@ -31,7 +29,6 @@
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
-            _specificationsApiClient = specificationsApiClient;
         }
 
         [HttpPost]
@@ -176,7 +173,7 @@
                 return Ok(response.Content);
             }
 
-			return BadRequest($"An error occurred while saving calculation. Please check and try again.");
+            return BadRequest($"An error occurred while saving calculation. Please check and try again.");
         }
 
         [HttpPost]

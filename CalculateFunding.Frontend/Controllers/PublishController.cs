@@ -1,11 +1,10 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -19,17 +18,17 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [Route("api/publish/savetimetable")]
-		[HttpPost]
+        [HttpPost]
         public async Task<IActionResult> SaveTimetable([FromBody]ReleaseTimetableViewModel viewModel)
         {
-            var publishData = new SpecificationPublishDateModel
+            SpecificationPublishDateModel publishData = new SpecificationPublishDateModel
             {
                 EarliestPaymentAvailableDate = viewModel.FundingDate,
                 ExternalPublicationDate = viewModel.StatementDate
             };
 
 
-            var publish = await _specificationsApiClient.SetPublishDates(viewModel.SpecificationId, publishData);
+            HttpStatusCode publish = await _specificationsApiClient.SetPublishDates(viewModel.SpecificationId, publishData);
 
             if (publish == HttpStatusCode.OK)
             {
@@ -45,17 +44,17 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [Route("api/publish/gettimetable/{specificationId}")]
-		[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetTimetable(string specificationId)
         {
-	        var result = await _specificationsApiClient.GetPublishDates(specificationId);
+            ApiResponse<SpecificationPublishDateModel> result = await _specificationsApiClient.GetPublishDates(specificationId);
 
-	        if (result != null)
-	        {
-		        return new OkObjectResult(result);
-	        }
+            if (result != null)
+            {
+                return new OkObjectResult(result);
+            }
 
-	        return new NotFoundObjectResult(Content("Error. Not Found."));
+            return new NotFoundObjectResult(Content("Error. Not Found."));
         }
 
     }

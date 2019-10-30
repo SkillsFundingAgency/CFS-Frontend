@@ -1,5 +1,5 @@
-﻿using CalculateFunding.Frontend.ViewModels.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.ViewModels.Specs
 {
@@ -10,10 +10,6 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
         public IEnumerable<ReferenceViewModel> FundingStreams { get; set; }
 
         public string Description { get; set; }
-
-        public List<CalculationViewModel> Calculations { get; set; }
-
-        //public List<PolicyViewModel> Policies { get; set; }
 
         public PublishStatusViewModel PublishStatus { get; set; }
     }

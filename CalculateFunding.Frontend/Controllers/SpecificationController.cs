@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -137,7 +136,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 IEnumerable<SpecificationSummary> specificationSummaries = apiResponse.Content;
                 IEnumerable<SpecificationSummary> specificationSummariesTrimmed = await _authorizationHelper.SecurityTrimList(User, specificationSummaries, SpecificationActionTypes.CanChooseFunding);
-                
+
                 return Ok(specificationSummaries.OrderBy(c => c.Name).Select(_ => (_, specificationSummariesTrimmed.Any(trimmedSpec => trimmedSpec.Id == _.Id) == true ? true : false)));
             }
 
@@ -169,50 +168,6 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new StatusCodeResult(500);
         }
-
-        [Route("api/specs/{specificationId}/status")]
-        [HttpPut]
-        public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
-
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
-            {
-                return new ForbidResult();
-            }
-
-            ValidatedApiResponse<PublishStatusResult> response = await _specsClient.UpdatePublishStatus(specificationId, publishStatusEditModel);
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(response.Content);
-            }
-
-            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
-        }
-
-        [Route("api/specs/{specificationId}/selectforfunding")]
-        [HttpPost]
-        public async Task<IActionResult> SelectSpecificationForFunding(string specificationId)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanChooseFunding))
-            {
-                return new ForbidResult();
-            }
-
-            HttpStatusCode statusCode = await _specsClient.SelectSpecificationForFunding(specificationId);
-
-            if (statusCode == HttpStatusCode.NoContent)
-            {
-                return NoContent();
-            }
-
-            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={statusCode}");
-        }
-
 
         [HttpPost]
         [Route("api/specs/create")]
@@ -248,7 +203,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (result.StatusCode.IsSuccess())
             {
-				return new OkObjectResult(result.Content);
+                return new OkObjectResult(result.Content);
             }
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {

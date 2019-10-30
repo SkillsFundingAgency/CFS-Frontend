@@ -16,6 +16,7 @@ using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Pages.Specs;
 using CalculateFunding.Frontend.UnitTests.Helpers;
+using CalculateFunding.Frontend.ViewModels;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,22 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
     {
         private const string specificationId = "spec-id";
         private const string specName = "spec name";
+        private ISpecificationsApiClient _specsClient;
+        private IPoliciesApiClient _policiesClient;
+        private IMapper _mapper;
+        private IAuthorizationHelper _authorizationHelper;
+        private EditSpecificationPageModel _pageModel;
+
+        [TestInitialize]
+        public void TestSetup()
+        {
+            _specsClient = Substitute.For<ISpecificationsApiClient>();
+            _policiesClient = Substitute.For<IPoliciesApiClient>();
+            _mapper = CreateMapper();
+            _authorizationHelper = Substitute.For<IAuthorizationHelper>();
+
+            _pageModel = CreatePageModel(_specsClient, _policiesClient, _mapper, _authorizationHelper);
+        }
 
         [TestMethod]
         public void OnGetAsync_GivenNullOrEmptySpecificationId_ThrowsArgumentException()
@@ -55,11 +72,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_GivenSpecificationIdButResponseIsBadRequest_ReturnsError(HttpStatusCode responseCode)
         {
             //Arrange
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(responseCode);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(responseCode);
 
-            ISpecsApiClient apiClient = CreateApiClient();
+            ISpecificationsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
@@ -67,31 +84,31 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             //Act
             var result = await pageModel.OnGetAsync(specificationId);
 
-			//Assert
-			result.Should().BeOfType(typeof(ObjectResult));
+            //Assert
+            result.Should().BeOfType(typeof(ObjectResult));
 
-			ObjectResult typedResult = (ObjectResult)result;
+            ObjectResult typedResult = (ObjectResult)result;
 
-			typedResult
-				.StatusCode
-				.Should()
-				.Be((int)responseCode);
+            typedResult
+                .StatusCode
+                .Should()
+                .Be((int)responseCode);
 
-			typedResult
-				.Value.ToString()
-				.Should()
-				.Be($"Unable to retreive specification. Status Code = {responseCode}");
+            typedResult
+                .Value.ToString()
+                .Should()
+                .Be($"Unable to retreive specification. Status Code = {responseCode}");
         }
 
         [TestMethod]
         public async Task OnGetAsync_GivenSpecificationIdWithOKResponseButContentIsNull_ReturnsNoContent()
         {
             //Arrange
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK);
 
-            ISpecsApiClient apiClient = CreateApiClient();
+            ISpecificationsApiClient apiClient = CreateApiClient();
             apiClient
-                .GetSpecification(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
@@ -99,46 +116,36 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             //Act
             var result = await pageModel.OnGetAsync(specificationId);
 
-			//Assert
+            //Assert
             result
                 .Should()
                 .BeOfType(typeof(InternalServerErrorResult));
-			
-			((InternalServerErrorResult)result).Value.ToString()
-				.Should()
-				.Be($"Blank specification returned");
+
+            ((InternalServerErrorResult)result).Value.ToString()
+                .Should()
+                .Be($"Blank specification returned");
         }
 
         [TestMethod]
         public void OnGetAsync_GivenNullFundingPeriodsReturns_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
-            EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
-
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = null;
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = null;
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper : mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -149,32 +156,24 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnGetAsync_GivenToPopulateFundingPeriodsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.BadRequest);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.BadRequest);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -185,32 +184,24 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnGetAsync_GivenToPopulateFundingPeriodsReturnsOKButNullContent_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -221,43 +212,35 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnGetAsync_GivenNullFundingStreamsReturnsReturned_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<FundingPeriod> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new FundingPeriod { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = null;
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper : mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -268,43 +251,35 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnGetAsync_GivenToPopulateFundingPeriodsIsOKButFundingStreamsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<FundingPeriod> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new FundingPeriod { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.BadRequest);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -315,43 +290,35 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnGetAsync_GivenToPopulateFundingPeriodsIsOKButFundingStreamsReturnsOKButNullContent_ThrowsInvalidOperationException()
         {
             //Arrange
-            Specification specification = new Specification();
+            SpecificationSummary specification = new SpecificationSummary();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<FundingPeriod> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new FundingPeriod { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
-
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnGetAsync(specificationId);
+            Func<Task> test = async () => await _pageModel.OnGetAsync(specificationId);
 
             test
                 .Should()
@@ -362,7 +329,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_GivenPagePopulates_ReturnsPage()
         {
             //Arrange
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId,
                 Name = specName
@@ -377,53 +344,44 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
-            authorizationHelper
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, policiesApiClient, mapper: mapper, authorizationHelper: authorizationHelper);
-
             //Act
-            IActionResult result = await pageModel.OnGetAsync(specificationId);
+            IActionResult result = await _pageModel.OnGetAsync(specificationId);
 
             //Assert
             result
                 .Should()
                 .BeOfType<PageResult>();
 
-            pageModel
+            _pageModel
                 .FundingStreams
                 .Count()
                 .Should()
                 .Be(1);
 
-            pageModel
+            _pageModel
                 .IsAuthorizedToEdit
                 .Should().BeTrue();
 
-            viewModel
-                .OriginalSpecificationName
+            _pageModel
+                .EditSpecificationViewModel.OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
         }
@@ -432,7 +390,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_GivenPagePopulatesAndPeriodIdProvided_ReturnsPageSetsPeriodInSelectAsDefault()
         {
             //Arrange
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId,
                 Name = specName
@@ -447,52 +405,43 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            apiClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModel);
-
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
-            authorizationHelper
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, policiesApiClient, mapper, authorizationHelper);
 
             //Act
-            IActionResult result = await pageModel.OnGetAsync(specificationId);
+            IActionResult result = await _pageModel.OnGetAsync(specificationId);
 
             //Assert
             result
                 .Should()
                 .BeOfType<PageResult>();
 
-            pageModel
+            _pageModel
                 .FundingStreams
                 .Count()
                 .Should()
                 .Be(1);
 
-            pageModel
+            _pageModel
                 .IsAuthorizedToEdit
                 .Should().BeTrue();
 
-            viewModel
+            _pageModel.EditSpecificationViewModel
                 .OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
@@ -506,53 +455,44 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             {
                 new FundingStream { Id = "fp1", Name = "funding" }
             };
-            Specification specification = new Specification { Id = specificationId, Name = specName };
+            SpecificationSummary specification = new SpecificationSummary { Id = specificationId, Name = specName };
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
-            ApiResponse<Specification> specificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK, specification);
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
             EditSpecificationViewModel viewModelReturned = CreateEditSpecificationViewModel();
 
-            ISpecsApiClient mockSpecsClient = CreateApiClient();
-            IPoliciesApiClient mockPoliciesClient = CreatePoliciesApiClient();
-            mockSpecsClient
-                .GetSpecification(Arg.Is(specificationId))
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
-            mockPoliciesClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
-            mockAuthorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
-            mockAuthorizationHelper
+
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            IMapper mockMapper = CreateMapper();
-            mockMapper
-                .Map<EditSpecificationViewModel>(Arg.Is(specification))
-                .Returns(viewModelReturned);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: mockSpecsClient, policiesApiClient: mockPoliciesClient, authorizationHelper: mockAuthorizationHelper, mapper: mockMapper);
-
             // Act
-            IActionResult pageResult = await pageModel.OnGetAsync(specificationId);
+            IActionResult pageResult = await _pageModel.OnGetAsync(specificationId);
 
             // Assert
             pageResult
                 .Should()
                 .BeOfType<PageResult>();
 
-            pageModel
+            _pageModel
                 .EditSpecificationViewModel
                 .OriginalSpecificationName
                 .Should()
                 .BeEquivalentTo(specName);
 
-            pageModel
+            _pageModel
                 .IsAuthorizedToEdit
                 .Should().BeFalse();
         }
@@ -561,7 +501,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnGetAsync_WhenUserDoesNotHaveCreateSpecPermissionOnExistingFundingStream_ThenExistingFundingStreamsAvailableForList()
         {
             // Arrange
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId,
                 Name = "Test Spec",
@@ -584,42 +524,40 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 new FundingStream { Id = "fs2", Name = "FS Two" }
             };
 
-            ISpecsApiClient specsClient = CreateApiClient();
-            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            specsClient
-                .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
-            authorizationHelper
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(Enumerable.Empty<FundingStream>());
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
-
             // Act
-            await pageModel.OnGetAsync(specificationId);
+            await _pageModel.OnGetAsync(specificationId);
 
             // Assert
-            pageModel.FundingStreams.Should().HaveCount(1);
+            _pageModel
+                .FundingStreams
+                .Should()
+                .HaveCount(1);
         }
 
         [TestMethod]
         public async Task OnGetAsync_WhenUserDoesNotHaveCreateSpecPermissionOnAllExistingFundingStream_ThenExistingFundingStreamsAvailableForList()
         {
             // Arrange
-            Specification specification = new Specification
+            SpecificationSummary specification = new SpecificationSummary
             {
                 Id = specificationId,
                 Name = "Test Spec",
@@ -642,104 +580,64 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 new FundingStream { Id = "fs2", Name = "FS Two" }
             };
 
-            ISpecsApiClient specsClient = CreateApiClient();
-            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            specsClient
-                .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods));
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
-            authorizationHelper
+
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(new List<FundingStream>
                 {
                     new FundingStream { Id = "fs1", Name = "FS One" }
                 });
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper, mapper: MappingHelper.CreateFrontEndMapper());
-
             // Act
-            await pageModel.OnGetAsync(specificationId);
+            await _pageModel.OnGetAsync(specificationId);
 
             // Assert
-            pageModel.FundingStreams.Should().HaveCount(1);
+            _pageModel.FundingStreams.Should().HaveCount(1);
         }
 
         [TestMethod]
         public void OnPostAsync_GivenNameAlreadyExistsAndPopulateFundingPeriodsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.BadRequest);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.BadRequest);
 
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
 
-            pageModel.PageContext = new PageContext();
+            _pageModel.PageContext = new PageContext();
 
-            pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
+            _pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
                 Name = specName
             };
 
-            //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
-
-            test
-                .Should()
-                .ThrowExactly<InvalidOperationException>();
-        }
-
-        [TestMethod]
-        public void OnPostAsync_GivenNameAlreadyExistsAndPopulateFundingPeriodsReturnsOKButNullContent_ThrowsInvalidOperationException()
-        {
-            //Arrange
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK);
-
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
-
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
-                .GetSpecificationByName(Arg.Is(specName))
-                .Returns(existingSpecificationResponse);
-
-            apiClient
-                .GetFundingPeriods()
-                .Returns(fundingPeriodsResponse);
-
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
-
-            pageModel.PageContext = new PageContext();
-
-            pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
-            {
-                Name = specName
-            };
+            AndUserCanEditSpecification();
 
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
+            Func<Task> test = async () => await _pageModel.OnPostAsync();
 
             test
                 .Should()
@@ -750,46 +648,44 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public void OnPostAsync_GivenNameAlreadyExistsPopulateFundingPeriodsIsOKButFundingStreamsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
-            IEnumerable<Reference> fundingPeriods = new[]
+            IEnumerable<FundingPeriod> fundingPeriods = new[]
             {
-                new Reference { Id = "fp1", Name = "funding" }
+                new FundingPeriod { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK);
 
-            ApiResponse<IEnumerable<Reference>> fundingPeriodsResponse = new ApiResponse<IEnumerable<Reference>>(HttpStatusCode.OK, fundingPeriods);
+            ApiResponse<IEnumerable<FundingPeriod>> fundingPeriodsResponse = new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.OK, fundingPeriods);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.BadRequest);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingPeriods()
                 .Returns(fundingPeriodsResponse);
 
-            apiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient);
-
-            pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
+            _pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
                 Name = specName
             };
 
-            pageModel.PageContext = new PageContext();
+            _pageModel.PageContext = new PageContext();
+            AndUserCanEditSpecification();
 
             //Act/Assert
-            Func<Task> test = async () => await pageModel.OnPostAsync();
+            Func<Task> test = async () => await _pageModel.OnPostAsync();
 
             test
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<InvalidOperationException>()
+                .WithMessage("Unable to retreive Funding Streams. Status Code = BadRequest");
         }
 
         [TestMethod]
@@ -801,54 +697,48 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 new FundingStream { Id = "fs1", Name = "funding stream" }
             };
 
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
-            ISpecsApiClient apiClient = CreateApiClient();
-            IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            policiesApiClient
+            _policiesClient
                 .GetFundingStreams()
                 .Returns(fundingStreamsResponse);
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
-            authorizationHelper
+            _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
                 .Returns(fundingStreams);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: apiClient, policiesApiClient: policiesApiClient, authorizationHelper: authorizationHelper);
-
-            pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
+            _pageModel.EditSpecificationViewModel = new EditSpecificationViewModel
             {
                 Name = specName,
                 FundingStreamId = "fs1"
             };
 
-            pageModel.PageContext = new PageContext();
+            _pageModel.PageContext = new PageContext();
 
             //Act
-            IActionResult result = await pageModel.OnPostAsync();
+            IActionResult result = await _pageModel.OnPostAsync();
 
             //Assert
             result
                 .Should()
                 .BeOfType<PageResult>();
 
-            pageModel
+            _pageModel
                 .FundingStreams
                 .Count()
                 .Should()
                 .Be(1);
 
-            pageModel
+            _pageModel
                 .IsAuthorizedToEdit
                 .Should().BeTrue();
         }
@@ -857,35 +747,28 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         public async Task OnPostAsync_GivenViewModelIsValidAndNoRedirectActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToManagePolicies()
         {
             //Arrange
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
 
             EditSpecificationModel editModel = new EditSpecificationModel();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            _specsClient
                 .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
-                .Returns(HttpStatusCode.OK);
+                .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationModel>(Arg.Is(viewModel))
-                .Returns(editModel);
+            _pageModel.EditSpecificationViewModel = viewModel;
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
+            _pageModel.PageContext = new PageContext();
 
-            pageModel.EditSpecificationViewModel = viewModel;
-
-            pageModel.PageContext = new PageContext();
+            AndUserCanEditSpecification();
 
             //Act
-            IActionResult result = await pageModel.OnPostAsync(specificationId);
+            IActionResult result = await _pageModel.OnPostAsync(specificationId);
 
             //Assert
             result
@@ -900,44 +783,44 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId=spec-id");
 
             await
-                apiClient
+                _specsClient
                     .Received(1)
-                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
+                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is<EditSpecificationModel>(
+                        c => c.Name == viewModel.Name
+                        && c.FundingPeriodId == viewModel.FundingPeriodId
+                        && c.Description == viewModel.Description
+                        && c.ProviderVersionId == viewModel.ProviderVersionId));
         }
 
         [TestMethod]
         public async Task OnPostAsync_GivenViewModelIsValidAndRedirectToSpecificationsActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToSpecificationsPage()
         {
             //Arrange
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
-
-            EditSpecificationModel editModel = new EditSpecificationModel();
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            ISpecsApiClient apiClient = CreateApiClient();
+            SpecificationSummary specificationSummaryEditResult = new SpecificationSummary()
+            {
+                Id = specificationId,
+            };
 
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            _specsClient
                 .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
-                .Returns(HttpStatusCode.OK);
+                .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummaryEditResult));
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationModel>(Arg.Is(viewModel))
-                .Returns(editModel);
+            _pageModel.EditSpecificationViewModel = viewModel;
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
+            _pageModel.PageContext = new PageContext();
 
-            pageModel.EditSpecificationViewModel = viewModel;
-
-            pageModel.PageContext = new PageContext();
+            AndUserCanEditSpecification();
 
             //Act
-            IActionResult result = await pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
+            IActionResult result = await _pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
 
             //Assert
             result
@@ -952,44 +835,41 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be("/specs?operationType=SpecificationUpdated&operationId=spec-id");
 
             await
-                apiClient
+                _specsClient
                     .Received(1)
-                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
+                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is<EditSpecificationModel>(
+                        c => c.Name == viewModel.Name
+                        && c.FundingPeriodId == viewModel.FundingPeriodId
+                        && c.Description == viewModel.Description
+                        && c.ProviderVersionId == viewModel.ProviderVersionId));
         }
 
         [TestMethod]
         public async Task OnPostAsync_GivenViewModelIsValidAndUpdateSpecificationCallFails_ThenInternalServerErrorReturned()
         {
             // Arrange
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
 
             EditSpecificationModel editModel = new EditSpecificationModel();
 
             EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
 
-            ISpecsApiClient apiClient = CreateApiClient();
-
-            apiClient
+            _specsClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            apiClient
+            _specsClient
                 .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
-                .Returns(HttpStatusCode.InternalServerError);
+                .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.InternalServerError));
 
-            IMapper mapper = CreateMapper();
-            mapper
-                .Map<EditSpecificationModel>(Arg.Is(viewModel))
-                .Returns(editModel);
+            _pageModel.EditSpecificationViewModel = viewModel;
 
-            EditSpecificationPageModel pageModel = CreatePageModel(apiClient, mapper: mapper);
+            _pageModel.PageContext = new PageContext();
 
-            pageModel.EditSpecificationViewModel = viewModel;
-
-            pageModel.PageContext = new PageContext();
+            AndUserCanEditSpecification();
 
             // Act
-            IActionResult result = await pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
+            IActionResult result = await _pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
 
             //Assert
             result
@@ -1001,39 +881,39 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Be("Unable to update specification. API returned 'InternalServerError'");
 
             await
-                apiClient
+                _specsClient
                     .Received(1)
-                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is(editModel));
+                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is<EditSpecificationModel>(
+                        c => c.Name == viewModel.Name
+                        && c.FundingPeriodId == viewModel.FundingPeriodId
+                        && c.Description == viewModel.Description
+                        && c.ProviderVersionId == viewModel.ProviderVersionId));
         }
 
         [TestMethod]
         public async Task OnPostAsync_GivenUserDoesNotHaveEditSpecificationPermission_ThenForbidResultReturned()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-            specsClient
-                .GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification { Id = specificationId }));
+            _specsClient
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary { Id = specificationId }));
 
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper
+            _authorizationHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
-            EditSpecificationPageModel pageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper);
-
             // Act
-            IActionResult result = await pageModel.OnPostAsync(specificationId);
+            IActionResult result = await _pageModel.OnPostAsync(specificationId);
 
             // Assert
-            pageModel
+            _pageModel
                 .IsAuthorizedToEdit
                 .Should().BeFalse();
 
             result.Should().BeOfType<ForbidResult>();
         }
 
-        private static EditSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IPoliciesApiClient policiesApiClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        private static EditSpecificationPageModel CreatePageModel(ISpecificationsApiClient specsClient = null, IPoliciesApiClient policiesApiClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
             EditSpecificationPageModel pageModel = new EditSpecificationPageModel(specsClient ?? CreateApiClient(), policiesApiClient ?? CreatePoliciesApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditSpecification));
 
@@ -1042,9 +922,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             return pageModel;
         }
 
-        private static ISpecsApiClient CreateApiClient()
+        private static ISpecificationsApiClient CreateApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IPoliciesApiClient CreatePoliciesApiClient()
@@ -1054,7 +934,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
         private static IMapper CreateMapper()
         {
-            return Substitute.For<IMapper>();
+            MapperConfiguration mapperConfiguration = new MapperConfiguration(c =>
+            {
+                c.AddProfile<FrontEndMappingProfile>();
+            });
+
+            return mapperConfiguration.CreateMapper();
         }
 
         private static EditSpecificationViewModel CreateEditSpecificationViewModel()
@@ -1066,6 +951,21 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 FundingPeriodId = "fp1",
                 FundingStreamId = "fs1"
             };
+        }
+
+        private void AndUserCanEditSpecification()
+        {
+            IEnumerable<FundingStream> fundingStreams = new[]
+                        {
+                new FundingStream { Id = "fs1", Name = "funding stream" }
+            };
+
+            _authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .Returns(true);
+            _authorizationHelper
+                .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
+                .Returns(fundingStreams);
         }
     }
 }

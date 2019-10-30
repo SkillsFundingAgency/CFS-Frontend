@@ -1,9 +1,9 @@
-﻿using CalculateFunding.Common.ApiClient.DataSets;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
@@ -109,9 +109,6 @@ namespace CalculateFunding.Frontend.Pages.Specs
             this.DoesUserHavePermissionToApprove = (await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanApproveSpecification)).ToString().ToLowerInvariant();
 
             Specification = _mapper.Map<SpecificationViewModel>(specificationResponse.Content);
-            Specification.Calculations = specificationResponse.Content.Calculations.IsNullOrEmpty() ?
-                    new List<CalculationViewModel>() :
-                    specificationResponse.Content.Calculations.Select(m => _mapper.Map<CalculationViewModel>(m)).ToList();
 
             HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
