@@ -13,10 +13,8 @@
     @if (hostingEnv.IsDevelopment())
     {
         <link href="~/assets/libs/css/bootstrap.css" rel="stylesheet" type="text/css" />
-        @*<link href="~/assets/libs/css/summernote.css" rel="stylesheet" />*@
         <link rel="stylesheet" href="~/libs/govuk_bootstrap/govuk_bootstrap.css" type="text/css" />
         <link rel="stylesheet" href="~/assets/css/main.css" type="text/css" />
-
     }
     else
     {
@@ -42,13 +40,6 @@
                     <nav id="proposition-menu">
 
                         <a href="/" id="proposition-name">Calculate Funding</a>
-
-                        @*<ul id="proposition-links">
-                                <li><a href="layout.html">Layout</a></li>
-                                <li><a href="content.html">Content</a></li>
-                                <li><a href="elements.html">Components</a></li>
-                                <li><a href="developer_guide.html">Developer Guide</a></li>
-                            </ul>*@
                         <div class="user-container">
                             <i class="material-icons circle-icon">person</i> <span>@userProfileService.GetUser().Fullname</span>
                         </div>
@@ -182,26 +173,6 @@
     }
     <main role="main">
         <div class="container">
-            @*<div class="row">
-                    <div class="col-xs-12">
-                        <div class="phase-banner-alpha">
-                            <p>
-                                <strong class="phase-tag">ALPHA</strong>
-                                <span>This is a new service – your <a href="https://designpatterns.hackpad.com/GOV.UK-elements-feedback-sKrDyQxcfA2">feedback</a> will help us to improve it.</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>*@
-            <!-- Breadcrumbs -->
-            @*<div class="row">
-                    <div class="col-xs-12">
-                        <div class="breadcrumbs">
-                            <ol>
-                                <li><a href="index.html">GOV.UK Bootstrap</a></li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>*@
             @RenderBody()
 
         </div>
@@ -224,15 +195,6 @@
 
     <script asp-src-include="~/assets/libs/js/jquery.min.js" asp-append-version="true" type="text/javascript"></script>
     <script asp-src-include="/assets/libs/js/bootstrap.js" asp-append-version="true" type="text/javascript"></script>
-    @*<script src="/assets/libs/js/ace.js"></script>
-        <script src="/assets/libs/js/keybinding-vim.js"></script>
-        <script src="/assets/libs/js/keybinding-emacs.js"></script>
-        <script src="/assets/libs/js/ext-language_tools.js"></script>
-        <script src="/assets/libs/js/csharp.js"></script>
-        <script src="/assets/libs/js/mode-csharp.js"></script>
-        <script src="/assets/libs/js/mode-gherkin.js"></script>
-        <script src="/assets/libs/js/mode-vbscript.js"></script>
-        <script src="/assets/libs/js/summernote.min.js"></script>*@
 
     @if (!hostingEnv.IsDevelopment())
     {
@@ -243,9 +205,6 @@
         <script src="~/assets/js/main.js" type="text/javascript"></script>
     }
 
-    @*<script type="text/javascript">
-            var exports = {};
-        </script>*@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
