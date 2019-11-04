@@ -23,13 +23,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class EditTemplateCalculationPageModel : PageModel
     {
-        private ISpecsApiClient _specsClient;
+        private ISpecificationsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IResultsApiClient _resultsApiClient;
 		
-        public EditTemplateCalculationPageModel(ISpecsApiClient specsClient,
+        public EditTemplateCalculationPageModel(ISpecificationsApiClient specsClient,
             ICalculationsApiClient calcClient,
             IMapper mapper,
             IFeatureToggle features,
@@ -134,7 +134,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public async Task HandleSpecificationSummary(string specificationId)
         {
-            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse?.StatusCode != HttpStatusCode.OK)
             {

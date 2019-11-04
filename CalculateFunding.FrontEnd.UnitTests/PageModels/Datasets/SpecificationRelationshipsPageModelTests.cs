@@ -4,9 +4,7 @@
 
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Datasets;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -56,9 +54,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest);
 
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ILogger logger = CreateLogger();
@@ -98,9 +96,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.BadRequest);
@@ -151,9 +149,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = new ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>(HttpStatusCode.OK);
@@ -204,9 +202,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Is(specificationId))
+                .GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(specificationResponse);
 
             IEnumerable<DatasetSpecificationRelationshipViewModel> relationships = new[]
@@ -325,9 +323,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
 			ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification);
 
-			ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
 			specsApiClient
-				.GetSpecificationSummary(Arg.Is(specificationId))
+				.GetSpecificationSummaryById(Arg.Is(specificationId))
 				.Returns(specificationResponse);
 
 			IEnumerable<DatasetSpecificationRelationshipViewModel> relationships = new[]
@@ -378,7 +376,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		}
 
 		private static SpecificationRelationshipsPageModel CreatePageModel(
-            ISpecsApiClient specsApiClient = null, 
+            ISpecificationsApiClient specsApiClient = null, 
             IDatasetsApiClient datasetsApiClient = null, 
             ILogger logger = null,
             IMapper mapper = null,
@@ -392,9 +390,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 	            authorizationHelper ?? CreateMockAuthenticationHelper());
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IDatasetsApiClient CreateDatasetApiClient()

@@ -16,10 +16,10 @@
     {
         private const int PageSize = 20;
 
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly ILogger _logger;
 
-        public DatasetRelationshipsSearchService(ISpecsApiClient specsClient, ILogger logger)
+        public DatasetRelationshipsSearchService(ISpecificationsApiClient specsClient, ILogger logger)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));

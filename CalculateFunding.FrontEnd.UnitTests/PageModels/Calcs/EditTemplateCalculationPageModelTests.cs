@@ -32,7 +32,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task GetCalculation_ApiResponseIsNull_ThrowsNotFound()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -68,7 +68,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task GetCalculation_ApiResponseNotOK_ThrowsNotFound(HttpStatusCode statusCode)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task GetCalculation_ApiResponseOK_PopulatesPageModel()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -168,7 +168,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task EnableEditCalculationPage_ShouldNotBeEnabled_DoesNothing()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -201,7 +201,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task EnableEditCalculationPage_ShouldBeEnabled_PopulatesCorrectly(bool hasResults)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -240,7 +240,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task EnableEditCalculationPage_NullCalculationResponse_ReturnsFalse()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -282,7 +282,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task EnableEditCalculationPage_NotOkCalculationResponse_ReturnsFalse(HttpStatusCode statusCode)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -325,7 +325,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task HandleSpecificationSummary_ApiResponseNotOK_ThrowsException(ApiResponse<SpecificationSummary> specificationResponse)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -333,7 +333,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
 
             specsClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(specificationResponse);
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
@@ -356,7 +356,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             await specsClient
                 .Received(1)
-                .GetSpecificationSummary(specificationId);
+                .GetSpecificationSummaryById(specificationId);
         }
 
         private static IEnumerable<object[]> HandleSpecificationSummaryNotOkTestCases()
@@ -370,7 +370,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task HandleSpecificationSummary_ApiResponseOK_PopulatesCorrectly()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -395,7 +395,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 });
 
             specsClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(specificationResponse);
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
@@ -429,7 +429,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             await specsClient
                 .Received(1)
-                .GetSpecificationSummary(specificationId);
+                .GetSpecificationSummaryById(specificationId);
         }
 
         [TestMethod]
@@ -440,7 +440,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task OnGet_InvalidCalculationId_ReturnsBadRequest(string calculationId)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -469,7 +469,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task OnGet_GetCalculationThrowsNotFound_ReturnsNotFound()
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -514,7 +514,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             bool hasCalculationResponse)
         {
             //Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
@@ -565,7 +565,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             };
 
             specsClient
-                .GetSpecificationSummary(specificationId)
+                .GetSpecificationSummaryById(specificationId)
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,

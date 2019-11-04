@@ -22,10 +22,10 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
     public class IndexModel : PageModel
     {
         private readonly IScenarioSearchService _scenarioSearchservice;
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IPoliciesApiClient _policiesApiClient;
 
-        public IndexModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IScenarioSearchService scenariosSearchService)
+        public IndexModel(ISpecificationsApiClient specsClient, IPoliciesApiClient policiesApiClient, IScenarioSearchService scenariosSearchService)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(scenariosSearchService, nameof(scenariosSearchService));

@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using CalculateFunding.Common.ApiClient.Results;
-
-namespace CalculateFunding.Frontend.Pages.Results
+﻿namespace CalculateFunding.Frontend.Pages.Results
 {
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Calcs;
@@ -14,6 +11,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     using System.Collections.Generic;
     using CalculateFunding.Common.ApiClient.Results.Models;
     using System.Threading.Tasks;
+    using CalculateFunding.Common.ApiClient.Results;
 
     public class ProviderAdditionalCalculationsPageModel : ProviderResultsBasePageModel
     {
@@ -23,7 +21,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         public List<ProviderCalculationItemViewModel> AdditionalCalculationList;
 
 
-        public ProviderAdditionalCalculationsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger, ICalculationsApiClient calculationsApiClient)
+        public ProviderAdditionalCalculationsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecificationsApiClient specsApiClient, ILogger logger, ICalculationsApiClient calculationsApiClient)
             : base(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger)
         {
 	        _logger = logger;

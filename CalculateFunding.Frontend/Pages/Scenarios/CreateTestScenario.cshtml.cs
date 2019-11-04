@@ -20,12 +20,12 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
     public class CreateTestScenarioPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IScenariosApiClient _scenariosClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CreateTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public CreateTestScenarioPageModel(ISpecificationsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));

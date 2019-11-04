@@ -80,7 +80,11 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "testEngineClient:ApiEndpoint", "https://localhost:7007/api/tests" },
                 { "testEngineClient:ApiKey", "Local" },
                 { "usersClient:ApiEndpoint", "https://localhost:7008/api/users" },
-                { "usersClient:ApiKey", "Local" }
+                { "usersClient:ApiKey", "Local" },
+                { "providersClient:ApiEndpoint", "https://localhost:7011/api/providers" },
+                { "providersClient:ApiKey", "Local" },
+                { "policiesClient:ApiEndpoint", "https://localhost:7013/api/policies" },
+                { "policiesClient:ApiKey", "Local" }
             };
 
             var cb = new ConfigurationBuilder()

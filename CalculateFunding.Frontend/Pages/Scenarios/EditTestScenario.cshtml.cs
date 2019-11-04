@@ -20,13 +20,13 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
 
     public class EditTestScenarioPageModel : PageModel
     {
-        private ISpecsApiClient _specsClient;
+        private ISpecificationsApiClient _specsClient;
         private IScenariosApiClient _scenariosClient;
         private IMapper _mapper;
         private ILogger _logger;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public EditTestScenarioPageModel(ISpecsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
+        public EditTestScenarioPageModel(ISpecificationsApiClient specsClient, IScenariosApiClient scenariosApiClient, IMapper mapper, ILogger logger, IAuthorizationHelper authorizationHelper)
         {
 
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
@@ -106,7 +106,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse != null && specificationResponse.StatusCode == HttpStatusCode.OK)
             {

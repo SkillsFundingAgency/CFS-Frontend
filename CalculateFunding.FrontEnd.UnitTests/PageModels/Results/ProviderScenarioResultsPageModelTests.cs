@@ -16,7 +16,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
     using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.Pages.Results;
     using CalculateFunding.Frontend.ViewModels.Common;
@@ -37,7 +36,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -55,7 +54,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -90,7 +89,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -155,7 +154,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -197,7 +196,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -244,7 +243,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             // Arrange
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
@@ -313,7 +312,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
             IResultsApiClient resultsApiClient = CreateApiClient();
             IProvidersApiClient providersApiClient = CreateProvidersApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             ITestScenarioSearchService searchService = CreateTestScenarioSearchService();
 
@@ -488,9 +487,9 @@ namespace CalculateFunding.Frontend.PageModels.Results
             return Substitute.For<IProvidersApiClient>();
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IPoliciesApiClient CreatePoliciesApiClient()
@@ -512,7 +511,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 ITestScenarioSearchService testScenarioSearchService = null,
                 IResultsApiClient resultsApiClient = null,
                 IProvidersApiClient providersApiClient = null,
-                ISpecsApiClient specsApiClient = null,
+                ISpecificationsApiClient specsApiClient = null,
                 IPoliciesApiClient policiesApiClient = null,
                 IMapper mapper = null,
                 ILogger logger = null)

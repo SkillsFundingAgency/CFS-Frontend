@@ -8,14 +8,10 @@ using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Common.ApiClient.Policies.Models;
-using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Specs;
 using CalculateFunding.Frontend.UnitTests.Helpers;
@@ -157,8 +153,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             SpecificationSummary specificationSummary = CreateSpecificationSummary();
 
-            Specification specification = CreateSpecificationForBannerChecks();
-
             specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
@@ -216,8 +210,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             ILogger logger = CreateLogger();
 
             SpecificationSummary specificationSummary = CreateSpecificationSummary();
-
-            Specification specification = CreateSpecificationForBannerChecks();
 
             TemplateMetadataContents templateMetadataContents = new TemplateMetadataContents();
 
@@ -328,17 +320,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         private static ICalculationsApiClient CreateCalculationsApiClient()
         {
             return Substitute.For<ICalculationsApiClient>();
-        }
-
-        private static Specification CreateSpecificationForBannerChecks()
-        {
-            return new Specification()
-            {
-                Id = specificationId,
-                Name = "Test Specification",
-                Description = "Test Description",
-                FundingStreams = new List<FundingStream>() { new FundingStream("fs1", "Funding Stream Name"), new FundingStream("fs2", "Funding Stream 2 Name") }
-            };
         }
 
         private static SpecificationSummary CreateSpecificationSummary()

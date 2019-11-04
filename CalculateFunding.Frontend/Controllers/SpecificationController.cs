@@ -9,7 +9,6 @@ using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,58 +16,23 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class SpecificationController : Controller
     {
-        private readonly ISpecsApiClient _specsClient;
         private readonly ISpecificationsApiClient _specificationsApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
+        private readonly ISpecificationsApiClient _specsApiClient;
 
-        public SpecificationController(ISpecsApiClient specsApiClient, ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
+        public SpecificationController(ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
         {
-            Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
-            _specsClient = specsApiClient;
             _specificationsApiClient = specificationsApiClient;
             _authorizationHelper = authorizationHelper;
-        }
-
-        [Route("api/specifications-by-period/{fundingPeriodId}")]
-        public async Task<IActionResult> GetSpecificationsByFundingPeriod(string fundingPeriodId)
-        {
-            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecifications(fundingPeriodId);
-            if (apiResponse == null)
-            {
-                return new StatusCodeResult(500);
-            }
-
-            if (apiResponse.StatusCode != HttpStatusCode.OK)
-            {
-                return new StatusCodeResult((int)apiResponse.StatusCode);
-            }
-
-            if (apiResponse.Content == null)
-            {
-                return new ObjectResult("List of Specifications was null")
-                {
-                    StatusCode = 500,
-                };
-            }
-
-            List<ReferenceViewModel> result = new List<ReferenceViewModel>();
-
-            foreach (SpecificationSummary specification in apiResponse.Content.OrderBy(o => o.Name))
-            {
-                result.Add(new ReferenceViewModel(specification.Id, specification.Name));
-            }
-
-            return Ok(result);
         }
 
         [Route("api/specs/specifications-selected-for-funding")]
         public async Task<IActionResult> GetSpecificationsSelectedForFunding()
         {
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFunding();
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFunding();
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -88,7 +52,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetSpecificationsSelectedForFundingByPeriod(fundingPeriodId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFundingByPeriod(fundingPeriodId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -109,7 +73,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -130,7 +94,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specsClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -199,7 +163,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
+            ValidatedApiResponse<SpecificationVersion> result = await _specificationsApiClient.CreateSpecification(specification);
 
             if (result.StatusCode.IsSuccess())
             {

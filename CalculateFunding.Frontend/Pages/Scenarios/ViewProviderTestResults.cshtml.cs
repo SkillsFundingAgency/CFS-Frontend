@@ -26,14 +26,14 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
         private readonly ITestResultsSearchService _testResultsSearchService;
         private readonly ITestEngineApiClient _testEngineClient;
         private readonly IScenariosApiClient _scenariosApiClient;
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IMapper _mapper;
 
         public ViewProviderTestResultsPageModel(
             ITestResultsSearchService testResultsSearchService,
             ITestEngineApiClient testEngineApiClient,
             IScenariosApiClient scenariosApiClient,
-            ISpecsApiClient specsApiClient,
+            ISpecificationsApiClient specsApiClient,
             IMapper mapper)
         {
             Guard.ArgumentNotNull(testResultsSearchService, nameof(testResultsSearchService));
@@ -120,7 +120,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 TestCoverage = 0;
             }
 
-            ApiResponse<SpecificationSummary> specResponse = await _specsClient.GetSpecificationSummary(TestScenario.SpecificationId);
+            ApiResponse<SpecificationSummary> specResponse = await _specsClient.GetSpecificationSummaryById(TestScenario.SpecificationId);
             if (specResponse == null)
             {
                 return new InternalServerErrorResult("Specification summary API call result was null");

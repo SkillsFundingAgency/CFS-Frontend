@@ -112,9 +112,9 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Is<TestScenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
-            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient: specsApiClient);
@@ -211,9 +211,9 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Is<TestScenarioResultCountsRequestModel>(c => c.TestScenarioIds.Count() == 1 && c.TestScenarioIds.First() == Scenarioid))
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, countResults));
 
-            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(resultsService, testEngineClient, scenariosClient, specsApiClient);
@@ -423,9 +423,9 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, Enumerable.Empty<TestScenarioResultCounts>()));
 
-            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(
@@ -487,9 +487,9 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
                 .GetTestResultCounts(Arg.Any<TestScenarioResultCountsRequestModel>())
                 .Returns(new ApiResponse<IEnumerable<TestScenarioResultCounts>>(HttpStatusCode.OK, testScenarioResultCounts));
 
-            ISpecsApiClient specsApiClient = CreateSpecsClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsClient();
             specsApiClient
-                .GetSpecificationSummary(Arg.Any<string>())
+                .GetSpecificationSummaryById(Arg.Any<string>())
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             ViewProviderTestResultsPageModel pageModel = CreatePageModel(
@@ -522,7 +522,7 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             ITestResultsSearchService testResultsSearchService = null,
             ITestEngineApiClient testEngineApiClient = null,
             IScenariosApiClient scenariosApiClient = null,
-            ISpecsApiClient specsApiClient = null,
+            ISpecificationsApiClient specsApiClient = null,
             IMapper mapper = null)
         {
             return new ViewProviderTestResultsPageModel(
@@ -548,9 +548,9 @@ namespace CalculateFunding.Frontend.PageModels.Scenarios
             return Substitute.For<IScenariosApiClient>();
         }
 
-        static ISpecsApiClient CreateSpecsClient()
+        static ISpecificationsApiClient CreateSpecsClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         static IMapper CreateMapper()

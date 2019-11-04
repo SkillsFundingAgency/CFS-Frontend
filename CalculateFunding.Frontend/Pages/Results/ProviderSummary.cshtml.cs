@@ -12,7 +12,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 {
     public class ProviderSummaryPageModel : ProviderResultsBasePageModel
     {
-	    public ProviderSummaryPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+	    public ProviderSummaryPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, ISpecificationsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
             : base(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger)
         {
         }

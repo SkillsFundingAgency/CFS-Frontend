@@ -23,14 +23,13 @@ namespace CalculateFunding.Frontend.Services
     public class TestScenarioResultsService : ITestScenarioResultsService
     {
         private IScenarioSearchService _scenariosSearchService;
-        private ISpecsApiClient _specsClient;
+        private ISpecificationsApiClient _specsClient;
         private ITestEngineApiClient _testEngineClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly ISpecsApiClient _specsApiClient;
         private readonly IFeatureToggle _featureToggle;
 
-        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecsApiClient specsApiClient,
+        public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecificationsApiClient specsApiClient,
             ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
@@ -45,10 +44,8 @@ namespace CalculateFunding.Frontend.Services
             _testEngineClient = testEngineApiClient;
             _mapper = mapper;
             _logger = logger;
-            _specsApiClient = specsApiClient;
             _featureToggle = featureToggle;
         }
-
         public async Task<TestScenarioResultViewModel> PerformSearch(TestScenarioResultRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));

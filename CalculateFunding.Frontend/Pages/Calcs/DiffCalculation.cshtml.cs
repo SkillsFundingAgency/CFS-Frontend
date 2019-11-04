@@ -7,7 +7,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -18,17 +17,14 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class DiffCalculationModel : PageModel
     {
-        private ISpecsApiClient _specsClient;
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
 
-        public DiffCalculationModel(ISpecsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper)
+        public DiffCalculationModel(ICalculationsApiClient calcClient, IMapper mapper)
         {
-            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
 
-            _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
         }
@@ -72,7 +68,9 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             CalculationPeriodName = calculation.FundingStreamId;
             CalculationId = calculation.Id;
 
-            ApiResponse<CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
+            //ApiResponse<CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
+
+            ApiResponse<Calculation> specCalculation = await _calcClient.GetCalculationById(calculation.Id);
 
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
             {

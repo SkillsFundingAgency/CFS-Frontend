@@ -31,7 +31,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
 
             TestScenarioResultsService testScenarioResultsService = CreateService(searchService, specsApiClient, testEngineApiClient);
@@ -135,7 +135,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
 
             string specificationId = "spec1";
@@ -241,7 +241,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
 
             string periodId = "1819";
@@ -351,7 +351,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -397,7 +397,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -443,7 +443,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -483,7 +483,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -544,7 +544,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -605,7 +605,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -645,7 +645,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             ILogger logger = CreateLogger();
 
@@ -706,7 +706,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
 
             string periodId = "1819";
@@ -813,7 +813,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         {
             // Arrange
             IScenarioSearchService searchService = CreateScenarioSearchService();
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             ITestEngineApiClient testEngineApiClient = CreateTestEngineApiClient();
             IFeatureToggle featureToggle = CreateFeatureToggle(true);
 
@@ -918,7 +918,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
         private static TestScenarioResultsService CreateService(
             IScenarioSearchService scenarioSearchService = null,
-            ISpecsApiClient specsApiClient = null,
+            ISpecificationsApiClient specsApiClient = null,
             ITestEngineApiClient testEngineApiClient = null,
             IMapper mapper = null,
             ILogger logger = null,
@@ -948,9 +948,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return Substitute.For<IScenarioSearchService>();
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static ITestEngineApiClient CreateTestEngineApiClient()

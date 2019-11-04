@@ -114,11 +114,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 new FundingStream { Id = "fp1", Name = "funding" }
             };
 
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.OK);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK);
 
             ApiResponse<IEnumerable<FundingStream>> fundingStreamsResponse = new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams);
 
-            ISpecsApiClient apiClient = CreateApiClient();
+            ISpecificationsApiClient apiClient = CreateApiClient();
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
 
             apiClient
@@ -176,22 +176,24 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 FundingPeriodId = "fp1"
             };
 
-            ApiResponse<Specification> existingSpecificationResponse = new ApiResponse<Specification>(HttpStatusCode.NotFound);
+            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
 
-            ISpecsApiClient apiClient = CreateApiClient();
+            ISpecificationsApiClient apiClient = CreateApiClient();
 
             apiClient
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            Specification createdSpecification = new Specification()
+            SpecificationVersion createdSpecification = new SpecificationVersion()
             {
-                Id = "specId",
+                //Id = "specId",
+                SpecificationId = "specId",
+                Version = 1
             };
 
             apiClient
                 .CreateSpecification(Arg.Any<CreateSpecificationModel>())
-                .Returns(new ValidatedApiResponse<Specification>(HttpStatusCode.OK, createdSpecification));
+                .Returns(new ValidatedApiResponse<SpecificationVersion>(HttpStatusCode.OK, createdSpecification));
 
             IMapper mapper = CreateMapper();
             mapper
@@ -226,7 +228,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be("/specs/policies/specId?operationType=SpecificationCreated&operationId=specId");
+                .Be($"/specs/policies/{createdSpecification.Id}?operationType=SpecificationCreated&operationId={createdSpecification.Id}");
         }
 
         [TestMethod]
@@ -273,7 +275,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Should().BeFalse();
         }
 
-        private static CreateSpecificationPageModel CreatePageModel(ISpecsApiClient specsClient = null, IPoliciesApiClient policiesApiClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        private static CreateSpecificationPageModel CreatePageModel(ISpecificationsApiClient specsClient = null, IPoliciesApiClient policiesApiClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
             CreateSpecificationPageModel pageModel = new CreateSpecificationPageModel(specsClient ?? CreateApiClient(), policiesApiClient ?? CreatePoliciesApiClient(), mapper ?? CreateMapper(), authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(Common.Identity.Authorization.Models.SpecificationActionTypes.CanEditSpecification));
 
@@ -282,9 +284,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             return pageModel;
         }
 
-        private static ISpecsApiClient CreateApiClient()
+        private static ISpecificationsApiClient CreateApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IPoliciesApiClient CreatePoliciesApiClient()

@@ -1,11 +1,7 @@
-﻿
-
-using System.Linq;
-using CalculateFunding.Common.ApiClient.Calcs;
+﻿using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
-using CalculationType = CalculateFunding.Common.ApiClient.Results.Models.CalculationType;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
@@ -27,7 +23,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         private IResultsApiClient _resultsApiClient;
         public List<ProviderCalculationItemViewModel> TemplateCalculationList;
 
-        public ProviderTemplateCalculationsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecsApiClient specsApiClient, ILogger logger, ICalculationsApiClient calculationsApiClient)
+        public ProviderTemplateCalculationsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecificationsApiClient specsApiClient, ILogger logger, ICalculationsApiClient calculationsApiClient)
             : base(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger)
         {
 	        _logger = logger;

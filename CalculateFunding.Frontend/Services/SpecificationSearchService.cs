@@ -16,12 +16,12 @@
 
     public class SpecificationSearchService : ISpecificationSearchService
     {
-        private ISpecsApiClient _specsApiClient;
+        private ISpecificationsApiClient _specsApiClient;
         private IMapper _mapper;
         private ILogger _logger;
         private readonly IFeatureToggle _featureToggle;
 
-        public SpecificationSearchService(ISpecsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public SpecificationSearchService(ISpecificationsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));

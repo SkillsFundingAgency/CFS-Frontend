@@ -283,7 +283,7 @@ namespace CalculateFunding.Frontend.PageModels.Specs
 
         private static IndexModel CreateIndexModel(
             ISpecificationSearchService searchService = null,
-            ISpecsApiClient specsApiClient = null)
+            ISpecificationsApiClient specsApiClient = null)
         {
             return new IndexModel(
                 searchService ?? CreateSearchService(),
@@ -295,9 +295,9 @@ namespace CalculateFunding.Frontend.PageModels.Specs
             return Substitute.For<ISpecificationSearchService>();
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
     }
 }

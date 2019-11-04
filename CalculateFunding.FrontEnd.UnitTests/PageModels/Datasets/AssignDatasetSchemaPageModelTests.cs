@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -47,11 +47,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = string.Empty;
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             specsClient
-                .GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, expectedSpecification));
+                .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, expectedSpecification));
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
@@ -69,7 +69,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -93,7 +93,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecificationSummary(expectedSpecificationId)
+            .GetSpecificationSummaryById(expectedSpecificationId)
             .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
@@ -143,7 +143,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -151,13 +151,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecification(expectedSpecificationId)
-            .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, expectedSpecification));
+            .GetSpecificationSummaryById(expectedSpecificationId)
+            .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
             {
@@ -196,7 +196,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -209,7 +209,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecificationSummary(expectedSpecificationId)
+            .GetSpecificationSummaryById(expectedSpecificationId)
             .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
@@ -245,7 +245,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -269,7 +269,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecificationSummary(expectedSpecificationId)
+            .GetSpecificationSummaryById(expectedSpecificationId)
             .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IEnumerable<DatasetDefinition> dataDefn = null;
@@ -297,7 +297,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -322,7 +322,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-            .GetSpecificationSummary(expectedSpecificationId)
+            .GetSpecificationSummaryById(expectedSpecificationId)
             .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IEnumerable<DatasetDefinition> dataDefn = null;
@@ -344,7 +344,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -368,7 +368,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient, datasetClient, mapper);
 
             specsClient
-                .GetSpecificationSummary(expectedSpecificationId)
+                .GetSpecificationSummaryById(expectedSpecificationId)
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             DatasetDefinition d1 = new DatasetDefinition()
@@ -421,9 +421,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             specsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -465,9 +465,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -513,9 +513,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -555,9 +555,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "spec123";
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -607,9 +607,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -657,9 +657,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -712,9 +712,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = specDescription
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -787,9 +787,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = specDescription
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -833,9 +833,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
                 Description = anyString
             };
 
-            ISpecsApiClient mockSpecsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient mockSpecsClient = Substitute.For<ISpecificationsApiClient>();
             mockSpecsClient
-                .GetSpecificationSummary(Arg.Is(expectedSpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(expectedSpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
@@ -887,7 +887,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             return dataDefn;
         }
 
-        private static AssignDatasetSchemaPageModel CreatePageModel(ISpecsApiClient specsClient = null, IDatasetsApiClient datasetsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
+        private static AssignDatasetSchemaPageModel CreatePageModel(ISpecificationsApiClient specsClient = null, IDatasetsApiClient datasetsClient = null, IMapper mapper = null, IAuthorizationHelper authorizationHelper = null)
         {
             AssignDatasetSchemaPageModel pageModel = new AssignDatasetSchemaPageModel(
                 specsClient ?? CreateApiClient(),
@@ -900,9 +900,9 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             return pageModel;
         }
 
-        private static ISpecsApiClient CreateApiClient()
+        private static ISpecificationsApiClient CreateApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IDatasetsApiClient CreateDatasetsApiClient()

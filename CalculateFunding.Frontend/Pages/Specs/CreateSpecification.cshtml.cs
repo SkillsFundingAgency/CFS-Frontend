@@ -22,12 +22,12 @@ namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class CreateSpecificationPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public CreateSpecificationPageModel(ISpecsApiClient specsClient, IPoliciesApiClient policiesApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public CreateSpecificationPageModel(ISpecificationsApiClient specsClient, IPoliciesApiClient policiesApiClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<Specification> result = await _specsClient.CreateSpecification(specification);
+            ValidatedApiResponse<SpecificationVersion> result = await _specsClient.CreateSpecification(specification);
             if (result.StatusCode.IsSuccess())
             {
                 return Redirect($"/specs/policies/{result.Content.Id}?operationType=SpecificationCreated&operationId={result.Content.Id}");

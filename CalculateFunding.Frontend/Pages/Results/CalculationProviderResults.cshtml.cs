@@ -32,7 +32,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly IMapper _mapper;
         private readonly ICalculationProviderResultsSearchService _resultsSearchService;
         private readonly ICalculationsApiClient _calculationsApiClient;
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly IJobsApiClient _jobsClient;
         private readonly ILogger _logger;
@@ -40,7 +40,7 @@ namespace CalculateFunding.Frontend.Pages.Results
         public CalculationProviderResultsPageModel(
             ICalculationProviderResultsSearchService resultsSearchService,
             ICalculationsApiClient calculationsApiClient,
-            ISpecsApiClient specsApiClient,
+            ISpecificationsApiClient specsApiClient,
             IMapper mapper,
             IDatasetsApiClient datasetsClient,
             ILogger logger,
@@ -131,7 +131,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                 return new NotFoundResult();
             }
 
-            Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummary(Calculation.SpecificationId);
+            Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummaryById(Calculation.SpecificationId);
             Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaTask = _datasetsClient.GetRelationshipsBySpecificationId(Calculation.SpecificationId);
             Task<ApiResponse<JobSummary>> latestJobTask = _jobsClient.GetLatestJobForSpecification(Calculation.SpecificationId, new[] { JobTypes.CalculationInstruct, JobTypes.CalculationAggregration });
 

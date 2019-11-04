@@ -7,7 +7,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Pages.Calcs;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Serilog;
 
 namespace CalculateFunding.Frontend.PageModels.Calcs
 {
@@ -42,10 +40,8 @@ End Function";
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
-            ILogger logger = Substitute.For<ILogger>();
             string calculationId = "1";
             Calculation expectedCalculation = null;
 
@@ -54,7 +50,7 @@ End Function";
               .GetCalculationById(Arg.Any<string>())
               .Returns(new ApiResponse<Calculation>(HttpStatusCode.NotFound, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -69,10 +65,7 @@ End Function";
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            ILogger logger = Substitute.For<ILogger>();
 
             Calculation expectedCalculation = null;
 
@@ -84,7 +77,7 @@ End Function";
               .GetCalculationById(Arg.Any<string>())
               .Returns(new ApiResponse<Calculation>(HttpStatusCode.NotFound, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -102,11 +95,7 @@ End Function";
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
-
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            ILogger logger = Substitute.For<ILogger>();
 
             Calculation expectedCalculation = new Calculation()
             {
@@ -124,23 +113,11 @@ End Function";
             IEnumerable<int> versions = new List<int> { 1, 2 };
             string calculationId = "1";
 
-            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
-            {
-                Id = "1",
-                Name = "Test spec",
-                Description = "Test description",
-                AllocationLine = new Reference("1", "Test Allocation")
-            };
-
             calcsClient
             .GetCalculationById(calculationId)
             .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            specsClient
-             .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.NotFound, specCalculation));
-
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -158,10 +135,7 @@ End Function";
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            ILogger logger = Substitute.For<ILogger>();
 
             Calculation expectedCalculation = new Calculation()
             {
@@ -179,22 +153,11 @@ End Function";
             IEnumerable<int> versions = new List<int> { 1 };  // Not passing two versionIDs in the versions array
             string calculationId = "1";
 
-            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
-            {
-                Id = "1",
-                Name = "Test spec",
-                Description = "Test description",
-                AllocationLine = new Reference("1", "Test Allocation")
-            };
-
             calcsClient
             .GetCalculationById(calculationId)
             .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            specsClient
-             .GetCalculationById(calculationId, "3")
-             .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -215,10 +178,7 @@ End Function";
             string calculationId = "2";
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            ILogger logger = Substitute.For<ILogger>();
 
             Calculation expectedCalculation = new Calculation()
             {
@@ -234,14 +194,6 @@ End Function";
             };
 
             IEnumerable<int> versions = new List<int> { 1, 2 };
-
-            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
-            {
-                Id = "1",
-                Name = "Test spec",
-                Description = "Test description",
-                AllocationLine = new Reference("1", "Test Allocation")
-            };
 
             // build two versions for feeding the left and right panel
             CalculationVersion calver1 = new CalculationVersion()
@@ -269,15 +221,11 @@ End Function";
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            specsClient
-                .GetCalculationById(specificationId, calculationId)
-                .Returns(new ApiResponse<CalculationCurrentVersion>(HttpStatusCode.OK, specCalculation));
-
             calcsClient
                 .GetMultipleVersionsByCalculationId(versions, calculationId)
                 .Returns(new ApiResponse<IEnumerable<CalculationVersion>>(HttpStatusCode.OK, calcVerArray));
 
-            DiffCalculationModel diffCalcPageModel = new DiffCalculationModel(specsClient, calcsClient, mapper);
+            DiffCalculationModel diffCalcPageModel = new DiffCalculationModel(calcsClient, mapper);
 
             // Act
             IActionResult result = await diffCalcPageModel.OnGet(versions, calculationId);

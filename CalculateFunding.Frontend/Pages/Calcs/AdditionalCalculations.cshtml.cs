@@ -24,13 +24,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class AdditionalCalculationsModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IMapper _mapper;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly ICalculationSearchService _calculationSearchService;
 
         public AdditionalCalculationsModel(
-            ISpecsApiClient specsClient,
+            ISpecificationsApiClient specsClient,
             IDatasetsApiClient datasetsClient,
             IMapper mapper,
             ICalculationSearchService calculationSearchService)
@@ -64,12 +64,12 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                 return new BadRequestObjectResult(ErrorMessages.SpecificationIdNullOrEmpty);
             }
 
-            Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
+            Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummaryById(specificationId);
             Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaResponseTask = _datasetsClient.GetRelationshipsBySpecificationId(specificationId);
 
             await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
-            ApiResponse<Specification> specificationResponse = specificationResponseTask.Result;
+            ApiResponse<SpecificationSummary> specificationResponse = specificationResponseTask.Result;
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 
             if (specificationResponse.StatusCode == HttpStatusCode.NotFound)

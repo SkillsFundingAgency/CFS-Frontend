@@ -22,13 +22,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
 {
     public class ReleaseTimetableModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public ReleaseTimetableModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public ReleaseTimetableModel(ISpecificationsApiClient specsClient, IDatasetsApiClient datasetsClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
@@ -55,13 +55,13 @@ namespace CalculateFunding.Frontend.Pages.Specs
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            Task<ApiResponse<Specification>> specificationResponseTask = _specsClient.GetSpecification(specificationId);
+            Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummaryById(specificationId);
 
             Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaResponseTask = _datasetsClient.GetRelationshipsBySpecificationId(specificationId);
 
             await TaskHelper.WhenAllAndThrow(specificationResponseTask, datasetSchemaResponseTask);
 
-            ApiResponse<Specification> specificationResponse = specificationResponseTask.Result;
+            ApiResponse<SpecificationSummary> specificationResponse = specificationResponseTask.Result;
 
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> datasetSchemaResponse = datasetSchemaResponseTask.Result;
 

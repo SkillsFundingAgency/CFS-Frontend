@@ -112,6 +112,12 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.ValueType, opt => opt.Ignore())
                 ;
 
+            CreateMap<EditCalculationViewModel, CalculationEditModel>()
+                .ForMember(d => d.CalculationId, opt => opt.Ignore())
+                .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+                .ForMember(d => d.ValueType, opt => opt.Ignore())
+                .ForMember(d => d.SourceCode, opt => opt.Ignore());
+
             CreateMap<CalculationVersion, CalculationVersionsCompareModel>()
                 .ForMember(m => m.Versions, opt => opt.MapFrom(f => new[] { f.Version }))
                 ;
@@ -126,13 +132,13 @@ namespace CalculateFunding.Frontend.ViewModels
 
         private void MapSpecs()
         {
-            CreateMap<CreateSpecificationViewModel, Specification>()
+            CreateMap<CreateSpecificationViewModel, SpecificationSummary>()
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.FundingPeriod, opt => opt.Ignore())
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
-                .ForMember(m => m.Calculations, opt => opt.Ignore())
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
-                .ForMember(m => m.PublishStatus, opt => opt.Ignore());
+                .ForMember(m => m.ApprovalStatus, opt => opt.Ignore())
+                .ForMember(m => m.TemplateIds, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
@@ -178,8 +184,6 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.CalculationId, opt => opt.Ignore())
                 .ForMember(m => m.ValueType, opt => opt.Ignore());
 
-
-            CreateMap<Specification, SpecificationViewModel>();
 
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 

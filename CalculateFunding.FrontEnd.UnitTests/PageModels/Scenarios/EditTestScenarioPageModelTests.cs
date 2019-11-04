@@ -34,7 +34,7 @@
         public void EditTestScenarioPageModel_OnGetAsync_GivenNullProviderIdProvided_ThenArgumentNullExceptionThrown()
         {
             // Arrange
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -50,7 +50,7 @@
         {
             //Arrange
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -77,7 +77,7 @@
             //Arrange
             ApiResponse<TestScenario> testScenario = new ApiResponse<TestScenario>(HttpStatusCode.NotFound);
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -106,9 +106,9 @@
             // Arrange
             ApiResponse<TestScenario> testScenario = new ApiResponse<TestScenario>(HttpStatusCode.OK, new TestScenario() { SpecificationId = SpecificationId });
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
             specsClient
-                .GetSpecificationSummary(Arg.Is(SpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(SpecificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, null));
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
@@ -147,7 +147,7 @@
                 Version = 1
             });
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -174,7 +174,7 @@
             };
 
             specsClient
-                .GetSpecificationSummary(Arg.Is(SpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(SpecificationId))
                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             EditTestScenarioPageModel pageModel = CreatePageModel(specsClient, scenarioClient);
@@ -210,7 +210,7 @@
                 Version = 1
             });
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -237,7 +237,7 @@
             };
 
             specsClient
-                .GetSpecificationSummary(Arg.Is(SpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(SpecificationId))
                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
@@ -269,7 +269,7 @@
                 Version = 1
             });
 
-            ISpecsApiClient specsClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsClient = CreateSpecsApiClient();
 
             IScenariosApiClient scenarioClient = CreateScenarioApiClient();
 
@@ -296,7 +296,7 @@
             };
 
             specsClient
-                .GetSpecificationSummary(Arg.Is(SpecificationId))
+                .GetSpecificationSummaryById(Arg.Is(SpecificationId))
                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
@@ -314,7 +314,7 @@
         }
 
         private static EditTestScenarioPageModel CreatePageModel(
-             ISpecsApiClient specsApiClient = null,
+             ISpecificationsApiClient specsApiClient = null,
              IScenariosApiClient scenariosApiClient = null,
              IMapper mapper = null,
              ILogger logger = null,
@@ -328,9 +328,9 @@
                 authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanEditQaTests));
         }
 
-        private static ISpecsApiClient CreateSpecsApiClient()
+        private static ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private static IScenariosApiClient CreateScenarioApiClient()

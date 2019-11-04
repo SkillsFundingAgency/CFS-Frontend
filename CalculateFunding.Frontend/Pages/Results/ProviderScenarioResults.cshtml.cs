@@ -29,7 +29,7 @@ namespace CalculateFunding.Frontend.Pages.Results
     public class ProviderScenarioResultsPageModel : PageModel
     {
         private readonly ILogger _logger;
-        private readonly ISpecsApiClient _specsApiClient;
+        private readonly ISpecificationsApiClient _specsApiClient;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
         private readonly IResultsApiClient _resultsApiClient;
@@ -41,7 +41,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             IResultsApiClient resultsApiClient,
             IProvidersApiClient providersApiClient,
             IMapper mapper,
-            ISpecsApiClient specsApiClient,
+            ISpecificationsApiClient specsApiClient,
             IPoliciesApiClient policiesApiClient,
             ILogger logger)
 

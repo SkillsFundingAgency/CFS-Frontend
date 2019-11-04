@@ -22,12 +22,12 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 	public class SpecificationRelationshipsPageModel : PageModel
     {
 		private readonly IAuthorizationHelper _authorizationHelper;
-        private readonly ISpecsApiClient _specsApiClient;
+        private readonly ISpecificationsApiClient _specsApiClient;
         private readonly IDatasetsApiClient _datasetsApiClient;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public SpecificationRelationshipsPageModel(ISpecsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public SpecificationRelationshipsPageModel(ISpecificationsApiClient specsApiClient, IDatasetsApiClient datasetsApiClient, ILogger logger, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
 	        Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
 	        Guard.ArgumentNotNull(datasetsApiClient, nameof(datasetsApiClient));
@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
             ShowSuccessMessage = wasSuccess;
 
-            ApiResponse<SpecificationSummary> specificationResponse = await _specsApiClient.GetSpecificationSummary(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsApiClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {

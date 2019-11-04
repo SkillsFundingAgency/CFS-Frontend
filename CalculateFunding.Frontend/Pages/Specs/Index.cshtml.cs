@@ -17,9 +17,9 @@
     public class IndexModel : PageModel
     {
         private readonly ISpecificationSearchService _searchService;
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
 
-        public IndexModel(ISpecificationSearchService specsSearchService, ISpecsApiClient specsClient)
+        public IndexModel(ISpecificationSearchService specsSearchService, ISpecificationsApiClient specsClient)
         {
             Guard.ArgumentNotNull(specsSearchService, nameof(specsSearchService));
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
@@ -58,7 +58,7 @@
                     return new PreconditionFailedResult("Operation ID not provided");
                 }
 
-                ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(operationId);
+                ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(operationId);
 
                 IActionResult errorResult = specificationResponse.IsSuccessOrReturnFailureResult("Specification");
 

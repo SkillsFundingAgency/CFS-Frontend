@@ -158,9 +158,6 @@ namespace CalculateFunding.Frontend.Modules
                 .AddSingleton<IPoliciesApiClient, PoliciesApiClient>();
 
             services
-               .AddSingleton<ISpecsApiClient, SpecsApiClient>();
-
-            services
                .AddSingleton<IDatasetsApiClient, DatasetsApiClient>();
 
             services

@@ -26,8 +26,6 @@ using Serilog;
 
 namespace CalculateFunding.Frontend.PageModels.Datasets
 {
-
-
     [TestClass]
     public class ListDatasetSchemasModelTests
     {
@@ -37,7 +35,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -45,14 +43,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string specificationId = "10";
 
-            Specification specification = new Specification()
+            SpecificationSummary specification = new SpecificationSummary()
             {
                 Id = specificationId
             };
 
             specsClient
-            .GetSpecification(specificationId)
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+            .GetSpecificationSummaryById(specificationId)
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
@@ -215,7 +213,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -223,14 +221,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string specificationId = "10";
 
-            Specification specification = new Specification()
+            SpecificationSummary specification = new SpecificationSummary()
             {
                 Id = specificationId
             };
 
             specsClient
-            .GetSpecification(specificationId)
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+            .GetSpecificationSummaryById(specificationId)
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
@@ -284,7 +282,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -292,14 +290,14 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string specificationId = "10";
 
-            Specification specification = new Specification()
+            SpecificationSummary specification = new SpecificationSummary()
             {
                 Id = specificationId
             };
 
             specsClient
-            .GetSpecification(specificationId)
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, specification));
+            .GetSpecificationSummaryById(specificationId)
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specification));
 
             List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
@@ -341,7 +339,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -349,11 +347,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = string.Empty;
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             specsClient
-            .GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, expectedSpecification));
+            .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, expectedSpecification));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -371,7 +369,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -379,11 +377,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             specsClient
-            .GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, expectedSpecification));
+            .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, expectedSpecification));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -403,7 +401,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -411,11 +409,11 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = null;
+            SpecificationSummary expectedSpecification = null;
 
             specsClient
-            .GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.BadRequest, expectedSpecification));
+            .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest, expectedSpecification));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 
@@ -433,7 +431,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             // Arrange
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
 
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -441,7 +439,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             string expectedSpecificationId = "1";
 
-            Specification expectedSpecification = new Specification
+            SpecificationSummary expectedSpecification = new SpecificationSummary
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
@@ -455,8 +453,8 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             };
 
             specsClient
-            .GetSpecification(Arg.Any<string>())
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, expectedSpecification));
+            .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
 
             ListDatasetSchemasModel listDatasetSchemasPageModel = new ListDatasetSchemasModel(specsClient, datasetClient, mapper);
 

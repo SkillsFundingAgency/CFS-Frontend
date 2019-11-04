@@ -8,8 +8,6 @@ using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Calcs;
 using Microsoft.AspNetCore.Mvc;
@@ -32,11 +30,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task AdditionalCalculationsModel_OnGet_WhenSpecificationNotFound_ThenNotFoundReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
-            specsApiClient.GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.NotFound, null));
+            specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound, null));
 
             datasetsApiClient
                 .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
@@ -61,11 +59,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         public async Task AdditionalCalculationsModel_OnGet_WhenDatasetsApiFailed_ThenErrorShouldBeReturned()
         {
             // Arrange
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
-            specsApiClient.GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
+            specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             datasetsApiClient
                 .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
@@ -100,7 +98,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 }
             };
 
-            ISpecsApiClient specsApiClient = CreateSpecsApiClient();
+            ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             IDatasetsApiClient datasetsApiClient = CreateDatasetsApiClient();
 
             ICalculationSearchService calculationSearchService = CreateSearchService();
@@ -108,8 +106,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .PerformSearch(Arg.Any<SearchRequestViewModel>())
                 .Returns(calculationSearchResultViewModel);
 
-            specsApiClient.GetSpecification(Arg.Is(specificationId))
-                .Returns(new ApiResponse<Specification>(HttpStatusCode.OK, new Specification()));
+            specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary()));
 
             datasetsApiClient
                 .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
@@ -140,7 +138,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         }
 
         public AdditionalCalculationsModel CreateAdditionalCalculationsModel(
-            ISpecsApiClient specsClient = null,
+            ISpecificationsApiClient specsClient = null,
             IDatasetsApiClient datasetsClient = null,
             IMapper mapper = null,
             ICalculationSearchService calculationSearchService = null)
@@ -152,9 +150,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 calculationSearchService ?? CreateSearchService());
         }
 
-        private ISpecsApiClient CreateSpecsApiClient()
+        private ISpecificationsApiClient CreateSpecsApiClient()
         {
-            return Substitute.For<ISpecsApiClient>();
+            return Substitute.For<ISpecificationsApiClient>();
         }
 
         private IDatasetsApiClient CreateDatasetsApiClient()

@@ -29,7 +29,7 @@ namespace CalculateFunding.Frontend.Services
         public void PerformSearch_WhenFindSpecificationsServiceUnavailable_ThenHttpExceptionThrown()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -56,7 +56,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_WhenFindSpecificationsServiceReturnsNotFound_ThenNullReturned()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -82,7 +82,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_FirstSearchResultReturnedCorrectly()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -115,7 +115,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_FirstSearchResultWithFacets_ReturnedCorrectly()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -173,7 +173,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_FirstSearchResultWithFacets_EnsuresFacetsLoadedCorrectly()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -239,7 +239,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnZeroItems()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -268,7 +268,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSinglePageOfItems()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -297,7 +297,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithLessThanPageSize()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -332,7 +332,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_StartAndEndItemsNumbersDisplayedCorrectlyOnSecondPageOfItemsWithMorePagesAvailable()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -367,7 +367,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_WhenFeatureToggleIsSwitchedOff_EnsureSearchModeIsAny()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle();
@@ -393,7 +393,7 @@ namespace CalculateFunding.Frontend.Services
         public async Task PerformSearch_WhenFeatureToggleIsSwitchedOn_EnsureSearchModeIsAll()
         {
             // Arrange
-            ISpecsApiClient specsClient = Substitute.For<ISpecsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
             IFeatureToggle featureToggle = CreateFeatureToggle(true);

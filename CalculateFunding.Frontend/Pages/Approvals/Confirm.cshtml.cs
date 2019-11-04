@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
@@ -14,14 +13,11 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 {
     public class ConfirmPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient;
 
-        private readonly IMapper _mapper;
-
-        public ConfirmPageModel(ISpecsApiClient specsClient, IMapper mapper)
+        public ConfirmPageModel(ISpecificationsApiClient specificationsApiClient)
         {
-            _specsClient = specsClient;
-            _mapper = mapper;
+            _specificationsApiClient = specificationsApiClient;
         }
 
         public string SpecificationId { get; set; }
@@ -39,7 +35,7 @@ namespace CalculateFunding.Frontend.Pages.Approvals
 
             FundingPeriodId = fundingPeriodId;
 
-            ApiResponse<Specification> specificationLookupTask = await _specsClient.GetSpecification(specificationId);
+            ApiResponse<SpecificationSummary> specificationLookupTask = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
 
             IActionResult specificationLookupError = specificationLookupTask.IsSuccessOrReturnFailureResult("Specification");
 

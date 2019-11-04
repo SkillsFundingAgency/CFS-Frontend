@@ -29,14 +29,14 @@ namespace CalculateFunding.Frontend.Pages.Results
         private readonly IProvidersApiClient _providersApiClient;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
-        private readonly ISpecsApiClient _specsApiClient;
+        private readonly ISpecificationsApiClient _specsApiClient;
         private readonly ILogger _logger;
 
         protected ProviderResultsBasePageModel(IResultsApiClient resultsApiClient,
             IProvidersApiClient providersApiClient,
             IPoliciesApiClient policiesApiClient,
             IMapper mapper,
-            ISpecsApiClient specsApiClient,
+            ISpecificationsApiClient specsApiClient,
             ILogger logger)
         {
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));

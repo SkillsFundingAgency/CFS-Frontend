@@ -23,12 +23,12 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 {
     public class AssignDatasetSchemaPageModel : PageModel
     {
-        private readonly ISpecsApiClient _specsClient;
+        private readonly ISpecificationsApiClient _specsClient;
         private readonly IDatasetsApiClient _datasetsClient;
         private readonly IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public AssignDatasetSchemaPageModel(ISpecsApiClient specsClient, IDatasetsApiClient datasetsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public AssignDatasetSchemaPageModel(ISpecificationsApiClient specsClient, IDatasetsApiClient datasetsClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(specsClient, nameof(mapper));
@@ -67,7 +67,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
             SpecificationId = specificationId;
 
-            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
             {
@@ -129,7 +129,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
 	        SpecificationId = specificationId;
 
-	        ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummary(specificationId);
+	        ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(specificationId);
 	        if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
 	        {
 		        return new NotFoundObjectResult($"Unable to get specification response. Specification Id value = {SpecificationId}");
