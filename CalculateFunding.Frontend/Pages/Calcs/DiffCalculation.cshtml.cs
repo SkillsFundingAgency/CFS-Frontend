@@ -68,8 +68,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             CalculationPeriodName = calculation.FundingStreamId;
             CalculationId = calculation.Id;
 
-            //ApiResponse<CalculationCurrentVersion> specCalculation = await _specsClient.GetCalculationById(calculation.SpecificationId, calculation.Id);
-
             ApiResponse<Calculation> specCalculation = await _calcClient.GetCalculationById(calculation.Id);
 
             if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
