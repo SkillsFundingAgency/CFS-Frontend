@@ -31,7 +31,7 @@
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.23" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.9" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.7" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.19" />
