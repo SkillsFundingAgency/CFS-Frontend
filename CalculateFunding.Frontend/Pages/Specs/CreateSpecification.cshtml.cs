@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<SpecificationVersion> result = await _specsClient.CreateSpecification(specification);
+            ValidatedApiResponse<SpecificationSummary> result = await _specsClient.CreateSpecification(specification);
             if (result.StatusCode.IsSuccess())
             {
                 return Redirect($"/specs/policies/{result.Content.Id}?operationType=SpecificationCreated&operationId={result.Content.Id}");

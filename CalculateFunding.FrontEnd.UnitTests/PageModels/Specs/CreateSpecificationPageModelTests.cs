@@ -184,16 +184,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .GetSpecificationByName(Arg.Is(specName))
                 .Returns(existingSpecificationResponse);
 
-            SpecificationVersion createdSpecification = new SpecificationVersion()
+            SpecificationSummary createdSpecification = new SpecificationSummary()
             {
-                //Id = "specId",
-                SpecificationId = "specId",
-                Version = 1
+                Id = "specId",
             };
 
             apiClient
                 .CreateSpecification(Arg.Any<CreateSpecificationModel>())
-                .Returns(new ValidatedApiResponse<SpecificationVersion>(HttpStatusCode.OK, createdSpecification));
+                .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.OK, createdSpecification));
 
             IMapper mapper = CreateMapper();
             mapper

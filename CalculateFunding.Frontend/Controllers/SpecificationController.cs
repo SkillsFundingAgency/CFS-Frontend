@@ -144,8 +144,6 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestObjectResult(ModelState);
             }
 
-            //var viewModel = JsonConvert.DeserializeObject<CreateSpecificationViewModel>(data);
-
             var fundingStreamIds = new List<string> { viewModel.FundingStreamId };
 
             CreateSpecificationModel specification = new CreateSpecificationModel
@@ -163,7 +161,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<SpecificationVersion> result = await _specificationsApiClient.CreateSpecification(specification);
+            ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.CreateSpecification(specification);
 
             if (result.StatusCode.IsSuccess())
             {
