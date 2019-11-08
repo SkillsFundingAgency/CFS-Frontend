@@ -744,7 +744,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
         }
 
         [TestMethod]
-        public async Task OnPostAsync_GivenViewModelIsValidAndNoRedirectActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToManagePolicies()
+        public async Task OnPostAsync_GivenViewModelIsValid_ThenSpecificationIsEditedAndReturnsToSpecificationPageWithOperationTypeUpdated()
         {
             //Arrange
             ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
@@ -780,7 +780,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             redirectResult
                 .Url
                 .Should()
-                .Be($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId=spec-id");
+                .Be($"/specs/fundinglinestructure/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
 
             await
                 _specsClient
@@ -791,59 +791,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                         && c.Description == viewModel.Description
                         && c.ProviderVersionId == viewModel.ProviderVersionId));
         }
-
-        [TestMethod]
-        public async Task OnPostAsync_GivenViewModelIsValidAndRedirectToSpecificationsActionProvided_ThenSpecificationIsEditedAndReturnsRedirectToSpecificationsPage()
-        {
-            //Arrange
-            ApiResponse<SpecificationSummary> existingSpecificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.NotFound);
-
-            EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
-
-            SpecificationSummary specificationSummaryEditResult = new SpecificationSummary()
-            {
-                Id = specificationId,
-            };
-
-            _specsClient
-                .GetSpecificationByName(Arg.Is(specName))
-                .Returns(existingSpecificationResponse);
-
-            _specsClient
-                .UpdateSpecification(Arg.Is(specificationId), Arg.Any<EditSpecificationModel>())
-                .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummaryEditResult));
-
-            _pageModel.EditSpecificationViewModel = viewModel;
-
-            _pageModel.PageContext = new PageContext();
-
-            AndUserCanEditSpecification();
-
-            //Act
-            IActionResult result = await _pageModel.OnPostAsync(specificationId, EditSpecificationRedirectAction.Specifications);
-
-            //Assert
-            result
-                .Should()
-                .BeOfType<RedirectResult>();
-
-            RedirectResult redirectResult = result as RedirectResult;
-
-            redirectResult
-                .Url
-                .Should()
-                .Be("/specs?operationType=SpecificationUpdated&operationId=spec-id");
-
-            await
-                _specsClient
-                    .Received(1)
-                    .UpdateSpecification(Arg.Is(specificationId), Arg.Is<EditSpecificationModel>(
-                        c => c.Name == viewModel.Name
-                        && c.FundingPeriodId == viewModel.FundingPeriodId
-                        && c.Description == viewModel.Description
-                        && c.ProviderVersionId == viewModel.ProviderVersionId));
-        }
-
+		
         [TestMethod]
         public async Task OnPostAsync_GivenViewModelIsValidAndUpdateSpecificationCallFails_ThenInternalServerErrorReturned()
         {

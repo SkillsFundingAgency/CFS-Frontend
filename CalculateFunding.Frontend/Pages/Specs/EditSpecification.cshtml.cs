@@ -119,14 +119,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             ValidatedApiResponse<SpecificationSummary> editResult = await _specsClient.UpdateSpecification(specificationId, specification);
             if (editResult.StatusCode == HttpStatusCode.OK)
             {
-                if (returnPage == EditSpecificationRedirectAction.ManagePolicies)
-                {
-                    return Redirect($"/specs/policies/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
-                }
-                else
-                {
-                    return Redirect($"/specs?operationType=SpecificationUpdated&operationId={specificationId}");
-                }
+                return Redirect($"/specs/fundinglinestructure/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
             }
             else if (editResult.StatusCode == HttpStatusCode.BadRequest)
             {
