@@ -123,9 +123,10 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<CalculationVersion, CalculationVersionViewModel>()
-                .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
-                .ForMember(m => m.Status, opt => opt.Ignore())
-                ;
+	            .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
+	            .ForMember(m => m.Status, opt => opt.Ignore())
+	            .AfterMap((src, dest) => dest.Status = src.PublishStatus.ToString());
+                
 
             CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>();
         }

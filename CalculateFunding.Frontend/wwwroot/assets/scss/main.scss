@@ -1110,24 +1110,24 @@ blockquote {
 
     .diff-left {
         width: 50%;
-        background-color: rgb(248, 188,155);
-        border-left: 15px solid $orange;
+        background-color: #6E787A;
+        color: white;
     }
 
     .diff-right {
         width: 50%;
-        background-color: rgb(146, 207, 202);
-        border-left: 15px solid $green;
+        background-color: #00A499;
+        color: white;
     }
 
     .diff-left-status {
         float: right;
-        color: $orange;
+        color: $white;
     }
 
     .diff-right-status {
         float: right;
-        color: $green;
+        color: $white;
     }
 
     .monaco-editor-diff-container {
@@ -2536,6 +2536,12 @@ table {
 
 .disabled-input {
     background-color: #fff !important;
+}
+
+.hero-text-bold {
+    font-size: 16px;
+    margin: 10px 0 0 0;
+    font-weight: bold;
 }
 
 .faded-text {

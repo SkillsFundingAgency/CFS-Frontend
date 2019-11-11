@@ -7,7 +7,10 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +20,21 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class DiffCalculationModel : PageModel
     {
-        private ICalculationsApiClient _calcClient;
-        private IMapper _mapper;
+        private readonly ICalculationsApiClient _calcClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient;
+        private readonly IMapper _mapper;
 
-        public DiffCalculationModel(ICalculationsApiClient calcClient, IMapper mapper)
+        public DiffCalculationModel(ICalculationsApiClient calcClient,
+	        ISpecificationsApiClient specificationsApiClient,
+	        IMapper mapper)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
 
             _calcClient = calcClient;
             _mapper = mapper;
+            _specificationsApiClient = specificationsApiClient;
         }
 
         public CalculationVersionViewModel LeftCalculationDiffModel { get; set; }
@@ -39,7 +47,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public string CalculationDescription { get; set; }
 
-        public string CalculationPeriodName { get; set; }
+        public string CalculationFundingPeriodId { get; set; }
 
         public string CalculationId { get; set; }
 
@@ -64,8 +72,16 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             Calculation calculation = calculationResponse.Content;
 
+            ApiResponse<SpecificationSummary> specificationResponse =
+	            await _specificationsApiClient.GetSpecificationSummaryById(calculation.SpecificationId);
+
+            if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+	            return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
+            }
+
             CalculationName = calculation.Name;
-            CalculationPeriodName = calculation.FundingStreamId;
+			CalculationFundingPeriodId = specificationResponse.Content.FundingPeriod?.Name.FundingPeriodString();
             CalculationId = calculation.Id;
 
             ApiResponse<Calculation> specCalculation = await _calcClient.GetCalculationById(calculation.Id);
@@ -81,7 +97,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             if (calculationVersionsResponse == null || calculationVersionsResponse.StatusCode != HttpStatusCode.OK)
             {
-                throw new InvalidOperationException($"Unable to retreive selected versions of calculations. Status Code = {calculationVersionsResponse?.StatusCode}");
+                throw new InvalidOperationException($"Unable to retrieve selected versions of calculations. Status Code = {calculationVersionsResponse?.StatusCode}");
             }
 
             if (calculationVersionsResponse.StatusCode == HttpStatusCode.OK)

@@ -7,6 +7,9 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Pages.Calcs;
@@ -35,6 +38,19 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 	Return result
 End Function";
 
+        private ISpecificationsApiClient _specificationsApiClient;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+	        _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+	        _specificationsApiClient.GetSpecificationSummaryById(Arg.Any<string>())
+		        .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary
+		        {
+			        FundingPeriod = new FundingPeriod()
+		        }));
+        }
+
         [TestMethod]
         public async Task OnGet_WhenCalculationVersionsDoesNotExistThenNotFoundReturned()
         {
@@ -50,7 +66,7 @@ End Function";
               .GetCalculationById(Arg.Any<string>())
               .Returns(new ApiResponse<Calculation>(HttpStatusCode.NotFound, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, _specificationsApiClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -77,7 +93,7 @@ End Function";
               .GetCalculationById(Arg.Any<string>())
               .Returns(new ApiResponse<Calculation>(HttpStatusCode.NotFound, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, _specificationsApiClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -117,7 +133,7 @@ End Function";
             .GetCalculationById(calculationId)
             .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, _specificationsApiClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -157,7 +173,7 @@ End Function";
             .GetCalculationById(calculationId)
             .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, mapper);
+            DiffCalculationModel diffCalcModel = new DiffCalculationModel(calcsClient, _specificationsApiClient, mapper);
 
             // Act
             IActionResult result = await diffCalcModel.OnGet(versions, calculationId);
@@ -225,7 +241,7 @@ End Function";
                 .GetMultipleVersionsByCalculationId(versions, calculationId)
                 .Returns(new ApiResponse<IEnumerable<CalculationVersion>>(HttpStatusCode.OK, calcVerArray));
 
-            DiffCalculationModel diffCalcPageModel = new DiffCalculationModel(calcsClient, mapper);
+            DiffCalculationModel diffCalcPageModel = new DiffCalculationModel(calcsClient, _specificationsApiClient, mapper);
 
             // Act
             IActionResult result = await diffCalcPageModel.OnGet(versions, calculationId);
