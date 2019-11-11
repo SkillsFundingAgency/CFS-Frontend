@@ -5,6 +5,7 @@
 namespace System.Collections.Generic
 {
     using System.Linq;
+    using CalculateFunding.Common.TemplateMetadata.Models;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -300,6 +301,35 @@ namespace System.Collections.Generic
         }
 
         [TestMethod]
+        public void FlattenDepthFirstCalculations_GivenHeirarchyOfObjects_ReturnsFalttenedList()
+        {
+            // Arrange
+            IEnumerable<Calculation> nodes = GetCalculationNodes();
+
+            // Act
+            IEnumerable<Calculation> flattened = nodes.FlattenDepthFirst();
+
+            // Assert
+            flattened
+                .Should()
+                .HaveCount(6);
+
+            IEnumerable<string> nameOrder = flattened.Select(c => c.Name);
+
+            nameOrder
+                .Should()
+                .ContainInOrder(new[]
+                {
+                    "Name1",
+                    "Name2",
+                    "Name3",
+                    "Name6",
+                    "Name4",
+                    "Name5",
+                });
+        }
+
+        [TestMethod]
         public void DistinctBy_GivenListOfItemsWithDuplicates_ReturnsNonDuplicatedItems()
         {
             // Arrange
@@ -354,6 +384,49 @@ namespace System.Collections.Generic
                         {
                             Name = "Name5",
                             ChildNodes = Enumerable.Empty<TestNode>()
+                        }
+                    }
+                }
+            };
+        }
+
+        private static IEnumerable<Calculation> GetCalculationNodes()
+        {
+            return new[]
+            {
+                new Calculation
+                {
+                    Name = "Name1",
+                    Calculations = new[]
+                    {
+                        new Calculation
+                        {
+                            Name = "Name2",
+                            Calculations = new[]
+                            {
+                                new Calculation
+                                {
+                                    Name = "Name3",
+                                    Calculations = Enumerable.Empty<Calculation>()
+                                }
+                            }
+                        },
+                        new Calculation
+                        {
+                            Name = "Name6",
+                            Calculations = null,
+                        }
+                    }
+                },
+                new Calculation
+                {
+                    Name = "Name4",
+                    Calculations = new[]
+                    {
+                        new Calculation
+                        {
+                            Name = "Name5",
+                            Calculations = Enumerable.Empty<Calculation>()
                         }
                     }
                 }

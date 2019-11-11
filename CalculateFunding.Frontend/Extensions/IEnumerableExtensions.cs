@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
+    using CalculateFunding.Common.TemplateMetadata.Models;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class IEnumerableExtensions
@@ -69,6 +70,26 @@
             enumerable = enumerable ?? new T[0];
 
             return enumerable.SelectMany(c => func(c).Flatten(func)).Concat(enumerable);
+        }
+
+        public static IEnumerable<Calculation> FlattenDepthFirst(this IEnumerable<Calculation> enumerable)
+        {
+            List<Calculation> results = new List<Calculation>();
+
+            if (enumerable.AnyWithNullCheck())
+            {
+                foreach (Calculation item in enumerable)
+                {
+                    results.Add(item);
+
+                    if (item.Calculations.AnyWithNullCheck())
+                    {
+                        results.AddRange(FlattenDepthFirst(item.Calculations));
+                    }
+                }
+            }
+
+            return results;
         }
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)

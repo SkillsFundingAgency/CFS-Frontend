@@ -4,7 +4,7 @@
 
 @if (!Model.FundingLines.IsNullOrEmpty())
 {
-    @foreach (var fundingLine in Model.FundingLines.Flatten(x => x.FundingLines))
+    @foreach (var fundingLine in Model.FundingLines)
     {
         <tr>
             <td colspan="2">Funding line</td>
@@ -14,7 +14,7 @@
         </tr>
         @if (!fundingLine.Calculations.IsNullOrEmpty())
         {
-            IEnumerable<Common.TemplateMetadata.Models.Calculation> calculations = fundingLine.Calculations.Flatten(x => x.Calculations);
+            IEnumerable<Common.TemplateMetadata.Models.Calculation> calculations = fundingLine.Calculations.FlattenDepthFirst();
             int rowCount = calculations.Count();
             int counter = 1;
             foreach (var calculation in calculations)
