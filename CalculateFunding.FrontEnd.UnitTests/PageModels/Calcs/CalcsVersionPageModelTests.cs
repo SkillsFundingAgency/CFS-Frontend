@@ -112,43 +112,6 @@ End Function";
             Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        [DataRow(0)]
-        [DataRow(HttpStatusCode.NotFound)]
-        public async Task OnGet_WhenSpecificationDoesntExist_ThenErrorReturned(HttpStatusCode responseStatusCode)
-        {
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            string calculationId = "1";
-            string expectedCalculationId = "2";
-
-            Calculation expectedCalculation = new Calculation() { Id = expectedCalculationId };
-
-            calcsClient
-                .GetCalculationById(calculationId)
-                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
-
-            calcsClient
-                .GetCalculationById(expectedCalculationId)
-                .Returns(responseStatusCode == 0
-                    ? null
-                    : new ApiResponse<Calculation>(responseStatusCode));
-
-            ComparePageModel compPageModel = new ComparePageModel(calcsClient, mapper);
-
-            // Act
-            IActionResult result = await compPageModel.OnGet(calculationId);
-
-            // Assert
-            result.Should().NotBeNull();
-            result
-                .Should().BeOfType<NotFoundObjectResult>();
-
-            ((NotFoundObjectResult)result).Value
-                .Should().Be("Check the specification you entered - one or more of the specifications you entered aren't working");
-
-            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
-        }
 
         [TestMethod]
         public async Task OnGet_WhenCalculationExists_ThenCalculationReturned()
@@ -228,7 +191,7 @@ End Function";
 
             calculation.Should().NotBeNull();
 
-            calculation.Description.Should().Be(specCalculation.Description);
+            calculation.Description.Should().Be(calculation.Description);
 
             calculation.Name.Should().Be(expectedCalculation.Name);
 
@@ -303,7 +266,7 @@ End Function";
             comparePageModel.Calculations
                 .Should().HaveCount(versions);
 
-            comparePageModel.Calculations.Select(c => c.Versions.FirstOrDefault())
+            comparePageModel.Calculations.Select(c => c.Version)
                 .Should().BeInDescendingOrder();
         }
     }

@@ -1,7 +1,7 @@
 ﻿@page "{calculationId}"
 @model CalculateFunding.Frontend.Pages.Calcs.ComparePageModel
 @using CalculateFunding.Frontend.Properties
-@*@using CalculateFunding.Frontend.Helpers*@
+@using CalculateFunding.Frontend.ViewModels.Common
 @{
     ViewData["Title"] = "Compare calculations";
 }
@@ -14,35 +14,29 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
-            <li><a href="/calcs/editCalculation/@Model.Calculation.Id">@BreadcrumbText.EditCalculation</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li>
+            @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+            {
+                <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id">@BreadcrumbText.EditCalculation</a>
+            } 
+            @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+            {
+                <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id">@BreadcrumbText.EditTemplateCalculationSpec</a>
+            } 
+            </li>
             <li>@BreadcrumbText.CompareCalcuationVersions</li>
         </ol>
     </div>
 }
 
 @section FormBannerLeft{
-    <h1 class="hero-title">@Model.Calculation.Name for @Model.Calculation.FundingPeriodName</h1>
+    <h1 class="hero-title">@Model.Calculation.Name</h1>
 }
 
 @section FormBannerRight{
 
 }
-
-<div class="row">
-    <div class="col-xs-12">
-        <p class="what-is-title-nojs withjs-hide">What is @Model.Calculation.Name?</p>
-        <div class="inline-collapse-container">
-            <div class="inline-collapse-heading withjs-show">
-                <i class="inline-collapse-arrow"></i>
-                <span>What is @Model.Calculation.Name?</span>
-            </div>
-            <div class="inline-collapse-contents withjs-hide what-is-description">
-                @Model.Calculation.Description
-            </div>
-        </div>
-    </div>
-</div>
 
 <blockquote class="spacing-30">
     Select 2 versions to compare:
@@ -56,10 +50,9 @@
                 <table class="compare-table table table-condensed" id="calculationVersions">
                     <thead>
                         <tr>
-                            <th> </th>
-                            <th>Status</th>
-                            <th>Version</th>
-                            <th>Updated</th>
+                            <th class="inner-white-right">Status</th>
+                            <th class="inner-white-right">Version</th>
+                            <th class="inner-white-right">Updated</th>
                             <th>Author</th>
                         </tr>
                     </thead>
@@ -67,28 +60,22 @@
                         @{
                             int rowCount = 0;
                         }
-                        @foreach (var calculation in Model.Calculations)
+                        @foreach (var calculationVersion in Model.Calculations)
                         {
-                            @foreach (var version in calculation.Versions)
-                             {
-                                 <tr id="calculation-version-compare-row-@rowCount">
-                                     <td class="calculation-select">
-                                         <div class="multiple-choice">
-                                             <input id="calculation-version-compare-checkbox-@rowCount" type="checkbox" class="calculation-version-compare-checkbox" name="Versions" value="@version"/>
-                                             <label></label>
-                                         </div>
-                                     </td>
-                                     @*<td class="calculation-status">
-                                         @{ string statusClass = calculation == null || string.IsNullOrEmpty(calculation..Status) ? "none" : calculation.Status.ToLower(); }
-                                         <span class="calculation-status-@statusClass">@calculation.Status</span>
-                                     </td>*@
-                                     <td class="calculation-version"><span class="calculation-version">@version</span></td>
-                                     @*<td class="calculation-updated"><span class="calculation-Updated">@calculation.Date.ToString(FormatStrings.DateTimeFormatString)</span></td>
-                                     <td class="calculation-author"><span class="calculation-author">@calculation.Author?.Name</span></td>*@
-                                 </tr>
+                             <tr id="calculation-version-compare-row-@rowCount">
+                                 <td>
+                                     <div class="multiple-choice">
+                                         <input id="calculation-version-compare-checkbox-@rowCount" type="checkbox" name="Versions" value="@calculationVersion.Version"/>
+                                         <label></label>
+                                         @Model.Calculation.PublishStatus.ToString()
+                                     </div>
+                                 </td>
+                                 <td>@calculationVersion.Version</td>
+                                 <td>@calculationVersion.Date.ToString(FormatStrings.DateTimeFormatString)</td>
+                                 <td>@calculationVersion.Author?.Name</td>
+                             </tr>
 
-                                 rowCount++;
-                             }
+                             rowCount++;
                         }
                     </tbody>
                 </table>
@@ -99,7 +86,16 @@
 
             }
             <p class="form-submit-container"><button type="submit" class="button" id="compare-button">Compare calculations</button> </p>
-            <p><a href="/calcs/editCalculation/@Model.Calculation.Id" id="back-link">Back</a></p>
+            <p>
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+                {
+                    <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id">Back</a>
+                } 
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+                {
+                    <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id">Back</a>
+                } 
+            </p>
         </form>
     </div>
 </div>

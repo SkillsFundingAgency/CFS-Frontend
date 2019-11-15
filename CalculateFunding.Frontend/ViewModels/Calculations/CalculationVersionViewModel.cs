@@ -1,8 +1,8 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
-{
-    using System;
-    using CalculateFunding.Frontend.ViewModels.Common;
+﻿using System;
+using CalculateFunding.Frontend.ViewModels.Common;
 
+namespace CalculateFunding.Frontend.ViewModels.Calculations
+{
     public class CalculationVersionViewModel
     {
         public int DecimalPlaces { get; set; }

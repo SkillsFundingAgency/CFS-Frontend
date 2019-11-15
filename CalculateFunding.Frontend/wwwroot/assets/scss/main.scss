@@ -682,6 +682,29 @@ blockquote {
 
 .compare-container {
     .compare-table {
+        border: solid 1px;
+        border-color: #6E787A;
+        padding: 2px;
+
+        td {
+            border: solid 1px !important;
+            border-color: #6E787A !important;
+            vertical-align: middle;
+            padding: 9px;
+        }
+
+        th {
+            background-color: #6E787A;
+            color: white;
+            height: 50px;
+            vertical-align: middle;
+        }
+    }
+
+    .inner-white-right {
+        border-right-style: solid !important;
+        border-right-width: 1px !important;
+        border-right-color: white !important;
     }
 
     .calculation-select {

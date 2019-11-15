@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
@@ -17,8 +16,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 {
     public class ComparePageModel : PageModel
     {
-        private ICalculationsApiClient _calcClient;
-        private IMapper _mapper;
+        private readonly ICalculationsApiClient _calcClient;
+        private readonly IMapper _mapper;
 
         public ComparePageModel(ICalculationsApiClient calcClient, IMapper mapper)
         {
@@ -31,7 +30,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public CalculationViewModel Calculation { get; set; }
 
-        public IEnumerable<CalculationVersionsCompareModel> Calculations { get; set; }
+        public IEnumerable<CalculationVersionViewModel> Calculations { get; set; }
 
         public async Task<IActionResult> OnGet(string calculationId)
         {
@@ -41,6 +40,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             }
 
             ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
+            
             if (calculationResponse == null)
             {
                 return new InternalServerErrorResult(ErrorMessages.CalculationNotFoundInCalcsService);
@@ -52,31 +52,20 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
-
-            // TODO: Are we sure that GetCalculationById should be called twice? If not I think I should remove below second call
-            ApiResponse<Calculation> specCalculation = await _calcClient.GetCalculationById(calculation.Id);
-
-            if (specCalculation == null || specCalculation.StatusCode == HttpStatusCode.NotFound)
-            {
-                return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
-            }
-
+            
             ApiResponse<IEnumerable<CalculationVersion>> calculationAllVersionsResponse = await _calcClient.GetAllVersionsByCalculationId(calculationId);
-            if (calculationAllVersionsResponse == null)
+            
+            if (calculationAllVersionsResponse?.Content == null)
             {
-                return new InternalServerErrorResult(null);
+                return new InternalServerErrorResult($"Unable to locate calculation versions for calculation id {calculationId}");
             }
 
-            List<CalculationVersionsCompareModel> calculationVersions = new List<CalculationVersionsCompareModel>();
-            foreach (CalculationVersion calculationVersion in calculationAllVersionsResponse.Content)
-            {
-                calculationVersions.Add(_mapper.Map<CalculationVersionsCompareModel>(calculationVersion));
-            }
-
-            Calculations = calculationVersions.AsEnumerable().OrderByDescending(c => c.Versions.FirstOrDefault());
-
+            Calculations = calculationAllVersionsResponse.Content
+	            .OrderByDescending(_ => _.Version)
+	            .Select(calculationVersion => _mapper.Map<CalculationVersionViewModel>(calculationVersion));
+            
             Calculation = _mapper.Map<CalculationViewModel>(calculation);
-            Calculation.Description = specCalculation.Content.Description;
+            Calculation.Description = calculation.Description;
 
             return Page();
         }
