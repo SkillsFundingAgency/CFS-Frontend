@@ -97,7 +97,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             typedResult
                 .Value.ToString()
                 .Should()
-                .Be($"Unable to retreive specification. Status Code = {responseCode}");
+                .Be($"Unable to retrieve specification. Status Code = {responseCode}");
         }
 
         [TestMethod]
@@ -685,7 +685,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             test
                 .Should()
                 .ThrowExactly<InvalidOperationException>()
-                .WithMessage("Unable to retreive Funding Streams. Status Code = BadRequest");
+                .WithMessage("Unable to retrieve Funding Streams. Status Code = BadRequest");
         }
 
         [TestMethod]

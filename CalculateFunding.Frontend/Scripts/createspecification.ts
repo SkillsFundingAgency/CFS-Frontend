@@ -20,7 +20,6 @@ namespace calculateFunding.specification {
         public fundingStreamIdValid: KnockoutObservable<boolean> = ko.observable();
         public providerVersionIdValid: KnockoutObservable<boolean> = ko.observable();
         public fundingPeriodIdValid: KnockoutObservable<boolean> = ko.observable();
-        public descriptionValid: KnockoutObservable<boolean> = ko.observable();
         public formValid: KnockoutObservable<boolean> = ko.observable();
         public formError: KnockoutObservable<boolean> = ko.observable();
 
@@ -373,15 +372,7 @@ namespace calculateFunding.specification {
                 this.fundingPeriodIdValid(true);
             }
 
-            if (this.description() == null || this.description().length == 0) {
-                this.descriptionValid(false);
-                this.formValid(false);
-            } else {
-                this.descriptionValid(true);
-            }
-
             return this.formValid();
-
         }
 
 

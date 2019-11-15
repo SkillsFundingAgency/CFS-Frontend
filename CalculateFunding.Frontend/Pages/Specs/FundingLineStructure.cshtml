@@ -32,20 +32,23 @@
 }
 
 <div class="edit-policy-container">
-    <div class="row">
-        <div class="col-xs-12 policy-spec-what ">
-            <p class="withjs-hide">What is @Model.Specification.Name?</p>
-            <div class="inline-collapse-container spacing-15-bottom">
-                <div class="inline-collapse-heading withjs-show">
-                    <i class="inline-collapse-arrow"></i>
-                    <span>What is @Model.Specification.Name?</span>
-                </div>
-                <div class="inline-collapse-contents withjs-hide policy-spec-description">
-                    @Model.Specification.Description.ReplaceLineBreaksForHtml()
+    @if (!string.IsNullOrEmpty(@Model.Specification.Description))
+    {
+        <div class="row">
+            <div class="col-xs-12 policy-spec-what ">
+                <p class="withjs-hide">What is @Model.Specification.Name?</p>
+                <div class="inline-collapse-container spacing-15-bottom">
+                    <div class="inline-collapse-heading withjs-show">
+                        <i class="inline-collapse-arrow"></i>
+                        <span>What is @Model.Specification.Name?</span>
+                    </div>
+                    <div class="inline-collapse-contents withjs-hide policy-spec-description">
+                        @Model.Specification.Description.ReplaceLineBreaksForHtml()
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
     <ul class="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs" role="tablist">
         <li class="nav-item active">
             <a id="nav-policy-tab" href="/specs/fundinglinestructure/@Model.Specification.Id" role="tab" aria-selected="false">Funding Line Structure</a>
@@ -59,7 +62,7 @@
                     <span>Datasets</span>
                     @if (!Model.HasProviderDatasetsAssigned)
                     {
-                        <i class="material-icons icon-not-HasProviderDatasetsAssigned" style="color:black;">error</i>
+                        <i class="material-icons icon-not-HasProviderDatasetsAssigned" style="color: black;">error</i>
                     }
                 </span>
             </a>
@@ -75,27 +78,27 @@
         <div class="col-xs-12">
             <table class="cf funding-lines-table" id="funding-lines-table">
                 <thead>
-                    <tr>
-                        <th width="20%" id="calculation-header-column" colspan="2" class="sticky-header">Structure</th>
-                        <th width="40%" class="sticky-header">Name</th>
-                        <th width="20%" class="sticky-header">Calculation Type</th>
-                        <th width="20%" class="sticky-header">Status</th>
-                    </tr>
+                <tr>
+                    <th width="20%" id="calculation-header-column" colspan="2" class="sticky-header">Structure</th>
+                    <th width="40%" class="sticky-header">Name</th>
+                    <th width="20%" class="sticky-header">Calculation Type</th>
+                    <th width="20%" class="sticky-header">Status</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (KeyValuePair<string, TemplateMetadataContents> templateMetadataContents in Model.TemplateData)
+                @foreach (KeyValuePair<string, TemplateMetadataContents> templateMetadataContents in Model.TemplateData)
+                {
+                    var viewModel = new FundingLineViewModel
                     {
-                        var viewModel = new FundingLineViewModel
-                        {
-                            Calculations = Model.Calculations,
-                            FundingLines = templateMetadataContents.Value.RootFundingLines,
-                            TemplateMapping = Model.TemplateMappings[templateMetadataContents.Key],
-                            FundingStreamId = templateMetadataContents.Key,
-                            BorderThicknessMultiplier = 1
-                        };
+                        Calculations = Model.Calculations,
+                        FundingLines = templateMetadataContents.Value.RootFundingLines,
+                        TemplateMapping = Model.TemplateMappings[templateMetadataContents.Key],
+                        FundingStreamId = templateMetadataContents.Key,
+                        BorderThicknessMultiplier = 1
+                    };
 
-                         <partial name="_FundingLineRows" model="viewModel" />
-                    }
+                    <partial name="_FundingLineRows" model="viewModel"/>
+                }
                 </tbody>
             </table>
         </div>

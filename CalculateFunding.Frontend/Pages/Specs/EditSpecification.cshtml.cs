@@ -58,7 +58,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {
-                return new ObjectResult($"Unable to retreive specification. Status Code = {specificationResponse.StatusCode}")
+                return new ObjectResult($"Unable to retrieve specification. Status Code = {specificationResponse.StatusCode}")
                 { StatusCode = (int)specificationResponse.StatusCode };
             }
             if (specificationResponse.Content == null)
@@ -80,22 +80,28 @@ namespace CalculateFunding.Frontend.Pages.Specs
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string specificationId = null, [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
+        public async Task<IActionResult> OnPostAsync(
+	        string specificationId = null, 
+	        [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
-            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
+            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(
+	            User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
 
             if (!IsAuthorizedToEdit)
             {
                 return new ForbidResult();
             }
 
-            if (!string.IsNullOrWhiteSpace(EditSpecificationViewModel.Name) && EditSpecificationViewModel.Name != EditSpecificationViewModel.OriginalSpecificationName)
+            if (!string.IsNullOrWhiteSpace(EditSpecificationViewModel.Name) 
+                && EditSpecificationViewModel.Name != EditSpecificationViewModel.OriginalSpecificationName)
             {
-                ApiResponse<SpecificationSummary> existingSpecificationResponse = await this._specsClient.GetSpecificationByName(EditSpecificationViewModel.Name);
+                ApiResponse<SpecificationSummary> existingSpecificationResponse = 
+	                await _specsClient.GetSpecificationByName(EditSpecificationViewModel.Name);
 
                 if (existingSpecificationResponse.StatusCode != HttpStatusCode.NotFound)
                 {
-                    this.ModelState.AddModelError($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.Name)}", ValidationMessages.SpecificationAlreadyExists);
+                    ModelState.AddModelError($"{nameof(EditSpecificationViewModel)}.{nameof(EditSpecificationViewModel.Name)}", 
+	                    ValidationMessages.SpecificationAlreadyExists);
                 }
             }
 
@@ -111,27 +117,29 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (!ModelState.IsValid)
             {
                 await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
+
                 return Page();
             }
 
             EditSpecificationModel specification = _mapper.Map<EditSpecificationModel>(EditSpecificationViewModel);
 
             ValidatedApiResponse<SpecificationSummary> editResult = await _specsClient.UpdateSpecification(specificationId, specification);
+
             if (editResult.StatusCode == HttpStatusCode.OK)
             {
                 return Redirect($"/specs/fundinglinestructure/{specificationId}?operationType=SpecificationUpdated&operationId={specificationId}");
             }
-            else if (editResult.StatusCode == HttpStatusCode.BadRequest)
-            {
-                editResult.AddValidationResultErrors(ModelState);
 
-                await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
-                return Page();
-            }
-            else
+            if (editResult.StatusCode == HttpStatusCode.BadRequest)
             {
-                return new InternalServerErrorResult($"Unable to update specification. API returned '{editResult?.StatusCode}'");
+	            editResult.AddValidationResultErrors(ModelState);
+
+	            await PopulateFundingStreams(EditSpecificationViewModel.FundingStreamId);
+
+	            return Page();
             }
+
+            return new InternalServerErrorResult($"Unable to update specification. API returned '{editResult.StatusCode}'");
         }
 
         private async Task PopulateFundingStreams(string fundingStreamId)
@@ -140,21 +148,20 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
             if (fundingStreamsResponse == null)
             {
-                throw new InvalidOperationException($"Null funding streams response returned");
+                throw new InvalidOperationException("Null funding streams response returned");
             }
 
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
                 // Need to make sure existing funding stream ids on the spec are still included on the list to display in the list as the security trimmed list is based on Create permission not Edit
-                IEnumerable<PolicyModels.FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
-                IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
+                IEnumerable<PolicyModels.FundingStream> existingFundingStreams = 
+	                fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
 
-                IEnumerable<PolicyModels.FundingStream> fundingStreams = trimmedResults.Union(existingFundingStreams, new PolicyModels.FundingStreamComparer());
-                IEnumerable<SelectListItem> fundingStreamListItems = fundingStreams.Select(m => new SelectListItem
-                {
-                    Value = m.Id,
-                    Text = m.Name,
-                }).ToList();
+                IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(
+	                User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);
+
+                IEnumerable<PolicyModels.FundingStream> fundingStreams = 
+	                trimmedResults.Union(existingFundingStreams, new PolicyModels.FundingStreamComparer());
 
                 FundingStreams = fundingStreams.Select(m => new SelectListItem
                 {
@@ -165,9 +172,8 @@ namespace CalculateFunding.Frontend.Pages.Specs
             }
             else
             {
-                throw new InvalidOperationException($"Unable to retreive Funding Streams. Status Code = {fundingStreamsResponse.StatusCode}");
+                throw new InvalidOperationException($"Unable to retrieve Funding Streams. Status Code = {fundingStreamsResponse.StatusCode}");
             }
         }
-
     }
 }

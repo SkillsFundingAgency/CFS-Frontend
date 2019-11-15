@@ -1,9 +1,7 @@
-﻿using Newtonsoft.Json;
-
-namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿namespace CalculateFunding.Frontend.ViewModels.Specs
 {
     using System.ComponentModel.DataAnnotations;
-    using CalculateFunding.Frontend.Properties;
+    using Properties;
 
     public class CreateSpecificationViewModel
     {
@@ -16,7 +14,6 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationProviderVersionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string ProviderVersionId { get; set; }
 
-        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationDescriptionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Description { get; set; }
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingPeriodRequired), ErrorMessageResourceType = typeof(ValidationMessages))]

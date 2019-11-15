@@ -47,7 +47,6 @@
                 </p>
                 <ul>
                     <li><a href="#specificationName" data-bind="css: nameValid() === false ? 'validation-summary-link' : 'hidden'">Enter a unique name</a></li>
-                    <li><a href="#description" data-bind="css: descriptionValid() === false ? 'validation-summary-link' : 'hidden'">Enter a description</a></li>
                     <li><a href="#select-funding-stream" data-bind="css: fundingStreamIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding stream</a></li>
                     <li><a href="#select-funding-period" data-bind="css: fundingPeriodIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a funding period</a></li>
                     <li><a href="#providerVersionIdSelect" data-bind="css: providerVersionIdValid() === false ? 'validation-summary-link' : 'hidden'">You must select a core provider</a></li>
@@ -109,7 +108,7 @@
                 </div>
             </div>
             <div>
-                <div data-bind="css: descriptionValid() === false ? 'validation-failed-block' : 'validation-passed-block'">
+                <div>
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea id="description" rows="10" class="form-control" data-bind="value: description"></textarea>
