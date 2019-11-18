@@ -124,7 +124,8 @@ namespace calculateFunding.specification {
                 status = new JobStatus();
             }
 
-            if (status.jobId !== notification.jobId && !notification.parentJobId && notification.runningStatus !== RunningStatus.Completed) {
+            if (status.jobId !== notification.jobId && !notification.parentJobId && notification.runningStatus !== RunningStatus.Completed
+                && notification.runningStatus !== RunningStatus.Queued) {
                 console.log("changing job created date as different job id received");
 
                 status.jobCreatedTime(notification.statusDateTime);
@@ -132,7 +133,7 @@ namespace calculateFunding.specification {
                 this.onJobStarted(notification.jobType);
             }
 
-            if (notification.itemCount != null && notification.itemCount != undefined && notification.itemCount !== 0) {
+            if (notification.runningStatus !== RunningStatus.Queued && notification.itemCount != null && notification.itemCount != undefined && notification.itemCount !== 0) {
                 this.showCreatingCalcs(true);
                 status.itemCount = notification.itemCount;
                 // a temporary workaround until figuring out why data binding is not working
@@ -140,7 +141,7 @@ namespace calculateFunding.specification {
                 if (notification.overallItemsProcessed === null || notification.overallItemsProcessed === undefined)
                     $("#calculationProcessed").text(0);
             }
-            if (notification.overallItemsProcessed !== null && notification.overallItemsProcessed !== undefined) {
+            if (notification.runningStatus !== RunningStatus.Queued &&  notification.overallItemsProcessed !== null && notification.overallItemsProcessed !== undefined) {
                 this.showCreatingCalcs(true);
                 status.overallItemsProcessed = notification.overallItemsProcessed;
                 // a temporary workaround until figuring out why data binding is not working
