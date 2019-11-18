@@ -280,7 +280,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 items.Add(new CalculationProviderResultSearchResult
                 {
                     Id = $"{i + 10}",
-                    CalculationName = $"prov-{i + 1}",
+                    CalculationName = $"calc-{i + 1}",
+					ProviderName = $"prov-{i + 1}",
                     CalculationResult = i + 1,
                     CalculationType = "Number"
                 });

@@ -67,7 +67,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
             CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CalculationName))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ProviderName))
                 .ForMember(dest => dest.DateOpened, opt => opt.MapFrom(src => src.OpenDate))
                 .ForMember(dest => dest.LocalAuthorityChangeDate, opt => opt.Ignore())
                 .ForMember(dest => dest.PreviousLocalAuthority, opt => opt.Ignore())
