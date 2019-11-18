@@ -54,10 +54,13 @@
                                 Edit additional calculation
                             </div>
                         </div>
-                        <div class="bannerblue-button-container edit-calculation-status-container col-xs-3" id="approve-button-container">
-                            @*<approve-status-button params="publishStatus : '@Model.Calculation.Current.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>*@
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <div class="bannerblue-button-container " id="approve-button-container">
+                                <approve-status-button params="publishStatus : '@Model.Calculation.Current.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+                            </div>
                         </div>
-
                     </div>
                     <div>
                         <div>
@@ -72,14 +75,14 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div>
-                        <div >
+                        <div>
                             <div class="form-group">
                                 <label asp-for="EditModel.ValueType">Value type</label>
                                 <h4 class="material-icons-content-container"><i class="material-icons material-icons-left">error</i> <span class="faded-text">Select a value type</span></h4>
 
-                                <select asp-for="EditModel.ValueType" class="form-control select-calculation-type" data-bind="value: calculationValueType">  
+                                <select asp-for="EditModel.ValueType" class="form-control select-calculation-type" data-bind="value: calculationValueType">
                                     <option value="" disabled selected>Select a value type</option>
                                     <option value="Percentage">Percentage</option>
                                     <option value="Number">Number</option>
@@ -90,7 +93,7 @@
                     </div>
 
                     <div>
-                        <a href="/calcs/Compare/@Model.Calculation.Id" >View calculation history</a>
+                        <a href="/calcs/Compare/@Model.Calculation.Id">View calculation history</a>
                     </div>
                 </div>
             </div>
