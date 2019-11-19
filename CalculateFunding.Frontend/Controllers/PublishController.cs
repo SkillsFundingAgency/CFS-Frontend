@@ -130,5 +130,19 @@ namespace CalculateFunding.Frontend.Controllers
 			return BadRequest(-1);
 
 		}
-	}
+
+        [Route("api/specifications/{specificationId}/publishedproviders/publishingstatus")]
+        [HttpGet]
+        public async Task<IActionResult> GetProviderStatusCounts(string specificationId)
+        {
+            ApiResponse<ProviderFundingStreamStatusResponse> result = await _publishingApiClient.GetProviderStatusCounts(specificationId);
+
+            if (result != null)
+            {
+                return new OkObjectResult(result);
+            }
+
+            return new NotFoundObjectResult(Content("Error. Not Found."));
+        }
+    }
 }
