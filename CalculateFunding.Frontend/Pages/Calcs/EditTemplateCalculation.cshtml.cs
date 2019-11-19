@@ -114,7 +114,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             Calculation calculation = calculationResponse.Content;
 
             SpecificationId = calculation.SpecificationId;
-            Calculation = _mapper.Map<CalculationViewModel>(calculation.Current);
+            Calculation = _mapper.Map<CalculationViewModel>(calculation);
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation);
         }
 

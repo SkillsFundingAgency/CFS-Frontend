@@ -22,6 +22,7 @@
             services.AddScoped<ISpecificationSearchService, SpecificationSearchService>();
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<ITemplateMetadataContentsAssemblerService, TemplateMetadataContentsAssemblerService>();
+            services.AddScoped<IPublishedProviderSearchService, PublishedProviderSearchService>();
         }
     }
 }

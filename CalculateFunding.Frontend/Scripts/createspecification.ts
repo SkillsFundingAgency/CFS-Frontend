@@ -44,7 +44,7 @@ namespace calculateFunding.specification {
             let self = this;
 
             this._hubConnection = new signalR.HubConnectionBuilder()
-                .withUrl("/notifications")
+                .withUrl("/api/notifications")
                 .build();
 
             this._hubConnection.onclose((error) => {

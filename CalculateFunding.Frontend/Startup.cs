@@ -199,7 +199,7 @@
 
             app.UseAzureSignalR(routes =>
             {
-                routes.MapHub<Notifications>("/notifications");
+                routes.MapHub<Notifications>("/api/notifications");
             });
         }
     }

@@ -8,13 +8,13 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Versioning;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
-using PublishStatus = CalculateFunding.Common.Models.Versioning.PublishStatus;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -40,6 +40,65 @@ namespace CalculateFunding.Frontend.Controllers
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/get-fundingstreams-for-selected-specifications")]
+        public async Task<IActionResult> GetFundingStreamsForSelectedSpecifications()
+        {
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFunding();
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+				List<Reference> fundingStreams = new List<Reference>();
+				
+	            foreach (var item in apiResponse.Content)
+	            {
+		          fundingStreams.AddRange(item.FundingStreams);
+	            }
+
+                return Ok(fundingStreams.Select(x => new
+                {
+					x.Name,
+					x.Id
+                }).Distinct());
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/get-fundingperiods-for-selected-fundingstream/{fundingStreamId}")]
+        public async Task<IActionResult> GetFundingStreamsForSelectedSpecifications(string fundingStreamId)
+        {
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFunding();
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+				List<Reference> fundingPeriods = new List<Reference>();
+				
+	            foreach (var item in apiResponse.Content)
+	            {
+		            
+		            fundingPeriods.Add(item.FundingPeriod);
+	            }
+
+                return Ok(fundingPeriods.Select(x => new
+                {
+					x.Name,
+					x.Id
+                }).Distinct());
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
@@ -195,7 +254,7 @@ namespace CalculateFunding.Frontend.Controllers
 	        
 	        ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId, new PublishStatusRequestModel
 	        {
-		        PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<PublishStatus>()
+		        PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<Common.Models.Versioning.PublishStatus>()
 	        });
 	        
 	        if (response.StatusCode == HttpStatusCode.OK)

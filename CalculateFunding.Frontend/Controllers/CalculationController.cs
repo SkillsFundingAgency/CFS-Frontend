@@ -60,7 +60,7 @@
             CalculationEditModel update = new CalculationEditModel()
             {
                 CalculationId = calculationId,
-                Description = existingCalculation.Current.Description,
+                Description = existingCalculation.Description,
                 Name = existingCalculation.Name,
                 SpecificationId = specificationId,
                 ValueType = existingCalculation.Current.ValueType,

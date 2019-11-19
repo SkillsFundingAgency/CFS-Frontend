@@ -50,6 +50,8 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<TestScenarioResultController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioResultController));
             ResolveType<TestScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioSearchController));
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
+            ResolveType<PublishController>(serviceProvider).Should().NotBeNull(nameof(PublishController));
+
         }
 
         protected virtual IConfigurationRoot CreateTestConfiguration()
@@ -84,7 +86,9 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "providersClient:ApiEndpoint", "https://localhost:7011/api/providers" },
                 { "providersClient:ApiKey", "Local" },
                 { "policiesClient:ApiEndpoint", "https://localhost:7013/api/policies" },
-                { "policiesClient:ApiKey", "Local" }
+                { "policiesClient:ApiKey", "Local" },
+                { "publishingClient:ApiEndpoint", "https://localhost:7012/api" },
+                { "publishingClient:ApiKey", "Local" }
             };
 
             var cb = new ConfigurationBuilder()

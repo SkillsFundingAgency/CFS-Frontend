@@ -137,7 +137,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(Task.FromResult(new ApiResponse<Calculation>(HttpStatusCode.OK, calculation)));
 
             mapper
-                .Map<CalculationViewModel>(currentCalculationVersion)
+                .Map<CalculationViewModel>(calculation)
                 .Returns(calculationViewModel);
             mapper
                 .Map<CalculationEditViewModel>(calculation)
@@ -554,7 +554,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(new ApiResponse<bool>(HttpStatusCode.OK, hasCalculationResponse));
 
             mapper
-                .Map<CalculationViewModel>(Arg.Any<CalculationVersion>())
+                .Map<CalculationViewModel>(Arg.Any<Calculation>())
                 .Returns(calculationViewModel);
 
             SpecificationSummary specificationSummary = new SpecificationSummary
@@ -611,7 +611,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             mapper
                 .Received(1)
-                .Map<CalculationViewModel>(calculationVersion);
+                .Map<CalculationViewModel>(calculation);
 
             mapper
                 .Received(1)

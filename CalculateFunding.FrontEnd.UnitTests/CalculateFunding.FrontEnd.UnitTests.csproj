@@ -9,6 +9,8 @@
     <CodeAnalysisRuleSet>CalculateFunding.Tests.ruleset</CodeAnalysisRuleSet>
 
     <AssemblyName>CalculateFunding.Frontend.UnitTests</AssemblyName>
+
+    <UserSecretsId>8783bac1-e42b-4e6b-9db7-47e5dbcd2ea8</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -32,7 +34,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.23" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.11" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.7" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.9" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.19" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.9" />

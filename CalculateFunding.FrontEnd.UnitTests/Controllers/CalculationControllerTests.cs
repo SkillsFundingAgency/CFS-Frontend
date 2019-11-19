@@ -191,11 +191,7 @@ namespace CalculateFunding.Frontend.Controllers
             Calculation apiResultCalculation = new Calculation()
             {
                 Id = calculationId,
-                SpecificationId = specificationId,
-                Current = new CalculationVersion
-                {
-                    SourceCode = updateViewModel.SourceCode,
-                }
+                SpecificationId = specificationId
             };
 
             calcsClient

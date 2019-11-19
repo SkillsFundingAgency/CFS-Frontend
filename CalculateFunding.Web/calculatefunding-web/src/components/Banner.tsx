@@ -1,53 +1,45 @@
 import * as React from "react"
 import {Breadcrumbs} from "./Breadcrumbs";
+import {IBreadcrumbs} from "../types/IBreadcrumbs";
 
 interface IBannerTypes {
     bannerType:string;
+    breadcrumbs: IBreadcrumbs[];
+    title: string;
+    subtitle: string;
 }
 
 export class Banner extends React.Component<IBannerTypes,{}>{
     render(){
         if(this.props.bannerType === "Left")
         {
-            return <div>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-xs-12 spacing-15">
-                            <div className="govuk-beta-label">
-
-                                <strong className="phase-tag">Beta</strong>
-                                <span>
-                            Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer"
-                                                                       href="https://www.smartsurvey.co.uk/s/cfsbeta/">help us improve the service</a>.
-
-                        </span>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+            return <>
                 <section className="banner-container">
                     <div className="container">
                         <div className="row">
                             <div className="col-xs-9">
-                               <Breadcrumbs>
-                                   {this.props.children}
+                               <Breadcrumbs >
+                                   {this.props.breadcrumbs.map(bread =>
+                                       <li key={bread.name}><a href={bread.url}>{bread.name}</a></li>
+                                   )}
                                </Breadcrumbs>
                             </div>
                             <div className="col-xs-3">
                                 <div className="banner-container-right">
+
                                 </div>
 
                             </div>
                         </div>
                             <div className="row">
                                 <div className="col-xs-12">
-
+                                    <h1 className="hero-title">{this.props.title}</h1>
+                                    <h2 className="hero-description">{this.props.subtitle}</h2>
                                 </div>
                             </div>
                     </div>
                 </section>
-            </div>
+            </>
         }
 
         if(this.props.bannerType === "Whole")

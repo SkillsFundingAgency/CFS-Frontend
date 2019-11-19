@@ -144,6 +144,17 @@ namespace CalculateFunding.Frontend.Modules
                 .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+          
+            services.AddHttpClient(HttpClientKeys.Publishing,
+                c =>
+                {
+                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("publishingClient");
+
+                    SetDefaultApiClientConfigurationOptions(c, opts, services);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services
 	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
