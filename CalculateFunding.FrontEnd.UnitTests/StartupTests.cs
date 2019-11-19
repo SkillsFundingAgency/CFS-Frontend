@@ -42,6 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<DownloadDatasetSchemaController>(serviceProvider).Should().NotBeNull(nameof(DownloadDatasetSchemaController));
             ResolveType<DownloadDatasourceController>(serviceProvider).Should().NotBeNull(nameof(DownloadDatasourceController));
             ResolveType<ProviderSearchController>(serviceProvider).Should().NotBeNull(nameof(ProviderSearchController));
+            ResolveType<PublishController>(serviceProvider).Should().NotBeNull(nameof(PublishController));
             ResolveType<ScenarioController>(serviceProvider).Should().NotBeNull(nameof(ScenarioController));
             ResolveType<ScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(ScenarioSearchController));
             ResolveType<SpecificationController>(serviceProvider).Should().NotBeNull(nameof(SpecificationController));
