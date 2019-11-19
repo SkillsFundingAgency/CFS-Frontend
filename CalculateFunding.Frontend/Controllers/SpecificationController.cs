@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models.Versioning;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
+using PublishStatus = CalculateFunding.Common.Models.Versioning.PublishStatus;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -18,7 +22,6 @@ namespace CalculateFunding.Frontend.Controllers
     {
         private readonly ISpecificationsApiClient _specificationsApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
-        private readonly ISpecificationsApiClient _specsApiClient;
 
         public SpecificationController(ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
         {
@@ -177,6 +180,30 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
             }
+        }
+        
+        [Route("api/specs/{specificationId}/status")]
+        [HttpPut]
+        public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        {
+	        Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+	        Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+	        if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
+	        {
+		        return new ForbidResult();
+	        }
+	        
+	        ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId, new PublishStatusRequestModel
+	        {
+		        PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<PublishStatus>()
+	        });
+	        
+	        if (response.StatusCode == HttpStatusCode.OK)
+	        {
+		        return Ok(response.Content);
+	        }
+	        
+	        throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
     }
 }
