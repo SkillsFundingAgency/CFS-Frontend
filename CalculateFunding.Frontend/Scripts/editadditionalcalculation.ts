@@ -295,19 +295,7 @@ namespace calculateFunding.editadditionalcalculation {
                                     else {
                                         functions[functionInformation.label.toLowerCase()] = functionInformation;
                                     }
-                                }
-                                else {
-                                    let variable: providers.IVariable = {
-                                        name: "calcname",
-                                        friendlyName: "calcname",
-                                        description: "current calculation name",
-                                        type: "string",
-                                        items: {},
-                                        isAggregable: "true"
-                                    };
-
-                                    functionvariables[variable.name.toLowerCase()] = variable;
-                                }
+                                }                               
                             }
                         }
 
@@ -318,9 +306,8 @@ namespace calculateFunding.editadditionalcalculation {
                             let variableSet: boolean;
 
                             if (calculationType.name === variable.type) {
-                                for (let i in functionvariables) {
-                                    // Always add the calcname function to the variables
-                                    if (functionvariables[i].name == "calcname" || functionvariables[i].type === calculationType.name) {
+                                for (let i in functionvariables) {                                    
+                                    if (functionvariables[i].type === calculationType.name) {
                                         variable.items[i] = functionvariables[i];
                                     }
                                 }
