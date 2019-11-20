@@ -31,10 +31,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.23" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="1.0.24" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.11" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.10" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.19" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.9" />
@@ -46,7 +46,7 @@
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
     <PackageReference Include="NSubstitute" Version="4.0.0" />
-    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 

@@ -69,13 +69,13 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.34.0" />
+    <PackageReference Include="CalculateFunding.Common" Version="1.36.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.19" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.9" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.10" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.18" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.21" />
@@ -91,7 +91,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />
-    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.0.2" />
