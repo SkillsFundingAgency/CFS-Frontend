@@ -5,9 +5,6 @@ using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Interfaces.Services;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +12,12 @@ namespace CalculateFunding.Frontend.Controllers
 {
 	public class PublishController : Controller
 	{
-		private readonly ISpecificationsApiClient _specificationsApiClient;
-		private readonly ISpecificationSearchService _specificationSearchService;
+		private readonly ISpecificationsApiClient _specificationsApiClient;	
 		private IPublishingApiClient _publishingApiClient;
 
-		public PublishController(ISpecificationsApiClient specificationsApiClient, ISpecificationSearchService specificationSearchService, IPublishingApiClient publishingApiClient)
+		public PublishController(ISpecificationsApiClient specificationsApiClient,  IPublishingApiClient publishingApiClient)
 		{
-			_specificationsApiClient = specificationsApiClient;
-			_specificationSearchService = specificationSearchService;
+			_specificationsApiClient = specificationsApiClient;		
 			_publishingApiClient = publishingApiClient;
 		}
 
@@ -68,23 +63,7 @@ namespace CalculateFunding.Frontend.Controllers
 
 			return new NotFoundObjectResult(Content("Error. Not Found."));
 		}
-
-		[HttpPost]
-		[Route("api/specifications/search")]
-		public async Task<IActionResult> SearchCalculations([FromBody] SearchRequestViewModel request)
-		{
-			Guard.ArgumentNotNull(request, nameof(request));
-
-			SpecificationSearchResultViewModel result = await _specificationSearchService.PerformSearch(request);
-			if (result != null)
-			{
-				return Ok(result);
-			}
-			else
-			{
-				return new StatusCodeResult(500);
-			}
-		}
+       
 
         [Route("api/publish/refreshfunding/{specificationId}")]
 		[HttpGet]
