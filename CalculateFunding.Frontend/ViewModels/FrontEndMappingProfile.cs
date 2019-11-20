@@ -87,7 +87,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
                 .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.Current.Date))
                 .ForMember(m => m.Version, opt => opt.Ignore())
-                .ForMember(m => m.LastModifiedByName, opt => opt.Ignore())
+                .ForMember(m => m.LastModifiedByName, opt => opt.MapFrom(p => p.Current.Author != null ? p.Current.Author.Name : "Unknown"))
                 .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.Current.SourceCode))
                 .ForMember(m => m.CalculationType, opt => opt.MapFrom(p => p.Current.CalculationType))
                 .ForMember(m => m.PublishStatus, opt => opt.MapFrom(p => p.Current.PublishStatus));
