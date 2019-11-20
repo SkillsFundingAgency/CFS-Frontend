@@ -17,18 +17,22 @@
     </div>
 }
 @section BannerLeft{
+    <h6>Provider name:</h6>
     <h1 class="hero-title no-margin">@Model.ViewModel.ProviderName</h1>
-    <p class="hero-text no-margin">
-        <span>UPIN:&nbsp;<strong>@Model.ViewModel.Upin</strong>&nbsp;</span>
-        <span>UKPRN:&nbsp;<strong>@Model.ViewModel.Ukprn</strong>&nbsp;</span>
-        <span>URN:&nbsp;<strong>@Model.ViewModel.Urn</strong>&nbsp;</span>
-    </p>
+    @*<p class="hero-text no-margin">
+            <span>UPIN:&nbsp;<strong>@Model.ViewModel.Upin</strong>&nbsp;</span>
+            <span>UKPRN:&nbsp;<strong>@Model.ViewModel.Ukprn</strong>&nbsp;</span>
+            <span>URN:&nbsp;<strong>@Model.ViewModel.Urn</strong>&nbsp;</span>
+        </p>*@
     <p class="hero-text">
         <div>
             <span>Local authority:&nbsp;<strong>@Model.ViewModel.LocalAuthority</strong></span>
         </div>
         <div>
             <span>Provider type:&nbsp;<strong>@Model.ViewModel.ProviderType</strong></span>&nbsp;
+        </div>
+        <div>
+
             <span>Provider subtype:&nbsp;<strong>@Model.ViewModel.ProviderSubtype</strong></span>
         </div>
         <div>
@@ -39,8 +43,8 @@
 @section BannerMiddle{
     <form method="post" class="filter-container spacing-15" id="filter-container" asp-antiforgery="true">
         <div class="row">
-            <div class="col-xs-3 filter-field-heading">Select a funding period</div>
-            <div class="col-xs-4 filter-field-heading">Select a specification</div>
+            <div class="col-xs-3 filter-field-heading">Funding period</div>
+            <div class="col-xs-4 filter-field-heading">Specification</div>
         </div>
         <div class="row">
             <div class="col-xs-3">
@@ -68,7 +72,7 @@
                 </li>
                 <li class="nav-item">
                     <a id="nav-calculations-tab" href="/results/ProviderAdditionalCalculations?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationProviderVersion=@Model.SpecificationProviderVersion" role="tab" aria-selected="false">Additional Calculations</a>
-                    
+
                 </li>
                 <li class="nav-item">
                     <a id="nav-test-results-tab" href="/results/ProviderScenarioResults?providerId=@Model.ProviderId&fundingPeriodId=@Model.FundingPeriodId&specificationProviderVersion=@Model.SpecificationProviderVersion" role="tab" aria-selected="false">QA Test results</a>

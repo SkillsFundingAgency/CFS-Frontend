@@ -256,11 +256,7 @@ namespace CalculateFunding.Frontend.ViewModels
 
              .AfterMap((ProviderVersionSearchResult source, ProviderViewModel destination) =>
              {
-                 if (source.DateOpened.HasValue)
-                 {
-                     destination.DateOpenedDisplay = source.DateOpened.Value.ToString(FormatStrings.DateTimeFormatString);
-
-                 }
+                 destination.DateOpenedDisplay = source.DateOpened.HasValue ? source.DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown";
              });
 
             CreateMap<DatasetVersionResponseViewModel, DatasetVersionFullViewModel>()
