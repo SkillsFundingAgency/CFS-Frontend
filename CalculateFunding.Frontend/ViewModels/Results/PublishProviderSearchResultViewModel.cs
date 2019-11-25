@@ -13,6 +13,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public IEnumerable<PublishedProviderSearchResultItemViewModel> Providers { get; set; }
         public double FilteredFundingAmount { get; set; }
+        public bool CanPublish { get; set; }
     }
 
     public class PublishedProviderSearchResultItemViewModel

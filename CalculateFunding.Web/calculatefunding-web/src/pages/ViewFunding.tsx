@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {Header} from "../components/Header";
 import {Banner} from "../components/Banner";
 import {Footer} from "../components/Footer";
@@ -15,11 +15,14 @@ export interface IViewFundingProps {
     filterPublishedProviderResults: any;
     refreshFunding: any;
     approveFunding: any;
+    publishFunding: any;
+    changePageState: any;
     specifications: Specification;
     fundingStreams: FundingStream[];
     selectedFundingPeriods: FundingPeriod[];
     specificationSelected: boolean;
     publishedProviderResults: {
+        canPublish: boolean;
         currentPage: number,
         endItemNumber: number,
         facets: FacetsEntity[],
@@ -42,6 +45,7 @@ export interface IViewFundingProps {
     refreshFundingJobId: string;
     approveFundingJobId: string;
     publishFundingJobId: string;
+    pageState: string;
 }
 
 export default class ViewFundingPage extends React.Component<IViewFundingProps, {}> {
@@ -50,15 +54,14 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     }
 
     state = {
-        fundingPeriod: '',
-        fundingStream: '',
-        specification: '',
-        providerType: '',
-        localAuthority: '',
-        status: '',
-        pageState: 'IDLE',
+        fundingPeriod: "",
+        fundingStream: "",
+        specification: "",
+        providerType: "",
+        localAuthority: "",
+        status: "",
         pageSize: 50,
-        jobId: ''
+        jobId: ""
     };
 
     getSpecifications = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -92,7 +95,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         console.log(event.target.value);
         this.setState({status: event.target.value});
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, event.target.value, 1, this.state.pageSize);
-        // fundingPeriodId: string, fundingStreamId: string, specificationId: string, providerType: string, localAuthority: string, status: string
     };
 
     filterProviderType = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -109,18 +111,27 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     };
 
     refreshFunding = () => {
-        this.setState({pageState: "REFRESH_FUNDING"});
+        this.props.changePageState("REFRESH_FUNDING");
         this.props.refreshFunding(this.props.specifications.id)
     };
 
     approveFunding = () => {
-        this.setState({pageState: "APPROVE_FUNDING"});
+        this.props.changePageState("APPROVE_FUNDING");
         //this.props.approveFunding(this.props.specifications.id)
     };
 
+    publishFunding = () => {
+        this.props.changePageState("PUBLISH_FUNDING");
+    };
+
     confirmApproveFunding = () => {
-        this.setState({pageState: "APPROVE_FUNDING_JOB"});
+        this.props.changePageState("APPROVE_FUNDING_JOB");
         this.props.approveFunding(this.props.specifications.id);
+    };
+
+    confirmPublishFunding = () => {
+        this.setState({pageState: "PUBLISH_FUNDING_JOB"});
+        this.props.publishFunding(this.props.specifications.id);
     };
 
     movePage = (action: string) => {
@@ -145,6 +156,12 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, this.state.status, pageNumber);
     };
 
+    dismissLoader = () => {
+        this.props.changePageState("IDLE");
+        this.setState({pageState: "IDLE"});
+    };
+
+
     render() {
         let breadcrumbs: IBreadcrumbs[] = [
             {
@@ -163,60 +180,57 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (!this.props.specificationSelected) {
             return <div>
                 <Header/>
-                <Banner bannerType='Left' breadcrumbs={breadcrumbs} title="Choose Specification"
+                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
-                <main className='container' hidden={this.props.specificationSelected}>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className='form-group'>
-                                <div className='form-label'>
-                                    <label htmlFor="select-funding-stream">Select funding stream:</label>
-                                </div>
-                                <select id='select-funding-stream' className='form-control'
-                                        disabled={this.props.fundingStreams.length === 0} onChange={(e) => {
-                                    this.getFundingPeriods(e)
-                                }}>
-                                    <option>Please select a funding stream</option>
-                                    {this.props.fundingStreams.map(fs =>
-                                        <option key={fs.id} value={fs.id}>{fs.name}</option>
-                                    )}
-                                </select>
-                            </div>
+                <main className="container" hidden={this.props.specificationSelected}>
+
+                    <fieldset className="govuk-fieldset">
+                        <div className="govuk-form-group">
+                            <label htmlFor="select-funding-stream" className="govuk-fieldset__heading">Select funding
+                                stream:</label>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className='form-group'>
-                                <div className='form-label'>
-                                    <label htmlFor="select-provider">Select funding period:</label>
-                                </div>
-                                <select id='select-provider' className='form-control' placeholder='Please select'
-                                        disabled={this.props.selectedFundingPeriods.length === 0}
-                                        onChange={(e) => {
-                                            this.getSpecifications(e)
-                                        }}>
-                                    <option>Please select a funding period</option>
-                                    {this.props.selectedFundingPeriods.map(fp =>
-                                        <option key={fp.id} value={fp.id}>{fp.name}</option>
-                                    )}
-                                </select>
-                            </div>
+                        <div className="govuk-form-group">
+                            <select id="select-funding-stream" className="govuk-select"
+                                    disabled={this.props.fundingStreams.length === 0} onChange={(e) => {
+                                this.getFundingPeriods(e)
+                            }}>
+                                <option>Please select a funding stream</option>
+                                {this.props.fundingStreams.map(fs =>
+                                    <option key={fs.id} value={fs.id}>{fs.name}</option>
+                                )}
+                            </select></div>
+                    </fieldset>
+                    <fieldset className="govuk-fieldset spacing-30">
+                        <div className="govuk-form-group">
+                            <label htmlFor="select-provider" className="govuk-fieldset__heading">Select funding
+                                period:</label>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className='form-group' hidden={this.props.specifications.name === ""}>
-                                <div className='form-label'>
-                                    <label htmlFor="select-provider">Specification:</label>
-                                </div>
-                                <input type="text" disabled={true} value={this.props.specifications.name}/>
-                            </div>
+                        <div className="govuk-form-group">
+                            <select id="select-provider" className="govuk-select" placeholder="Please select"
+                                    disabled={this.props.selectedFundingPeriods.length === 0}
+                                    onChange={(e) => {
+                                        this.getSpecifications(e)
+                                    }}>
+                                <option>Please select a funding period</option>
+                                {this.props.selectedFundingPeriods.map(fp =>
+                                    <option key={fp.id} value={fp.id}>{fp.name}</option>
+                                )}
+                            </select>
                         </div>
-                    </div>
+                    </fieldset>
+                    <fieldset className="govuk-fieldset">
+                        <div className="form-group" hidden={this.props.specifications.name === ""}>
+                            <div className="form-label">
+                                <label htmlFor="select-provider"
+                                       className="govuk-fieldset__heading">Specification:</label>
+                            </div>
+                            <input type="text" disabled={true} value={this.props.specifications.name}/>
+                        </div>
+                    </fieldset>
                     <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className='form-group'>
-                                <button className='button button-publish' onClick={(e) => this.viewFunding(e)}
+                            <div className="form-group">
+                                <button className="button button-publish" onClick={(e) => this.viewFunding(e)}
                                         disabled={this.props.specifications.id === ""}>View
                                     Funding
                                 </button>
@@ -230,10 +244,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (this.props.specificationSelected) {
             return <div>
                 <Header/>
-                <Banner bannerType='Left' breadcrumbs={breadcrumbs} title="Choose Specification"
+                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
-                <main className='container' hidden={this.state.pageState !== "IDLE"}>
-                    <p><i className='glyphicon glyphicon-exclamation-sign'> </i> Only one funding stream can be approved
+                <main className="container" hidden={this.props.pageState !== "IDLE"}>
+                    <p><i className="glyphicon glyphicon-exclamation-sign"> </i> Only one funding stream can be approved
                         or
                         released at a time</p>
 
@@ -291,7 +305,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             of {this.props.publishedProviderResults.totalResults}
                         </div>
                     </div>
-                    <div id='funding-table'>
+                    <div id="funding-table">
                         <table>
                             <thead>
                             <tr>
@@ -346,11 +360,15 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </ul>
                             </div>
                         </div>
-                        <div className='row'>
+                        <div className="row">
                             <div
                                 className="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-9 col-sm-offset-9 col-md-offset-9 col-lg-offset-9">
-                                <button className='button button-publish'
+                                <button className="button button-publish"
                                         onClick={() => this.approveFunding()}>Approve
+                                </button>
+                                <button className="button button-publish"
+                                        disabled={!this.props.publishedProviderResults.canPublish}
+                                        onClick={() => this.publishFunding()}>Publish
                                 </button>
                                 <button className="button button-publish"
                                         onClick={() => this.refreshFunding()}>Refresh
@@ -362,14 +380,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     </div>
 
                 </main>
-                <div hidden={this.state.pageState !== "REFRESH_FUNDING"}>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
-                    </div>
-                </div>
-                <div
-                    hidden={this.state.pageState !== "APPROVE_FUNDING" || this.props.specifications.fundingStreams == null}>
-                    <div className="container">
+                <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
                         <div className="row">
                             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                 <h2>You have selected:</h2>
@@ -392,10 +403,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Provider local authories selected</td>
+                                        <td>Provider local authorities selected</td>
                                         <td>You have
                                             selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
-                                            authories
+                                            authorities
                                         </td>
                                     </tr>
                                     </tbody>
@@ -442,7 +453,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr>
                                         <th>Total funding being approved</th>
                                         <th></th>
-                                        <th>£404.00</th>
+                                        <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -457,16 +468,107 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                         </div>
                         <div className="spacing-30"></div>
-                    </div>
+                </main>
+                <main className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <h2>You have selected:</h2>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Provider Name</th>
+                                        <th>Info</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Number of providers to publish</td>
+                                        <td>{this.props.publishedProviderResults.totalResults}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Provider Types Selected</td>
+                                        <td>You have
+                                            selected {this.props.publishedProviderResults.providers.length} providers
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Provider local authorities selected</td>
+                                        <td>You have
+                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                            authorities
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Specification Details</th>
+                                        <th>Info</th>
+                                        <th>Funding</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Funding Period</td>
+                                        <td>{this.props.specifications.fundingPeriod.name}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Specification selected</td>
+                                        <td>{this.props.specifications.name}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Funding Stream</td>
+                                        <td>{this.props.specifications.fundingStreams.map(stream =>
+                                            stream.name
+                                        )}</td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div className="spacing-30"></div>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Total funding being published</th>
+                                        <th></th>
+                                        <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                                <button className="button button-publish"
+                                        onClick={() => this.confirmPublishFunding()}>Confirm Publish
+                                </button>
+
+                            </div>
+                        </div>
+                        <div className="spacing-30"></div>
+                </main>
+                <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
+                    <NotificationSignal jobType="RefreshFundingJob" jobId={this.props.specifications.id}
+                                        message="Waiting to refresh funding" callback={this.props.changePageState}/>
                 </div>
-                <div className="container" hidden={this.state.pageState !== "REFRESH_FUNDING"}>
-                    <NotificationSignal jobId={this.props.refreshFundingJobId} message="Waiting to refresh funding"/>
+                <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
+                    <NotificationSignal jobType="ApproveFunding" jobId={this.props.specifications.id}
+                                        message="Waiting to approve funding" callback={this.props.changePageState}/>
                 </div>
-                <div className="container" hidden={this.state.pageState !== "APPROVE_FUNDING_JOB"}>
-                    <NotificationSignal jobId={this.props.approveFundingJobId} message="Waiting to approve funding"/>
-                </div>
-                <div className="container" hidden={this.state.pageState !== "PUBLISH_FUNDING"}>
-                    <NotificationSignal jobId={this.props.publishFundingJobId} message="Waiting to publish funding"/>
+                <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
+                    <NotificationSignal jobType="PublishFundingJob" jobId={this.props.specifications.id}
+                                        message="Waiting to publish funding" callback={this.props.changePageState}/>
                 </div>
 
                 <Footer/>

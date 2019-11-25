@@ -8,6 +8,7 @@ export interface PublishedProviderItems {
     totalErrorResults: number;
     totalResults: number;
     filteredFundingAmount: number;
+    canPublish:boolean;
 }
 export interface ProvidersEntity {
     fundingPeriodId: string;

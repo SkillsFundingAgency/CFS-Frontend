@@ -7,7 +7,10 @@ import {
     getSelectedFundingPeriods,
     getSelectedSpecifications,
     refreshFunding,
-    approveFunding, publishFunding, filterPublishedProviderResults
+    approveFunding,
+    publishFunding,
+    filterPublishedProviderResults,
+    changePageState
 } from "../actions/viewFundingAction";
 import {AppState} from "../reducers/rootReducer";
 
@@ -20,7 +23,8 @@ const mapStateToProps = (state: AppState) => ({
     filterTypes: state.viewFundingState.filterTypes,
     refreshFundingJobId: state.viewFundingState.refreshFundingJobId,
     approveFundingJobId: state.viewFundingState.approveFundingJobId,
-    publishFundingJobId: state.viewFundingState.publishFundingJobId
+    publishFundingJobId: state.viewFundingState.publishFundingJobId,
+    pageState: state.viewFundingState.pageState
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
@@ -33,7 +37,8 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
             filterPublishedProviderResults,
             refreshFunding,
             approveFunding,
-            publishFunding
+            publishFunding,
+            changePageState
         },
         dispatch
     );

@@ -10,6 +10,7 @@ using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Services
@@ -76,10 +77,10 @@ namespace CalculateFunding.Frontend.Services
 
             if (searchRequestResult.Content != null)
             {
-	            foreach (PublishedProviderSearchItem searchresult in searchRequestResult.Content.Results)
+	            foreach (PublishedProviderSearchItem searchResult in searchRequestResult.Content.Results)
 	            {
-		            itemResults.Add(_mapper.Map<PublishedProviderSearchResultItemViewModel>(searchresult));
-		            result.FilteredFundingAmount += searchresult.FundingValue;
+		            itemResults.Add(_mapper.Map<PublishedProviderSearchResultItemViewModel>(searchResult));
+		            result.FilteredFundingAmount += searchResult.FundingValue;
 	            }
 
 	            result.Providers = itemResults.AsEnumerable();
@@ -99,6 +100,8 @@ namespace CalculateFunding.Frontend.Services
 		            result.EndItemNumber = searchRequestResult.Content.TotalCount;
 	            }
             }
+
+            result.CanPublish = result.Providers.All(x => x.FundingStatus == "Approved");
 
             result.PagerState = new PagerState(requestOptions.PageNumber, 10, 4);
 

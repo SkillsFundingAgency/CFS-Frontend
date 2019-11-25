@@ -14,7 +14,8 @@ export enum ViewFundingActionTypes {
     FILTER_PUBLISHEDPROVIDERRESULTS = 'filterPublishedProviderResults',
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
-    PUBLISH_FUNDING = 'publishFunding'
+    PUBLISH_FUNDING = 'publishFunding',
+    CHANGE_PAGESTATE = 'changePageState'
 }
 
 export interface IGetSpecificationAction {
@@ -58,6 +59,10 @@ export interface IPublishFundingAction {
     type: ViewFundingActionTypes.PUBLISH_FUNDING,
     payload: string,
 }
+export interface ChangePageStateAction {
+    type: ViewFundingActionTypes.CHANGE_PAGESTATE,
+    payload: string
+}
 
 export type ViewFundingAction =
     IGetSpecificationAction
@@ -67,7 +72,8 @@ export type ViewFundingAction =
     | IRefreshFundingAction
     | IApproveFundingAction
     | IPublishFundingAction
-    | IFilterPublishedProviderResultsAction;
+    | IFilterPublishedProviderResultsAction
+    | ChangePageStateAction;
 
 export const getSelectedSpecifications: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingPeriodId: string, fundingStreamId: string) => {
     return async (dispatch: Dispatch) => {
@@ -220,6 +226,15 @@ export const publishFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundin
         dispatch({
             type: ViewFundingActionTypes.PUBLISH_FUNDING,
             payload: response.data,
+        })
+    }
+};
+
+export const changePageState: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (state: string) => {
+    return async (dispatch: Dispatch) => {
+        dispatch({
+            type: ViewFundingActionTypes.CHANGE_PAGESTATE,
+            payload: state,
         })
     }
 };
