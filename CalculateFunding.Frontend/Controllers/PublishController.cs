@@ -103,7 +103,7 @@ namespace CalculateFunding.Frontend.Controllers
 
 			if (result.Content.JobId != null)
 			{
-				return Ok(result.Content.JobId);
+				return Ok(result.Content.JobId); 
 			}
 
 			return BadRequest(-1);

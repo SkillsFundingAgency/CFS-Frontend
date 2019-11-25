@@ -7,6 +7,7 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -38,13 +39,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string calculationId = "12345";
 
@@ -74,6 +77,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string calculationId = "12345";
 
@@ -82,7 +86,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             calcClient
                 .GetCalculationById(calculationId)
@@ -112,6 +117,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string calculationId = "12345";
             string specificationId = "67890";
@@ -124,7 +130,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             Calculation calculation = new Calculation
             {
@@ -174,13 +181,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string calculationId = "1234";
 
@@ -207,13 +216,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string calculationId = "2345";
 
@@ -246,13 +257,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string calculationId = "2345";
 
@@ -288,13 +301,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string calculationId = "2345";
 
@@ -331,6 +346,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             specsClient
                 .GetSpecificationSummaryById(Arg.Any<string>())
@@ -341,7 +357,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             string specificationId = "12345";
 
@@ -376,36 +393,84 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string specificationName = "Spec name";
             string fundingStreamName = "Bob";
             string fundingStreamId = "5678";
             string fundingPeriodName = "Alice";
+            string templateVersion = "1";
+            string calculationName = "calculationName";
 
-            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK,
-                new SpecificationSummary
+            SpecificationSummary specificationSummary = new SpecificationSummary
+            {
+                Name = specificationName,
+                FundingStreams = new[] { new Reference(fundingStreamId, fundingStreamName) },
+                FundingPeriod = new Reference("a", fundingPeriodName),
+                TemplateIds = new Dictionary<string, string>
                 {
-                    Name = specificationName,
-                    FundingStreams = new Reference[]
-                    {
-                        new Reference(fundingStreamId, fundingStreamName),
-                        new Reference("b", "c")
-                    },
-                    FundingPeriod = new Reference("a", fundingPeriodName)
-                });
+                    {fundingStreamId, templateVersion}
+                }
+            };
 
             specsClient
                 .GetSpecificationSummaryById(Arg.Any<string>())
-                .Returns(specificationResponse);
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            string fundingLineName = "2";
+            uint templateId = 1;
+
+            Common.TemplateMetadata.Models.TemplateMetadataContents templateMetadataContents = new Common.TemplateMetadata.Models.TemplateMetadataContents
+            {
+                RootFundingLines = new List<Common.TemplateMetadata.Models.FundingLine>
+                {
+                    new Common.TemplateMetadata.Models.FundingLine
+                    {
+                        Name = fundingLineName,
+                        Calculations = new List<Common.TemplateMetadata.Models.Calculation>
+                        {
+                            new Common.TemplateMetadata.Models.Calculation
+                            {
+                                TemplateCalculationId = templateId
+                            }
+                        }
+                    }
+                }
+            };
+
+            policiesApiClient
+                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
+
+            string specificationId = "12345";
+
+            TemplateMapping templateMapping = new TemplateMapping
+            {
+                FundingStreamId = fundingStreamId,
+                SpecificationId = specificationId,
+                TemplateMappingItems = new List<TemplateMappingItem>
+                {
+                    new TemplateMappingItem
+                    {
+                        TemplateId = templateId
+                    }
+                }
+            };
+
+            calcClient
+                .GetTemplateMapping(specificationId, fundingStreamId)
+                .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
-            string specificationId = "12345";
+
+            pageModel.Calculation = new CalculationViewModel { Name = calculationName };
 
             //Act
             await pageModel.HandleSpecificationSummary(specificationId);
@@ -430,6 +495,187 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             await specsClient
                 .Received(1)
                 .GetSpecificationSummaryById(specificationId);
+
+            await policiesApiClient
+                .Received(1)
+                .GetFundingTemplateContents(fundingStreamId, templateVersion);
+
+            await calcClient
+                .Received(1)
+                .GetTemplateMapping(specificationId, fundingStreamId);
+        }
+
+#if NCRUNCH
+        [Ignore]
+#endif
+        [TestMethod]
+        [DynamicData(nameof(HandleGetFundingTemplateContentsNotOkTestCases), DynamicDataSourceType.Method)]
+        public async Task HandleGetFundingTemplateContents_ApiResponseNotOK_ThrowsException(ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents> getFundingTemplateContentsResponse)
+        {
+            //Arrange
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
+            ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
+            IMapper mapper = Substitute.For<IMapper>();
+            IFeatureToggle features = Substitute.For<IFeatureToggle>();
+            IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
+            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
+
+            string fundingStreamId = "fundingStreamId";
+
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK,
+                new SpecificationSummary
+                {
+                    Name = "name",
+                    FundingStreams = new Reference[]
+                    {
+                                    new Reference(fundingStreamId, "fundingStreamName"),
+                                    new Reference("b", "c")
+                    },
+                    FundingPeriod = new Reference("a", "fundingPeriodName"),
+                    TemplateIds = new Dictionary<string, string>
+                    {
+                        { fundingStreamId, "templateVersion" }
+                    }
+                });
+
+            specsClient
+                .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(specificationResponse);
+
+            policiesApiClient
+                .GetFundingTemplateContents(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(getFundingTemplateContentsResponse);
+
+            EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
+                calcClient,
+                mapper,
+                features,
+                authHelper,
+                resultsApiClient,
+                policiesApiClient);
+
+            string specificationId = "12345";
+
+            //Act
+            Func<Task> test = async () => await pageModel.HandleSpecificationSummary(specificationId);
+
+            //Assert
+            test
+                .Should()
+                .Throw<Exception>()
+                .WithMessage($"Bad response received from policies API: {getFundingTemplateContentsResponse?.StatusCode.ToString() ?? "No response"}");
+
+            await specsClient
+                .Received(1)
+                .GetSpecificationSummaryById(specificationId);
+        }
+
+        private static IEnumerable<object[]> HandleGetFundingTemplateContentsNotOkTestCases()
+        {
+            yield return new object[] { null };
+            yield return new object[] { new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.BadRequest, null) };
+            yield return new object[] { new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.NotFound, null) };
+        }
+
+#if NCRUNCH
+        [Ignore]
+#endif
+        [TestMethod]
+        [DynamicData(nameof(HandleGetTemplateMappingNotOkTestCases), DynamicDataSourceType.Method)]
+        public async Task HandleGetTemplateMapping_ApiResponseNotOK_ThrowsException(ApiResponse<TemplateMapping> getTemplateMappingResponse)
+        {
+            //Arrange
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
+            ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
+            IMapper mapper = Substitute.For<IMapper>();
+            IFeatureToggle features = Substitute.For<IFeatureToggle>();
+            IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
+            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
+
+            string fundingStreamId = "fundingStreamId";
+            string templateVersion = "templateVersion";
+
+            ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK,
+                new SpecificationSummary
+                {
+                    Name = "name",
+                    FundingStreams = new Reference[]
+                    {
+                                    new Reference(fundingStreamId, "fundingStreamName"),
+                                    new Reference("b", "c")
+                    },
+                    FundingPeriod = new Reference("a", "fundingPeriodName"),
+                    TemplateIds = new Dictionary<string, string>
+                    {
+                        { fundingStreamId, templateVersion }
+                    }
+                });
+
+            specsClient
+                .GetSpecificationSummaryById(Arg.Any<string>())
+                .Returns(specificationResponse);
+
+            Common.TemplateMetadata.Models.TemplateMetadataContents templateMetadataContents = new Common.TemplateMetadata.Models.TemplateMetadataContents
+            {
+                RootFundingLines = new List<Common.TemplateMetadata.Models.FundingLine>
+                {
+                    new Common.TemplateMetadata.Models.FundingLine
+                    {
+                        Name = "name",
+                        Calculations = new List<Common.TemplateMetadata.Models.Calculation>
+                        {
+                            new Common.TemplateMetadata.Models.Calculation
+                            {
+                                Name = "name"
+                            }
+                        }
+                    }
+                }
+            };
+
+            policiesApiClient
+                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
+
+            calcClient
+                .GetTemplateMapping(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(getTemplateMappingResponse);
+
+            EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
+                calcClient,
+                mapper,
+                features,
+                authHelper,
+                resultsApiClient,
+                policiesApiClient);
+
+            string specificationId = "12345";
+
+            //Act
+            Func<Task> test = async () => await pageModel.HandleSpecificationSummary(specificationId);
+
+            //Assert
+            test
+                .Should()
+                .Throw<Exception>()
+                .WithMessage($"Bad response received from calcs API: {getTemplateMappingResponse?.StatusCode.ToString() ?? "No response"}");
+
+            await specsClient
+                .Received(1)
+                .GetSpecificationSummaryById(specificationId);
+
+            await policiesApiClient
+                .Received(1)
+                .GetFundingTemplateContents(fundingStreamId, templateVersion);
+        }
+
+        private static IEnumerable<object[]> HandleGetTemplateMappingNotOkTestCases()
+        {
+            yield return new object[] { null };
+            yield return new object[] { new ApiResponse<TemplateMapping>(HttpStatusCode.BadRequest, null) };
+            yield return new object[] { new ApiResponse<TemplateMapping>(HttpStatusCode.NotFound, null) };
         }
 
         [TestMethod]
@@ -446,13 +692,15 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -475,6 +723,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string calculationId = "4567";
 
@@ -483,7 +732,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             //Act
             IActionResult result = await pageModel.OnGet(calculationId);
@@ -520,21 +770,24 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string calculationId = "4567";
             string specificationId = "123";
+            string calculationName = "calculationName";
             CalculationVersion calculationVersion = new CalculationVersion();
 
             Calculation calculation = new Calculation
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = calculationVersion
+                Current = calculationVersion,
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel
             {
-                Id = calculationId + specificationId
+                Id = calculationId + specificationId,
+                Name = calculationName
             };
 
             calcClient
@@ -557,23 +810,74 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Map<CalculationViewModel>(Arg.Any<Calculation>())
                 .Returns(calculationViewModel);
 
+            string fundingStreamId = "1";
+            string templateVersion = "1";
+
             SpecificationSummary specificationSummary = new SpecificationSummary
             {
                 Name = "A",
-                FundingStreams = new[] { new Reference("1", "Kochanski") },
-                FundingPeriod = new Reference()
+                FundingStreams = new[] { new Reference(fundingStreamId, "Kochanski") },
+                FundingPeriod = new Reference(),
+                TemplateIds = new Dictionary<string, string>
+                {
+                    {fundingStreamId, templateVersion}
+                }
             };
 
             specsClient
                 .GetSpecificationSummaryById(specificationId)
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
+            string fundingLineName = "2";
+            uint templateId = 1;
+
+            Common.TemplateMetadata.Models.TemplateMetadataContents templateMetadataContents = new Common.TemplateMetadata.Models.TemplateMetadataContents
+            {
+                RootFundingLines = new List<Common.TemplateMetadata.Models.FundingLine>
+                {
+                    new Common.TemplateMetadata.Models.FundingLine
+                    {
+                        Name = fundingLineName,
+                        Calculations = new List<Common.TemplateMetadata.Models.Calculation>
+                        {
+                            new Common.TemplateMetadata.Models.Calculation
+                            {
+                                TemplateCalculationId = templateId
+                            }
+                        }
+                    }
+                }
+            };
+
+            policiesApiClient
+                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
+
+            TemplateMapping templateMapping = new TemplateMapping
+            {
+                FundingStreamId = fundingStreamId,
+                SpecificationId = specificationId,
+                TemplateMappingItems = new List<TemplateMappingItem>
+                {
+                    new TemplateMappingItem
+                    {
+                        TemplateId = templateId,
+                        CalculationId = calculationId + specificationId
+                    }
+                }
+            };
+
+            calcClient
+                .GetTemplateMapping(specificationId, fundingStreamId)
+                .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
+
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
                 features,
                 authHelper,
-                resultsApiClient);
+                resultsApiClient,
+                policiesApiClient);
 
             pageModel.PageContext = TestAuthHelper.CreatePageContext();
 
@@ -624,6 +928,10 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             pageModel.ViewData["GreyBackground"]
                 .Should()
                 .Be(newEditCalculationPageEnabled.ToString());
+
+            await calcClient
+                .Received(1)
+                .GetTemplateMapping(specificationId, fundingStreamId);
         }
     }
 }
