@@ -7,8 +7,8 @@ const App: React.FunctionComponent = () => {
   return (
    <BrowserRouter>
      <Switch>
-       <Route exact={true} path="/" component={Home} />
-       <Route exact={true} path="/ViewFunding" component={ViewFundingContainer} />
+       <Route path="/" component={Home} />
+       <Route path="/ViewFunding" component={ViewFundingContainer} />
      </Switch>
    </BrowserRouter>
   );
