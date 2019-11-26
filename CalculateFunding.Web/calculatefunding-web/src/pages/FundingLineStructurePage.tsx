@@ -59,25 +59,6 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
         if (this.props.specificationResult != null) {
             specId = this.props.specificationResult.id;
             let specName = this.props.specificationResult.name;
-            {/*let specDescription = this.props.specificationResult.description;
-            if (specDescription != null) {
-                whatIsSpecName =
-                   <div className="row">
-                        <div className="col-xs-12 policy-spec-what ">
-                            <p className="withjs-hide">What is {specName}</p>
-                            <div className="inline-collapse-container spacing-15-bottom">
-                                <div className="inline-collapse-heading withjs-show">
-                                    <i className="inline-collapse-arrow"></i>
-                                    <span>What is {specName}?</span>
-                                </div>
-                                <div className="inline-collapse-contents withjs-hide policy-spec-description">
-                                    {specDescription}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            }*/
-            }
             let fundingPeriod = this.props.specificationResult.fundingPeriod.name;
             let fundingStreams = this.props.specificationResult.fundingStreams.map(f =>
                 <p className="hero-subtext">{f.name}</p>

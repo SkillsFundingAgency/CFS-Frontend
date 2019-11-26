@@ -4,6 +4,7 @@ export class Header extends React.Component<{},{}>{
     render(){
         return <header role="banner" id="global-header" className="with-proposition">
             <div className="header-wrapper  container">
+                <div className="container">
                 <div className="header-global">
                     <div className="header-logo">
                         <div id="logo" className="content">
@@ -16,7 +17,10 @@ export class Header extends React.Component<{},{}>{
                     <div className="content">
                         <a href="#proposition-links" className="js-header-toggle menu">Menu</a>
                         <nav id="proposition-menu">
-                            <a href="/" id="proposition-name">Calculate Funding</a>
+                            <div className="page-header-title">
+                                <a href="/" id="proposition-name">Calculate Funding</a>
+                                <strong className="phase-tag navbar-item-overlay-active">Beta</strong>
+                            </div>
                             <div className="user-container">
                                 <i className="material-icons circle-icon">person</i>
                                 <span id="userName"></span>
@@ -24,7 +28,7 @@ export class Header extends React.Component<{},{}>{
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div></div>
         </header>
     }
 }

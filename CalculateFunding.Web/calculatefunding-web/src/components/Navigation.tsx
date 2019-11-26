@@ -1,5 +1,4 @@
 import * as React from "react"
-import {string} from "prop-types";
 
 interface INavigationLevel {
     currentNavigationLevel: NavigationLevel;
@@ -35,7 +34,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/">Home</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.Home ? (activeStyle) : (normalStyle)}>
-                                    <img alt="" src="/assets/images/navbar_selected.png"/>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>
                         </li>
@@ -43,7 +42,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/FundingLineStructure">Specifications</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.Specification ? (activeStyle) : (normalStyle)}>
-                                    <img src="/assets/images/navbar_selected.png"/>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>
                         </li>
@@ -51,7 +50,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/datasets">Manage Data</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.ManageData ? (activeStyle) : (normalStyle)}>
-                                    <img src="/assets/images/navbar_selected.png"/>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>
                         </li>
@@ -59,7 +58,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/scenarios">Quality assurance tests</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.QualityTests ? (activeStyle) : (normalStyle)}>
-                                    <img src="/assets/images/navbar_selected.png"/>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>
                         </li>
@@ -67,7 +66,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/results">View results</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.ViewResult ? (activeStyle) : (normalStyle)}>
-                                    <img src="/assets/images/navbar_selected.png"/>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>
                         </li>

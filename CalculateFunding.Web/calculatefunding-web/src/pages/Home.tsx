@@ -11,7 +11,7 @@ export interface IHomeProps {
 export class Home extends Component<IHomeProps, {}> {
     userIsAuthenticated() {
         // console.log("Fetching stuff")
-        fetch("https://localhost:59842/account/IsAuthenticated", {
+        fetch("/api/account/IsAuthenticated", {
             method: 'GET'
         })
             .then(function (response) {

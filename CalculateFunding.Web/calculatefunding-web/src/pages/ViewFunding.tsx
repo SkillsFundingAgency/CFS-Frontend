@@ -6,6 +6,7 @@ import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingT
 import {FacetsEntity, ProvidersEntity} from "../types/publishedProvider";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {NotificationSignal} from "../signals/NotificationSignal";
+import {Navigation, NavigationLevel} from "../components/Navigation";
 
 export interface IViewFundingProps {
     getSelectedSpecifications: any;
@@ -180,6 +181,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (!this.props.specificationSelected) {
             return <div>
                 <Header/>
+                <Navigation currentNavigationLevel={NavigationLevel.ViewResult}/>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
                 <main className="container" hidden={this.props.specificationSelected}>
@@ -244,6 +246,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (this.props.specificationSelected) {
             return <div>
                 <Header/>
+                <Navigation currentNavigationLevel={NavigationLevel.ViewResult}/>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
                 <main className="container" hidden={this.props.pageState !== "IDLE"}>
@@ -381,193 +384,196 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
                 </main>
                 <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <h2>You have selected:</h2>
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Provider Name</th>
-                                        <th>Info</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>Number of providers to approve</td>
-                                        <td>{this.props.publishedProviderResults.totalResults}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Provider Types Selected</td>
-                                        <td>You have
-                                            selected {this.props.publishedProviderResults.providers.length} providers
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Provider local authorities selected</td>
-                                        <td>You have
-                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
-                                            authorities
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h2>You have selected:</h2>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Provider Name</th>
+                                    <th>Info</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Number of providers to approve</td>
+                                    <td>{this.props.publishedProviderResults.totalResults}</td>
+                                </tr>
+                                <tr>
+                                    <td>Provider Types Selected</td>
+                                    <td>You have
+                                        selected {this.props.publishedProviderResults.providers.length} providers
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Provider local authorities selected</td>
+                                    <td>You have
+                                        selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                        authorities
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Specification Details</th>
-                                        <th>Info</th>
-                                        <th>Funding</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>Funding Period</td>
-                                        <td>{this.props.specifications.fundingPeriod.name}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Specification selected</td>
-                                        <td>{this.props.specifications.name}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Funding Stream</td>
-                                        <td>{this.props.specifications.fundingStreams.map(stream =>
-                                            stream.name
-                                        )}</td>
-                                        <td></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Specification Details</th>
+                                    <th>Info</th>
+                                    <th>Funding</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Funding Period</td>
+                                    <td>{this.props.specifications.fundingPeriod.name}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Specification selected</td>
+                                    <td>{this.props.specifications.name}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Funding Stream</td>
+                                    <td>{this.props.specifications.fundingStreams.map(stream =>
+                                        stream.name
+                                    )}</td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <div className="spacing-30"></div>
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Total funding being approved</th>
-                                        <th></th>
-                                        <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
-                                    </tr>
-                                    </thead>
-                                </table>
-                            </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div className="spacing-30"></div>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Total funding being approved</th>
+                                    <th></th>
+                                    <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                </tr>
+                                </thead>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                                <button className="button button-publish"
-                                        onClick={() => this.confirmApproveFunding()}>Confirm Approval
-                                </button>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                            <button className="button button-publish"
+                                    onClick={() => this.confirmApproveFunding()}>Confirm Approval
+                            </button>
 
-                            </div>
                         </div>
-                        <div className="spacing-30"></div>
+                    </div>
+                    <div className="spacing-30"></div>
                 </main>
                 <main className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <h2>You have selected:</h2>
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Provider Name</th>
-                                        <th>Info</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>Number of providers to publish</td>
-                                        <td>{this.props.publishedProviderResults.totalResults}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Provider Types Selected</td>
-                                        <td>You have
-                                            selected {this.props.publishedProviderResults.providers.length} providers
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Provider local authorities selected</td>
-                                        <td>You have
-                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
-                                            authorities
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h2>You have selected:</h2>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Provider Name</th>
+                                    <th>Info</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Number of providers to publish</td>
+                                    <td>{this.props.publishedProviderResults.totalResults}</td>
+                                </tr>
+                                <tr>
+                                    <td>Provider Types Selected</td>
+                                    <td>You have
+                                        selected {this.props.publishedProviderResults.providers.length} providers
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Provider local authorities selected</td>
+                                    <td>You have
+                                        selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                        authorities
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Specification Details</th>
-                                        <th>Info</th>
-                                        <th>Funding</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>Funding Period</td>
-                                        <td>{this.props.specifications.fundingPeriod.name}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Specification selected</td>
-                                        <td>{this.props.specifications.name}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Funding Stream</td>
-                                        <td>{this.props.specifications.fundingStreams.map(stream =>
-                                            stream.name
-                                        )}</td>
-                                        <td></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Specification Details</th>
+                                    <th>Info</th>
+                                    <th>Funding</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Funding Period</td>
+                                    <td>{this.props.specifications.fundingPeriod.name}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Specification selected</td>
+                                    <td>{this.props.specifications.name}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Funding Stream</td>
+                                    <td>{this.props.specifications.fundingStreams.map(stream =>
+                                        stream.name
+                                    )}</td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <div className="spacing-30"></div>
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Total funding being published</th>
-                                        <th></th>
-                                        <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
-                                    </tr>
-                                    </thead>
-                                </table>
-                            </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div className="spacing-30"></div>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Total funding being published</th>
+                                    <th></th>
+                                    <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                </tr>
+                                </thead>
+                            </table>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                                <button className="button button-publish"
-                                        onClick={() => this.confirmPublishFunding()}>Confirm Publish
-                                </button>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                            <button className="button button-publish"
+                                    onClick={() => this.confirmPublishFunding()}>Confirm Publish
+                            </button>
 
-                            </div>
                         </div>
-                        <div className="spacing-30"></div>
+                    </div>
+                    <div className="spacing-30"></div>
                 </main>
                 <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
-                    <NotificationSignal jobType="RefreshFundingJob" jobId={this.props.specifications.id}
+                    <NotificationSignal jobType="RefreshFundingJob"
+                                        jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
                                         message="Waiting to refresh funding" callback={this.props.changePageState}/>
                 </div>
                 <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
-                    <NotificationSignal jobType="ApproveFunding" jobId={this.props.specifications.id}
+                    <NotificationSignal jobType="ApproveFunding"
+                                        jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
                                         message="Waiting to approve funding" callback={this.props.changePageState}/>
                 </div>
                 <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
-                    <NotificationSignal jobType="PublishFundingJob" jobId={this.props.specifications.id}
+                    <NotificationSignal jobType="PublishFundingJob"
+                                        jobId={this.props.pageState === "PUBLISH_FUNDING_JOB" ? this.props.specifications.id : ""}
                                         message="Waiting to publish funding" callback={this.props.changePageState}/>
                 </div>
 

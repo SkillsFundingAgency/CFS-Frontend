@@ -20,7 +20,7 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                                 {this.props.breadcrumbs.map(bread =>
                                     (bread.url != null) ?
                                         (<li key={bread.name}><a href={bread.url}>{bread.name}</a></li>) :
-                                        (<li>{bread.name}</li>)
+                                        (<li key={bread.name}>{bread.name}</li>)
                                 )}
                             </Breadcrumbs>
                         </div>
