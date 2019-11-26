@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -18,17 +22,22 @@ namespace CalculateFunding.Frontend.Pages.Calcs
     {
         private readonly ICalculationsApiClient _calcClient;
         private readonly IMapper _mapper;
+        private readonly ISpecificationsApiClient _specsClient;
 
-        public ComparePageModel(ICalculationsApiClient calcClient, IMapper mapper)
+        public ComparePageModel(ICalculationsApiClient calcClient, IMapper mapper, ISpecificationsApiClient specsClient)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(specsClient, nameof(specsClient));
 
             _calcClient = calcClient;
             _mapper = mapper;
+            _specsClient = specsClient;
         }
 
         public CalculationViewModel Calculation { get; set; }
+
+        public SpecificationViewModel Specification { get; set; }
 
         public IEnumerable<CalculationVersionViewModel> Calculations { get; set; }
 
@@ -66,6 +75,21 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             
             Calculation = _mapper.Map<CalculationViewModel>(calculation);
             Calculation.Description = calculation.Description;
+
+            ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(calculation.SpecificationId);
+            
+            if (specificationResponse?.Content == null)
+            {
+                return new InternalServerErrorResult($"Unable to get specification for specification id {calculation.SpecificationId}");
+            }
+
+            SpecificationSummary specificationSummary = _mapper.Map<SpecificationSummary>(specificationResponse.Content);
+
+            Specification = new SpecificationViewModel
+            {
+                Id = specificationSummary.Id,
+                Name = specificationSummary.Name
+            };
 
             return Page();
         }

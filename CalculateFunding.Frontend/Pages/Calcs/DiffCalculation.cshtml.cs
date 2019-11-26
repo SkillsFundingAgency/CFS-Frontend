@@ -13,6 +13,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -41,15 +42,11 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public CalculationVersionViewModel RightCalculationDiffModel { get; set; }
 
-        public IEnumerable<Calculation> Calculation { get; set; }
+        public SpecificationViewModel Specification { get; set; }
 
-        public string CalculationName { get; set; }
-
-        public string CalculationDescription { get; set; }
+        public CalculationViewModel Calculation { get; set; }
 
         public string CalculationFundingPeriodId { get; set; }
-
-        public string CalculationId { get; set; }
 
         public async Task<IActionResult> OnGet(IEnumerable<int> versions, string calculationId)
         {
@@ -80,9 +77,17 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 	            return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInCalcsService);
             }
 
-            CalculationName = calculation.Name;
+            SpecificationSummary specificationSummary = _mapper.Map<SpecificationSummary>(specificationResponse.Content);
+
+            Specification = new SpecificationViewModel
+            {
+                Id = specificationSummary.Id,
+                Name = specificationSummary.Name
+            };
+
+            Calculation = _mapper.Map<CalculationViewModel>(calculation);
+            Calculation.Description = calculation.Description;
 			CalculationFundingPeriodId = specificationResponse.Content.FundingPeriod?.Name.FundingPeriodString();
-            CalculationId = calculation.Id;
 
             ApiResponse<Calculation> specCalculation = await _calcClient.GetCalculationById(calculation.Id);
 
@@ -90,8 +95,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 return new NotFoundObjectResult(ErrorMessages.CalculationNotFoundInSpecsService);
             }
-
-            CalculationDescription = specCalculation.Content.Description;
 
             ApiResponse<IEnumerable<CalculationVersion>> calculationVersionsResponse = await _calcClient.GetMultipleVersionsByCalculationId(versions, calculationId);
 

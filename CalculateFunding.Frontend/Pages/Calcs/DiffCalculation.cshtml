@@ -2,6 +2,7 @@
 @model CalculateFunding.Frontend.Pages.Calcs.DiffCalculationModel
 @using CalculateFunding.Frontend.Properties
 @using CalculateFunding.Frontend.Helpers
+@using CalculateFunding.Frontend.ViewModels.Common
 @{
     ViewData["Title"] = "Calculation comparision";
 }
@@ -14,17 +15,27 @@
     <div class="breadcrumbs">
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-            <li><a href="/calcs">@BreadcrumbText.ManageCalculations</a></li>
-            <li><a href="/calcs/editCalculation/@Model.CalculationId">@BreadcrumbText.EditCalculation</a></li>
-            <li><a href="/calcs/compare/@Model.CalculationId">@BreadcrumbText.CompareCalcuationVersions</a></li>
-            <li>@Model.CalculationName</li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="/specs/fundinglinestructure/@Model.Specification.Id">@Model.Specification.Name</a></li>
+            <li>
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+                {
+                    <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id">@Model.Calculation.Name</a>
+                }
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+                {
+                    <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id">@Model.Calculation.Name</a>
+                }
+            </li>
+            <li><a href="/calcs/compare/@Model.Calculation.Id">@BreadcrumbText.CalculationVersionHistory</a></li>
+            <li>@BreadcrumbText.CompareCalcuationVersions</li>
         </ol>
     </div>
 }
 
 @section FormBannerLeft{
     <p class="hero-text-bold">Funding Period: @Model.CalculationFundingPeriodId</p>
-    <h1 class="hero-title">@Model.CalculationName</h1>
+    <h1 class="hero-title">@Model.Calculation.Name</h1>
 }
 
 @section FormBannerRight{
@@ -55,7 +66,7 @@
     </div>
 
     <p><input type="checkbox" name="inLineCodeEditor" data-bind="checked: displayAsInline" value="true" id="inLineCodeEditor" /> <label for="inLineCodeEditor">Inline Code Viewer</label></p>
-    <p><a href="/calcs/compare/@Model.CalculationId" id="back-link">Back</a></p>
+    <p><a href="/calcs/compare/@Model.Calculation.Id" id="back-link">Back</a></p>
 
 </form>
 

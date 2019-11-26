@@ -11,11 +11,14 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Pages.Calcs;
 using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -54,6 +57,7 @@ End Function";
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             Calculation expectedCalculation = null;
             calcsClient
@@ -62,7 +66,7 @@ End Function";
 
             string calculationId = "1";
 
-            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper);
+            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper, specsClient);
 
             // Act
             IActionResult result = await comparePageModel.OnGet(calculationId);
@@ -78,6 +82,7 @@ End Function";
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             string calculationID = "1";
 
@@ -85,7 +90,7 @@ End Function";
                 .GetAllVersionsByCalculationId(calculationID)
                 .Returns((ApiResponse<IEnumerable<CalculationVersion>>)null);
 
-            ComparePageModel compPageModel = new ComparePageModel(calcsClient, mapper);
+            ComparePageModel compPageModel = new ComparePageModel(calcsClient, mapper, specsClient);
 
             // Act
             IActionResult result = await compPageModel.OnGet(calculationID);
@@ -107,8 +112,9 @@ End Function";
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
-            ComparePageModel compPageModel = new ComparePageModel(calcsClient, mapper);
+            ComparePageModel compPageModel = new ComparePageModel(calcsClient, mapper, specsClient);
 
             // Act
             IActionResult result = await compPageModel.OnGet(calculationId);
@@ -125,6 +131,7 @@ End Function";
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
 
             string calculationId = "1";
             string expectedCalculationId = "2";
@@ -184,7 +191,19 @@ End Function";
                .GetAllVersionsByCalculationId(calculationId)
                .Returns(new ApiResponse<IEnumerable<CalculationVersion>>(HttpStatusCode.OK, calculationVersion));
 
-            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper);
+            string specificationName = "specName";
+
+            SpecificationSummary specificationSummary = new SpecificationSummary
+            {
+                Id = specificationId,
+                Name = specificationName,
+            };
+
+            specsClient
+                .GetSpecificationSummaryById(specificationId)
+                .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper, specsClient);
 
             // Act
             IActionResult result = await comparePageModel.OnGet(calculationId);
@@ -201,6 +220,11 @@ End Function";
             calculation.Name.Should().Be(expectedCalculation.Name);
 
             comparePageModel.Calculations.Should().HaveCount(calculationVersion.Count());
+
+            SpecificationViewModel specificationViewModel = comparePageModel.Specification;
+            specificationViewModel.Should().NotBeNull();
+            specificationViewModel.Id.Should().Be(specificationId);
+            specificationViewModel.Name.Should().Be(specificationName);
         }
 
         [TestMethod]
@@ -208,7 +232,7 @@ End Function";
         {
             // Arrange
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            //ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
+            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             ILogger logger = Substitute.For<ILogger>();
@@ -258,7 +282,7 @@ End Function";
                .GetAllVersionsByCalculationId(calculationId)
                .Returns(new ApiResponse<IEnumerable<CalculationVersion>>(HttpStatusCode.OK, calculationVersions));
 
-            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper);
+            ComparePageModel comparePageModel = new ComparePageModel(calcsClient, mapper, specsClient);
 
             // Act
             IActionResult result = await comparePageModel.OnGet(calculationId);

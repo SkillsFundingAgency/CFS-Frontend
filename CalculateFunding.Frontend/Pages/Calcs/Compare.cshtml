@@ -15,17 +15,18 @@
         <ol>
             <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
             <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="/specs/fundinglinestructure/@Model.Specification.Id">@Model.Specification.Name</a></li>
             <li>
-            @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
-            {
-                <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id">@BreadcrumbText.EditCalculation</a>
-            } 
-            @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
-            {
-                <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id">@BreadcrumbText.EditTemplateCalculationSpec</a>
-            } 
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
+                {
+                    <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id">@Model.Calculation.Name</a>
+                }
+                @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
+                {
+                    <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id">@Model.Calculation.Name</a>
+                }
             </li>
-            <li>@BreadcrumbText.CompareCalcuationVersions</li>
+            <li>@BreadcrumbText.CalculationVersionHistory</li>
         </ol>
     </div>
 }

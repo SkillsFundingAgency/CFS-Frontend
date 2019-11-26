@@ -228,4 +228,7 @@
   <data name="EditTemplateCalculationSpec" xml:space="preserve">
     <value>Edit template calculation specification</value>
   </data>
+  <data name="CalculationVersionHistory" xml:space="preserve">
+    <value>Calculation Version History</value>
+  </data>
 </root>

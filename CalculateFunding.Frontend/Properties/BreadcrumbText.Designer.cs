@@ -79,6 +79,15 @@ namespace CalculateFunding.Frontend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calculation Version History.
+        /// </summary>
+        public static string CalculationVersionHistory {
+            get {
+                return ResourceManager.GetString("CalculationVersionHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose funding specification.
         /// </summary>
         public static string ChooseFundingSpecification {
