@@ -112,7 +112,19 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Filters = new Dictionary<string, string[]> { { "calculationId", new[] { calculationId } } }
             };
 
-            CalculationProviderResults = await _resultsSearchService.PerformSearch(searchRequest);
+            var searchResults = await _resultsSearchService.PerformSearch(searchRequest);
+
+            if (searchResults == null)
+            {
+				return;
+            }
+
+            foreach (var providerResult in searchResults.CalculationProviderResults)
+            {
+	            providerResult.SetCalculationResultDisplay(Calculation.ValueType);
+            }
+
+            CalculationProviderResults = searchResults;
         }
 
         private async Task<IActionResult> Populate(string calculationId, int? pageNumber, string searchTerm)

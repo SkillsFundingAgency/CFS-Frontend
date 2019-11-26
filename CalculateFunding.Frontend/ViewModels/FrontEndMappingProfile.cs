@@ -68,7 +68,8 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Failures, opt => opt.MapFrom(v => 0))
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
-            CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>();
+            CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
+	            .ForMember(d => d.CalculationResultDisplay, opt => opt.Ignore());
         }
 
         private void MapCalcs()

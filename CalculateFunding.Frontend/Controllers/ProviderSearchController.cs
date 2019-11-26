@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.Controllers
+﻿using CalculateFunding.Common.Extensions;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+
+namespace CalculateFunding.Frontend.Controllers
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -60,22 +63,34 @@
             }
         }
 
+
         [HttpPost]
         [Route("api/results/calculation-provider-results-search")]
-        public async Task<IActionResult> SearchCalculationProviderResults([FromBody] SearchRequestViewModel request)
+        public async Task<IActionResult> SearchCalculationProviderResults([FromBody] SearchRequestViewModel request, [FromQuery] string calculationValueType = null)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            CalculationProviderResultSearchResultViewModel result = await _calculationProviderResultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel searchResults = await _calculationProviderResultsSearchService.PerformSearch(request);
+
+            if (calculationValueType != null)
+            {
+	            CalculationValueTypeViewModel valueType = calculationValueType.AsEnum<CalculationValueTypeViewModel>();
+
+	            foreach (CalculationProviderResultSearchResultItemViewModel providerResult in searchResults.CalculationProviderResults)
+	            {
+		            providerResult.SetCalculationResultDisplay(valueType);
+
+	            }
+            }
+
+            CalculationProviderResultSearchResultViewModel result = searchResults;
 
             if (result != null)
             {
                 return Ok(result);
             }
-            else
-            {
-                return new InternalServerErrorResult($"Find provider results HTTP request failed");
-            }
+
+            return new InternalServerErrorResult($"Find provider results HTTP request failed");
         }
     }
 }

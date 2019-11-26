@@ -399,7 +399,7 @@
     <script asp-src-include="~/js/search.calculationProviderResults.js" asp-append-version="true" type="text/javascript"></script>
 
     <script type="text/javascript">
-        var searchVM = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationId: '@Model.Calculation.Id', specificationId: '@Model.Specification.Id', providerVersionId: '@Model.Specification.ProviderVersionId', fundingPeriodId: '@Model.Specification.FundingPeriod?.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
+        var searchVM = new calculateFunding.results.listCalulationProviderResults.ProviderSearchViewModel({ calculationValueType: '@Model.Calculation.ValueType.ToString()', calculationId: '@Model.Calculation.Id', specificationId: '@Model.Specification.Id', providerVersionId: '@Model.Specification.ProviderVersionId', fundingPeriodId: '@Model.Specification.FundingPeriod?.Id', doSearch: @Model.HasProviderDatasetsAssigned.ToString().ToLower() });
         var filterElement = document.getElementById("filter-container");
         if (filterElement) {
             ko.applyBindings(searchVM, filterElement);

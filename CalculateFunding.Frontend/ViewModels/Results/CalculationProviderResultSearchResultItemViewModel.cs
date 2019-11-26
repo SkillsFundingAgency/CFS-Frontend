@@ -1,9 +1,9 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Results
-{
-    using System;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using Helpers;
+﻿using System;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.Helpers;
 
+namespace CalculateFunding.Frontend.ViewModels.Results
+{
     public class CalculationProviderResultSearchResultItemViewModel
     {
         public string Id { get; set; }
@@ -50,10 +50,15 @@
             ? OpenDate.Value.ToString(FormatStrings.DateTimeFormatString)
             : string.Empty;
 
+        public string CalculationResultDisplay { get; set; }
+
+        public void SetCalculationResultDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
+        {
+	        CalculationResultDisplay = AsDisplay(calculationValueTypeViewModel);
+        }
+
         public string AsDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
         {
-
-
             if (CalculationResult.HasValue)
             {
                 switch (calculationValueTypeViewModel)

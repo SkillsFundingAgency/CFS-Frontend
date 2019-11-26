@@ -4,6 +4,7 @@
         private fundingPeriodId: string;
         private specificationId: string;
         private providerVersionId: string;
+        private calculationValueType: string;
         private doSearch: boolean;
 
         public providerSearchResults: KnockoutObservableArray<ICalculationProviderResultDetailResponse> = ko.observableArray([]);
@@ -52,6 +53,7 @@
                 self.fundingPeriodId = options.fundingPeriodId;
                 self.specificationId = options.specificationId;
                 self.providerVersionId = options.providerVersionId;
+                self.calculationValueType = options.calculationValueType;
                 self.doSearch = options.doSearch;
 
                 self.selectedSearchFilters = ko.computed(() => {
@@ -113,7 +115,7 @@
             if (!self.doSearch)
                 return;
 
-            super.makeSearchResultAndProcess("/api/results/calculation-provider-results-search", pageNumber, (resultUntyped) => {
+            super.makeSearchResultAndProcess("/api/results/calculation-provider-results-search?calculationValueType=" + self.calculationValueType, pageNumber, (resultUntyped) => {
                 let result: ICalculationProviderResultSearchResultResponse = resultUntyped;
                 self.providerSearchResults(result.calculationProviderResults);
                 self.populateCommonSearchResultProperties(result);
@@ -177,6 +179,7 @@
         fundingPeriodId: string;
         specificationId: string;
         providerVersionId: string;
+        calculationValueType: string;
         doSearch: boolean;
     }
 }
