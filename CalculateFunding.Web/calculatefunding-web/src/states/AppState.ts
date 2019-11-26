@@ -1,5 +1,5 @@
-import {IViewFundingState} from "./IViewFundingState";
+import {IFundingLineStructureState} from "./IFundingLineStructureState";
 
 export interface AppState {
-    viewFunding: IViewFundingState;
+    fundingLineStructure: IFundingLineStructureState
 }

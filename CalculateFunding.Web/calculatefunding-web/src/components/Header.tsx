@@ -3,7 +3,7 @@ import * as React from "react"
 export class Header extends React.Component<{},{}>{
     render(){
         return <header role="banner" id="global-header" className="with-proposition">
-            <div className="header-wrapper">
+            <div className="header-wrapper  container">
                 <div className="header-global">
                     <div className="header-logo">
                         <div id="logo" className="content">

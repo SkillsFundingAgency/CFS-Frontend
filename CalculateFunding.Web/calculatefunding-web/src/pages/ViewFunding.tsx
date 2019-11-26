@@ -173,7 +173,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 name: "Funding Approvals"
             },
             {
-                url: "/app/ViewFunding",
+                url: null,
                 name: "Choose Specification"
             }];
 

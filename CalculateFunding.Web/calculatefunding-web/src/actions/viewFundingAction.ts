@@ -107,7 +107,7 @@ export const getAllFundingStreams: ActionCreator<ThunkAction<Promise<any>, IView
 
 export const getSelectedFundingPeriods: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (id: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`api/policy/fundingperiods`, {
+        const response = await axios(`api/specs/get-fundingperiods-for-selected-fundingstream/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

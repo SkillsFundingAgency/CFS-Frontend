@@ -66,8 +66,6 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(request);
 
-			
-
             if (result != null)
             {
                 return Ok(result);

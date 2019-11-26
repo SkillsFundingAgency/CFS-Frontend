@@ -50,6 +50,24 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [Route("api/specs/get-fundingperiods-for-selected-fundingstream/{fundingStreamId}")]
+        public async Task<IActionResult> GetFundingPeriodsByFundingStreamIds(string fundingStreamId)
+        {
+            ApiResponse<IEnumerable<Reference>> apiResponse = await _specificationsApiClient.GetFundingPeriodsByFundingStreamIds(fundingStreamId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+	            return Ok(apiResponse.Content);
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
         [Route("api/specs/get-fundingstreams-for-selected-specifications")]
         public async Task<IActionResult> GetFundingStreamsForSelectedSpecifications()
         {
@@ -65,36 +83,6 @@ namespace CalculateFunding.Frontend.Controllers
 	            }
 
                 return Ok(fundingStreams.Select(x => new
-                {
-					x.Name,
-					x.Id
-                }).Distinct());
-            }
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return new BadRequestResult();
-            }
-
-            return new StatusCodeResult(500);
-        }
-
-        [Route("api/specs/get-fundingperiods-for-selected-fundingstream/{fundingStreamId}")]
-        public async Task<IActionResult> GetFundingStreamsForSelectedSpecifications(string fundingStreamId)
-        {
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFunding();
-
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
-            {
-				List<Reference> fundingPeriods = new List<Reference>();
-				
-	            foreach (var item in apiResponse.Content)
-	            {
-		            
-		            fundingPeriods.Add(item.FundingPeriod);
-	            }
-
-                return Ok(fundingPeriods.Select(x => new
                 {
 					x.Name,
 					x.Id

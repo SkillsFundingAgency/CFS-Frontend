@@ -1,6 +1,8 @@
 import {combineReducers, Reducer} from "redux";
 import {reduceUserState} from "./userReducer";
 import {IUserState} from "../states/IUserState";
+import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
+import {reduceFundingLineStructureState} from "./fundingLineStructureReducer";
 import {IViewFundingState} from "../states/IViewFundingState";
 import {reduceViewFundingState} from "./viewFundingReducer";
 
@@ -9,8 +11,9 @@ import {reduceViewFundingState} from "./viewFundingReducer";
  * It contains every substate of the app
  */
 export interface IStoreState {
+    viewFundingState: IViewFundingState,
     userState: IUserState,
-    viewFundingState: IViewFundingState
+    fundingLineStructureState: IFundingLineStructureState
 }
 
 /**
@@ -19,6 +22,7 @@ export interface IStoreState {
  */
 export const rootReducer: Reducer<IStoreState> = combineReducers({
     userState: reduceUserState,
+    fundingLineStructureState: reduceFundingLineStructureState,
     viewFundingState: reduceViewFundingState
 });
 

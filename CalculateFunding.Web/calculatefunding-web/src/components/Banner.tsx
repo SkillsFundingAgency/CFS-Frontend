@@ -3,47 +3,45 @@ import {Breadcrumbs} from "./Breadcrumbs";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 
 interface IBannerTypes {
-    bannerType:string;
+    bannerType: string;
     breadcrumbs: IBreadcrumbs[];
     title: string;
     subtitle: string;
 }
 
-export class Banner extends React.Component<IBannerTypes,{}>{
-    render(){
-        if(this.props.bannerType === "Left")
-        {
-            return <>
-                <section className="banner-container">
-                    <div className="container">
-                        <div className="row">
-                            <div className="col-xs-9">
-                               <Breadcrumbs >
-                                   {this.props.breadcrumbs.map(bread =>
-                                       <li key={bread.name}><a href={bread.url}>{bread.name}</a></li>
-                                   )}
-                               </Breadcrumbs>
-                            </div>
-                            <div className="col-xs-3">
-                                <div className="banner-container-right">
-
-                                </div>
-
-                            </div>
+export class Banner extends React.Component<IBannerTypes, {}> {
+    render() {
+        if (this.props.bannerType === "Left") {
+            return <section className="banner-container">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-xs-9">
+                            <Breadcrumbs>
+                                {this.props.breadcrumbs.map(bread =>
+                                    (bread.url != null) ?
+                                        (<li key={bread.name}><a href={bread.url}>{bread.name}</a></li>) :
+                                        (<li>{bread.name}</li>)
+                                )}
+                            </Breadcrumbs>
                         </div>
-                            <div className="row">
-                                <div className="col-xs-12">
-                                    <h1 className="hero-title">{this.props.title}</h1>
-                                    <h2 className="hero-description">{this.props.subtitle}</h2>
-                                </div>
+                        <div className="col-xs-3">
+                            <div className="banner-container-right">
+
                             </div>
+
+                        </div>
                     </div>
-                </section>
-            </>
+                    <div className="row">
+                        <div className="col-xs-12">
+                            <h1 className="hero-title">{this.props.title}</h1>
+                            <h2 className="hero-description">{this.props.subtitle}</h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
         }
 
-        if(this.props.bannerType === "Whole")
-        {
+        if (this.props.bannerType === "Whole") {
             return <div>
                 <div className="container">
                     <div className="row">
@@ -63,13 +61,13 @@ export class Banner extends React.Component<IBannerTypes,{}>{
                 </div>
                 <section className="banner-link-wrapper">
                     <div className="container">
-                            <div className="row">
-                                <div className="col-xs-9">
-                                    <Breadcrumbs>
-                                        {this.props.children}
-                                    </Breadcrumbs>
-                                </div>
+                        <div className="row">
+                            <div className="col-xs-9">
+                                <Breadcrumbs>
+                                    {this.props.children}
+                                </Breadcrumbs>
                             </div>
+                        </div>
                         <div className="row">
                             <div className="col-xs-12">
                             </div>
@@ -78,8 +76,7 @@ export class Banner extends React.Component<IBannerTypes,{}>{
                 </section>
             </div>
         }
-        if(this.props.bannerType === "FormLeft")
-        {
+        if (this.props.bannerType === "FormLeft") {
             return <div>
                 <div className="container form-banner-container-beta">
                     <div className="row">
@@ -117,7 +114,24 @@ export class Banner extends React.Component<IBannerTypes,{}>{
                 </section>
             </div>
         }
-
+        if (this.props.bannerType === "WholeBlue") {
+            return <section className="banner-container">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-xs-12">
+                            <Breadcrumbs>
+                                {this.props.breadcrumbs.map(bread =>
+                                    (bread.url != null) ?
+                                        (<li key={bread.name}><a href={bread.url}>{bread.name}</a></li>) :
+                                        (<li>{bread.name}</li>)
+                                )}
+                            </Breadcrumbs>
+                            {this.props.children}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
         return <div/>
     }
 }

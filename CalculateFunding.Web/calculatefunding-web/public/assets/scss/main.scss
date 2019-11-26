@@ -44,6 +44,8 @@ $glyph: 'glyphicons-halflings-regular';
     src: local('Material Icons'), local('MaterialIcons-Regular'), url('/assets/libs/fonts/MaterialIcons-Regular.woff2') format('woff2'), url('/assets/libs/fonts/MaterialIcons-Regular.woff') format('woff'), url('/asssets/libs/fonts/MaterialIcons-Regular.ttf') format('truetype');
 }
 
+body { font-family: "nta", Arial, sans-serif !important; }
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -142,9 +144,8 @@ blockquote {
 /////////////////////////////////////
 /////         Navbar            /////
 /////////////////////////////////////
-.navbar-container {
-    padding-left: 0;
-}
+.navbar { margin-bottom: 0 !important; border: 0 !important;}
+.navbar-container { padding-left: 0 !important;  }
 
 .navbar-default {
     background-color: white;
@@ -2331,6 +2332,34 @@ table {
     }
 }
 
+.funding-line-structure-level-1 td { font-weight: bold; }
+
+#funding-lines-table {
+    position: relative; }
+
+#funding-lines-table .grey-border-cell {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 5px;
+    background-color: #DEE0E2;
+    padding: 0;
+    height: 100%;
+    border-bottom: 1px solid #fff !important; }
+
+#funding-lines-table .sticky-header {
+    position: sticky;
+    top: 0;
+    background-color: #768693;
+    border-top: none !important; }
+
+#funding-lines-table .calc-spec-title-cell {
+    vertical-align: top;
+    border-left: none !important; }
+
+#funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) { width:10%; text-align: center; padding:0; }
+#funding-lines-table tr td:nth-child(2) { width:20%; }
+#funding-lines-table tr td:nth-child(3) { width:70%; }
 
 table {
     tr {
