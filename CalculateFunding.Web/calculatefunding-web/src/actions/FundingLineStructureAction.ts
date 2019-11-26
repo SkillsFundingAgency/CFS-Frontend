@@ -32,7 +32,7 @@ export const getFundingLineStructure:
         const specificationIdQuery = params.get('specificationId');
         const fundingStreamIdQuery = params.get('fundingStreamId');
 
-        const response = await axios(`api/fundingstructures/specifications/${specificationIdQuery}/fundingstreams/${fundingStreamIdQuery}`, {
+        const response = await axios(`/api/fundingstructures/specifications/${specificationIdQuery}/fundingstreams/${fundingStreamIdQuery}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ export const getSpecificationById:
     return async (dispatch: Dispatch) => {
         const params = new URLSearchParams(window.location.search);
         const specificationIdQuery = params.get('specificationId');
-        const response = await axios(`api/specs/specification-summary-by-id/${specificationIdQuery}`, {
+        const response = await axios(`/api/specs/specification-summary-by-id/${specificationIdQuery}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

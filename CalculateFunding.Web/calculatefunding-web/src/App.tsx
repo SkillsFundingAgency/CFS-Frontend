@@ -6,14 +6,27 @@ import ViewFundingContainer from "./containers/ViewFundingContainer";
 
 const App: React.FunctionComponent = () => {
   return (
-   <BrowserRouter>
+   <BrowserRouter basename="/app">
      <Switch>
+       <Route exact path="/" component={Home} />
        <Route path="/FundingLineStructure" component={FundingLineStructureContainer} />
-       <Route path="/" component={Home} />
        <Route path="/ViewFunding" component={ViewFundingContainer} />
+       <Route path="*">
+            <NoMatch />
+          </Route>
      </Switch>
    </BrowserRouter>
   );
 };
+
+function NoMatch() {
+  return (
+    <div>
+      <h3>
+        No match for this path
+      </h3>
+    </div>
+  );
+}
 
 export default App;
