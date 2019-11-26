@@ -70,7 +70,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CalculateFunding.Common" Version="1.36.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="1.0.19" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="2.0.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.5" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.11" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.11" />

@@ -1,19 +1,19 @@
-﻿namespace CalculateFunding.Frontend.Controllers
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using CalculateFunding.Common.ApiClient.Calcs;
-    using CalculateFunding.Common.ApiClient.Calcs.Models;
-    using CalculateFunding.Common.Identity.Authorization.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Helpers;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using Common.ApiClient.Models;
-    using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Common.ApiClient.Models;
+using Microsoft.AspNetCore.Mvc;
 
+namespace CalculateFunding.Frontend.Controllers
+{
     public class CalculationController : Controller
     {
         private ICalculationsApiClient _calcClient;
@@ -63,7 +63,7 @@
                 Description = existingCalculation.Description,
                 Name = existingCalculation.Name,
                 SpecificationId = specificationId,
-                ValueType = existingCalculation.Current.ValueType,
+                ValueType = existingCalculation.ValueType,
                 SourceCode = vm.SourceCode,
             };
 

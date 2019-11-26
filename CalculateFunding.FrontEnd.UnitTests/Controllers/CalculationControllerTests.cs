@@ -56,10 +56,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = new CalculationVersion
-                {
-                    SourceCode = "Existing source code"
-                },
+	            SourceCode = "Existing source code"
             };
 
             calcsClient
@@ -70,10 +67,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = new CalculationVersion
-                {
-                    SourceCode = updateViewModel.SourceCode
-                },
+	            SourceCode = updateViewModel.SourceCode
             };
 
             calcsClient
@@ -89,7 +83,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             OkObjectResult typedResult = result as OkObjectResult;
             Calculation resultCalculation = typedResult.Value as Calculation;
-            resultCalculation?.Current.SourceCode.Should().Be(updateViewModel.SourceCode);
+            resultCalculation?.SourceCode.Should().Be(updateViewModel.SourceCode);
         }
 
         [TestMethod]
@@ -142,10 +136,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = new CalculationVersion
-                {
-                    SourceCode = "Existing source code"
-                },
+	            SourceCode = "Existing source code"
             };
 
             calcsClient

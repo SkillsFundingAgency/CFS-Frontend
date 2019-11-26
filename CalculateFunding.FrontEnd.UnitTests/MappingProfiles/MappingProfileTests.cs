@@ -34,7 +34,6 @@ namespace CalculateFunding.Frontend.MappingProfiles
             a.Should().NotThrow("Mapping configuration should be valid for FrontEndMappingProfile");
         }
 
-        #region "Calculation -> CalculationViewModel"
 #if NCRUNCH
         [Ignore]
 #endif
@@ -53,12 +52,6 @@ namespace CalculateFunding.Frontend.MappingProfiles
             //Assert
             result?.Description
                 .Should().Be(destination?.Description);
-
-            result?.FundingPeriodId
-                .Should().Be(destination?.FundingPeriodId);
-
-            result?.FundingPeriodName
-                .Should().Be(destination?.FundingPeriodName);
 
             if (result?.LastModified != null)
             {
@@ -91,14 +84,10 @@ namespace CalculateFunding.Frontend.MappingProfiles
             {
                 new Calculation
                 {
-                    Current = new CalculationVersion
-                    {
-                        Description = "a",
-                        Date = new DateTimeOffset(new DateTime(1, 2, 3, 4, 5, 6)),
+                        LastUpdated = new DateTime(1, 2, 3, 4, 5, 6),
+						CalculationType =  CalculationType.Additional,
                         SourceCode = "Pack my box with five dozen liquor jugs",
-                        CalculationType =  CalculationType.Additional,
-                        PublishStatus = PublishStatus.Approved
-                    }
+						PublishStatus = PublishStatus.Approved,
                 },
                 new CalculationViewModel
                 {
@@ -110,9 +99,7 @@ namespace CalculateFunding.Frontend.MappingProfiles
                 }
             };
         }
-        #endregion
 
-        #region "CalculationVersion -> CalculationViewModel"
 #if NCRUNCH
         [Ignore]
 #endif
@@ -130,12 +117,6 @@ namespace CalculateFunding.Frontend.MappingProfiles
             //Assert
             result?.Description
                 .Should().Be(destination?.Description);
-
-            result?.FundingPeriodId
-                .Should().Be(destination?.FundingPeriodId);
-
-            result?.FundingPeriodName
-                .Should().Be(destination?.FundingPeriodName);
 
             if (result?.LastModified != null)
             {
@@ -168,8 +149,7 @@ namespace CalculateFunding.Frontend.MappingProfiles
             {
                 new CalculationVersion
                 {
-                    Description = "a",
-                    Date = new DateTimeOffset(new DateTime(1, 2, 3, 4, 5, 6)),
+                    LastUpdated = new DateTimeOffset(new DateTime(1, 2, 3, 4, 5, 6)),
                     SourceCode = "Pack my box with five dozen liquor jugs",
                     CalculationType =  CalculationType.Additional,
                     PublishStatus = PublishStatus.Approved
@@ -184,7 +164,6 @@ namespace CalculateFunding.Frontend.MappingProfiles
                 }
             };
         }
-        #endregion
 
         #region "Calculation -> CalculationEditViewModel"
 #if NCRUNCH
@@ -218,14 +197,10 @@ namespace CalculateFunding.Frontend.MappingProfiles
             {
                 new Calculation
                 {
-                    Current = new CalculationVersion
-                    {
-                        Description = "a",
-                        Date = new DateTimeOffset(new DateTime(1, 2, 3, 4, 5, 6)),
-                        SourceCode = "Pack my box with five dozen liquor jugs",
-                        CalculationType =  CalculationType.Additional,
-                        PublishStatus = PublishStatus.Approved
-                    }
+                    LastUpdated = new DateTime(1, 2, 3, 4, 5, 6),
+                    SourceCode = "Pack my box with five dozen liquor jugs",
+                    CalculationType =  CalculationType.Additional,
+                    PublishStatus = PublishStatus.Approved
                 },
                 new CalculationEditViewModel
                 {

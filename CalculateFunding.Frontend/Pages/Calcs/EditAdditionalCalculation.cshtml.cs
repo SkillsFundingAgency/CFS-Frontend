@@ -4,12 +4,12 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,17 +24,17 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private readonly IAuthorizationHelper _authorizationHelper;
         private IMapper _mapper;
 
-        public EditAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, 
-	        ICalculationsApiClient calcClient, 
-	        IMapper mapper, 
-	        IFeatureToggle features, 
-	        IAuthorizationHelper authorizationHelper)
+        public EditAdditionalCalculationPageModel(ISpecificationsApiClient specsClient,
+            ICalculationsApiClient calcClient,
+            IMapper mapper,
+            IFeatureToggle features,
+            IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(features, nameof(features));
-			Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
@@ -59,7 +59,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public bool CalculationHasResults { get; set; }
 
-		public Reference FundingPeriod { get; set; }
+        public Reference FundingPeriod { get; set; }
 
         public string FundingStreams { get; set; }
 
@@ -72,34 +72,34 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
 
-            var calculationResponse = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
 
             Calculation = calculationResponse.Content;
 
-			EditModel = new CalculationEditModel
-			{
-				CalculationId = calculationId,
-				Description = Calculation.Description,
-				Name = Calculation.Name,
-				SourceCode = Calculation.Current.SourceCode,
-				SpecificationId = Calculation.SpecificationId,
-				ValueType = Calculation.Current.ValueType
+            EditModel = new CalculationEditModel
+            {
+                CalculationId = calculationId,
+                Description = Calculation.Description,
+                Name = Calculation.Name,
+                SourceCode = Calculation.SourceCode,
+                SpecificationId = Calculation.SpecificationId,
+                ValueType = Calculation.ValueType
             };
 
             ApiResponse<SpecificationSummary> specificationResponse = await _specsClient.GetSpecificationSummaryById(Calculation.SpecificationId);
-            
+
             SpecificationSummary specificationSummary = specificationResponse?.Content;
 
             if (specificationResponse?.StatusCode == HttpStatusCode.OK)
             {
                 SpecificationName = specificationSummary.Name;
-            
+
                 SpecificationId = specificationSummary.Id;
 
                 FundingStreams = JsonConvert.SerializeObject(specificationSummary.FundingStreams);
 
                 FundingPeriod = specificationSummary.FundingPeriod;
-                
+
                 bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, SpecificationName, SpecificationActionTypes.CanEditCalculations);
 
                 DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
@@ -108,7 +108,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 SpecificationName = "Unknown";
             }
-       
+
             return Page();
         }
     }

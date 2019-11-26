@@ -2,12 +2,12 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
-using CalculateFunding.Common.ApiClient.DataSets;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies.Models;
@@ -56,60 +56,60 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 new DatasetSpecificationRelationshipViewModel()
                 {
-	                Id = "ds1",
-	                Name = "Dataset Schema 1",
-	                IsProviderData = false,
-	                Definition = new DatasetDefinitionViewModel
-	                {
-		                Id = "1234",
-		                Name = "Definition 1234",
-	                },
-	                RelationshipDescription = "Datasets Schema 1 Description",
+                    Id = "ds1",
+                    Name = "Dataset Schema 1",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "1234",
+                        Name = "Definition 1234",
+                    },
+                    RelationshipDescription = "Datasets Schema 1 Description",
                 },
                 new DatasetSpecificationRelationshipViewModel()
                 {
-	                Id = "ds2",
-	                Name = "Dataset Schema Two",
-	                IsProviderData = false,
-	                Definition = new DatasetDefinitionViewModel
-	                {
-		                Id = "2345",
-		                Name = "Definition 2345",
-	                },
-	                RelationshipDescription = "Datasets Schema Two Description",
+                    Id = "ds2",
+                    Name = "Dataset Schema Two",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "2345",
+                        Name = "Definition 2345",
+                    },
+                    RelationshipDescription = "Datasets Schema Two Description",
                 },
                 new DatasetSpecificationRelationshipViewModel()
                 {
-	                Id = "ds3",
-	                Name = "Dataset Schema 3",
-	                IsProviderData = false,
-	                Definition = new DatasetDefinitionViewModel
-	                {
-		                Id = "5555",
-		                Name = "Definition Grouped",
-	                },
+                    Id = "ds3",
+                    Name = "Dataset Schema 3",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "5555",
+                        Name = "Definition Grouped",
+                    },
                 },
                 new DatasetSpecificationRelationshipViewModel()
                 {
-	                Id = "ds4",
-	                Name = "Grouped with same schema",
-	                IsProviderData = false,
-	                Definition = new DatasetDefinitionViewModel
-	                {
-		                Id = "5555",
-		                Name = "Definition Grouped",
-	                },
+                    Id = "ds4",
+                    Name = "Grouped with same schema",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "5555",
+                        Name = "Definition Grouped",
+                    },
                 },
                 new DatasetSpecificationRelationshipViewModel()
                 {
-	                Id = "providerDs",
-	                Name = "Provider Dataset",
-	                IsProviderData = true,
-	                Definition = new DatasetDefinitionViewModel
-	                {
-		                Id = "5678",
-		                Name = "Provider Dataset Definition",
-	                },
+                    Id = "providerDs",
+                    Name = "Provider Dataset",
+                    IsProviderData = true,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "5678",
+                        Name = "Provider Dataset Definition",
+                    },
                 },
             };
 
@@ -232,30 +232,30 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
-	            new DatasetSpecificationRelationshipViewModel()
-	            {
-		            Id = "ds15",
-		            Name = "Dataset Schema 15",
-		            IsProviderData = true,
-		            Definition = new DatasetDefinitionViewModel
-		            {
-			            Id = "12345",
-			            Name = "Definition 12345",
-		            },
-		            RelationshipDescription = "Datasets Schema 1 Description",
-	            },
-	            new DatasetSpecificationRelationshipViewModel()
-	            {
-		            Id = "ds16",
-		            Name = "Dataset Schema 16",
-		            IsProviderData = false,
-		            Definition = new DatasetDefinitionViewModel
-		            {
-			            Id = "12346",
-			            Name = "Definition 12346",
-		            },
-		            RelationshipDescription = "Datasets Schema 1 Description6",
-	            },
+                new DatasetSpecificationRelationshipViewModel()
+                {
+                    Id = "ds15",
+                    Name = "Dataset Schema 15",
+                    IsProviderData = true,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "12345",
+                        Name = "Definition 12345",
+                    },
+                    RelationshipDescription = "Datasets Schema 1 Description",
+                },
+                new DatasetSpecificationRelationshipViewModel()
+                {
+                    Id = "ds16",
+                    Name = "Dataset Schema 16",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "12346",
+                        Name = "Definition 12346",
+                    },
+                    RelationshipDescription = "Datasets Schema 1 Description6",
+                },
             };
 
             datasetClient
@@ -301,18 +301,18 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             List<DatasetSpecificationRelationshipViewModel> datasetSchemasAssigned = new List<DatasetSpecificationRelationshipViewModel>()
             {
-	            new DatasetSpecificationRelationshipViewModel()
-	            {
-		            Id = "ds15",
-		            Name = "Dataset Schema 15",
-		            IsProviderData = false,
-		            Definition = new DatasetDefinitionViewModel
-		            {
-			            Id = "12345",
-			            Name = "Definition 12345",
-		            },
-		            RelationshipDescription = "Datasets Schema 1 Description",
-	            },
+                new DatasetSpecificationRelationshipViewModel()
+                {
+                    Id = "ds15",
+                    Name = "Dataset Schema 15",
+                    IsProviderData = false,
+                    Definition = new DatasetDefinitionViewModel
+                    {
+                        Id = "12345",
+                        Name = "Definition 12345",
+                    },
+                    RelationshipDescription = "Datasets Schema 1 Description",
+                },
             };
 
             datasetClient
@@ -443,7 +443,13 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
             {
                 FundingPeriod = new Reference("2018", "17-18"),
 
-                FundingStreams = new List<FundingStream>() { new FundingStream(), },
+                FundingStreams = new List<FundingStream>()
+                {
+                    new FundingStream()
+                    {
+                        Id = "2018", Name = "18-19"
+                    },
+                },
 
                 Description = "Test Spec",
 

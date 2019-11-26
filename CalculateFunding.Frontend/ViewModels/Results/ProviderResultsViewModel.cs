@@ -8,8 +8,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
     {
         public ProviderResultsViewModel()
         {
-            CalculationItems = Enumerable.Empty<CalculationItemResult>();
-
             ScenarioItems = Enumerable.Empty<ScenarioItemResult>();
         }
 
@@ -93,8 +91,6 @@ namespace CalculateFunding.Frontend.ViewModels.Results
                 }
             }
         }
-
-        public IEnumerable<CalculationItemResult> CalculationItems { get; set; }
 
         public IEnumerable<ScenarioItemResult> ScenarioItems { get; set; }
     }

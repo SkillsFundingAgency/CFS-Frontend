@@ -83,7 +83,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 if (operationType.HasValue && string.IsNullOrWhiteSpace(operationId))
                 {
-	                return new PreconditionFailedResult("Operation ID not provided");
+                    return new PreconditionFailedResult("Operation ID not provided");
                 }
 
                 Task<ApiResponse<SpecificationSummary>> specificationResponseTask = _specsClient.GetSpecificationSummaryById(specificationId);
@@ -131,14 +131,14 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
                 if (!TemplateData.IsNullOrEmpty())
                 {
-                    ApiResponse<IEnumerable<CalculationMetadata>> calculationsResponse = await _calculationsApiClient.GetCalculations(Specification.Id);
+                    ApiResponse<IEnumerable<CalculationMetadata>> calculationsResponse = await _calculationsApiClient.GetCalculationMetadataForSpecification(Specification.Id);
 
                     HandleApiResponse(calculationsResponse, specificationId, "Calculations lookup");
 
                     Calculations = calculationsResponse.Content?.Where(m => m.CalculationType == CalculationType.Template);
                 }
 
-                this.TemplateMappings = await SetTemplateMappings(specificationId);
+                TemplateMappings = await SetTemplateMappings(specificationId);
 
                 HasProviderDatasetsAssigned = datasetSchemaResponse.Content.Any(d => d.IsProviderData);
 
@@ -158,60 +158,60 @@ namespace CalculateFunding.Frontend.Pages.Specs
 
         private PageBannerOperation PopulatePageBanner(string specificationId, PoliciesPageBannerOperationType? operationType, string operationId)
         {
-			PageBannerOperation pageBanner = new PageBannerOperation();
+            PageBannerOperation pageBanner = new PageBannerOperation();
 
-	        switch (operationType.Value)
-	        {
-		        case PoliciesPageBannerOperationType.SpecificationCreated:
-		        case PoliciesPageBannerOperationType.SpecificationUpdated:
-			        pageBanner.EntityName = Specification.Name;
-			        pageBanner.EntityType = "Specification";
-			        pageBanner.OperationAction = "updated";
-			        pageBanner.ActionText = "Edit";
-			        pageBanner.ActionUrl = $"/specs/editspecification/{Specification.Id}&returnPage=ManagePolicies";
+            switch (operationType.Value)
+            {
+                case PoliciesPageBannerOperationType.SpecificationCreated:
+                case PoliciesPageBannerOperationType.SpecificationUpdated:
+                    pageBanner.EntityName = Specification.Name;
+                    pageBanner.EntityType = "Specification";
+                    pageBanner.OperationAction = "updated";
+                    pageBanner.ActionText = "Edit";
+                    pageBanner.ActionUrl = $"/specs/editspecification/{Specification.Id}&returnPage=ManagePolicies";
 
-			        if (operationType.Value == PoliciesPageBannerOperationType.SpecificationUpdated)
-			        {
-				        pageBanner.OperationAction = "updated";
-			        }
-			        else if (operationType.Value == PoliciesPageBannerOperationType.SpecificationCreated)
-			        {
-				        pageBanner.OperationAction = "created";
-			        }
+                    if (operationType.Value == PoliciesPageBannerOperationType.SpecificationUpdated)
+                    {
+                        pageBanner.OperationAction = "updated";
+                    }
+                    else if (operationType.Value == PoliciesPageBannerOperationType.SpecificationCreated)
+                    {
+                        pageBanner.OperationAction = "created";
+                    }
 
-			        break;
+                    break;
 
-		        case PoliciesPageBannerOperationType.CalculationUpdated:
-		        case PoliciesPageBannerOperationType.CalculationCreated:
-			        if (Calculations.AnyWithNullCheck())
-			        {
-				        foreach (CalculationMetadata calculation in Calculations)
-				        {
-					        if (calculation.CalculationId == operationId)
-					        {
-						        pageBanner.EntityName = calculation.Name;
-					        }
-				        }
-			        }
+                case PoliciesPageBannerOperationType.CalculationUpdated:
+                case PoliciesPageBannerOperationType.CalculationCreated:
+                    if (Calculations.AnyWithNullCheck())
+                    {
+                        foreach (CalculationMetadata calculation in Calculations)
+                        {
+                            if (calculation.CalculationId == operationId)
+                            {
+                                pageBanner.EntityName = calculation.Name;
+                            }
+                        }
+                    }
 
-			        pageBanner.EntityType = "Calculation specification";
-			        pageBanner.OperationAction = "updated";
-			        pageBanner.ActionText = "Edit";
-			        pageBanner.ActionUrl = $"/specs/EditCalculation/{operationId}?specificationId={specificationId}";
+                    pageBanner.EntityType = "Calculation specification";
+                    pageBanner.OperationAction = "updated";
+                    pageBanner.ActionText = "Edit";
+                    pageBanner.ActionUrl = $"/specs/EditCalculation/{operationId}?specificationId={specificationId}";
 
-			        if (operationType.Value == PoliciesPageBannerOperationType.CalculationUpdated)
-			        {
-				        pageBanner.OperationAction = "updated";
-			        }
-			        else if (operationType.Value == PoliciesPageBannerOperationType.CalculationCreated)
-			        {
-				        pageBanner.OperationAction = "created";
-			        }
+                    if (operationType.Value == PoliciesPageBannerOperationType.CalculationUpdated)
+                    {
+                        pageBanner.OperationAction = "updated";
+                    }
+                    else if (operationType.Value == PoliciesPageBannerOperationType.CalculationCreated)
+                    {
+                        pageBanner.OperationAction = "created";
+                    }
 
-			        break;
-	        }
+                    break;
+            }
 
-	        return pageBanner;
+            return pageBanner;
         }
 
         private async Task<IDictionary<string, TemplateMapping>> SetTemplateMappings(string specificationId)

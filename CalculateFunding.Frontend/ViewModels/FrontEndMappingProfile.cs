@@ -9,6 +9,7 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
@@ -23,6 +24,7 @@ using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
+using IEnumerableExtensions = System.Linq.IEnumerableExtensions;
 
 namespace CalculateFunding.Frontend.ViewModels
 {
@@ -66,37 +68,23 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Failures, opt => opt.MapFrom(v => 0))
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
-            CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ProviderName))
-                .ForMember(dest => dest.DateOpened, opt => opt.MapFrom(src => src.OpenDate))
-                .ForMember(dest => dest.LocalAuthorityChangeDate, opt => opt.Ignore())
-                .ForMember(dest => dest.PreviousLocalAuthority, opt => opt.Ignore())
-                .ForMember(dest => dest.DateClosed, opt => opt.Ignore())
-                .ForMember(dest => dest.ConvertDate, opt => opt.Ignore());
+            CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>();
         }
 
         private void MapCalcs()
         {
             CreateMap<Calculation, CalculationEditViewModel>()
-                .ForMember(m => m.SourceCode, opt => opt.MapFrom(f => f.Current.SourceCode))
-                ;
+                .ForMember(m => m.SourceCode, opt => opt.MapFrom(f => f.SourceCode));
 
-            CreateMap<Calculation, Calculations.CalculationViewModel>()
-                .ForMember(m => m.Description, opt => opt.MapFrom(p => p.Current.Description))
-                .ForMember(m => m.FundingPeriodId, opt => opt.Ignore())
-                .ForMember(m => m.FundingPeriodName, opt => opt.Ignore())
-                .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.Current.Date))
+            CreateMap<Calculation, CalculationViewModel>()
+                .ForMember(m => m.Description, opt => opt.MapFrom(p => p.Description))
+                .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.LastUpdated))
                 .ForMember(m => m.Version, opt => opt.Ignore())
-                .ForMember(m => m.LastModifiedByName, opt => opt.MapFrom(p => p.Current.Author != null ? p.Current.Author.Name : "Unknown"))
-                .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.Current.SourceCode))
-                .ForMember(m => m.CalculationType, opt => opt.MapFrom(p => p.Current.CalculationType))
-                .ForMember(m => m.PublishStatus, opt => opt.MapFrom(p => p.Current.PublishStatus));
-
-            CreateMap<CalculationUpdateViewModel, CalculationUpdateModel>()
-                .ForMember(m => m.CalculationType, opt => opt.Ignore())
-                .ForMember(m => m.Name, opt => opt.Ignore())
-                .ForMember(m => m.AllocationLineId, opt => opt.Ignore())
-                .ForMember(m => m.Description, opt => opt.Ignore());
+                .ForMember(m => m.LastModifiedByName, opt => opt.MapFrom(p => p.Author != null ? p.Author.Name : "Unknown"))
+                .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.SourceCode))
+                .ForMember(m => m.CalculationType, opt => opt.MapFrom(p => p.CalculationType.AsMatchingEnum<CalculationTypeViewModel>()))
+                .ForMember(m => m.ValueType, opt => opt.MapFrom(p => p.ValueType.AsMatchingEnum<CalculationValueTypeViewModel>()))
+                .ForMember(m => m.PublishStatus, opt => opt.MapFrom(p => p.PublishStatus));
 
             CreateMap<PreviewCompileRequestViewModel, PreviewRequest>()
                 .ForMember(d => d.SpecificationId, opt => opt.Ignore())
@@ -123,6 +111,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<CalculationVersion, CalculationVersionViewModel>()
+	            .ForMember(m => m.Date, opt => opt.MapFrom(s => s.LastUpdated))
 	            .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
 	            .ForMember(m => m.Status, opt => opt.Ignore())
 	            .AfterMap((src, dest) => dest.Status = src.PublishStatus.ToString());
@@ -193,24 +182,14 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<SpecificationSummary, SpecificationViewModel>()
                   .ForMember(m => m.PublishStatus, opt => opt.MapFrom(c => c.ApprovalStatus));
 
-            CreateMap<Calculation, Specs.CalculationViewModel>()
-                .ForMember(d => d.LastUpdated, opt => opt.Ignore());
-
-
-            CreateMap<CalculationCurrentVersion,
-                    Specs.CalculationViewModel>()
-                .ForMember(d => d.LastUpdated, opt => opt.Ignore())
-                .ForMember(d => d.Description, opt => opt.Ignore())
-                .ForMember(d => d.AllocationLine, opt => opt.Ignore())
-                ;
-
-            CreateMap<CalculationVersion, Calculations.CalculationViewModel>()
-                .ForMember(d => d.SpecificationId, opt => opt.Ignore())
-                .ForMember(d => d.FundingPeriodId, opt => opt.Ignore())
-                .ForMember(d => d.FundingPeriodName, opt => opt.Ignore())
-                .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.Date.Date))
-                .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author.Name))
-                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId));
+            CreateMap<CalculationVersion, CalculationViewModel>()
+	            .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.LastUpdated))
+	            .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author != null ? s.Author.Name : "Unknown"))
+	            .ForMember(d => d.PublishStatus, opt => opt.MapFrom(s => s.PublishStatus.AsMatchingEnum<PublishStatusViewModel>()))
+	            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
+	            .ForMember(d => d.ValueType, opt => opt.Ignore())
+	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+                .ForMember(d => d.Description, opt => opt.Ignore());
 
             CreateMap<SpecificationSummary, EditSpecificationViewModel>()
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
@@ -220,7 +199,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .AfterMap((SpecificationSummary source, EditSpecificationViewModel destination) =>
                 {
                     destination.FundingPeriodId = source.FundingPeriod?.Id;
-                    if (source.FundingStreams.AnyWithNullCheck())
+                    if (IEnumerableExtensions.AnyWithNullCheck(source.FundingStreams))
                     {
                         destination.FundingStreamId = source.FundingStreams.FirstOrDefault()?.Id;
                     }

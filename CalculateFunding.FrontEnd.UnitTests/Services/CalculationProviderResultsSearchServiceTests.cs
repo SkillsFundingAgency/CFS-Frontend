@@ -1,5 +1,14 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
@@ -8,16 +17,6 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using CalculateFunding.Common.ApiClient.Calcs.Models;
-using CalculateFunding.Common.ApiClient.Results;
-using CalculateFunding.Common.ApiClient.Results.Models;
-using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.UnitTests.Services
 {
@@ -42,7 +41,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             // Act
             Func<Task> test = () => resultsSearchService.PerformSearch(request);
-           
+
             // Assert
             test
                 .Should()
@@ -89,8 +88,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
             resultClient
-	            .SearchCalculationProviderResults(Arg.Any<SearchModel>())
-	            .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
+                .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+                .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -107,14 +106,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Id
                 .Should()
                 .Be("10");
- 
-            first
-                .CalculationType
-                .Should()
-                .Be(CalculationSpecificationType.Number);
 
             first
-                .Name
+                .ProviderName
                 .Should()
                 .Be("prov-1");
 
@@ -151,8 +145,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
             resultClient
-	            .SearchCalculationProviderResults(Arg.Any<SearchModel>())
-	            .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
+                .SearchCalculationProviderResults(Arg.Any<SearchModel>())
+                .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
@@ -220,12 +214,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Be("10");
 
             first
-                .CalculationType
-                .Should()
-                .Be(CalculationSpecificationType.Number);
-
-            first
-                .Name
+                .ProviderName
                 .Should()
                 .Be("prov-1");
 
@@ -273,7 +262,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
         CalculationProviderResultSearchResults GenerateSearchResults(int numberOfItems, IEnumerable<Facet> facets = null)
         {
-	        CalculationProviderResultSearchResults result = new CalculationProviderResultSearchResults();
+            CalculationProviderResultSearchResults result = new CalculationProviderResultSearchResults();
             List<CalculationProviderResultSearchResult> items = new List<CalculationProviderResultSearchResult>();
             for (int i = 0; i < numberOfItems; i++)
             {
@@ -283,7 +272,6 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     CalculationName = $"calc-{i + 1}",
 					ProviderName = $"prov-{i + 1}",
                     CalculationResult = i + 1,
-                    CalculationType = "Number"
                 });
             }
 
@@ -292,7 +280,6 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 Id = $"{numberOfItems + 10}",
                 CalculationName = $"prov-{numberOfItems + 1}",
                 CalculationResult = numberOfItems + 1,
-                CalculationType = "Number",
                 CalculationExceptionType = "Exception",
                 CalculationExceptionMessage = "An exception has occurred"
             });

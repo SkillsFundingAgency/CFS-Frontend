@@ -180,7 +180,10 @@ namespace CalculateFunding.Frontend.Pages.Results
             return await _resultsApiClient.GetProviderResults(providerId, SpecificationId);
         }
 
-        public abstract void PopulateResults(ApiResponse<ProviderResult> providerResponse);
+        public virtual Task PopulateResults(ApiResponse<ProviderResult> providerResponse)
+        {
+			return Task.CompletedTask;
+        }
 
         private async Task PopulatePeriods(string fundingPeriodId = null)
         {

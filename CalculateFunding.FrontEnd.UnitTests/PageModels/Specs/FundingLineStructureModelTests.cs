@@ -41,7 +41,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             specsApiClient
                 .GetSpecificationSummaryById(Arg.Is(specificationId))
-                .Returns((ApiResponse<SpecificationSummary>) null);
+                .Returns((ApiResponse<SpecificationSummary>)null);
 
             datasetsApiClient
                 .GetRelationshipsBySpecificationId(Arg.Is(specificationId))
@@ -50,8 +50,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             ILogger logger = CreateLogger();
 
             FundingLineStructureModel model = CreateFundingLineStructureModel(
-                specsApiClient: specsApiClient, 
-                datasetsApiClient: datasetsApiClient, 
+                specsApiClient: specsApiClient,
+                datasetsApiClient: datasetsApiClient,
                 logger: logger);
 
             // Act
@@ -84,7 +84,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
             datasetsApiClient
                 .GetRelationshipsBySpecificationId(specificationId)
-                .Returns((ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>) null);
+                .Returns((ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>)null);
 
             ILogger logger = CreateLogger();
 
@@ -163,14 +163,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             IEnumerable<CalculationMetadata> calculationMetadatas = Enumerable.Empty<CalculationMetadata>();
 
             calculationsApiClient
-                .GetCalculations(Arg.Is(specificationId))
+                .GetCalculationMetadataForSpecification(Arg.Is(specificationId))
                 .Returns(new ApiResponse<IEnumerable<CalculationMetadata>>(HttpStatusCode.OK, calculationMetadatas));
 
             TemplateMapping templateMapping = new TemplateMapping();
 
             calculationsApiClient
-	            .GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
-	            .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
+                .GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
+                .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
 
             FundingLineStructureModel model = CreateFundingLineStructureModel(
                specsApiClient: specsApiClient,
@@ -232,14 +232,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             IEnumerable<CalculationMetadata> calculationMetadatas = Enumerable.Empty<CalculationMetadata>();
 
             calculationsApiClient
-                .GetCalculations(Arg.Is(specificationId))
+                .GetCalculationMetadataForSpecification(Arg.Is(specificationId))
                 .Returns(new ApiResponse<IEnumerable<CalculationMetadata>>(HttpStatusCode.OK, calculationMetadatas));
 
-			TemplateMapping templateMapping = new TemplateMapping();
+            TemplateMapping templateMapping = new TemplateMapping();
 
-			calculationsApiClient
-				.GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
-				.Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
+            calculationsApiClient
+                .GetTemplateMapping(Arg.Is(specificationId), Arg.Any<string>())
+                .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, templateMapping));
 
             FundingLineStructureModel model = CreateFundingLineStructureModel(
                specsApiClient: specsApiClient,
@@ -262,18 +262,18 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .BeEquivalentTo(templateMetadataContentsCollection);
 
             await calculationsApiClient
-	            .Received(specificationSummary.FundingStreams.Count())
-	            .GetTemplateMapping(specificationId, Arg.Any<string>());
+                .Received(specificationSummary.FundingStreams.Count())
+                .GetTemplateMapping(specificationId, Arg.Any<string>());
 
             foreach (var fundingStream in specificationSummary.FundingStreams)
             {
-	            await calculationsApiClient
-		            .Received(1)
-		            .GetTemplateMapping(specificationId, fundingStream.Id);
+                await calculationsApiClient
+                    .Received(1)
+                    .GetTemplateMapping(specificationId, fundingStream.Id);
 
                 model
                     .TemplateMappings
-		            .Should()
+                    .Should()
                     .Contain(fundingStream.Id, templateMapping);
             }
         }

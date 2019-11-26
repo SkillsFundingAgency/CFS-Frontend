@@ -42,6 +42,12 @@ namespace CalculateFunding.Frontend.PageModels.Calcs
 	Return result
 End Function";
 
+        [TestInitialize]
+        public void TestSetup()
+        {
+
+        }
+
         [TestMethod]
         public async Task OnGet_WhenCalculationDoesNotExist_ThenNotFoundReturned()
         {
@@ -139,7 +145,6 @@ End Function";
                 Id = expectedCalculationId,
                 Name = "Test spec",
                 Description = "Test description",
-                AllocationLine = new Reference("1", "Test Allocation")
             };
 
             calcsClient
@@ -153,7 +158,7 @@ End Function";
                 new CalculationVersion()
                 {
                     Version = 1,
-                    Date = new DateTime(2018, 1, 1, 12, 34, 45, 03),
+                    LastUpdated = new DateTime(2018, 1, 1, 12, 34, 45, 03),
                     Author = author,
                     SourceCode = _sourceCode,
                 },
@@ -161,7 +166,7 @@ End Function";
                 {
                     PublishStatus = PublishStatus.Draft,
                     Version = 2,
-                    Date = new DateTime(2018, 1, 2, 12, 34, 45, 03),
+                    LastUpdated = new DateTime(2018, 1, 2, 12, 34, 45, 03),
                     Author = author,
                     SourceCode = _sourceCode,
                 },
@@ -169,7 +174,7 @@ End Function";
                 {
                     PublishStatus = PublishStatus.Draft,
                     Version = 3,
-                    Date = new DateTime(2018, 1, 3, 12, 34, 45, 03),
+                    LastUpdated = new DateTime(2018, 1, 3, 12, 34, 45, 03),
                     Author = author,
                     SourceCode = _sourceCode,
                 }
@@ -222,12 +227,11 @@ End Function";
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, expectedCalculation));
 
-            CalculationCurrentVersion specCalculation = new CalculationCurrentVersion()
+            CalculationVersion specCalculation = new CalculationVersion()
             {
-                Id = "1",
+                CalculationId = "1",
                 Name = "Test spec",
                 Description = "Test description",
-                AllocationLine = new Reference("1", "Test Allocation")
             };
 
             //specsClient
@@ -240,11 +244,11 @@ End Function";
 
             for (int i = 1; i <= versions; i++)
             {
-                calculationVersions.Add(new CalculationVersion()
+                calculationVersions.Add(new CalculationVersion
                 {
                     PublishStatus = PublishStatus.Draft,
                     Version = i,
-                    Date = startCalcTime.AddHours(i),
+                    LastUpdated = startCalcTime.AddHours(i),
                     Author = new Reference("1", "Matt Vallily"),
                     SourceCode = _sourceCode,
                 });

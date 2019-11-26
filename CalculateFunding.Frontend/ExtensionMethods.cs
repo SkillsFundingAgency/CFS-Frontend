@@ -32,5 +32,10 @@
         {
             return $"{number:###,###,###,###,##0.##########}";
         }
+
+        public static string AsFormattedPercentage(this decimal number)
+        {
+            return $"{number}%";
+        }
     }
 }

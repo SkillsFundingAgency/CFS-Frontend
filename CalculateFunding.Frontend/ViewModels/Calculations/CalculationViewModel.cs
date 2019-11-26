@@ -9,10 +9,6 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public string Description { get; set; }
 
-        public string FundingPeriodId { get; set; }
-
-        public string FundingPeriodName { get; set; }
-
         public DateTime LastModified { get; set; }
 
         public int Version { get; set; }
@@ -24,5 +20,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
         public CalculationTypeViewModel CalculationType { get; set; }
 
         public PublishStatusViewModel PublishStatus { get; set; }
+
+        public CalculationValueTypeViewModel ValueType { get; set; }
     }
 }

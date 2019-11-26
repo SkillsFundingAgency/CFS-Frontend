@@ -117,13 +117,10 @@ End Function";
             {
                 Id = "2",
                 SpecificationId = "3",
-                Current = new CalculationVersion
-                {
-                    PublishStatus = PublishStatus.Draft,
-                    Author = new Reference("1", "Matt Vallily"),
-                    SourceCode = _sourceCode,
-                    Version = 4
-                }
+                PublishStatus = PublishStatus.Draft,
+                Author = new Reference("1", "Matt Vallily"),
+                SourceCode = _sourceCode,
+                Version = 4,
             };
 
             IEnumerable<int> versions = new List<int> { 1, 2 };
@@ -157,13 +154,10 @@ End Function";
             {
                 Id = "2",
                 SpecificationId = "3",
-                Current = new CalculationVersion
-                {
-                    PublishStatus = PublishStatus.Draft,
-                    Author = new Reference("1", "Matt Vallily"),
-                    SourceCode = _sourceCode,
-                    Version = 4
-                }
+				PublishStatus = PublishStatus.Draft,
+                Author = new Reference("1", "Matt Vallily"),
+                SourceCode = _sourceCode,
+                Version = 4
             };
 
             IEnumerable<int> versions = new List<int> { 1 };  // Not passing two versionIDs in the versions array
@@ -200,13 +194,10 @@ End Function";
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = new CalculationVersion
-                {
-                    PublishStatus = PublishStatus.Draft,
-                    Author = new Reference("1", "Matt Vallily"),
-                    SourceCode = _sourceCode,
-                    Version = 4
-                }
+                PublishStatus = PublishStatus.Draft,
+                Author = new Reference("1", "Matt Vallily"),
+                SourceCode = _sourceCode,
+                Version = 4
             };
 
             IEnumerable<int> versions = new List<int> { 1, 2 };
@@ -215,7 +206,7 @@ End Function";
             CalculationVersion calver1 = new CalculationVersion()
             {
                 Version = 1,
-                Date = new DateTime(2018, 1, 1, 10, 23, 34),
+                LastUpdated = new DateTime(2018, 1, 1, 10, 23, 34),
                 Author = new Reference("1", "Clifford"),
                 PublishStatus = PublishStatus.Draft,
                 SourceCode = "Test"
@@ -224,7 +215,7 @@ End Function";
             CalculationVersion calver2 = new CalculationVersion()
             {
                 Version = 2,
-                Date = new DateTime(2018, 1, 1, 10, 23, 34),
+                LastUpdated = new DateTime(2018, 1, 1, 10, 23, 34),
                 Author = new Reference("1", "Clifford"),
                 PublishStatus = PublishStatus.Draft,
                 SourceCode = "Test"

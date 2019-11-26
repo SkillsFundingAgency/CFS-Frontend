@@ -36,11 +36,11 @@
     @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
     {
         <a href="/calcs/editAdditionalCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
-    } 
+    }
     @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
     {
         <a href="/calcs/editTemplateCalculation/@Model.Calculation.Id" class="view-calc-button float-right">View calculation</a>
-    } 
+    }
 }
 @section BannerMiddle{
     <form method="post" action="/results" class="filter-container spacing-15" data-bind="submit: performSearch" id="filter-container" asp-antiforgery="true">
@@ -200,9 +200,9 @@
                             }
                             else
                             {
-                                <span class="float-right"><strong>@provider.CalculationResultDisplay</strong></span>
+                                <span class="float-right"><strong>@provider.AsDisplay(Model.Calculation.ValueType)</strong></span>
                             }
-                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Calculation.FundingPeriodId&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.Name</a></h4>
+                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Specification.FundingPeriod.Id&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.ProviderName</a></h4>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
                         {
@@ -229,7 +229,7 @@
                                 UPIN:
                                 <strong>
                                     <span id="provider-item-upin-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.Upin) ? provider.Upin.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.UPIN) ? provider.UPIN.ToString() : "No data found")
                                     </span>
                                 </strong>
                             </span>
@@ -237,7 +237,7 @@
                                 UKPRN:
                                 <strong>
                                     <span id="provider-item-ukprn-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.Ukprn) ? provider.Ukprn.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.UKPRN) ? provider.UKPRN.ToString() : "No data found")
 
                                     </span>
                                 </strong>
@@ -246,7 +246,7 @@
                                 URN:
                                 <strong>
                                     <span id="provider-item-urn-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.Urn) ? provider.Urn.ToString() : "No data found")
+                                        @(!string.IsNullOrWhiteSpace(provider.URN) ? provider.URN.ToString() : "No data found")
                                     </span>
                                 </strong>
                             </span>
@@ -320,11 +320,11 @@
                         @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
                         {
                             <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderAdditionalCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
-                        } 
+                        }
                         @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
                         {
                             <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderTemplateCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
-                        } 
+                        }
                     </div>
                     <div>
                         <span class="provider-item-property error-highlight" data-bind="visible: calculationExceptionType != ''">

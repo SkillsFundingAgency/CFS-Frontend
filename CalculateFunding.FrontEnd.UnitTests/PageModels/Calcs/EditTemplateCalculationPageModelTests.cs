@@ -136,7 +136,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             Calculation calculation = new Calculation
             {
                 SpecificationId = specificationId,
-                Current = currentCalculationVersion
             };
 
             calcClient
@@ -367,9 +366,9 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             //Assert
             test
-	            .Should()
-	            .Throw<Exception>()
-	            .WithMessage($"Bad response received from specification API: {specificationResponse?.StatusCode.ToString() ?? "No response"}");
+                .Should()
+                .Throw<Exception>()
+                .WithMessage($"Bad response received from specification API: {specificationResponse?.StatusCode.ToString() ?? "No response"}");
 
             await specsClient
                 .Received(1)
@@ -781,7 +780,11 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             {
                 Id = calculationId,
                 SpecificationId = specificationId,
-                Current = calculationVersion,
+				LastUpdated = calculationVersion.LastUpdated,
+				CalculationType = calculationVersion.CalculationType,
+				SourceCode = calculationVersion.SourceCode,
+				Author = calculationVersion.Author,
+				Description = calculationVersion.Description,
             };
 
             CalculationViewModel calculationViewModel = new CalculationViewModel

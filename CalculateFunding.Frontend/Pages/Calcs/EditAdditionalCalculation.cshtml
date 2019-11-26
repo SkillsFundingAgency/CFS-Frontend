@@ -24,24 +24,24 @@
 }
 
 
-    @section FormBannerLeft{
+@section FormBannerLeft{
 
-    }
+}
 
-    @section FormBannerRight{
+@section FormBannerRight{
 
-    }
+}
 
-    @section BreadCrumb{
-        <div class="breadcrumbs">
-            <ol>
-                <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
-                <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
-                <li><a href="/calcs/additionalcalculations/@Model.SpecificationId">@Model.SpecificationName</a></li>
-                <li>Edit Additional Calculation</li>
-            </ol>
-        </div>
-    }
+@section BreadCrumb{
+    <div class="breadcrumbs">
+        <ol>
+            <li><a href="/">@BreadcrumbText.CalculateFunding</a></li>
+            <li><a href="/specs">@BreadcrumbText.Specifications</a></li>
+            <li><a href="/calcs/additionalcalculations/@Model.SpecificationId">@Model.SpecificationName</a></li>
+            <li>Edit Additional Calculation</li>
+        </ol>
+    </div>
+}
 <div id="editAdditionalCalc">
     <div class="row">
         <div class="col-xs-12">
@@ -58,7 +58,7 @@
                     <div class="row">
                         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                             <div class="bannerblue-button-container " id="approve-button-container">
-                                <approve-status-button params="publishStatus : '@Model.Calculation.Current.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
+                                <approve-status-button params="publishStatus : '@Model.Calculation.PublishStatus', stateChangeUrl : '/api/specs/@Model.Calculation.SpecificationId/calculations/@Model.Calculation.Id/status', canApprove: canApproveCalculation"></approve-status-button>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
         </div>
     </div>
     <div class="row edit-calculation" id="edit-calculation">
-        
+
         <div class="col-xs-12 edit-calculation-editor-wrapper">
             <div class="edit-calculation-editor-container">
                 <div class="edit-calculation-container-header">
@@ -154,11 +154,11 @@
         var editViewModelOptions = {
             calculationId: "@Model.Calculation.Id",
             calculationName: "@Model.Calculation.Name",
-            calculationValueType:"@Model.Calculation.Current.ValueType.ToString()",
+            calculationValueType:"@Model.Calculation.ValueType.ToString()",
             specificationId: "@Model.SpecificationId",
             fundingStreams: @Html.Raw(Model.FundingStreams),
             newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled",
-            existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.Current.SourceCode))"
+            existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))"
         };
 
         var viewModel = new calculateFunding.editadditionalcalculation.EditAdditionalCalculationViewModel(editViewModelOptions);

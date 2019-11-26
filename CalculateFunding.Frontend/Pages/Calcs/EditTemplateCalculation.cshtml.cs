@@ -147,7 +147,7 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
             if (specificationResponse?.StatusCode != HttpStatusCode.OK)
             {
-	            throw new Exception($"Bad response received from specification API: {specificationResponse?.StatusCode.ToString() ?? "No response"}");
+                throw new Exception($"Bad response received from specification API: {specificationResponse?.StatusCode.ToString() ?? "No response"}");
             }
 
             SpecificationName = specificationResponse.Content.Name;

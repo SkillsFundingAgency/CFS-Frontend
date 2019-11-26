@@ -5,16 +5,15 @@ using CalculateFunding.Common.ApiClient.Results.Models;
 
 namespace CalculateFunding.Frontend.Pages.Results
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using AutoMapper;
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.ApiClient.Policies;
-    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Common.ApiClient.Providers;
-
-    using Serilog;
-    using System.Collections.Generic;
+    using CalculateFunding.Common.ApiClient.Specifications;
     using CalculateFunding.Frontend.ViewModels.Calculations;
-    using System.Threading.Tasks;
+    using Serilog;
 
     public class ProviderTemplateCalculationsPageModel : ProviderResultsBasePageModel
     {
@@ -26,8 +25,8 @@ namespace CalculateFunding.Frontend.Pages.Results
         public ProviderTemplateCalculationsPageModel(IResultsApiClient resultsApiClient, IProvidersApiClient providersApiClient, IPoliciesApiClient policiesApiClient, IMapper mapper, ISpecificationsApiClient specsApiClient, ILogger logger, ICalculationsApiClient calculationsApiClient)
             : base(resultsApiClient, providersApiClient, policiesApiClient, mapper, specsApiClient, logger)
         {
-	        _logger = logger;
-	        _calculationsApiClient = calculationsApiClient;
+            _logger = logger;
+            _calculationsApiClient = calculationsApiClient;
             _resultsApiClient = resultsApiClient;
         }
 
@@ -36,21 +35,23 @@ namespace CalculateFunding.Frontend.Pages.Results
             return await _resultsApiClient.GetProviderResultByCalculationTypeTemplate(providerId, specificationId);
         }
 
-        public override void PopulateResults(ApiResponse<ProviderResult> providerResponse)
+        public override Task PopulateResults(ApiResponse<ProviderResult> providerResponse)
         {
-	        TemplateCalculationList = new List<ProviderCalculationItemViewModel>();
+            TemplateCalculationList = new List<ProviderCalculationItemViewModel>();
 
-	        foreach (CalculationResult calculationResultItem in providerResponse.Content.CalculationResults)
-	        {
-		        ApiResponse<Calculation> calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
+            foreach (CalculationResult calculationResultItem in providerResponse.Content.CalculationResults)
+            {
+                ApiResponse<Calculation> calculation = _calculationsApiClient.GetCalculationById(calculationResultItem.Calculation.Id).Result;
 
-		        TemplateCalculationList.Add(new ProviderCalculationItemViewModel
-		        {
-			        Name = calculationResultItem.Calculation.Name,
-			        ValueType = calculation.Content.Current.ValueType.ToString(),
-			        Value = calculationResultItem.Value
-		        });
-	        }
+                TemplateCalculationList.Add(new ProviderCalculationItemViewModel
+                {
+                    Name = calculationResultItem.Calculation.Name,
+                    ValueType = calculation.Content.ValueType.ToString(),
+                    Value = calculationResultItem.Value
+                });
+            }
+
+			return Task.CompletedTask;
         }
     }
 }
