@@ -266,8 +266,8 @@
           "name": "authSettings",
           "type": "config",
           "apiVersion": "2018-02-01",
-          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
-          "properties":{
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]" ],
+          "properties": {
             "enabled": "[parameters('enablePlatformAuth')]",
             "unauthenticatedClientAction": 0,
             "tokenStoreEnabled": true,
@@ -277,15 +277,15 @@
             "issuer": "[parameters('aadAuthIssuer')]",
             "allowedAudiences": null,
             "isAadAutoProvisioned": false,
-            "additionalLoginParams": [ "response_type=code id_token", "resource=https://graph.microsoft.com"]
+            "additionalLoginParams": [ "response_type=code id_token", "resource=https://graph.microsoft.com" ]
           }
         },
         {
           "name": "[concat(variables('webSiteName'), '/web')]",
           "type": "Microsoft.Web/sites/config",
           "apiVersion": "2016-08-01",
-          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]"],
-          "properties":{
+          "dependsOn": [ "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]" ],
+          "properties": {
             "ipSecurityRestrictions": [
               {
                 "ipAddress": "213.123.63.150",
@@ -345,120 +345,6 @@
                 "ipAddress": "217.38.165.176",
                 "subnetMask": "255.255.255.240",
                 "name": "DfE External IP Block D",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.165.193",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Sheffield NAT Block A",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.165.194",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Sheffield NAT Block B",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.165.195",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Sheffield NAT Block C",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.165.196",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Sheffield NAT Block D",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.49",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block A",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.50",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block B",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.51",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block C",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.52",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block D",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.53",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block E",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.54",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block F",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.55",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block G",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.56",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block H",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.57",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block I",
-                "priority": 200
-              },
-              {
-                "ipAddress": "217.38.175.58",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE London NAT Block J",
-                "priority": 200
-              },
-              {
-                "ipAddress": "81.134.140.24",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Coventry NAT Block A",
-                "priority": 200
-              },
-              {
-                "ipAddress": "81.134.140.25",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Coventry NAT Block B",
-                "priority": 200
-              },
-              {
-                "ipAddress": "81.134.140.26",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Coventry NAT Block C",
-                "priority": 200
-              },
-              {
-                "ipAddress": "81.134.140.27",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Coventry NAT Block D",
-                "priority": 200
-              },
-              {
-                "ipAddress": "81.134.140.28",
-                "subnetMask": "255.255.255.255",
-                "name": "DfE Coventry NAT Block E",
                 "priority": 200
               }
             ]
