@@ -179,136 +179,142 @@
             <div data-bind="visible: isResultsVisible">
                 <partial name="_SearchPagerPartial_ProviderResults" model='new PagerPartialViewModel(Model.CalculationProviderResults, "providers", Model.SearchTerm)' />
             </div>
-            <div class="row" data-bind="visible: !searchPerformed()">
-                <div class="provider-item-property-container">
-                    <span> Provider </span>
-                    <span> Funding  </span>
+            <noscript>
+                <div class="row" data-bind="visible: !searchPerformed()">
+                    <div class="provider-item-property-container">
+                        <span> Provider </span>
+                        <span> Funding  </span>
+                    </div>
                 </div>
-            </div>
-            <div class="providers-searchresult-container" data-bind="visible: !searchPerformed()">
-                @{
-                    int providerRow = 0;
-                }
 
-                @foreach (var provider in Model.CalculationProviderResults.CalculationProviderResults)
-                {
-                    <div class="provider-item-container" id="provider-item-result-@providerRow">
-                        <div class="provider-item-header">
+                <div class="providers-searchresult-container" data-bind="visible: !searchPerformed()">
+                    @{
+                        int providerRow = 0;
+                    }
+
+                    @foreach (var provider in Model.CalculationProviderResults.CalculationProviderResults)
+                    {
+                        <div class="provider-item-container" id="provider-item-result-@providerRow">
+                            <div class="provider-item-header">
+                                @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
+                                {
+                                    <span class="float-right error-highlight"><strong>Error</strong></span>
+                                }
+                                else
+                                {
+                                    <span class="float-right"><strong>@provider.AsDisplay(Model.Calculation.ValueType)</strong></span>
+                                }
+                                <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Specification.FundingPeriod.Id&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.ProviderName</a></h4>
+                            </div>
                             @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
                             {
-                                <span class="float-right error-highlight"><strong>Error</strong></span>
+                                <div class="provider-item-property-container">
+                                    <span class="provider-item-property provider-item-property-date-opened">
+                                        <strong>
+                                            <span class="error-highlight" id="provider-item-exception-@providerRow">@provider.CalculationExceptionMessage</span>
+                                        </strong>
+                                    </span>
+                                </div>
                             }
-                            else
-                            {
-                                <span class="float-right"><strong>@provider.AsDisplay(Model.Calculation.ValueType)</strong></span>
-                            }
-                            <h4 class="heading-small"><a href="/results/ProviderCalcsResults?providerId=@provider.ProviderId&periodId=@Model.Specification.FundingPeriod.Id&specificationProviderVersion=@(Model.Calculation.SpecificationId + "_" + Model.Specification.ProviderVersionId)">@provider.ProviderName</a></h4>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(provider.CalculationExceptionType))
-                        {
                             <div class="provider-item-property-container">
-                                <span class="provider-item-property provider-item-property-date-opened">
+                                <span class="provider-item-property provider-item-property-last-updated">
+                                    Updated:
                                     <strong>
-                                        <span class="error-highlight" id="provider-item-exception-@providerRow">@provider.CalculationExceptionMessage</span>
+                                        <span id="provider-item-last-updated-@providerRow">
+                                            @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateFullMonthFormatString)
+                                        </span>
                                     </strong>
                                 </span>
                             </div>
-                        }
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-last-updated">
-                                Updated:
-                                <strong>
-                                    <span id="provider-item-last-updated-@providerRow">
-                                        @Model.Calculation.LastModified.ToString(Helpers.FormatStrings.DateFullMonthFormatString)
-                                    </span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-upin">
-                                UPIN:
-                                <strong>
-                                    <span id="provider-item-upin-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.UPIN) ? provider.UPIN.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-ukprn">
-                                UKPRN:
-                                <strong>
-                                    <span id="provider-item-ukprn-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.UKPRN) ? provider.UKPRN.ToString() : "No data found")
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-upin">
+                                    UPIN:
+                                    <strong>
+                                        <span id="provider-item-upin-@providerRow">
+                                            @(!string.IsNullOrWhiteSpace(provider.UPIN) ? provider.UPIN.ToString() : "No data found")
+                                        </span>
+                                    </strong>
+                                </span>
+                                <span class="provider-item-property provider-item-property-ukprn">
+                                    UKPRN:
+                                    <strong>
+                                        <span id="provider-item-ukprn-@providerRow">
+                                            @(!string.IsNullOrWhiteSpace(provider.UKPRN) ? provider.UKPRN.ToString() : "No data found")
 
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-urn">
-                                URN:
-                                <strong>
-                                    <span id="provider-item-urn-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.URN) ? provider.URN.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-estab-num">
-                                Establishment number:
-                                <strong>
-                                    <span id="provider-item-establishmentnumber-@providerRow">
-                                        @(!string.IsNullOrWhiteSpace(provider.EstablishmentNumber) ? provider.EstablishmentNumber.ToString() : "No data found")
-                                    </span>
-                                </strong>
-                            </span>
+                                        </span>
+                                    </strong>
+                                </span>
+                                <span class="provider-item-property provider-item-property-urn">
+                                    URN:
+                                    <strong>
+                                        <span id="provider-item-urn-@providerRow">
+                                            @(!string.IsNullOrWhiteSpace(provider.URN) ? provider.URN.ToString() : "No data found")
+                                        </span>
+                                    </strong>
+                                </span>
+                                <span class="provider-item-property provider-item-property-estab-num">
+                                    Establishment number:
+                                    <strong>
+                                        <span id="provider-item-establishmentnumber-@providerRow">
+                                            @(!string.IsNullOrWhiteSpace(provider.EstablishmentNumber) ? provider.EstablishmentNumber.ToString() : "No data found")
+                                        </span>
+                                    </strong>
+                                </span>
+                            </div>
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-providertype">
+                                    Provider type:
+                                    <strong>
+                                        <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
+                                    </strong>
+                                </span>
+                                <span class="provider-item-property provider-item-property-provider">
+                                    &nbsp;Provider subtype:
+                                    <strong>
+                                        <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
+                                    </strong>
+                                </span>
+                            </div>
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-local-authority">
+                                    Local authority:
+                                    <strong>
+                                        <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
+                                    </strong>
+                                </span>
+                            </div>
+                            <div class="provider-item-property-container">
+                                <span class="provider-item-property provider-item-property-date-opened">
+                                    Date Opened:
+                                    <strong>
+                                        <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
+                                    </strong>
+                                </span>
+                            </div>
                         </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-providertype">
-                                Provider type:
-                                <strong>
-                                    <span id="provider-item-providertype-@providerRow">@provider.ProviderType</span>
-                                </strong>
-                            </span>
-                            <span class="provider-item-property provider-item-property-provider">
-                                &nbsp;Provider subtype:
-                                <strong>
-                                    <span id="provider-item-providersubtype-@providerRow">@provider.ProviderSubType</span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-local-authority">
-                                Local authority:
-                                <strong>
-                                    <span id="provider-item-localauthority-@providerRow">@provider.LocalAuthority</span>
-                                </strong>
-                            </span>
-                        </div>
-                        <div class="provider-item-property-container">
-                            <span class="provider-item-property provider-item-property-date-opened">
-                                Date Opened:
-                                <strong>
-                                    <span id="provider-item-dateopened-@providerRow">@provider.DateOpenedDisplay</span>
-                                </strong>
-                            </span>
-                        </div>
-                    </div>
-                    providerRow++;
-                }
-            </div>
+                        providerRow++;
+                    }
+                </div>
+            </noscript>
         }
         <div class="providers-searchresult-header row spacing-30-top" data-bind="visible: isResultsVisible()">
             <div class="col-xs-12">
                 <span> <strong>Provider</strong></span>
-                @* TODO this needs sorting *@
-                @*<span class="float-right">
-                        @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Funding)
-                        {
-                            <strong>Total funding</strong>
+                <span class="float-right">
+                    @if (Model.Calculation.ValueType == ViewModels.Calculations.CalculationValueTypeViewModel.Currency)
+                    {
+                        <strong>Total funding</strong>
 
-                        }
-                        else if (Model.Calculation.CalculationType == CalculationTypeViewModel.Number)
-                        {
-                            <strong>Total value</strong>
-                        }
-                    </span>*@
+                    }
+                    else if (Model.Calculation.ValueType == ViewModels.Calculations.CalculationValueTypeViewModel.Number)
+                    {
+                        <strong>Total value</strong>
+                    }
+                    else if (Model.Calculation.ValueType == ViewModels.Calculations.CalculationValueTypeViewModel.Percentage)
+                    {
+                        <strong>Percentage</strong>
+                    }
+                </span>
             </div>
         </div>
         <div data-bind="visible: isResultsVisible">
@@ -319,11 +325,11 @@
                         <img src="~/assets/images/loader.gif" data-bind="visible: $root.areResultsBeingUpdated()" class="float-right notifications-panel-loading-image" />
                         @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Additional)
                         {
-                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderAdditionalCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
+                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderAdditionalCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: providerName"></a></h4>
                         }
                         @if (Model.Calculation.CalculationType == CalculationTypeViewModel.Template)
                         {
-                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderTemplateCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: name"></a></h4>
+                            <h4 class="heading-small"><a data-bind="attr: {href: '/results/ProviderTemplateCalculations?providerId=' + providerId + '&fundingPeriodId=' + $root.fundingPeriodId + '&specificationProviderVersion=' + $root.specificationId + '_' + $root.providerVersionId }, text: providerName"></a></h4>
                         }
                     </div>
                     <div>

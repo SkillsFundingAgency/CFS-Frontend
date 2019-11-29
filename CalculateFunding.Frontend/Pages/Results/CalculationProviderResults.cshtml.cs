@@ -112,16 +112,11 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Filters = new Dictionary<string, string[]> { { "calculationId", new[] { calculationId } } }
             };
 
-            var searchResults = await _resultsSearchService.PerformSearch(searchRequest);
+            CalculationProviderResultSearchResultViewModel searchResults = await _resultsSearchService.PerformSearch(searchRequest);
 
             if (searchResults == null)
             {
-				return;
-            }
-
-            foreach (var providerResult in searchResults.CalculationProviderResults)
-            {
-	            providerResult.SetCalculationResultDisplay(Calculation.ValueType);
+                return;
             }
 
             CalculationProviderResults = searchResults;

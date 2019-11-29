@@ -5,12 +5,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.Models.Search;
-using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using FluentAssertions;
@@ -23,24 +25,40 @@ namespace CalculateFunding.Frontend.UnitTests.Services
     [TestClass]
     public class CalculationProviderResultsSearchServiceTests
     {
+        private IResultsApiClient _resultsClient;
+        private ICalculationsApiClient _calculationsClient;
+        private IMapper _mapper;
+        private ILogger _logger;
+        private CalculationProviderResultsSearchService _resultsSearchService;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _resultsClient = Substitute.For<IResultsApiClient>();
+            _calculationsClient = Substitute.For<ICalculationsApiClient>();
+            MapperConfiguration mapperConfiguration = new MapperConfiguration(c =>
+            {
+                c.AddProfile<FrontEndMappingProfile>();
+            });
+            _mapper = mapperConfiguration.CreateMapper();
+
+            _logger = Substitute.For<ILogger>();
+
+            _resultsSearchService = new CalculationProviderResultsSearchService(_resultsClient, _calculationsClient, _mapper, _logger);
+        }
 
         [TestMethod]
         public void PerformSearch_GivenFindCalculationProviderResultsServiceUnavailable_ThenHttpExceptionThrown()
         {
             // Arrange
-            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
-            ILogger logger = CreateLogger();
-            IMapper mapper = CreateMapper();
-            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
-
-            resultClient
+            _resultsClient
                 .When(a => a.SearchCalculationProviderResults(Arg.Any<SearchModel>()))
                 .Do(x => throw new HttpRequestException());
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            Func<Task> test = () => resultsSearchService.PerformSearch(request);
+            Func<Task> test = () => _resultsSearchService.PerformSearch(request);
 
             // Assert
             test
@@ -52,20 +70,14 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         public async Task PerformSearch_GivenFindCalculationProviderResultsServiceReturnsNotFound_ThenNullReturned()
         {
             // Arrange
-            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
-            ILogger logger = CreateLogger();
-            IMapper mapper = CreateMapper();
-
-            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
-
-            resultClient
+            _resultsClient
                 .SearchCalculationProviderResults(Arg.Any<SearchModel>())
                 .Returns((ApiResponse<CalculationProviderResultSearchResults>)null);
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
             // Act
-            CalculationProviderResultSearchResultViewModel result = await resultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel result = await _resultsSearchService.PerformSearch(request);
 
             // Assert
             result
@@ -77,24 +89,20 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         public async Task PerformSearch_GivenFirstSearchResultReturnedCorrectly_EnsuresResult()
         {
             // Arrange
-            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
-            ILogger logger = CreateLogger();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
-
             int numberOfItems = 25;
 
             CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
-            resultClient
+            _resultsClient
                 .SearchCalculationProviderResults(Arg.Any<SearchModel>())
                 .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
+            AndCalculationExistsForCalcId("calcId");
+
             // Act
-            CalculationProviderResultSearchResultViewModel results = await resultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel results = await _resultsSearchService.PerformSearch(request);
 
             // Assert
             CalculationProviderResultSearchResultItemViewModel first = results.CalculationProviderResults.First();
@@ -130,28 +138,37 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Be("An exception has occurred");
         }
 
+        private void AndCalculationExistsForCalcId(string calculationId)
+        {
+            Calculation calculation = new Calculation()
+            {
+                CalculationType = Common.ApiClient.Calcs.Models.CalculationType.Additional,
+                ValueType = CalculationValueType.Currency,
+            };
+
+            _calculationsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calculation));
+        }
+
         [TestMethod]
         public async Task PerformSearch_GivenFirstSearchResultReturnedCorrectly_EnsuresResults()
         {
             // Arrange
-            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
-            ILogger logger = CreateLogger();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
-
             int numberOfItems = 25;
 
             CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems);
 
-            resultClient
+            _resultsClient
                 .SearchCalculationProviderResults(Arg.Any<SearchModel>())
                 .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
+            AndCalculationExistsForCalcId("calcId");
+
             // Act
-            CalculationProviderResultSearchResultViewModel results = await resultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel results = await _resultsSearchService.PerformSearch(request);
 
             // Assert
             results.TotalResults.Should().Be(numberOfItems + 1);
@@ -162,12 +179,6 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         public async Task PerformSearch_FirstSearchResultWithFacets_EnsuresFacetsLoadedCorrectly()
         {
             // Arrange
-            IResultsApiClient resultClient = Substitute.For<IResultsApiClient>();
-            ILogger logger = CreateLogger();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            CalculationProviderResultsSearchService resultsSearchService = CreateSearchService(resultClient, mapper, logger);
-
             int numberOfItems = 25;
 
             IEnumerable<Facet> facets = new[]
@@ -193,14 +204,16 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             CalculationProviderResultSearchResults itemResult = GenerateSearchResults(numberOfItems, facets);
 
-            resultClient
+            _resultsClient
                 .SearchCalculationProviderResults(Arg.Any<SearchModel>())
                 .Returns(new ApiResponse<CalculationProviderResultSearchResults>(HttpStatusCode.OK, itemResult));
 
             SearchRequestViewModel request = new SearchRequestViewModel();
 
+            AndCalculationExistsForCalcId("calcId");
+
             // Act
-            CalculationProviderResultSearchResultViewModel results = await resultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel results = await _resultsSearchService.PerformSearch(request);
 
             // Assert
             CalculationProviderResultSearchResultItemViewModel first = results.CalculationProviderResults.First();
@@ -237,28 +250,6 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         }
 
 
-        static CalculationProviderResultsSearchService CreateSearchService(IResultsApiClient resultsApiClient = null, IMapper mapper = null, ILogger logger = null)
-        {
-            return new CalculationProviderResultsSearchService(
-                resultsApiClient ?? CreateResultsApiClient(),
-                mapper ?? CreateMapper(),
-                logger ?? CreateLogger());
-        }
-
-        static IResultsApiClient CreateResultsApiClient()
-        {
-            return Substitute.For<IResultsApiClient>();
-        }
-
-        static IMapper CreateMapper()
-        {
-            return Substitute.For<IMapper>();
-        }
-
-        static ILogger CreateLogger()
-        {
-            return Substitute.For<ILogger>();
-        }
 
         CalculationProviderResultSearchResults GenerateSearchResults(int numberOfItems, IEnumerable<Facet> facets = null)
         {
@@ -269,8 +260,9 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 items.Add(new CalculationProviderResultSearchResult
                 {
                     Id = $"{i + 10}",
+                    CalculationId = "calcId",
                     CalculationName = $"calc-{i + 1}",
-					ProviderName = $"prov-{i + 1}",
+                    ProviderName = $"prov-{i + 1}",
                     CalculationResult = i + 1,
                 });
             }
@@ -279,6 +271,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             {
                 Id = $"{numberOfItems + 10}",
                 CalculationName = $"prov-{numberOfItems + 1}",
+                CalculationId = "calcId",
                 CalculationResult = numberOfItems + 1,
                 CalculationExceptionType = "Exception",
                 CalculationExceptionMessage = "An exception has occurred"

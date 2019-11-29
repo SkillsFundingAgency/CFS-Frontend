@@ -79,7 +79,6 @@ namespace CalculateFunding.Frontend.Controllers
 	            foreach (CalculationProviderResultSearchResultItemViewModel providerResult in searchResults.CalculationProviderResults)
 	            {
 		            providerResult.SetCalculationResultDisplay(valueType);
-
 	            }
             }
 
