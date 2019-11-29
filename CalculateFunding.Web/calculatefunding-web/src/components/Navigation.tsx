@@ -9,7 +9,8 @@ export enum NavigationLevel {
     Specification,
     ManageData,
     QualityTests,
-    ViewResult
+    ViewResult,
+    FundingApproval
 }
 
 export class Navigation extends React.Component<INavigationLevel,{}>{
@@ -66,6 +67,14 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                             <div className="navbar-item-container">
                                 <a href="/results">View results</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.ViewResult ? (activeStyle) : (normalStyle)}>
+                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="navbar-item-container">
+                                <a href="/app/viewfunding">Funding approvals</a>
+                                <div className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (activeStyle) : (normalStyle)}>
                                     <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>
                             </div>

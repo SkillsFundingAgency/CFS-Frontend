@@ -74,7 +74,7 @@ export class Home extends Component<IHomeProps, {}> {
                             </div>
                             <div className="col-xs-12 col-sm-4">
                                 <div className="homepage-section-title">
-                                    <a href="/approvals" className="heading-medium">Funding approvals</a>
+                                    <a href="/app/viewfunding" className="heading-medium">Funding approvals</a>
                                 </div>
                                 <div>Approve funding for providers and view how it's been calculated.</div>
                             </div>

@@ -181,7 +181,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (!this.props.specificationSelected) {
             return <div>
                 <Header/>
-                <Navigation currentNavigationLevel={NavigationLevel.ViewResult}/>
+                <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
                 <main className="container" hidden={this.props.specificationSelected}>
@@ -246,7 +246,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (this.props.specificationSelected) {
             return <div>
                 <Header/>
-                <Navigation currentNavigationLevel={NavigationLevel.ViewResult}/>
+                <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                         subtitle="You can approve and release funding for payment for completed specifications"/>
                 <main className="container" hidden={this.props.pageState !== "IDLE"}>
