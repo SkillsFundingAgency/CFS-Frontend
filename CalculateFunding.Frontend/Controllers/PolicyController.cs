@@ -44,7 +44,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(response.Content);
+                return Ok(response.Content.OrderBy(x => x.Name));
             }
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
@@ -80,7 +80,7 @@ namespace CalculateFunding.Frontend.Controllers
             IEnumerable<Reference> fundingPeriods =
 	            fundingPeriodsLookupTask.Result.Content.Where(_ => fundingPeriodIds.Contains(_.Id));
 
-            return new OkObjectResult(fundingPeriods);
+            return new OkObjectResult(fundingPeriods.OrderBy(x => x.Name));
         }
     }
 }

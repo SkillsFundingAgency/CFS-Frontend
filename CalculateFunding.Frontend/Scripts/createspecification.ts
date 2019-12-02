@@ -216,7 +216,7 @@ namespace calculateFunding.specification {
             console.log("Starting search request");
 
             request.done((resultUntyped) => {
-                console.log("Search request completed");
+                console.log("get provider versions by funding stream search request completed");
                 let results: Array<IProviderVersion> = resultUntyped;
                 this.providerVersions(ko.utils.arrayMap(results, item => {
                     item.display = providerVersionId + " from " + new Date(item.targetDate).toLocaleDateString() + " Version " + Number(item.version);
@@ -230,7 +230,7 @@ namespace calculateFunding.specification {
             });
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
-                console.log("Search request failed");
+                console.log("get provider versions by funding stream search request failed");
                 this.isInProgress(false);
             });
 
@@ -247,15 +247,16 @@ namespace calculateFunding.specification {
             console.log("Starting request for funding period ids");
 
             request.done((resultUntyped) => {
-                console.log("Request completed");
+                console.log("received funding periods");
                 let results: Array<IFundingPeriod> = resultUntyped;
-                this.fundingPeriods(ko.utils.arrayMap(results, function (item) {
+
+                this.fundingPeriods(ko.utils.arrayMap(results, item => {
                     return item;
                 }));
             });
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
-                console.log("Search request failed");
+                console.log("funding periods request failed");
                 this.isInProgress(false);
             });
         }
@@ -268,9 +269,12 @@ namespace calculateFunding.specification {
                 contentType: "application/json"
             });
 
+            console.log("Starting request for funding streams");
+
             request.done((resultUntyped) => {
-                console.log("received funding periods");
-                let results: Array<IFundingPeriod> = resultUntyped;
+                console.log("received funding streams");
+                let results: Array<IFundingStream> = resultUntyped;
+                
                 this.fundingStreams(ko.utils.arrayMap(results, item => {
                     return item;
                 }));
@@ -278,7 +282,7 @@ namespace calculateFunding.specification {
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
 
-                console.log("funding periods request failed");
+                console.log("funding streams request failed");
                 this.isInProgress(false);
             });
         }
