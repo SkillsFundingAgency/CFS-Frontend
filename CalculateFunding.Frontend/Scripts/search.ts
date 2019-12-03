@@ -249,10 +249,14 @@
                 }
             }
 
-            let compareResult = ko.utils.compareArrays(facetObservableArray(), facets);
+            let sortedFacets: Array<calculateFunding.search.SearchFacet> = facets.sort(function (l, r) {
+                return l.name().toLowerCase() == r.name().toLowerCase() ? 0 : (l.name().toLowerCase() < r.name().toLowerCase() ? -1 : 1);
+            });
+
+            let compareResult = ko.utils.compareArrays(facetObservableArray(), sortedFacets);
             if (compareResult.length > 0) {
                 console.log("Updating " + filterName, compareResult);
-                facetObservableArray(facets);
+                facetObservableArray(sortedFacets);
             }
         }
 
