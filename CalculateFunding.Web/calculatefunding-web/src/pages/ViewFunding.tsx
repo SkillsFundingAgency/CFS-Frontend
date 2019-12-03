@@ -65,10 +65,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         jobId: ""
     };
 
+
     getSpecifications = (event: React.ChangeEvent<HTMLSelectElement>) => {
         console.log(event);
         console.log(event.target.value);
-        this.props.getSelectedSpecifications(event.target.value, "PSG");
+        this.props.getSelectedSpecifications(event.target.value, this.state.fundingStream);
         this.setState({fundingPeriod: event.target.value});
     };
 
