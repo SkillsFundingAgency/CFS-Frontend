@@ -19,5 +19,5 @@ ReactDOM.render(
     <Provider store={store}>
         <AppContainer  />
     </Provider>,
-    document.getElementById('root') as HTMLElement
+    document.getElementById('main-content') as HTMLElement
 );

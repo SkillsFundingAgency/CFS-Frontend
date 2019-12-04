@@ -51,9 +51,9 @@ const callback = props.callback;
     let message: string = props.message;
     return (
         <div className="center-block">
-            <h1>{message}</h1>
-            <h2>Please wait, this can take several minutes</h2>
-            <img src="/assets/images/loading.svg" alt="Loading"/>
+            <h1 className="govuk-heading-xl">{message}</h1>
+            <h2 className="govuk-heading-l">Please wait, this can take several minutes</h2>
+            <img src="/assets/images/loader.gif" alt="Loading"/>
         </div>
     )
 }

@@ -3,6 +3,9 @@ import {Switch, Route, BrowserRouter} from 'react-router-dom';
 import {Home} from "./pages/Home";
 import FundingLineStructureContainer from "./containers/FundingLineStructureContainer";
 import ViewFundingContainer from "./containers/ViewFundingContainer";
+import './App.scss'
+import {Footer} from "./components/Footer";
+import {Header} from "./components/Header";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -21,11 +24,25 @@ const App: React.FunctionComponent = () => {
 
 function NoMatch() {
   return (
-    <div>
-      <h3>
-        No match for this path
-      </h3>
-    </div>
+      <>
+      <Header />>
+      <div className="govuk-width-container">
+          <main className="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
+              <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-two-thirds">
+                      <h1 className="govuk-heading-xl">Page not found</h1>
+                      <p className="govuk-body">
+                          If you typed the web address, check it is correct.
+                      </p>
+                      <p className="govuk-body">
+                          If you pasted the web address, check you copied the entire address.
+                      </p>
+                  </div>
+              </div>
+          </main>
+      </div>
+          <Footer />
+        </>
   );
 }
 

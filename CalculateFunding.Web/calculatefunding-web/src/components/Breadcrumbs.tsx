@@ -4,8 +4,8 @@ import {Component} from "react";
 export class Breadcrumbs extends Component<{}, {}> {
 
     render() {
-        return <div className="breadcrumbs">
-            <ol>
+        return <div className="govuk-breadcrumbs">
+            <ol className="govuk-breadcrumbs__list">
                 {this.props.children}
             </ol>
         </div>

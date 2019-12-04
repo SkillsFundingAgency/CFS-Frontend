@@ -1,16 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon"/>
-    <link rel="mask-icon" href="assets/images/gov.uk_logotype_crown.svg" color="#0b0c0c">
-    <title>Calculate Funding</title>
-    <link rel="stylesheet" href="libs/govuk_bootstrap/govuk_bootstrap.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/libs/css/bootstrap.css">
+<html lang="en" class="govuk-template app-html-class">
 
+<head>
+    <meta charset="utf-8" />
+    <title>GOV.UK - Customised page template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="blue" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/images/govuk-mask-icon.svg" color="blue">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/govuk-apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/images/govuk-apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/govuk-apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" href="/images/govuk-apple-touch-icon.png">
+
+    <!--[if !IE 8]><!-->
+    <link href="/govuk-frontend/all.css" rel="stylesheet" />
+    <!--<![endif]-->
+
+    <!--[if IE 8]>
+    <link href="/govuk-frontend/all-ie8.css" rel="stylesheet" />
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+    <script src="/html5-shiv/html5shiv.js"></script>
+    <![endif]-->
+
+    <meta property="og:image" content="&lt;YOUR-DOMAIN&gt;/images/govuk-opengraph-image.png">
 </head>
-<body id="top" ><div id="root"></div></body>
+
+<body class="govuk-template__body app-body-class" data-test="My value" data-other="report:details">
+<script>
+    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+
+</script>
+
+<a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+<div id="main-content"></div>
+
+<script src="/govuk-frontend/all.js"></script>
+</body>
+
 </html>

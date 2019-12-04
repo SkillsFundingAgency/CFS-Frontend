@@ -119,7 +119,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
     approveFunding = () => {
         this.props.changePageState("APPROVE_FUNDING");
-        //this.props.approveFunding(this.props.specifications.id)
     };
 
     publishFunding = () => {
@@ -182,65 +181,65 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (!this.props.specificationSelected) {
             return <div>
                 <Header/>
-                <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
-                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
-                        subtitle="You can approve and release funding for payment for completed specifications"/>
-                <main className="container" hidden={this.props.specificationSelected}>
+                <div className="govuk-width-container">
+                    <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
+                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
+                            subtitle="You can approve and release funding for payment for completed specifications"/>
+                    <main className="govuk-main-wrapper govuk-main-wrapper--l"
+                          hidden={this.props.specificationSelected}>
 
-                    <fieldset className="govuk-fieldset">
-                        <div className="govuk-form-group">
-                            <label htmlFor="select-funding-stream" className="govuk-fieldset__heading">Select funding
-                                stream:</label>
-                        </div>
-                        <div className="govuk-form-group">
-                            <select id="select-funding-stream" className="govuk-select"
-                                    disabled={this.props.fundingStreams.length === 0} onChange={(e) => {
-                                this.getFundingPeriods(e)
-                            }}>
-                                <option>Please select a funding stream</option>
-                                {this.props.fundingStreams.map(fs =>
-                                    <option key={fs.id} value={fs.id}>{fs.name}</option>
-                                )}
-                            </select></div>
-                    </fieldset>
-                    <fieldset className="govuk-fieldset spacing-30">
-                        <div className="govuk-form-group">
-                            <label htmlFor="select-provider" className="govuk-fieldset__heading">Select funding
-                                period:</label>
-                        </div>
-                        <div className="govuk-form-group">
-                            <select id="select-provider" className="govuk-select" placeholder="Please select"
-                                    disabled={this.props.selectedFundingPeriods.length === 0}
-                                    onChange={(e) => {
-                                        this.getSpecifications(e)
-                                    }}>
-                                <option>Please select a funding period</option>
-                                {this.props.selectedFundingPeriods.map(fp =>
-                                    <option key={fp.id} value={fp.id}>{fp.name}</option>
-                                )}
-                            </select>
-                        </div>
-                    </fieldset>
-                    <fieldset className="govuk-fieldset">
-                        <div className="form-group" hidden={this.props.specifications.name === ""}>
-                            <div className="form-label">
+                        <fieldset className="govuk-fieldset">
+                            <div className="govuk-form-group">
+                                <label htmlFor="select-funding-stream" className="govuk-label">Select
+                                    funding
+                                    stream:</label>
+                                <select id="select-funding-stream" className="govuk-select"
+                                        disabled={this.props.fundingStreams.length === 0} onChange={(e) => {
+                                    this.getFundingPeriods(e)
+                                }}>
+                                    <option>Please select a funding stream</option>
+                                    {this.props.fundingStreams.map(fs =>
+                                        <option key={fs.id} value={fs.id}>{fs.name}</option>
+                                    )}
+                                </select></div>
+                        </fieldset>
+                        <fieldset className="govuk-fieldset">
+                            <div className="govuk-form-group">
+                                <label htmlFor="select-provider" className="govuk-label">Select funding
+                                    period:</label>
+                                <select id="select-provider" className="govuk-select" placeholder="Please select"
+                                        disabled={this.props.selectedFundingPeriods.length === 0}
+                                        onChange={(e) => {
+                                            this.getSpecifications(e)
+                                        }}>
+                                    <option>Please select a funding period</option>
+                                    {this.props.selectedFundingPeriods.map(fp =>
+                                        <option key={fp.id} value={fp.id}>{fp.name}</option>
+                                    )}
+                                </select>
+                            </div>
+                        </fieldset>
+                        <fieldset className="govuk-fieldset">
+                            <div className="govuk-form-group" hidden={this.props.specifications.name === ""}>
                                 <label htmlFor="select-provider"
-                                       className="govuk-fieldset__heading">Specification:</label>
+                                       className="govuk-label">Specification:</label>
+                                <input className="govuk-input" type="text" disabled={true}
+                                       value={this.props.specifications.name}/>
                             </div>
-                            <input type="text" disabled={true} value={this.props.specifications.name}/>
-                        </div>
-                    </fieldset>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className="form-group">
-                                <button className="button button-publish" onClick={(e) => this.viewFunding(e)}
-                                        disabled={this.props.specifications.id === ""}>View
-                                    Funding
-                                </button>
+                        </fieldset>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div className="form-group">
+                                    <button className="govuk-button" data-module="govuk-button"
+                                            onClick={(e) => this.viewFunding(e)}
+                                            disabled={this.props.specifications.id === ""}>View
+                                        Funding
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
+                </div>
                 <Footer/>
             </div>;
         }
@@ -248,336 +247,341 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
             return <div>
                 <Header/>
                 <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
-                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
-                        subtitle="You can approve and release funding for payment for completed specifications"/>
-                <main className="container" hidden={this.props.pageState !== "IDLE"}>
-                    <p><i className="glyphicon glyphicon-exclamation-sign"> </i> Only one funding stream can be approved
-                        or
-                        released at a time</p>
+                <div className="govuk-width-container">
+                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
+                            subtitle="You can approve and release funding for payment for completed specifications"/>
+                    <main className="container" hidden={this.props.pageState !== "IDLE"}>
 
-                    <div className="row table-filter-container">
-                        <div className="col-xs-2 col-sm-2 col-md-3 col-lg-3">
-                            <label htmlFor="ProviderType">Provider Type</label>
-                            <select name="ProviderType" id="ProviderType" onChange={(e) => {
-                                this.filterProviderType(e)
-                            }}>
-                                <option value="">Show all</option>
-                                {this.props.filterTypes[0].facetValues.map(facet =>
-                                    <option key={facet.name}>{facet.name}</option>
-                                )}
-                            </select>
+                        <div className="govuk-warning-text">
+                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong className="govuk-warning-text__text">
+                                <span className="govuk-warning-text__assistive">Warning</span>
+                                Only one funding stream can be
+                                approved
+                                or
+                                released at a time.
+                            </strong>
                         </div>
-                        <div className="col-xs-2 col-sm-2 col-md-3 col-lg-3">
-                            <label htmlFor="LocalAuthority">Local Authority</label>
-                            <select name="LocalAuthority" id="LocalAuthority" onChange={(e) => {
-                                this.filterLocalAuthority(e)
-                            }}>
-                                <option value="">Show all</option>
-                                {this.props.filterTypes[1].facetValues.map(facet =>
-                                    <option key={facet.name}>{facet.name}</option>
-                                )}
-                            </select>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-one-quarter">
+                                <label className="govuk-label" htmlFor="ProviderType">Provider Type</label>
+                                <select className="govuk-select" name="ProviderType" id="ProviderType" onChange={(e) => {
+                                    this.filterProviderType(e)
+                                }}>
+                                    <option value="">Show all</option>
+                                    {this.props.filterTypes[0].facetValues.map(facet =>
+                                        <option key={facet.name}>{facet.name}</option>
+                                    )}
+                                </select>
+                            </div>
+                            <div className="govuk-grid-column-one-quarter">
+                                <label className="govuk-label" htmlFor="LocalAuthority">Local Authority</label>
+                                <select className="govuk-select" name="LocalAuthority" id="LocalAuthority" onChange={(e) => {
+                                    this.filterLocalAuthority(e)
+                                }}>
+                                    <option value="">Show all</option>
+                                    {this.props.filterTypes[1].facetValues.map(facet =>
+                                        <option key={facet.name}>{facet.name}</option>
+                                    )}
+                                </select>
+                            </div>
+                            <div className="govuk-grid-column-one-quarter">
+                                <label className="govuk-label" htmlFor="Status">Status</label>
+                                <select className="govuk-select" name="Status" id="Status" onChange={(e) => {
+                                    this.filterStatus(e)
+                                }}>
+                                    <option value="">Show all</option>
+                                    {this.props.filterTypes[2].facetValues.map(facet =>
+                                        <option key={facet.name}>{facet.name}</option>
+                                    )}
+                                </select>
+                            </div>
+                            <div className="govuk-grid-column-one-quarter">
+                                <h4 className="govuk-heading-s">Funding Total</h4>
+                                <p
+                                    className="govuk-body">£{this.props.publishedProviderResults.filteredFundingAmount}</p>
+                                <p className="govuk-body">of filtered items</p>
+                            </div>
                         </div>
-                        <div className="col-xs-2 col-sm-2 col-md-3 col-lg-4">
-                            <label htmlFor="Status">Status</label>
-                            <select name="Status" id="Status" onChange={(e) => {
-                                this.filterStatus(e)
-                            }}>
-                                <option value="">Show all</option>
-                                {this.props.filterTypes[2].facetValues.map(facet =>
-                                    <option key={facet.name}>{facet.name}</option>
-                                )}
-                            </select>
+                        <div className="govuk-row">
+                            <div className="govuk-grid-column-full">
+                                <p className="govuk-body govuk-!-margin-right-1">Showing</p>
+                                <select className="govuk-select govuk-!-margin-right-1" name="viewFundingPageSize" id="viewFundingPageSize" onChange={(e) => {
+                                    this.changePageSize(e)
+                                }}>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                </select>
+                                <p className="govuk-body govuk-!-margin-right-1">of {this.props.publishedProviderResults.totalResults}</p>
+                            </div>
                         </div>
-                        <div className="col-xs-3 col-sm-3 col-md-3 col-lg-2 pull-right">
-                            <span>Funding Total</span>
-                            <div
-                                className="bold-medium">£{this.props.publishedProviderResults.filteredFundingAmount}</div>
-                            <span>of filtered items</span>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            Showing
-                            <select name="viewFundingPageSize" id="viewFundingPageSize" onChange={(e) => {
-                                this.changePageSize(e)
-                            }}>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="200">200</option>
-                            </select>
-                            of {this.props.publishedProviderResults.totalResults}
-                        </div>
-                    </div>
-                    <div id="funding-table">
-                        <table>
-                            <thead>
-                            <tr>
-                                <td className="table-type-header">Provider name</td>
-                                <td>UKPRN</td>
-                                <td>Status</td>
-                                <td>Funding total</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {this.props.publishedProviderResults.providers.map(fp =>
-                                <tr key={fp.id}>
-                                    <td>{fp.providerName}</td>
-                                    <td>{fp.ukprn}</td>
-                                    <td>{fp.fundingStatus}</td>
-                                    <td>&pound;{fp.fundingValue}</td>
+                        <div id="funding-table">
+                            <table className="govuk-table">
+                                <thead className="govuk-table__head">
+                                <tr className="govuk-table__row">
+                                    <td className="govuk-table__header">Provider name</td>
+                                    <td className="govuk-table__header">UKPRN</td>
+                                    <td className="govuk-table__header">Status</td>
+                                    <td className="govuk-table__header">Funding total</td>
                                 </tr>
-                            )}
+                                </thead>
+                                <tbody className="govuk-table__body">
+                                {this.props.publishedProviderResults.providers.map(fp =>
+                                    <tr className="govuk-table__body" key={fp.id}>
+                                        <td className="govuk-table__cell">{fp.providerName}</td>
+                                        <td className="govuk-table__cell">{fp.ukprn}</td>
+                                        <td className="govuk-table__cell">{fp.fundingStatus}</td>
+                                        <td className="govuk-table__cell">&pound;{fp.fundingValue}</td>
+                                    </tr>
+                                )}
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
 
+                            <div className="row">
+                                <div className="col-xs-12">
+                                    <ul className="pagination">
+                                        <li className="hasPrevious">
+                                            <button title="View First Page"
+                                                    disabled={this.props.publishedProviderResults.currentPage === 1}
+                                                    onClick={() => this.movePage("firstPage")}><i
+                                                className="material-icons">first_page</i>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button disabled={this.props.publishedProviderResults.currentPage === 1}
+                                                    onClick={() => this.movePage("previousPage")}><i
+                                                className="material-icons">chevron_left</i></button>
+                                        </li>
+                                        <li className="hasNext">
+                                            <button title="View Next Page"
+                                                    disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
+                                                    onClick={() => this.movePage("nextPage")}><i
+                                                className="material-icons">chevron_right</i>
+                                            </button>
+                                        </li>
+                                        <li className="hasNext">
+                                            <button title="View Last Page"
+                                                    disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
+                                                    onClick={() => this.movePage("lastPage")}><i
+                                                className="material-icons">last_page</i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="govuk-row">
+                                    <button className="govuk-button govuk-!-margin-right-1"
+                                            onClick={() => this.approveFunding()}>Approve
+                                    </button>
+                                    <button className="govuk-button govuk-!-margin-right-1"
+                                            disabled={!this.props.publishedProviderResults.canPublish}
+                                            onClick={() => this.publishFunding()}>Publish
+                                    </button>
+                                    <button className="govuk-button"
+                                            onClick={() => this.refreshFunding()}>Refresh
+                                        funding
+                                    </button>
+                                    <p className="govuk-body">Last refresh on: Not Available</p>
+                            </div>
+                        </div>
+
+                    </main>
+                    <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
                         <div className="row">
-                            <div className="col-xs-12">
-                                <ul className="pagination">
-                                    <li className="hasPrevious">
-                                        <button title="View First Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                onClick={() => this.movePage("firstPage")}><i
-                                            className="material-icons">first_page</i>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                onClick={() => this.movePage("previousPage")}><i
-                                            className="material-icons">chevron_left</i></button>
-                                    </li>
-                                    <li className="hasNext">
-                                        <button title="View Next Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                onClick={() => this.movePage("nextPage")}><i
-                                            className="material-icons">chevron_right</i>
-                                        </button>
-                                    </li>
-                                    <li className="hasNext">
-                                        <button title="View Last Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                onClick={() => this.movePage("lastPage")}><i
-                                            className="material-icons">last_page</i>
-                                        </button>
-                                    </li>
-                                </ul>
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <table className="govuk-table">
+                                    <caption className="govuk-table__caption">You have selected:</caption>
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__header">Provider Name</th>
+                                        <th className="govuk-table__header">Info</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="govuk-table__body">
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Number of providers to approve</td>
+                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalResults}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="govuk-table__header">Provider Types Selected</td>
+                                        <td className="govuk-table__cell">You have
+                                            selected {this.props.publishedProviderResults.providers.length} providers
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="govuk-table__header">Provider local authorities selected</td>
+                                        <td className="govuk-table__cell">You have
+                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                            authorities
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                         <div className="row">
-                            <div
-                                className="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-9 col-sm-offset-9 col-md-offset-9 col-lg-offset-9">
-                                <button className="button button-publish"
-                                        onClick={() => this.approveFunding()}>Approve
-                                </button>
-                                <button className="button button-publish"
-                                        disabled={!this.props.publishedProviderResults.canPublish}
-                                        onClick={() => this.publishFunding()}>Publish
-                                </button>
-                                <button className="button button-publish"
-                                        onClick={() => this.refreshFunding()}>Refresh
-                                    funding
-                                </button>
-                                <p>Last refresh on: Not Available</p>
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <table className="govuk-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__header">Specification Details</th>
+                                        <th className="govuk-table__header">Info</th>
+                                        <th className="govuk-table__header">Funding</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="govuk-table__body">
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__cell">Funding Period</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.fundingPeriod.name}</td>
+                                        <td className="govuk-table__cell"></td>
+                                    </tr>
+                                    <tr>
+                                        <td className="govuk-table__cell">Specification selected</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.name}</td>
+                                        <td className="govuk-table__cell"></td>
+                                    </tr>
+                                    <tr>
+                                        <td className="govuk-table__cell">Funding Stream</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.fundingStreams.map(stream =>
+                                            stream.name
+                                        )}</td>
+                                        <td className="govuk-table__cell"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div className="spacing-30"></div>
+                                <table className="govuk-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__header">Total funding being approved</th>
+                                        <th className="govuk-table__header"></th>
+                                        <th className="govuk-table__header">£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                                <button className="govuk-button"
+                                        onClick={() => this.confirmApproveFunding()}>Confirm Approval
+                                </button>
 
-                </main>
-                <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <h2>You have selected:</h2>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Provider Name</th>
-                                    <th>Info</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Number of providers to approve</td>
-                                    <td>{this.props.publishedProviderResults.totalResults}</td>
-                                </tr>
-                                <tr>
-                                    <td>Provider Types Selected</td>
-                                    <td>You have
-                                        selected {this.props.publishedProviderResults.providers.length} providers
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Provider local authorities selected</td>
-                                    <td>You have
-                                        selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
-                                        authorities
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                            </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Specification Details</th>
-                                    <th>Info</th>
-                                    <th>Funding</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Funding Period</td>
-                                    <td>{this.props.specifications.fundingPeriod.name}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Specification selected</td>
-                                    <td>{this.props.specifications.name}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Funding Stream</td>
-                                    <td>{this.props.specifications.fundingStreams.map(stream =>
-                                        stream.name
-                                    )}</td>
-                                    <td></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className="spacing-30"></div>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Total funding being approved</th>
-                                    <th></th>
-                                    <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
-                                </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                            <button className="button button-publish"
-                                    onClick={() => this.confirmApproveFunding()}>Confirm Approval
-                            </button>
+                        <div className="spacing-30"></div>
+                    </main>
+                    <main className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 
+                                <table className="">
+                                    <caption className="govuk-table__caption">You have selected:</caption>
+                                    <thead>
+                                    <tr>
+                                        <th>Provider Name</th>
+                                        <th>Info</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Number of providers to publish</td>
+                                        <td>{this.props.publishedProviderResults.totalResults}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Provider Types Selected</td>
+                                        <td>You have
+                                            selected {this.props.publishedProviderResults.providers.length} providers
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Provider local authorities selected</td>
+                                        <td>You have
+                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                            authorities
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    <div className="spacing-30"></div>
-                </main>
-                <main className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <h2>You have selected:</h2>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Provider Name</th>
-                                    <th>Info</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Number of providers to publish</td>
-                                    <td>{this.props.publishedProviderResults.totalResults}</td>
-                                </tr>
-                                <tr>
-                                    <td>Provider Types Selected</td>
-                                    <td>You have
-                                        selected {this.props.publishedProviderResults.providers.length} providers
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Provider local authorities selected</td>
-                                    <td>You have
-                                        selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
-                                        authorities
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Specification Details</th>
+                                        <th>Info</th>
+                                        <th>Funding</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Funding Period</td>
+                                        <td>{this.props.specifications.fundingPeriod.name}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Specification selected</td>
+                                        <td>{this.props.specifications.name}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Funding Stream</td>
+                                        <td>{this.props.specifications.fundingStreams.map(stream =>
+                                            stream.name
+                                        )}</td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Specification Details</th>
-                                    <th>Info</th>
-                                    <th>Funding</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Funding Period</td>
-                                    <td>{this.props.specifications.fundingPeriod.name}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Specification selected</td>
-                                    <td>{this.props.specifications.name}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Funding Stream</td>
-                                    <td>{this.props.specifications.fundingStreams.map(stream =>
-                                        stream.name
-                                    )}</td>
-                                    <td></td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <table className="govuk-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__head">Total funding being published</th>
+                                        <th className="govuk-table__head"></th>
+                                        <th className="govuk-table__head">£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <div className="spacing-30"></div>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Total funding being published</th>
-                                    <th></th>
-                                    <th>£{this.props.publishedProviderResults.filteredFundingAmount}</th>
-                                </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                            <button className="button button-publish"
-                                    onClick={() => this.confirmPublishFunding()}>Confirm Publish
-                            </button>
+                        <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                                <button className="button button-publish"
+                                        onClick={() => this.confirmPublishFunding()}>Confirm Publish
+                                </button>
 
+                            </div>
                         </div>
+                    </main>
+
+                    <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
+                        <NotificationSignal jobType="RefreshFundingJob"
+                                            jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
+                                            message="Waiting to refresh funding" callback={this.props.changePageState}/>
                     </div>
-                    <div className="spacing-30"></div>
-                </main>
-                <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
-                    <NotificationSignal jobType="RefreshFundingJob"
-                                        jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
-                                        message="Waiting to refresh funding" callback={this.props.changePageState}/>
+                    <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
+                        <NotificationSignal jobType="ApproveFunding"
+                                            jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
+                                            message="Waiting to approve funding" callback={this.props.changePageState}/>
+                    </div>
+                    <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
+                        <NotificationSignal jobType="PublishFundingJob"
+                                            jobId={this.props.pageState === "PUBLISH_FUNDING_JOB" ? this.props.specifications.id : ""}
+                                            message="Waiting to publish funding" callback={this.props.changePageState}/>
+                    </div>
                 </div>
-                <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
-                    <NotificationSignal jobType="ApproveFunding"
-                                        jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
-                                        message="Waiting to approve funding" callback={this.props.changePageState}/>
-                </div>
-                <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
-                    <NotificationSignal jobType="PublishFundingJob"
-                                        jobId={this.props.pageState === "PUBLISH_FUNDING_JOB" ? this.props.specifications.id : ""}
-                                        message="Waiting to publish funding" callback={this.props.changePageState}/>
-                </div>
-
                 <Footer/>
             </div>;
         }

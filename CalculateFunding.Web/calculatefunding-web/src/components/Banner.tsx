@@ -12,29 +12,17 @@ interface IBannerTypes {
 export class Banner extends React.Component<IBannerTypes, {}> {
     render() {
         if (this.props.bannerType === "Left") {
-            return <section className="banner-container">
+            return <section className="banner-container" hidden={this.props.breadcrumbs.length === 0}>
                 <div className="container">
                     <div className="row">
                         <div className="col-xs-9">
                             <Breadcrumbs>
                                 {this.props.breadcrumbs.map(bread =>
                                     (bread.url != null) ?
-                                        (<li key={bread.name}><a href={bread.url}>{bread.name}</a></li>) :
-                                        (<li key={bread.name}>{bread.name}</li>)
+                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item"><a href={bread.url} className="govuk-breadcrumbs__link">{bread.name}</a></li>) :
+                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item" aria-current="page">{bread.name}</li>)
                                 )}
                             </Breadcrumbs>
-                        </div>
-                        <div className="col-xs-3">
-                            <div className="banner-container-right">
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-xs-12">
-                            <h1 className="hero-title">{this.props.title}</h1>
-                            <h2 className="hero-description">{this.props.subtitle}</h2>
                         </div>
                     </div>
                 </div>
@@ -59,17 +47,13 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                         </div>
                     </div>
                 </div>
-                <section className="banner-link-wrapper">
+                <section className="banner-link-wrapper" hidden={this.props.breadcrumbs.length === 0}>
                     <div className="container">
                         <div className="row">
                             <div className="col-xs-9">
                                 <Breadcrumbs>
                                     {this.props.children}
                                 </Breadcrumbs>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-xs-12">
                             </div>
                         </div>
                     </div>
@@ -90,11 +74,11 @@ export class Banner extends React.Component<IBannerTypes, {}> {
 
                         </span>
                             </div>
-                            <hr className="spacing-15"/>
+                            <hr />
                         </div>
                     </div>
                 </div>
-                <section className="form-banner-container">
+                <section className="form-banner-container" hidden={this.props.breadcrumbs.length === 0}>
                     <div className="container">
                         <div className="row">
                             <div className="col-xs-9">
@@ -104,18 +88,13 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                                     </Breadcrumbs>
                                 </div>
                             </div>
-                            <div className="col-xs-3">
-                                <div className="form-banner-container-right">
-                                </div>
-
-                            </div>
                         </div>
                     </div>
                 </section>
             </div>
         }
         if (this.props.bannerType === "WholeBlue") {
-            return <section className="banner-container">
+            return <section className="banner-container" hidden={this.props.breadcrumbs.length === 0}>
                 <div className="container">
                     <div className="row">
                         <div className="col-xs-12">
