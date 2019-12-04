@@ -4369,6 +4369,33 @@ a.govuk-back-link:hover {
       text-decoration: none;
       border-radius: 0;
       margin: 0 15px; }
+.funding-line-status-cont { float: right !important; }
+.funding-line-status {
+  background-color: #00823b;
+  position: relative;
+  display: -moz-inline-stack;
+  display: inline-block;
+  padding: .526315em .789473em .263157em;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  -webkit-appearance: none;
+  font-size: 1em;
+  line-height: 1.25;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  color: #fff;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  vertical-align: top; }
+
+.funding-line-status-Draft { background-color: #768693 !important; }
+.funding-line-status-Approved { background-color: #28a197 !important; }
+.funding-line-status-Updated { background-color: #f47738 !important; }
 
 .funding-line-structure-level-1 td { font-weight: bold; }
 #funding-lines-table {

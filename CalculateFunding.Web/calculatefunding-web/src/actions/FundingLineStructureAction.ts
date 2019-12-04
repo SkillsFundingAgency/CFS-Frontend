@@ -7,7 +7,8 @@ import {Specification} from "../types/viewFundingTypes";
 
 export enum FundingLineStructureActionTypes {
     GET_FUNDINGLINESTRUCTURE = 'getFundingLineStructure',
-    GET_SPECIFICATIONBYID = 'getSpecificationById'
+    GET_SPECIFICATIONBYID = 'getSpecificationById',
+    CHANGE_FUNDINGLINESTATUS = 'changeFundingLineState'
 }
 
 export interface IGetFundingLineStructureAction {
@@ -20,9 +21,15 @@ export interface IGetSpecificationAction {
     payload: Specification
 }
 
+export interface ChangeFundingLineStatusAction {
+    type: FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS,
+    payload: string
+}
+
 export type FundingLineStructureAction =
     IGetSpecificationAction
-    | IGetFundingLineStructureAction;
+    | IGetFundingLineStructureAction
+    | ChangeFundingLineStatusAction;
 
 export const getFundingLineStructure:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = () => {
@@ -62,3 +69,34 @@ export const getSpecificationById:
         });
     }
 };
+
+export const changeFundingLineState:
+    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId: string) => {
+    return async (dispatch: Dispatch) => {
+        const publishStatusEditModel: PublishStatusModel = {
+            publishStatus: PublishStatus.Approved
+        };
+
+        const response = await axios(`api/specs/${specificationId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: publishStatusEditModel
+        });
+
+        let publishStatusModelResult = response.data as PublishStatusModel;
+
+        dispatch({
+            type: FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS,
+            payload: publishStatusModelResult.publishStatus as PublishStatus
+        });
+    }
+};
+
+export enum PublishStatus {
+    Approved = "Approved",
+}
+export interface PublishStatusModel {
+    publishStatus: PublishStatus;
+}

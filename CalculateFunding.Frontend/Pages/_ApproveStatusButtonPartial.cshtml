@@ -1,10 +1,12 @@
 ﻿<script type="text/template" id="componenttemplate-approvestatus-button">
     <div class="btn-group">
-        <button type="button" class="btn btn-status btn-status-text" data-bind="css : buttonCssClass, enable: !isLoading()" aria-label="Approval Status">
+        <button type="button" class="btn btn-status btn-status-text" 
+                data-bind="css : buttonCssClass, enable: !isLoading()" aria-label="Approval Status">
             <span data-bind="text: publishStatus, visible: state() === 'idle'"></span>
             <span data-bind="visible: state() === 'loading'"><i class="material-icons">timer</i> Loading</span>
         </button>
-        <button type="button" class="btn dropdown-toggle btn-status" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Select Approval Status" data-bind="css : buttonCssClass, enable: canApprove">
+        <button type="button" class="btn dropdown-toggle btn-status" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Select Approval Status" 
+                data-bind="css : buttonCssClass, enable: canApprove">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
         </button>

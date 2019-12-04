@@ -20,7 +20,8 @@ const initialState: IFundingLineStructureState = {
         description: "",
         approvalStatus: ""
     },
-    fundingLineStructureResult: []
+    fundingLineStructureResult: [],
+    fundingLineStatusResult: ""
 };
 
 export function reduceFundingLineStructureState(state: IFundingLineStructureState = initialState, action: FundingLineStructureAction): IFundingLineStructureState {
@@ -29,6 +30,8 @@ export function reduceFundingLineStructureState(state: IFundingLineStructureStat
             return {...state, fundingLineStructureResult: action.payload};
         case FundingLineStructureActionTypes.GET_SPECIFICATIONBYID:
             return {...state, specificationResult: action.payload};
+        case FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS:
+            return {...state, fundingLineStatusResult: action.payload};
         default:
             return state;
     }

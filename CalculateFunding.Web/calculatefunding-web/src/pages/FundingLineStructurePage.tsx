@@ -2,10 +2,9 @@ import * as React from 'react';
 import {Header} from "../components/Header";
 import {Banner} from "../components/Banner";
 import {Footer} from "../components/Footer";
-import {IFundingStructureItem} from "../types/FundingStructureItem";
-import {FundingStructureType} from "../types/FundingStructureItem";
-import {Navigation} from "../components/Navigation";
-import {NavigationLevel} from "../components/Navigation";
+import {ApproveStatusButton} from "../components/ApproveStatusButton";
+import {Navigation, NavigationLevel} from "../components/Navigation";
+import {IFundingStructureItem, FundingStructureType} from "../types/FundingStructureItem";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {Specification} from "../types/viewFundingTypes";
 
@@ -14,12 +13,15 @@ export interface IFundingLineStructureProps {
     fundingLineStructureResult: IFundingStructureItem[];
     getSpecificationById: any;
     specificationResult: Specification;
+    changeFundingLineState: any;
+    fundingLineStatusResult: string;
 }
 
 export default class FundingLineStructurePage extends React.Component<IFundingLineStructureProps, {}> {
     componentDidMount(): void {
         this.props.getFundingLineStructure();
         this.props.getSpecificationById();
+
     }
 
     render() {
@@ -36,7 +38,6 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
                 url: null,
                 name: this.props.specificationResult ? (this.props.specificationResult.name) : ('')
             }];
-
         let fundingLines;
         if (this.props.fundingLineStructureResult != null) {
             fundingLines = this.props.fundingLineStructureResult.map(f =>
@@ -94,6 +95,10 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
                 </Banner>;
         }
 
+        let fundingLineStatus = this.props.specificationResult.approvalStatus;
+        if (this.props.fundingLineStatusResult != null && this.props.fundingLineStatusResult != "")
+            fundingLineStatus = this.props.fundingLineStatusResult;
+
         return <div>
             <Header/>
             <Navigation currentNavigationLevel={NavigationLevel.Specification}/>
@@ -106,15 +111,15 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
                     <ul className="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs"
                         role="tablist">
                         <li className="nav-item active">
-                            <a id="nav-policy-tab" href={"/specs/fundinglinestructure/" + specId}
+                            <a href={"/specs/fundinglinestructure/" + specId}
                                role="tab" aria-selected="false">Funding Line Structure</a>
                         </li>
                         <li className="nav-item">
-                            <a id="nav-policy-tab" href={"/calcs/additionalcalculations/" + specId}
+                            <a href={"/calcs/additionalcalculations/" + specId}
                                role="tab" aria-selected="true">Additional calculations</a>
                         </li>
                         <li className="nav-item">
-                            <a id="nav-dataset-tab" href={"/datasets/listdatasetschemas/" + specId}
+                            <a href={"/datasets/listdatasetschemas/" + specId}
                                role="tab" aria-selected="false">
                                     <span className="provider-datasets-warning-tab">
                                         <span>Datasets</span>
@@ -122,8 +127,13 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a id="nav-policy-tab" href={"/specs/releasetimetable/" + specId} role="tab"
+                            <a href={"/specs/releasetimetable/" + specId} role="tab"
                                aria-selected="true">Release timetable</a>
+                        </li>
+                        <li className="nav-item funding-line-status-cont">
+                            <ApproveStatusButton id={this.props.specificationResult.id}
+                                                 status={fundingLineStatus}
+                                                 callback={this.props.changeFundingLineState} />
                         </li>
                     </ul>
                     <div className="row">
