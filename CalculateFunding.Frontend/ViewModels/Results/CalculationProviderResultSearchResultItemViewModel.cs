@@ -54,30 +54,12 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public void SetCalculationResultDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
         {
-	        CalculationResultDisplay = AsDisplay(calculationValueTypeViewModel);
+	        CalculationResultDisplay = CalculationResult.AsFormatCalculationType(calculationValueTypeViewModel);
         }
 
         public string AsDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
         {
-            if (CalculationResult.HasValue)
-            {
-                switch (calculationValueTypeViewModel)
-                {
-                    case CalculationValueTypeViewModel.Number:
-                        return CalculationResult.Value.AsFormattedNumber();
-                    case CalculationValueTypeViewModel.Percentage:
-                        return CalculationResult.Value.AsFormattedPercentage();
-                    case CalculationValueTypeViewModel.Currency:
-                        return CalculationResult.Value.AsFormattedMoney();
-                    default:
-                        throw new InvalidOperationException("Unknown calculation type");
-                }
-            }
-            else
-            {
-                return Properties.PageText.ExcludedText;
-            }
-
+            return CalculationResult.AsFormatCalculationType(calculationValueTypeViewModel);
         }
     }
 }
