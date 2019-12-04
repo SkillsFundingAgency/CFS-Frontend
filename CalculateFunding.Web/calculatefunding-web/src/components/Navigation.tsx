@@ -73,7 +73,7 @@ export class Navigation extends React.Component<INavigationLevel,{}>{
                         </li>
                         <li>
                             <div className="navbar-item-container">
-                                <a href="/app/viewfunding">Funding approvals</a>
+                                <a href="/approvals">Funding approvals</a>
                                 <div className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (activeStyle) : (normalStyle)}>
                                     <img alt="Selected" src="/assets/images/navbar_selected.png"/>
                                 </div>

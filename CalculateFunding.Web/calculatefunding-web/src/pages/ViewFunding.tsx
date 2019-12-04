@@ -170,7 +170,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 name: "Calculate Funding"
             },
             {
-                url: "/app/approvals",
+                url: "/approvals",
                 name: "Funding Approvals"
             },
             {

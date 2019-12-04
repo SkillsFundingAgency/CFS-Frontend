@@ -76,7 +76,7 @@ export class Home extends Component<IHomeProps, {}> {
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/app/viewfunding" className="govuk-link">Funding approvals</a>
+                                            <a href="/approvals" className="govuk-link">Funding approvals</a>
                                         </div>
                                         <p className="govuk-body">Approve funding for providers and view how it's been calculated.</p>
                                     </div>
