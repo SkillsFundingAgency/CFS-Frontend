@@ -49,52 +49,61 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            AzureAdOptions azureAdOptions = new AzureAdOptions();
-            Configuration.Bind("AzureAd", azureAdOptions);
-            _authenticationEnabled = azureAdOptions.IsEnabled;
+            bool enablePlatformAuth = Configuration.GetValue<bool>("features:enablePlatformAuth");
 
-            if (_authenticationEnabled)
+            if (enablePlatformAuth)
             {
-                services.AddAuthentication(adOptions =>
-                {
-                    adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                })
-                .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-                .AddCookie();
-
-                services.AddAuthorization();
-
-                services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
-                services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
-
-                services.Configure<PermissionOptions>(options =>
-                {
-                    Configuration.GetSection("permissionOptions").Bind(options);
-                });
-
-                services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-
-                services.AddMvc(config =>
-                {
-                    AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
-                                     .RequireAuthenticatedUser()
-                                     .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
-                                     .Build();
-                    config.Filters.Add(new AuthorizeFilter(policy));
-
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                services.AddModule<AuthModule>(Configuration, _hostingEnvironment);
             }
             else
             {
-                services.AddAuthorization();
+                AzureAdOptions azureAdOptions = new AzureAdOptions();
+                Configuration.Bind("AzureAd", azureAdOptions);
+                _authenticationEnabled = azureAdOptions.IsEnabled;
 
-                services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
+                if (_authenticationEnabled)
+                {
+                    services.AddAuthentication(adOptions =>
+                    {
+                        adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    })
+                    .AddAzureAd(options => Configuration.Bind("AzureAd", options))
+                    .AddCookie();
 
-                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
-                services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
+                    services.AddAuthorization();
 
-                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                    services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
+                    services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
+
+                    services.Configure<PermissionOptions>(options =>
+                    {
+                        Configuration.GetSection("permissionOptions").Bind(options);
+                    });
+
+                    services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
+
+                    services.AddMvc(config =>
+                    {
+                        AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+                                         .RequireAuthenticatedUser()
+                                         .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
+                                         .Build();
+                        config.Filters.Add(new AuthorizeFilter(policy));
+
+                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                }
+                else
+                {
+                    services.AddAuthorization();
+
+                    services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
+
+                    services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
+                    services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
+
+                    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                }
             }
 
             services.AddAntiforgery(options =>
