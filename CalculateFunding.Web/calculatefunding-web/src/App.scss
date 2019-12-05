@@ -80,12 +80,47 @@
 /////////////////////////////////////
 /////      funding line         /////
 /////////////////////////////////////
-.funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) { width:10%; }
-.funding-lines-table tr td:nth-child(2) { width:20%; }
-.funding-lines-table tr td:nth-child(3) { width:70%; }
-.funding-line-status-container { float: right !important; }
-.funding-line-status-container .govuk-button { margin-bottom: 0 !important; padding:8px 5px 7px !important; }
-.approval-status-Draft { background-color: #768693 !important; }
-.approval-status-Approved { background-color: #28a197 !important; }
-.approval-status-Updated { background-color: #f47738 !important; }
-.approve-button-container { float:right; }
+.funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) {
+  width: 10%;
+}
+
+.funding-lines-table tr td {
+  &:nth-child(2) {
+    width: 20%;
+  }
+
+  &:nth-child(3) {
+    width: 70%;
+  }
+}
+
+.funding-line-status-container {
+  float: right !important;
+
+  .govuk-button {
+    margin-bottom: 0 !important;
+    padding: 8px 5px 7px !important;
+  }
+}
+
+.approval-status-Draft {
+  background-color: #768693 !important;
+}
+
+.approval-status-Approved {
+  background-color: #28a197 !important;
+}
+
+.approval-status-Updated {
+  background-color: #f47738 !important;
+}
+
+.approve-button-container {
+  float: right;
+}
+
+
+.viewfunding-filter {
+  background-color: $govuk-border-colour;
+  padding: 10px;
+}

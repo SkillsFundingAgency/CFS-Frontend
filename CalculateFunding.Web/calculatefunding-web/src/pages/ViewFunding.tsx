@@ -262,7 +262,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 released at a time.
                             </strong>
                         </div>
-                        <div className="govuk-grid-row">
+                        <div className="govuk-grid-row viewfunding-filter">
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="ProviderType">Provider Type</label>
                                 <select className="govuk-select" name="ProviderType" id="ProviderType" onChange={(e) => {
@@ -297,10 +297,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </select>
                             </div>
                             <div className="govuk-grid-column-one-quarter">
-                                <h4 className="govuk-heading-s">Funding Total</h4>
-                                <p
-                                    className="govuk-body">£{this.props.publishedProviderResults.filteredFundingAmount}</p>
-                                <p className="govuk-body">of filtered items</p>
+                                <span className="govuk-body">Funding Total</span>
+                                <p className="govuk-body govuk-!-font-size-27 govuk-!-font-weight-bold govuk-!-margin-bottom-0">£{this.props.publishedProviderResults.filteredFundingAmount}</p>
+                                <span className="govuk-body">of filtered items</span>
                             </div>
                         </div>
                         <div className="govuk-row">
