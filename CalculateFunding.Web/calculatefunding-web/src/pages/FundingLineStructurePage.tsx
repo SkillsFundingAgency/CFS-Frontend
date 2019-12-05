@@ -10,18 +10,16 @@ import {Specification} from "../types/viewFundingTypes";
 
 export interface IFundingLineStructureProps {
     getFundingLineStructure: any;
-    fundingLineStructureResult: IFundingStructureItem[];
     getSpecificationById: any;
-    specificationResult: Specification;
     changeFundingLineState: any;
+    fundingLineStructureResult: IFundingStructureItem[];
+    specificationResult: Specification;
     fundingLineStatusResult: string;
 }
 
 export default class FundingLineStructurePage extends React.Component<IFundingLineStructureProps, {}> {
     componentDidMount(): void {
-        this.props.getFundingLineStructure();
         this.props.getSpecificationById();
-
     }
 
     render() {
@@ -40,55 +38,56 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
             }];
         let fundingLines;
         if (this.props.fundingLineStructureResult != null) {
-            fundingLines = this.props.fundingLineStructureResult.map(f =>
-            {
+            fundingLines = this.props.fundingLineStructureResult.map(f => {
                 let calculationId = <span>{f.name}</span>;
-                if (f.calculationId != null)
-                {
-                  calculationId = <a href={"/calcs/editTemplateCalculation/" + f.calculationId}>{f.name}</a>;
+                if (f.calculationId != null) {
+                    calculationId = <a className={"govuk-link"} href={"/calcs/editTemplateCalculation/" + f.calculationId}>{f.name}</a>;
                 }
-                return <tr className={f.level === 1 ? ('funding-line-structure-level-1') : ('')}>
-                    <td>{f.level}</td>
-                    <td>{FundingStructureType[f.type]}</td>
-                    <td>{calculationId}</td>
+                return <tr
+                    className={"govuk-table__row " + (f.level === 1 ? ('govuk-!-font-weight-bold') : (''))}>
+                    <td className="govuk-table__cell">{f.level}</td>
+                    <td className="govuk-table__cell">{FundingStructureType[f.type]}</td>
+                    <td className="govuk-table__cell">{calculationId}</td>
                 </tr>
             });
         }
         let banner = <span/>;
-        let whatIsSpecName = <span/>;
         let specId = "";
         if (this.props.specificationResult != null) {
             specId = this.props.specificationResult.id;
+            let fundingStreams = this.props.specificationResult.fundingStreams;
+            let fundingStreamNames = fundingStreams.map(f =>
+                <p className="govuk-!-font-weight-regular">{f.name}</p>
+            );
+            if (fundingStreams.length > 0 && this.props.fundingLineStructureResult.length === 0) {
+                this.props.getFundingLineStructure(specId, fundingStreams[0].id);
+            }
             let specName = this.props.specificationResult.name;
             let fundingPeriod = this.props.specificationResult.fundingPeriod.name;
-            let fundingStreams = this.props.specificationResult.fundingStreams.map(f =>
-                <p className="hero-subtext">{f.name}</p>
-            );
-
             let editSpecificationUrl = "/specs/editspecification/" + specId + "?returnPage=ManagePolicies";
             let createCalculationUrl = "/calcs/createadditionalcalculation/" + specId;
             let editDatasetUrl = "/datasets/AssignDatasetSchema/" + specId;
 
             banner =
                 <Banner bannerType='WholeBlue' breadcrumbs={breadcrumbs} title="" subtitle="">
-                    <div className="banner-link-container">
+                    <div className="govuk-body banner-link-container">
                         <div className="banner-link-left-container">
-                            <p className="hero-text-bold">Specification name:</p>
-                            <h1 className="hero-title-headed">{specName}</h1>
-                            <p className="hero-text-bold">Funding period:</p>
-                            <p className="hero-subtext">{fundingPeriod}</p>
-                            <p className="hero-text-bold">Funding streams:</p>
-                            {fundingStreams}
+                            <p className="govuk-!-font-weight-bold">Specification name:</p>
+                            <h1 className="govuk-heading-xl">{specName}</h1>
+                            <p className="govuk-!-font-weight-bold">Funding period:</p>
+                            <p className="govuk-!-font-weight-regular">{fundingPeriod}</p>
+                            <p className="govuk-!-font-weight-bold">Funding streams:</p>
+                            {fundingStreamNames}
                         </div>
                         <div className="banner-link-right-container">
                             <div>
-                                <a href={editSpecificationUrl}>Edit specification</a>
+                                <a className="govuk-!-font-weight-regular" href={editSpecificationUrl}>Edit specification</a>
                             </div>
                             <div>
-                                <a href={createCalculationUrl}>Create additional calculation</a>
+                                <a className="govuk-!-font-weight-regular" href={createCalculationUrl}>Create additional calculation</a>
                             </div>
                             <div>
-                                <a href={editDatasetUrl}>Create dataset</a>
+                                <a className="govuk-!-font-weight-regular" href={editDatasetUrl}>Create dataset</a>
                             </div>
                         </div>
                     </div>
@@ -96,62 +95,61 @@ export default class FundingLineStructurePage extends React.Component<IFundingLi
         }
 
         let fundingLineStatus = this.props.specificationResult.approvalStatus;
-        if (this.props.fundingLineStatusResult != null && this.props.fundingLineStatusResult != "")
+        if (this.props.fundingLineStatusResult !== null && this.props.fundingLineStatusResult !== "")
             fundingLineStatus = this.props.fundingLineStatusResult;
 
         return <div>
             <Header/>
             <Navigation currentNavigationLevel={NavigationLevel.Specification}/>
             {banner}
-            <main className='container'>
-                <div className="edit-policy-container">
+            <main className='govuk-main-wrapper govuk-main-wrapper--l govuk-width-container'>
 
-                    {whatIsSpecName}
-
-                    <ul className="nav nav-tabs nav-tabs-pagenavigation spacing-15-bottom" id="managePoliciesTabs"
-                        role="tablist">
-                        <li className="nav-item active">
-                            <a href={"/specs/fundinglinestructure/" + specId}
-                               role="tab" aria-selected="false">Funding Line Structure</a>
+                <div className="govuk-tabs" data-module="govuk-tabs">
+                    <h2 className="govuk-tabs__title">
+                        Contents
+                    </h2>
+                    <ul className="govuk-tabs__list">
+                        <li className="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                            <a className="govuk-tabs__tab" href="#past-day">
+                                Funding Line Structure
+                            </a>
                         </li>
-                        <li className="nav-item">
-                            <a href={"/calcs/additionalcalculations/" + specId}
+                        <li className="govuk-tabs__list-item">
+                            <a className="govuk-tabs__tab" href={"/calcs/additionalcalculations/" + specId}
                                role="tab" aria-selected="true">Additional calculations</a>
                         </li>
-                        <li className="nav-item">
-                            <a href={"/datasets/listdatasetschemas/" + specId}
+                        <li className="govuk-tabs__list-item">
+                            <a className="govuk-tabs__tab" href={"/datasets/listdatasetschemas/" + specId}
                                role="tab" aria-selected="false">
                                     <span className="provider-datasets-warning-tab">
                                         <span>Datasets</span>
                                     </span>
                             </a>
                         </li>
-                        <li className="nav-item">
-                            <a href={"/specs/releasetimetable/" + specId} role="tab"
+                        <li className="govuk-tabs__list-item">
+                            <a className="govuk-tabs__tab" href={"/specs/releasetimetable/" + specId} role="tab"
                                aria-selected="true">Release timetable</a>
                         </li>
-                        <li className="nav-item funding-line-status-cont">
+                        <li className="nav-item funding-line-status-container">
                             <ApproveStatusButton id={this.props.specificationResult.id}
                                                  status={fundingLineStatus}
-                                                 callback={this.props.changeFundingLineState} />
+                                                 callback={this.props.changeFundingLineState}/>
                         </li>
                     </ul>
-                    <div className="row">
-                        <div className="col-xs-12">
-                            <table className="cf funding-lines-table" id="funding-lines-table">
-                                <thead>
-                                <tr>
-                                    <th className="sticky-header">Level</th>
-                                    <th className="sticky-header">Calculation Type</th>
-                                    <th className="sticky-header"></th>
-                                </tr>
-                                </thead>
-                                <tbody>
+                    <section className="govuk-tabs__panel" id="past-day">
+                        <table className="govuk-table funding-lines-table">
+                            <thead className="govuk-table__head">
+                            <tr className="govuk-table__row">
+                                <th scope="col" className="govuk-table__header">Level</th>
+                                <th scope="col" className="govuk-table__header">Calculation Type</th>
+                                <th scope="col" className="govuk-table__header"></th>
+                            </tr>
+                            </thead>
+                            <tbody className="govuk-table__body">
                                 {fundingLines}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                            </tbody>
+                        </table>
+                    </section>
                 </div>
             </main>
             <Footer/>

@@ -95,14 +95,14 @@ export class Banner extends React.Component<IBannerTypes, {}> {
         }
         if (this.props.bannerType === "WholeBlue") {
             return <section className="banner-container" hidden={this.props.breadcrumbs.length === 0}>
-                <div className="container">
+                <div className="govuk-width-container">
                     <div className="row">
                         <div className="col-xs-12">
                             <Breadcrumbs>
                                 {this.props.breadcrumbs.map(bread =>
                                     (bread.url != null) ?
-                                        (<li key={bread.name}><a href={bread.url}>{bread.name}</a></li>) :
-                                        (<li>{bread.name}</li>)
+                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item"><a href={bread.url} className="govuk-breadcrumbs__link">{bread.name}</a></li>) :
+                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item" aria-current="page">{bread.name}</li>)
                                 )}
                             </Breadcrumbs>
                             {this.props.children}

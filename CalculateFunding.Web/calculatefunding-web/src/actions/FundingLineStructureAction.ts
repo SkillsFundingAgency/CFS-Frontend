@@ -32,25 +32,21 @@ export type FundingLineStructureAction =
     | ChangeFundingLineStatusAction;
 
 export const getFundingLineStructure:
-    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = () => {
-    return async (dispatch: Dispatch) => {
-        // Workaround for getting specificationId and FundingStreamId until final solution
-        const params = new URLSearchParams(window.location.search);
-        const specificationIdQuery = params.get('specificationId');
-        const fundingStreamIdQuery = params.get('fundingStreamId');
-
-        const response = await axios(`/api/fundingstructures/specifications/${specificationIdQuery}/fundingstreams/${fundingStreamIdQuery}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        dispatch({
-            type: FundingLineStructureActionTypes.GET_FUNDINGLINESTRUCTURE,
-            payload: response.data as IFundingStructureItem[]
-        });
-    }
-};
+    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> =
+    (specificationId: string, fundingStreamId: string) => {
+        return async (dispatch: Dispatch) => {
+            const response = await axios(`/api/fundingstructures/specifications/${specificationId}/fundingstreams/${fundingStreamId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            dispatch({
+                type: FundingLineStructureActionTypes.GET_FUNDINGLINESTRUCTURE,
+                payload: response.data as IFundingStructureItem[]
+            });
+        }
+    };
 
 export const getSpecificationById:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = () => {
@@ -69,6 +65,14 @@ export const getSpecificationById:
         });
     }
 };
+
+export enum PublishStatus {
+    Approved = "Approved",
+}
+
+export interface PublishStatusModel {
+    publishStatus: PublishStatus;
+}
 
 export const changeFundingLineState:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId: string) => {
@@ -93,10 +97,3 @@ export const changeFundingLineState:
         });
     }
 };
-
-export enum PublishStatus {
-    Approved = "Approved",
-}
-export interface PublishStatusModel {
-    publishStatus: PublishStatus;
-}

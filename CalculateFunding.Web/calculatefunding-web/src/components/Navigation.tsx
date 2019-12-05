@@ -13,75 +13,42 @@ export enum NavigationLevel {
     FundingApproval
 }
 
-export class Navigation extends React.Component<INavigationLevel,{}>{
-    render(){
-        const activeStyle = "navbar-item-overlay navbar-item-overlay-active";
-        const normalStyle = "navbar-item-overlay";
+export class Navigation extends React.Component<INavigationLevel, {}> {
+    render() {
+        const activeStyle = "app-navigation__list-item--current";
+        const normalStyle = "app-navigation__list-item ";
 
-        return <nav className="navbar navbar-default">
-            <div className="container navbar-container">
-                <div className="navbar-header">
-                    <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
-                            data-target="#cfs-navbar-collapse" aria-expanded="false">
-                        <span className="sr-only">Toggle navigation</span>
-                        <span className="icon-bar"></span>
-                        <span className="icon-bar"></span>
-                        <span className="icon-bar"></span>
-                    </button>
-                </div>
-                <div className="collapse navbar-collapse navbar-container" id="cfs-navbar-collapse">
-                    <ul className="nav navbar-nav">
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/">Home</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.Home ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/specs">Specifications</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.Specification ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/datasets">Manage Data</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.ManageData ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/scenarios">Quality assurance tests</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.QualityTests ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/results">View results</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.ViewResult ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="navbar-item-container">
-                                <a href="/approvals">Funding approvals</a>
-                                <div className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (activeStyle) : (normalStyle)}>
-                                    <img alt="Selected" src="/assets/images/navbar_selected.png"/>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        return <nav className="app-navigation govuk-clearfix">
+            <ul className="app-navigation__list govuk-width-container">
+
+                <li className={this.props.currentNavigationLevel === NavigationLevel.Home ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/"
+                       data-topnav="Get started">Home</a>
+                </li>
+
+                <li className={this.props.currentNavigationLevel === NavigationLevel.Specification ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/specs"
+                       data-topnav="Styles">Specifications</a>
+                </li>
+
+                <li className={this.props.currentNavigationLevel === NavigationLevel.ManageData ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/datasets"
+                       data-topnav="Components">Manage Data</a>
+                </li>
+
+                <li className={this.props.currentNavigationLevel === NavigationLevel.QualityTests ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/scenarios"
+                       data-topnav="Patterns">Quality assurance tests</a>
+                </li>
+                <li className={this.props.currentNavigationLevel === NavigationLevel.ViewResult ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/results"
+                       data-topnav="Community">View results</a>
+                </li>
+                <li className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/app/viewfunding"
+                       data-topnav="Community">Funding approvals</a>
+                </li>
+            </ul>
         </nav>
     }
 }

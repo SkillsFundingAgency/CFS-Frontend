@@ -1,1 +1,91 @@
 @import '~govuk-frontend';
+
+.govuk-phase-banner {
+  border-bottom: 0 !important;
+}
+
+/////////////////////////////////////
+/////         Navbar            /////
+/////////////////////////////////////
+.nav { list-style: none;}
+.nav > li { float:left; position: relative; display: block; margin: 0; padding: 0;}
+.app-pane.app-pane--enabled {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.app-navigation {
+  font-family: "GDS Transport",Arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 700;
+  font-size: 19px;
+  font-size: 1.1875rem;
+  line-height: 1.31579;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  background-color: #f8f8f8;
+}
+.app-navigation__list {
+  position: relative;
+  left: -15px;
+  padding: 0;
+  list-style: none;
+}
+.app-navigation__list-item {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  height: 50px;
+  padding: 0 15px;
+  float: left;
+  line-height: 50px;
+}
+.app-navigation__link {
+  font-weight: 700;
+  text-decoration: none;
+}
+.app-navigation__list-item--current {
+  border-bottom: 4px solid #1d70b8;
+}
+
+
+/////////////////////////////////////
+/////        Page banner        /////
+/////////////////////////////////////
+.banner-link-container {
+  display: flex;
+  align-content: stretch; }
+.banner-link-container .banner-link-left-container {
+  width: 66.66%;
+  padding-right: 30px;
+  padding-bottom: 30px; }
+.banner-link-container .banner-link-right-container {
+  width: 33.33%;
+  background-color: govuk-colour("black");
+  padding: 20px;
+  align-self: flex-end; }
+.banner-link-container .banner-link-right-container a,
+.banner-link-container .banner-link-right-container a:visited {
+  color: govuk-colour("white");
+  font-size: 19px; }
+
+
+/////////////////////////////////////
+/////      funding line         /////
+/////////////////////////////////////
+.funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) { width:10%; }
+.funding-lines-table tr td:nth-child(2) { width:20%; }
+.funding-lines-table tr td:nth-child(3) { width:70%; }
+.funding-line-status-container { float: right !important; }
+.funding-line-status-container .govuk-button { margin-bottom: 0 !important; padding:8px 5px 7px !important; }
+.approval-status-Draft { background-color: #768693 !important; }
+.approval-status-Approved { background-color: #28a197 !important; }
+.approval-status-Updated { background-color: #f47738 !important; }
+.approve-button-container { float:right; }
