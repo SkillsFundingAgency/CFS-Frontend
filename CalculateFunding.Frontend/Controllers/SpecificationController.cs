@@ -57,7 +57,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-	            return Ok(apiResponse.Content);
+                return Ok(apiResponse.Content);
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
@@ -75,17 +75,17 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-				List<Reference> fundingStreams = new List<Reference>();
-				
-	            foreach (var item in apiResponse.Content)
-	            {
-		          fundingStreams.AddRange(item.FundingStreams);
-	            }
+                List<Reference> fundingStreams = new List<Reference>();
+
+                foreach (var item in apiResponse.Content)
+                {
+                    fundingStreams.AddRange(item.FundingStreams);
+                }
 
                 return Ok(fundingStreams.Select(x => new
                 {
-					x.Name,
-					x.Id
+                    x.Name,
+                    x.Id
                 }).Distinct());
             }
 
@@ -107,6 +107,27 @@ namespace CalculateFunding.Frontend.Controllers
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/selected-specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}")]
+        public async Task<IActionResult> GetSpecificationsSelectedForFundingByPeriodAndStream(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetApprovedSpecifications(fundingPeriodId, fundingStreamId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content.Where(s => s.IsSelectedForFunding).OrderBy(c => c.Name));
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
@@ -228,29 +249,29 @@ namespace CalculateFunding.Frontend.Controllers
                 return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
             }
         }
-        
+
         [Route("api/specs/{specificationId}/status")]
         [HttpPut]
         public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
         {
-	        Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-	        Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
-	        if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
-	        {
-		        return new ForbidResult();
-	        }
-	        
-	        ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId, new PublishStatusRequestModel
-	        {
-		        PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<Common.Models.Versioning.PublishStatus>()
-	        });
-	        
-	        if (response.StatusCode == HttpStatusCode.OK)
-	        {
-		        return Ok(response.Content);
-	        }
-	        
-	        throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
+            {
+                return new ForbidResult();
+            }
+
+            ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId, new PublishStatusRequestModel
+            {
+                PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<Common.Models.Versioning.PublishStatus>()
+            });
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+
+            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
     }
 }

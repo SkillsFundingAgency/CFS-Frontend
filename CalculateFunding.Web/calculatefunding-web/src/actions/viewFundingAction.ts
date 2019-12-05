@@ -77,7 +77,7 @@ export type ViewFundingAction =
 
 export const getSelectedSpecifications: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingPeriodId: string, fundingStreamId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/specs/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
+        const response = await axios(`/api/specs/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
