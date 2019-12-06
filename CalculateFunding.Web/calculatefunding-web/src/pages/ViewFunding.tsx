@@ -65,6 +65,15 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         jobId: ""
     };
 
+    selectedCount = () => {
+        if (this.props.publishedProviderResults.facets != null) {
+            if (this.props.publishedProviderResults.facets[2] != null && this.props.publishedProviderResults.facets[2].facetValues.length > 0) {
+                return this.props.publishedProviderResults.facets[2].facetValues.length
+            }
+        }
+        return 0;
+    };
+
 
     getSpecifications = (event: React.ChangeEvent<HTMLSelectElement>) => {
         console.log(event);
@@ -341,6 +350,13 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     )}
 
                                     </tbody>
+                                    <tbody hidden={this.selectedCount() > 0}>
+                                    <tr>
+                                        <td colSpan={4}>
+                                            There are no records available for the selected specification
+                                        </td>
+                                    </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -412,13 +428,13 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr>
                                         <td className="govuk-table__header">Provider Types Selected</td>
                                         <td className="govuk-table__cell">You have
-                                            selected {this.props.publishedProviderResults.providers.length} providers
+                                            selected {this.selectedCount} providers
                                         </td>
                                     </tr>
                                     <tr>
                                         <td className="govuk-table__header">Provider local authorities selected</td>
                                         <td className="govuk-table__cell">You have
-                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                            selected {this.selectedCount} local
                                             authorities
                                         </td>
                                     </tr>
@@ -508,7 +524,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr>
                                         <td>Provider local authorities selected</td>
                                         <td>You have
-                                            selected {this.props.publishedProviderResults.facets[2].facetValues.length} local
+                                            selected {this.selectedCount} local
                                             authorities
                                         </td>
                                     </tr>
