@@ -265,9 +265,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         <div className="govuk-grid-row viewfunding-filter">
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="ProviderType">Provider Type</label>
-                                <select className="govuk-select" name="ProviderType" id="ProviderType" onChange={(e) => {
-                                    this.filterProviderType(e)
-                                }}>
+                                <select className="govuk-select" name="ProviderType" id="ProviderType"
+                                        onChange={(e) => {
+                                            this.filterProviderType(e)
+                                        }}>
                                     <option value="">Show all</option>
                                     {this.props.filterTypes[0].facetValues.map(facet =>
                                         <option key={facet.name}>{facet.name}</option>
@@ -276,9 +277,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="LocalAuthority">Local Authority</label>
-                                <select className="govuk-select" name="LocalAuthority" id="LocalAuthority" onChange={(e) => {
-                                    this.filterLocalAuthority(e)
-                                }}>
+                                <select className="govuk-select" name="LocalAuthority" id="LocalAuthority"
+                                        onChange={(e) => {
+                                            this.filterLocalAuthority(e)
+                                        }}>
                                     <option value="">Show all</option>
                                     {this.props.filterTypes[1].facetValues.map(facet =>
                                         <option key={facet.name}>{facet.name}</option>
@@ -302,10 +304,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <span className="govuk-body">of filtered items</span>
                             </div>
                         </div>
-                        <div className="govuk-row">
+                        <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <p className="govuk-body govuk-!-margin-right-1">Showing</p>
-                                <select className="govuk-select govuk-!-margin-right-1" name="viewFundingPageSize" id="viewFundingPageSize" onChange={(e) => {
+                                <select className="govuk-select govuk-!-margin-right-1" name="viewFundingPageSize"
+                                        id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
                                 }}>
                                     <option value="50">50</option>
@@ -315,77 +318,80 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <p className="govuk-body govuk-!-margin-right-1">of {this.props.publishedProviderResults.totalResults}</p>
                             </div>
                         </div>
-                        <div id="funding-table">
-                            <table className="govuk-table">
-                                <thead className="govuk-table__head">
-                                <tr className="govuk-table__row">
-                                    <td className="govuk-table__header">Provider name</td>
-                                    <td className="govuk-table__header">UKPRN</td>
-                                    <td className="govuk-table__header">Status</td>
-                                    <td className="govuk-table__header">Funding total</td>
-                                </tr>
-                                </thead>
-                                <tbody className="govuk-table__body">
-                                {this.props.publishedProviderResults.providers.map(fp =>
-                                    <tr className="govuk-table__body" key={fp.id}>
-                                        <td className="govuk-table__cell">{fp.providerName}</td>
-                                        <td className="govuk-table__cell">{fp.ukprn}</td>
-                                        <td className="govuk-table__cell">{fp.fundingStatus}</td>
-                                        <td className="govuk-table__cell">&pound;{fp.fundingValue}</td>
+
+                        <div id="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <table className="govuk-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Provider name</td>
+                                        <td className="govuk-table__header">UKPRN</td>
+                                        <td className="govuk-table__header">Status</td>
+                                        <td className="govuk-table__header">Funding total</td>
                                     </tr>
-                                )}
+                                    </thead>
+                                    <tbody className="govuk-table__body">
+                                    {this.props.publishedProviderResults.providers.map(fp =>
+                                        <tr className="govuk-table__body" key={fp.id}>
+                                            <td className="govuk-table__cell">{fp.providerName}</td>
+                                            <td className="govuk-table__cell">{fp.ukprn}</td>
+                                            <td className="govuk-table__cell">{fp.fundingStatus}</td>
+                                            <td className="govuk-table__cell">&pound;{fp.fundingValue}</td>
+                                        </tr>
+                                    )}
 
-                                </tbody>
-                            </table>
-
-                            <div className="row">
-                                <div className="col-xs-12">
-                                    <ul className="pagination">
-                                        <li className="hasPrevious">
-                                            <button title="View First Page"
-                                                    disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                    onClick={() => this.movePage("firstPage")}><i
-                                                className="material-icons">first_page</i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                    onClick={() => this.movePage("previousPage")}><i
-                                                className="material-icons">chevron_left</i></button>
-                                        </li>
-                                        <li className="hasNext">
-                                            <button title="View Next Page"
-                                                    disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                    onClick={() => this.movePage("nextPage")}><i
-                                                className="material-icons">chevron_right</i>
-                                            </button>
-                                        </li>
-                                        <li className="hasNext">
-                                            <button title="View Last Page"
-                                                    disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                    onClick={() => this.movePage("lastPage")}><i
-                                                className="material-icons">last_page</i>
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className="govuk-row">
-                                    <button className="govuk-button govuk-!-margin-right-1"
-                                            onClick={() => this.approveFunding()}>Approve
-                                    </button>
-                                    <button className="govuk-button govuk-!-margin-right-1"
-                                            disabled={!this.props.publishedProviderResults.canPublish}
-                                            onClick={() => this.publishFunding()}>Publish
-                                    </button>
-                                    <button className="govuk-button"
-                                            onClick={() => this.refreshFunding()}>Refresh
-                                        funding
-                                    </button>
-                                    <p className="govuk-body">Last refresh on: Not Available</p>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <ul className="pagination">
+                                    <li className="hasPrevious">
+                                        <button title="View First Page"
+                                                disabled={this.props.publishedProviderResults.currentPage === 1}
+                                                onClick={() => this.movePage("firstPage")}><span
+                                            className="govuk-body">&lt;&lt;</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button disabled={this.props.publishedProviderResults.currentPage === 1}
+                                                onClick={() => this.movePage("previousPage")}><span
+                                            className="govuk-body">&lt;</span></button>
+                                    </li>
+                                    <li className="hasNext">
+                                        <button title="View Next Page"
+                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
+                                                onClick={() => this.movePage("nextPage")}><span
+                                            className="govuk-body">&gt;</span>
+                                        </button>
+                                    </li>
+                                    <li className="hasNext">
+                                        <button title="View Last Page"
+                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
+                                                onClick={() => this.movePage("lastPage")}><span
+                                            className="govuk-body">&gt;&gt;</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <button className="govuk-button govuk-!-margin-right-1"
+                                        onClick={() => this.approveFunding()}>Approve
+                                </button>
+                                <button className="govuk-button govuk-!-margin-right-1"
+                                        disabled={!this.props.publishedProviderResults.canPublish}
+                                        onClick={() => this.publishFunding()}>Publish
+                                </button>
+                                <button className="govuk-button"
+                                        onClick={() => this.refreshFunding()}>Refresh
+                                    funding
+                                </button>
+                                <p className="govuk-body">Last refresh on: Not Available</p>
+                            </div>
+                        </div>
                     </main>
                     <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
                         <div className="row">
