@@ -313,18 +313,24 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <span className="govuk-body">of filtered items</span>
                             </div>
                         </div>
-                        <div className="govuk-grid-row">
+                        <div className="govuk-grid-row govuk-!-margin-top-5 govuk-!-margin-bottom-5">
                             <div className="govuk-grid-column-full">
-                                <p className="govuk-body govuk-!-margin-right-1">Showing</p>
-                                <select className="govuk-select govuk-!-margin-right-1" name="viewFundingPageSize"
+                                <p className="govuk-body govuk-!-display-inline">Showing</p>
+                                <select className="govuk-select" name="viewFundingPageSize"
                                         id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
-                                }}>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
+                                }} hidden={this.props.publishedProviderResults.totalResults > 49}>
+                                    <option value={this.props.publishedProviderResults.totalResults}>{this.props.publishedProviderResults.totalResults}</option>
                                 </select>
-                                <p className="govuk-body govuk-!-margin-right-1">of {this.props.publishedProviderResults.totalResults}</p>
+                                <select className="govuk-select" name="viewFundingPageSize"
+                                        id="viewFundingPageSize" onChange={(e) => {
+                                    this.changePageSize(e)
+                                }} hidden={this.props.publishedProviderResults.totalResults < 50}>
+                                    <option value="50" >50</option>
+                                    <option value="100" hidden={this.props.publishedProviderResults.totalResults < 100}>100</option>
+                                    <option value="200" hidden={this.props.publishedProviderResults.totalResults < 200}>200</option>
+                                </select>
+                                <p className="govuk-body govuk-!-display-inline">of {this.props.publishedProviderResults.totalResults}</p>
                             </div>
                         </div>
 
