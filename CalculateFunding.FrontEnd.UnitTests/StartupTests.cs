@@ -51,8 +51,6 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<TestScenarioResultController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioResultController));
             ResolveType<TestScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioSearchController));
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
-            ResolveType<PublishController>(serviceProvider).Should().NotBeNull(nameof(PublishController));
-
         }
 
         protected virtual IConfigurationRoot CreateTestConfiguration()
