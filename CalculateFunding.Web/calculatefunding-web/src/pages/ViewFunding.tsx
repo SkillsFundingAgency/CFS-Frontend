@@ -13,11 +13,13 @@ export interface IViewFundingProps {
     getAllFundingStreams: any;
     getSelectedFundingPeriods: any;
     getPublishedProviderResults: any;
+    getLatestRefreshDate: any;
     filterPublishedProviderResults: any;
     refreshFunding: any;
     approveFunding: any;
     publishFunding: any;
     changePageState: any;
+    latestRefreshDateResults: string;
     specifications: Specification;
     fundingStreams: FundingStream[];
     selectedFundingPeriods: FundingPeriod[];
@@ -73,7 +75,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         }
         return 0;
     };
-
 
     getSpecifications = (event: React.ChangeEvent<HTMLSelectElement>) => {
         console.log(event);
@@ -186,6 +187,13 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 url: null,
                 name: "Choose Specification"
             }];
+
+        let lastRefreshDate = "Not Available";
+        if (this.props.specifications.id != null && this.props.specifications.id.length > 0) {
+            this.props.getLatestRefreshDate(this.props.specifications.id);
+            if (this.props.latestRefreshDateResults.length > 0)
+                lastRefreshDate = this.props.latestRefreshDateResults
+        }
 
         if (!this.props.specificationSelected) {
             return <div>
@@ -320,15 +328,20 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                         id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
                                 }} hidden={this.props.publishedProviderResults.totalResults > 49}>
-                                    <option value={this.props.publishedProviderResults.totalResults}>{this.props.publishedProviderResults.totalResults}</option>
+                                    <option
+                                        value={this.props.publishedProviderResults.totalResults}>{this.props.publishedProviderResults.totalResults}</option>
                                 </select>
                                 <select className="govuk-select" name="viewFundingPageSize"
                                         id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
                                 }} hidden={this.props.publishedProviderResults.totalResults < 50}>
-                                    <option value="50" >50</option>
-                                    <option value="100" hidden={this.props.publishedProviderResults.totalResults < 100}>100</option>
-                                    <option value="200" hidden={this.props.publishedProviderResults.totalResults < 200}>200</option>
+                                    <option value="50">50</option>
+                                    <option value="100"
+                                            hidden={this.props.publishedProviderResults.totalResults < 100}>100
+                                    </option>
+                                    <option value="200"
+                                            hidden={this.props.publishedProviderResults.totalResults < 200}>200
+                                    </option>
                                 </select>
                                 <p className="govuk-body govuk-!-display-inline">of {this.props.publishedProviderResults.totalResults}</p>
                             </div>
@@ -411,7 +424,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                         onClick={() => this.refreshFunding()}>Refresh
                                     funding
                                 </button>
-                                <p className="govuk-body">Last refresh on: Not Available</p>
+                                <p className="govuk-body">Last refresh on: {lastRefreshDate}</p>
                             </div>
                         </div>
                     </main>

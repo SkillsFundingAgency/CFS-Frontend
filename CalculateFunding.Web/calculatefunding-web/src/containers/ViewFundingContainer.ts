@@ -4,6 +4,7 @@ import {AnyAction, bindActionCreators, Dispatch} from "redux";
 import {
     getAllFundingStreams,
     getPublishedProviderResults,
+    getLatestRefreshDate,
     getSelectedFundingPeriods,
     getSelectedSpecifications,
     refreshFunding,
@@ -20,6 +21,7 @@ const mapStateToProps = (state: AppState) => ({
     selectedFundingPeriods: state.viewFundingState.selectedFundingPeriods,
     specificationSelected: state.viewFundingState.specificationSelected,
     publishedProviderResults: state.viewFundingState.publishedProviderResults,
+    latestRefreshDateResults: state.viewFundingState.latestRefreshDateResults,
     filterTypes: state.viewFundingState.filterTypes,
     refreshFundingJobId: state.viewFundingState.refreshFundingJobId,
     approveFundingJobId: state.viewFundingState.approveFundingJobId,
@@ -34,6 +36,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
             getAllFundingStreams,
             getSelectedFundingPeriods,
             getPublishedProviderResults,
+            getLatestRefreshDate,
             filterPublishedProviderResults,
             refreshFunding,
             approveFunding,

@@ -43,6 +43,7 @@ const initialState: IViewFundingState = {
         filteredFundingAmount: 0,
         canPublish: false
     },
+    latestRefreshDateResults: '',
     approveFundingJobId: '',
     publishFundingJobId: '',
     refreshFundingJobId: '',
@@ -60,6 +61,8 @@ export function reduceViewFundingState(state: IViewFundingState = initialState, 
             return {...state, selectedFundingPeriods: action.payload};
         case ViewFundingActionTypes.GET_PUBLISHEDPROVIDERRESULTS:
             return {...state, publishedProviderResults: action.payload, specificationSelected: action.success, filterTypes: action.filterTypes};
+        case ViewFundingActionTypes.GET_LATESTREFRESHDATE:
+            return {...state, latestRefreshDateResults: action.payload};
         case ViewFundingActionTypes.FILTER_PUBLISHEDPROVIDERRESULTS:
             return {...state, publishedProviderResults: action.payload};
         case ViewFundingActionTypes.REFRESH_FUNDING:

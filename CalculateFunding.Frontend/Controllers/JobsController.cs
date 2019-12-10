@@ -40,5 +40,23 @@ namespace CalculateFunding.Frontend.Controllers
 
             return Ok(jobSummaryViewModel);
         }
+
+        [Route("api/jobs/{specificationId}/last-updated/{jobTypes}")]
+        public async Task<IActionResult> GetJobLastUpdatedForSpecification([FromRoute] string specificationId, [FromRoute] string jobTypes)
+        {
+	        string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            ApiResponse<JobSummary> latestJobTask = await _jobsApiClient.GetLatestJobForSpecification(specificationId, jobTypesArray);
+
+            IActionResult errorResult = latestJobTask.IsSuccessOrReturnFailureResult("JobSummary");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            JobSummaryViewModel jobSummaryViewModel = _mapper.Map<JobSummaryViewModel>(latestJobTask.Content);
+
+            return Ok(jobSummaryViewModel.LastUpdatedFormatted);
+        }
     }
 }

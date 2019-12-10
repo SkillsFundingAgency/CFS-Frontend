@@ -6,6 +6,7 @@ export interface IViewFundingState {
     fundingStreams: FundingStream[],
     selectedFundingPeriods: FundingPeriod[],
     publishedProviderResults: PublishedProviderItems,
+    latestRefreshDateResults: string,
     specificationSelected: boolean,
     refreshFundingJobId: string,
     approveFundingJobId: string,

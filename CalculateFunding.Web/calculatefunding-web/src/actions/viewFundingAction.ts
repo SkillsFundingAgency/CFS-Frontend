@@ -11,6 +11,7 @@ export enum ViewFundingActionTypes {
     GET_FUNDINGSTREAMS = 'getAllFundingStreams',
     GET_SELECTEDFUNDINGPERIODS = 'getSelectedFundingPeriods',
     GET_PUBLISHEDPROVIDERRESULTS = 'getPublishedProviderResults',
+    GET_LATESTREFRESHDATE = 'getLatestRefreshDate',
     FILTER_PUBLISHEDPROVIDERRESULTS = 'filterPublishedProviderResults',
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
@@ -38,6 +39,11 @@ export interface IGetPublishedProviderResultsAction {
     payload: PublishedProviderItems,
     success: boolean,
     filterTypes: FacetsEntity[]
+}
+
+export interface IGetLatestRefreshDateAction {
+    type: ViewFundingActionTypes.GET_LATESTREFRESHDATE,
+    payload: string
 }
 
 export interface IFilterPublishedProviderResultsAction {
@@ -69,6 +75,7 @@ export type ViewFundingAction =
     | IGetAllFundingStreamsAction
     | IGetSelectedFundingPeriodsAction
     | IGetPublishedProviderResultsAction
+    | IGetLatestRefreshDateAction
     | IRefreshFundingAction
     | IApproveFundingAction
     | IPublishFundingAction
@@ -150,6 +157,22 @@ export const getPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>
             payload: response.data as PublishedProviderItems,
             success: (response.data as PublishedProviderItems).totalResults > 0,
             filterTypes: (response.data as PublishedProviderItems).facets
+        })
+    }
+};
+
+export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
+    const jobTypes = "RefreshFundingJob";
+    return async (dispatch: Dispatch) => {
+        const response = await axios(`api/jobs/${specificationId}/last-updated/${jobTypes}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        dispatch({
+            type: ViewFundingActionTypes.GET_LATESTREFRESHDATE,
+            payload: response.data,
         })
     }
 };
