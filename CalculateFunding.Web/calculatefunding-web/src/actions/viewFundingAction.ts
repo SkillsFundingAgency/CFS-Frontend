@@ -164,15 +164,21 @@ export const getPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>
 export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     const jobTypes = "RefreshFundingJob";
     return async (dispatch: Dispatch) => {
-        const response = await axios(`api/jobs/${specificationId}/last-updated/${jobTypes}`, {
+        const response = await axios(`/api/jobs/${specificationId}/last-updated/${jobTypes}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         });
+
+        let latestDate = "";
+
+        if (response.status === 200)
+            latestDate = response.data;
+
         dispatch({
             type: ViewFundingActionTypes.GET_LATESTREFRESHDATE,
-            payload: response.data,
+            payload: latestDate,
         })
     }
 };
