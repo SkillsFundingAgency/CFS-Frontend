@@ -26,6 +26,7 @@ export interface IViewFundingProps {
     specificationSelected: boolean;
     publishedProviderResults: {
         canPublish: boolean;
+        canApprove: boolean
         currentPage: number,
         endItemNumber: number,
         facets: FacetsEntity[],
@@ -143,6 +144,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     confirmPublishFunding = () => {
         this.setState({pageState: "PUBLISH_FUNDING_JOB"});
         this.props.publishFunding(this.props.specifications.id);
+    };
+
+    refreshProviderResults = () => {
+        this.props.getPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification);
+        this.props.changePageState("IDLE");
     };
 
     movePage = (action: string) => {
@@ -414,6 +420,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <button className="govuk-button govuk-!-margin-right-1"
+                                        disabled={!this.props.publishedProviderResults.canApprove}
                                         onClick={() => this.approveFunding()}>Approve
                                 </button>
                                 <button className="govuk-button govuk-!-margin-right-1"
@@ -609,17 +616,17 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
                         <NotificationSignal jobType="RefreshFundingJob"
                                             jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
-                                            message="Waiting to refresh funding" callback={this.props.changePageState}/>
+                                            message="Waiting to refresh funding" callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
                         <NotificationSignal jobType="ApproveFunding"
                                             jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
-                                            message="Waiting to approve funding" callback={this.props.changePageState}/>
+                                            message="Waiting to approve funding" callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
                         <NotificationSignal jobType="PublishFundingJob"
                                             jobId={this.props.pageState === "PUBLISH_FUNDING_JOB" ? this.props.specifications.id : ""}
-                                            message="Waiting to publish funding" callback={this.props.changePageState}/>
+                                            message="Waiting to publish funding" callback={this.refreshProviderResults}/>
                     </div>
                 </div>
                 <Footer/>

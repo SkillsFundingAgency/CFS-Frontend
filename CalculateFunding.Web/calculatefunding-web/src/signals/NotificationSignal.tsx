@@ -28,7 +28,7 @@ const callback = props.callback;
                         if (message.jobType === props.jobType && message.runningStatus === "Completed" && message.specificationId === props.jobId) {
                             console.log(message);
                             hubConnect.stop();
-                            callback("IDLE");
+                            callback();
                         }
                     });
 

@@ -77,31 +77,49 @@ namespace CalculateFunding.Frontend.Services
 
             if (searchRequestResult.Content != null)
             {
-	            foreach (PublishedProviderSearchItem searchResult in searchRequestResult.Content.Results)
-	            {
-		            itemResults.Add(_mapper.Map<PublishedProviderSearchResultItemViewModel>(searchResult));
-		            result.FilteredFundingAmount += searchResult.FundingValue;
-	            }
+                foreach (PublishedProviderSearchItem searchResult in searchRequestResult.Content.Results)
+                {
+                    itemResults.Add(_mapper.Map<PublishedProviderSearchResultItemViewModel>(searchResult));
+                    result.FilteredFundingAmount += searchResult.FundingValue;
+                }
 
-	            result.Providers = itemResults.AsEnumerable();
-	            if (result.TotalResults == 0)
-	            {
-		            result.StartItemNumber = 0;
-		            result.EndItemNumber = 0;
-	            }
-	            else
-	            {
-		            result.StartItemNumber = ((requestOptions.PageNumber - 1) * requestOptions.Top) + 1;
-		            result.EndItemNumber = result.StartItemNumber + requestOptions.Top - 1;
-	            }
+                result.Providers = itemResults.AsEnumerable();
+                if (result.TotalResults == 0)
+                {
+                    result.StartItemNumber = 0;
+                    result.EndItemNumber = 0;
+                }
+                else
+                {
+                    result.StartItemNumber = ((requestOptions.PageNumber - 1) * requestOptions.Top) + 1;
+                    result.EndItemNumber = result.StartItemNumber + requestOptions.Top - 1;
+                }
 
-	            if (result.EndItemNumber > searchRequestResult.Content.TotalCount)
-	            {
-		            result.EndItemNumber = searchRequestResult.Content.TotalCount;
-	            }
+                if (result.EndItemNumber > searchRequestResult.Content.TotalCount)
+                {
+                    result.EndItemNumber = searchRequestResult.Content.TotalCount;
+                }
             }
 
-            result.CanPublish = result.Providers.All(x => x.FundingStatus == "Approved");
+            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts = await _publishingApiClient.GetProviderStatusCounts(result.Providers.First().SpecificationId);
+
+            result.CanPublish = result.CanApprove = false;
+
+            foreach (var providerFundingStreamStatusResponse in providerStatusCounts.Content)
+            {
+                if (providerFundingStreamStatusResponse.ProviderDraftCount == 0 &&
+                    providerFundingStreamStatusResponse.ProviderApprovedCount > 0 &&
+                    providerFundingStreamStatusResponse.ProviderUpdatedCount == 0)
+                {
+                    result.CanPublish = true;
+                }
+
+                if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 &&
+                    providerFundingStreamStatusResponse.ProviderUpdatedCount > 0)
+                {
+                    result.CanApprove = true;
+                }
+            }
 
             result.PagerState = new PagerState(requestOptions.PageNumber, 10, 4);
 

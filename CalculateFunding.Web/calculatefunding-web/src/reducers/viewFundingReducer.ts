@@ -41,7 +41,8 @@ const initialState: IViewFundingState = {
         totalErrorResults: 0,
         totalResults: 0,
         filteredFundingAmount: 0,
-        canPublish: false
+        canPublish: false,
+        canApprove: false
     },
     latestRefreshDateResults: '',
     approveFundingJobId: '',

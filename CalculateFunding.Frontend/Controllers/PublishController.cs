@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -144,7 +145,7 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProviderStatusCounts(string specificationId)
         {
-            ApiResponse<ProviderFundingStreamStatusResponse> result = await _publishingApiClient.GetProviderStatusCounts(specificationId);
+            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> result = await _publishingApiClient.GetProviderStatusCounts(specificationId);
 
             if (result != null)
             {
