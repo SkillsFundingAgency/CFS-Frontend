@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 @import url('govuk_bootstrap.css');
 @font-face {
   font-family: GDS-Logo;
@@ -968,9 +968,10 @@ button:focus,
     text-align: right; } }
 
 @font-face {
-  font-family: 'Glyphicons Halflings';
-  src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot");
-  src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff2") format("woff2"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/bootstrap/glyphicons-halflings-regular.ttf") format("truetype"), url("../fonts/bootstrap/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
+    font-family: 'Glyphicons Halflings';
+    src: url("/assets/libs/fonts/glyphicons-halflings-regular.eot");
+    src: url("/assets/libs/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("/assets/libs/fonts/glyphicons-halflings-regular.woff2") format("woff2"), url("/assets/libs/fonts/glyphicons-halflings-regular.woff") format("woff"), url("/assets/libs/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("/assets/libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg");
+}
 
 .glyphicon {
   position: relative;
