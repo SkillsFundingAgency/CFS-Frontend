@@ -43,6 +43,7 @@
                 success: function () {
                     self.Redirect(self.specificationId, self.fundingPeriodId)
                 },
+                context: self,
                 error: self.Error
             });
         }

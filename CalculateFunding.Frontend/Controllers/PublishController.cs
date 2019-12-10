@@ -67,7 +67,7 @@ namespace CalculateFunding.Frontend.Controllers
 			return new NotFoundObjectResult(Content("Error. Not Found."));
 		}
 
-		[Route("api/publish/gettimetable/{specificationId}")]
+        [Route("api/publish/gettimetable/{specificationId}")]
 		[HttpGet]
 		public async Task<IActionResult> GetTimetable(string specificationId)
 		{
@@ -80,29 +80,21 @@ namespace CalculateFunding.Frontend.Controllers
 			}
 
 			return new NotFoundObjectResult(Content("Error. Not Found."));
-		}
+        }
+
+        [HttpPost]
+        [Route("api/specs/{specificationId}/selectforfunding")]
+        public async Task<IActionResult> SelectSpecificationForFunding(string specificationId)
+        {
+            return await ChooseRefresh(specificationId, SpecificationActionTypes.CanChooseFunding);
+        }
 
         [Route("api/publish/refreshfunding/{specificationId}")]
 		[HttpGet]
 		public async Task<IActionResult> RefreshFunding(string specificationId)
-		{
-			if (!await _authorizationHelper.DoesUserHavePermission(
-				User,
-				specificationId,
-				SpecificationActionTypes.CanRefreshFunding))
-			{
-				return new ForbidResult();
-			}
-
-			ValidatedApiResponse<JobCreationResponse> result = await _publishingApiClient.RefreshFundingForSpecification(specificationId);
-
-            if (result.Content.JobId != null)
-            {
-                return Ok(result.Content.JobId);
-            }
-
-            return BadRequest(-1);
-		}
+        {
+            return await ChooseRefresh(specificationId, SpecificationActionTypes.CanRefreshFunding);
+        }
 
 		[Route("api/publish/approvefunding/{specificationId}")]
 		[HttpGet]
@@ -160,6 +152,26 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new NotFoundObjectResult(Content("Error. Not Found."));
+        }
+
+        private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
+        {
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                specificationActionType))
+            {
+                return new ForbidResult();
+            }
+
+            ValidatedApiResponse<JobCreationResponse> result = await _publishingApiClient.RefreshFundingForSpecification(specificationId);
+
+            if (result.Content.JobId != null)
+            {
+                return Ok(result.Content.JobId);
+            }
+
+            return BadRequest(-1);
         }
     }
 }
