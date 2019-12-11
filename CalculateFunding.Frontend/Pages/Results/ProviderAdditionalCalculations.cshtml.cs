@@ -45,6 +45,8 @@
                 AdditionalCalculationList.Add(new ProviderCalculationItemViewModel
                 {
                     Name = calculationResultItem.Calculation.Name,
+                    ExceptionMessage = calculationResultItem.ExceptionMessage,
+                    ExceptionType = calculationResultItem.ExceptionType,
                     ValueType = calculation.Content.ValueType.ToString(),
                     Value = calculationResultItem.Value
                 });
