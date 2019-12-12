@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,7 +9,6 @@ using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Services
@@ -114,7 +112,7 @@ namespace CalculateFunding.Frontend.Services
                     result.CanPublish = true;
                 }
 
-                if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 &&
+                if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 ||
                     providerFundingStreamStatusResponse.ProviderUpdatedCount > 0)
                 {
                     result.CanApprove = true;
