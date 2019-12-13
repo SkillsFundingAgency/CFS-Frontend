@@ -8,8 +8,11 @@ export interface PublishedProviderItems {
     totalErrorResults: number;
     totalResults: number;
     filteredFundingAmount: number;
-    canPublish:boolean;
+    canPublish: boolean;
     canApprove: boolean;
+    totalFundingAmount: number;
+    totalProvidersToApprove: number;
+    totalProvidersToPublish: number;
 }
 export interface ProvidersEntity {
     fundingPeriodId: string;

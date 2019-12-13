@@ -103,6 +103,10 @@ namespace CalculateFunding.Frontend.Services
 
             result.CanPublish = result.CanApprove = false;
 
+            result.TotalFundingAmount = 0;
+            result.TotalProvidersToApprove = 0;
+            result.TotalProvidersToPublish = 0;
+
             foreach (var providerFundingStreamStatusResponse in providerStatusCounts.Content)
             {
                 if (providerFundingStreamStatusResponse.ProviderDraftCount == 0 &&
@@ -110,12 +114,20 @@ namespace CalculateFunding.Frontend.Services
                     providerFundingStreamStatusResponse.ProviderUpdatedCount == 0)
                 {
                     result.CanPublish = true;
+                    result.TotalProvidersToPublish += providerFundingStreamStatusResponse.ProviderApprovedCount;
                 }
 
                 if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 ||
                     providerFundingStreamStatusResponse.ProviderUpdatedCount > 0)
                 {
                     result.CanApprove = true;
+                    result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderUpdatedCount;
+                    result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderDraftCount;
+                }
+
+                if (providerFundingStreamStatusResponse.TotalFunding.HasValue)
+                {
+                    result.TotalFundingAmount = +providerFundingStreamStatusResponse.TotalFunding.Value;
                 }
             }
 

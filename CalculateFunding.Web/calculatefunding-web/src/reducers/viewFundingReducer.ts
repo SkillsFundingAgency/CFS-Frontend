@@ -34,7 +34,7 @@ const initialState: IViewFundingState = {
             lastPage: 0,
             nextPage: 0,
             pages: [],
-            previousPage: 0
+            previousPage: 0,
         },
         providers: [] as ProvidersEntity[],
         startItemNumber: 0,
@@ -42,7 +42,10 @@ const initialState: IViewFundingState = {
         totalResults: 0,
         filteredFundingAmount: 0,
         canPublish: false,
-        canApprove: false
+        canApprove: false,
+        totalFundingAmount: 0,
+        totalProvidersToApprove: 0,
+        totalProvidersToPublish: 0,
     },
     latestRefreshDateResults: '',
     approveFundingJobId: '',

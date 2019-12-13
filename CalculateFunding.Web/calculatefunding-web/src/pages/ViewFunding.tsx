@@ -42,7 +42,10 @@ export interface IViewFundingProps {
         startItemNumber: number,
         totalErrorResults: number,
         totalResults: number,
-        filteredFundingAmount: number
+        filteredFundingAmount: number,
+        totalFundingAmount: number,
+        totalProvidersToApprove: number,
+        totalProvidersToPublish: number,
     };
     filterTypes: FacetsEntity[];
     jobId: string;
@@ -323,8 +326,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <span className="govuk-body">Funding Total</span>
-                                <p className="govuk-body govuk-!-font-size-27 govuk-!-font-weight-bold govuk-!-margin-bottom-0">£{this.props.publishedProviderResults.filteredFundingAmount}</p>
-                                <span className="govuk-body">of filtered items</span>
+                                <p className="govuk-body govuk-!-font-size-27 govuk-!-font-weight-bold govuk-!-margin-bottom-0">£{this.props.publishedProviderResults.totalFundingAmount}</p>
                             </div>
                         </div>
                         <div className="govuk-grid-row govuk-!-margin-top-5 govuk-!-margin-bottom-5">
@@ -442,27 +444,14 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <caption className="govuk-table__caption">You have selected:</caption>
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
-                                        <th className="govuk-table__header">Provider Name</th>
-                                        <th className="govuk-table__header">Info</th>
+                                        <th className="govuk-table__header">Item</th>
+                                        <th className="govuk-table__header">Total</th>
                                     </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
                                     <tr className="govuk-table__row">
                                         <td className="govuk-table__header">Number of providers to approve</td>
-                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalResults}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="govuk-table__header">Provider Types Selected</td>
-                                        <td className="govuk-table__cell">You have
-                                            selected {this.selectedCount} providers
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="govuk-table__header">Provider local authorities selected</td>
-                                        <td className="govuk-table__cell">You have
-                                            selected {this.selectedCount} local
-                                            authorities
-                                        </td>
+                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalProvidersToApprove}</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -507,7 +496,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr className="govuk-table__row">
                                         <th className="govuk-table__header">Total funding being approved</th>
                                         <th className="govuk-table__header"></th>
-                                        <th className="govuk-table__header">£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                        <th className="govuk-table__header">£{this.props.publishedProviderResults.totalFundingAmount}</th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -526,27 +515,14 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <caption className="govuk-table__caption">You have selected:</caption>
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
-                                        <th className="govuk-table__header">Provider Name</th>
-                                        <th className="govuk-table__header">Info</th>
+                                        <th className="govuk-table__header">Item</th>
+                                        <th className="govuk-table__header">Total</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr className="govuk-table__row">
                                         <td className="govuk-table__header">Number of providers to publish</td>
-                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalResults}</td>
-                                    </tr>
-                                    <tr className="govuk-table__row">
-                                        <td className="govuk-table__header">Provider Types Selected</td>
-                                        <td className="govuk-table__cell">You have
-                                            selected {this.props.publishedProviderResults.providers.length} providers
-                                        </td>
-                                    </tr>
-                                    <tr className="govuk-table__row">
-                                        <td className="govuk-table__header">Provider local authorities selected</td>
-                                        <td className="govuk-table__cell">You have
-                                            selected {this.selectedCount} local
-                                            authorities
-                                        </td>
+                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalProvidersToPublish}</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -591,7 +567,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr className="govuk-table__row">
                                         <th className="govuk-table__head">Total funding being published</th>
                                         <th className="govuk-table__head"></th>
-                                        <th className="govuk-table__head">£{this.props.publishedProviderResults.filteredFundingAmount}</th>
+                                        <th className="govuk-table__head">£{this.props.publishedProviderResults.totalFundingAmount}</th>
                                     </tr>
                                     </thead>
                                 </table>
