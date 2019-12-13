@@ -10,7 +10,7 @@ export interface IViewFundingState {
     specificationSelected: boolean,
     refreshFundingJobId: string,
     approveFundingJobId: string,
-    publishFundingJobId: string,
+    releaseFundingJobId: string,
     filterTypes: FacetsEntity[],
     pageState: string
 }

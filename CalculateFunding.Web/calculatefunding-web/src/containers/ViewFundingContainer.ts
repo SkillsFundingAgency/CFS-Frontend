@@ -9,7 +9,7 @@ import {
     getSelectedSpecifications,
     refreshFunding,
     approveFunding,
-    publishFunding,
+    releaseFunding,
     filterPublishedProviderResults,
     changePageState
 } from "../actions/viewFundingAction";
@@ -25,7 +25,7 @@ const mapStateToProps = (state: AppState) => ({
     filterTypes: state.viewFundingState.filterTypes,
     refreshFundingJobId: state.viewFundingState.refreshFundingJobId,
     approveFundingJobId: state.viewFundingState.approveFundingJobId,
-    publishFundingJobId: state.viewFundingState.publishFundingJobId,
+    releaseFundingJobId: state.viewFundingState.releaseFundingJobId,
     pageState: state.viewFundingState.pageState
 });
 
@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
             filterPublishedProviderResults,
             refreshFunding,
             approveFunding,
-            publishFunding,
+            releaseFunding,
             changePageState
         },
         dispatch

@@ -15,7 +15,7 @@ export enum ViewFundingActionTypes {
     FILTER_PUBLISHEDPROVIDERRESULTS = 'filterPublishedProviderResults',
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
-    PUBLISH_FUNDING = 'publishFunding',
+    RELEASE_FUNDING = 'releaseFunding',
     CHANGE_PAGESTATE = 'changePageState'
 }
 
@@ -61,8 +61,8 @@ export interface IApproveFundingAction {
     payload: string,
 }
 
-export interface IPublishFundingAction {
-    type: ViewFundingActionTypes.PUBLISH_FUNDING,
+export interface IReleaseFundingAction {
+    type: ViewFundingActionTypes.RELEASE_FUNDING,
     payload: string,
 }
 export interface ChangePageStateAction {
@@ -78,7 +78,7 @@ export type ViewFundingAction =
     | IGetLatestRefreshDateAction
     | IRefreshFundingAction
     | IApproveFundingAction
-    | IPublishFundingAction
+    | IReleaseFundingAction
     | IFilterPublishedProviderResultsAction
     | ChangePageStateAction;
 
@@ -244,7 +244,7 @@ export const approveFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundin
     }
 };
 
-export const publishFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
+export const releaseFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
         const response = await axios(`/api/publish/publishfunding/${specificationId}`, {
             method: 'GET',
@@ -253,7 +253,7 @@ export const publishFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundin
             }
         });
         dispatch({
-            type: ViewFundingActionTypes.PUBLISH_FUNDING,
+            type: ViewFundingActionTypes.RELEASE_FUNDING,
             payload: response.data,
         })
     }

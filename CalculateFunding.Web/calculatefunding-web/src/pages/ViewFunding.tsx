@@ -17,7 +17,7 @@ export interface IViewFundingProps {
     filterPublishedProviderResults: any;
     refreshFunding: any;
     approveFunding: any;
-    publishFunding: any;
+    releaseFunding: any;
     changePageState: any;
     latestRefreshDateResults: string;
     specifications: Specification;
@@ -51,7 +51,7 @@ export interface IViewFundingProps {
     jobId: string;
     refreshFundingJobId: string;
     approveFundingJobId: string;
-    publishFundingJobId: string;
+    releaseFundingJobId: string;
     pageState: string;
 }
 
@@ -135,7 +135,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.changePageState("APPROVE_FUNDING");
     };
 
-    publishFunding = () => {
+    releaseFunding = () => {
         this.props.changePageState("PUBLISH_FUNDING");
     };
 
@@ -144,9 +144,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.approveFunding(this.props.specifications.id);
     };
 
-    confirmPublishFunding = () => {
-        this.props.changePageState("PUBLISH_FUNDING_JOB");
-        this.props.publishFunding(this.props.specifications.id);
+    confirmReleaseFunding = () => {
+        this.props.changePageState("RELEASE_FUNDING_JOB");
+        this.props.releaseFunding(this.props.specifications.id);
     };
 
     refreshProviderResults = () => {
@@ -211,7 +211,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
-                    <main className="govuk-main-wrapper govuk-main-wrapper--l"
+                    <div className="govuk-main-wrapper govuk-main-wrapper--l"
                           hidden={this.props.specificationSelected}>
 
                         <fieldset className="govuk-fieldset">
@@ -264,7 +264,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </div>
                             </div>
                         </div>
-                    </main>
+                    </div>
                 </div>
                 <Footer/>
             </div>;
@@ -276,7 +276,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <div className="govuk-width-container">
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
-                    <main className="container" hidden={this.props.pageState !== "IDLE"}>
+                    <div className="container" hidden={this.props.pageState !== "IDLE"}>
 
                         <div className="govuk-warning-text">
                             <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -427,7 +427,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </button>
                                 <button className="govuk-button govuk-!-margin-right-1"
                                         disabled={!this.props.publishedProviderResults.canPublish}
-                                        onClick={() => this.publishFunding()}>Publish
+                                        onClick={() => this.releaseFunding()}>Release
                                 </button>
                                 <button className="govuk-button"
                                         onClick={() => this.refreshFunding()}>Refresh
@@ -436,8 +436,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <p className="govuk-body">Last refresh on: {lastRefreshDate}</p>
                             </div>
                         </div>
-                    </main>
-                    <main className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
+                    </div>
+                    <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
                         <div className="row">
                             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                 <table className="govuk-table">
@@ -507,7 +507,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <button className="govuk-button" data-module="govuk-button" onClick={() => this.confirmApproveFunding()}>Confirm Approval</button>
                             </div>
                         </div>
-                    </main>
+                    </div>
                     <main className="govuk-width-container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
@@ -521,7 +521,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     </thead>
                                     <tbody>
                                     <tr className="govuk-table__row">
-                                        <td className="govuk-table__header">Number of providers to publish</td>
+                                        <td className="govuk-table__header">Number of providers to release</td>
                                         <td className="govuk-table__cell">{this.props.publishedProviderResults.totalProvidersToPublish}</td>
                                     </tr>
                                     </tbody>
@@ -565,7 +565,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
-                                        <th className="govuk-table__head">Total funding being published</th>
+                                        <th className="govuk-table__head">Total funding being released</th>
                                         <th className="govuk-table__head"></th>
                                         <th className="govuk-table__head">£{this.props.publishedProviderResults.totalFundingAmount}</th>
                                     </tr>
@@ -576,7 +576,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         <div className="row">
                             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
                                 <button className="govuk-button" data-module="govuk-button"
-                                        onClick={() => this.confirmPublishFunding()}>Confirm Publish
+                                        onClick={() => this.confirmReleaseFunding()}>Confirm Release
                                 </button>
 
                             </div>
@@ -593,10 +593,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                             jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
                                             message="Waiting to approve funding" callback={this.refreshProviderResults}/>
                     </div>
-                    <div className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING_JOB"}>
-                        <NotificationSignal jobType="PublishFundingJob"
-                                            jobId={this.props.pageState === "PUBLISH_FUNDING_JOB" ? this.props.specifications.id : ""}
-                                            message="Waiting to publish funding" callback={this.refreshProviderResults}/>
+                    <div className="container" hidden={this.props.pageState !== "RELEASE_FUNDING_JOB"}>
+                        <NotificationSignal jobType="PublishProviderFundingJob"
+                                            jobId={this.props.pageState === "RELEASE_FUNDING_JOB" ? this.props.specifications.id : ""}
+                                            message="Waiting to release funding" callback={this.refreshProviderResults}/>
                     </div>
                 </div>
                 <Footer/>

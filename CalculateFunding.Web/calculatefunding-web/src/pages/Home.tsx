@@ -41,7 +41,7 @@ export class Home extends Component<IHomeProps, {}> {
             <div className="govuk-width-container">
                 <a href='/' className="govuk-back-link">Back</a>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
-                <main className="govuk-main-wrapper">
+                <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
                             <h1 className="govuk-heading-xl">Calculate funding</h1>
@@ -85,7 +85,7 @@ export class Home extends Component<IHomeProps, {}> {
                         </div>
                     </div>
 
-                </main>
+                </div>
             </div>
             <Footer/>
 

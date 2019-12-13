@@ -49,7 +49,7 @@ const initialState: IViewFundingState = {
     },
     latestRefreshDateResults: '',
     approveFundingJobId: '',
-    publishFundingJobId: '',
+    releaseFundingJobId: '',
     refreshFundingJobId: '',
     filterTypes: [],
     pageState: "IDLE"
@@ -73,8 +73,8 @@ export function reduceViewFundingState(state: IViewFundingState = initialState, 
             return {...state, refreshFundingJobId: action.payload};
         case ViewFundingActionTypes.APPROVE_FUNDING:
             return {...state, approveFundingJobId: action.payload};
-        case ViewFundingActionTypes.PUBLISH_FUNDING:
-            return {...state, publishFundingJobId: action.payload};
+        case ViewFundingActionTypes.RELEASE_FUNDING:
+            return {...state, releaseFundingJobId: action.payload};
         case ViewFundingActionTypes.CHANGE_PAGESTATE:
             return {...state, pageState: action.payload};
         default:
