@@ -142,7 +142,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     };
 
     confirmPublishFunding = () => {
-        this.setState({pageState: "PUBLISH_FUNDING_JOB"});
+        this.props.changePageState("PUBLISH_FUNDING_JOB");
         this.props.publishFunding(this.props.specifications.id);
     };
 
