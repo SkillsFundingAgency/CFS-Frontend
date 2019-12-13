@@ -500,9 +500,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <div className="spacing-30"></div>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
@@ -514,42 +513,37 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                                <button className="govuk-button"
-                                        onClick={() => this.confirmApproveFunding()}>Confirm Approval
-                                </button>
-
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <button className="govuk-button" data-module="govuk-button" onClick={() => this.confirmApproveFunding()}>Confirm Approval</button>
                             </div>
                         </div>
-                        <div className="spacing-30"></div>
                     </main>
-                    <main className="container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-
-                                <table className="">
+                    <main className="govuk-width-container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <table className="govuk-table">
                                     <caption className="govuk-table__caption">You have selected:</caption>
-                                    <thead>
-                                    <tr>
-                                        <th>Provider Name</th>
-                                        <th>Info</th>
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__header">Provider Name</th>
+                                        <th className="govuk-table__header">Info</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>Number of providers to publish</td>
-                                        <td>{this.props.publishedProviderResults.totalResults}</td>
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Number of providers to publish</td>
+                                        <td className="govuk-table__cell">{this.props.publishedProviderResults.totalResults}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Provider Types Selected</td>
-                                        <td>You have
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Provider Types Selected</td>
+                                        <td className="govuk-table__cell">You have
                                             selected {this.props.publishedProviderResults.providers.length} providers
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>Provider local authorities selected</td>
-                                        <td>You have
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Provider local authorities selected</td>
+                                        <td className="govuk-table__cell">You have
                                             selected {this.selectedCount} local
                                             authorities
                                         </td>
@@ -558,33 +552,33 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Specification Details</th>
-                                        <th>Info</th>
-                                        <th>Funding</th>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <table className="govuk-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th className="govuk-table__header">Specification Details</th>
+                                        <th className="govuk-table__header">Info</th>
+                                        <th className="govuk-table__header">Funding</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>Funding Period</td>
-                                        <td>{this.props.specifications.fundingPeriod.name}</td>
-                                        <td></td>
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Funding Period</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.fundingPeriod.name}</td>
+                                        <td className="govuk-table__cell"></td>
                                     </tr>
-                                    <tr>
-                                        <td>Specification selected</td>
-                                        <td>{this.props.specifications.name}</td>
-                                        <td></td>
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Specification selected</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.name}</td>
+                                        <td className="govuk-table__cell"></td>
                                     </tr>
-                                    <tr>
-                                        <td>Funding Stream</td>
-                                        <td>{this.props.specifications.fundingStreams.map(stream =>
+                                    <tr className="govuk-table__row">
+                                        <td className="govuk-table__header">Funding Stream</td>
+                                        <td className="govuk-table__cell">{this.props.specifications.fundingStreams.map(stream =>
                                             stream.name
                                         )}</td>
-                                        <td></td>
+                                        <td className="govuk-table__cell"></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -605,7 +599,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         </div>
                         <div className="row">
                             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
-                                <button className="button button-publish"
+                                <button className="govuk-button" data-module="govuk-button"
                                         onClick={() => this.confirmPublishFunding()}>Confirm Publish
                                 </button>
 
