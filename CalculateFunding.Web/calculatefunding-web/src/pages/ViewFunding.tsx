@@ -7,6 +7,7 @@ import {FacetsEntity, ProvidersEntity} from "../types/publishedProvider";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {NotificationSignal} from "../signals/NotificationSignal";
 import {Navigation, NavigationLevel} from "../components/Navigation";
+import {BackButton} from "../components/BackButton";
 
 export interface IViewFundingProps {
     getSelectedSpecifications: any;
@@ -178,7 +179,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
     dismissLoader = () => {
         this.props.changePageState("IDLE");
-        this.setState({pageState: "IDLE"});
     };
 
 
@@ -437,9 +437,15 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                         </div>
                     </div>
-                    <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div className="govuk-width-container" hidden={this.props.pageState !== "APPROVE_FUNDING"}>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <BackButton name="Back" callback={this.dismissLoader} />
+                            </div>
+                        </div>
+
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <table className="govuk-table">
                                     <caption className="govuk-table__caption">You have selected:</caption>
                                     <thead className="govuk-table__head">
@@ -457,8 +463,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
@@ -511,6 +517,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     <main className="govuk-width-container" hidden={this.props.pageState !== "PUBLISH_FUNDING"}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
+                                <BackButton name="Back" callback={this.dismissLoader} />
+                            </div>
+                        </div>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <table className="govuk-table">
                                     <caption className="govuk-table__caption">You have selected:</caption>
                                     <thead className="govuk-table__head">
@@ -560,8 +571,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
@@ -573,8 +584,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 spacing-30">
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
                                 <button className="govuk-button" data-module="govuk-button"
                                         onClick={() => this.confirmReleaseFunding()}>Confirm Release
                                 </button>
@@ -584,16 +595,19 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     </main>
 
                     <div className="container" hidden={this.props.pageState !== "REFRESH_FUNDING"}>
+                        <BackButton name="Back" callback={this.dismissLoader} />
                         <NotificationSignal jobType="RefreshFundingJob"
                                             jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
                                             message="Waiting to refresh funding" callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container" hidden={this.props.pageState !== "APPROVE_FUNDING_JOB"}>
+                        <BackButton name="Back" callback={this.dismissLoader} />
                         <NotificationSignal jobType="ApproveFunding"
                                             jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
                                             message="Waiting to approve funding" callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container" hidden={this.props.pageState !== "RELEASE_FUNDING_JOB"}>
+                        <BackButton name="Back" callback={this.dismissLoader} />
                         <NotificationSignal jobType="PublishProviderFundingJob"
                                             jobId={this.props.pageState === "RELEASE_FUNDING_JOB" ? this.props.specifications.id : ""}
                                             message="Waiting to release funding" callback={this.refreshProviderResults}/>
