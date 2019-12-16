@@ -194,7 +194,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
             },
             {
                 url: null,
-                name: "Choose Specification"
+                name: "Approve and release funding"
             }];
 
         let lastRefreshDate = "Not Available";
@@ -209,7 +209,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <Header/>
                 <div className="govuk-width-container">
                     <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
-                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
+                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
                     <div className="govuk-main-wrapper govuk-main-wrapper--l"
                           hidden={this.props.specificationSelected}>
@@ -274,7 +274,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <Header/>
                 <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <div className="govuk-width-container">
-                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Choose Specification"
+                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
                     <div className="container" hidden={this.props.pageState !== "IDLE"}>
 
