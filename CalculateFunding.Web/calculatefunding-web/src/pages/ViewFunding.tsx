@@ -315,14 +315,14 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         <div className="govuk-grid-row govuk-!-margin-top-5 govuk-!-margin-bottom-5">
                             <div className="govuk-grid-column-full">
                                 <p className="govuk-body govuk-!-display-inline">Showing</p>
-                                <select className="govuk-select" name="viewFundingPageSize"
+                                <select className="govuk-select govuk-!-margin-left-1 govuk-!-margin-right-1" name="viewFundingPageSize"
                                         id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
                                 }} hidden={this.props.publishedProviderResults.totalResults > 49}>
                                     <option
                                         value={this.props.publishedProviderResults.totalResults}>{this.props.publishedProviderResults.totalResults}</option>
                                 </select>
-                                <select className="govuk-select" name="viewFundingPageSize"
+                                <select className="govuk-select govuk-!-margin-left-1 govuk-!-margin-right-1" name="viewFundingPageSize"
                                         id="viewFundingPageSize" onChange={(e) => {
                                     this.changePageSize(e)
                                 }} hidden={this.props.publishedProviderResults.totalResults < 50}>
