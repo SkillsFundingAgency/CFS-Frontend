@@ -8,6 +8,7 @@ import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {NotificationSignal} from "../signals/NotificationSignal";
 import {Navigation, NavigationLevel} from "../components/Navigation";
 import {BackButton} from "../components/BackButton";
+import Pagination from "../components/Pagination";
 
 export interface IViewFundingProps {
     getSelectedSpecifications: any;
@@ -155,25 +156,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.changePageState("IDLE");
     };
 
-    movePage = (action: string) => {
-        let pageNumber = 0;
-        switch (action) {
-            case "nextPage":
-                pageNumber = this.props.publishedProviderResults.pagerState.currentPage + 1;
-                break;
-            case "previousPage":
-                pageNumber = this.props.publishedProviderResults.pagerState.currentPage - 1;
-                break;
-            case "firstPage":
-                pageNumber = 1;
-                break;
-            case "lastPage":
-                pageNumber = this.props.publishedProviderResults.pagerState.lastPage;
-                break;
-            default:
-                pageNumber = 1;
-                break;
-        }
+    movePage = (pageNumber: string) => {
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, this.state.status, pageNumber);
     };
 
@@ -389,34 +372,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         </div>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
-                                <ul className="pagination">
-                                    <li className="hasPrevious">
-                                        <button title="View First Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                onClick={() => this.movePage("firstPage")}><span
-                                            className="govuk-body">&lt;&lt;</span>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button disabled={this.props.publishedProviderResults.currentPage === 1}
-                                                onClick={() => this.movePage("previousPage")}><span
-                                            className="govuk-body">&lt;</span></button>
-                                    </li>
-                                    <li className="hasNext">
-                                        <button title="View Next Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                onClick={() => this.movePage("nextPage")}><span
-                                            className="govuk-body">&gt;</span>
-                                        </button>
-                                    </li>
-                                    <li className="hasNext">
-                                        <button title="View Last Page"
-                                                disabled={this.props.publishedProviderResults.currentPage === this.props.publishedProviderResults.pagerState.lastPage}
-                                                onClick={() => this.movePage("lastPage")}><span
-                                            className="govuk-body">&gt;&gt;</span>
-                                        </button>
-                                    </li>
-                                </ul>
+                                <Pagination currentPage={this.props.publishedProviderResults.pagerState.currentPage} lastPage={this.props.publishedProviderResults.pagerState.lastPage} callback={this.movePage}/>
                             </div>
                         </div>
                         <div className="govuk-grid-row">
