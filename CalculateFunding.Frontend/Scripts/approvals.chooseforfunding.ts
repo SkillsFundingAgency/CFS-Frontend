@@ -76,7 +76,7 @@
                     let fundingStreams: Array<FundingStreamResponse> = response;
                     self.fundingStreams(fundingStreams);
                     let specificationSelected: string = self.getQueryStringValue("specificationId");
-                    if (specificationSelected != undefined) {
+                    if (specificationSelected != undefined && specificationSelected != "") {
                         let specificationRequest = $.ajax({
                             url: self.settings.specificationsUrl.replace("{specificationId}", specificationSelected),
                             dataType: "json",
@@ -148,6 +148,10 @@
                                     specificationIds.push(specResponse.id);
                                 }
                             });
+
+                            if (specificationIds.length === 0) {
+                                return;
+                            }
 
                             let calcStatusRequest = $.ajax({
                                 url: fundingModel.settings.calculationStatusCountUrl,
