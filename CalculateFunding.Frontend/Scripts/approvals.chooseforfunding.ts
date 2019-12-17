@@ -76,7 +76,7 @@
                     let fundingStreams: Array<FundingStreamResponse> = response;
                     self.fundingStreams(fundingStreams);
                     let specificationSelected: string = self.getQueryStringValue("specificationId");
-                    if (specificationSelected != undefined && specificationSelected != "") {
+                    if (specificationSelected != undefined && specificationSelected !== "") {
                         let specificationRequest = $.ajax({
                             url: self.settings.specificationsUrl.replace("{specificationId}", specificationSelected),
                             dataType: "json",
