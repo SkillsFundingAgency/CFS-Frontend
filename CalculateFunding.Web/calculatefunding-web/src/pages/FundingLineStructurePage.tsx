@@ -20,6 +20,7 @@ export interface IFundingLineStructureProps {
 export default class FundingLineStructurePage extends React.Component<IFundingLineStructureProps, {}> {
     componentDidMount(): void {
         this.props.getSpecificationById();
+        document.title = "Funding Line Structure - Calculate Funding";
     }
 
     render() {

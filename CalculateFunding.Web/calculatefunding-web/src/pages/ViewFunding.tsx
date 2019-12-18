@@ -60,6 +60,7 @@ export interface IViewFundingProps {
 export default class ViewFundingPage extends React.Component<IViewFundingProps, {}> {
     componentDidMount(): void {
         this.props.getAllFundingStreams();
+        document.title = "Approve and release funding - Calculate Funding";
     }
 
     state = {
