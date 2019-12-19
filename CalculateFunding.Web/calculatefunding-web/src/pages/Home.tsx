@@ -39,7 +39,6 @@ export class Home extends Component<IHomeProps, {}> {
         return <div>
             <Header/>
             <div className="govuk-width-container">
-                <a href='/' className="govuk-back-link">Back</a>
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
                 <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
@@ -70,7 +69,7 @@ export class Home extends Component<IHomeProps, {}> {
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/results" className="govuk-link">View results</a>
+                                            <a href="/app/results" className="govuk-link">View results</a>
                                         </div>
                                         <p className="govuk-body">View results for providers, calculations and quality assurance tests.</p>
                                     </div>
