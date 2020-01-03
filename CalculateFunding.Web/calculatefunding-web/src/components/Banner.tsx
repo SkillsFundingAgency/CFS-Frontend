@@ -39,7 +39,7 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                                 <strong className="phase-tag">Beta</strong>
                                 <span>
                             Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer"
-                                                                       href="https://www.smartsurvey.co.uk/s/cfsbeta/">help us improve the service</a>.
+                                                                       href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-YJWVbwgF21Alt5-BoBqL_RUNjY%20xSlJVTFhWR0wwTkgyRzc2RVdDN0VEMC4u">help us improve the service</a>.
 
                         </span>
                             </div>
@@ -70,7 +70,7 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                                 <strong className="phase-tag">Beta</strong>
                                 <span>
                             Complete our quick 5-question survey to <a target="_blank" rel="noopener noreferrer"
-                                                                       href="https://www.smartsurvey.co.uk/s/cfsbeta/">help us improve the service</a>.
+                                                                       href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-YJWVbwgF21Alt5-BoBqL_RUNjY%20xSlJVTFhWR0wwTkgyRzc2RVdDN0VEMC4u">help us improve the service</a>.
 
                         </span>
                             </div>
