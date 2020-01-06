@@ -7,6 +7,7 @@ import './App.scss'
 import {Footer} from "./components/Footer";
 import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
+import {ViewSpecificationResults} from "./pages/ViewSpecificationResults";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/FundingLineStructure" component={FundingLineStructureContainer} />
        <Route path="/ViewFunding" component={ViewFundingContainer} />
        <Route path="/results" component={ViewResults} />
+       <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
        <Route path="*">
             <NoMatch />
           </Route>
