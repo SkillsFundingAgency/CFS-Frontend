@@ -11,7 +11,6 @@
     using CalculateFunding.Frontend.ViewModels.Common;
     using ViewModels.Specs;
     using Serilog;
-    using Common.FeatureToggles;
     using Common.ApiClient.Specifications.Models;
 
     public class SpecificationSearchService : ISpecificationSearchService
@@ -19,20 +18,17 @@
         private ISpecificationsApiClient _specsApiClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
-        public SpecificationSearchService(ISpecificationsApiClient specsApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public SpecificationSearchService(ISpecificationsApiClient specsApiClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
 
             _specsApiClient = specsApiClient;
             _mapper = mapper;
             _logger = logger;
-            _featureToggle = featureToggle;
         }
 
         public async Task<SpecificationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -44,7 +40,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
+                SearchMode = SearchMode.All
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

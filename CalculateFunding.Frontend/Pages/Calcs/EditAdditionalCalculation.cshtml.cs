@@ -6,7 +6,6 @@ using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
@@ -27,23 +26,18 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         public EditAdditionalCalculationPageModel(ISpecificationsApiClient specsClient,
             ICalculationsApiClient calcClient,
             IMapper mapper,
-            IFeatureToggle features,
             IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
-            Guard.ArgumentNotNull(features, nameof(features));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
-            ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
         }
-
-        public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
 
         public Calculation Calculation { get; set; }
 
@@ -69,8 +63,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 return new BadRequestObjectResult("Specification not found");
             }
-
-            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
 
             ApiResponse<Calculation> calculationResponse = await _calcClient.GetCalculationById(calculationId);
 

@@ -7,7 +7,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -27,24 +26,21 @@ namespace CalculateFunding.Frontend.Services
         private ITestEngineApiClient _testEngineClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
         public TestScenarioResultsService(IScenarioSearchService scenariosApiClient, ISpecificationsApiClient specsApiClient,
-            ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+            ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(scenariosApiClient, nameof(scenariosApiClient));
             Guard.ArgumentNotNull(specsApiClient, nameof(specsApiClient));
             Guard.ArgumentNotNull(testEngineApiClient, nameof(testEngineApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _scenariosSearchService = scenariosApiClient;
             _specsClient = specsApiClient;
             _testEngineClient = testEngineApiClient;
             _mapper = mapper;
             _logger = logger;
-            _featureToggle = featureToggle;
         }
         public async Task<TestScenarioResultViewModel> PerformSearch(TestScenarioResultRequestViewModel request)
         {
@@ -57,7 +53,7 @@ namespace CalculateFunding.Frontend.Services
                 Filters = request.Filters,
                 PageNumber = request.PageNumber,
                 PageSize = 20,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
+                SearchMode = SearchMode.All
             };
 
             if (searchRequest.Filters == null)

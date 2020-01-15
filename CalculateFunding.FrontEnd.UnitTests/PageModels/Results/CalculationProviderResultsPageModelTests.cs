@@ -3,7 +3,6 @@ using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Pages.Results;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -1169,8 +1168,6 @@ namespace CalculateFunding.Frontend.PageModels.Results
             ILogger logger = null,
             IJobsApiClient jobsApiClient = null)
         {
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            featureToggle.IsExceptionMessagesEnabled().Returns(true);
             return new CalculationProviderResultsPageModel(
                 resultsSearchService ?? CreateResultsSearchService(),
                 calculationsApiClient ?? CreateCalculationsApiClient(),
@@ -1178,8 +1175,7 @@ namespace CalculateFunding.Frontend.PageModels.Results
                 mapper ?? CreateMapper(),
                 datasetsApiClient ?? CreateDatasetsApiClient(),
                 logger ?? Createlogger(),
-                jobsApiClient ?? CreateJobsApiClient(),
-                featureToggle);
+                jobsApiClient ?? CreateJobsApiClient());
         }
 
         private static ICalculationsApiClient CreateCalculationsApiClient()

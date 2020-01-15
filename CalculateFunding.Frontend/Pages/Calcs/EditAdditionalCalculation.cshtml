@@ -157,7 +157,6 @@
             calculationValueType:"@Model.Calculation.ValueType.ToString()",
             specificationId: "@Model.SpecificationId",
             fundingStreams: @Html.Raw(Model.FundingStreams),
-            newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled",
             existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))"
         };
 

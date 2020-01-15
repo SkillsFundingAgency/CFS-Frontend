@@ -9,7 +9,6 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CalculateFunding.Common.FeatureToggles;
 
 namespace CalculateFunding.Frontend.Pages.Datasets
 {
@@ -19,19 +18,14 @@ namespace CalculateFunding.Frontend.Pages.Datasets
     {
         private IDatasetSearchService _searchService;
         private readonly IDatasetsApiClient _datasetApiClient;
-        private readonly IFeatureToggle _featureToggle;
 
-        public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient, IFeatureToggle featureToggle)
+        public ManageDatasetsPageModel(IDatasetSearchService searchService, IDatasetsApiClient datasetApiClient)
         {
             Guard.ArgumentNotNull(searchService, nameof(searchService));
             Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
-
+            
             _searchService = searchService;
             _datasetApiClient = datasetApiClient;
-            _featureToggle = featureToggle;
-
-            ShouldNewManageSourcesPageBeEnabled = _featureToggle.IsNewManageDataSourcesPageEnabled();
         }
 
         [BindProperty]
@@ -42,8 +36,6 @@ namespace CalculateFunding.Frontend.Pages.Datasets
         public DatasetPageBannerOperationType? OperationType { get; set; }
 
         public PageBannerOperation PageBanner { get; set; }
-
-        public bool ShouldNewManageSourcesPageBeEnabled { get; private set; }
 
         public async Task<IActionResult> OnGetAsync(int? pageNumber, string searchTerm, DatasetPageBannerOperationType? operationType = null, string operationId = null)
         {

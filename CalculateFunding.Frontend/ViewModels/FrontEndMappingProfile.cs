@@ -129,7 +129,8 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.FundingStreams, opt => opt.Ignore())
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore())
                 .ForMember(m => m.ApprovalStatus, opt => opt.Ignore())
-                .ForMember(m => m.TemplateIds, opt => opt.Ignore());
+                .ForMember(m => m.TemplateIds, opt => opt.Ignore())
+                .ForMember(m => m.DataDefinitionRelationshipIds, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamId, opt => opt.Ignore())

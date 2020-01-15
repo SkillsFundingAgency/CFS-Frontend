@@ -8,7 +8,6 @@
     using CalculateFunding.Common.ApiClient.Providers;
     using CalculateFunding.Common.ApiClient.Providers.Models;
     using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.ViewModels.Common;
     using CalculateFunding.Frontend.ViewModels.Results;
@@ -19,19 +18,16 @@
         private IProvidersApiClient _providersApiClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
-        public ProviderSearchService(IProvidersApiClient providersApiClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public ProviderSearchService(IProvidersApiClient providersApiClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _providersApiClient = providersApiClient;
             _mapper = mapper;
             _logger = logger;
-            _featureToggle = featureToggle;
         }
 
         public async Task<IEnumerable<ProviderVersionMetadata>> GetProviderVersionsByFundingStream(string fundingStreamId)
@@ -57,7 +53,7 @@
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
+                SearchMode = SearchMode.All
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

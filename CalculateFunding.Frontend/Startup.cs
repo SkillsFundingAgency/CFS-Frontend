@@ -127,7 +127,6 @@
 
             services.AddModule<MappingModule>(Configuration);
             services.AddModule<ServicesModule>(Configuration);
-            services.AddModule<FeaturesModule>(Configuration);
 
             services.AddHttpContextAccessor();
             services.AddSingleton<ICancellationTokenProvider, HttpContextCancellationProvider>();

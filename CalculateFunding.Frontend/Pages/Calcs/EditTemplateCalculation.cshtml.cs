@@ -10,7 +10,6 @@ using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Common.Utility;
@@ -36,7 +35,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         public EditTemplateCalculationPageModel(ISpecificationsApiClient specsClient,
             ICalculationsApiClient calcClient,
             IMapper mapper,
-            IFeatureToggle features,
             IAuthorizationHelper authorizationHelper,
             IResultsApiClient resultsApiClient,
             IPoliciesApiClient policiesApiClient)
@@ -44,7 +42,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
-            Guard.ArgumentNotNull(features, nameof(features));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
@@ -54,11 +51,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _resultsApiClient = resultsApiClient;
-            ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
             _policiesApiClient = policiesApiClient;
         }
-
-        public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
 
         public CalculationViewModel Calculation { get; set; }
 
@@ -98,15 +92,13 @@ namespace CalculateFunding.Frontend.Pages.Calcs
                     : new ObjectResult(hex.Message) { StatusCode = (int)HttpStatusCode.InternalServerError };
             }
 
-            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
-
             bool doesUserHavePermission = await _authorizationHelper.DoesUserHavePermission(User, SpecificationId, SpecificationActionTypes.CanEditCalculations);
 
             DoesUserHavePermissionToApproveOrEdit = doesUserHavePermission.ToString().ToLowerInvariant();
 
             await HandleSpecificationSummary(SpecificationId);
 
-            await EnableEditCalculationPage(ShouldNewEditCalculationPageBeEnabled, Calculation.Id);
+            await EnableEditCalculationPage(Calculation.Id);
 
             return Page();
         }
@@ -127,10 +119,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             EditModel = _mapper.Map<CalculationEditViewModel>(calculation);
         }
 
-        public async Task<bool> EnableEditCalculationPage(bool shouldNewEditCalculationPageBeEnabled, string calculationId)
+        public async Task<bool> EnableEditCalculationPage(string calculationId)
         {
-            if (!shouldNewEditCalculationPageBeEnabled) return false;
-
             ApiResponse<bool> hasCalculationResponse = await _resultsApiClient.HasCalculationResults(calculationId);
 
             if (hasCalculationResponse != null && hasCalculationResponse.StatusCode == HttpStatusCode.OK)

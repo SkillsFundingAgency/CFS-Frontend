@@ -11,7 +11,6 @@ using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Constants;
 using CalculateFunding.Frontend.Extensions;
@@ -44,8 +43,7 @@ namespace CalculateFunding.Frontend.Pages.Results
             IMapper mapper,
             IDatasetsApiClient datasetsClient,
             ILogger logger,
-            IJobsApiClient jobsApiClient,
-            IFeatureToggle featureToggle)
+            IJobsApiClient jobsApiClient)
         {
             Guard.ArgumentNotNull(resultsSearchService, nameof(resultsSearchService));
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
@@ -54,7 +52,6 @@ namespace CalculateFunding.Frontend.Pages.Results
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
             Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _mapper = mapper;
             _resultsSearchService = resultsSearchService;
@@ -63,7 +60,6 @@ namespace CalculateFunding.Frontend.Pages.Results
             _datasetsClient = datasetsClient;
             _jobsClient = jobsApiClient;
             _logger = logger;
-            ShowExceptionCountAndFacet = featureToggle.IsExceptionMessagesEnabled();
         }
 
         [BindProperty]
@@ -74,8 +70,6 @@ namespace CalculateFunding.Frontend.Pages.Results
         public ViewModels.Calculations.CalculationViewModel Calculation { get; set; }
 
         public bool HasProviderDatasetsAssigned { get; set; }
-
-        public bool ShowExceptionCountAndFacet { get; set; }
 
         public SpecificationSummaryViewModel Specification { get; set; }
 

@@ -36,8 +36,6 @@
     <partial name="_PageBannerOperationPartial" model="Model.PageBanner" />
 }
 
-@if (Model.ShouldNewManageSourcesPageBeEnabled)
-{
     @section BannerMiddle{
         <form method="post" action="/datasets" class="filter-container spacing-15" id="filter-container" data-bind="submit: performSearch" asp-antiforgery="true">
             <div role="search">
@@ -58,7 +56,6 @@
                 </div>
             </div>
         </form>
-    }
 
         <div class="row manage-datasets" id="manage-datasets-container">
             <partial name="_SearchErrorPartial" />

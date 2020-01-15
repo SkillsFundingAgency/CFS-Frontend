@@ -2,7 +2,6 @@
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
@@ -223,23 +222,12 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             results.Facets.Last().FacetValues.Last().Count.Should().Be(1);
         }
 
-        static ProviderSearchService CreateSearchService(IProvidersApiClient providersApiClient = null, IMapper mapper = null, ILogger logger = null, IFeatureToggle featureToggle = null)
+        static ProviderSearchService CreateSearchService(IProvidersApiClient providersApiClient = null, IMapper mapper = null, ILogger logger = null)
         {
             return new ProviderSearchService(
                 providersApiClient ?? CreateProvidersApiClient(),
                 mapper ?? CreateMapper(),
-                logger ?? CreateLogger(),
-                featureToggle ?? CreateFeatureToggle());
-        }
-
-        static IFeatureToggle CreateFeatureToggle(bool searchModeAll = true)
-        {
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-
-            featureToggle.IsSearchModeAllEnabled()
-                .Returns(searchModeAll);
-
-            return featureToggle;
+                logger ?? CreateLogger());
         }
 
         static IProvidersApiClient CreateProvidersApiClient()

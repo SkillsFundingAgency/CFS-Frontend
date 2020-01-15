@@ -3,7 +3,6 @@
 	using CalculateFunding.Common.ApiClient.Calcs;
 	using CalculateFunding.Common.ApiClient.Calcs.Models;
 	using System.Threading.Tasks;
-    using CalculateFunding.Common.FeatureToggles;
     using CalculateFunding.Common.Utility;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -16,15 +15,13 @@
         private ICalculationsApiClient _calculationsApiClient;
         private ICalculationSearchService _searchService;
 
-        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService, IFeatureToggle featuretoggle)
+        public IndexPageModel(ICalculationsApiClient calculationsApiClient, ICalculationSearchService searchService)
         {
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
             Guard.ArgumentNotNull(searchService, nameof(searchService));
-            Guard.ArgumentNotNull(featuretoggle, nameof(featuretoggle));
-
+            
             _calculationsApiClient = calculationsApiClient;
             _searchService = searchService;
-            ShouldViewResultsLinkBeEnabled = featuretoggle.IsNewEditCalculationPageEnabled();
         }
 
         public CalculationSearchResultViewModel SearchResults { get; set; }
@@ -32,8 +29,6 @@
         public Calculation DraftSavedCalculation { get; set; }
 
         public Calculation PublishedCalculation { get; set; }
-
-        public bool ShouldViewResultsLinkBeEnabled { get; private set; }
 
         [BindProperty]
         public string SearchTerm { get; set; }

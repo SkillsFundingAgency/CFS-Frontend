@@ -10,9 +10,7 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Serilog;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Models.Search;
-using SearchMode = CalculateFunding.Common.ApiClient.Models.SearchMode;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -21,19 +19,16 @@ namespace CalculateFunding.Frontend.Services
         private IDatasetsApiClient _datasetsClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
-        public DatasetDefinitionSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public DatasetDefinitionSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _datasetsClient = datasetsClient;
             _mapper = mapper;
             _logger = logger;
-            _featureToggle = featureToggle;
         }
 
         public async Task<DatasetDefinitionSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -48,7 +43,7 @@ namespace CalculateFunding.Frontend.Services
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? Common.Models.Search.SearchMode.All : Common.Models.Search.SearchMode.Any
+                SearchMode = Common.Models.Search.SearchMode.All
             };
 
 	        ApiResponse<SearchResults<DatasetDefinitionIndex>> searchRequestResult = await _datasetsClient.SearchDatasetDefinitions(requestOptions);

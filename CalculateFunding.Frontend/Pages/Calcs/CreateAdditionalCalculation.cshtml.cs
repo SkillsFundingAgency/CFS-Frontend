@@ -4,7 +4,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -24,23 +23,19 @@ namespace CalculateFunding.Frontend.Pages.Calcs
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;     
 
-        public CreateAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper, IFeatureToggle features,
+        public CreateAdditionalCalculationPageModel(ISpecificationsApiClient specsClient, ICalculationsApiClient calcClient, IMapper mapper,
             IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
-            Guard.ArgumentNotNull(features, nameof(features));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));         
 
             _specsClient = specsClient;
             _calcClient = calcClient;
             _mapper = mapper;
-            ShouldNewEditCalculationPageBeEnabled = features.IsNewEditCalculationPageEnabled();
             _authorizationHelper = authorizationHelper;         
         }
-
-        public bool ShouldNewEditCalculationPageBeEnabled { get; private set; }
 
         public Calculation Calculation { get; set; }
 
@@ -66,8 +61,6 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             {
                 return new BadRequestObjectResult("Specification not found");
             }
-
-            ViewData["GreyBackground"] = ShouldNewEditCalculationPageBeEnabled.ToString();
 
             ApiResponse<Calculation> calculation = new ApiResponse<Calculation>(HttpStatusCode.Continue);
 

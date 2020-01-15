@@ -12,7 +12,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -34,9 +33,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             calcsClient
                 .When(a => a.FindCalculations(Arg.Any<SearchFilterRequest>()))
@@ -61,9 +59,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             ApiResponse<SearchResults<CalculationSearchResult>> expectedServiceResult = null;
 
@@ -87,9 +84,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -121,9 +117,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -162,9 +157,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -230,9 +224,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 0;
 
@@ -259,9 +252,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -288,9 +280,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -321,9 +312,8 @@ namespace CalculateFunding.Frontend.Services
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
 
             int numberOfItems = 50;
 
@@ -346,67 +336,7 @@ namespace CalculateFunding.Frontend.Services
             results.StartItemNumber.Should().Be(51);
             results.EndItemNumber.Should().Be(100);
         }
-
-        [TestMethod]
-        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIsSwitchedOff_SearchModeIsAny()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
-
-            SearchRequestViewModel request = new SearchRequestViewModel()
-            {
-                PageNumber = 2,
-            };
-
-            // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
-
-            // Assert
-            await
-                calcsClient
-                    .FindCalculations(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.Any));
-        }
-
-        [TestMethod]
-        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIsSwitchedOn_SearchModeIsAll()
-        {
-            // Arrange
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            ILogger logger = Substitute.For<ILogger>();
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle(true);
-
-            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger, featureToggle);
-
-            SearchRequestViewModel request = new SearchRequestViewModel()
-            {
-                PageNumber = 2,
-            };
-
-            // Act
-            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
-
-            // Assert
-            await
-                calcsClient
-                    .FindCalculations(Arg.Is<SearchFilterRequest>(m => m.SearchMode == SearchMode.All));
-        }
-
-        private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)
-        {
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            featureToggle
-                .IsSearchModeAllEnabled()
-                .Returns(featureToggleOn);
-
-            return featureToggle;
-        }
-
+        
         private ApiResponse<SearchResults<CalculationSearchResult>> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
             SearchResults<CalculationSearchResult> output = new SearchResults<CalculationSearchResult>();

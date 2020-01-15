@@ -5,7 +5,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -19,19 +18,16 @@ namespace CalculateFunding.Frontend.Services
         private ICalculationsApiClient _calculationsApiClient;
         private IMapper _mapper;
         private ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
-        public CalculationSearchService(ICalculationsApiClient calculationsClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public CalculationSearchService(ICalculationsApiClient calculationsClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(calculationsClient, nameof(calculationsClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(featureToggle, nameof(featureToggle));
 
             _calculationsApiClient = calculationsClient;
             _mapper = mapper;
             _logger = logger;
-            _featureToggle = featureToggle;
         }
 
         public async Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -44,7 +40,7 @@ namespace CalculateFunding.Frontend.Services
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
                 FacetCount = request.FacetCount,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? SearchMode.All : SearchMode.Any
+                SearchMode = SearchMode.All
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

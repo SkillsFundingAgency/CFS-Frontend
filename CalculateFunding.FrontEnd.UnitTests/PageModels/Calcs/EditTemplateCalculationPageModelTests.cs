@@ -11,7 +11,6 @@ using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -36,7 +35,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -44,7 +42,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -74,7 +71,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -84,7 +80,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -114,7 +109,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -128,7 +122,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -171,89 +164,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         }
 
         [TestMethod]
-        public async Task EnableEditCalculationPage_ShouldNotBeEnabled_DoesNothing()
-        {
-            //Arrange
-            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
-            ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
-            IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
-            IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
-            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
-            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
-
-            EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
-                calcClient,
-                mapper,
-                features,
-                authHelper,
-                resultsApiClient,
-                policiesApiClient);
-
-            string calculationId = "1234";
-
-            //Act
-            await pageModel.EnableEditCalculationPage(false, calculationId);
-
-            //Assert
-            await resultsApiClient
-                .Received(0)
-                .HasCalculationResults(Arg.Any<string>());
-
-            pageModel.CalculationHasResults = false;
-        }
-
-        [TestMethod]
-        [DataRow(true)]
-        [DataRow(false)]
-        public async Task EnableEditCalculationPage_ShouldBeEnabled_PopulatesCorrectly(bool hasResults)
-        {
-            //Arrange
-            ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
-            ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
-            IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
-            IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
-            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
-            IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
-
-            EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
-                calcClient,
-                mapper,
-                features,
-                authHelper,
-                resultsApiClient,
-                policiesApiClient);
-
-            string calculationId = "2345";
-
-            pageModel.Calculation = new CalculationViewModel { Id = calculationId };
-
-            resultsApiClient
-                .HasCalculationResults(calculationId)
-                .Returns(new ApiResponse<bool>(HttpStatusCode.OK, hasResults));
-
-            //Act
-            bool result = await pageModel.EnableEditCalculationPage(true, calculationId);
-
-            //Assert
-            result
-                .Should()
-                .Be(hasResults);
-
-            await resultsApiClient
-                .Received(1)
-                .HasCalculationResults(calculationId);
-        }
-
-        [TestMethod]
         public async Task EnableEditCalculationPage_NullCalculationResponse_ReturnsFalse()
         {
             //Arrange
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -261,7 +177,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -275,7 +190,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns((ApiResponse<bool>)null);
 
             //Act
-            bool result = await pageModel.EnableEditCalculationPage(true, calculationId);
+            bool result = await pageModel.EnableEditCalculationPage(calculationId);
 
             //Assert
             result
@@ -297,7 +212,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -305,7 +219,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -319,7 +232,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(new ApiResponse<bool>(statusCode, true));
 
             //Act
-            bool result = await pageModel.EnableEditCalculationPage(true, calculationId);
+            bool result = await pageModel.EnableEditCalculationPage(calculationId);
 
             //Assert
             result
@@ -342,7 +255,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -354,7 +266,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -389,7 +300,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -463,7 +373,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -515,7 +424,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -549,7 +457,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -588,7 +495,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -645,7 +551,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -688,7 +593,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -696,7 +600,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -719,7 +622,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -729,7 +631,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -750,23 +651,17 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         }
 
         [TestMethod]
-        [DataRow(true, true, true)]
-        [DataRow(false, false, true)]
-        [DataRow(true, false, true)]
-        [DataRow(false, true, true)]
-        [DataRow(true, true, false)]
-        [DataRow(false, false, false)]
-        [DataRow(true, false, false)]
-        [DataRow(false, true, false)]
-        public async Task OnGet_ValidRequest_ReturnsCorrectly(bool newEditCalculationPageEnabled,
-            bool userHasPermission,
+        [DataRow(true, true)]
+        [DataRow(false, true)]
+        [DataRow(true, false)]
+        [DataRow(false, false)]
+        public async Task OnGet_ValidRequest_ReturnsCorrectly(bool userHasPermission,
             bool hasCalculationResponse)
         {
             //Arrange
             ISpecificationsApiClient specsClient = Substitute.For<ISpecificationsApiClient>();
             ICalculationsApiClient calcClient = Substitute.For<ICalculationsApiClient>();
             IMapper mapper = Substitute.For<IMapper>();
-            IFeatureToggle features = Substitute.For<IFeatureToggle>();
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
             IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
@@ -796,10 +691,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             calcClient
                 .GetCalculationById(calculationId)
                 .Returns(new ApiResponse<Calculation>(HttpStatusCode.OK, calculation));
-
-            features
-                .IsNewEditCalculationPageEnabled()
-                .Returns(newEditCalculationPageEnabled);
 
             authHelper
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), SpecificationActionTypes.CanEditCalculations)
@@ -877,7 +768,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
                 calcClient,
                 mapper,
-                features,
                 authHelper,
                 resultsApiClient,
                 policiesApiClient);
@@ -895,26 +785,13 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Received(1)
                 .GetCalculationById(calculationId);
 
-            features
-                .Received(1)
-                .IsNewEditCalculationPageEnabled();
-
             await authHelper
                 .Received(1)
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), SpecificationActionTypes.CanEditCalculations);
 
-            if (newEditCalculationPageEnabled)
-            {
-                await resultsApiClient
-                    .Received(1)
-                    .HasCalculationResults(calculationId + specificationId);
-            }
-            else
-            {
-                await resultsApiClient
-                    .DidNotReceive()
-                    .HasCalculationResults(Arg.Any<string>());
-            }
+            await resultsApiClient
+                .Received(1)
+                .HasCalculationResults(calculationId + specificationId);
 
             mapper
                 .Received(1)
@@ -927,10 +804,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             pageModel.DoesUserHavePermissionToApproveOrEdit
                 .Should()
                 .Be(userHasPermission.ToString().ToLowerInvariant());
-
-            pageModel.ViewData["GreyBackground"]
-                .Should()
-                .Be(newEditCalculationPageEnabled.ToString());
 
             await calcClient
                 .Received(1)

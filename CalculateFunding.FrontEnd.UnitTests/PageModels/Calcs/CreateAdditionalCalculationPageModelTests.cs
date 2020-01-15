@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using FluentAssertions;
 using CalculateFunding.Common.ApiClient.Calcs;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.UnitTests.Helpers;
 using CalculateFunding.Common.Identity.Authorization.Models;
@@ -42,11 +41,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 Name = "APT Final Baselines current year"
             };
 
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-            featureToggle
-                .IsNewEditCalculationPageEnabled()
-                .Returns(true);
-
             ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
@@ -56,7 +50,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanCreateCalculations))
                 .Returns(true);
 
-            CreateAdditionalCalculationPageModel pageModel = CreateAdditionalCalculationPageModel(specsClient: specsApiClient, features: featureToggle, authorizationHelper: authorizationHelper);
+            CreateAdditionalCalculationPageModel pageModel = CreateAdditionalCalculationPageModel(specsClient: specsApiClient, authorizationHelper: authorizationHelper);
 
             // Act
             IActionResult result = await pageModel.OnGet("5");
@@ -84,11 +78,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 Name = "APT Final Baselines current year"
             };
 
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-            featureToggle
-                .IsNewEditCalculationPageEnabled()
-                .Returns(true);
-
             ISpecificationsApiClient specsApiClient = CreateSpecsApiClient();
             specsApiClient.GetSpecificationSummaryById(Arg.Is(specificationId))
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, expectedSpecification));
@@ -98,7 +87,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanCreateCalculations))
                 .Returns(false);
 
-            CreateAdditionalCalculationPageModel pageModel = CreateAdditionalCalculationPageModel(specsClient: specsApiClient, features: featureToggle, authorizationHelper: authorizationHelper);
+            CreateAdditionalCalculationPageModel pageModel = CreateAdditionalCalculationPageModel(specsClient: specsApiClient, authorizationHelper: authorizationHelper);
 
             // Act
             IActionResult result = await pageModel.OnGet("5");
@@ -111,14 +100,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             ISpecificationsApiClient specsClient = null,
             ICalculationsApiClient calcsClient = null,
             IMapper mapper = null,
-            IFeatureToggle features = null,
             IAuthorizationHelper authorizationHelper=null)
         {
             CreateAdditionalCalculationPageModel pageModel = new CreateAdditionalCalculationPageModel(
                 specsClient ?? CreateSpecsApiClient(),
                  calcsClient ?? CreateCalcsApiClient(),
                 mapper ?? CreateMapper(),
-                features ?? CreateFeatureToggle(),
                  authorizationHelper ?? TestAuthHelper.CreateAuthorizationHelperSubstitute(SpecificationActionTypes.CanCreateCalculations));
 
             pageModel.PageContext = TestAuthHelper.CreatePageContext();
@@ -138,11 +125,6 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
         private IMapper CreateMapper()
         {
             return Substitute.For<IMapper>();
-        }
-
-        private static IFeatureToggle CreateFeatureToggle()
-        {
-            return Substitute.For<IFeatureToggle>();
         }
     }
 }

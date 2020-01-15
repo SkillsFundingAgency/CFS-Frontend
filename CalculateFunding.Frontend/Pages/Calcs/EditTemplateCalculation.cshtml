@@ -161,8 +161,7 @@
             specificationId: "@Model.SpecificationId",
             fundingStreamId: "@Model.FundingStreamId",
             existingSourceCode: "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Calculation.SourceCode))",
-            calculationName: "@Model.Calculation.Name",
-            newEditCalculationPageBeEnabled: "@Model.ShouldNewEditCalculationPageBeEnabled"
+            calculationName: "@Model.Calculation.Name"
         };
         var viewModel = new calculateFunding.editTemplateCalculation.EditTemplateCalculationViewModel(editTemplateViewModelOptions);
         viewModel.loadIntellisenseContext();

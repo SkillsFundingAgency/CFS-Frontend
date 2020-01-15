@@ -185,13 +185,7 @@ namespace calculateFunding.editTemplateCalculation {
                     self.state("redirecting");
 
                     // Redirect back to Manage Calculations page
-                    if (this.options.newEditCalculationPageBeEnabled.length &&
-                        this.options.newEditCalculationPageBeEnabled.toLowerCase() === "true") {
-                        window.location.href = `/specs/fundinglinestructure/${this.options.specificationId}`;
-                    }
-                    else {
-                        window.location.href = "/specs";
-                    }
+                    window.location.href = `/specs/fundinglinestructure/${this.options.specificationId}`;
                 });
             }
         }
@@ -398,8 +392,7 @@ namespace calculateFunding.editTemplateCalculation {
         specificationId: string,
         fundingStreamId: string,
         existingSourceCode: string,
-        calculationName: string,
-        newEditCalculationPageBeEnabled: string
+        calculationName: string
     }
 
     export interface IPreviewCompileResultReponse {

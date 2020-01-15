@@ -10,7 +10,6 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Serilog;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 
@@ -21,9 +20,8 @@ namespace CalculateFunding.Frontend.Services
 		private readonly IDatasetsApiClient _datasetsClient;
 		private readonly IMapper _mapper;
 		private readonly ILogger _logger;
-        private readonly IFeatureToggle _featureToggle;
 
-        public DatasetSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger, IFeatureToggle featureToggle)
+        public DatasetSearchService(IDatasetsApiClient datasetsClient, IMapper mapper, ILogger logger)
 		{
 			Guard.ArgumentNotNull(datasetsClient, nameof(datasetsClient));
 			Guard.ArgumentNotNull(mapper, nameof(mapper));
@@ -32,7 +30,6 @@ namespace CalculateFunding.Frontend.Services
 			_datasetsClient = datasetsClient;
 			_mapper = mapper;
 			_logger = logger;
-            _featureToggle = featureToggle;
         }
 
 		public async Task<DatasetSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
@@ -47,7 +44,7 @@ namespace CalculateFunding.Frontend.Services
 				SearchTerm = request.SearchTerm,
 				IncludeFacets = request.IncludeFacets,
 				Filters = request.Filters,
-                SearchMode = _featureToggle.IsSearchModeAllEnabled() ? Common.Models.Search.SearchMode.All : Common.Models.Search.SearchMode.Any
+                SearchMode = Common.Models.Search.SearchMode.All
             };
 
 			ApiResponse<SearchResults<DatasetIndex>> searchRequestResult = await _datasetsClient.SearchDatasets(requestOptions);
@@ -118,7 +115,7 @@ namespace CalculateFunding.Frontend.Services
 				SearchTerm = searchRequest.SearchTerm,
 				IncludeFacets = searchRequest.IncludeFacets,
 				Filters = searchRequest.Filters,
-				SearchMode = _featureToggle.IsSearchModeAllEnabled() ? Common.Models.Search.SearchMode.All : Common.Models.Search.SearchMode.Any
+				SearchMode = Common.Models.Search.SearchMode.All
 			};
 			
 			ApiResponse<SearchResults<DatasetVersionIndex>> searchRequestResult = await _datasetsClient.SearchDatasetVersion(requestOptions);

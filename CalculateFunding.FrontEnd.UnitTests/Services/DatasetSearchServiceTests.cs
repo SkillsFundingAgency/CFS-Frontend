@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.FeatureToggles;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Common;
@@ -35,9 +34,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             datasetClient
                 .When(a => a.SearchDatasets(Arg.Any<SearchModel>()))
@@ -62,9 +60,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             ApiResponse<SearchResults<DatasetIndex>> expectedServiceResult = null;
 
@@ -88,9 +85,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -121,9 +117,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -161,9 +156,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -227,9 +221,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 0;
 
@@ -256,9 +249,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -285,9 +277,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 25;
 
@@ -319,9 +310,8 @@ namespace CalculateFunding.Frontend.Services
             IDatasetsApiClient datasetClient = Substitute.For<IDatasetsApiClient>();
             ILogger logger = Substitute.For<ILogger>();
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(datasetClient, mapper, logger);
 
             int numberOfItems = 50;
 
@@ -353,9 +343,8 @@ namespace CalculateFunding.Frontend.Services
 		    IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
 		    ILogger mockLogger = Substitute.For<ILogger>();
 		    IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
 
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
+            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger);
 
 		    mockDatasetsApiClient
 			    .SearchDatasets(Arg.Any<SearchModel>())
@@ -367,90 +356,6 @@ namespace CalculateFunding.Frontend.Services
 		    // Assert
 		    datasetVersionSearchResultViewModel.Should().BeNull();
 	    }
-
-        [TestMethod]
-        public async Task PerformSearchDatasetVersion_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOff_SearchModeIsAny()
-        {
-            // Arrange
-            IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
-            ILogger mockLogger = Substitute.For<ILogger>();
-            IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
-
-            // Act
-            DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
-
-            // Assert
-            await
-                mockDatasetsApiClient
-                    .Received(1)
-                    .SearchDatasetVersion(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.Any));
-        }
-
-        [TestMethod]
-        public async Task PerformSearchDatasetVersion_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOn_SearchModeIsAll()
-        {
-            // Arrange
-            IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
-            ILogger mockLogger = Substitute.For<ILogger>();
-            IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle(true);
-
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
-
-            // Act
-            DatasetVersionSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearchDatasetVersion(new SearchRequestViewModel());
-
-            // Assert
-            await
-                mockDatasetsApiClient
-                    .Received(1)
-                    .SearchDatasetVersion(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.All));
-        }
-
-        [TestMethod]
-        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOff_SearchModeIsAny()
-        {
-            // Arrange
-            IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
-            ILogger mockLogger = Substitute.For<ILogger>();
-            IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle();
-
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
-
-            // Act
-            DatasetSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearch(new SearchRequestViewModel());
-
-            // Assert
-            await
-                mockDatasetsApiClient
-                    .Received(1)
-                    .SearchDatasets(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.Any));
-        }
-
-        [TestMethod]
-        public async Task PerformSearch_GivenIsSearchModeAllEnabledFeatureToggleIdTurnedOn_SearchModeIsAll()
-        {
-            // Arrange
-            IDatasetsApiClient mockDatasetsApiClient = Substitute.For<IDatasetsApiClient>();
-            ILogger mockLogger = Substitute.For<ILogger>();
-            IMapper mockMapper = MappingHelper.CreateFrontEndMapper();
-            IFeatureToggle featureToggle = CreateFeatureToggle(true);
-
-            IDatasetSearchService datasetSearchService = new DatasetSearchService(mockDatasetsApiClient, mockMapper, mockLogger, featureToggle);
-
-            // Act
-            DatasetSearchResultViewModel datasetVersionSearchResultViewModel = await datasetSearchService.PerformSearch(new SearchRequestViewModel());
-
-            // Assert
-            await
-                mockDatasetsApiClient
-                    .Received(1)
-                    .SearchDatasets(Arg.Is<SearchModel>(m => m.SearchMode == Common.Models.Search.SearchMode.All));
-        }
 
         private ApiResponse<SearchResults<DatasetIndex>> GenerateSearchResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
@@ -493,15 +398,5 @@ namespace CalculateFunding.Frontend.Services
 
 		    return new ApiResponse<SearchResults<DatasetVersionIndex>>(HttpStatusCode.OK, result);
 		}
-
-        private static IFeatureToggle CreateFeatureToggle(bool featureToggleOn = false)
-        {
-            IFeatureToggle featureToggle = Substitute.For<IFeatureToggle>();
-            featureToggle
-                .IsSearchModeAllEnabled()
-                .Returns(featureToggleOn);
-
-            return featureToggle;
-        }
     }
 }

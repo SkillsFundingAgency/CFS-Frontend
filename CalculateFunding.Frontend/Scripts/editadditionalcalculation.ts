@@ -404,8 +404,7 @@ namespace calculateFunding.editadditionalcalculation {
         fundingStreams: IEditAdditionalCalculationViewModelFundingStream[],
         existingSourceCode: string,
         calculationName: string,
-        calculationValueType: string,
-        newEditCalculationPageBeEnabled: string;
+        calculationValueType: string
     }
 
     export interface IEditAdditionalCalculationViewModelFundingStream {
