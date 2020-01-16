@@ -36,7 +36,7 @@
             <span>Provider subtype:&nbsp;<strong>@Model.ViewModel.ProviderSubtype</strong></span>
         </div>
         <div>
-            <span>Date opened:&nbsp;<strong>@Model.ViewModel.DateOpened</strong>&nbsp;</span>
+            <span>Date opened:&nbsp;<strong>@String.Format(Model.ViewModel.DateOpened, FormatStrings.DateTimeFormatString)</strong>&nbsp;</span>
         </div>
     </p>
 }
@@ -178,12 +178,12 @@
                         <tr>
                             <td class="tab"></td>
                             <td>Date opened</td>
-                            <td>@Model.ViewModel.DateOpened</td>
+                            <td>@String.Format(Model.ViewModel.DateOpened, FormatStrings.DateTimeFormatString)</td>
                         </tr>
                         <tr>
                             <td class="tab"></td>
                             <td>Date closed</td>
-                            <td>@Model.ViewModel.DateClosed</td>
+                            <td>@String.Format(Model.ViewModel.DateClosed, FormatStrings.DateTimeFormatString)</td>
                         </tr>
                         <tr>
                             <td class="tab"></td>

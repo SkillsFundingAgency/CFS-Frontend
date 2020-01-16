@@ -1,7 +1,9 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Results
+﻿using CalculateFunding.Frontend.Helpers;
+
+namespace CalculateFunding.Frontend.ViewModels.Results
 {
     using System;
-    using CalculateFunding.Frontend.ViewModels.Common;
+    using Common;
     using Newtonsoft.Json;
 
     public class ProviderSearchResultItemViewModel : ReferenceViewModel
@@ -34,12 +36,6 @@
         [JsonProperty("closeDate")]
         public DateTime? DateClosed { get; set; }
 
-        public string DateOpenedDisplay
-        {
-            get
-            {
-                return DateOpened.HasValue ? DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown";
-            }
-        }
+        public string DateOpenedDisplay => DateOpened.HasValue ? DateOpened.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown";
     }
 }

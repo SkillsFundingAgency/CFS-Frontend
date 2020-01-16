@@ -39,7 +39,7 @@
             <span>Provider subtype:&nbsp;<strong>@Model.ViewModel.ProviderSubtype</strong></span>
         </div>
         <div>
-            <span>Date opened:&nbsp;<strong>@Model.ViewModel.DateOpened</strong>&nbsp;</span>
+            <span>Date opened:&nbsp;<strong>@String.Format(Model.ViewModel.DateOpened, FormatStrings.DateTimeFormatString)</strong>&nbsp;</span>
         </div>
     </p>
 

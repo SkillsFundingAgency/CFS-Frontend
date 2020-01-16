@@ -56,7 +56,7 @@
                             <tr>
                                 <td class="text-center">@datasetVersionHistory.Version</td>
                                 <td>@datasetVersionHistory.ChangeNote</td>
-                                <td>@datasetVersionHistory.LastUpdatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@datasetVersionHistory.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString)</td>
                                 <td>@datasetVersionHistory.LastUpdatedByName</td>
                                 <td class="text-center">
                                     <a href="/api/datasets/download-dataset-file/@datasetVersionHistory.DatasetId/@datasetVersionHistory.Version" target="_blank">

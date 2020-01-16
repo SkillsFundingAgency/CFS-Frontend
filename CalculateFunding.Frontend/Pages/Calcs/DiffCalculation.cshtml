@@ -49,12 +49,12 @@
             <div class="diff-details-container">
                 <div class="diff-left diff-details-panel">
                     <span>@Model.LeftCalculationDiffModel.Author?.Name</span>
-                    <span>@Model.LeftCalculationDiffModel.Date.ToString(FormatStrings.DateFullMonthFormatString)</span>
+                    <span>@Model.LeftCalculationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString)</span>
                     <span class="diff-left-status">@Model.LeftCalculationDiffModel.Status</span>
                 </div>
                 <div class="diff-right diff-details-panel">
                     <span>@Model.RightCalculationDiffModel.Author?.Name</span>
-                    <span>@Model.RightCalculationDiffModel.Date.ToString(FormatStrings.DateFullMonthFormatString) </span>
+                    <span>@Model.RightCalculationDiffModel.Date.ToString(FormatStrings.DateTimeFormatString) </span>
                     <span class="diff-right-status"> @Model.RightCalculationDiffModel.Status</span>
                 </div>
             </div>

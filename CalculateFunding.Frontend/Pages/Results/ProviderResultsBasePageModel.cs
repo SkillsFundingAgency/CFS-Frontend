@@ -15,6 +15,7 @@ using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -137,8 +138,8 @@ namespace CalculateFunding.Frontend.Pages.Results
                 Upin = string.IsNullOrWhiteSpace(response.UPIN) ? 0 : Convert.ToInt32(response.UPIN),
                 Ukprn = string.IsNullOrWhiteSpace(response.UKPRN) ? 0 : Convert.ToInt32(response.UKPRN),
                 Urn = string.IsNullOrWhiteSpace(response.URN) ? 0 : Convert.ToInt32(response.URN),
-                DateOpened = response.DateOpened.HasValue ? response.DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown",
-                DateClosed = response.DateClosed.HasValue ? response.DateClosed.Value.ToString("dd/MM/yyyy") : "Unknown",
+                DateOpened = response.DateOpened.HasValue ? response.DateOpened.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown",
+                DateClosed = response.DateClosed.HasValue ? response.DateClosed.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown",
                 TrustStatus = response.TrustStatus,
                 Successor = response.Successor,
                 ReasonEstablishmentClosed = response.ReasonEstablishmentClosed,
