@@ -99,13 +99,26 @@ namespace CalculateFunding.Frontend.Services
                 }
             }
 
-            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts = await _publishingApiClient.GetProviderStatusCounts(result.Providers.First().SpecificationId);
-
             result.CanPublish = result.CanApprove = false;
 
             result.TotalFundingAmount = 0;
             result.TotalProvidersToApprove = 0;
             result.TotalProvidersToPublish = 0;
+
+            result.PagerState = new PagerState(requestOptions.PageNumber, 10, 4);
+
+            if(result.Providers.FirstOrDefault() == null)
+            {
+                return result;
+            }
+
+            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
+                await _publishingApiClient.GetProviderStatusCounts(
+                    result.Providers.First().SpecificationId,
+                    request.Filters.GetValueOrDefault("providerType")?.FirstOrDefault(),
+                    request.Filters.GetValueOrDefault("localAuthority")?.FirstOrDefault(),
+                    request.Filters.GetValueOrDefault("fundingStatus")?.FirstOrDefault()
+                    );
 
             foreach (var providerFundingStreamStatusResponse in providerStatusCounts.Content)
             {
@@ -131,9 +144,8 @@ namespace CalculateFunding.Frontend.Services
                 }
             }
 
-            result.PagerState = new PagerState(requestOptions.PageNumber, 10, 4);
-
             return result;
         }
+
     }
 }

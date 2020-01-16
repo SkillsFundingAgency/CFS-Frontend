@@ -103,5 +103,15 @@
                 }
             }
         }
+
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key)
+        {
+            if (source.ContainsKey(key))
+            {
+                return source[key];
+            }
+
+            return default(TValue);
+        }
     }
 }
