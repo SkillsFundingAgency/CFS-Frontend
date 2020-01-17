@@ -9,6 +9,7 @@ import {NotificationSignal} from "../signals/NotificationSignal";
 import {Navigation, NavigationLevel} from "../components/Navigation";
 import {BackButton} from "../components/BackButton";
 import Pagination from "../components/Pagination";
+import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 
 export interface IViewFundingProps {
     getSelectedSpecifications: any;
@@ -356,7 +357,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                             <td className="govuk-table__cell">{fp.providerName}</td>
                                             <td className="govuk-table__cell">{fp.ukprn}</td>
                                             <td className="govuk-table__cell">{fp.fundingStatus}</td>
-                                            <td className="govuk-table__cell">&pound;{fp.fundingValue}</td>
+                                            <td className="govuk-table__cell">
+                                                <FormattedNumber value={fp.fundingValue} type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                            </td>
                                         </tr>
                                     )}
 
@@ -459,7 +462,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr className="govuk-table__row">
                                         <th className="govuk-table__header">Total funding being approved</th>
                                         <th className="govuk-table__header"></th>
-                                        <th className="govuk-table__header">£{this.props.publishedProviderResults.totalFundingAmount}</th>
+                                        <th className="govuk-table__header">
+                                            <FormattedNumber value={this.props.publishedProviderResults.totalFundingAmount} type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                        </th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -535,7 +540,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tr className="govuk-table__row">
                                         <th className="govuk-table__head">Total funding being released</th>
                                         <th className="govuk-table__head"></th>
-                                        <th className="govuk-table__head">£{this.props.publishedProviderResults.totalFundingAmount}</th>
+                                        <th className="govuk-table__head">
+                                            <FormattedNumber value={this.props.publishedProviderResults.totalFundingAmount} type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                        </th>
                                     </tr>
                                     </thead>
                                 </table>
