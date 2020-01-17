@@ -156,7 +156,13 @@ namespace CalculateFunding.Frontend.Pages.Results
                 TrustName = response.TrustName,
                 TrustCode = response.TrustCode,
                 Town = response.Town,
-                Postcode = response.Postcode
+                Postcode = response.Postcode,
+                Region = response.RscRegionName,
+                RegionCode = response.RscRegionCode,
+                LocalGovernmentGroupType = response.LocalGovernmentGroupTypeName,
+                LocalGovernmentGroupTypeCode = response.LocalGovernmentGroupTypeCode,
+                Country = response.CountryName,
+                CountryCode = response.CountryCode,
             };
 
             ViewModel = viewModel;

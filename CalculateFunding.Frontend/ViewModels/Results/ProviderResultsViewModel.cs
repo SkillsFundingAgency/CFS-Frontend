@@ -67,6 +67,18 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string Postcode { get; set; }
 
+        public string Region { get; set; }
+
+        public string RegionCode { get; set; }
+        
+        public string LocalGovernmentGroupType { get; set; }
+        
+        public string LocalGovernmentGroupTypeCode { get; set; }
+        
+        public string Country { get; set; }
+
+        public string CountryCode { get; set; }
+
         public string TotalDescription { get; set; }
 
         public double? Total
