@@ -1,5 +1,7 @@
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
-import {ViewSpecificationActions, ViewSpecificationActionTypes} from "../actions/ViewSpecificationActions";
+import {ViewSpecificationActionTypes, ViewSpecificationsActions} from "../actions/ViewSpecificationsActions";
+import {CalculationSummary} from "../types/CalculationSummary";
+import {DatasetSummary} from "../types/DatasetSummary";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -15,24 +17,7 @@ const initialState: ViewSpecificationState = {
             pages: [],
             previousPage: 0
         },
-        startItemNumber:0,
-        totalErrorResults: 0,
-        totalResults: 0
-    },
-    templateCalculations: {
-        calculations: [],
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        pagerState: {
-            currentPage: 0,
-            displayNumberOfPages: 0,
-            lastPage: 0,
-            nextPage: 0,
-            pages: [],
-            previousPage: 0
-        },
-        startItemNumber:0,
+        startItemNumber: 0,
         totalErrorResults: 0,
         totalResults: 0
     },
@@ -44,21 +29,28 @@ const initialState: ViewSpecificationState = {
             id: "",
             name: ""
         },
-        fundingStreams: [],
+        fundingStreams: [{
+            name: "",
+            id: ""
+        }],
         id: "",
         isSelectedForFunding: false,
         providerVersionId: ""
+    },
+    datasets: {
+        content: [],
+        statusCode: 0
     }
 };
 
-export function reduceViewSpecificationState(state: ViewSpecificationState = initialState, action: ViewSpecificationActions): ViewSpecificationState {
+export function reduceViewSpecificationState(state: ViewSpecificationState = initialState, action: ViewSpecificationsActions): ViewSpecificationState {
     switch (action.type) {
-        case ViewSpecificationActionTypes.GET_SPECIFICATIONSUMMARY:
+        case ViewSpecificationActionTypes.GET_SPECIFICATION:
             return {...state, specification: action.payload};
-        case ViewSpecificationActionTypes.GET_TEMPLATECALCULATIONS:
-            return {...state, templateCalculations: action.payload};
         case ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS:
-            return {...state, additionalCalculations: action.payload};
+            return {...state, additionalCalculations: action.payload as CalculationSummary};
+        case ViewSpecificationActionTypes.GET_DATASETS:
+            return {...state, datasets: action.payload as DatasetSummary};
         default:
             return state;
     }

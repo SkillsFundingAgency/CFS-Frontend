@@ -1,7 +1,7 @@
 import configureMockStore from 'redux-mock-store';
 import axios from 'axios';
 import MockAdapter from "axios-mock-adapter";
-import {getSpecification, ViewSpecificationActionTypes} from "../../actions/ViewSpecificationActions";
+import {getSpecification, ViewSpecificationActionTypes} from "../../actions/ViewSpecificationResultsActions";
 
 
 describe('getSpecification action', () => {

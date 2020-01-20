@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -171,6 +173,26 @@ namespace CalculateFunding.Frontend.Controllers
                 _logger.Error($"{nameof(GetDatasetValidateStatus)} returned unexpected HTTP status {statusResponse.StatusCode}");
                 return new InternalServerErrorResult("Unable to query Validate Status");
             }
+        }
+
+        [HttpGet]
+        [Route("api/datasets/getdatasetsbyspecificationid/{specificationId}")]
+        public async Task<IActionResult> GetDatasetBySpecificationId(string specificationId)
+        {
+	        ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> result =
+		        await _datasetApiClient.GetRelationshipsBySpecificationId(specificationId);
+
+	        if (result.StatusCode == HttpStatusCode.OK)
+	        {
+		        return Ok(result);
+	        }
+
+	        if (result.StatusCode == HttpStatusCode.NotFound)
+	        {
+		        return NotFound();
+	        }
+
+	        return BadRequest();
         }
     }
 }

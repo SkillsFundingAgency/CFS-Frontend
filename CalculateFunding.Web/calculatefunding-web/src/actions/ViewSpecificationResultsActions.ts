@@ -1,38 +1,38 @@
 import axios from 'axios';
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
+import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {CalculationSummary} from "../types/CalculationSummary";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 
-export enum ViewSpecificationActionTypes {
+export enum ViewSpecificationResultsActionTypes {
     GET_SPECIFICATIONSUMMARY = 'getSpecificationSummary',
     GET_TEMPLATECALCULATIONS = 'getTemplateCalculations',
     GET_ADDITIONALCALCULATIONS = 'getAdditionalCalculations'
 }
 
 export interface GetSpecificationAction {
-    type: ViewSpecificationActionTypes.GET_SPECIFICATIONSUMMARY;
+    type: ViewSpecificationResultsActionTypes.GET_SPECIFICATIONSUMMARY;
     payload: SpecificationSummary
 }
 
 export interface GetTemplateCalculations {
-    type: ViewSpecificationActionTypes.GET_TEMPLATECALCULATIONS;
+    type: ViewSpecificationResultsActionTypes.GET_TEMPLATECALCULATIONS;
     payload: CalculationSummary
 }
 
 export interface GetAdditionalCalculations {
-    type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS
+    type: ViewSpecificationResultsActionTypes.GET_ADDITIONALCALCULATIONS
     payload: CalculationSummary
 }
 
-export type ViewSpecificationActions =
+export type ViewSpecificationResultsActions =
     GetSpecificationAction |
     GetTemplateCalculations |
     GetAdditionalCalculations
 
-export const getSpecificationSummary: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationActions>> = (specificationId: string) => {
+export const getSpecificationSummary: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationResultsState, null, ViewSpecificationResultsActions>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
         const response = await axios(`/api/specs/specification-summary-by-id/${specificationId}`, {
             method: 'GET',
@@ -41,12 +41,12 @@ export const getSpecificationSummary: ActionCreator<ThunkAction<Promise<any>, Vi
             },
         });
         dispatch({
-            type: ViewSpecificationActionTypes.GET_SPECIFICATIONSUMMARY,
+            type: ViewSpecificationResultsActionTypes.GET_SPECIFICATIONSUMMARY,
             payload: response.data as SpecificationSummary
         });
     }
 };
-export const getTemplateCalculations: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationActions>> = (specificationId: string, status: string, pageNumber: number, searchTerm: string) => {
+export const getTemplateCalculations: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationResultsState, null, ViewSpecificationResultsActions>> = (specificationId: string, status: string, pageNumber: number, searchTerm: string) => {
     const searchRequest: CalculationSearchRequestViewModel = {
         searchTerm: searchTerm,
         pageNumber: pageNumber,
@@ -64,12 +64,12 @@ export const getTemplateCalculations: ActionCreator<ThunkAction<Promise<any>, Vi
             params: searchRequest
         });
         dispatch({
-            type: ViewSpecificationActionTypes.GET_TEMPLATECALCULATIONS,
+            type: ViewSpecificationResultsActionTypes.GET_TEMPLATECALCULATIONS,
             payload: response.data as CalculationSummary
         });
     }
 };
-export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationActions>> = (specificationId: string, status: string, pageNumber: number, searchTerm: string) => {
+export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationResultsState, null, ViewSpecificationResultsActions>> = (specificationId: string, status: string, pageNumber: number, searchTerm: string) => {
     const searchRequest: CalculationSearchRequestViewModel = {
         searchTerm: searchTerm,
         pageNumber: pageNumber,
@@ -87,7 +87,7 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
             params: searchRequest
         });
         dispatch({
-            type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
+            type: ViewSpecificationResultsActionTypes.GET_ADDITIONALCALCULATIONS,
             payload: response.data as CalculationSummary
         });
     }

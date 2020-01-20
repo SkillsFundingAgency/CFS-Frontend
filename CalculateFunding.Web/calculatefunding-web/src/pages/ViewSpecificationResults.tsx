@@ -10,11 +10,11 @@ import {
     getAdditionalCalculations,
     getSpecificationSummary,
     getTemplateCalculations
-} from "../actions/ViewSpecificationActions";
+} from "../actions/ViewSpecificationResultsActions";
 import {useDispatch, useSelector} from "react-redux";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {AppState} from "../states/AppState";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
+import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import Pagination from "../components/Pagination";
 
 export interface ViewSpecificationResultsProps {
@@ -32,7 +32,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const [templateCalculationsSearchTerm, setTemplateCalculationsSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState("Draft");
 
-    let specificationSummary: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
+    let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
     let specificationId = match.params.specificationId;
     useEffect(() => {
@@ -58,7 +58,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             url: ""
         },
         {
-            name: specificationSummary.specification.name,
+            name: specificationResults.specification.name,
             url: null
         }
     ];
@@ -94,8 +94,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <h1 className="govuk-heading-xl">{specificationSummary.specification.name}</h1>
-                        <h2 className="govuk-caption-xl">{specificationSummary.specification.fundingPeriod.name}</h2>
+                        <h1 className="govuk-heading-xl">{specificationResults.specification.name}</h1>
+                        <h2 className="govuk-caption-xl">{specificationResults.specification.fundingPeriod.name}</h2>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </tr>
                                         </thead>
                                         <tbody className="govuk-table__body">
-                                        {specificationSummary.templateCalculations.calculations.map(tc =>
+                                        {specificationResults.templateCalculations.calculations.map(tc =>
                                             <tr key={tc.id} className="govuk-table__row">
                                                 <td className="govuk-table__cell"><a
                                                     href={`/results/calculationproviderresults?calculationid=${tc.id}`}>{tc.name}</a>
@@ -146,7 +146,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationSummary.templateCalculations.totalResults > 0}>
+                                        <tr className="govuk-table__row" hidden={specificationResults.templateCalculations.totalResults > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -154,13 +154,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-two-thirds">
                                             <Pagination
-                                                currentPage={specificationSummary.templateCalculations.pagerState.currentPage}
-                                                lastPage={specificationSummary.templateCalculations.pagerState.lastPage}
+                                                currentPage={specificationResults.templateCalculations.pagerState.currentPage}
+                                                lastPage={specificationResults.templateCalculations.pagerState.lastPage}
                                                 callback={() => {
                                                 }}/>
                                         </div>
                                         <div className="govuk-grid-column-one-third govuk-body govuk-!-padding-top-4">
-                                            Showing {specificationSummary.templateCalculations.startItemNumber} - {specificationSummary.templateCalculations.endItemNumber} of {specificationSummary.templateCalculations.totalResults} results
+                                            Showing {specificationResults.templateCalculations.startItemNumber} - {specificationResults.templateCalculations.endItemNumber} of {specificationResults.templateCalculations.totalResults} results
                                         </div>
                                     </div>
                                 </section>
@@ -182,7 +182,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </tr>
                                         </thead>
                                         <tbody className="govuk-table__body">
-                                        {specificationSummary.additionalCalculations.calculations.map(tc =>
+                                        {specificationResults.additionalCalculations.calculations.map(tc =>
                                             <tr className="govuk-table__row">
                                                 <td className="govuk-table__cell"><a
                                                     href={`/results/calculationproviderresults?calculationid=${tc.id}`}>{tc.name}</a>
@@ -191,7 +191,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationSummary.additionalCalculations.totalResults > 0}>
+                                        <tr className="govuk-table__row" hidden={specificationResults.additionalCalculations.totalResults > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -199,13 +199,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-two-thirds">
                                             <Pagination
-                                                currentPage={specificationSummary.additionalCalculations.pagerState.currentPage}
-                                                lastPage={specificationSummary.additionalCalculations.pagerState.lastPage}
+                                                currentPage={specificationResults.additionalCalculations.pagerState.currentPage}
+                                                lastPage={specificationResults.additionalCalculations.pagerState.lastPage}
                                                 callback={() => {
                                                 }}/>
                                         </div>
                                         <div className="govuk-grid-column-one-third govuk-body govuk-!-padding-top-4">
-                                            Showing {specificationSummary.additionalCalculations.startItemNumber} - {specificationSummary.additionalCalculations.endItemNumber} of {specificationSummary.additionalCalculations.totalResults} results
+                                            Showing {specificationResults.additionalCalculations.startItemNumber} - {specificationResults.additionalCalculations.endItemNumber} of {specificationResults.additionalCalculations.totalResults} results
                                         </div>
                                     </div>
                                 </section>

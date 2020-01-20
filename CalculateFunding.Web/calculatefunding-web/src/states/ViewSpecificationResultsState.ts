@@ -1,9 +1,8 @@
 import {CalculationSummary} from "../types/CalculationSummary";
 import {SpecificationSummary} from "../types/SpecificationSummary";
-import {DatasetSummary} from "../types/DatasetSummary";
 
-export interface ViewSpecificationState {
+export interface ViewSpecificationResultsState {
     specification: SpecificationSummary,
     additionalCalculations: CalculationSummary,
-    datasets: DatasetSummary
+    templateCalculations: CalculationSummary
 }

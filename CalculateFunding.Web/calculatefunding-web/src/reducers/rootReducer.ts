@@ -5,6 +5,8 @@ import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
 import {reduceFundingLineStructureState} from "./fundingLineStructureReducer";
 import {IViewFundingState} from "../states/IViewFundingState";
 import {reduceViewFundingState} from "./viewFundingReducer";
+import {reduceViewSpecificationResultsState} from "./viewSpecificationResultsReducer";
+import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {reduceViewSpecificationState} from "./viewSpecificationReducer";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 
@@ -16,6 +18,7 @@ export interface IStoreState {
     viewFundingState: IViewFundingState,
     userState: IUserState,
     fundingLineStructureState: IFundingLineStructureState,
+    viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState
 }
 
@@ -27,6 +30,7 @@ export const rootReducer: Reducer<IStoreState> = combineReducers({
     userState: reduceUserState,
     fundingLineStructureState: reduceFundingLineStructureState,
     viewFundingState: reduceViewFundingState,
+    viewSpecificationResults: reduceViewSpecificationResultsState,
     viewSpecification: reduceViewSpecificationState
 });
 

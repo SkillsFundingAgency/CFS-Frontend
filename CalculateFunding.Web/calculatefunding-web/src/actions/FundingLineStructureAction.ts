@@ -49,11 +49,9 @@ export const getFundingLineStructure:
     };
 
 export const getSpecificationById:
-    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = () => {
+    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId:string) => {
     return async (dispatch: Dispatch) => {
-        const params = new URLSearchParams(window.location.search);
-        const specificationIdQuery = params.get('specificationId');
-        const response = await axios(`/api/specs/specification-summary-by-id/${specificationIdQuery}`, {
+        const response = await axios(`/api/specs/specification-summary-by-id/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
