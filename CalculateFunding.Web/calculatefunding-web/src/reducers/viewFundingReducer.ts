@@ -52,7 +52,26 @@ const initialState: IViewFundingState = {
     releaseFundingJobId: '',
     refreshFundingJobId: '',
     filterTypes: [],
-    pageState: "IDLE"
+    pageState: "IDLE",
+    userPermission: {
+        canAdministerFundingStream: false,
+        canApproveFunding: false,
+        canApproveSpecification: false,
+        canChooseFunding: false,
+        canCreateQaTests: false,
+        canCreateSpecification: false,
+        canDeleteCalculations: false,
+        canDeleteQaTests: false,
+        canDeleteSpecification: false,
+        canEditCalculations: false,
+        canEditQaTests: false,
+        canEditSpecification: false,
+        canMapDatasets: false,
+        canRefreshFunding: false,
+        canReleaseFunding: false,
+        specificationId: "",
+        userId: ""
+    }
 };
 
 export function reduceViewFundingState(state: IViewFundingState = initialState, action: ViewFundingAction): IViewFundingState {
@@ -77,6 +96,8 @@ export function reduceViewFundingState(state: IViewFundingState = initialState, 
             return {...state, releaseFundingJobId: action.payload};
         case ViewFundingActionTypes.CHANGE_PAGESTATE:
             return {...state, pageState: action.payload};
+        case ViewFundingActionTypes.GET_USERPERMISSION:
+            return {...state, userPermission: action.payload};
         default:
             return state;
     }

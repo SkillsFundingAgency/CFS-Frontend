@@ -5,6 +5,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {IViewFundingState} from "../states/IViewFundingState";
 import {SearchMode, SearchRequestViewModel} from "../types/searchRequestViewModel";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
+import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 
 export enum ViewFundingActionTypes {
     GET_SPECIFICATIONS = 'getSelectedSpecifications',
@@ -12,6 +13,7 @@ export enum ViewFundingActionTypes {
     GET_SELECTEDFUNDINGPERIODS = 'getSelectedFundingPeriods',
     GET_PUBLISHEDPROVIDERRESULTS = 'getPublishedProviderResults',
     GET_LATESTREFRESHDATE = 'getLatestRefreshDate',
+    GET_USERPERMISSION = 'getUserPermissions',
     FILTER_PUBLISHEDPROVIDERRESULTS = 'filterPublishedProviderResults',
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
@@ -46,6 +48,11 @@ export interface IGetLatestRefreshDateAction {
     payload: string
 }
 
+export interface IGetUserPermissions {
+    type: ViewFundingActionTypes.GET_USERPERMISSION;
+    payload: EffectiveSpecificationPermission
+}
+
 export interface IFilterPublishedProviderResultsAction {
     type: ViewFundingActionTypes.FILTER_PUBLISHEDPROVIDERRESULTS,
     payload: PublishedProviderItems,
@@ -76,6 +83,7 @@ export type ViewFundingAction =
     | IGetSelectedFundingPeriodsAction
     | IGetPublishedProviderResultsAction
     | IGetLatestRefreshDateAction
+    | IGetUserPermissions
     | IRefreshFundingAction
     | IApproveFundingAction
     | IReleaseFundingAction
@@ -158,6 +166,21 @@ export const getPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>
             success: (response.data as PublishedProviderItems).totalResults > 0,
             filterTypes: (response.data as PublishedProviderItems).facets
         })
+    }
+};
+
+export const getUserPermissions: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
+    return async (dispatch: Dispatch) => {
+        const response = await axios(`/api/users/effectivepermissions/${specificationId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        dispatch({
+            type: ViewFundingActionTypes.GET_USERPERMISSION,
+            payload: response.data as EffectiveSpecificationPermission
+        });
     }
 };
 

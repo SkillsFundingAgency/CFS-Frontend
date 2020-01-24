@@ -175,3 +175,18 @@ ul.pagination {
     }
   }
 }
+
+.permissions-banner {
+  background-color: #F47738;
+  padding: 20px;
+  span {
+    margin-left: 20px;
+    border-color: #fff;
+    color: #F47738;
+    background-color: white;
+  }
+  strong {
+    margin-left: 20px;
+    color: white;
+  }
+}

@@ -10,6 +10,9 @@ import {Navigation, NavigationLevel} from "../components/Navigation";
 import {BackButton} from "../components/BackButton";
 import Pagination from "../components/Pagination";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
+import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
+import {PermissionStatus} from "../components/PermissionStatus";
+
 
 export interface IViewFundingProps {
     getSelectedSpecifications: any;
@@ -17,12 +20,14 @@ export interface IViewFundingProps {
     getSelectedFundingPeriods: any;
     getPublishedProviderResults: any;
     getLatestRefreshDate: any;
+    getUserPermissions: any;
     filterPublishedProviderResults: any;
     refreshFunding: any;
     approveFunding: any;
     releaseFunding: any;
     changePageState: any;
     latestRefreshDateResults: string;
+    effectiveSpecificationPermission: EffectiveSpecificationPermission;
     specifications: Specification;
     fundingStreams: FundingStream[];
     selectedFundingPeriods: FundingPeriod[];
@@ -185,8 +190,24 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         let lastRefreshDate = "Not Available";
         if (this.props.specifications.id != null && this.props.specifications.id.length > 0) {
             this.props.getLatestRefreshDate(this.props.specifications.id);
+            this.props.getUserPermissions(this.props.specifications.id);
             if (this.props.latestRefreshDateResults.length > 0)
                 lastRefreshDate = this.props.latestRefreshDateResults
+        }
+
+
+        let missingPermissions= [];
+        if (!this.props.effectiveSpecificationPermission.canApproveFunding)
+        {
+            missingPermissions.push("approve");
+        }
+        if (!this.props.effectiveSpecificationPermission.canReleaseFunding)
+        {
+            missingPermissions.push("release");
+        }
+        if (!this.props.effectiveSpecificationPermission.canRefreshFunding)
+        {
+            missingPermissions.push("refresh");
         }
 
         if (!this.props.specificationSelected) {
@@ -261,6 +282,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <div className="govuk-width-container">
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
+                    <PermissionStatus requiredPermissions={missingPermissions} />
                     <div className="container" hidden={this.props.pageState !== "IDLE"}>
 
                         <div className="govuk-warning-text">
@@ -311,7 +333,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <span className="govuk-body">Funding Total</span>
-                                <p className="govuk-body govuk-!-font-size-27 govuk-!-font-weight-bold govuk-!-margin-bottom-0">£{this.props.publishedProviderResults.totalFundingAmount}</p>
+                                <p className="govuk-body govuk-!-font-size-27 govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                                    <FormattedNumber value={this.props.publishedProviderResults.totalFundingAmount} type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                </p>
                             </div>
                         </div>
                         <div className="govuk-grid-row govuk-!-margin-top-5 govuk-!-margin-bottom-5">

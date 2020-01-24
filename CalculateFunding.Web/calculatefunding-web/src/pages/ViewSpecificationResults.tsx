@@ -43,7 +43,6 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         dispatch(getAdditionalCalculations(specificationId, "Draft", 1, additionalCalculationsSearchTerm));
     }, [specificationId]);
 
-
     let breadcrumbs: IBreadcrumbs[] = [
         {
             name: "Calculate funding",
