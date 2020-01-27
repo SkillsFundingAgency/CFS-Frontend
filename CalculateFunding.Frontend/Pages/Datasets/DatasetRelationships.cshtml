@@ -32,8 +32,8 @@
                 <div class="col-xs-3 spacing-30-top filter-field-heading">Funding period</div>
             </div>
             <div class="row">
-                <div class="col-xs-3">
-                    <select data-bind="event: { change: fundingPeriodChanged }, value: selectedFundingPeriod" asp-items="@(Model.FundingPeriods)" class="form-control spec-mgr-control" id="select-spec-period" name="fundingPeriodId"></select>
+                <div class="col-xs-5">
+                    <select data-bind="event: { change: fundingPeriodChanged }, value: selectedFundingPeriod" asp-items="@(Model.FundingPeriods)" class="form-control" id="select-spec-period" name="fundingPeriodId"></select>
                 </div>
             </div>
         </div>
