@@ -64,7 +64,6 @@
                     <td>
                         <span class="datetime-split-container">
                             <span class="datetime-split-date data-datasetDefinition-lastupdated-date" data-bind="text: lastUpdatedDateFormatted"></span>
-                            <span class="datetime-split-time data-datasetDefinition-lastupdated-time" data-bind="text: lastUpdatedTimeFormatted"></span>
                         </span>
                     </td>
                     <td class="text-center">
@@ -97,7 +96,6 @@
                             <td>
                                 <span class="datetime-split-container">
                                     <span class="datetime-split-date data-static-datasetDefinition-lastupdated-date">@schema.LastUpdatedDateFormatted</span>
-                                    <span class="datetime-split-time data-static-datasetDefinition-lastupdated-time">@schema.LastUpdatedTimeFormatted</span>
                                 </span>
                             </td>
                             <td><a asp-action="Download" asp-controller="DownloadDatasetSchema" asp-route-schemaName="@schema.Id"><i class="material-icons">cloud_download</i></a></td>

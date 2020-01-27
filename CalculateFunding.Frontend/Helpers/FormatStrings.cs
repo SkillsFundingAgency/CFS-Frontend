@@ -2,7 +2,7 @@
 {
     public static class FormatStrings
     {
-        public const string DateTimeFormatString = "d/MM/yyyy HH:mm";
+        public const string DateTimeFormatString = "dd MMMM hh:mm tt";
 
         public const string DateFormatString = "d/MM/yyyy";
 

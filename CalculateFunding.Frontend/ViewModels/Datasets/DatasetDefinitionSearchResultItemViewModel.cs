@@ -21,15 +21,7 @@
         {
             get
             {
-                return LastUpdatedDate.Value.ToString(FormatStrings.DateFormatString);
-            }
-        }
-
-        public string LastUpdatedTimeFormatted
-        {
-            get
-            {
-                return LastUpdatedDate.Value.ToString(FormatStrings.TimeFormatString);
+                return LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
             }
         }
     }
