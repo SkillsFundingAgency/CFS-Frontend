@@ -190,7 +190,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         let lastRefreshDate = "Not Available";
         if (this.props.specifications.id != null && this.props.specifications.id.length > 0) {
             this.props.getLatestRefreshDate(this.props.specifications.id);
-            this.props.getUserPermissions(this.props.specifications.id);
+            if (this.props.effectiveSpecificationPermission.specificationId === "")
+                this.props.getUserPermissions(this.props.specifications.id);
             if (this.props.latestRefreshDateResults.length > 0)
                 lastRefreshDate = this.props.latestRefreshDateResults
         }
