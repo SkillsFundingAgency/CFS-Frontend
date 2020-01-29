@@ -9,6 +9,7 @@ import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
 import {ViewSpecificationResults} from "./pages/ViewSpecificationResults";
 import {ViewSpecification} from "./pages/ViewSpecification";
+import {SelectSpecification} from "./pages/SelectSpecification";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/FundingLineStructure" component={FundingLineStructureContainer} />
        <Route path="/ViewFunding" component={ViewFundingContainer} />
        <Route path="/results" component={ViewResults} />
+       <Route path="/SelectSpecification" component={SelectSpecification} />
        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
        <Route path="*">

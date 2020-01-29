@@ -19,25 +19,24 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class SpecificationControllerTests
     {
         private ISpecificationsApiClient _specificationsApiClient;
-        private IAuthorizationHelper _authorizationHelper;
+        private SpecificationController _specificationController;
 
         [TestInitialize]
         public void Initialize()
         {
+			
             _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
-            _authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+			_specificationController = new SpecificationController(_specificationsApiClient, authorizationHelper);
         }
 
         [TestMethod]
         public void GetSpecificationsForFundingByPeriod_OnNullFundingPeriod_ThenReturnsBadRequestResponse()
         {
-            // Arrange
-            SpecificationController controller = CreateSpecificationController();
-
             // Act
             Func<Task> a = new Func<Task>(async () =>
             {
-                IActionResult result = await controller.GetSpecificationsSelectedForFundingByPeriodAndStream(null, null);
+                IActionResult result = await _specificationController.GetSpecificationsSelectedForFundingByPeriodAndStream(null, null);
             });
 
             // Assert
@@ -48,13 +47,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetSpecificationsForFundingByPeriod_OnNullFundingStream_ThenReturnsBadRequestResponse()
         {
             // Arrange
-            SpecificationController controller = CreateSpecificationController();
             const string fundingPeriod = "fundingPeriod";
 
             // Act
             Func<Task> a = new Func<Task>(async () =>
             {
-                IActionResult result = await controller.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriod, null);
+                IActionResult result = await _specificationController.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriod, null);
             });
 
             // Assert
@@ -65,7 +63,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetSpecificationsForFundingByPeriod_OnBadRequestStatusFromSpecApiClient_ThenReturnsBadRequestResponse()
         {
             // Arrange
-            SpecificationController controller = CreateSpecificationController();
             const string fundingPeriodId = "fundingPeriodId";
             const string fundingStreamId = "fundingStreamId";
 
@@ -74,7 +71,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.ServiceUnavailable, null)));
 
             // Act
-            IActionResult result = await controller.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
+            IActionResult result = await _specificationController.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
 
             // Assert
             result.Should().BeOfType<StatusCodeResult>();
@@ -84,7 +81,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetSpecificationsForFundingByPeriod_OnNotExpectingStatusFromSpecApiClient_ThenReturnsInternalServerErrorResponse()
         {
             // Arrange
-            SpecificationController controller = CreateSpecificationController();
             const string fundingPeriodId = "fundingPeriodId";
             const string fundingStreamId = "fundingStreamId";
 
@@ -93,7 +89,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.BadRequest, null)));
 
             // Act
-            IActionResult result = await controller.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
+            IActionResult result = await _specificationController.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
 
             // Assert
             result.Should().BeOfType<BadRequestResult>();
@@ -103,7 +99,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetSpecificationsForFundingByPeriod_OnSuccessfulGetRequest_ThenResponseSentToClient()
         {
             // Arrange
-            SpecificationController controller = CreateSpecificationController();
             const string fundingPeriodId = "fundingPeriodId";
             const string fundingStreamId = "fundingStreamId";
 
@@ -136,7 +131,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specificationSummaries)));
 
             // Act
-            IActionResult result = await controller.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
+            IActionResult result = await _specificationController.GetSpecificationsSelectedForFundingByPeriodAndStream(fundingPeriodId, fundingStreamId);
 
             // Assert
             result.Should().NotBeNull();
@@ -149,10 +144,41 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             specificationSummariesResult.Last().Name.Should().Be(selectedForFundingOnSecondOrder.Name);
         }
 
-        private SpecificationController CreateSpecificationController(IAuthorizationHelper authorizationHelper = null)
+        [TestMethod]
+        public async Task GetDistinctFundingStreamsForSpecifications_Returns_Bad_Request_Given_Api_Returns_Bad_Request_Status()
         {
-            return new SpecificationController(_specificationsApiClient, authorizationHelper ?? _authorizationHelper);
+            _specificationsApiClient
+	            .GetDistinctFundingStreamsForSpecifications()
+                .Returns(Task.FromResult(new ApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest, null)));
+
+            IActionResult result = await _specificationController.GetDistinctFundingStreamsForSpecifications();
+
+            result.Should().BeOfType<BadRequestResult>();
         }
 
+        [TestMethod]
+        public async Task GetDistinctFundingStreamsForSpecifications_Returns_Internal_Server_Error_Api_Result_Is_Not_Ok_or_Bad_Request()
+        {
+            _specificationsApiClient
+	            .GetDistinctFundingStreamsForSpecifications()
+                .Returns(Task.FromResult(new ApiResponse<IEnumerable<string>>(HttpStatusCode.ServiceUnavailable, null)));
+
+            IActionResult result = await _specificationController.GetDistinctFundingStreamsForSpecifications();
+
+			result.Should().BeEquivalentTo(new StatusCodeResult(500));
+        }
+
+        [TestMethod]
+        public async Task GetDistinctFundingStreamsForSpecifications_Returns_Funding_Streams_Given_A_Successful_Request()
+        {
+			List<string> expectedFundingStreams = new List<string> { "PSG", "DSG" };
+            _specificationsApiClient
+	            .GetDistinctFundingStreamsForSpecifications()
+                .Returns(Task.FromResult(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, expectedFundingStreams)));
+
+            IActionResult result = await _specificationController.GetDistinctFundingStreamsForSpecifications();
+
+			result.As<OkObjectResult>().Value.As<List<string>>().Count.Should().Be(expectedFundingStreams.Count);
+        }
     }
 }

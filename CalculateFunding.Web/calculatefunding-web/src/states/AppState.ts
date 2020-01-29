@@ -4,8 +4,10 @@ import {
     ViewSpecificationResultsState,
 } from "./ViewSpecificationResultsState";
 import {ViewSpecificationState} from "./ViewSpecificationState";
+import {SelectSpecificationState} from "./SelectSpecificationState";
 
 export interface AppState {
+    selectSpecification: SelectSpecificationState;
     viewFunding: IViewFundingState;
     fundingLineStructure: IFundingLineStructureState
     viewSpecificationResults: ViewSpecificationResultsState;

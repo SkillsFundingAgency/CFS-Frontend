@@ -11,7 +11,7 @@ export function PermissionStatus(props: { requiredPermissions: string[] }) {
         permissionAlertMessage = "You do not have permissions to perform the following actions: ";
         for (let i = 0; i < requiredPermissions.status.length; i++)
         {
-            if (i != 0)
+            if (i > 0)
             {
                 permissionAlertMessage += ", ";
             }

@@ -97,6 +97,24 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [Route("api/specs/fundingstream-id-for-specifications")]
+        public async Task<IActionResult> GetDistinctFundingStreamsForSpecifications()
+        {
+            ApiResponse<IEnumerable<string>> apiResponse = await _specificationsApiClient.GetDistinctFundingStreamsForSpecifications();
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content);
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
         [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsForFundingByPeriod(string fundingPeriodId)
         {
