@@ -1,9 +1,8 @@
 import {IFundingLineStructureState} from "./IFundingLineStructureState";
 import {IViewFundingState} from "./IViewFundingState";
-import {
-    ViewSpecificationResultsState,
-} from "./ViewSpecificationResultsState";
+import {ViewSpecificationResultsState} from "./ViewSpecificationResultsState";
 import {ViewSpecificationState} from "./ViewSpecificationState";
+import {ViewCalculationState} from "./ViewCalculationState";
 import {SelectSpecificationState} from "./SelectSpecificationState";
 
 export interface AppState {
@@ -12,4 +11,5 @@ export interface AppState {
     fundingLineStructure: IFundingLineStructureState
     viewSpecificationResults: ViewSpecificationResultsState;
     viewSpecification: ViewSpecificationState;
+    viewCalculationResults: ViewCalculationState;
 }

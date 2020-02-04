@@ -8,6 +8,7 @@ import {Footer} from "./components/Footer";
 import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
 import {ViewSpecificationResults} from "./pages/ViewSpecificationResults";
+import {ViewCalculationResults} from "./pages/ViewCalculationResults";
 import {ViewSpecification} from "./pages/ViewSpecification";
 import {SelectSpecification} from "./pages/SelectSpecification";
 
@@ -22,6 +23,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/SelectSpecification" component={SelectSpecification} />
        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+       <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
        <Route path="*">
             <NoMatch />
           </Route>

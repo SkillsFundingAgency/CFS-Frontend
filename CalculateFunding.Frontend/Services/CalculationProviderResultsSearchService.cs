@@ -51,11 +51,11 @@ namespace CalculateFunding.Frontend.Services
                 Top = pageSize,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
-                ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors" ? true : false),
+                ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors"),
                 Filters = request.Filters
             });
 
-            if (searchRequestResult == null)
+            if (searchRequestResult?.Content == null)
             {
                 _logger.Error("Find providers HTTP request failed");
                 return null;

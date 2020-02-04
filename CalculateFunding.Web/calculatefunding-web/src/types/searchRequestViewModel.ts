@@ -13,9 +13,23 @@ export interface SearchRequestViewModel {
     searchMode: SearchMode
 }
 
-
-
 export enum SearchMode {
     Any,
     All
+}
+
+export interface CalculationProviderSearchRequestViewModel {
+    pageNumber: number;
+    searchTerm: string;
+    errorToggle: string;
+    includeFacets: boolean;
+    providerType: string[];
+    providerSubType: string[];
+    resultsStatus: string[];
+    localAuthority: string[];
+    pageSize: number;
+    facetCount: number;
+    searchMode: SearchMode;
+    calculationValueType:string;
+    calculationId:string;
 }

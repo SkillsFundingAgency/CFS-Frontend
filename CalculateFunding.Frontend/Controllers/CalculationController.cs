@@ -229,5 +229,21 @@ namespace CalculateFunding.Frontend.Controllers
                 throw new InvalidOperationException($"An error occurred while saving calculation. Status code={response.StatusCode}");
             }
         }
+
+        [HttpGet]
+        [Route("api/calcs/getcalculationbyid/{calculationId}")]
+        public async Task<IActionResult> GetCalculationById(string calculationId)
+        {
+			Guard.ArgumentNotNull(calculationId, nameof(calculationId));
+
+			ApiResponse<Calculation> result = await _calcClient.GetCalculationById(calculationId);
+
+			if (result.StatusCode == HttpStatusCode.OK)
+			{
+				return Ok(result.Content);
+			}
+
+			return BadRequest(result.Content);
+        }
     }
 }

@@ -9,7 +9,7 @@ export interface CalculationSummary{
     facets:            any[];
 }
 
-interface Calculation{
+export interface Calculation{
     id:                     string;
     name:                   string;
     fundingStreamId:        string;
