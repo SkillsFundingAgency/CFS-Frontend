@@ -90,8 +90,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     };
 
     getSpecifications = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(event);
-        console.log(event.target.value);
         this.props.getSelectedSpecifications(event.target.value, this.state.fundingStream);
         this.setState({fundingPeriod: event.target.value});
     };
@@ -106,24 +104,20 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     };
 
     viewFunding = (event: React.FormEvent) => {
-        console.log(event);
         this.props.getPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification);
     };
 
     filterLocalAuthority = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(event.target.value);
         this.setState({localAuthority: event.target.value});
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, event.target.value, this.state.status, 1, this.state.pageSize);
     };
 
     filterStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(event.target.value);
         this.setState({status: event.target.value});
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, event.target.value, 1, this.state.pageSize);
     };
 
     filterProviderType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(event.target.value);
         this.setState({providerType: event.target.value});
         this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, event.target.value, this.state.localAuthority, this.state.status, 1, this.state.pageSize);
     };

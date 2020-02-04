@@ -36,7 +36,6 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
 
     let specificationId = match.params.specificationId;
     useEffect(() => {
-        console.log("Fired Effect");
         document.title = "Specification Results - Calculate Funding";
         dispatch(getSpecificationSummary(specificationId));
         dispatch(getTemplateCalculations(specificationId, "Draft", 1, templateCalculationsSearchTerm));

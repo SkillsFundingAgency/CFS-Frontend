@@ -10,7 +10,6 @@ export interface IHomeProps {
 
 export class Home extends Component<IHomeProps, {}> {
     userIsAuthenticated() {
-        // console.log("Fetching stuff")
         fetch("/api/account/IsAuthenticated", {
             method: 'GET'
         })

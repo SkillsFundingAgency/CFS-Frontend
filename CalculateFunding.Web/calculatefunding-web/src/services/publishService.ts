@@ -16,6 +16,6 @@ export async  function saveReleaseTimetableForSpecificationService(saveReleaseTi
         headers: {
             'Content-Type': 'application/json'
         },
-        params: saveReleaseTimetable
+        data: saveReleaseTimetable
     });
 }

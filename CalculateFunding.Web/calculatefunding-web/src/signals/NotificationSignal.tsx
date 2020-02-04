@@ -20,20 +20,15 @@ const callback = props.callback;
                     .build();
                 try {
                     await hubConnect.start();
-                    console.log('Connection successful!');
 
                     hubConnect.on('NotificationEvent', (message: JobMessage) => {
-                        console.log(message);
-
                         if (message.jobType === props.jobType && message.runningStatus === "Completed" && message.specificationId === props.jobId) {
-                            console.log(message);
                             hubConnect.stop();
                             callback();
                         }
                     });
 
                     if (props.jobId !== "") {
-                        console.log(`Looking for job id ${props.jobId}`);
                         hubConnect.invoke("StartWatchingForSpecificationNotifications", props.jobId);
                     }
 

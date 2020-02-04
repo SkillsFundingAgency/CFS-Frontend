@@ -1,5 +1,5 @@
 export interface SaveReleaseTimetableViewModel {
-    fundingDate: string;
-    statementDate: string;
+    fundingDate: Date;
+    statementDate: Date;
     specificationId: string;
 }

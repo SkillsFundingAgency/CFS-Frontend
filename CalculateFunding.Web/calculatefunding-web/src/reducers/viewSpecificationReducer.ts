@@ -2,6 +2,7 @@ import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {ViewSpecificationActionTypes, ViewSpecificationsActions} from "../actions/ViewSpecificationsActions";
 import {CalculationSummary} from "../types/CalculationSummary";
 import {DatasetSummary} from "../types/DatasetSummary";
+import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -40,6 +41,20 @@ const initialState: ViewSpecificationState = {
     datasets: {
         content: [],
         statusCode: 0
+    },
+    releaseTimetable: {
+        navisionDate: {
+            day: "",
+            month: "",
+            year: "",
+            time: ""
+        },
+        releaseDate: {
+            day: "",
+            month: "",
+            year: "",
+            time: ""
+        }
     }
 };
 
@@ -51,6 +66,8 @@ export function reduceViewSpecificationState(state: ViewSpecificationState = ini
             return {...state, additionalCalculations: action.payload as CalculationSummary};
         case ViewSpecificationActionTypes.GET_DATASETS:
             return {...state, datasets: action.payload as DatasetSummary};
+        case ViewSpecificationActionTypes.GET_RELEASETIMETABLE:
+            return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
         default:
             return state;
     }

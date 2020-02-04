@@ -9,11 +9,15 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../states/AppState";
 import {
+    confirmTimetableChanges,
     getAdditionalCalculations,
-    getDatasetBySpecificationId,
+    getDatasetBySpecificationId, getReleaseTimetable,
     getSpecification
 } from "../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
+import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
+import {DateInput} from "../components/DateInput";
+import {TimeInput} from "../components/TimeInput";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -23,20 +27,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const dispatch = useDispatch();
     const [additionalCalculationsSearchTerm,] = useState('');
     const [statusFilter] = useState("");
+    const [navisionDate, setNavisionDate] = useState();
+    const [releaseDate, setReleaseDate] = useState();
+    const [navisionTime, setNavisionTime] = useState();
+    const [releaseTime, setReleaseTime] = useState();
 
     let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
-    console.log(viewSpecification);
 
     let specificationId = match.params.specificationId;
-
-    console.log(specificationId);
+    let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
     useEffect(() => {
-        console.log("Fired Effect - now getSpecification");
         document.title = "Specification Results - Calculate Funding";
         dispatch(getSpecification(specificationId));
         dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));
         dispatch(getDatasetBySpecificationId(specificationId));
+        dispatch(getReleaseTimetable(specificationId));
     }, [specificationId]);
 
 
@@ -54,6 +60,46 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             url: null
         }
     ];
+
+    function confirmChanges() {
+        let navDateAndTime2 = updateDateWithTime(navisionDate, navisionTime);
+        let releaseDate2 = updateDateWithTime(releaseDate, releaseTime);
+        saveReleaseTimetable = {
+            specificationId: viewSpecification.specification.id,
+            statementDate: navDateAndTime2,
+            fundingDate: releaseDate2
+        };
+        dispatch(confirmTimetableChanges(saveReleaseTimetable))
+    }
+
+    function updateDateWithTime(date: Date, time: string) {
+        let timeParts = time.match(/(\d+):(\d+)/);
+        if (timeParts !== null) {
+            let hours = timeParts[1];
+            let minutes = timeParts[2];
+            if (hours !== null && minutes !== null) {
+                date.setHours(hours as unknown as number);
+                date.setMinutes(minutes as unknown as number);
+            }
+        }
+        return date;
+    }
+
+    function updateNavisionDate(e: Date) {
+        setNavisionDate(e);
+    }
+
+    function updateReleaseDate(e: Date) {
+        setReleaseDate(e);
+    }
+
+    function updateNavisionTime(e: string) {
+        setNavisionTime(e);
+    }
+
+    function updateReleaseTime(e: string) {
+        setReleaseTime(e);
+    }
 
     return <div>
         <Header/>
@@ -100,10 +146,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <p>{viewSpecification.specification.description}</p>
                         </div>
                     </details>
-                    <Tabs initialTab="additional-calculations">
+                    <Tabs initialTab="release-timetable">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
+                            <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
@@ -144,10 +191,52 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
-                                        No additional calculations available. <a href={'/calcs/createadditionalcalculation/' + viewSpecification.specification.id}>Create a
+                                        No additional calculations available. <a
+                                        href={'/calcs/createadditionalcalculation/' + viewSpecification.specification.id}>Create a
                                         calculation</a>
                                     </strong>
                                 </div>
+                                <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
+                                    <div className="pagination__summary">Showing 101 - 150 of 246 results</div>
+                                    <ul className="pagination">
+                                        <li className="pagination__item">
+                                            <button className="pagination__link" aria-label="Previous page"><span
+                                                aria-hidden="true" role="presentation">«</span> Previous
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link"
+                                                    aria-label="Page 1">1
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link"
+                                                    aria-label="Page 2">2
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link current"
+                                                    aria-current="true"
+                                                    aria-label="Page 3, current page">3
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link"
+                                                    aria-label="Page 4">4
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link"
+                                                    aria-label="Page 5">5
+                                            </button>
+                                        </li>
+                                        <li className="pagination__item">
+                                            <button className="pagination__link"
+                                                    aria-label="Next page">Next <span
+                                                aria-hidden="true" role="presentation">»</span></button>
+                                        </li>
+                                    </ul>
+                                </nav>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
@@ -195,6 +284,54 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     )}
                                     </tbody>
                                 </table>
+                            </section>
+                        </Tabs.Panel>
+                        <Tabs.Panel label="release-timetable">
+                            <section className="govuk-tabs__panel" id="additional-calculations">
+                                <div className="govuk-grid-row">
+                                    <div className="govuk-grid-column-full">
+                                        <h2 className="govuk-heading-l">Release timetable</h2>
+                                    </div>
+                                </div>
+                                <div className="govuk-form-group">
+                                    <fieldset className="govuk-fieldset" role="group"
+                                              aria-describedby="passport-issued-hint">
+                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                                            <h3 className="govuk-heading-m">Release date of funding to Navison?</h3>
+                                        </legend>
+                                        <span id="passport-issued-hint"
+                                              className="govuk-hint">Set the date and time that the statement will be published externally for this funding stream. <br/>For example, 12 11 2019</span>
+                                        <DateInput year={parseInt(viewSpecification.releaseTimetable.navisionDate.year)}
+                                                   month={parseInt(viewSpecification.releaseTimetable.navisionDate.month)}
+                                                   day={parseInt(viewSpecification.releaseTimetable.navisionDate.day)}
+                                                   callback={updateNavisionDate} />
+                                    </fieldset>
+                                </div>
+                                <div className="govuk-form-group govuk-!-margin-bottom-9">
+                                    <TimeInput time={viewSpecification.releaseTimetable.navisionDate.time}
+                                               callback={updateNavisionTime}/>
+                                </div>
+                                <div className="govuk-form-group">
+                                    <fieldset className="govuk-fieldset" role="group"
+                                              aria-describedby="passport-issued-hint">
+                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                                            <h3 className="govuk-heading-m">Release date of statement to providers?</h3>
+                                        </legend>
+                                        <span id="passport-issued-hint"
+                                              className="govuk-hint">Set the date and time that the statement will be published externally for this funding stream. <br/>For example, 12 11 2019</span>
+                                        <DateInput year={parseInt(viewSpecification.releaseTimetable.releaseDate.year)}
+                                                   month={parseInt(viewSpecification.releaseTimetable.releaseDate.month)}
+                                                   day={parseInt(viewSpecification.releaseTimetable.releaseDate.day)}
+                                                   callback={updateReleaseDate} />
+                                    </fieldset>
+                                </div>
+                                <div className="govuk-form-group govuk-!-margin-bottom-9">
+                                    <TimeInput time={viewSpecification.releaseTimetable.releaseDate.time}
+                                               callback={updateReleaseTime}/>
+                                </div>
+                                <div className="govuk-form-group">
+                                    <button className="govuk-button" onClick={confirmChanges}>Confirm changes</button>
+                                </div>
                             </section>
                         </Tabs.Panel>
                     </Tabs>
