@@ -31,30 +31,6 @@ describe('<Pagination />', () => {
 
         let actual = wrapper.find('ul');
 
-        expect(actual.children()).toHaveLength(9);
+        expect(actual.children()).toHaveLength(4);
     });
-
-    it("has first two buttons disabled when it's on the first page", () => {
-        const wrapper = shallow(<Pagination callback={() => {
-        }} currentPage={1} lastPage={10}/>);
-
-        let btnFirstPage = wrapper.find('#btnFirstPage');
-        let btnLastPage = wrapper.find("#btnPreviousPage");
-
-        expect(btnFirstPage.is('[disabled]')).toBeTruthy();
-        expect(btnLastPage.is("[disabled]")).toBeTruthy();
-    });
-
-    it("has last two buttons disabled when it's on the first page", () => {
-        const wrapper = shallow(<Pagination callback={() => {
-        }} currentPage={1} lastPage={10}/>);
-
-        let btnNextPage = wrapper.find("#btnNextPage");
-        let btnLastPage = wrapper.find('#btnLastPage');
-
-        expect(btnNextPage.is("[disabled]")).toBeTruthy();
-        expect(btnLastPage.is('[disabled]')).toBeTruthy();
-    });
-
-
 });
