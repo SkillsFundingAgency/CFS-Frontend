@@ -401,14 +401,15 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <button className="govuk-button govuk-!-margin-right-1"
-                                        disabled={!this.props.publishedProviderResults.canApprove}
+                                        disabled={!this.props.publishedProviderResults.canApprove || !this.props.effectiveSpecificationPermission.canApproveFunding}
                                         onClick={() => this.approveFunding()}>Approve
                                 </button>
                                 <button className="govuk-button govuk-!-margin-right-1"
-                                        disabled={!this.props.publishedProviderResults.canPublish}
+                                        disabled={!this.props.publishedProviderResults.canPublish || !this.props.effectiveSpecificationPermission.canReleaseFunding}
                                         onClick={() => this.releaseFunding()}>Release
                                 </button>
                                 <button className="govuk-button"
+                                        disabled={!this.props.effectiveSpecificationPermission.canRefreshFunding}
                                         onClick={() => this.refreshFunding()}>Refresh
                                     funding
                                 </button>
