@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -105,9 +106,11 @@ namespace CalculateFunding.Frontend.Services
             result.TotalProvidersToApprove = 0;
             result.TotalProvidersToPublish = 0;
 
-            result.PagerState = new PagerState(requestOptions.PageNumber, 10, 4);
+            int totalItemCount = result.TotalResults;
+            int totalPages = (int)Math.Ceiling((double)totalItemCount / (double)request.PageSize.Value);
+            result.PagerState = new PagerState(requestOptions.PageNumber, totalPages, 4);
 
-            if(result.Providers.FirstOrDefault() == null)
+            if (result.Providers.FirstOrDefault() == null)
             {
                 return result;
             }

@@ -158,7 +158,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     };
 
     movePage = (pageNumber: string) => {
-        this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, this.state.status, pageNumber);
+        this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, this.state.localAuthority, this.state.status, pageNumber, this.state.pageSize);
     };
 
     dismissLoader = () => {
