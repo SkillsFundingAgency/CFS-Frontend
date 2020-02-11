@@ -373,7 +373,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tbody className="govuk-table__body">
                                     {this.props.publishedProviderResults.providers.map(fp =>
                                         <tr className="govuk-table__body" key={fp.id}>
-                                            <td className="govuk-table__cell"><a href={"/FundingApprovals/ProviderFundingOverview/" + fp.id}>{fp.providerName}</a></td>
+                                            <td className="govuk-table__cell"><a href={"/app/FundingApprovals/ProviderFundingOverview/" + fp.specificationId + "/" + fp.ukprn + "/" + this.props.specifications.providerVersionId}>{fp.providerName}</a></td>
                                             <td className="govuk-table__cell">{fp.ukprn}</td>
                                             <td className="govuk-table__cell">{fp.fundingStatus}</td>
                                             <td className="govuk-table__cell">

@@ -23,6 +23,7 @@
     "axios-mock-adapter": "^1.17.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
+    "fetch-mock": "^9.0.0-beta.2",
     "govuk-frontend": "^3.3.0",
     "govuk-react": "^0.7.2",
     "http-proxy-middleware": "^0.20.0",

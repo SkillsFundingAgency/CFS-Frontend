@@ -4,6 +4,7 @@ import {ViewSpecificationResultsState} from "./ViewSpecificationResultsState";
 import {ViewSpecificationState} from "./ViewSpecificationState";
 import {ViewCalculationState} from "./ViewCalculationState";
 import {SelectSpecificationState} from "./SelectSpecificationState";
+import {ProviderState} from "./ProviderState";
 
 export interface AppState {
     selectSpecification: SelectSpecificationState;
@@ -12,4 +13,5 @@ export interface AppState {
     viewSpecificationResults: ViewSpecificationResultsState;
     viewSpecification: ViewSpecificationState;
     viewCalculationResults: ViewCalculationState;
+    provider: ProviderState;
 }

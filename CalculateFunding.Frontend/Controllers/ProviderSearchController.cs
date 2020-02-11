@@ -158,5 +158,6 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new InternalServerErrorResult($"Find provider results HTTP request failed");
         }
+
     }
 }

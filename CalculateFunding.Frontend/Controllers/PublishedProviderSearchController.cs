@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Results;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Extensions;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Results;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
-
     public class PublishedProviderSearchController : Controller
     {
         private IPublishedProviderSearchService _publishedProviderSearchService;

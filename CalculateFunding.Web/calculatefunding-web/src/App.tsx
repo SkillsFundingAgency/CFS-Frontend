@@ -11,6 +11,7 @@ import {ViewSpecificationResults} from "./pages/ViewSpecificationResults";
 import {ViewCalculationResults} from "./pages/ViewCalculationResults";
 import {ViewSpecification} from "./pages/ViewSpecification";
 import {SelectSpecification} from "./pages/SelectSpecification";
+import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
+       <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
        <Route path="*">
             <NoMatch />
           </Route>
