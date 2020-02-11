@@ -1,5 +1,7 @@
 @import '~govuk-frontend';
-
+.govuk-width-container{
+  max-width: 1020px;
+}
 .govuk-phase-banner {
   border-bottom: 0 !important;
 }
