@@ -1,8 +1,5 @@
 import React from 'react';
-import ViewFundingPage from "../pages/ViewFunding";
-import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
-import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
-import {Header} from "../components/Header";
+import {Header} from "../../components/Header";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');

@@ -302,8 +302,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                             <CollapsiblePanel title="Filter by results status" expanded={false}>
                                 <fieldset className="govuk-fieldset">
                                     <div className="govuk-radios">
-                                        {filterResultsStatus.map(pt =>
-                                            <div className="govuk-radios__item">
+                                        {filterResultsStatus.map((pt, index) =>
+                                            <div key={index} className="govuk-radios__item">
                                                 <input className="govuk-radios__input" id={`resultsStatus-${pt.name}`}
                                                        name="resultsStatus"
                                                        type="radio" value={pt.name}

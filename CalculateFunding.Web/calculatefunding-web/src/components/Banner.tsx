@@ -17,10 +17,10 @@ export class Banner extends React.Component<IBannerTypes, {}> {
                     <div className="row">
                         <div className="col-xs-9">
                             <Breadcrumbs>
-                                {this.props.breadcrumbs.map(bread =>
-                                    (bread.url != null) ?
-                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item"><a href={bread.url} className="govuk-breadcrumbs__link">{bread.name}</a></li>) :
-                                        (<li key={bread.name} className="govuk-breadcrumbs__list-item" aria-current="page">{bread.name}</li>)
+                                {this.props.breadcrumbs.map((breadcrumb, index) =>
+                                    (breadcrumb.url != null) ?
+                                        (<li key={index} className="govuk-breadcrumbs__list-item"><a href={breadcrumb.url} className="govuk-breadcrumbs__link">{breadcrumb.name}</a></li>) :
+                                        (<li key={index} className="govuk-breadcrumbs__list-item" aria-current="page">{breadcrumb.name}</li>)
                                 )}
                             </Breadcrumbs>
                         </div>
