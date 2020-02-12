@@ -6,6 +6,8 @@ import {IViewFundingState} from "../states/IViewFundingState";
 import {SearchMode, SearchRequestViewModel} from "../types/searchRequestViewModel";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
+import {JobMessage} from "../types/jobMessage";
+import {GetLatestJobForSpecification} from "../services/jobService";
 
 export enum ViewFundingActionTypes {
     GET_SPECIFICATIONS = 'getSelectedSpecifications',
@@ -14,6 +16,7 @@ export enum ViewFundingActionTypes {
     GET_PUBLISHEDPROVIDERRESULTS = 'getPublishedProviderResults',
     GET_LATESTREFRESHDATE = 'getLatestRefreshDate',
     GET_USERPERMISSION = 'getUserPermissions',
+    GET_LATESTJOBFORSPECIFICATION = 'getLatestJobForSpecification',
     FILTER_PUBLISHEDPROVIDERRESULTS = 'filterPublishedProviderResults',
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
@@ -53,6 +56,11 @@ export interface IGetUserPermissions {
     payload: EffectiveSpecificationPermission
 }
 
+export interface IGetLatestJobForSpecification {
+    type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION;
+    payload: string
+}
+
 export interface IFilterPublishedProviderResultsAction {
     type: ViewFundingActionTypes.FILTER_PUBLISHEDPROVIDERRESULTS,
     payload: PublishedProviderItems,
@@ -83,6 +91,7 @@ export type ViewFundingAction =
     | IGetSelectedFundingPeriodsAction
     | IGetPublishedProviderResultsAction
     | IGetLatestRefreshDateAction
+    | IGetLatestJobForSpecification
     | IGetUserPermissions
     | IRefreshFundingAction
     | IApproveFundingAction
@@ -205,6 +214,18 @@ export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IView
         })
     }
 };
+
+export const getLatestJobForSpecification: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
+    return async (dispatch: Dispatch) => {
+        const response = await GetLatestJobForSpecification(specificationId);
+        let jobMessage = response.data as JobMessage;
+        dispatch({
+            type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION,
+            payload: jobMessage.jobType,
+        })
+    }
+};
+
 export const filterPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingPeriodId: string, fundingStreamId: string, specificationId: string, providerType: string, localAuthority: string, status: string, pageNumber: number, pageSize: number) => {
     return async (dispatch: Dispatch) => {
 

@@ -15,5 +15,6 @@ export interface IViewFundingState {
     releaseFundingJobId: string,
     filterTypes: FacetsEntity[],
     pageState: string,
-    userPermission: EffectiveSpecificationPermission
+    userPermission: EffectiveSpecificationPermission,
+    jobCurrentlyInProgress: string
 }

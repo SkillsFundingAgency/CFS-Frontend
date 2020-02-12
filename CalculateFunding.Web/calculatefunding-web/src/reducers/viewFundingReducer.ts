@@ -71,7 +71,8 @@ const initialState: IViewFundingState = {
         canReleaseFunding: false,
         specificationId: "",
         userId: ""
-    }
+    },
+    jobCurrentlyInProgress: ''
 };
 
 export function reduceViewFundingState(state: IViewFundingState = initialState, action: ViewFundingAction): IViewFundingState {
@@ -98,6 +99,8 @@ export function reduceViewFundingState(state: IViewFundingState = initialState, 
             return {...state, pageState: action.payload};
         case ViewFundingActionTypes.GET_USERPERMISSION:
             return {...state, userPermission: action.payload};
+        case ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION:
+            return {...state, jobCurrentlyInProgress: action.payload};
         default:
             return state;
     }

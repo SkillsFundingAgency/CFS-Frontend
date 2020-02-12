@@ -12,7 +12,7 @@ import {
     approveFunding,
     releaseFunding,
     filterPublishedProviderResults,
-    changePageState
+    changePageState, getLatestJobForSpecification
 } from "../actions/viewFundingAction";
 import {AppState} from "../reducers/rootReducer";
 
@@ -28,7 +28,8 @@ const mapStateToProps = (state: AppState) => ({
     refreshFundingJobId: state.viewFundingState.refreshFundingJobId,
     approveFundingJobId: state.viewFundingState.approveFundingJobId,
     releaseFundingJobId: state.viewFundingState.releaseFundingJobId,
-    pageState: state.viewFundingState.pageState
+    pageState: state.viewFundingState.pageState,
+    jobCurrentlyInProgress: state.viewFundingState.jobCurrentlyInProgress
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
@@ -40,6 +41,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
             getPublishedProviderResults,
             getLatestRefreshDate,
             getUserPermissions,
+            getLatestJobForSpecification,
             filterPublishedProviderResults,
             refreshFunding,
             approveFunding,

@@ -18,6 +18,7 @@ const mockRefreshFunding = jest.fn();
 const mockApproveFunding = jest.fn();
 const mockChangePageState = jest.fn();
 const mockGetUserPermission = jest.fn();
+const mockGetLatestJobForSpecification = jest.fn();
 const mockReleaseFunding = jest.fn();
 
 it('will shallow mount', () => {
@@ -26,6 +27,8 @@ it('will shallow mount', () => {
                                              getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
                                              getPublishedProviderResults={mockGetPublishedProviderResults}
                                              getLatestRefreshDate={mockGetLatestRefreshDate}
+                                             getUserPermissions={mockGetUserPermission}
+                                             getLatestJobForSpecification={mockGetLatestJobForSpecification}
                                              filterPublishedProviderResults={mockFilterPublishedProviderResults}
                                              refreshFunding={mockRefreshFunding}
                                              approveFunding={mockApproveFunding}
@@ -42,9 +45,9 @@ it('will shallow mount', () => {
                                              approveFundingJobId={""}
                                              pageState={""}
                                              effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
-                                             getUserPermissions={mockGetUserPermission}
                                              releaseFunding={mockReleaseFunding}
-                                             releaseFundingJobId={""}/>);
+                                             releaseFundingJobId={""}
+                                             jobCurrentlyInProgress={""}/>);
     expect(wrapper.find('div.govuk-width-container'));
 });
 
@@ -54,6 +57,8 @@ it('will show the first screen', () => {
                                              getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
                                              getPublishedProviderResults={mockGetPublishedProviderResults}
                                              getLatestRefreshDate={mockGetLatestRefreshDate}
+                                             getUserPermissions={mockGetUserPermission}
+                                             getLatestJobForSpecification={mockGetLatestJobForSpecification}
                                              filterPublishedProviderResults={mockFilterPublishedProviderResults}
                                              refreshFunding={mockRefreshFunding}
                                              approveFunding={mockApproveFunding}
@@ -70,9 +75,9 @@ it('will show the first screen', () => {
                                              approveFundingJobId={""}
                                              pageState={""}
                                              effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
-                                             getUserPermissions={mockGetUserPermission}
                                              releaseFunding={mockReleaseFunding}
                                              releaseFundingJobId={""}
+                                             jobCurrentlyInProgress={""}
     />);
 
     expect(wrapper.find('#select-funding-stream')).toBeTruthy();
