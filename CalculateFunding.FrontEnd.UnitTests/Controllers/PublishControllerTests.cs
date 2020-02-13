@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -51,9 +52,20 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _publishController =
                 new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
 
-            IActionResult result = await _publishController.SaveTimetable(new ReleaseTimetableViewModel());
+            var fundingDate = DateTime.Now.AddDays(-1);
+            var statementDate = DateTime.Now.AddMonths(-1);
+            var releaseTimetableViewModel = new ReleaseTimetableViewModel
+            {
+				SpecificationId = "XYZ",
+				FundingDate = fundingDate,
+				StatementDate = statementDate
+            };
+            IActionResult result = await _publishController.SaveTimetable(releaseTimetableViewModel);
 
             result.Should().BeAssignableTo<OkObjectResult>();
+            var specificationPublishDateModelResult = result.As<OkObjectResult>().Value.As<SpecificationPublishDateModel>();
+            specificationPublishDateModelResult.EarliestPaymentAvailableDate.Should().Be(fundingDate);
+            specificationPublishDateModelResult.ExternalPublicationDate.Should().Be(statementDate);
         }
 
         [TestMethod]

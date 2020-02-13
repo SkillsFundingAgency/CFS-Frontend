@@ -31,6 +31,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [releaseDate, setReleaseDate] = useState();
     const [navisionTime, setNavisionTime] = useState();
     const [releaseTime, setReleaseTime] = useState();
+    const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
 
     let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
 
@@ -44,6 +45,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getDatasetBySpecificationId(specificationId));
         dispatch(getReleaseTimetable(specificationId));
     }, [specificationId]);
+
+    useEffect(() => {
+        return () => setCanTimetableBeUpdated(true);
+    }, [viewSpecification]);
 
 
     let breadcrumbs: IBreadcrumbs[] = [
@@ -62,6 +67,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     ];
 
     function confirmChanges() {
+        setCanTimetableBeUpdated(false);
         let navDateAndTime2 = updateDateWithTime(navisionDate, navisionTime);
         let releaseDate2 = updateDateWithTime(releaseDate, releaseTime);
         saveReleaseTimetable = {
@@ -69,7 +75,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             statementDate: navDateAndTime2,
             fundingDate: releaseDate2
         };
-        dispatch(confirmTimetableChanges(saveReleaseTimetable))
+        dispatch(confirmTimetableChanges(saveReleaseTimetable));
     }
 
     function updateDateWithTime(date: Date, time: string) {
@@ -146,7 +152,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <p>{viewSpecification.specification.description}</p>
                         </div>
                     </details>
-                    <Tabs initialTab="release-timetable">
+                    <Tabs initialTab="additional-calculations">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
@@ -330,7 +336,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                callback={updateReleaseTime}/>
                                 </div>
                                 <div className="govuk-form-group">
-                                    <button className="govuk-button" onClick={confirmChanges}>Confirm changes</button>
+                                    <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated} >Confirm changes</button>
                                 </div>
                             </section>
                         </Tabs.Panel>

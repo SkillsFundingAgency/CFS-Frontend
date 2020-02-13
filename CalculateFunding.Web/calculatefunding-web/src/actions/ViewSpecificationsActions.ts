@@ -10,7 +10,7 @@ import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {getDatasetBySpecificationIdService} from "../services/datasetService";
 import {DatasetSummary} from "../types/DatasetSummary";
-import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
+import {Content, ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
 import {
     getReleaseTimetableForSpecificationService,
     saveReleaseTimetableForSpecificationService
@@ -47,6 +47,7 @@ export interface GetReleaseTimetable {
 
 export interface ConfirmTimetableChanges {
     type: ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES
+    payload: ReleaseTimetableViewModel
 }
 
 export type ViewSpecificationsActions =
@@ -89,44 +90,14 @@ export const getDatasetBySpecificationId: ActionCreator<ThunkAction<Promise<any>
     }
 };
 
-export const getReleaseTimetable: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> = (specificationId: string) => {
+export const getReleaseTimetable: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> =
+    (specificationId: string) => {
     return async (dispatch: Dispatch) => {
         let response = await getReleaseTimetableForSpecificationService(specificationId);
-        let reply = response.data as ReleaseTimetableSummary;
 
-        let releaseDate: Date = new Date(reply.content.earliestPaymentAvailableDate);
-        let navisionDate: Date = new Date(reply.content.externalPublicationDate);
+        let releaseTimetableSummary = response.data as ReleaseTimetableSummary;
 
-        let statementDate: Date = new Date(reply.content.externalPublicationDate);
-        let statementHours: string = statementDate.getHours() < 10 ? `0${statementDate.getHours()}` : `${statementDate.getHours()}`;
-        let statementMinutes: string = statementDate.getMinutes() < 10 ? `0${statementDate.getMinutes()}` : `${statementDate.getMinutes()}`;
-        let statementDay = statementDate.getDate();
-        let statementMonth = statementDate.getMonth();
-        let statementYear = statementDate.getFullYear();
-        let statementTime = `${statementHours}:${statementMinutes}`;
-
-        let paymentDate: Date = new Date(reply.content.earliestPaymentAvailableDate);
-        let fundingHours: string = paymentDate.getHours() < 10 ? `0${paymentDate.getHours()}` : `${paymentDate.getHours()}`;
-        let fundingMinutes: string = paymentDate.getMinutes() < 10 ? `0${paymentDate.getMinutes()}` : `${paymentDate.getMinutes()}`;
-        let fundingDay = paymentDate.getDate();
-        let fundingMonth = paymentDate.getMonth();
-        let fundingYear = paymentDate.getFullYear();
-        let fundingTime = `${fundingHours}:${fundingMinutes}`;
-
-        let output: ReleaseTimetableViewModel = {
-            navisionDate: {
-                day: !isNaN(navisionDate.getDate()) ? statementDay.toString() : "",
-                month: !isNaN(navisionDate.getMonth()) ? statementMonth.toString() : "",
-                year: !isNaN(navisionDate.getFullYear()) ? statementYear.toString() : "",
-                time: !isNaN(navisionDate.getTime()) ? statementTime : ""
-            },
-            releaseDate: {
-                day: !isNaN(releaseDate.getDate()) ? fundingDay.toString() : "",
-                month: !isNaN(releaseDate.getMonth()) ? fundingMonth.toString() : "",
-                year: !isNaN(releaseDate.getFullYear()) ? fundingYear.toString() : "",
-                time: !isNaN(releaseDate.getTime()) ? fundingTime : ""
-            }
-        };
+        let output = createReleaseTimetableViewModel(releaseTimetableSummary.content);
 
         dispatch({
             type: ViewSpecificationActionTypes.GET_RELEASETIMETABLE,
@@ -135,13 +106,55 @@ export const getReleaseTimetable: ActionCreator<ThunkAction<Promise<any>, ViewSp
     }
 };
 
-export const confirmTimetableChanges: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> = (releaseTimetable: SaveReleaseTimetableViewModel) => {
-
+export const confirmTimetableChanges: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> =
+    (releaseTimetable: SaveReleaseTimetableViewModel) => {
     return async (dispatch: Dispatch) => {
         const response = await saveReleaseTimetableForSpecificationService(releaseTimetable);
+
+        let output = createReleaseTimetableViewModel(response.data);
+
         dispatch({
             type: ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES,
-            payload: response.data as DatasetSummary
+            payload: output as ReleaseTimetableViewModel
         });
     }
 };
+
+function createReleaseTimetableViewModel(content: Content)
+{
+    let releaseDate: Date = new Date(content.earliestPaymentAvailableDate);
+    let navisionDate: Date = new Date(content.externalPublicationDate);
+
+    let statementDate: Date = new Date(content.externalPublicationDate);
+    let statementHours: string = statementDate.getHours() < 10 ? `0${statementDate.getHours()}` : `${statementDate.getHours()}`;
+    let statementMinutes: string = statementDate.getMinutes() < 10 ? `0${statementDate.getMinutes()}` : `${statementDate.getMinutes()}`;
+    let statementDay = statementDate.getDate();
+    let statementMonth = statementDate.getMonth();
+    let statementYear = statementDate.getFullYear();
+    let statementTime = `${statementHours}:${statementMinutes}`;
+
+    let paymentDate: Date = new Date(content.earliestPaymentAvailableDate);
+    let fundingHours: string = paymentDate.getHours() < 10 ? `0${paymentDate.getHours()}` : `${paymentDate.getHours()}`;
+    let fundingMinutes: string = paymentDate.getMinutes() < 10 ? `0${paymentDate.getMinutes()}` : `${paymentDate.getMinutes()}`;
+    let fundingDay = paymentDate.getDate();
+    let fundingMonth = paymentDate.getMonth();
+    let fundingYear = paymentDate.getFullYear();
+    let fundingTime = `${fundingHours}:${fundingMinutes}`;
+
+    let output: ReleaseTimetableViewModel = {
+        navisionDate: {
+            day: !isNaN(navisionDate.getDate()) ? statementDay.toString() : "",
+            month: !isNaN(navisionDate.getMonth()) ? statementMonth.toString() : "",
+            year: !isNaN(navisionDate.getFullYear()) ? statementYear.toString() : "",
+            time: !isNaN(navisionDate.getTime()) ? statementTime : ""
+        },
+        releaseDate: {
+            day: !isNaN(releaseDate.getDate()) ? fundingDay.toString() : "",
+            month: !isNaN(releaseDate.getMonth()) ? fundingMonth.toString() : "",
+            year: !isNaN(releaseDate.getFullYear()) ? fundingYear.toString() : "",
+            time: !isNaN(releaseDate.getTime()) ? fundingTime : ""
+        }
+    };
+
+    return output;
+}

@@ -68,6 +68,8 @@ export function reduceViewSpecificationState(state: ViewSpecificationState = ini
             return {...state, datasets: action.payload as DatasetSummary};
         case ViewSpecificationActionTypes.GET_RELEASETIMETABLE:
             return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
+        case ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES:
+            return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
         default:
             return state;
     }

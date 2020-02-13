@@ -380,11 +380,81 @@ describe('ViewSpecificationReducer ', () => {
     });
 
     it('should handle CONFIRM_TIMETABLECHANGES', () => {
+        const expectedState =   {
+            "additionalCalculations":  {
+                "calculations":  [],
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets":  [],
+                "pagerState":  {
+                    "currentPage": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages":  [],
+                    "previousPage": 0,
+                },
+                "startItemNumber": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets":  {
+                "content":  [],
+                "statusCode": 0,
+            },
+            "releaseTimetable":  {
+                "navisionDate":  {
+                    "day": "26",
+                    "month": "10",
+                    "time": "01:20",
+                    "year": "1985",
+                },
+                "releaseDate":  {
+                    "day": "21",
+                    "month": "1",
+                    "time": "03:56",
+                    "year": "2015",
+                },
+            },
+            "specification":  {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod":  {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams":  [
+                    {
+                        "id": "",
+                        "name": "",
+                    },
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
+
         expect(
             reduceViewSpecificationState(initialState, {
                 type: ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES,
+                payload: {
+                    releaseDate: {
+                        time: "03:56",
+                        day: "21",
+                        month: "1",
+                        year: "2015"
+                    },
+                    navisionDate: {
+                        time: "01:20",
+                        day: "26",
+                        month: "10",
+                        year: "1985"
+                    }
+                }
             })
-        ).toEqual(initialState);
+        ).toEqual(expectedState);
     });
 });
 

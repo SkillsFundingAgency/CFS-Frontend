@@ -61,7 +61,8 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (publish == HttpStatusCode.OK)
             {
-                return new OkObjectResult(Content("Successful"));
+				
+                return new OkObjectResult(publishData);
             }
 
             if (publish == HttpStatusCode.BadRequest)
