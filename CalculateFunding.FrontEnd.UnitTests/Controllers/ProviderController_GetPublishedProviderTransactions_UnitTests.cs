@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Providers;
-using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
@@ -16,6 +11,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {

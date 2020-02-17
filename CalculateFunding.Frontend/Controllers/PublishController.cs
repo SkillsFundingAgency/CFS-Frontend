@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -61,7 +59,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (publish == HttpStatusCode.OK)
             {
-				
+
                 return new OkObjectResult(publishData);
             }
 
@@ -188,6 +186,33 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new NotFoundObjectResult(Content("Error. Not Found."));
+        }
+
+        [HttpGet]
+        [Route("api/provider/getlocalauthorities/{fundingStreamId}/{fundingPeriodId}/")]
+        public async Task<IActionResult> GetLocalAuthorities(string fundingStreamId, string fundingPeriodId, [FromQuery]string searchText = "")
+        {
+
+            var result =
+                await _publishingApiClient.SearchPublishedProviderLocalAuthorities(searchText, fundingStreamId,
+                    fundingPeriodId);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+	            return new OkObjectResult(result.Content);
+            }
+
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+
+             
+                return new BadRequestResult();
+            }
+
+            return new NotFoundObjectResult(Content("Error. Not found."))
+            {
+                StatusCode = 404
+            };
         }
 
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
