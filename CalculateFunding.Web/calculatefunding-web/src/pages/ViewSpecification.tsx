@@ -145,7 +145,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     <details className="govuk-details govuk-!-margin-bottom-5" data-module="govuk-details">
                         <summary className="govuk-details__summary">
         <span className="govuk-details__summary-text">
-          What is DSG SIT?
+          What is {viewSpecification.specification.name}?
         </span>
                         </summary>
                         <div className="govuk-details__text">
