@@ -1,6 +1,5 @@
 import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
-import {CalculationSummary} from "../types/CalculationSummary";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 
 export interface IViewFundingState {
@@ -17,4 +16,5 @@ export interface IViewFundingState {
     pageState: string,
     userPermission: EffectiveSpecificationPermission,
     jobCurrentlyInProgress: string
+    localAuthorities: string[];
 }

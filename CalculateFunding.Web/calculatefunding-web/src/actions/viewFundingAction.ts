@@ -8,6 +8,7 @@ import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {JobMessage} from "../types/jobMessage";
 import {GetLatestJobForSpecification} from "../services/jobService";
+import {getLocalAuthoritiesService} from "../services/publishService";
 
 export enum ViewFundingActionTypes {
     GET_SPECIFICATIONS = 'getSelectedSpecifications',
@@ -21,7 +22,9 @@ export enum ViewFundingActionTypes {
     REFRESH_FUNDING = 'refreshFunding',
     APPROVE_FUNDING = 'approveFunding',
     RELEASE_FUNDING = 'releaseFunding',
-    CHANGE_PAGESTATE = 'changePageState'
+    CHANGE_PAGESTATE = 'changePageState',
+    GET_LOCALAUTHORITIES = 'getLocalAuthorities',
+    
 }
 
 export interface IGetSpecificationAction {
@@ -85,6 +88,11 @@ export interface ChangePageStateAction {
     payload: string
 }
 
+export interface GetLocalAuthoritiesAction {
+    type: ViewFundingActionTypes.GET_LOCALAUTHORITIES,
+    payload: string[]
+}
+
 export type ViewFundingAction =
     IGetSpecificationAction
     | IGetAllFundingStreamsAction
@@ -97,7 +105,8 @@ export type ViewFundingAction =
     | IApproveFundingAction
     | IReleaseFundingAction
     | IFilterPublishedProviderResultsAction
-    | ChangePageStateAction;
+    | ChangePageStateAction
+    | GetLocalAuthoritiesAction;
 
 export const getSelectedSpecifications: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingPeriodId: string, fundingStreamId: string) => {
     return async (dispatch: Dispatch) => {
@@ -308,6 +317,16 @@ export const changePageState: ActionCreator<ThunkAction<Promise<any>, IViewFundi
         dispatch({
             type: ViewFundingActionTypes.CHANGE_PAGESTATE,
             payload: state,
+        })
+    }
+};
+
+export const getLocalAuthorities: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingStreamId: string, fundingPeriodId:string) => {
+    return async (dispatch: Dispatch) => {
+        const response = getLocalAuthoritiesService(fundingStreamId, fundingPeriodId, "");
+        dispatch({
+            type: ViewFundingActionTypes.GET_LOCALAUTHORITIES,
+            payload: response,
         })
     }
 };
