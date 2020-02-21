@@ -138,7 +138,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         {specificationResults.templateCalculations.calculations.map(tc =>
                                             <tr key={tc.id} className="govuk-table__row">
                                                 <td className="govuk-table__cell"><a
-                                                    href={`/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
+                                                    href={`/app/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
                                                 </td>
                                                 <td className="govuk-table__cell">{tc.status}</td>
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>

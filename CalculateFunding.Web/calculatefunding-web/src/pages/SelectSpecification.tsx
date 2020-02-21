@@ -123,7 +123,7 @@ export function SelectSpecification(props: SelectSpecificationProps) {
                 </fieldset>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <a href={selectedSpecificationId === ''? `#` : `/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
+                        <a href={selectedSpecificationId === ''? `#` : `/app/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
                            className={`govuk-button govuk-button ${selectedSpecificationId === ''? "govuk-button--disabled":"govuk-button govuk-button"}`}
                            data-module="govuk-button">
                             Continue
