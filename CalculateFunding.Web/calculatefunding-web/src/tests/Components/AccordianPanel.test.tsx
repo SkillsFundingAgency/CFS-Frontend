@@ -1,5 +1,4 @@
 import React from 'react';
-import Pagination from "../../components/Pagination";
 import {AccordianPanel} from "../../components/AccordianPanel";
 
 const Adapter = require('enzyme-adapter-react-16');

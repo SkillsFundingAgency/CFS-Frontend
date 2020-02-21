@@ -19,6 +19,7 @@ import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewMo
 import {DateInput} from "../components/DateInput";
 import {TimeInput} from "../components/TimeInput";
 import Pagination from "../components/Pagination";
+import {Details} from "../components/Details";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -148,16 +149,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
-                    <details className="govuk-details govuk-!-margin-bottom-5" data-module="govuk-details">
-                        <summary className="govuk-details__summary">
-        <span className="govuk-details__summary-text">
+                    <Details title={`What is ${viewSpecification.specification.name}`} body={viewSpecification.specification.description}/>
           What is {viewSpecification.specification.name}?
-        </span>
-                        </summary>
-                        <div className="govuk-details__text">
-                            <p>{viewSpecification.specification.description}</p>
-                        </div>
-                    </details>
                     <Tabs initialTab="additional-calculations">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
