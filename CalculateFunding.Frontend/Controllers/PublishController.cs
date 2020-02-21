@@ -176,11 +176,11 @@ namespace CalculateFunding.Frontend.Controllers
                         Status = item.Status.ToString(),
                         Author = item.Author.Name,
                         DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
-                        FundingStreamValue = item.TotalFunding.HasValue ? $"{item.TotalFunding.Value:C0}" : ""
+                        FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N0}" : ""
                     });
                 }
 
-                output.FundingTotal = result.Content.Sum(x => x.TotalFunding)?.ToString("C0");
+                output.FundingTotal = result.Content.OrderByDescending(x => x.Date).First() != null ? $"£{result.Content.OrderByDescending(x => x.Date).First().TotalFunding.Value:N0}" : "";
                 output.LatestStatus = result.Content.OrderByDescending(x => x.Date).FirstOrDefault()?.Status.ToString();
                 return new OkObjectResult(output);
             }
