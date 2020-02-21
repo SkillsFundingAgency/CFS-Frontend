@@ -18,6 +18,7 @@ import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
 import {DateInput} from "../components/DateInput";
 import {TimeInput} from "../components/TimeInput";
+import Pagination from "../components/Pagination";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -107,6 +108,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         setReleaseTime(e);
     }
 
+    function movePage(pageNumber : number)
+    {
+        dispatch(getAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm));
+    }
+
     return <div>
         <Header/>
         <div className="govuk-width-container">
@@ -165,7 +171,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third ">
-                                        <p className="govuk-body right-align">Showing 0 - 0 of 0 calculations</p>
+                                        <p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber} of {viewSpecification.additionalCalculations.totalResults} calculations</p>
                                     </div>
                                 </div>
                                 <div className="govuk-grid-row">
@@ -203,45 +209,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </strong>
                                 </div>
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                    <div className="pagination__summary">Showing 101 - 150 of 246 results</div>
-                                    <ul className="pagination">
-                                        <li className="pagination__item">
-                                            <button className="pagination__link" aria-label="Previous page"><span
-                                                aria-hidden="true" role="presentation">«</span> Previous
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link"
-                                                    aria-label="Page 1">1
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link"
-                                                    aria-label="Page 2">2
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link current"
-                                                    aria-current="true"
-                                                    aria-label="Page 3, current page">3
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link"
-                                                    aria-label="Page 4">4
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link"
-                                                    aria-label="Page 5">5
-                                            </button>
-                                        </li>
-                                        <li className="pagination__item">
-                                            <button className="pagination__link"
-                                                    aria-label="Next page">Next <span
-                                                aria-hidden="true" role="presentation">»</span></button>
-                                        </li>
-                                    </ul>
+                                    <div className="pagination__summary"><p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber} of {viewSpecification.additionalCalculations.totalResults} calculations</p></div>
+                                    <Pagination currentPage={viewSpecification.additionalCalculations.pagerState.currentPage} lastPage={viewSpecification.additionalCalculations.pagerState.lastPage} callback={movePage} />
                                 </nav>
                             </section>
                         </Tabs.Panel>
