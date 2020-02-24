@@ -98,7 +98,7 @@
                 Value = m.Id,
                 Text = m.Name,
                 Selected = m.Id == fundingPeriodId
-            }).ToList();
+            }).OrderBy(x => x.Text);
         }
     }
 }
