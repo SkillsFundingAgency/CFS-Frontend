@@ -13,6 +13,7 @@ import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {PermissionStatus} from "../components/PermissionStatus";
 import {LoadingStatus} from "../components/LoadingStatus";
+import {JobMessage} from "../types/jobMessage";
 
 export interface IViewFundingProps {
     getLocalAuthorities: any;
@@ -63,7 +64,7 @@ export interface IViewFundingProps {
     approveFundingJobId: string;
     releaseFundingJobId: string;
     pageState: string;
-    jobCurrentlyInProgress: string;
+    latestJob: JobMessage;
     localAuthorities: string[]
 }
 
@@ -282,11 +283,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
                             subtitle="You can approve and release funding for payment for completed specifications"/>
                     <PermissionStatus requiredPermissions={missingPermissions}/>
-                    <LoadingStatus title={`${this.props.jobCurrentlyInProgress} of funding in progress`}
+                    <LoadingStatus title={`${this.props.latestJob.jobType} of funding in progress`}
                                    subTitle={"Please wait, this could take several minutes"}
-                                   hidden={this.props.jobCurrentlyInProgress === ''}/>
+                                   hidden={this.props.latestJob.runningStatus === 'Completed' || this.props.latestJob.runningStatus === ''}/>
                     <div className="container"
-                         hidden={this.props.pageState !== "IDLE" || this.props.jobCurrentlyInProgress !== ''}>
+                         hidden={this.props.pageState !== "IDLE" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
 
                         <div className="govuk-warning-text">
                             <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -434,7 +435,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         </div>
                     </div>
                     <div className="govuk-width-container"
-                         hidden={this.props.pageState !== "APPROVE_FUNDING" || this.props.jobCurrentlyInProgress !== ''}>
+                         hidden={this.props.pageState !== "APPROVE_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <BackButton name="Back" callback={this.dismissLoader}/>
@@ -518,7 +519,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                         </div>
                     </div>
                     <main className="govuk-width-container"
-                          hidden={this.props.pageState !== "PUBLISH_FUNDING" || this.props.jobCurrentlyInProgress !== ''}>
+                          hidden={this.props.pageState !== "PUBLISH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <BackButton name="Back" callback={this.dismissLoader}/>
@@ -603,7 +604,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                     </main>
 
                     <div className="container"
-                         hidden={this.props.pageState !== "REFRESH_FUNDING" || this.props.jobCurrentlyInProgress !== ''}>
+                         hidden={this.props.pageState !== "REFRESH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <BackButton name="Back" callback={this.dismissLoader}/>
                         <NotificationSignal jobType="RefreshFundingJob"
                                             jobId={this.props.pageState === "REFRESH_FUNDING" ? this.props.specifications.id : ""}
@@ -611,7 +612,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                             callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container"
-                         hidden={this.props.pageState !== "APPROVE_FUNDING_JOB" || this.props.jobCurrentlyInProgress !== ''}>
+                         hidden={this.props.pageState !== "APPROVE_FUNDING_JOB" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <BackButton name="Back" callback={this.dismissLoader}/>
                         <NotificationSignal jobType="ApproveFunding"
                                             jobId={this.props.pageState === "APPROVE_FUNDING_JOB" ? this.props.specifications.id : ""}
@@ -619,7 +620,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                             callback={this.refreshProviderResults}/>
                     </div>
                     <div className="container"
-                         hidden={this.props.pageState !== "RELEASE_FUNDING_JOB" || this.props.jobCurrentlyInProgress !== ''}>
+                         hidden={this.props.pageState !== "RELEASE_FUNDING_JOB" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <BackButton name="Back" callback={this.dismissLoader}/>
                         <NotificationSignal jobType="PublishProviderFundingJob"
                                             jobId={this.props.pageState === "RELEASE_FUNDING_JOB" ? this.props.specifications.id : ""}

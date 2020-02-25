@@ -61,7 +61,7 @@ export interface IGetUserPermissions {
 
 export interface IGetLatestJobForSpecification {
     type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION;
-    payload: string
+    payload: JobMessage
 }
 
 export interface IFilterPublishedProviderResultsAction {
@@ -230,7 +230,7 @@ export const getLatestJobForSpecification: ActionCreator<ThunkAction<Promise<any
         let jobMessage = response.data as JobMessage;
         dispatch({
             type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION,
-            payload: jobMessage.jobType,
+            payload: jobMessage,
         })
     }
 };

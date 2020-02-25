@@ -1,6 +1,7 @@
 import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
+import {JobMessage} from "../types/jobMessage";
 
 export interface IViewFundingState {
     specifications: Specification,
@@ -15,6 +16,6 @@ export interface IViewFundingState {
     filterTypes: FacetsEntity[],
     pageState: string,
     userPermission: EffectiveSpecificationPermission,
-    jobCurrentlyInProgress: string
+    latestJob: JobMessage
     localAuthorities: string[];
 }

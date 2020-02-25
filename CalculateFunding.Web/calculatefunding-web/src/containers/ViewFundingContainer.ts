@@ -29,7 +29,7 @@ const mapStateToProps = (state: AppState) => ({
     approveFundingJobId: state.viewFundingState.approveFundingJobId,
     releaseFundingJobId: state.viewFundingState.releaseFundingJobId,
     pageState: state.viewFundingState.pageState,
-    jobCurrentlyInProgress: state.viewFundingState.jobCurrentlyInProgress,
+    latestJob: state.viewFundingState.latestJob,
     localAuthorities: state.viewFundingState.localAuthorities
 });
 

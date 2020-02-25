@@ -72,7 +72,23 @@ const initialState: IViewFundingState = {
         specificationId: "",
         userId: ""
     },
-    jobCurrentlyInProgress: '',
+    latestJob: {
+        completionStatus: null,
+        invokerUserDisplayName: '',
+        invokerUserId: '',
+        itemCount: 0,
+        jobId: '',
+        jobType: '',
+        outcome: null,
+        overallItemsFailed: 0,
+        overallItemsProcessed: 0,
+        overallItemsSucceeded: 0,
+        parentJobId: 0,
+        runningStatus: '',
+        specificationId: '',
+        statusDateTime: '',
+        supersededByJobId: 0
+    },
     localAuthorities: []
 };
 
@@ -101,7 +117,7 @@ export function reduceViewFundingState(state: IViewFundingState = initialState, 
         case ViewFundingActionTypes.GET_USERPERMISSION:
             return {...state, userPermission: action.payload};
         case ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION:
-            return {...state, jobCurrentlyInProgress: action.payload};
+            return {...state, latestJob: action.payload};
         case ViewFundingActionTypes.GET_LOCALAUTHORITIES:
             return {...state, localAuthorities: action.payload};
         default:

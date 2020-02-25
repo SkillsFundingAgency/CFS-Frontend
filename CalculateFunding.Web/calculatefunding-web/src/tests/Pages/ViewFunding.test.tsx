@@ -81,6 +81,25 @@ const mockSpecifications = {
         approvalStatus: ""
     };
 
+const mockJobMessage =
+    {
+        completionStatus: null,
+        invokerUserDisplayName: '',
+        invokerUserId: '',
+        itemCount: 0,
+        jobId: '',
+        jobType: '',
+        outcome: null,
+        overallItemsFailed: 0,
+        overallItemsProcessed: 0,
+        overallItemsSucceeded: 0,
+        parentJobId: 0,
+        runningStatus: '',
+        specificationId: '',
+        statusDateTime: '',
+        supersededByJobId: 0
+    };
+
 const mockViewFundingPageWithSpecification = <ViewFundingPage getSelectedSpecifications={mockGetSelectedSpecification}
                                                             getAllFundingStreams={mockGetAllFundingStreams}
                                                             getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
@@ -106,7 +125,7 @@ const mockViewFundingPageWithSpecification = <ViewFundingPage getSelectedSpecifi
                                                             effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
                                                             releaseFunding={mockReleaseFunding}
                                                             releaseFundingJobId={""}
-                                                            jobCurrentlyInProgress={""}/>;
+                                                            latestJob={mockJobMessage}/>;
 
 it('will show the first screen', () => {
     const wrapper = shallow(<ViewFundingPage getSelectedSpecifications={mockGetSelectedSpecification}
@@ -134,7 +153,7 @@ it('will show the first screen', () => {
                                              effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
                                              releaseFunding={mockReleaseFunding}
                                              releaseFundingJobId={""}
-                                             jobCurrentlyInProgress={""}
+                                             latestJob={mockJobMessage}
     />);
 
     expect(wrapper.find('#select-funding-stream')).toBeTruthy();
@@ -156,13 +175,123 @@ it('will show permission status given a valid specification is selected', () => 
     expect(actual.length).toBe(1);
 });
 
-it('will show loading status given a valid specification is selected', () => {
+it('will hide loading status given latest jobs running status is Completed', () => {
+    const mockJobMessage =
+        {
+            completionStatus: null,
+            invokerUserDisplayName: '',
+            invokerUserId: '',
+            itemCount: 0,
+            jobId: '',
+            jobType: '',
+            outcome: null,
+            overallItemsFailed: 0,
+            overallItemsProcessed: 0,
+            overallItemsSucceeded: 0,
+            parentJobId: 0,
+            runningStatus: 'Completed',
+            specificationId: '',
+            statusDateTime: '',
+            supersededByJobId: 0
+        };
+    const mockViewFundingPageWithLatestJobCompleted = <ViewFundingPage getSelectedSpecifications={mockGetSelectedSpecification}
+                                                                  getAllFundingStreams={mockGetAllFundingStreams}
+                                                                  getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
+                                                                  getPublishedProviderResults={mockGetPublishedProviderResults}
+                                                                  getLatestRefreshDate={mockGetLatestRefreshDate}
+                                                                  getUserPermissions={mockGetUserPermission}
+                                                                  getLatestJobForSpecification={mockGetLatestJobForSpecification}
+                                                                  filterPublishedProviderResults={mockFilterPublishedProviderResults}
+                                                                  refreshFunding={mockRefreshFunding}
+                                                                  approveFunding={mockApproveFunding}
+                                                                  changePageState={mockChangePageState}
+                                                                  latestRefreshDateResults={""}
+                                                                  specifications={mockSpecifications}
+                                                                  fundingStreams={[] as FundingStream[]}
+                                                                  selectedFundingPeriods={[] as FundingPeriod[]}
+                                                                  specificationSelected={true}
+                                                                  publishedProviderResults={mockPublishedProviderResults}
+                                                                  filterTypes={mockFacets}
+                                                                  jobId={""}
+                                                                  refreshFundingJobId={""}
+                                                                  approveFundingJobId={""}
+                                                                  pageState={""}
+                                                                  effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
+                                                                  releaseFunding={mockReleaseFunding}
+                                                                  releaseFundingJobId={""}
+                                                                  latestJob={mockJobMessage}/>;
+
+    const wrapper = shallow(mockViewFundingPageWithLatestJobCompleted);
+
+    let actual = wrapper.find("LoadingStatus");
+
+    expect(actual.length).toBe(1);
+    expect(actual.props().hidden).toBe(true);
+});
+
+it('will hide loading status given latest jobs running status is empty', () => {
     const wrapper = shallow(mockViewFundingPageWithSpecification);
 
     let actual = wrapper.find("LoadingStatus");
 
     expect(actual.length).toBe(1);
+    expect(actual.props().hidden).toBe(true);
 });
+
+it('will show loading status given latest jobs running status is not empty and not completed', () => {
+    const mockJobMessage =
+        {
+            completionStatus: null,
+            invokerUserDisplayName: '',
+            invokerUserId: '',
+            itemCount: 0,
+            jobId: '',
+            jobType: '',
+            outcome: null,
+            overallItemsFailed: 0,
+            overallItemsProcessed: 0,
+            overallItemsSucceeded: 0,
+            parentJobId: 0,
+            runningStatus: 'In Progress',
+            specificationId: '',
+            statusDateTime: '',
+            supersededByJobId: 0
+        };
+    const mockViewFundingPageWithJobNotCompleted = <ViewFundingPage getSelectedSpecifications={mockGetSelectedSpecification}
+                                                                       getAllFundingStreams={mockGetAllFundingStreams}
+                                                                       getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
+                                                                       getPublishedProviderResults={mockGetPublishedProviderResults}
+                                                                       getLatestRefreshDate={mockGetLatestRefreshDate}
+                                                                       getUserPermissions={mockGetUserPermission}
+                                                                       getLatestJobForSpecification={mockGetLatestJobForSpecification}
+                                                                       filterPublishedProviderResults={mockFilterPublishedProviderResults}
+                                                                       refreshFunding={mockRefreshFunding}
+                                                                       approveFunding={mockApproveFunding}
+                                                                       changePageState={mockChangePageState}
+                                                                       latestRefreshDateResults={""}
+                                                                       specifications={mockSpecifications}
+                                                                       fundingStreams={[] as FundingStream[]}
+                                                                       selectedFundingPeriods={[] as FundingPeriod[]}
+                                                                       specificationSelected={true}
+                                                                       publishedProviderResults={mockPublishedProviderResults}
+                                                                       filterTypes={mockFacets}
+                                                                       jobId={""}
+                                                                       refreshFundingJobId={""}
+                                                                       approveFundingJobId={""}
+                                                                       pageState={""}
+                                                                       effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
+                                                                       releaseFunding={mockReleaseFunding}
+                                                                       releaseFundingJobId={""}
+                                                                       latestJob={mockJobMessage}/>;
+
+    const wrapper = shallow(mockViewFundingPageWithJobNotCompleted);
+
+    let actual = wrapper.find("LoadingStatus");
+
+    expect(actual.length).toBe(1);
+    expect(actual.props().hidden).toBe(false);
+});
+
 
 it('will show warning status given a valid specification, page state not IDLE and no jobs in progress', () => {
     const wrapper = shallow(mockViewFundingPageWithSpecification);
@@ -218,7 +347,7 @@ it('will show last refresh date given latestRefreshDateResults information is av
                                                                   effectiveSpecificationPermission={{} as EffectiveSpecificationPermission}
                                                                   releaseFunding={mockReleaseFunding}
                                                                   releaseFundingJobId={""}
-                                                                  jobCurrentlyInProgress={""}/>;
+                                                                  latestJob={mockJobMessage}/>;
 
     const wrapper = shallow(mockViewFundingPage);
 
