@@ -63,7 +63,7 @@ const mockPublishedProviderResults = {
         totalProvidersToPublish: 123,
     };
 const mockSpecifications = {
-        name: "",
+        name: "TEST SPECIFICATION NAME",
         id: "ABCD",
         templateIds: {
             PSG: ""
@@ -71,16 +71,18 @@ const mockSpecifications = {
         publishedResultsRefreshedAt: null,
         providerVersionId: "",
         lastCalculationUpdatedAt: "",
-        fundingStreams: [],
+        fundingStreams:[
+                { id:"",
+                 name:"TEST SELECTED SPECIFICATION FUNDING STREAM NAME"
+                }],
         fundingPeriod: {
             id: "",
-            name: ""
+            name: "TEST SELECTED SPECIFICATION FUNDING PERIOD NAME"
         },
         isSelectedForFunding: false,
         description: "",
         approvalStatus: ""
     };
-
 const mockJobMessage =
     {
         completionStatus: null,
@@ -99,7 +101,6 @@ const mockJobMessage =
         statusDateTime: '',
         supersededByJobId: 0
     };
-
 const mockViewFundingPageWithSpecification = <ViewFundingPage getSelectedSpecifications={mockGetSelectedSpecification}
                                                             getAllFundingStreams={mockGetAllFundingStreams}
                                                             getSelectedFundingPeriods={mockGetSelectedFundingPeriods}
@@ -292,7 +293,6 @@ it('will show loading status given latest jobs running status is not empty and n
     expect(actual.props().hidden).toBe(false);
 });
 
-
 it('will show warning status given a valid specification, page state not IDLE and no jobs in progress', () => {
     const wrapper = shallow(mockViewFundingPageWithSpecification);
 
@@ -388,5 +388,31 @@ it('will show status filter with correct options', () => {
     expect(actual.find('option').at(0).text()).toBe("Show all");
     expect(actual.find('option').at(1).text()).toBe(mockFacetStatusTypeValues[0].name);
     expect(actual.find('option').at(2).text()).toBe(mockFacetStatusTypeValues[1].name);
+});
+
+it('will show specification name in page header', () => {
+    const wrapper = shallow(mockViewFundingPageWithSpecification);
+
+    let actual = wrapper.find("h1");
+
+    expect(actual.text()).toBe(mockSpecifications.name);
+});
+
+it('will show funding period name in page header', () => {
+    const wrapper = shallow(mockViewFundingPageWithSpecification);
+
+    let actual = wrapper.find("h2");
+
+    expect(actual.length).toBe(2);
+    expect(actual.at(0).text()).toBe(mockSpecifications.fundingPeriod.name);
+});
+
+it('will show funding stream name in page header', () => {
+    const wrapper = shallow(mockViewFundingPageWithSpecification);
+
+    let actual = wrapper.find("h2");
+
+    expect(actual.length).toBe(2);
+    expect(actual.at(1).text()).toBe(mockSpecifications.fundingStreams[0].name);
 });
 

@@ -299,6 +299,20 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 released at a time.
                             </strong>
                         </div>
+
+                        <div className="govuk-grid-row govuk-!-margin-bottom-5">
+                            <div className="govuk-grid-column-two-thirds">
+                                <span className="govuk-caption-xl">Specification</span>
+                                <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{this.props.specifications.name}</h1>
+                                <span className="govuk-caption-m">Funding period</span>
+                                <h2 className="govuk-heading-m">{this.props.specifications.fundingPeriod.name}</h2>
+                                <span className="govuk-caption-m">Funding stream</span>
+                                <h2 className="govuk-heading-m">{
+                                    this.props.specifications.fundingStreams.length > 0?
+                                    this.props.specifications.fundingStreams[0].name : ""}</h2>
+                            </div>
+                        </div>
+
                         <div className="govuk-grid-row viewfunding-filter">
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="ProviderType">Provider Type</label>
