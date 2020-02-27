@@ -71,6 +71,7 @@
     ]
   },
   "devDependencies": {
+    "jest-junit": "^10.0.0",
     "redux-devtools": "^3.5.0"
   }
 }
