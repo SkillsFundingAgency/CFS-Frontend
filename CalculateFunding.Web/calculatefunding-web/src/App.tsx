@@ -12,6 +12,7 @@ import {ViewCalculationResults} from "./pages/ViewCalculationResults";
 import {ViewSpecification} from "./pages/ViewSpecification";
 import {SelectSpecification} from "./pages/SelectSpecification";
 import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
+import {SpecificationsList} from "./pages/SpecificationsList";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -22,6 +23,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/ViewFunding" component={ViewFundingContainer} />
        <Route path="/results" component={ViewResults} />
        <Route path="/SelectSpecification" component={SelectSpecification} />
+       <Route path="/SpecificationsList" component={SpecificationsList} />
        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />

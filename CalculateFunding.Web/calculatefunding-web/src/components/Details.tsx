@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Details(props: {title:string, body:string}){
+export function Details(props: { title: string, body: string }) {
     return <details className="govuk-details" data-module="govuk-details">
         <summary className="govuk-details__summary">
     <span className="govuk-details__summary-text">

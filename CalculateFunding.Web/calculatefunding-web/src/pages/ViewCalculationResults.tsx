@@ -133,11 +133,11 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         },
         {
             name: "Select specification",
-            url: `/specs`
+            url: `/app/SelectSpecification`
         },
         {
             name: specificationResults.specification.name,
-            url: `/app/viewspecification/${specificationResults.specification.id}`
+            url: `/app/ViewSpecification/${specificationResults.specification.id}`
         },
         {
             name: calculationSummary.calculation.name,

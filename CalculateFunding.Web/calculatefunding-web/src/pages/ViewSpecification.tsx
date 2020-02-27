@@ -56,11 +56,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     let breadcrumbs: IBreadcrumbs[] = [
         {
             name: "Calculate funding",
-            url: "/"
+            url: "/app"
         },
         {
             name: "View specification",
-            url: "/specs"
+            url: "/app/SpecificationsList"
         },
         {
             name: viewSpecification.specification.name,
@@ -150,7 +150,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <Details title={`What is ${viewSpecification.specification.name}`} body={viewSpecification.specification.description}/>
-          What is {viewSpecification.specification.name}?
                     <Tabs initialTab="additional-calculations">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>

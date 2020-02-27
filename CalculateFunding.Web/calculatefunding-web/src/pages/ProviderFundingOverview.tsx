@@ -36,7 +36,7 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
         },
         {
             name: "Select specification",
-            url: "/app/ViewFunding"
+            url: "/app/SelectSpecification"
         },
         {
             name: "Funding approval results",

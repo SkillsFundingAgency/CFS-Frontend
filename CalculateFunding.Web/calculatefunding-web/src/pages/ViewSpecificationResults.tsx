@@ -45,15 +45,15 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     let breadcrumbs: IBreadcrumbs[] = [
         {
             name: "Calculate funding",
-            url: "/"
+            url: "/app"
         },
         {
             name: "View results",
-            url: "/results"
+            url: "/app/results"
         },
         {
             name: "Select specification",
-            url: ""
+            url: "/app/SelectSpecification"
         },
         {
             name: specificationResults.specification.name,

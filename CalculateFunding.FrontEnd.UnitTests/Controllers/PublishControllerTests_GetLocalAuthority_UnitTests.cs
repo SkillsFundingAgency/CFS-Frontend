@@ -7,7 +7,6 @@ using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
-using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

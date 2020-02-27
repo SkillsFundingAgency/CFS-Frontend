@@ -14,8 +14,8 @@ export class ViewResults extends Component {
                 name: "Calculate Funding"
             },
             {
-                url: null,
-                name: "View results"
+                name: "View results",
+                url: null
             }];
 
         return <div>
@@ -37,7 +37,7 @@ export class ViewResults extends Component {
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/results/viewcalculationresults" className="govuk-link">View specification results</a>
+                                            <a href="/app/SelectSpecification" className="govuk-link">View specification results</a>
                                         </div>
                                         <p className="govuk-body">Select a specification to view the calculation and QA results.</p>
                                     </div>

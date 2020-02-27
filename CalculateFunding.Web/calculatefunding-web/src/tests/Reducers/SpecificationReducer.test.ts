@@ -1,460 +1,57 @@
-import {reduceViewSpecificationState} from "../../reducers/viewSpecificationReducer";
-import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActions";
-import {ViewSpecificationState} from "../../states/ViewSpecificationState";
+import {SpecificationState} from "../../states/SpecificationState";
+import {reduceSpecificationState} from "../../reducers/specificationReducer";
+import {SpecificationActionTypes} from "../../actions/SpecificationActions";
+import {Specification} from "../../types/viewFundingTypes";
+import {SpecificationListResults} from "../../types/SpecificationListResults";
 
-const initialState: ViewSpecificationState = {
-    additionalCalculations: {
-        calculations: [],
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        pagerState: {
-            currentPage: 0,
-            displayNumberOfPages: 0,
-            lastPage: 0,
-            nextPage: 0,
-            pages: [],
-            previousPage: 0
-        },
-        startItemNumber: 0,
-        totalErrorResults: 0,
-        totalResults: 0
-    },
-    specification: {
-        name: "",
-        approvalStatus: "",
-        description: "",
-        fundingPeriod: {
-            id: "",
-            name: ""
-        },
-        fundingStreams: [{
-            name: "",
-            id: ""
-        }],
-        id: "",
-        isSelectedForFunding: false,
-        providerVersionId: ""
-    },
-    datasets: {
-        content: [],
-        statusCode: 0
-    },
-    releaseTimetable: {
-        navisionDate: {
-            day: "",
-            month: "",
-            year: "",
-            time: ""
-        },
-        releaseDate: {
-            day: "",
-            month: "",
-            year: "",
-            time: ""
-        }
+const initialState: SpecificationState = {
+    specificationListResults : {
+        totalPages: 0,
+        totalItems: 0,
+        totalErrorItems: 0,
+        pageSize:0,
+        pageNumber:0,
+        items:[],
+        facets:[]
     }
 };
 
-describe('ViewSpecificationReducer ', () => {
-    it('should handle GET_ADDITIONALCALCULATIONS', () => {
+describe('SpecificationReducer ', () => {
+    it('should handle GET_ALLSPECIFICATIONS', () => {
         const expectedState = {
-            "additionalCalculations": {
-                "calculations": [],
-                "currentPage": 1,
-                "endItemNumber": 1,
-                "facets": [],
-                "pagerState": {
-                    "currentPage": 1,
-                    "displayNumberOfPages": 2,
-                    "lastPage": 2,
-                    "nextPage": 2,
-                    "pages": [
-                        2,
-                    ],
-                    "previousPage": 0,
-                },
-                "startItemNumber": 1,
-                "totalErrorResults": 0,
-                "totalResults": 1,
-            },
-            "datasets": {
-                "content": [],
-                "statusCode": 0,
-            },
-            "releaseTimetable": {
-                "navisionDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-                "releaseDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-            },
-            "specification": {
-                "approvalStatus": "",
-                "description": "",
-                "fundingPeriod": {
-                    "id": "",
-                    "name": "",
-                },
-                "fundingStreams": [
-                    {
-                        "id": "",
-                        "name": "",
-                    },
-                ],
-                "id": "",
-                "isSelectedForFunding": false,
-                "name": "",
-                "providerVersionId": "",
-            },
-        };
-        expect(
-            reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
-                payload: {
-                    totalResults: 1,
-                    endItemNumber: 1,
-                    startItemNumber: 1,
-                    pagerState: {
-                        previousPage: 0,
-                        pages: [2],
-                        nextPage: 2,
-                        displayNumberOfPages: 2,
-                        lastPage: 2,
-                        currentPage: 1
-                    },
-                    totalErrorResults: 0,
-                    facets: [],
-                    currentPage: 1,
-                    calculations: [],
-                }
-            })
-        ).toEqual(expectedState);
-
-    });
-
-    it('should handle GET_SPECIFICATION', () => {
-        const expectedState = {
-            "additionalCalculations": {
-                "calculations": [],
-                "currentPage": 0,
-                "endItemNumber": 0,
-                "facets": [],
-                "pagerState": {
-                    "currentPage": 0,
-                    "displayNumberOfPages": 0,
-                    "lastPage": 0,
-                    "nextPage": 0,
-                    "pages": [],
-                    "previousPage": 0,
-                },
-                "startItemNumber": 0,
-                "totalErrorResults": 0,
-                "totalResults": 0,
-            },
-            "datasets": {
-                "content": [],
-                "statusCode": 0,
-            },
-            "releaseTimetable": {
-                "navisionDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-                "releaseDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-            },
-            "specification": {
-                "approvalStatus": "Draft",
-                "description": "TEST-SPEC-DESCRIPTION",
-                "fundingPeriod": {
-                    "id": "TEST-FUNDING-ID",
-                    "name": "TEST-FUNDING-PERIOD",
-                },
-                "fundingStreams": [],
-                "id": "TEST-SPEC_ID",
-                "isSelectedForFunding": true,
-                "name": "TEST-SPEC-NAME",
-                "providerVersionId": "PROVIDER-VERSION-ID",
-            },
-        };
-        expect(
-            reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.GET_SPECIFICATION,
-                payload: {
-                    fundingStreams: [],
-                    fundingPeriod: {
-                        name: "TEST-FUNDING-PERIOD",
-                        id: "TEST-FUNDING-ID"
-                    },
-                    name: "TEST-SPEC-NAME",
-                    providerVersionId: "PROVIDER-VERSION-ID",
-                    id: "TEST-SPEC_ID",
-                    approvalStatus: "Draft",
-                    isSelectedForFunding: true,
-                    description: "TEST-SPEC-DESCRIPTION"
-                }
-            })
-        ).toEqual(expectedState);
-    });
-
-    it('should handle GET_DATASETS', () => {
-        const expectedState = {
-            "additionalCalculations": {
-                "calculations": [],
-                "currentPage": 0,
-                "endItemNumber": 0,
-                "facets": [],
-                "pagerState": {
-                    "currentPage": 0,
-                    "displayNumberOfPages": 0,
-                    "lastPage": 0,
-                    "nextPage": 0,
-                    "pages": [],
-                    "previousPage": 0,
-                },
-                "startItemNumber": 0,
-                "totalErrorResults": 0,
-                "totalResults": 0,
-            },
-            "datasets": {
-                "content": [
-                    {
-                        "definition": {
-                            "description": "Test definition description",
-                            "id": "Test definition id",
-                            "name": "Test definition name",
-                        },
-                        "id": "Test dataset",
-                        "isProviderData": false,
-                        "name": "Test name",
-                        "relationshipDescription": "Test relationship description",
-                    },
-                ],
-                "statusCode": 200,
-            },
-            "releaseTimetable": {
-                "navisionDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-                "releaseDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-            },
-            "specification": {
-                "approvalStatus": "",
-                "description": "",
-                "fundingPeriod": {
-                    "id": "",
-                    "name": "",
-                },
-                "fundingStreams": [
-                    {
-                        "id": "",
-                        "name": "",
-                    },
-                ],
-                "id": "",
-                "isSelectedForFunding": false,
-                "name": "",
-                "providerVersionId": "",
-            },
-        };
-
-        expect(
-            reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.GET_DATASETS,
-                payload: {
-                    statusCode: 200, content: [{
-                        id: "Test dataset",
-                        definition: {
-                            name: "Test definition name",
-                            description: "Test definition description",
-                            id: "Test definition id"
-                        },
-                        relationshipDescription: "Test relationship description",
-                        name: "Test name",
-                        isProviderData: false,
-                    }]
-                }
-            })
-        ).toEqual(expectedState);
-    });
-
-    it('should handle GET_RELEASETIMETABLE', () => {
-        const expectedState = {
-                "additionalCalculations": {
-                    "calculations": [],
-                    "currentPage": 0,
-                    "endItemNumber": 0,
-                    "facets": [],
-                    "pagerState": {
-                        "currentPage": 0,
-                        "displayNumberOfPages": 0,
-                        "lastPage": 0,
-                        "nextPage": 0,
-                        "pages": [],
-                        "previousPage": 0,
-                    },
-                    "startItemNumber": 0,
-                    "totalErrorResults": 0,
-                    "totalResults": 0,
-                },
-                "datasets": {
-                    "content": [],
-                    "statusCode": 0,
-                },
-                "releaseTimetable": {
-                    "navisionDate": {
-                        "day": "26",
-                        "month": "10",
-                        "time": "01:20",
-                        "year": "1985",
-                    },
-                    "releaseDate": {
-                        "day": "21",
-                        "month": "1",
-                        "time": "03:56",
-                        "year": "2015",
-                    },
-                },
-                "specification": {
-                    "approvalStatus": "",
-                    "description": "",
-                    "fundingPeriod": {
-                        "id": "",
-                        "name": "",
-                    },
-                    "fundingStreams": [
-                        {
-                            "id": "",
-                            "name": "",
-                        },
-                    ],
-                    "id": "",
-                    "isSelectedForFunding": false,
-                    "name": "",
-                    "providerVersionId": "",
-                },
+            specificationListResults: {
+                totalPages: 10,
+                totalItems: 500,
+                totalErrorItems: 0,
+                pageSize:50,
+                pageNumber:1,
+                items: [{status: "Draft", name: "Item1", lastUpdatedDate: new Date(), id:"",
+                    fundingStreamNames:[],
+                    fundingStreamIds:[],
+                    fundingPeriodName:"",
+                    fundingPeriodId:"",
+                    description:""}, {}],
+                facets:[],
             }
-        ;
-
-        expect(
-            reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.GET_RELEASETIMETABLE,
-                payload: {
-                    releaseDate: {
-                        time: "03:56",
-                        day: "21",
-                        month: "1",
-                        year: "2015"
-                    },
-                    navisionDate: {
-                        time: "01:20",
-                        day: "26",
-                        month: "10",
-                        year: "1985"
-                    }
-                }
-            })
-        ).toEqual(expectedState);
-    });
-
-    it('should handle CONFIRM_TIMETABLECHANGES', () => {
-        const expectedState =   {
-            "additionalCalculations":  {
-                "calculations":  [],
-                "currentPage": 0,
-                "endItemNumber": 0,
-                "facets":  [],
-                "pagerState":  {
-                    "currentPage": 0,
-                    "displayNumberOfPages": 0,
-                    "lastPage": 0,
-                    "nextPage": 0,
-                    "pages":  [],
-                    "previousPage": 0,
-                },
-                "startItemNumber": 0,
-                "totalErrorResults": 0,
-                "totalResults": 0,
-            },
-            "datasets":  {
-                "content":  [],
-                "statusCode": 0,
-            },
-            "releaseTimetable":  {
-                "navisionDate":  {
-                    "day": "26",
-                    "month": "10",
-                    "time": "01:20",
-                    "year": "1985",
-                },
-                "releaseDate":  {
-                    "day": "21",
-                    "month": "1",
-                    "time": "03:56",
-                    "year": "2015",
-                },
-            },
-            "specification":  {
-                "approvalStatus": "",
-                "description": "",
-                "fundingPeriod":  {
-                    "id": "",
-                    "name": "",
-                },
-                "fundingStreams":  [
-                    {
-                        "id": "",
-                        "name": "",
-                    },
-                ],
-                "id": "",
-                "isSelectedForFunding": false,
-                "name": "",
-                "providerVersionId": "",
-            },
         };
-
-        expect(
-            reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES,
+        expect(reduceSpecificationState(initialState, {
+                type: SpecificationActionTypes.GET_ALLSPECIFICATIONS,
                 payload: {
-                    releaseDate: {
-                        time: "03:56",
-                        day: "21",
-                        month: "1",
-                        year: "2015"
-                    },
-                    navisionDate: {
-                        time: "01:20",
-                        day: "26",
-                        month: "10",
-                        year: "1985"
-                    }
-                }
-            })
-        ).toEqual(expectedState);
+                    totalPages: 10,
+                    totalItems: 500,
+                    totalErrorItems: 0,
+                    pageSize:50,
+                    pageNumber:1,
+                    items: [{status: "Draft", name: "Item1", lastUpdatedDate: new Date(), id:"",
+                    fundingStreamNames:[],
+                    fundingStreamIds:[],
+                    fundingPeriodName:"",
+                    fundingPeriodId:"",
+                    description:""}, {}],
+                    facets:[],
+                } as SpecificationListResults
+            })).toEqual(expectedState);
+
     });
 });
 

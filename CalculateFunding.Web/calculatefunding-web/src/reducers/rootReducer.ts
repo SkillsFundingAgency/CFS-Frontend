@@ -15,6 +15,8 @@ import {SelectSpecificationState} from "../states/SelectSpecificationState";
 import {reduceCalculationResultsState} from "./viewCalculationResultsReducer";
 import {ProviderState} from "../states/ProviderState";
 import {reduceProvider} from "./providerReducer";
+import {reduceSpecificationState} from "./specificationReducer";
+import {SpecificationState} from "../states/SpecificationState";
 
 export interface IStoreState {
     viewFundingState: IViewFundingState,
@@ -24,7 +26,8 @@ export interface IStoreState {
     viewSpecification: ViewSpecificationState,
     viewCalculationResults: ViewCalculationState
     selectSpecification: SelectSpecificationState,
-    provider: ProviderState
+    provider: ProviderState,
+    specifications: SpecificationState
 }
 
 
@@ -37,7 +40,8 @@ export const rootReducer: Reducer<IStoreState> = combineReducers({
     viewSpecification: reduceViewSpecificationState,
     selectSpecification: reduceSelectSpecificationState,
     viewCalculationResults: reduceCalculationResultsState,
-    provider: reduceProvider
+    provider: reduceProvider,
+    specifications: reduceSpecificationState
 });
 
 export type AppState = ReturnType<typeof rootReducer>

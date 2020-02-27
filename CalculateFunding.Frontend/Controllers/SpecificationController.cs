@@ -291,5 +291,53 @@ namespace CalculateFunding.Frontend.Controllers
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
+
+        [Route("api/specs/get-all-specifications")]
+		[HttpGet]
+        public async Task<IActionResult> GetAllSpecifications([FromQuery]SpecificationSearchRequestViewModel viewModel)
+        {
+	        var searchFilterRequest = new SearchFilterRequest
+	        {
+		        Filters = new Dictionary<string, string[]>(),
+				ErrorToggle = false,
+				SearchMode = SearchMode.All,
+				FacetCount = 0,
+				PageSize = viewModel.PageSize,
+				Page = viewModel.Page,
+				IncludeFacets = true,
+				SearchFields = new List<string>(),
+				SearchTerm = ""
+	        };
+
+	        if (viewModel.Status?.Length > 0)
+            {
+                searchFilterRequest.Filters.Add("status", viewModel.Status.ToArray());
+
+            }
+
+            if (viewModel.FundingPeriods?.Length > 0)
+            {
+				searchFilterRequest.Filters.Add("fundingPeriodName", viewModel.FundingPeriods.ToArray());
+            }
+
+            if (viewModel.FundingStreams?.Length > 0)
+            {
+				searchFilterRequest.Filters.Add("fundingStreamNames", viewModel.FundingStreams.ToArray());
+            }
+
+            if (!string.IsNullOrEmpty(viewModel.SearchText))
+            {
+	            searchFilterRequest.SearchTerm = viewModel.SearchText;
+            }
+
+            PagedResult<SpecificationSearchResultItem> result = await _specificationsApiClient.FindSpecifications(searchFilterRequest);
+
+            if (result != null)
+            {
+				return new OkObjectResult(result);
+            }
+
+            return new BadRequestResult();
+        }
     }
 }

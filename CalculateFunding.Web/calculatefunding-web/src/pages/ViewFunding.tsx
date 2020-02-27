@@ -177,7 +177,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     render() {
         let breadcrumbs: IBreadcrumbs[] = [
             {
-                url: "/",
+                url: "/app",
                 name: "Calculate Funding"
             },
             {

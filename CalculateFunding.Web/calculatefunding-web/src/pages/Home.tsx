@@ -48,7 +48,7 @@ export class Home extends Component<IHomeProps, {}> {
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/specs" className="govuk-link">Specifications</a>
+                                            <a href="/app/SpecificationsList" className="govuk-link">Specifications</a>
                                         </div>
                                         <p className="govuk-body">Create and manage the specifications used to calculate funding.</p>
                                     </div>
