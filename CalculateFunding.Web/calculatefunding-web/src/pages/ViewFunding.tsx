@@ -14,6 +14,7 @@ import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationP
 import {PermissionStatus} from "../components/PermissionStatus";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobMessage} from "../types/jobMessage";
+import {AutoComplete} from "../components/AutoComplete";
 
 export interface IViewFundingProps {
     getLocalAuthorities: any;
@@ -115,9 +116,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.getLocalAuthorities(this.state.fundingStream, this.state.fundingPeriod);
     };
 
-    filterLocalAuthority = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        this.setState({localAuthority: event.target.value});
-        this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, event.target.value, this.state.status, 1, this.state.pageSize);
+    filterLocalAuthority = (selectedLocalAuthority: string) => {
+        this.setState({localAuthority: selectedLocalAuthority});
+        this.props.filterPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification, this.state.providerType, selectedLocalAuthority, this.state.status, 1, this.state.pageSize);
     };
 
     filterStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -327,16 +328,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 </select>
                             </div>
                             <div className="govuk-grid-column-one-quarter">
-                                <label className="govuk-label" htmlFor="LocalAuthority">Local Authority</label>
-                                <select className="govuk-select" name="LocalAuthority" id="LocalAuthority"
-                                        onChange={(e) => {
-                                            this.filterLocalAuthority(e)
-                                        }}>
-                                    <option value="">Show all</option>
-                                    {this.props.filterTypes[1].facetValues.map(facet =>
-                                        <option key={facet.name}>{facet.name}</option>
-                                    )}
-                                </select>
+                                <label className="govuk-label">Local Authority</label>
+                                <AutoComplete suggestions={this.props.filterTypes[1].facetValues.map(x => x.name)} callback={this.filterLocalAuthority}/>
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="Status">Status</label>

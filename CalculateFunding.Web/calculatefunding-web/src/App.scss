@@ -310,3 +310,19 @@
   border-radius: 50%;
 }
 .center-align { text-align: center;}
+
+  ul.autocomplete{
+    border-bottom: 2px solid $govuk-input-border-colour;
+    border-right: 2px solid $govuk-input-border-colour;
+    border-left: 2px solid $govuk-input-border-colour;
+    border-top: none;
+    position: absolute;
+    width: 224px;
+    background-color: $govuk-body-background-colour;
+    li{
+      padding-right: 5px;
+      padding-left: 5px;
+      list-style: none;
+        cursor: pointer;
+    }
+  }

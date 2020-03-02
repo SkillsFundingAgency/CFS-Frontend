@@ -370,16 +370,6 @@ it('will show provider type filter with correct options', () => {
     expect(actual.find('option').at(2).text()).toBe(mockFacetProviderTypeValues[1].name);
 });
 
-it('will show local authority filter with correct options', () => {
-    const wrapper = shallow(mockViewFundingPageWithSpecification);
-
-    let actual = wrapper.find("#LocalAuthority");
-
-    expect(actual.find('option').at(0).text()).toBe("Show all");
-    expect(actual.find('option').at(1).text()).toBe(mockFacetLocalAuthorityValues[0].name);
-    expect(actual.find('option').at(2).text()).toBe(mockFacetLocalAuthorityValues[1].name);
-});
-
 it('will show status filter with correct options', () => {
     const wrapper = shallow(mockViewFundingPageWithSpecification);
 

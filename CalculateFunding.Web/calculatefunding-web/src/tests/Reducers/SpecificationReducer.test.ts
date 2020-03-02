@@ -18,6 +18,8 @@ const initialState: SpecificationState = {
 
 describe('SpecificationReducer ', () => {
     it('should handle GET_ALLSPECIFICATIONS', () => {
+        const testDate = new Date();
+
         const expectedState = {
             specificationListResults: {
                 totalPages: 10,
@@ -25,7 +27,7 @@ describe('SpecificationReducer ', () => {
                 totalErrorItems: 0,
                 pageSize:50,
                 pageNumber:1,
-                items: [{status: "Draft", name: "Item1", lastUpdatedDate: new Date(), id:"",
+                items: [{status: "Draft", name: "Item1", lastUpdatedDate: testDate, id:"",
                     fundingStreamNames:[],
                     fundingStreamIds:[],
                     fundingPeriodName:"",
@@ -42,7 +44,7 @@ describe('SpecificationReducer ', () => {
                     totalErrorItems: 0,
                     pageSize:50,
                     pageNumber:1,
-                    items: [{status: "Draft", name: "Item1", lastUpdatedDate: new Date(), id:"",
+                    items: [{status: "Draft", name: "Item1", lastUpdatedDate: testDate, id:"",
                     fundingStreamNames:[],
                     fundingStreamIds:[],
                     fundingPeriodName:"",
