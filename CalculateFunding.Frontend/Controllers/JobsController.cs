@@ -33,7 +33,7 @@ namespace CalculateFunding.Frontend.Controllers
             IActionResult errorResult = latestJobTask.IsSuccessOrReturnFailureResult("JobSummary");
             if (errorResult != null)
             {
-                return errorResult;
+                return BadRequest(errorResult);
             }
 
             JobSummaryViewModel jobSummaryViewModel = _mapper.Map<JobSummaryViewModel>(latestJobTask.Content);

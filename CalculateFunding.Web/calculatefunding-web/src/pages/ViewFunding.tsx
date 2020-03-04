@@ -15,6 +15,7 @@ import {PermissionStatus} from "../components/PermissionStatus";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobMessage} from "../types/jobMessage";
 import {AutoComplete} from "../components/AutoComplete";
+import {ErrorSummary} from "../components/ErrorSummary";
 
 export interface IViewFundingProps {
     getLocalAuthorities: any;
@@ -84,7 +85,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         localAuthority: "",
         status: "",
         pageSize: 50,
-        jobId: ""
+        jobId: "",
+        jobStatus:"",
+        jobMessage: "",
+        jobSuggestion: ""
     };
 
     selectedCount = () => {
@@ -161,9 +165,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.releaseFunding(this.props.specifications.id);
     };
 
-    refreshProviderResults = () => {
+    refreshProviderResults = (status:string, message:string, suggestion:string) => {
         this.props.getPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification);
         this.props.changePageState("IDLE");
+        this.setState({jobStatus: status, jobMessage:message, jobSuggestion: suggestion})
     };
 
     movePage = (pageNumber: string) => {
@@ -182,7 +187,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 name: "Calculate Funding"
             },
             {
-                url: "/approvals",
+                url: "/app/ViewFunding",
                 name: "Funding Approvals"
             },
             {
@@ -313,7 +318,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     this.props.specifications.fundingStreams[0].name : ""}</h2>
                             </div>
                         </div>
-
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <ErrorSummary title={this.state.jobMessage} error={this.state.jobStatus} suggestion={this.state.jobSuggestion}/>
+                            </div>
+                        </div>
                         <div className="govuk-grid-row viewfunding-filter">
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="ProviderType">Provider Type</label>
@@ -380,6 +389,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
                         <div id="govuk-grid-row">
                             <div className="govuk-grid-column-full">
+
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
@@ -525,8 +535,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                         </div>
                     </div>
-                    <main className="govuk-width-container"
-                          hidden={this.props.pageState !== "PUBLISH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
+                    <main className="govuk-width-container" hidden={this.props.pageState !== "PUBLISH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <BackButton name="Back" callback={this.dismissLoader}/>

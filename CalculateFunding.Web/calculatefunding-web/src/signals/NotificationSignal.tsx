@@ -24,7 +24,12 @@ const callback = props.callback;
                     hubConnect.on('NotificationEvent', (message: JobMessage) => {
                         if (message.jobType === props.jobType && message.runningStatus === "Completed" && message.specificationId === props.jobId) {
                             hubConnect.stop();
-                            callback();
+                            callback("Completed", "", "");
+                        }
+
+                        if (message.jobType === props.jobType && message.completionStatus === "Failed" && message.specificationId === props.jobId) {
+                            hubConnect.stop();
+                            callback("Failed", "Your job request has failed", "Please try again");
                         }
                     });
 
@@ -33,8 +38,8 @@ const callback = props.callback;
                     }
 
                 } catch (err) {
-
-                    alert(err);
+                    hubConnect.stop();
+                    callback("Failed", "Your job request has failed", "Please try again");
                 }
                 setHubConnection(hubConnect);
             };
