@@ -9,7 +9,9 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
@@ -113,7 +115,8 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result = await _publishingApiClient.ApproveFundingForSpecification(specificationId);
+            ValidatedApiResponse<JobCreationResponse> result =
+                await _publishingApiClient.ApproveFundingForSpecification(specificationId);
 
             if (result.Content.JobId != null)
             {
@@ -135,7 +138,8 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result = await _publishingApiClient.PublishFundingForSpecification(specificationId);
+            ValidatedApiResponse<JobCreationResponse> result =
+                await _publishingApiClient.PublishFundingForSpecification(specificationId);
 
             if (result.Content.JobId != null)
             {
@@ -149,7 +153,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProviderStatusCounts(string specificationId)
         {
-            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> result = await _publishingApiClient.GetProviderStatusCounts(specificationId);
+            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> result =
+                await _publishingApiClient.GetProviderStatusCounts(specificationId);
 
             if (result != null)
             {
@@ -163,11 +168,13 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPublishedProviderTransactions(string specificationId, string providerId)
         {
-            ApiResponse<IEnumerable<PublishedProviderTransaction>> result = await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
+            ApiResponse<IEnumerable<PublishedProviderTransaction>> result =
+                await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
 
             if (result != null)
             {
-                ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel { Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>() };
+                ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
+                { Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>() };
 
                 foreach (PublishedProviderTransaction item in result.Content)
                 {
@@ -180,7 +187,9 @@ namespace CalculateFunding.Frontend.Controllers
                     });
                 }
 
-                output.FundingTotal = result.Content.OrderByDescending(x => x.Date).First() != null ? $"£{result.Content.OrderByDescending(x => x.Date).First().TotalFunding.Value:N0}" : "";
+                output.FundingTotal = result.Content.OrderByDescending(x => x.Date).First() != null
+                    ? $"£{result.Content.OrderByDescending(x => x.Date).First().TotalFunding.Value:N0}"
+                    : "";
                 output.LatestStatus = result.Content.OrderByDescending(x => x.Date).FirstOrDefault()?.Status.ToString();
                 return new OkObjectResult(output);
             }
@@ -190,7 +199,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/provider/getlocalauthorities/{fundingStreamId}/{fundingPeriodId}/")]
-        public async Task<IActionResult> GetLocalAuthorities(string fundingStreamId, string fundingPeriodId, [FromQuery]string searchText = "")
+        public async Task<IActionResult> GetLocalAuthorities(string fundingStreamId, string fundingPeriodId,
+            [FromQuery] string searchText = "")
         {
 
             var result =
@@ -199,13 +209,13 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
-	            return new OkObjectResult(result.Content);
+                return new OkObjectResult(result.Content);
             }
 
             if (result.StatusCode == HttpStatusCode.BadRequest)
             {
 
-             
+
                 return new BadRequestResult();
             }
 
@@ -215,7 +225,8 @@ namespace CalculateFunding.Frontend.Controllers
             };
         }
 
-        private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
+        private async Task<IActionResult> ChooseRefresh(string specificationId,
+            SpecificationActionTypes specificationActionType)
         {
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
@@ -225,7 +236,8 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result = await _publishingApiClient.RefreshFundingForSpecification(specificationId);
+            ValidatedApiResponse<JobCreationResponse> result =
+                await _publishingApiClient.RefreshFundingForSpecification(specificationId);
 
             if (result.Content.JobId != null)
             {
@@ -234,5 +246,67 @@ namespace CalculateFunding.Frontend.Controllers
 
             return BadRequest(-1);
         }
+
+        [HttpGet]
+        [Route("api/provider/{fundingStreamId}/{fundingPeriodId}/{providerId}/profileTotals")]
+        public async Task<IActionResult> GetAllReleasedProfileTotals(
+            string fundingStreamId,
+            string fundingPeriodId,
+            string providerId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.ArgumentNotNull(providerId, nameof(providerId));
+
+            ApiResponse<IDictionary<int, ProfilingVersion>> apiResponse =
+                await _publishingApiClient.GetAllReleasedProfileTotals(
+                    fundingStreamId,
+                    fundingPeriodId,
+                    providerId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                if (apiResponse.Content != null && apiResponse.Content.Any())
+                {
+                    return Ok(MapToProfilingViewModel(apiResponse.Content));
+                }
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(apiResponse.Content);
+            }
+
+            return new InternalServerErrorResult(
+                "There was an error retrieving latest profile totals.");
+        }
+
+        private static ProfilingViewModel MapToProfilingViewModel(
+            IDictionary<int, ProfilingVersion> profilingVersions)
+        {
+            IReadOnlyCollection<KeyValuePair<int, ProfilingVersion>> orderedProfilingVersionByLatest =
+                profilingVersions.OrderByDescending(p => p.Key).ToList();
+
+            decimal previousAllocation = CalculatePreviousAllocation(orderedProfilingVersionByLatest);
+
+            List<ProfilingInstallment> profilingInstallments = orderedProfilingVersionByLatest.First().Value
+                .ProfileTotals
+                .Select(profilingTotal =>
+                    new ProfilingInstallment(
+                        profilingTotal.Year,
+                        profilingTotal.TypeValue,
+                        profilingTotal.Occurrence,
+                        profilingTotal.Value))
+                .ToList();
+
+            return new ProfilingViewModel(profilingInstallments, previousAllocation);
+        }
+
+        private static decimal CalculatePreviousAllocation(
+            IReadOnlyCollection<KeyValuePair<int, ProfilingVersion>> orderedProfilingVersionByLatestVersion)
+            => orderedProfilingVersionByLatestVersion.Count > 1
+                ? orderedProfilingVersionByLatestVersion.ToList()[1].Value.ProfileTotals.Sum(
+                    profileTotal => profileTotal.Value)
+                : 0;
     }
 }

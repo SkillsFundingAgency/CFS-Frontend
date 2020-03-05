@@ -1,18 +1,18 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import {RouteComponentProps} from "react-router";
 import {Footer} from "../components/Footer";
 import {Header} from "../components/Header";
 import {Banner} from "../components/Banner";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {useDispatch, useSelector} from "react-redux";
-import {getProviderByIdAndVersion, getPublishedProviderTransactions} from "../actions/ProviderActions";
+import {getProfiling, getProviderByIdAndVersion, getPublishedProviderTransactions} from "../actions/ProviderActions";
 import {getSpecification} from "../actions/ViewSpecificationsActions";
 import {AppState} from "../states/AppState";
 import {ProviderState} from "../states/ProviderState";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {Tabs} from "../components/Tabs";
-import Pagination from "../components/Pagination";
 import {useEffectOnce} from "../hooks/useEffectOnce";
+import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string
@@ -59,6 +59,10 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
     let provider: ProviderState = useSelector((state: AppState) => state.provider);
     let specification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
 
+    useEffect(() => {
+        dispatch(getProfiling(specification.specification.fundingStreams[0].id, specification.specification.fundingPeriod.id, match.params.providerId));
+    }, [specification.specification.fundingPeriod.id, specification.specification.fundingStreams[0].id]);
+
     return (
         <div>
             <Header/>
@@ -100,6 +104,7 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
                         <Tabs initialTab="funding-stream-history">
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="funding-stream-history">Funding stream history</Tabs.Tab>
+                                <Tabs.Tab label="profiling">Profiling</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="funding-stream-history">
                                 <section className="govuk-tabs__panel" id="funding-stream-history">
@@ -135,7 +140,52 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
                                     </table>
                                 </section>
                             </Tabs.Panel>
+                            <Tabs.Panel label="profiling">
+                                <section className="govuk-tabs__panel" id="profiling">
+                                    <h2 className="govuk-heading-l">Profiling</h2>
 
+                                        <span className="govuk-caption-m">Total allocation for {specification.specification.fundingPeriod.name}</span>
+                                        <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
+                                            <FormattedNumber value={provider.profiling.totalAllocation} type={NumberType.FormattedMoney} />
+                                        </h3>
+                                        <span className="govuk-caption-m">Previous allocation value</span>
+                                        <h3 className="govuk-heading-m">
+                                            <FormattedNumber value={provider.profiling.previousAllocation} type={NumberType.FormattedMoney} />
+                                        </h3>
+                                        <table className="govuk-table">
+                                            <caption className="govuk-table__caption">Profiling installments</caption>
+                                            <thead className="govuk-table__head">
+                                            <tr className="govuk-table__row">
+                                                <th scope="col" className="govuk-table__header">Installment month</th>
+                                                <th scope="col" className="govuk-table__header">Installment number</th>
+                                                <th scope="col"
+                                                    className="govuk-table__header govuk-table__header--numeric">Value
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody className="govuk-table__body">
+                                            {provider.profiling.profilingInstallments.map(p =>
+                                                <tr className="govuk-table__row">
+                                                    <th scope="row" className="govuk-table__header">{p.installmentYear} {p.installmentMonth}
+                                                        &nbsp;{p.isPaid? <strong className="govuk-tag">Paid</strong>: ""}
+                                                    </th>
+                                                    <td className="govuk-table__cell">{p.installmentNumber}</td>
+                                                    <td className="govuk-table__cell govuk-table__cell--numeric">
+                                                        <FormattedNumber value={p.installmentValue} type={NumberType.FormattedMoney} />
+                                                    </td>
+                                                </tr>)}
+                                            <tr className="govuk-table__row">
+                                                <th scope="row" className="govuk-table__header">Total
+                                                </th>
+                                                <td className="govuk-table__cell"></td>
+                                                <td className="govuk-table__cell govuk-table__cell--numeric">
+                                                    <FormattedNumber value={provider.profiling.totalAllocation} type={NumberType.FormattedMoney} />
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                </section>
+                            </Tabs.Panel>
                         </Tabs>
                     </div>
                 </div>

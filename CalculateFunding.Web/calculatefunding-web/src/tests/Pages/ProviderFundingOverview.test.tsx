@@ -14,7 +14,6 @@ describe("Provider Funding Overview ", () => {
     const store: Store<IStoreState> = createStore(
         rootReducer
     );
-
     const history = createBrowserHistory();
     const location = createLocation("", "", "", {search:"", pathname:"", hash:"", key:"", state: ""});
     const match :match<ProviderFundingOverviewRoute>= {
@@ -28,17 +27,35 @@ describe("Provider Funding Overview ", () => {
         url: ""
     };
     store.dispatch = jest.fn();
+    const mockProvider = <Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider>;
 
     it("renders the page", async () => {
-
-        const wrapper = mount(<Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider>);
+        const wrapper = mount(mockProvider);
         expect(wrapper.find('.govuk-caption-xl').first().text()).toBe('Provider name');
     });
 
     it("dispatches to Redux the correct number of times",()=>{
-
-        mount(<Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider>);
-
-        expect(store.dispatch).toHaveBeenCalledTimes(6);
+        mount(mockProvider);
+        expect(store.dispatch).toHaveBeenCalledTimes(8);
     });
+
+    it('has profiling tab in correct order', () => {
+        const wrapper = mount(mockProvider);
+
+        let actual = wrapper.find("Tab");
+
+        expect(actual.length).toBe(2);
+        expect(actual.at(1).text()).toBe("Profiling");
+    });
+/*
+    it('shows total allocation value with correct formatting in profiling panel', () => {
+
+        const wrapper = mount(mockProvider);
+
+        let profilingPanel = wrapper.find("Panel").at(1);
+        let actual = profilingPanel.find("FormattedNumber");
+
+        expect(actual.length).toBe(2);
+    });
+*/
 });

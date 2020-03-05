@@ -44,7 +44,13 @@ const initialState: ProviderState = {
         status: -1,
         latestStatus: "",
         fundingTotal: ""
-    }
+    },
+    profiling:
+        {
+            totalAllocation: 0,
+            previousAllocation: 0,
+            profilingInstallments: []
+        }
 };
 
 export function reduceProvider(state: ProviderState = initialState, action: ProviderActions): ProviderState {
@@ -53,6 +59,8 @@ export function reduceProvider(state: ProviderState = initialState, action: Prov
             return {...state, providerSummary: action.payload};
         case ProviderActionTypes.GET_PUBLISHEDPROVIDERTRANSACTIONS:
             return {...state, providerTransactionSummary: action.payload};
+        case ProviderActionTypes.GET_PROFILING:
+            return {...state, profiling: action.payload};
         default:
             return state;
     }

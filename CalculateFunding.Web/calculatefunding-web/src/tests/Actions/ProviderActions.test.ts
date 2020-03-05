@@ -19,4 +19,11 @@ describe('Provider actions ', () => {
 
         expect(actions[1]).toEqual({type: ProviderActionTypes.GET_PUBLISHEDPROVIDERTRANSACTIONS});
     });
+
+    it('calls the provider profiling', () => {
+        store.dispatch({type: ProviderActionTypes.GET_PROFILING});
+        const actions = store.getActions();
+
+        expect(actions[2]).toEqual({type: ProviderActionTypes.GET_PROFILING});
+    });
 });
