@@ -1,6 +1,7 @@
 import axios from "axios";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
+import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 
 let baseURL = "/api/specs";
 
@@ -58,5 +59,19 @@ export async function getAllSpecificationsService(searchRequest:SpecificationSea
         headers: {
             'Content-Type': 'application/json'
         }
+    });
+}
+
+export async function changeFundingLineStateService(specificationId: string) {
+    const publishStatusEditModel: PublishStatusModel = {
+        publishStatus: PublishStatus.Approved
+    };
+
+    return axios(`${baseURL}/${specificationId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: publishStatusEditModel
     });
 }

@@ -3,6 +3,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {CalculationSummary} from "../types/CalculationSummary";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {
+    changeFundingLineStateService,
     getAdditionalCalculationsForSpecificationService,
     getSpecificationSummaryService
 } from "../services/specificationService";
@@ -16,12 +17,22 @@ import {
     saveReleaseTimetableForSpecificationService
 } from "../services/publishService";
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
+import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
+import {IFundingStructureItem} from "../types/FundingStructureItem";
+import {
+    ChangeFundingLineStatusAction,
+    FundingLineStructureAction,
+} from "./FundingLineStructureAction";
+import {getFundingLineStructureService} from "../services/fundingStructuresService";
+import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 
 export enum ViewSpecificationActionTypes {
     GET_RELEASETIMETABLE = 'getReleaseTimetable',
     GET_ADDITIONALCALCULATIONS = 'getAdditionalCalculations',
     GET_SPECIFICATION = 'getSpecification',
     GET_DATASETS = 'getDatasetBySpecificationId',
+    GET_FUNDINGLINESTRUCTURE = 'getFundingLineStructure',
+    CHANGE_FUNDINGLINESTATUS = 'changeFundingLineState',
     CONFIRM_TIMETABLECHANGES = 'confirmTimetableChanges'
 }
 
@@ -45,13 +56,29 @@ export interface GetReleaseTimetable {
     payload: ReleaseTimetableViewModel
 }
 
+export interface GetFundingLineStructureAction {
+    type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE;
+    payload: IFundingStructureItem[]
+}
+
+export interface ChangeFundingLineStatusAction {
+    type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
+    payload: string
+}
+
 export interface ConfirmTimetableChanges {
     type: ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES
     payload: ReleaseTimetableViewModel
 }
 
 export type ViewSpecificationsActions =
-    GetAdditionalCalculations | GetSpecification | GetDatasets | GetReleaseTimetable | ConfirmTimetableChanges
+    GetAdditionalCalculations
+    | GetSpecification
+    | GetDatasets
+    | GetReleaseTimetable
+    | GetFundingLineStructureAction
+    | ChangeFundingLineStatusAction
+    | ConfirmTimetableChanges;
 
 export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> = (specificationId: string, status: string, pageNumber: number, searchTerm: string) => {
     const searchRequest: CalculationSearchRequestViewModel = {
@@ -80,6 +107,7 @@ export const getSpecification: ActionCreator<ThunkAction<Promise<any>, ViewSpeci
         });
     }
 };
+
 export const getDatasetBySpecificationId: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
         const response = await getDatasetBySpecificationIdService(specificationId);
@@ -102,6 +130,31 @@ export const getReleaseTimetable: ActionCreator<ThunkAction<Promise<any>, ViewSp
         dispatch({
             type: ViewSpecificationActionTypes.GET_RELEASETIMETABLE,
             payload: output as ReleaseTimetableViewModel
+        });
+    }
+};
+
+export const getFundingLineStructure:
+    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> =
+    (specificationId: string, fundingStreamId: string) => {
+        return async (dispatch: Dispatch) => {
+            const response = await getFundingLineStructureService(specificationId, fundingStreamId);
+            dispatch({
+                type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE,
+                payload: response.data as IFundingStructureItem[]
+            });
+        }
+    };
+
+export const changeFundingLineState:
+    ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId: string) => {
+    return async (dispatch: Dispatch) => {
+        const response = await changeFundingLineStateService(specificationId);
+        let publishStatusModelResult = response.data as PublishStatusModel;
+
+        dispatch({
+            type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
+            payload: publishStatusModelResult.publishStatus as PublishStatus
         });
     }
 };

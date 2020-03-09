@@ -11,8 +11,11 @@ import {AppState} from "../states/AppState";
 import {
     confirmTimetableChanges,
     getAdditionalCalculations,
-    getDatasetBySpecificationId, getReleaseTimetable,
-    getSpecification
+    getDatasetBySpecificationId,
+    getFundingLineStructure,
+    getReleaseTimetable,
+    getSpecification,
+    changeFundingLineState
 } from "../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
@@ -20,6 +23,8 @@ import {DateInput} from "../components/DateInput";
 import {TimeInput} from "../components/TimeInput";
 import Pagination from "../components/Pagination";
 import {Details} from "../components/Details";
+import {FundingStructureType} from "../types/FundingStructureItem";
+import {ApproveStatusButton} from "../components/ApproveStatusButton";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -47,6 +52,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getDatasetBySpecificationId(specificationId));
         dispatch(getReleaseTimetable(specificationId));
     }, [specificationId]);
+
+    useEffect(() => {
+        dispatch(getFundingLineStructure(viewSpecification.specification.id, viewSpecification.specification.fundingStreams[0].id));
+    }, [viewSpecification.specification.id]);
 
     useEffect(() => {
         return () => setCanTimetableBeUpdated(true);
@@ -114,6 +123,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm));
     }
 
+    let fundingLineStatus = viewSpecification.specification.approvalStatus;
+    if (viewSpecification.fundingLineStatusResult !== null && viewSpecification.fundingLineStatusResult !== "")
+        fundingLineStatus = viewSpecification.fundingLineStatusResult;
+
     return <div>
         <Header/>
         <div className="govuk-width-container">
@@ -150,12 +163,51 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <Details title={`What is ${viewSpecification.specification.name}`} body={viewSpecification.specification.description}/>
-                    <Tabs initialTab="additional-calculations">
+                    <Tabs initialTab="fundingline-structure">
                         <ul className="govuk-tabs__list">
+                            <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
                         </ul>
+                        <Tabs.Panel label="fundingline-structure">
+                            <section className="govuk-tabs__panel" id="fundingline-structure">
+                                <div className="govuk-grid-row">
+                                    <div className="govuk-grid-column-two-thirds">
+                                        <h2 className="govuk-heading-l">Funding line structure</h2>
+                                    </div>
+                                    <div className="govuk-grid-column-one-third ">
+                                        <ApproveStatusButton id={viewSpecification.specification.id}
+                                                             status={fundingLineStatus}
+                                                             callback={changeFundingLineState(viewSpecification.specification.id)}/>
+                                    </div>
+                                </div>
+                                <table className="govuk-table funding-lines-table">
+                                    <thead className="govuk-table__head">
+                                    <tr className="govuk-table__row">
+                                        <th scope="col" className="govuk-table__header">Level</th>
+                                        <th scope="col" className="govuk-table__header">Calculation Type</th>
+                                        <th scope="col" className="govuk-table__header"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="govuk-table__body">
+                                    {viewSpecification.fundingLineStructureResult.map(f => {
+                                        let calculationId = <span>{f.name}</span>;
+                                        if (f.calculationId != null) {
+                                            calculationId = <a className={"govuk-link"}
+                                                               href={"/calcs/editTemplateCalculation/" + f.calculationId}>{f.name}</a>;
+                                        }
+                                        return <tr
+                                            className={"govuk-table__row " + (f.level === 1 ? ('govuk-!-font-weight-bold') : (''))}>
+                                            <td className="govuk-table__cell">{f.level}</td>
+                                            <td className="govuk-table__cell">{FundingStructureType[f.type]}</td>
+                                            <td className="govuk-table__cell">{calculationId}</td>
+                                        </tr>
+                                    })}
+                                    </tbody>
+                                </table>
+                            </section>
+                        </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
                                 <div className="govuk-grid-row">

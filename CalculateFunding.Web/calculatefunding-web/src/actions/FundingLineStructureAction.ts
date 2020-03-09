@@ -4,6 +4,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
 import {IFundingStructureItem} from "../types/FundingStructureItem";
 import {Specification} from "../types/viewFundingTypes";
+import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 
 export enum FundingLineStructureActionTypes {
     GET_FUNDINGLINESTRUCTURE = 'getFundingLineStructure',
@@ -63,14 +64,6 @@ export const getSpecificationById:
         });
     }
 };
-
-export enum PublishStatus {
-    Approved = "Approved",
-}
-
-export interface PublishStatusModel {
-    publishStatus: PublishStatus;
-}
 
 export const changeFundingLineState:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId: string) => {

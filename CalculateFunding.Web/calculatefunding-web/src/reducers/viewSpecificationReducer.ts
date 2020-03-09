@@ -3,6 +3,8 @@ import {ViewSpecificationActionTypes, ViewSpecificationsActions} from "../action
 import {CalculationSummary} from "../types/CalculationSummary";
 import {DatasetSummary} from "../types/DatasetSummary";
 import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
+import {IFundingStructureItem} from "../types/FundingStructureItem";
+import {FundingLineStructureActionTypes} from "../actions/FundingLineStructureAction";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -55,7 +57,9 @@ const initialState: ViewSpecificationState = {
             year: "",
             time: ""
         }
-    }
+    },
+    fundingLineStructureResult: [],
+    fundingLineStatusResult: ""
 };
 
 export function reduceViewSpecificationState(state: ViewSpecificationState = initialState, action: ViewSpecificationsActions): ViewSpecificationState {
@@ -68,6 +72,10 @@ export function reduceViewSpecificationState(state: ViewSpecificationState = ini
             return {...state, datasets: action.payload as DatasetSummary};
         case ViewSpecificationActionTypes.GET_RELEASETIMETABLE:
             return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
+        case ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE:
+            return {...state, fundingLineStructureResult: action.payload as IFundingStructureItem[]};
+        case FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS:
+            return {...state, fundingLineStatusResult: action.payload};
         case ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES:
             return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
         default:

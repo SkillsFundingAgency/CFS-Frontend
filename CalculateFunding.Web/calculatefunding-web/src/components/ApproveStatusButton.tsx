@@ -14,9 +14,9 @@ export function ApproveStatusButton(props: { id: string, status: string, callbac
     }
 
     return <div hidden={currentStatus.status === ""}>
-        <div className={"govuk-button approval-status-" + props.status}>
+        <strong className="govuk-tag right-align">
             {currentStatus.status}
-        </div>
+        </strong>
         <div className="approve-button-container" hidden={props.status === "Approved"}>
             <button className="govuk-button"
                     type="button"

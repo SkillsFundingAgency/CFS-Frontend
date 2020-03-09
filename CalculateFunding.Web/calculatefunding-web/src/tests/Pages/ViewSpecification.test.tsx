@@ -30,12 +30,12 @@ describe("Provider Funding Overview ", () => {
     it("renders the page with 3 tabs", async () => {
         const wrapper = mount(<Provider store={store}><ViewSpecification history={history} location={location} match={match}/></Provider>);
 
-        expect(wrapper.find('.govuk-tabs__list').children().length).toBe(3);
+        expect(wrapper.find('.govuk-tabs__list').children().length).toBe(4);
     });
 
     it("dispatches to Redux the correct number of times", () => {
         mount(<Provider store={store}><ViewSpecification history={history} location={location} match={match}/></Provider>);
 
-        expect(store.dispatch).toHaveBeenCalledTimes(8);
+        expect(store.dispatch).toHaveBeenCalledTimes(10);
     });
 });
