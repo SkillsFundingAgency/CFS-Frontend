@@ -27,6 +27,7 @@
     "govuk-frontend": "^3.3.0",
     "govuk-react": "^0.7.2",
     "http-proxy-middleware": "^0.20.0",
+    "jest-junit-reporter": "^1.1.0",
     "monaco-editor": "^0.17.1",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "nock": "^11.8.2",
@@ -52,7 +53,7 @@
   "scripts": {
     "start": "set HTTPS=true&&react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test — testResultsProcessor ./node_modules/jest-junit-reporter",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
