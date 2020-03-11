@@ -194,7 +194,7 @@ export function SpecificationsList() {
 
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third">
-                        <a href="/specs/CreateSpecification" id={"create-specification-link"}
+                        <a href="/app/Specifications/CreateSpecification" id={"create-specification-link"}
                            className="govuk-button govuk-button--primary"
                            data-module="govuk-button">
                             Create specification

@@ -2,6 +2,7 @@ import axios from "axios";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
+import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecificationViewModel";
 
 let baseURL = "/api/specs";
 
@@ -50,6 +51,7 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(funding
         }
     });
 }
+
 export async function getAllSpecificationsService(searchRequest:SpecificationSearchRequestViewModel ) {
     const queryString = require("query-string");
     const stringSearchRequest = queryString.stringify(searchRequest);
@@ -73,5 +75,15 @@ export async function changeFundingLineStateService(specificationId: string) {
             'Content-Type': 'application/json'
         },
         data: publishStatusEditModel
+    });
+}
+
+export async  function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel) {
+    return axios(`${baseURL}/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: createSpecificationViewModel
     });
 }

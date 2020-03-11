@@ -30,9 +30,9 @@ namespace CalculateFunding.Frontend.Controllers
             _calculationProviderResultsSearchService = calculationProviderResultsSearchService;
         }
 
-        [HttpPost]
-        [Route("api/providerversions/getbyfundingstream")]
-        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody] string fundingStreamId)
+        [HttpGet]
+        [Route("api/providerversions/getbyfundingstream/{fundingStreamId}")]
+        public async Task<IActionResult> GetProviderVersionsByFundingStream(string fundingStreamId)
         {
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
 
