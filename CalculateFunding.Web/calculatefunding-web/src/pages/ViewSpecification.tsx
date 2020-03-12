@@ -14,7 +14,6 @@ import {
     getDatasetBySpecificationId,
     getFundingLineStructure,
     getReleaseTimetable,
-    getSpecification,
     changeFundingLineState
 } from "../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
@@ -25,6 +24,9 @@ import Pagination from "../components/Pagination";
 import {Details} from "../components/Details";
 import {FundingStructureType} from "../types/FundingStructureItem";
 import {ApproveStatusButton} from "../components/ApproveStatusButton";
+import {useEffectOnce} from "../hooks/useEffectOnce";
+import {getSpecificationSummaryService} from "../services/specificationService";
+import {SpecificationSummary} from "../types/SpecificationSummary";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -39,28 +41,52 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [navisionTime, setNavisionTime] = useState();
     const [releaseTime, setReleaseTime] = useState();
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
-
+    const initialSpecification: SpecificationSummary = {
+            name: "",
+            approvalStatus: "",
+            description: "",
+            fundingPeriod: {
+                id: "",
+                name: ""
+            },
+            fundingStreams: [{
+                name: "",
+                id: ""
+            }],
+            id: "",
+            isSelectedForFunding: false,
+            providerVersionId: ""
+        };
+    const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
-
     let specificationId = match.params.specificationId;
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
-        dispatch(getSpecification(specificationId));
         dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));
         dispatch(getDatasetBySpecificationId(specificationId));
         dispatch(getReleaseTimetable(specificationId));
     }, [specificationId]);
 
-    useEffect(() => {
-        dispatch(getFundingLineStructure(viewSpecification.specification.id, viewSpecification.specification.fundingStreams[0].id));
-    }, [viewSpecification.specification.id]);
+    useEffectOnce(() => {
+        const getSpecification = async () => {
+            const specificationResult = await getSpecificationSummaryService(specificationId);
+            setSpecification(specificationResult.data);
+            return specificationResult;
+        };
+        getSpecification().then((result) => {
+            if (result.status === 200) {
+                const response = result.data as SpecificationSummary;
+                dispatch(getFundingLineStructure(response.id, response.fundingStreams[0].id));
+            }
+            return true;
+        });
+    });
 
     useEffect(() => {
         return () => setCanTimetableBeUpdated(true);
     }, [viewSpecification]);
-
 
     let breadcrumbs: IBreadcrumbs[] = [
         {
@@ -72,7 +98,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             url: "/app/SpecificationsList"
         },
         {
-            name: viewSpecification.specification.name,
+            name: specification.name,
             url: null
         }
     ];
@@ -82,7 +108,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         let navDateAndTime2 = updateDateWithTime(navisionDate, navisionTime);
         let releaseDate2 = updateDateWithTime(releaseDate, releaseTime);
         saveReleaseTimetable = {
-            specificationId: viewSpecification.specification.id,
+            specificationId: specification.id,
             statementDate: navDateAndTime2,
             fundingDate: releaseDate2
         };
@@ -123,7 +149,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm));
     }
 
-    let fundingLineStatus = viewSpecification.specification.approvalStatus;
+    let fundingLineStatus = specification.approvalStatus;
     if (viewSpecification.fundingLineStatusResult !== null && viewSpecification.fundingLineStatusResult !== "")
         fundingLineStatus = viewSpecification.fundingLineStatusResult;
 
@@ -134,25 +160,25 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-l">Specification Name</span>
-                    <h2 className="govuk-heading-l">{viewSpecification.specification.name}</h2>
+                    <h2 className="govuk-heading-l">{specification.name}</h2>
                     <span className="govuk-caption-m">Funding period</span>
-                    <h3 className="govuk-heading-m">{viewSpecification.specification.fundingPeriod.name}</h3>
+                    <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
                 </div>
             </div>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-m">Funding streams</span>
-                    <h3 className="govuk-heading-m">{viewSpecification.specification.fundingStreams[0].name}</h3>
+                    <h3 className="govuk-heading-m">{specification.fundingStreams[0].name}</h3>
                 </div>
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
                         <li>
                             <a className="govuk-link"
-                               href={'/specs/editspecification/' + viewSpecification.specification.id}>Edit specification</a>
+                               href={'/specs/editspecification/' + specification.id}>Edit specification</a>
                         </li>
                         <li>
                             <a className="govuk-link"
-                               href={'/calcs/createadditionalcalculation/' + viewSpecification.specification.id}>Create additional calculation</a>
+                               href={'/calcs/createadditionalcalculation/' + specification.id}>Create additional calculation</a>
                         </li>
                         <li>
                             <a className="govuk-link" href="/datasets/createdataset">Create dataset</a>
@@ -162,7 +188,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
-                    <Details title={`What is ${viewSpecification.specification.name}`} body={viewSpecification.specification.description}/>
+                    <Details title={`What is ${specification.name}`} body={specification.description}/>
                     <Tabs initialTab="fundingline-structure">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
@@ -177,9 +203,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third ">
-                                        <ApproveStatusButton id={viewSpecification.specification.id}
+                                        <ApproveStatusButton id={specification.id}
                                                              status={fundingLineStatus}
-                                                             callback={changeFundingLineState(viewSpecification.specification.id)}/>
+                                                             callback={changeFundingLineState(specification.id)}/>
                                     </div>
                                 </div>
                                 <table className="govuk-table funding-lines-table">
@@ -248,7 +274,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
                                         No additional calculations available. <a
-                                        href={'/calcs/createadditionalcalculation/' + viewSpecification.specification.id}>Create a
+                                        href={'/calcs/createadditionalcalculation/' + specification.id}>Create a
                                         calculation</a>
                                     </strong>
                                 </div>

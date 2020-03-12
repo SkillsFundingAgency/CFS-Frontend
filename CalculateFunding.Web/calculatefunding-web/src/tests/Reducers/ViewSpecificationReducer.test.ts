@@ -1,6 +1,7 @@
 import {reduceViewSpecificationState} from "../../reducers/viewSpecificationReducer";
 import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../../states/ViewSpecificationState";
+import {FundingStructureType} from "../../types/FundingStructureItem";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -453,6 +454,148 @@ describe('ViewSpecificationReducer ', () => {
                         year: "1985"
                     }
                 }
+            })
+        ).toEqual(expectedState);
+    });
+
+    it('should handle GET_FUNDINGLINESTRUCTURE', () => {
+        const expectedState = {
+            "additionalCalculations": {
+                "calculations": [],
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets": [],
+                "pagerState": {
+                    "currentPage": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages": [],
+                    "previousPage": 0,
+                },
+                "startItemNumber": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets": {
+                "content": [],
+                "statusCode": 0,
+            },
+            "fundingLineStructureResult": {
+                "calculationId": "test calculationId",
+                "level": 1,
+                "name": "test funding line",
+                "type": 1,
+            },
+            "releaseTimetable": {
+                "navisionDate": {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+                "releaseDate": {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+            },
+            "specification": {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod": {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams": [
+                    {
+                        "id": "",
+                        "name": "",
+                    },
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
+
+        expect(
+            reduceViewSpecificationState(initialState, {
+                type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE,
+                payload: {
+                    level : 1,
+                    name : "test funding line",
+                    calculationId : "test calculationId",
+                    type : FundingStructureType.calculation
+                }
+            })
+        ).toEqual(expectedState);
+    });
+
+    it('should handle CHANGE_FUNDINGLINESTATUS', () => {
+        const expectedState = {
+            "additionalCalculations": {
+                "calculations": [],
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets": [],
+                "pagerState": {
+                    "currentPage": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages": [],
+                    "previousPage": 0,
+                },
+                "startItemNumber": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets": {
+                "content": [],
+                "statusCode": 0,
+            },
+            "fundingLineStatusResult": "test specificationId",
+            "releaseTimetable": {
+                "navisionDate": {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+                "releaseDate": {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+            },
+            "specification": {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod": {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams": [
+                    {
+                        "id": "",
+                        "name": "",
+                    },
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
+
+        expect(
+            reduceViewSpecificationState(initialState, {
+                type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
+                payload: "test specificationId"
             })
         ).toEqual(expectedState);
     });

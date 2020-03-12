@@ -46,4 +46,20 @@ describe('ViewSpecification actions ', () => {
 
         expect(actions[0]).toEqual({type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS});
     });
+
+    it('calls the get funding line structure action', () => {
+        store.dispatch({type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE});
+
+        const actions = store.getActions();
+
+        expect(actions[0]).toEqual({type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE});
+    });
+
+    it('calls the change funding line status action', () => {
+        store.dispatch({type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS});
+
+        const actions = store.getActions();
+
+        expect(actions[0]).toEqual({type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS});
+    });
 });
