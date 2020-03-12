@@ -15,11 +15,9 @@
             this.selectedFundingStream(selectedItem);
 
             let request = $.ajax({
-                data: JSON.stringify(selectedItem),
-                url: "/api/providerversions/getbyfundingstream",
+                url: `/api/providerversions/getbyfundingstream/${selectedItem}`,
                 dataType: "json",
-                method: "POST",
-                contentType: "application/json"
+                method: "GET",
             });
 
             console.log("Starting search request");

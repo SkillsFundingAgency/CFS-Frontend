@@ -197,20 +197,18 @@ namespace calculateFunding.specification {
         }
 
 
-        public fundingStreamChanged(providerVersionId:string): void {
+        public fundingStreamChanged(fundingStream:string): void {
 
-            if (providerVersionId == undefined || providerVersionId == null || providerVersionId.length <= 0) {
+            if (fundingStream == undefined || fundingStream == null || fundingStream.length <= 0) {
                 //only request provider versions if a funding stream has been selected
                 console.log("Backing out of provider version search request as no funding stream selected");
                 return;
             }
 
             let request = $.ajax({
-                data: JSON.stringify(providerVersionId),
-                url: "/api/providerversions/getbyfundingstream",
+                url: `/api/providerversions/getbyfundingstream/${fundingStream}`,
                 dataType: "json",
-                method: "POST",
-                contentType: "application/json"
+                method: "GET",
             });
 
             console.log("Starting search request");
@@ -219,14 +217,14 @@ namespace calculateFunding.specification {
                 console.log("get provider versions by funding stream search request completed");
                 let results: Array<IProviderVersion> = resultUntyped;
                 this.providerVersions(ko.utils.arrayMap(results, item => {
-                    item.display = providerVersionId + " from " + new Date(item.targetDate).toLocaleDateString() + " Version " + Number(item.version);
+                    item.display = fundingStream + " from " + new Date(item.targetDate).toLocaleDateString() + " Version " + Number(item.version);
                     item.description = item.description;
                     return item;
                 }));
                 $("#select-funding-period > option").remove();
 
-                this.populateFundingPeriods(providerVersionId);
-               this.selectedProviderVersion(providerVersionId);
+                this.populateFundingPeriods(fundingStream);
+                this.selectedProviderVersion(fundingStream);
             });
 
             request.fail((xhrDetails: JQuery.jqXHR<any>, errorStatus: JQuery.Ajax.ErrorTextStatus) => {
