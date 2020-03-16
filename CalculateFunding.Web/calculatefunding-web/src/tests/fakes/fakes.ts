@@ -13,6 +13,9 @@ export const fakeHistory = createBrowserHistory();
 export const fakeLocation = createLocation("", "", "", {search:"", pathname:"", hash:"", key:"", state: ""});
 
 export const fakeInitialState: IStoreState = {
+    datasets: {
+        dataSchemas: []
+    },
     viewFundingState: {
         specifications: {
             name: "",

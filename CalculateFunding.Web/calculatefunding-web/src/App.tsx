@@ -14,6 +14,7 @@ import {SelectSpecification} from "./pages/SelectSpecification";
 import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
 import {SpecificationsList} from "./pages/SpecificationsList";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
+import {CreateDatasetPage} from "./pages/CreateDatasetPage";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
        <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
+       <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
        <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
        <Route path="*">
             <NoMatch />

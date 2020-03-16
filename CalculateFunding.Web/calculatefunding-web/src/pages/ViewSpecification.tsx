@@ -181,7 +181,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                href={'/calcs/createadditionalcalculation/' + specification.id}>Create additional calculation</a>
                         </li>
                         <li>
-                            <a className="govuk-link" href="/datasets/createdataset">Create dataset</a>
+                            <a className="govuk-link" href={`/app/Datasets/CreateDataset/${specificationId}`}>Create dataset</a>
                         </li>
                     </ul>
                 </div>

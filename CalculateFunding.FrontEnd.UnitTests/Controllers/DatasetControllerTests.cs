@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -17,6 +18,7 @@ using CalculateFunding.Frontend.ViewModels.Datasets;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using NSubstitute;
 using Serilog;
 
@@ -25,7 +27,10 @@ namespace CalculateFunding.Frontend.Controllers
     [TestClass]
     public class DatasetControllerTests
     {
-        [TestMethod]
+	    private static Mock<ISpecificationsApiClient> _mockSpecificationsApiClient;
+	    private static Mock<IAuthorizationHelper> _mockAuthorisationHelper;
+
+	    [TestMethod]
         public void SaveDataset_GivenViewModelIsNull_ThowsArgumentNullException()
         {
             // Arrange
@@ -285,7 +290,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         private static DatasetController CreateController(IDatasetsApiClient apiClient = null, ILogger logger = null, IMapper mapper = null)
         {
-            return new DatasetController(apiClient ?? CreateApiClient(), logger ?? CreateLogger(), mapper ?? MappingHelper.CreateFrontEndMapper());
+			_mockSpecificationsApiClient = new Mock<ISpecificationsApiClient>();
+			_mockAuthorisationHelper = new Mock<IAuthorizationHelper>();
+
+            return new DatasetController(apiClient ?? CreateApiClient(), logger ?? CreateLogger(), mapper ?? MappingHelper.CreateFrontEndMapper(), _mockSpecificationsApiClient.Object, _mockAuthorisationHelper.Object);
         }
 
         private static IDatasetsApiClient CreateApiClient()
