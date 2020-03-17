@@ -1,9 +1,10 @@
 import * as React from "react"
-import {Component} from "react";
+import {Component} from "react"
 import {Header} from "../components/Header";
 import {Footer} from "../components/Footer";
 import {Banner} from "../components/Banner";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
+import {Section} from "../types/Sections";
 
 export interface IHomeProps {
 }
@@ -36,7 +37,7 @@ export class Home extends Component<IHomeProps, {}> {
             ];
 
         return <div>
-            <Header/>
+            <Header location={Section.Home}/>
             <div className="govuk-width-container">
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
                 <div className="govuk-main-wrapper">

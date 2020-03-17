@@ -1,18 +1,18 @@
 import {Header} from "../components/Header";
 import {Banner} from "../components/Banner";
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {Footer} from "../components/Footer";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../states/AppState";
 import {SelectSpecificationState} from "../states/SelectSpecificationState";
-import {useEffect} from "react";
 import {
     getFundingPeriodsByFundingStreamId,
     getFundingStreams,
     getSpecificationsByFundingPeriodAndStreamId
 } from "../actions/SelectSpecificationActions";
-import {useState} from "react";
+import {Section} from "../types/Sections";
 
 export interface SelectSpecificationProps {
     fundingStreams: string[];
@@ -65,7 +65,7 @@ export function SelectSpecification(props: SelectSpecificationProps) {
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-grid-row">

@@ -1,5 +1,6 @@
 import {Banner} from "../components/Banner";
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {Footer} from "../components/Footer";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {Header} from "../components/Header";
@@ -11,10 +12,9 @@ import {AppState} from "../states/AppState";
 import {SpecificationState} from "../states/SpecificationState";
 import {DateFormatter} from "../components/DateFormatter";
 import Pagination from "../components/Pagination";
-import {useEffect, useState} from "react";
-import {getCalculationResults} from "../actions/ViewCalculationResultsActions";
 import {FacetValue} from "../types/CalculationProviderResult";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
+import {Section} from "../types/Sections";
 
 
 export function SpecificationsList() {
@@ -182,7 +182,7 @@ export function SpecificationsList() {
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row  govuk-!-margin-bottom-4">

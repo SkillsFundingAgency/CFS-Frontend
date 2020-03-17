@@ -1,11 +1,11 @@
 import * as React from "react"
+import {useEffect, useState} from "react"
 import {Header} from "../components/Header";
 import {Footer} from "../components/Footer";
 import {Banner} from "../components/Banner";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {Tabs} from "../components/Tabs";
 import {RouteComponentProps} from "react-router";
-import {useEffect, useState} from "react";
 import {
     getAdditionalCalculations,
     getSpecificationSummary,
@@ -16,6 +16,7 @@ import {SpecificationSummary} from "../types/SpecificationSummary";
 import {AppState} from "../states/AppState";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import Pagination from "../components/Pagination";
+import {Section} from "../types/Sections";
 
 export interface ViewSpecificationResultsProps {
     specification: SpecificationSummary;
@@ -86,7 +87,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-main-wrapper">

@@ -1,7 +1,6 @@
 import React from 'react';
-import {Switch, Route, BrowserRouter} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Home} from "./pages/Home";
-import FundingLineStructureContainer from "./containers/FundingLineStructureContainer";
 import ViewFundingContainer from "./containers/ViewFundingContainer";
 import './App.scss'
 import {Footer} from "./components/Footer";
@@ -15,13 +14,13 @@ import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
 import {SpecificationsList} from "./pages/SpecificationsList";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
 import {CreateDatasetPage} from "./pages/CreateDatasetPage";
+import {Section} from "./types/Sections";
 
 const App: React.FunctionComponent = () => {
   return (
    <BrowserRouter basename="/app">
      <Switch>
        <Route exact path="/" component={Home} />
-       <Route path="/FundingLineStructure" component={FundingLineStructureContainer} />
        <Route path="/ViewFunding" component={ViewFundingContainer} />
        <Route path="/results" component={ViewResults} />
        <Route path="/SelectSpecification" component={SelectSpecification} />
@@ -42,8 +41,8 @@ const App: React.FunctionComponent = () => {
 
 function NoMatch() {
   return (
-      <>
-      <Header />>
+      <div>
+      <Header location={Section.Home} />>
       <div className="govuk-width-container">
           <main className="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
               <div className="govuk-grid-row">
@@ -60,7 +59,7 @@ function NoMatch() {
           </main>
       </div>
           <Footer />
-        </>
+        </div>
   );
 }
 

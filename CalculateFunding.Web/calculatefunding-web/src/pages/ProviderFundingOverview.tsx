@@ -13,6 +13,7 @@ import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {Tabs} from "../components/Tabs";
 import {useEffectOnce} from "../hooks/useEffectOnce";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
+import {Section} from "../types/Sections";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string
@@ -65,7 +66,7 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
 
     return (
         <div>
-            <Header/>
+            <Header location={Section.Approvals}/>
             <div className="govuk-width-container">
                 <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
                 <div className="govuk-grid-row govuk-!-margin-bottom-5">

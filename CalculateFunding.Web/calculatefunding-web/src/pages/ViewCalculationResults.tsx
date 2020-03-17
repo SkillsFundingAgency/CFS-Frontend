@@ -18,6 +18,7 @@ import {FacetValue} from "../types/CalculationProviderResult";
 import {getSpecificationSummary} from "../actions/ViewSpecificationResultsActions";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
+import {Section} from "../types/Sections";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -237,7 +238,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-main-wrapper">

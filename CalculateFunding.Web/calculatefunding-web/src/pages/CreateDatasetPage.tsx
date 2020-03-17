@@ -12,6 +12,7 @@ import {getDatasetSchema} from "../actions/DatasetActions";
 import {assignDatasetSchemaUpdateService} from "../services/datasetService";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {ConfirmationPanel} from "../components/ConfirmationPanel";
+import {Section} from "../types/Sections";
 
 interface CreateDatasetPageRoute {
     specificationId: string
@@ -201,7 +202,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Datasets}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <ConfirmationPanel title={"Dataset created"} body={"Your dataset has been created."} hidden={!addAnother}/>

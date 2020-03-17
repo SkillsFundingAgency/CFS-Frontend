@@ -16,6 +16,7 @@ import {LoadingStatus} from "../components/LoadingStatus";
 import {JobMessage} from "../types/jobMessage";
 import {AutoComplete} from "../components/AutoComplete";
 import {ErrorSummary} from "../components/ErrorSummary";
+import {Section} from "../types/Sections";
 
 export interface IViewFundingProps {
     getLocalAuthorities: any;
@@ -218,7 +219,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
         if (!this.props.specificationSelected) {
             return <div>
-                <Header/>
+                <Header location={Section.Approvals}/>
                 <div className="govuk-width-container">
                     <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
@@ -283,7 +284,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         }
         if (this.props.specificationSelected) {
             return <div>
-                <Header/>
+                <Header location={Section.Approvals}/>
                 <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <div className="govuk-width-container">
                     <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"

@@ -16,6 +16,7 @@ import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpe
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Section} from "../../types/Sections";
 
 export function CreateSpecification() {
     let breadcrumbs: IBreadcrumbs[] = [
@@ -142,7 +143,7 @@ export function CreateSpecification() {
     }
 
     return <div>
-        <Header/>
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-main-wrapper">

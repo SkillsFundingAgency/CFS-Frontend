@@ -2,19 +2,19 @@ import {RouteComponentProps} from "react-router";
 import {Header} from "../components/Header";
 import {Banner} from "../components/Banner";
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {Footer} from "../components/Footer";
 import {Tabs} from "../components/Tabs";
-import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../states/AppState";
 import {
+    changeFundingLineState,
     confirmTimetableChanges,
     getAdditionalCalculations,
     getDatasetBySpecificationId,
     getFundingLineStructure,
-    getReleaseTimetable,
-    changeFundingLineState
+    getReleaseTimetable
 } from "../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
@@ -27,6 +27,7 @@ import {ApproveStatusButton} from "../components/ApproveStatusButton";
 import {useEffectOnce} from "../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../services/specificationService";
 import {SpecificationSummary} from "../types/SpecificationSummary";
+import {Section} from "../types/Sections";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -154,7 +155,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         fundingLineStatus = viewSpecification.fundingLineStatusResult;
 
     return <div>
-        <Header/>
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-grid-row">
