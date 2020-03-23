@@ -43,7 +43,7 @@ export function Header(props: {location:Section}) {
                 </div>
                 <div className="govuk-header__content">
                     <span className="govuk-header__product-name">
-                        Calculating funding service {environment}
+                        Calculate funding service {environment}
                     </span>
                     <button type="button" className="govuk-header__menu-button govuk-js-header-toggle"
                             aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu
