@@ -5,6 +5,7 @@ import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsS
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {CalculationSummary} from "../types/CalculationSummary";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
+import {getCalculationsService} from "../services/calculationService";
 
 export enum ViewSpecificationResultsActionTypes {
     GET_SPECIFICATIONSUMMARY = 'getSpecificationSummary',
@@ -56,13 +57,7 @@ export const getTemplateCalculations: ActionCreator<ThunkAction<Promise<any>, Vi
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/calculations/getcalculationsforspecification`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            params: searchRequest
-        });
+        const response = await getCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationResultsActionTypes.GET_TEMPLATECALCULATIONS,
             payload: response.data as CalculationSummary
@@ -79,13 +74,7 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/calculations/getcalculationsforspecification`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            params: searchRequest
-        });
+        const response = await getCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationResultsActionTypes.GET_ADDITIONALCALCULATIONS,
             payload: response.data as CalculationSummary

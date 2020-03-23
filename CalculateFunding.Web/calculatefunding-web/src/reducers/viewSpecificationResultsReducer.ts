@@ -6,7 +6,9 @@ import {
 
 const initialState: ViewSpecificationResultsState = {
     additionalCalculations: {
-        calculations: [],
+        lastPage: 0,
+        totalCount: 0,
+        results: [],
         currentPage: 0,
         endItemNumber: 0,
         facets: [],
@@ -23,7 +25,9 @@ const initialState: ViewSpecificationResultsState = {
         totalResults: 0
     },
     templateCalculations: {
-        calculations: [],
+        totalCount: 0,
+        lastPage: 0,
+        results: [],
         currentPage: 0,
         endItemNumber: 0,
         facets: [],

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -234,16 +235,43 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/calcs/getcalculationbyid/{calculationId}")]
         public async Task<IActionResult> GetCalculationById(string calculationId)
         {
-			Guard.ArgumentNotNull(calculationId, nameof(calculationId));
+            Guard.ArgumentNotNull(calculationId, nameof(calculationId));
 
-			ApiResponse<Calculation> result = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> result = await _calcClient.GetCalculationById(calculationId);
 
-			if (result.StatusCode == HttpStatusCode.OK)
-			{
-				return Ok(result.Content);
-			}
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(result.Content);
+            }
 
-			return BadRequest(result.Content);
+            return BadRequest(result.Content);
+        }
+
+        [HttpGet]
+        [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{page}")]
+        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId, 
+	        CalculationType calculationType, int page, [FromQuery]string searchTerm, [FromQuery]string status)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            PublishStatus? publishStatus = null;
+
+            if (!string.IsNullOrEmpty(status) && status != "All")
+            {
+                publishStatus = (PublishStatus)Enum.Parse(typeof(PublishStatus), status);
+
+            }
+
+            ApiResponse<SearchResults<CalculationSearchResult>> result =
+                await _calcClient.SearchCalculationsForSpecification(specificationId, 
+	                calculationType, publishStatus, searchTerm, page);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(result.Content);
+            }
+
+            return BadRequest(result.Content);
         }
     }
 }

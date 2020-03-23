@@ -63,6 +63,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     let specificationId = match.params.specificationId;
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
+    const [additionalCalculations, setAdditionalCalculations] = useState()
+
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
         dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));

@@ -8,7 +8,9 @@ import {FundingLineStructureActionTypes} from "../actions/FundingLineStructureAc
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
-        calculations: [],
+        lastPage: 0,
+        totalCount: 0,
+        results: [],
         currentPage: 0,
         endItemNumber: 0,
         facets: [],

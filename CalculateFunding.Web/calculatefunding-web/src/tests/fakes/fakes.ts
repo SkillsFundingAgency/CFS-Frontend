@@ -133,7 +133,9 @@ export const fakeInitialState: IStoreState = {
     },
     viewSpecificationResults: {
         additionalCalculations: {
-            calculations: [],
+            results:[],
+            lastPage:0,
+            totalCount:0,
             currentPage: 0,
             endItemNumber: 0,
             facets: [],
@@ -150,7 +152,9 @@ export const fakeInitialState: IStoreState = {
             totalResults: 0
         },
         templateCalculations: {
-            calculations: [],
+            results:[],
+            lastPage:0,
+            totalCount:0,
             currentPage: 0,
             endItemNumber: 0,
             facets: [],
@@ -182,7 +186,9 @@ export const fakeInitialState: IStoreState = {
     },
     viewSpecification: {
         additionalCalculations: {
-            calculations: [],
+            totalCount:0,
+            lastPage: 0,
+            results: [],
             currentPage: 0,
             endItemNumber: 0,
             facets: [],

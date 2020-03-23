@@ -31,7 +31,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const dispatch = useDispatch();
     const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState('');
     const [templateCalculationsSearchTerm, setTemplateCalculationsSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState("Draft");
+    const [templateStatusFilter, setTemplateStatusFilter] = useState("All");
+    const [additionalStatusFilter, setAdditionalStatusFilter] = useState("All");
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
@@ -39,8 +40,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
         dispatch(getSpecificationSummary(specificationId));
-        dispatch(getTemplateCalculations(specificationId, "Draft", 1, templateCalculationsSearchTerm));
-        dispatch(getAdditionalCalculations(specificationId, "Draft", 1, additionalCalculationsSearchTerm));
+        dispatch(getTemplateCalculations(specificationId, "All", 1, templateCalculationsSearchTerm));
+        dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
     }, [specificationId]);
 
     let breadcrumbs: IBreadcrumbs[] = [
@@ -62,15 +63,19 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         }
     ];
 
-    function updateCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
+    function updateTemplateCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
-        setStatusFilter(filter);
+        setTemplateStatusFilter(filter);
         dispatch(getTemplateCalculations(specificationId, filter, 1, templateCalculationsSearchTerm));
+    }
+    function updateAdditionalCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
+        const filter = event.target.value;
+        setAdditionalStatusFilter(filter);
         dispatch(getAdditionalCalculations(specificationId, filter, 1, additionalCalculationsSearchTerm));
     }
 
     function searchAdditionalCalculations() {
-        dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));
+        dispatch(getAdditionalCalculations(specificationId, additionalStatusFilter, 1, additionalCalculationsSearchTerm));
     }
 
     function additionalCalculationsSearch(e: React.ChangeEvent<HTMLInputElement>) {
@@ -78,11 +83,10 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     }
 
     function searchTemplateCalculations() {
-        dispatch(getTemplateCalculations(specificationId, statusFilter, 1, templateCalculationsSearchTerm));
+        dispatch(getTemplateCalculations(specificationId, templateStatusFilter, 1, templateCalculationsSearchTerm));
     }
 
     function templatesCalculationsSearch(e: React.ChangeEvent<HTMLInputElement>) {
-
         setTemplateCalculationsSearchTerm(e.target.value);
     }
 
@@ -98,21 +102,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                     </div>
                 </div>
 
-                <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-full">
-                        <p className="govuk-body">
-                            Filter by calculation status
-                        </p>
-                        <select name="calculationStatus" id="calculationStatus" className="govuk-select"
-                                onChange={(e) => {
-                                    updateCalculations(e)
-                                }}>
-                            <option value="Draft">Draft</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Published">Published</option>
-                        </select>
-                    </div>
-                </div>
+
                 <div className="govuk-grid-row govuk-!-padding-top-5">
                     <div className="govuk-grid-column-full">
 
@@ -126,7 +116,20 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <h2 className="govuk-heading-l">Template Calculations</h2>
                                     <input className="govuk-input govuk-!-width-three-quarters govuk-!-margin-right-1"
                                            type="text" onChange={(e)=> templatesCalculationsSearch(e)}/>
-                                    <button className="govuk-button" onClick={() => searchTemplateCalculations()}>Search</button>
+                                    <button className="govuk-button" onClick={searchTemplateCalculations}>Search</button>
+                                            <p className="govuk-body">
+                                                Filter by calculation status
+                                            </p>
+                                            <select name="calculationStatus" id="calculationStatus" className="govuk-select"
+                                                    onChange={(e) => {
+                                                        updateTemplateCalculations(e)
+                                                    }}>
+                                                <option value="All">All</option>
+                                                <option value="Draft">Draft</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Updated">Updated</option>
+                                                <option value="Archived">Archived</option>
+                                            </select>
                                     <table className="govuk-table">
                                         <thead className="govuk-table__head">
                                         <tr className="govuk-table__row">
@@ -136,7 +139,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </tr>
                                         </thead>
                                         <tbody className="govuk-table__body">
-                                        {specificationResults.templateCalculations.calculations.map(tc =>
+                                        {specificationResults.templateCalculations.results.map(tc =>
                                             <tr key={tc.id} className="govuk-table__row">
                                                 <td className="govuk-table__cell"><a
                                                     href={`/app/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
@@ -145,7 +148,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationResults.templateCalculations.totalResults > 0}>
+                                        <tr className="govuk-table__row" hidden={specificationResults.templateCalculations.totalCount > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -153,8 +156,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-two-thirds">
                                             <Pagination
-                                                currentPage={specificationResults.templateCalculations.pagerState.currentPage}
-                                                lastPage={specificationResults.templateCalculations.pagerState.lastPage}
+                                                currentPage={specificationResults.templateCalculations.currentPage}
+                                                lastPage={specificationResults.templateCalculations.lastPage}
                                                 callback={() => {
                                                 }}/>
                                         </div>
@@ -170,8 +173,21 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <h2 className="govuk-heading-l">Additional calculations</h2>
                                     <input className="govuk-input govuk-!-width-three-quarters govuk-!-margin-right-1"
                                            type="text" onChange={(e) => additionalCalculationsSearch(e)}/>
-                                    <button className="govuk-button" onClick={() => searchAdditionalCalculations}>Search
+                                    <button className="govuk-button" onClick={searchAdditionalCalculations}>Search
                                     </button>
+                                    <p className="govuk-body">
+                                        Filter by calculation status
+                                    </p>
+                                    <select name="calculationStatus" id="calculationStatus" className="govuk-select"
+                                            onChange={(e) => {
+                                                updateAdditionalCalculations(e)
+                                            }}>
+                                        <option value="All">All</option>
+                                        <option value="Draft">Draft</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Updated">Updated</option>
+                                        <option value="Archived">Archived</option>
+                                    </select>
                                     <table className="govuk-table">
                                         <thead className="govuk-table__head">
                                         <tr className="govuk-table__row">
@@ -181,7 +197,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </tr>
                                         </thead>
                                         <tbody className="govuk-table__body">
-                                        {specificationResults.additionalCalculations.calculations.map(tc =>
+                                        {specificationResults.additionalCalculations.results.map(tc =>
                                             <tr className="govuk-table__row">
                                                 <td className="govuk-table__cell"><a
                                                     href={`/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
@@ -190,7 +206,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationResults.additionalCalculations.totalResults > 0}>
+                                        <tr className="govuk-table__row" hidden={specificationResults.additionalCalculations.totalCount > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -198,8 +214,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-two-thirds">
                                             <Pagination
-                                                currentPage={specificationResults.additionalCalculations.pagerState.currentPage}
-                                                lastPage={specificationResults.additionalCalculations.pagerState.lastPage}
+                                                currentPage={specificationResults.additionalCalculations.currentPage}
+                                                lastPage={specificationResults.additionalCalculations.lastPage}
                                                 callback={() => {
                                                 }}/>
                                         </div>
