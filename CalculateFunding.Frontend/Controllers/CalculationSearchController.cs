@@ -1,22 +1,37 @@
 ﻿using System.Collections.Generic;
+using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
+using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Calculations;
+using CalculateFunding.Frontend.ViewModels.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Calculations;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using Microsoft.AspNetCore.Mvc;
-
     public class CalculationSearchController : Controller
     {
-        private ICalculationSearchService _calculationSearchService;
+        private readonly ICalculationSearchService _calculationSearchService;
 
         public CalculationSearchController(ICalculationSearchService calculationSearchService)
         {
             Guard.ArgumentNotNull(calculationSearchService, nameof(calculationSearchService));
             _calculationSearchService = calculationSearchService;
+        }
+
+        [HttpGet("api/specifications/{specificationId}/calculations/calculationType/{calculationType}")]
+        public async Task<IActionResult> SearchCalculationsForSpecification([FromRoute] string specificationId,
+	        [FromRoute] CalculationType calculationType,
+	        [FromQuery] PublishStatus? status,
+	        [FromQuery] string searchTerm,
+	        [FromQuery] int? page)
+        {
+	        return Ok(await _calculationSearchService.PerformSearch(specificationId,
+		        calculationType,
+		        status,
+		        searchTerm,
+		        page));
         }
 
         [HttpPost]
