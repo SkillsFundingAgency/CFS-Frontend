@@ -25,6 +25,7 @@ import {
 } from "./FundingLineStructureAction";
 import {getFundingLineStructureService} from "../services/fundingStructuresService";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
+import {getCalculationsService} from "../services/calculationService";
 
 export enum ViewSpecificationActionTypes {
     GET_RELEASETIMETABLE = 'getReleaseTimetable',
@@ -90,7 +91,7 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await getAdditionalCalculationsForSpecificationService(searchRequest);
+        const response = await getCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
             payload: response.data as CalculationSummary

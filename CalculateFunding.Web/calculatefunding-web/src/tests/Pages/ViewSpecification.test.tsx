@@ -22,7 +22,10 @@ describe("Provider Funding Overview ", () => {
     };
     const mockViewSpecificationState = {
     additionalCalculations: {
-        calculations: [],
+        results: [{
+            id:"1",
+            name: "123"
+        }],
         currentPage: 0,
         endItemNumber: 0,
         facets: [],

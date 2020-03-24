@@ -28,6 +28,7 @@ import {useEffectOnce} from "../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../services/specificationService";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {Section} from "../types/Sections";
+import {DateFormatter} from "../components/DateFormatter";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -62,8 +63,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
     let specificationId = match.params.specificationId;
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
-
-    const [additionalCalculations, setAdditionalCalculations] = useState()
 
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
@@ -268,11 +267,18 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-
+                                    {viewSpecification.additionalCalculations.results.map((ac, index) =>
+                                        <tr className="govuk-table__row" key={index}>
+                                            <td className="govuk-table__cell">{ac.name}</td>
+                                            <td className="govuk-table__cell">{ac.status}</td>
+                                            <td className="govuk-table__cell">{ac.valueType}</td>
+                                            <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate} utc={false}/></td>
+                                        </tr>
+                                    )}
                                     </tbody>
                                 </table>
 
-                                <div className="govuk-warning-text">
+                                <div className="govuk-warning-text" hidden={viewSpecification.additionalCalculations.totalCount > 0}>
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
@@ -283,7 +289,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </div>
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
                                     <div className="pagination__summary"><p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber} of {viewSpecification.additionalCalculations.totalResults} calculations</p></div>
-                                    <Pagination currentPage={viewSpecification.additionalCalculations.pagerState.currentPage} lastPage={viewSpecification.additionalCalculations.pagerState.lastPage} callback={movePage} />
+                                    <Pagination currentPage={viewSpecification.additionalCalculations.currentPage} lastPage={viewSpecification.additionalCalculations.lastPage} callback={movePage} />
                                 </nav>
                             </section>
                         </Tabs.Panel>
