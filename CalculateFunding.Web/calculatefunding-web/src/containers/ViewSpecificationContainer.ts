@@ -1,8 +1,8 @@
 import {connect} from "react-redux";
 import {AnyAction, bindActionCreators, Dispatch} from "redux";
 import {AppState} from "../reducers/rootReducer";
-import {ViewSpecificationResults} from "../pages/ViewSpecificationResults";
 import {getSpecificationSummary} from "../actions/ViewSpecificationResultsActions";
+import {ViewSpecificationResults} from "../pages/Specifications/ViewSpecificationResults";
 
 const mapStateToProps = (state: AppState) => ({
     specifications: state.viewSpecificationResults.specification,

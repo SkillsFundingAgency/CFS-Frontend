@@ -1,18 +1,18 @@
-import {Header} from "../components/Header";
-import {Banner} from "../components/Banner";
+import {Header} from "../../components/Header";
+import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Footer} from "../components/Footer";
+import {IBreadcrumbs} from "../../types/IBreadcrumbs";
+import {Footer} from "../../components/Footer";
 import {useDispatch, useSelector} from "react-redux";
-import {AppState} from "../states/AppState";
-import {SelectSpecificationState} from "../states/SelectSpecificationState";
+import {AppState} from "../../states/AppState";
+import {SelectSpecificationState} from "../../states/SelectSpecificationState";
 import {
     getFundingPeriodsByFundingStreamId,
     getFundingStreams,
     getSpecificationsByFundingPeriodAndStreamId
-} from "../actions/SelectSpecificationActions";
-import {Section} from "../types/Sections";
+} from "../../actions/SelectSpecificationActions";
+import {Section} from "../../types/Sections";
 
 export interface SelectSpecificationProps {
     fundingStreams: string[];

@@ -1,9 +1,9 @@
 import React from 'react';
 import {createStore, Store} from "redux";
-import {IStoreState, rootReducer} from "../../reducers/rootReducer";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
-import {CreateSpecification} from "../../pages/Specifications/CreateSpecification";
+import {CreateSpecification} from "../../../pages/Specifications/CreateSpecification";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');

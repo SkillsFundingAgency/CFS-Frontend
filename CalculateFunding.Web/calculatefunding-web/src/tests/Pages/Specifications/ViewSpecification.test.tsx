@@ -1,11 +1,11 @@
 import React from "react";
 import {match} from "react-router";
 import {Provider} from "react-redux";
-import {IStoreState} from "../../reducers/rootReducer";
+import {IStoreState} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
-import {ViewSpecification, ViewSpecificationRoute} from "../../pages/ViewSpecification";
 import configureStore from 'redux-mock-store';
-import {fakeHistory, fakeInitialState, fakeLocation} from "../fakes/fakes";
+import {fakeHistory, fakeInitialState, fakeLocation} from "../../fakes/fakes";
+import {ViewSpecification, ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
 
 describe("Provider Funding Overview ", () => {
     const Adapter = require('enzyme-adapter-react-16');

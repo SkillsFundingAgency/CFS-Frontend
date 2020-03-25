@@ -1,13 +1,13 @@
 import {RouteComponentProps} from "react-router";
-import {Header} from "../components/Header";
-import {Banner} from "../components/Banner";
+import {Header} from "../../components/Header";
+import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Footer} from "../components/Footer";
-import {Tabs} from "../components/Tabs";
+import {IBreadcrumbs} from "../../types/IBreadcrumbs";
+import {Footer} from "../../components/Footer";
+import {Tabs} from "../../components/Tabs";
 import {useDispatch, useSelector} from "react-redux";
-import {AppState} from "../states/AppState";
+import {AppState} from "../../states/AppState";
 import {
     changeFundingLineState,
     confirmTimetableChanges,
@@ -15,20 +15,20 @@ import {
     getDatasetBySpecificationId,
     getFundingLineStructure,
     getReleaseTimetable
-} from "../actions/ViewSpecificationsActions";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
-import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
-import {DateInput} from "../components/DateInput";
-import {TimeInput} from "../components/TimeInput";
-import Pagination from "../components/Pagination";
-import {Details} from "../components/Details";
-import {FundingStructureType} from "../types/FundingStructureItem";
-import {ApproveStatusButton} from "../components/ApproveStatusButton";
-import {useEffectOnce} from "../hooks/useEffectOnce";
-import {getSpecificationSummaryService} from "../services/specificationService";
-import {SpecificationSummary} from "../types/SpecificationSummary";
-import {Section} from "../types/Sections";
-import {DateFormatter} from "../components/DateFormatter";
+} from "../../actions/ViewSpecificationsActions";
+import {ViewSpecificationState} from "../../states/ViewSpecificationState";
+import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
+import {DateInput} from "../../components/DateInput";
+import {TimeInput} from "../../components/TimeInput";
+import Pagination from "../../components/Pagination";
+import {Details} from "../../components/Details";
+import {FundingStructureType} from "../../types/FundingStructureItem";
+import {ApproveStatusButton} from "../../components/ApproveStatusButton";
+import {useEffectOnce} from "../../hooks/useEffectOnce";
+import {getSpecificationSummaryService} from "../../services/specificationService";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {Section} from "../../types/Sections";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -176,11 +176,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     <ul className="govuk-list">
                         <li>
                             <a className="govuk-link"
-                               href={'/specs/editspecification/' + specification.id}>Edit specification</a>
+                               href={'/app/specifications/editspecification/' + specificationId}>Edit specification</a>
                         </li>
                         <li>
                             <a className="govuk-link"
-                               href={'/calcs/createadditionalcalculation/' + specification.id}>Create additional calculation</a>
+                               href={'/calcs/createadditionalcalculation/' + specificationId}>Create additional calculation</a>
                         </li>
                         <li>
                             <a className="govuk-link" href={`/app/Datasets/CreateDataset/${specificationId}`}>Create dataset</a>

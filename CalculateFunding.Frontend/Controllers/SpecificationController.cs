@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -338,6 +339,20 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new BadRequestResult();
+        }
+
+        [Route("api/specs/update/{specificationId}")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateSpecification([FromBody]EditSpecificationModel viewModel, [FromRoute]string specificationId)
+        {
+	        ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
+
+	        if (result.StatusCode == HttpStatusCode.OK)
+	        {
+		        return new OkResult();
+	        }
+
+			return new BadRequestResult();
         }
     }
 }

@@ -6,15 +6,16 @@ import './App.scss'
 import {Footer} from "./components/Footer";
 import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
-import {ViewSpecificationResults} from "./pages/ViewSpecificationResults";
 import {ViewCalculationResults} from "./pages/ViewCalculationResults";
-import {ViewSpecification} from "./pages/ViewSpecification";
-import {SelectSpecification} from "./pages/SelectSpecification";
 import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
-import {SpecificationsList} from "./pages/SpecificationsList";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
 import {CreateDatasetPage} from "./pages/CreateDatasetPage";
+import {EditSpecification} from "./pages/Specifications/EditSpecification";
 import {Section} from "./types/Sections";
+import {SelectSpecification} from "./pages/Specifications/SelectSpecification";
+import {SpecificationsList} from "./pages/Specifications/SpecificationsList";
+import {ViewSpecificationResults} from "./pages/Specifications/ViewSpecificationResults";
+import {ViewSpecification} from "./pages/Specifications/ViewSpecification";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
        <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
        <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
+       <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
        <Route path="*">
             <NoMatch />
           </Route>

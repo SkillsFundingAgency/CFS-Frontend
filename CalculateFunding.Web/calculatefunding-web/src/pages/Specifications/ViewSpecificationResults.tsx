@@ -1,22 +1,22 @@
 import * as React from "react"
 import {useEffect, useState} from "react"
-import {Header} from "../components/Header";
-import {Footer} from "../components/Footer";
-import {Banner} from "../components/Banner";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Tabs} from "../components/Tabs";
+import {Footer} from "../../components/Footer";
+import {Banner} from "../../components/Banner";
+import {Header} from "../../components/Header";
+import {IBreadcrumbs} from "../../types/IBreadcrumbs";
+import {Tabs} from "../../components/Tabs";
 import {RouteComponentProps} from "react-router";
 import {
     getAdditionalCalculations,
     getSpecificationSummary,
     getTemplateCalculations
-} from "../actions/ViewSpecificationResultsActions";
+} from "../../actions/ViewSpecificationResultsActions";
 import {useDispatch, useSelector} from "react-redux";
-import {SpecificationSummary} from "../types/SpecificationSummary";
-import {AppState} from "../states/AppState";
-import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
-import Pagination from "../components/Pagination";
-import {Section} from "../types/Sections";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {AppState} from "../../states/AppState";
+import {ViewSpecificationResultsState} from "../../states/ViewSpecificationResultsState";
+import Pagination from "../../components/Pagination";
+import {Section} from "../../types/Sections";
 
 export interface ViewSpecificationResultsProps {
     specification: SpecificationSummary;

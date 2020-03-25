@@ -1,20 +1,20 @@
-import {Banner} from "../components/Banner";
+import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {Footer} from "../components/Footer";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Header} from "../components/Header";
-import {CollapsiblePanel} from "../components/CollapsiblePanel";
+import {Footer} from "../../components/Footer";
+import {IBreadcrumbs} from "../../types/IBreadcrumbs";
+import {Header} from "../../components/Header";
+import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {useDispatch, useSelector} from "react-redux";
-import {getAllSpecifications} from "../actions/SpecificationActions";
-import {useEffectOnce} from "../hooks/useEffectOnce";
-import {AppState} from "../states/AppState";
-import {SpecificationState} from "../states/SpecificationState";
-import {DateFormatter} from "../components/DateFormatter";
-import Pagination from "../components/Pagination";
-import {FacetValue} from "../types/CalculationProviderResult";
-import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
-import {Section} from "../types/Sections";
+import {getAllSpecifications} from "../../actions/SpecificationActions";
+import {useEffectOnce} from "../../hooks/useEffectOnce";
+import {AppState} from "../../states/AppState";
+import {SpecificationState} from "../../states/SpecificationState";
+import {DateFormatter} from "../../components/DateFormatter";
+import Pagination from "../../components/Pagination";
+import {FacetValue} from "../../types/CalculationProviderResult";
+import {SpecificationSearchRequestViewModel} from "../../types/SpecificationSearchRequestViewModel";
+import {Section} from "../../types/Sections";
 
 
 export function SpecificationsList() {

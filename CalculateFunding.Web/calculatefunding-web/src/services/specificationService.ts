@@ -2,7 +2,10 @@ import axios from "axios";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
-import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecificationViewModel";
+import {
+    CreateSpecificationViewModel
+} from "../types/Specifications/CreateSpecificationViewModel";
+import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 
 let baseURL = "/api/specs";
 
@@ -85,5 +88,15 @@ export async  function createSpecificationService(createSpecificationViewModel: 
             'Content-Type': 'application/json'
         },
         data: createSpecificationViewModel
+    });
+}
+
+export async  function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId:string) {
+    return axios(`${baseURL}/update/${specificationId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: updateSpecificationViewModel
     });
 }
