@@ -22,13 +22,14 @@ import {DateInput} from "../../components/DateInput";
 import {TimeInput} from "../../components/TimeInput";
 import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
-import {FundingStructureType} from "../../types/FundingStructureItem";
+import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {DateFormatter} from "../../components/DateFormatter";
+import {CollapsibleSteps} from "../../components/CollapsibleSteps";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -151,9 +152,60 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm));
     }
 
+    function updateFundingLineState(specificationId : string)
+    {
+        dispatch(changeFundingLineState(specificationId));
+    }
+
     let fundingLineStatus = specification.approvalStatus;
     if (viewSpecification.fundingLineStatusResult !== null && viewSpecification.fundingLineStatusResult !== "")
         fundingLineStatus = viewSpecification.fundingLineStatusResult;
+
+    const FundingLineItem: React.FC<IFundingStructureItem> = ({ fundingStructureItems }) => {
+        let fundingType: string = "";
+        return (
+            <React.Fragment>
+            {
+                (fundingStructureItems != null && fundingStructureItems.length > 0)? fundingStructureItems.map((innerFundingLineItem, index) => {
+                    let displayFundingType = false;
+                    if (fundingType != FundingStructureType[innerFundingLineItem.type])
+                    {
+                        displayFundingType = true;
+                        fundingType = FundingStructureType[innerFundingLineItem.type];
+                    }
+
+                    let linkValue = '';
+                    if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId != '') {
+                        linkValue = '/calcs/editTemplateCalculation/' + innerFundingLineItem.calculationId;
+                    }
+                        return (
+                            <CollapsibleSteps
+                                key={index}
+                                uniqueKey={index.toString()}
+                                title={displayFundingType?fundingType: ""}
+                                description={innerFundingLineItem.name}
+                                step={displayFundingType?innerFundingLineItem.level.toString(): ""}
+                                expanded={false}
+                                link={linkValue}
+                                hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
+                                {
+                                    innerFundingLineItem.fundingStructureItems ?
+                                        (<FundingLineItem calculationId={innerFundingLineItem.calculationId}
+                                                          type={innerFundingLineItem.type}
+                                                          level={innerFundingLineItem.level}
+                                                          name={innerFundingLineItem.name}
+                                                          fundingStructureItems={innerFundingLineItem.fundingStructureItems}/>)
+                                        : null
+                                }
+                            </CollapsibleSteps>
+                        )
+                    }
+                )
+                    : null
+            }
+        </React.Fragment>
+    )
+    };
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -207,33 +259,40 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <div className="govuk-grid-column-one-third ">
                                         <ApproveStatusButton id={specification.id}
                                                              status={fundingLineStatus}
-                                                             callback={changeFundingLineState(specification.id)}/>
+                                                             callback={updateFundingLineState}/>
                                     </div>
                                 </div>
-                                <table className="govuk-table funding-lines-table">
-                                    <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header">Level</th>
-                                        <th scope="col" className="govuk-table__header">Calculation Type</th>
-                                        <th scope="col" className="govuk-table__header"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="govuk-table__body">
-                                    {viewSpecification.fundingLineStructureResult.map(f => {
-                                        let calculationId = <span>{f.name}</span>;
-                                        if (f.calculationId != null) {
-                                            calculationId = <a className={"govuk-link"}
-                                                               href={"/calcs/editTemplateCalculation/" + f.calculationId}>{f.name}</a>;
+                                <ul className="collapsible-steps">
+                                {
+                                    viewSpecification.fundingLineStructureResult.map((f, index) => {
+                                    let linkValue = '';
+                                    if (f.calculationId != null && f.calculationId != '') {
+                                        linkValue = '/calcs/editTemplateCalculation/' + f.calculationId;
+                                    }
+
+                                    return <li key={"collapsible-steps-top"+index} className="collapsible-step step-is-shown"><CollapsibleSteps
+                                        key={"collapsible-steps"+ index}
+                                        uniqueKey={index.toString()}
+                                        title={FundingStructureType[f.type]}
+                                        description={f.name}
+                                        step={f.level.toString()}
+                                        expanded={false}
+                                        link={linkValue}
+                                        hasChildren={f.fundingStructureItems != null}>
+                                        {
+                                            viewSpecification.fundingLineStructureResult.map(innerFundingLineItem =>{
+                                                return <FundingLineItem key={innerFundingLineItem.name.replace(" ", "") + index}
+                                                                        calculationId={innerFundingLineItem.calculationId}
+                                                                        type={innerFundingLineItem.type}
+                                                                        level={innerFundingLineItem.level}
+                                                                        name={innerFundingLineItem.name}
+                                                                        fundingStructureItems={innerFundingLineItem.fundingStructureItems} />
+                                            })
                                         }
-                                        return <tr
-                                            className={"govuk-table__row " + (f.level === 1 ? ('govuk-!-font-weight-bold') : (''))}>
-                                            <td className="govuk-table__cell">{f.level}</td>
-                                            <td className="govuk-table__cell">{FundingStructureType[f.type]}</td>
-                                            <td className="govuk-table__cell">{calculationId}</td>
-                                        </tr>
-                                    })}
-                                    </tbody>
-                                </table>
+                                        </CollapsibleSteps>
+                                    </li>
+                                })}
+                                </ul>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
@@ -243,7 +302,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third ">
-                                        <p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber} of {viewSpecification.additionalCalculations.totalResults} calculations</p>
+                                        <p className="govuk-body right-align"
+                                           hidden={viewSpecification.additionalCalculations.totalResults === 0}>
+                                            Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber}
+                                            of {viewSpecification.additionalCalculations.totalResults}
+                                            calculations
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="govuk-grid-row">
@@ -288,8 +352,15 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </strong>
                                 </div>
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                    <div className="pagination__summary"><p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>Showing {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber} of {viewSpecification.additionalCalculations.totalResults} calculations</p></div>
-                                    <Pagination currentPage={viewSpecification.additionalCalculations.currentPage} lastPage={viewSpecification.additionalCalculations.lastPage} callback={movePage} />
+                                    <div className="pagination__summary">
+                                        <p className="govuk-body right-align" hidden={viewSpecification.additionalCalculations.totalResults === 0}>
+                                            Showing
+                                            {viewSpecification.additionalCalculations.startItemNumber} - {viewSpecification.additionalCalculations.endItemNumber}
+                                            of {viewSpecification.additionalCalculations.totalResults} calculations
+                                        </p>
+                                    </div>
+                                    <Pagination currentPage={viewSpecification.additionalCalculations.currentPage}
+                                                lastPage={viewSpecification.additionalCalculations.lastPage} callback={movePage} />
                                 </nav>
                             </section>
                         </Tabs.Panel>
@@ -354,7 +425,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                             <h3 className="govuk-heading-m">Release date of funding to Navison?</h3>
                                         </legend>
                                         <span id="passport-issued-hint"
-                                              className="govuk-hint">Set the date and time that the statement will be published externally for this funding stream. <br/>For example, 12 11 2019</span>
+                                              className="govuk-hint">Set the date and time that the statement will be
+                                            published externally for this funding stream. <br/>For example, 12 11 2019</span>
                                         <DateInput year={parseInt(viewSpecification.releaseTimetable.navisionDate.year)}
                                                    month={parseInt(viewSpecification.releaseTimetable.navisionDate.month)}
                                                    day={parseInt(viewSpecification.releaseTimetable.navisionDate.day)}
@@ -393,5 +465,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
         </div>
         <Footer/>
+        <script src="https://assets.publishing.service.gov.uk/static/libs/jquery/jquery-1.12.4-c731c20e2995c576b0509d3bd776f7ab64a66b95363a3b5fae9864299ee594ed.js"></script>
+        <script src="https://assets.publishing.service.gov.uk/static/header-footer-only-6210a252b9670a3fc6e36340f28c427d2a1b43d722bf5cb17eb364117aedec64.js"></script>
+        <script src="https://assets.publishing.service.gov.uk/static/surveys-70eb9715dca54df50152ddc5ea606c651ce9b9ea2060809685edc1616337d16c.js"></script>
+        <script src="https://assets.publishing.service.gov.uk/collections/application-11e083324c70619623a8a1f482760617547dac4cd2200c04129d52cdf97d6c40.js"></script>
     </div>
 }
+

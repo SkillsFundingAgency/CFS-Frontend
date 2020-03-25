@@ -17,167 +17,192 @@ using Calculation = CalculateFunding.Common.TemplateMetadata.Models.Calculation;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    public class FundingLineStructureController : Controller
-    {
-        private readonly IPoliciesApiClient _policiesApiClient;
-        private readonly ISpecificationsApiClient _specificationsApiClient;
-        private readonly ICalculationsApiClient _calculationsApiClient;
+	public class FundingLineStructureController : Controller
+	{
+		private readonly IPoliciesApiClient _policiesApiClient;
+		private readonly ISpecificationsApiClient _specificationsApiClient;
+		private readonly ICalculationsApiClient _calculationsApiClient;
 
-        public FundingLineStructureController(
-            IPoliciesApiClient policiesApiClient,
-            ISpecificationsApiClient specificationsApiClient,
-            ICalculationsApiClient calculationsApiClient)
-        {
-            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
-            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
-            Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
-            _policiesApiClient = policiesApiClient;
-            _specificationsApiClient = specificationsApiClient;
-            _calculationsApiClient = calculationsApiClient;
-        }
+		public FundingLineStructureController(
+			IPoliciesApiClient policiesApiClient,
+			ISpecificationsApiClient specificationsApiClient,
+			ICalculationsApiClient calculationsApiClient)
+		{
+			Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+			Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+			Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
+			_policiesApiClient = policiesApiClient;
+			_specificationsApiClient = specificationsApiClient;
+			_calculationsApiClient = calculationsApiClient;
+		}
 
-        [Route("api/fundingstructures/specifications/{specificationId}/fundingstreams/{fundingStreamId}")]
+		[Route("api/fundingstructures/specifications/{specificationId}/fundingstreams/{fundingStreamId}")]
 		[HttpGet]
-        public async Task<IActionResult> GetFundingStructures(
-            [FromRoute]string fundingStreamId,
-            [FromRoute]string specificationId)
-        {
-            SpecificationSummary specificationSummary;
-            ApiResponse<SpecificationSummary> specificationSummaryApiResponse = 
-	            await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+		public async Task<IActionResult> GetFundingStructures(
+			[FromRoute] string fundingStreamId,
+			[FromRoute] string specificationId)
+		{
+			SpecificationSummary specificationSummary;
+			ApiResponse<SpecificationSummary> specificationSummaryApiResponse =
+				await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
 
-            if (specificationSummaryApiResponse.StatusCode == HttpStatusCode.OK)
-            {
-                specificationSummary = specificationSummaryApiResponse.Content;
-            }
-            else
-            {
-                if (specificationSummaryApiResponse.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return new BadRequestResult();
-                }
-
-                return new InternalServerErrorResult(
-	                $"There was an issue with retrieving specification '{specificationId}'");
-            }
-
-            string templateVersion = specificationSummary.TemplateIds[fundingStreamId];
-            if (templateVersion == null)
-	            return new InternalServerErrorResult(
-		            $"Specification contains no matching template version for funding stream '{fundingStreamId}'");
-
-            ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
-                await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, templateVersion);
-
-            if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.OK)
-            {
-	            ApiResponse<TemplateMapping> templateMapping =
-		            await _calculationsApiClient.GetTemplateMapping(specificationId, fundingStreamId);
-	            if (templateMapping.StatusCode == HttpStatusCode.BadRequest)
-	            {
+			if (specificationSummaryApiResponse.StatusCode == HttpStatusCode.OK)
+			{
+				specificationSummary = specificationSummaryApiResponse.Content;
+			}
+			else
+			{
+				if (specificationSummaryApiResponse.StatusCode == HttpStatusCode.BadRequest)
+				{
 					return new BadRequestResult();
-	            }
+				}
 
-	            if (templateMapping.StatusCode != HttpStatusCode.OK || templateMapping.Content == null)
-	            {
-		            return new InternalServerErrorResult(
-		            $"There was an issue with retrieving template mapping for Specification '{specificationId}' and Funding Stream '{fundingStreamId}'");
-	            }
+				return new InternalServerErrorResult(
+					$"There was an issue with retrieving specification '{specificationId}'");
+			}
 
-	            List<FundingStructureItem> fundingStructures = new List<FundingStructureItem>();
-                RecursivelyAddFundingLineToFundingStructure(
-                    fundingStructures,
-                    fundingTemplateContentsApiResponse.Content.RootFundingLines,
-                    templateMapping.Content.TemplateMappingItems);
+			string templateVersion = specificationSummary.TemplateIds[fundingStreamId];
+			if (templateVersion == null)
+				return new InternalServerErrorResult(
+					$"Specification contains no matching template version for funding stream '{fundingStreamId}'");
 
-                return Ok(fundingStructures);
-            }
+			ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
+				await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, templateVersion);
 
-            if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return new BadRequestResult();
-            }
+			if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.OK)
+			{
+				ApiResponse<TemplateMapping> templateMapping =
+					await _calculationsApiClient.GetTemplateMapping(specificationId, fundingStreamId);
+				if (templateMapping.StatusCode == HttpStatusCode.BadRequest)
+				{
+					return new BadRequestResult();
+				}
 
-            return new StatusCodeResult(500);
-        }
+				if (templateMapping.StatusCode != HttpStatusCode.OK || templateMapping.Content == null)
+				{
+					return new InternalServerErrorResult(
+						$"There was an issue with retrieving template mapping for Specification '{specificationId}' and Funding Stream '{fundingStreamId}'");
+				}
 
-        private static void RecursivelyAddFundingLineToFundingStructure(List<FundingStructureItem> fundingStructures,
-	        IEnumerable<FundingLine> fundingLines,
-	        IEnumerable<TemplateMappingItem> templateMappingItems,
-	        int level = 0)
-        {
+				List<FundingStructureItem> fundingStructures = new List<FundingStructureItem>();
+				RecursivelyAddFundingLineToFundingStructure(
+					fundingStructures,
+					fundingTemplateContentsApiResponse.Content.RootFundingLines,
+					templateMapping.Content.TemplateMappingItems);
+
+				return Ok(fundingStructures);
+			}
+
+			if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.BadRequest)
+			{
+				return new BadRequestResult();
+			}
+
+			return new StatusCodeResult(500);
+		}
+
+		private static FundingStructureItem RecursivelyAddFundingLines(
+			IEnumerable<FundingLine> fundingLines,
+			IEnumerable<TemplateMappingItem> templateMappingItems,
+			int level,
+			FundingLine fundingLine)
+		{
 			level++;
 
-            foreach (FundingLine fundingLine in fundingLines)
-            {
-                //1 - add FundingLine to the structure
-                AddToFundingStructureItem(
-	                fundingStructures,  
-					level,
-	                fundingLine.Name,
-	                FundingStructureType.FundingLine);
+			List<FundingStructureItem> innerFundingStructureItems = new List<FundingStructureItem>();
 
-                //2 - Recursively add any lower lever Calculations to structure with increment level
-                if (fundingLine.Calculations != null && fundingLine.Calculations.Any())
-                {
-	                RecursivelyAddCalculationsToFundingStructure(
-						fundingStructures, 
-						fundingLine.Calculations, 
-						level,
-						templateMappingItems);
-                }
+			// If funding line has calculations, recursively add them to list of inner FundingStructureItems
+			if (fundingLine.Calculations != null && fundingLine.Calculations.Any())
+			{
+				foreach (Calculation calculation in fundingLine.Calculations)
+				{
+					innerFundingStructureItems.Add(
+						RecursivelyMapCalculationsToFundingStructureItem(
+							calculation,
+							level,
+							templateMappingItems));
+				}
+			}
 
-                //3 - Recursively add any lower lever FundingLines to structure with increment level
-                if (fundingLine.FundingLines != null && fundingLine.FundingLines.Any())
-                {
-	                RecursivelyAddFundingLineToFundingStructure(
-		                fundingStructures, 
-		                fundingLine.FundingLines, 
+			// If funding line has more funding lines, recursively add them to list of inner FundingStructureItems
+			if (fundingLine.FundingLines != null && fundingLine.FundingLines.Any())
+			{
+				foreach (FundingLine line in fundingLines)
+				{
+					innerFundingStructureItems.Add(RecursivelyAddFundingLines(
+						line.FundingLines,
 						templateMappingItems,
-		                level);
-                }
-            }
-        }
-
-        private static void RecursivelyAddCalculationsToFundingStructure(List<FundingStructureItem> fundingStructures,
-	        IEnumerable<Calculation> calculations,
-	        int level, IEnumerable<TemplateMappingItem> templateMappingItems)
-        {
-	        level++;
-
-	        foreach (Calculation calculation in calculations)
-	        {
-		        
-		        TemplateMappingItem templateMappingItem = templateMappingItems
-			        .FirstOrDefault(t => t.TemplateId == calculation.TemplateCalculationId);
-
-		        string calculationId = templateMappingItem?.CalculationId;
-
-		        AddToFundingStructureItem(
-			        fundingStructures,
-			        level,
-			        calculation.Name,
-			        FundingStructureType.Calculation,
-					calculationId
-		        );
-
-                if (calculation.Calculations != null && calculation.Calculations.Any())
-                {
-					RecursivelyAddCalculationsToFundingStructure(
-						fundingStructures, 
-						calculation.Calculations,
 						level,
-						templateMappingItems);
-                }
-	        }
-        }
+						line));
+				}
+			}
 
-        private static void AddToFundingStructureItem(
-	        List<FundingStructureItem> fundingStructures,
-	        int level, 
-            string name, 
-            FundingStructureType type,
-	        string calculationId = null) =>
-	        fundingStructures.Add(new FundingStructureItem(level, name, calculationId, type));
-    }
+			// Add FundingStructureItem
+			var fundingStructureItem = MapToFundingStructureItem(
+				level,
+				fundingLine.Name,
+				FundingStructureType.FundingLine,
+				null,
+				innerFundingStructureItems.Any() ? innerFundingStructureItems : null);
+
+			return fundingStructureItem;
+		}
+
+		private static void RecursivelyAddFundingLineToFundingStructure(List<FundingStructureItem> fundingStructures,
+			IEnumerable<FundingLine> fundingLines,
+			IEnumerable<TemplateMappingItem> templateMappingItems,
+			int level = 0) =>
+			fundingStructures.AddRange(fundingLines.Select(fundingLine =>
+				RecursivelyAddFundingLines(
+					fundingLine.FundingLines,
+					templateMappingItems,
+					level,
+					fundingLine)));
+
+
+		private static FundingStructureItem MapToFundingStructureItem(
+			int level,
+			string name,
+			FundingStructureType type,
+			string calculationId = null,
+			List<FundingStructureItem> fundingStructureItems = null) =>
+			new FundingStructureItem(level, name, calculationId, type, fundingStructureItems);
+
+		private static FundingStructureItem RecursivelyMapCalculationsToFundingStructureItem(
+			Calculation calculation,
+			int level, IEnumerable<TemplateMappingItem> templateMappingItems)
+		{
+			level++;
+
+			FundingStructureItem fundingStructureItem = null;
+			List<FundingStructureItem> innerFundingStructureItems = null;
+
+			string calculationId = GetCalculationId(calculation, templateMappingItems);
+
+			if (calculation.Calculations != null && calculation.Calculations.Any())
+			{
+				innerFundingStructureItems = calculation.Calculations.Select(innerCalculation =>
+						RecursivelyMapCalculationsToFundingStructureItem(
+							innerCalculation,
+							level,
+							templateMappingItems))
+					.ToList();
+			}
+
+			fundingStructureItem = MapToFundingStructureItem(
+				level,
+				calculation.Name,
+				FundingStructureType.Calculation,
+				calculationId,
+				innerFundingStructureItems);
+
+			return fundingStructureItem;
+		}
+
+		private static string GetCalculationId(
+			Calculation calculation,
+			IEnumerable<TemplateMappingItem> templateMappingItems) =>
+			templateMappingItems
+				.FirstOrDefault(t => t.TemplateId == calculation.TemplateCalculationId)?.CalculationId;
+	}
 }

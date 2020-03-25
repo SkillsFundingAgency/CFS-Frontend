@@ -10,7 +10,7 @@ export function ApproveStatusButton(props: { id: string, status: string, callbac
 
     function submitApprove() {
         setCurrentStatus({status: props.status, isLoading: true});
-        return callback(props.id);
+        callback(props.id);
     }
 
     return <div hidden={currentStatus.status === ""}>

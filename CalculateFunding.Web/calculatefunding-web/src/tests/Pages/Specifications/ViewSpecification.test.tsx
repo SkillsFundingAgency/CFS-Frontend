@@ -6,6 +6,7 @@ import {mount} from "enzyme";
 import configureStore from 'redux-mock-store';
 import {fakeHistory, fakeInitialState, fakeLocation} from "../../fakes/fakes";
 import {ViewSpecification, ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
+import {FundingStructureType} from "../../../types/FundingStructureItem";
 
 describe("Provider Funding Overview ", () => {
     const Adapter = require('enzyme-adapter-react-16');
@@ -22,13 +23,28 @@ describe("Provider Funding Overview ", () => {
     };
     const mockViewSpecificationState = {
     additionalCalculations: {
+        totalCount: 0,
         results: [{
             id:"1",
-            name: "123"
+            name: "123",
+            fundingStreamId: "",
+            specificationId: "",
+            specificationName: "",
+            valueType: "",
+            calculationType: "",
+            namespace: "",
+            wasTemplateCalculation: false,
+            description: null,
+            status: "",
+            lastUpdatedDate: new Date(),
+            lastUpdatedDateDisplay: ""
         }],
+        totalResults: 0,
+        totalErrorResults: 0,
         currentPage: 0,
+        lastPage: 0,
+        startItemNumber: 0,
         endItemNumber: 0,
-        facets: [],
         pagerState: {
             currentPage: 0,
             displayNumberOfPages: 0,
@@ -37,9 +53,7 @@ describe("Provider Funding Overview ", () => {
             pages: [],
             previousPage: 0
         },
-        startItemNumber: 0,
-        totalErrorResults: 0,
-        totalResults: 0
+        facets: []
     },
     specification: {
         name: "",
@@ -75,7 +89,24 @@ describe("Provider Funding Overview ", () => {
             time: ""
         }
     },
-    fundingLineStructureResult: [],
+    fundingLineStructureResult: [
+        {
+            level: 1,
+            name: "step 1 title",
+            type: FundingStructureType.fundingLine,
+            calculationId: "",
+            fundingStructureItems:[
+                {
+                    level: 2,
+                    name: "step 2 title",
+                    type: FundingStructureType.calculation,
+                    calculationId: "ABC",
+                    fundingStructureItems:[]
+                }
+            ],
+
+        }
+    ],
     fundingLineStatusResult: "test fundingLineStatusResult"
     };
     fakeInitialState.viewSpecification = mockViewSpecificationState;
@@ -104,5 +135,26 @@ describe("Provider Funding Overview ", () => {
 
         expect(actual.length).toBe(1);
         expect(actual.prop("status")).toBe(mockViewSpecificationState.fundingLineStatusResult);
+    });
+
+    it("renders collapsible steps", async () => {
+        const wrapper = mount(mockViewSpecificationPage);
+
+        expect(wrapper.find('.collapsible-steps').length).toBe(1);
+    });
+
+    it("renders correct number of collapsible steps", async () => {
+        const wrapper = mount(mockViewSpecificationPage);
+
+        expect(wrapper.find('CollapsibleSteps').length).toBe(2);
+    });
+
+    it("renders collapsible steps with calculation linked to edit calculation page", async () => {
+        const wrapper = mount(mockViewSpecificationPage);
+
+        expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').length).toBe(1);
+        expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').prop("href"))
+            .toBe("/calcs/editTemplateCalculation/"
+                + mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId);
     });
 });

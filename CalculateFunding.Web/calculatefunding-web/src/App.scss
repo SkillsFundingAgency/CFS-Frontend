@@ -171,7 +171,7 @@
   }
 
   &.current {
-    color: #0B0C0C;
+    color: $govuk-text-colour;
     font-weight: 700;
     border: none;
     pointer-events: none;
@@ -179,7 +179,7 @@
 
     &:hover,
     &:focus {
-      color: #0B0C0C;
+      color: $govuk-text-colour;
       background: none;
     }
   }
@@ -329,7 +329,7 @@
   display: inline-block;
   outline: 2px solid transparent;
   outline-offset: -2px;
-  color: #ffffff;
+  color: govuk-colour("white");
   background-color: #1d70b8;
   letter-spacing: 1px;
   text-decoration: none;
@@ -347,4 +347,144 @@
 }
 .right-align {
   float: right;
+}
+
+.collapsible-steps {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  .collapsible-step  {
+    position: relative;
+    padding-left: 45px;
+    list-style: none
+  }
+
+  .collapsible-step li {
+    margin-left: -45px;
+  }
+
+  .collapsible-step:after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    width: 0;
+    height: 100%;
+    border-left: solid 5px $govuk-border-colour;
+    background: govuk-colour("white");
+    left: 0;
+    margin-left: 16px;
+    top: 15px
+  }
+
+  .collapsible-step:last-child:after {
+    height: -webkit-calc(100% - 15px);
+    height: calc(100% - 15px)
+  }
+
+  .collapsible-step-circle {
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    left: 0;
+    width: 38px;
+    height: 38px;
+    color: $govuk-text-colour;
+    background: govuk-colour("white");
+    border-radius: 100px;
+    text-align: center
+  }
+
+  .collapsible-step-circle-number {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 28px;
+    border: solid 5px $govuk-border-colour
+  }
+
+  .collapsible-step-circle-inner {
+    float: right;
+    min-width: 100%
+  }
+
+  .collapsible-step-circle-background {
+    text-shadow: 0 -0.1em 0 govuk-colour("white"), 0.1em 0 0 govuk-colour("white"), 0 0.1em 0 govuk-colour("white"), -0.1em 0 0 govuk-colour("white")
+  }
+
+  .collapsible-step-circle-step-label,
+  .collapsible-step-circle-step-colon {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    -webkit-clip-path: inset(50%) !important;
+    clip-path: inset(50%) !important;
+    border: 0 !important;
+    white-space: nowrap !important
+  }
+
+  .collapsible-step-header-container {
+    padding: 15px 0;
+    border-top: solid 2px $govuk-border-colour;
+    margin-left: 20px;
+  }
+
+  .collapsible-step-header-container h2 {
+    margin: 0
+  }
+
+  .collapsible-step-panel {
+    color: $govuk-text-colour;
+  }
+
+  .collapsible-step-hidden-panel {
+    display: none
+  }
+
+  .collapsible-step-header-title {
+    width: 300px;
+    display: inline-block;
+  }
+
+  .collapsible-step-header-description {
+    width: 800px;
+    display: inline-block;
+  }
+
+  .collapsible-step-panel-button {
+    width: 30px;
+  }
+
+  .collapsible-step-panel-button:hover {
+    cursor: pointer !important;
+  }
+
+  .first-step-title {
+    font-weight: bold;
+  }
+
+  .govuk-collapsiblepanel-heading-expander:after {
+    content: '+';
+    align-content: end;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .govuk-collapsiblepanel-heading-collapser:after {
+    content: '-';
+    align-content: end;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px;
+  }
+}
+.collapsible-steps ul
+{
+  padding: 0 !important;
+  margin:0 !important;
 }

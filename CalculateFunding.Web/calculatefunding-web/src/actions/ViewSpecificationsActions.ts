@@ -152,7 +152,6 @@ export const changeFundingLineState:
     return async (dispatch: Dispatch) => {
         const response = await changeFundingLineStateService(specificationId);
         let publishStatusModelResult = response.data as PublishStatusModel;
-
         dispatch({
             type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
             payload: publishStatusModelResult.publishStatus as PublishStatus
