@@ -6,6 +6,7 @@ interface ICollapsibleStepsProps {
     step: string;
     title: string;
     description: string;
+    status: string;
     expanded: boolean;
     hasChildren: boolean;
     link: string;
@@ -38,6 +39,9 @@ export const CollapsibleSteps: React.FC<ICollapsibleStepsProps> = props => {
                     </span>
                     <span className="collapsible-step-header-description">
                         {description}
+                    </span>
+                    <span className="collapsible-step-header-status">
+                        {props.status}
                     </span>
                     <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={() => setExpanded(!expanded)}>
                         <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}></label>

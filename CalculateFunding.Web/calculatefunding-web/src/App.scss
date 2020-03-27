@@ -446,12 +446,16 @@
   }
 
   .collapsible-step-header-title {
-    width: 300px;
+    width: 200px;
     display: inline-block;
   }
 
   .collapsible-step-header-description {
-    width: 800px;
+    width: 750px;
+    display: inline-block;
+  }
+  .collapsible-step-header-status {
+    width: 150px;
     display: inline-block;
   }
 
@@ -472,7 +476,8 @@
     align-content: end;
     font-weight: bold;
     cursor: pointer;
-    padding: 2px;
+    font-size: 30px;
+    line-height: 12px;
   }
 
   .govuk-collapsiblepanel-heading-collapser:after {
@@ -480,7 +485,9 @@
     align-content: end;
     font-weight: bold;
     cursor: pointer;
-    padding: 2px;
+
+    font-size: 30px;
+    line-height: 12px;
   }
 }
 .collapsible-steps ul

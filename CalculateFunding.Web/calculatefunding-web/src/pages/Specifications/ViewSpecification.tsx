@@ -178,27 +178,30 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId != '') {
                         linkValue = '/calcs/editTemplateCalculation/' + innerFundingLineItem.calculationId;
                     }
-                        return (
-                            <CollapsibleSteps
-                                key={index}
-                                uniqueKey={index.toString()}
-                                title={displayFundingType?fundingType: ""}
-                                description={innerFundingLineItem.name}
-                                step={displayFundingType?innerFundingLineItem.level.toString(): ""}
-                                expanded={false}
-                                link={linkValue}
-                                hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
-                                {
-                                    innerFundingLineItem.fundingStructureItems ?
-                                        (<FundingLineItem calculationId={innerFundingLineItem.calculationId}
-                                                          type={innerFundingLineItem.type}
-                                                          level={innerFundingLineItem.level}
-                                                          name={innerFundingLineItem.name}
-                                                          fundingStructureItems={innerFundingLineItem.fundingStructureItems}/>)
-                                        : null
-                                }
-                            </CollapsibleSteps>
-                        )
+                    return (
+                        <CollapsibleSteps
+                            key={index}
+                            uniqueKey={index.toString()}
+                            title={displayFundingType?fundingType: ""}
+                            description={innerFundingLineItem.name}
+                            status={(innerFundingLineItem.calculationPublishStatus != null && innerFundingLineItem.calculationPublishStatus != '') ?
+                            innerFundingLineItem.calculationPublishStatus: ""}
+                            step={displayFundingType?innerFundingLineItem.level.toString(): ""}
+                            expanded={false}
+                            link={linkValue}
+                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
+                            {
+                                innerFundingLineItem.fundingStructureItems ?
+                                    (<FundingLineItem calculationId={innerFundingLineItem.calculationId}
+                                                      calculationPublishStatus={innerFundingLineItem.calculationPublishStatus}
+                                                      type={innerFundingLineItem.type}
+                                                      level={innerFundingLineItem.level}
+                                                      name={innerFundingLineItem.name}
+                                                      fundingStructureItems={innerFundingLineItem.fundingStructureItems}/>)
+                                    : null
+                            }
+                        </CollapsibleSteps>
+                    )
                     }
                 )
                     : null
@@ -275,6 +278,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         uniqueKey={index.toString()}
                                         title={FundingStructureType[f.type]}
                                         description={f.name}
+                                        status={(f.calculationPublishStatus != null && f.calculationPublishStatus != '') ?
+                                            f.calculationPublishStatus: ""}
                                         step={f.level.toString()}
                                         expanded={false}
                                         link={linkValue}
@@ -283,6 +288,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                             viewSpecification.fundingLineStructureResult.map(innerFundingLineItem =>{
                                                 return <FundingLineItem key={innerFundingLineItem.name.replace(" ", "") + index}
                                                                         calculationId={innerFundingLineItem.calculationId}
+                                                                        calculationPublishStatus={innerFundingLineItem.calculationPublishStatus}
                                                                         type={innerFundingLineItem.type}
                                                                         level={innerFundingLineItem.level}
                                                                         name={innerFundingLineItem.name}

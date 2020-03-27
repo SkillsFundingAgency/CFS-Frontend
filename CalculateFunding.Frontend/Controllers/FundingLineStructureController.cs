@@ -73,6 +73,7 @@ namespace CalculateFunding.Frontend.Controllers
 			{
 				ApiResponse<TemplateMapping> templateMapping =
 					await _calculationsApiClient.GetTemplateMapping(specificationId, fundingStreamId);
+
 				if (templateMapping.StatusCode == HttpStatusCode.BadRequest)
 				{
 					return new BadRequestResult();
@@ -84,11 +85,27 @@ namespace CalculateFunding.Frontend.Controllers
 						$"There was an issue with retrieving template mapping for Specification '{specificationId}' and Funding Stream '{fundingStreamId}'");
 				}
 
+				ApiResponse<IEnumerable<CalculationMetadata>> calculationMetadata =
+					await _calculationsApiClient.GetCalculationMetadataForSpecification(specificationId);
+
+				if (calculationMetadata.StatusCode == HttpStatusCode.BadRequest)
+				{
+					return new BadRequestResult();
+				}
+
+				if (calculationMetadata.StatusCode != HttpStatusCode.OK || calculationMetadata.Content == null)
+				{
+					return new InternalServerErrorResult(
+						$"There was an issue with retrieving calculation metadata for Specification '{specificationId}'");
+				}
+				
+
 				List<FundingStructureItem> fundingStructures = new List<FundingStructureItem>();
 				RecursivelyAddFundingLineToFundingStructure(
 					fundingStructures,
 					fundingTemplateContentsApiResponse.Content.RootFundingLines,
-					templateMapping.Content.TemplateMappingItems);
+					templateMapping.Content.TemplateMappingItems.ToList(),
+					calculationMetadata.Content.ToList());
 
 				return Ok(fundingStructures);
 			}
@@ -103,7 +120,8 @@ namespace CalculateFunding.Frontend.Controllers
 
 		private static FundingStructureItem RecursivelyAddFundingLines(
 			IEnumerable<FundingLine> fundingLines,
-			IEnumerable<TemplateMappingItem> templateMappingItems,
+			List<TemplateMappingItem> templateMappingItems,
+			List<CalculationMetadata> calculationMetadata,
 			int level,
 			FundingLine fundingLine)
 		{
@@ -120,7 +138,8 @@ namespace CalculateFunding.Frontend.Controllers
 						RecursivelyMapCalculationsToFundingStructureItem(
 							calculation,
 							level,
-							templateMappingItems));
+							templateMappingItems,
+							calculationMetadata));
 				}
 			}
 
@@ -132,6 +151,7 @@ namespace CalculateFunding.Frontend.Controllers
 					innerFundingStructureItems.Add(RecursivelyAddFundingLines(
 						line.FundingLines,
 						templateMappingItems,
+						calculationMetadata,
 						level,
 						line));
 				}
@@ -143,19 +163,23 @@ namespace CalculateFunding.Frontend.Controllers
 				fundingLine.Name,
 				FundingStructureType.FundingLine,
 				null,
+				null,
 				innerFundingStructureItems.Any() ? innerFundingStructureItems : null);
 
 			return fundingStructureItem;
 		}
 
-		private static void RecursivelyAddFundingLineToFundingStructure(List<FundingStructureItem> fundingStructures,
+		private static void RecursivelyAddFundingLineToFundingStructure(
+			List<FundingStructureItem> fundingStructures,
 			IEnumerable<FundingLine> fundingLines,
-			IEnumerable<TemplateMappingItem> templateMappingItems,
+			List<TemplateMappingItem> templateMappingItems,
+			List<CalculationMetadata> calculationMetadata,
 			int level = 0) =>
 			fundingStructures.AddRange(fundingLines.Select(fundingLine =>
 				RecursivelyAddFundingLines(
 					fundingLine.FundingLines,
 					templateMappingItems,
+					calculationMetadata,
 					level,
 					fundingLine)));
 
@@ -165,12 +189,16 @@ namespace CalculateFunding.Frontend.Controllers
 			string name,
 			FundingStructureType type,
 			string calculationId = null,
+			string calculationPublishStatus = null,
 			List<FundingStructureItem> fundingStructureItems = null) =>
-			new FundingStructureItem(level, name, calculationId, type, fundingStructureItems);
+			new FundingStructureItem(
+				level, name, calculationId, calculationPublishStatus, type, fundingStructureItems);
 
 		private static FundingStructureItem RecursivelyMapCalculationsToFundingStructureItem(
 			Calculation calculation,
-			int level, IEnumerable<TemplateMappingItem> templateMappingItems)
+			int level, List<TemplateMappingItem> templateMappingItems,
+			List<CalculationMetadata> calculationMetadata)
+
 		{
 			level++;
 
@@ -178,6 +206,9 @@ namespace CalculateFunding.Frontend.Controllers
 			List<FundingStructureItem> innerFundingStructureItems = null;
 
 			string calculationId = GetCalculationId(calculation, templateMappingItems);
+			string calculationPublishStatus = calculationMetadata.FirstOrDefault(c => c.CalculationId == calculationId)?
+				.PublishStatus.ToString();
+
 
 			if (calculation.Calculations != null && calculation.Calculations.Any())
 			{
@@ -185,7 +216,8 @@ namespace CalculateFunding.Frontend.Controllers
 						RecursivelyMapCalculationsToFundingStructureItem(
 							innerCalculation,
 							level,
-							templateMappingItems))
+							templateMappingItems,
+							calculationMetadata))
 					.ToList();
 			}
 
@@ -194,6 +226,7 @@ namespace CalculateFunding.Frontend.Controllers
 				calculation.Name,
 				FundingStructureType.Calculation,
 				calculationId,
+				calculationPublishStatus,
 				innerFundingStructureItems);
 
 			return fundingStructureItem;

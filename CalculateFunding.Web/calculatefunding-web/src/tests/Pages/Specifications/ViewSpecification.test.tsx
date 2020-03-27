@@ -95,16 +95,17 @@ describe("Provider Funding Overview ", () => {
             name: "step 1 title",
             type: FundingStructureType.fundingLine,
             calculationId: "",
+            calculationPublishStatus: "",
             fundingStructureItems:[
                 {
                     level: 2,
                     name: "step 2 title",
                     type: FundingStructureType.calculation,
                     calculationId: "ABC",
+                    calculationPublishStatus: "Draft",
                     fundingStructureItems:[]
                 }
-            ],
-
+            ]
         }
     ],
     fundingLineStatusResult: "test fundingLineStatusResult"
@@ -156,5 +157,12 @@ describe("Provider Funding Overview ", () => {
         expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').prop("href"))
             .toBe("/calcs/editTemplateCalculation/"
                 + mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId);
+    });
+
+    it("renders collapsible steps with calculation status", async () => {
+        const wrapper = mount(mockViewSpecificationPage);
+
+        expect(wrapper.find('.collapsible-step-header-status').at(1).text())
+            .toBe(mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationPublishStatus);
     });
 });

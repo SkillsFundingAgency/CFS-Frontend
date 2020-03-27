@@ -25,10 +25,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private const string TemplateVersion = "1.0";
         private const string SpecificationId = "680898bd-9ddc-4d11-9913-2a2aa34f213c";
         private const string CalculationId = "aValidCalculationId";
+		private const PublishStatus CalculationExpectedPublishStatus = PublishStatus.Approved;
 
         private readonly ISpecificationsApiClient _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
         private readonly IPoliciesApiClient _policiesApiClient = Substitute.For<IPoliciesApiClient>();
         private readonly ICalculationsApiClient _calculationsApiClient = Substitute.For<ICalculationsApiClient>();
+        
 
         [TestMethod]
         public async Task GetFundingStructures_ReturnsFlatStructureWithCorrectLevelsAndInCorrectOrder()
@@ -57,6 +59,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     [FundingStreamId] = TemplateVersion
                 }
             };
+
 
             var templateMetadataContents = new TemplateMetadataContents
             {
@@ -127,29 +130,41 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                         new TemplateMappingItem
                         {
                             TemplateId = 2,
-                            CalculationId = "CalculationIdForTemplateCalculationId2"
+                            CalculationId = "CalculationIdForTemplateCalculationId2",
                         }
                     }
                 }));
+
+            _calculationsApiClient.GetCalculationMetadataForSpecification(SpecificationId)
+	            .Returns(new ApiResponse<IEnumerable<CalculationMetadata>>(HttpStatusCode.OK,
+		            new List<CalculationMetadata>
+		            {
+			            new CalculationMetadata
+			            {
+				            SpecificationId = SpecificationId,
+				            CalculationId = CalculationId,
+				            PublishStatus = CalculationExpectedPublishStatus
+			            }
+		            }));
         }
 
         private static List<FundingStructureItem> GetValidMappedFundingStructureItems()
         {
 	        var result = new List<FundingStructureItem>
 	        {
-		        new FundingStructureItem(1, "FundingLine-1", null, FundingStructureType.FundingLine),
-		        new FundingStructureItem(1, "FundingLine-2-withFundingLines", null, FundingStructureType.FundingLine,
+		        new FundingStructureItem(1, "FundingLine-1", null, null, FundingStructureType.FundingLine),
+		        new FundingStructureItem(1, "FundingLine-2-withFundingLines", null, null, FundingStructureType.FundingLine,
 			        new List<FundingStructureItem>
 			        {
-				        new FundingStructureItem(2, "FundingLine-2-fl-1", null, FundingStructureType.FundingLine),
-				        new FundingStructureItem(2, "FundingLine-2-fl-2", null, FundingStructureType.FundingLine,
+				        new FundingStructureItem(2, "FundingLine-2-fl-1", null, null, FundingStructureType.FundingLine),
+				        new FundingStructureItem(2, "FundingLine-2-fl-2", null, null, FundingStructureType.FundingLine,
 					        new List<FundingStructureItem>
 					        {
-						        new FundingStructureItem(3, "FundingLine-2-fl-2-fl-1", null,
+						        new FundingStructureItem(3, "FundingLine-2-fl-2-fl-1", null, null,
 							        FundingStructureType.FundingLine)
 					        })
 			        }),
-		        new FundingStructureItem(1, "FundingLine-3-withCalculationsAndFundingLines", null,
+		        new FundingStructureItem(1, "FundingLine-3-withCalculationsAndFundingLines", null, null,
 			        FundingStructureType.FundingLine,
 			        new List<FundingStructureItem>
 			        {
@@ -157,11 +172,13 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 					        2, 
 					        "FundingLine-3-calc-1", 
 					        CalculationId,
+							CalculationExpectedPublishStatus.ToString(),
 					        FundingStructureType.Calculation),
 				        new FundingStructureItem(
 					        2, 
 					        "FundingLine-3-calc-2", 
 					        CalculationId,
+							CalculationExpectedPublishStatus.ToString(),
 					        FundingStructureType.Calculation,
 						        new List<FundingStructureItem>
 						        {
@@ -169,12 +186,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 								        3, 
 								        "FundingLine-3-calc-2-calc-1",
 								        "CalculationIdForTemplateCalculationId2", 
+										null,
 								        FundingStructureType.Calculation)
 						        }),
 				        new FundingStructureItem(
 					        2, 
 					        "FundingLine-3-fl-1",
 					        null, 
+							null,
 					        FundingStructureType.FundingLine)
 			        })
 	        };
