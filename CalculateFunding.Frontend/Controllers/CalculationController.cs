@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Common.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -86,7 +85,20 @@ namespace CalculateFunding.Frontend.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+				PreviewResponse errorResponse = new PreviewResponse();
+
+				foreach (var modelStateValue in ModelState.Values)
+				{
+					errorResponse.CompilerOutput = new Build
+					{
+						CompilerMessages = new List<CompilerMessage>
+						{
+							new CompilerMessage {Message = modelStateValue.Errors[0].ErrorMessage}
+						}
+					};
+				}
+
+                return BadRequest(errorResponse);
             }
 
             PreviewRequest request = _mapper.Map<PreviewRequest>(vm);
@@ -99,10 +111,13 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return Ok(response.Content);
             }
-            else
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                throw new InvalidOperationException($"An error occurred while compiling calculation. Status code={response.StatusCode}");
+                return Ok(response.Content);
             }
+
+            throw new InvalidOperationException($"An error occurred while compiling calculation. Status code={response.StatusCode}");
         }
 
         [Route("api/specs/{specificationId}/codeContext")]
@@ -249,8 +264,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{page}")]
-        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId, 
-	        CalculationType calculationType, int page, [FromQuery]string searchTerm, [FromQuery]string status)
+        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId,
+            CalculationType calculationType, int page, [FromQuery]string searchTerm, [FromQuery]string status)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
@@ -263,8 +278,8 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ApiResponse<SearchResults<CalculationSearchResult>> result =
-                await _calcClient.SearchCalculationsForSpecification(specificationId, 
-	                calculationType, publishStatus, searchTerm, page);
+                await _calcClient.SearchCalculationsForSpecification(specificationId,
+                    calculationType, publishStatus, searchTerm, page);
 
             if (result.StatusCode == HttpStatusCode.OK)
             {

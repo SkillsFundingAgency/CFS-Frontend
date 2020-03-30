@@ -231,11 +231,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     <ul className="govuk-list">
                         <li>
                             <a className="govuk-link"
-                               href={'/app/specifications/editspecification/' + specificationId}>Edit specification</a>
+                               href={`/app/specifications/editspecification/${specificationId}`}>Edit specification</a>
                         </li>
                         <li>
                             <a className="govuk-link"
-                               href={'/calcs/createadditionalcalculation/' + specificationId}>Create additional calculation</a>
+                               href={`/app/specifications/createadditionalcalculation/${specificationId}`}>Create additional calculation</a>
                         </li>
                         <li>
                             <a className="govuk-link" href={`/app/Datasets/CreateDataset/${specificationId}`}>Create dataset</a>

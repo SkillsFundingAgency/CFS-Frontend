@@ -349,6 +349,14 @@
   float: right;
 }
 
+<<<<<<< HEAD
+.govuk-textarea{
+  &--monaco-editor{
+    @extend .govuk-textarea;
+    height: 300px;
+  }
+}
+=======
 .collapsible-steps {
   padding: 0;
   margin: 0;
@@ -495,10 +503,4 @@
   padding: 0 !important;
   margin:0 !important;
 }
-
-.govuk-textarea{
-  &--monaco-editor{
-    @extend .govuk-textarea;
-    height: 300px;
-  }
-}
+>>>>>>> origin/providers

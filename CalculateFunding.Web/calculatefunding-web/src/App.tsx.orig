@@ -16,7 +16,10 @@ import {SelectSpecification} from "./pages/Specifications/SelectSpecification";
 import {SpecificationsList} from "./pages/Specifications/SpecificationsList";
 import {ViewSpecificationResults} from "./pages/Specifications/ViewSpecificationResults";
 import {ViewSpecification} from "./pages/Specifications/ViewSpecification";
+<<<<<<< HEAD
 import {CreateAdditionalCalculation} from "./pages/Calculations/CreateAdditionalCalculation";
+=======
+>>>>>>> origin/providers
 
 const App: React.FunctionComponent = () => {
   return (
@@ -34,7 +37,10 @@ const App: React.FunctionComponent = () => {
        <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
        <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
+<<<<<<< HEAD
        <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
+=======
+>>>>>>> origin/providers
        <Route path="*">
             <NoMatch />
           </Route>
