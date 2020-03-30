@@ -76,7 +76,6 @@ export function SpecificationsList() {
     }, [singleFire]);
 
     function movePage(pageNumber: number) {
-        console.log(pageNumber);
         setSearchCriteria(prevState => {
             return {
                 ...prevState,
@@ -142,14 +141,11 @@ export function SpecificationsList() {
         let request = searchCriteria;
         request.status = filterUpdate;
 
-        console.log(searchCriteria);
-        console.log(request);
         dispatch(getAllSpecifications(searchCriteria));
     }
 
     function filterBySearchTerm(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = e.target.value;
-        console.log(e.target.value);
 
         setSearchCriteria(prevState => {
             return {...prevState, searchTerm: filterUpdate}

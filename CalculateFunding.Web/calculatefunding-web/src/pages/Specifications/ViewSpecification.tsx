@@ -339,7 +339,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <tbody className="govuk-table__body">
                                     {viewSpecification.additionalCalculations.results.map((ac, index) =>
                                         <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell">{ac.name}</td>
+                                            <td className="govuk-table__cell"><a href={`/app/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</a></td>
                                             <td className="govuk-table__cell">{ac.status}</td>
                                             <td className="govuk-table__cell">{ac.valueType}</td>
                                             <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate} utc={false}/></td>
@@ -353,7 +353,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
                                         No additional calculations available. <a
-                                        href={'/calcs/createadditionalcalculation/' + specification.id}>Create a
+                                        href={`/app/specifications/createadditionalcalculation/${specificationId}`}>Create a
                                         calculation</a>
                                     </strong>
                                 </div>

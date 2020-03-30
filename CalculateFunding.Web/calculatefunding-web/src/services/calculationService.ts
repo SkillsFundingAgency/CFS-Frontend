@@ -1,7 +1,7 @@
 import axios from "axios";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
-import {CreateAdditionalCalculationViewModel} from "../types/Calculations/CreateAdditonalCalculationViewModel";
+import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 
 export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
@@ -46,14 +46,18 @@ export async function createAdditionalCalculationService(createAdditionalCalcula
         data: createAdditionalCalculationViewModel
     })
 }
+export async function updateAdditionalCalculationService(updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel, specificationId:string, calculationId:string) {
+    return axios(`/api/specs/${specificationId}/calculations/${calculationId}/editadditionalcalculation`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: updateAdditionalCalculationViewModel
+    })
+}
 
 export async function compileCalculationPreviewService(specificationId:string, calculationId:string, sourceCode:string)
 {
-    console.log("compileCalculationPreviewService");
-    console.log(specificationId);
-    console.log(calculationId);
-    console.log(sourceCode);
-
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
         method: 'POST',
         headers:{
@@ -61,6 +65,15 @@ export async function compileCalculationPreviewService(specificationId:string, c
         },
         data: {
             sourceCode: sourceCode
+        }
+    })
+}
+
+export async function getCodeContextService(specificationId: string) {
+    return axios(`/api/specs/${specificationId}/codeContext`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
         }
     })
 }

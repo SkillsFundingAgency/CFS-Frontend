@@ -40,7 +40,6 @@ export function AutoComplete(props: { suggestions: string[], callback: any }) {
     }
 
     function listClick(e: React.MouseEvent<HTMLLIElement>) {
-        console.log(e);
         const userSelected = e.currentTarget.innerText;
         setSuggestions(userSelected);
         setAutoCompleteState(prevState => {
