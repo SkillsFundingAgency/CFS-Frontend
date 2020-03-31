@@ -147,7 +147,7 @@ export function CreateSpecification() {
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-main-wrapper">
-                <LoadingStatus title={"Creating Subscription"}
+                <LoadingStatus title={"Creating Specification"}
                                subTitle={"Please wait whilst we create the specification"}
                                description={"This can take a few minutes"} id={"create-specification"}
                                hidden={!isLoading}/>

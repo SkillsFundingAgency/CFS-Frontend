@@ -37,8 +37,8 @@ export async function getFundingStreamsService() {
     });
 }
 
-export async function getFundingPeriodsByFundingStreamIdService(fundingstreamId: string) {
-    return axios(`${baseURL}/get-fundingperiods-for-selected-fundingstream/${fundingstreamId}`, {
+export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId: string) {
+    return axios(`/api/policy/fundingperiods/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
