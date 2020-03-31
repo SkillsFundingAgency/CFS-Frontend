@@ -155,8 +155,7 @@ describe("Provider Funding Overview ", () => {
 
         expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').length).toBe(1);
         expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').prop("href"))
-            .toBe("/calcs/editTemplateCalculation/"
-                + mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId);
+            .toBe(`/app/Specifications/EditTemplateCalculation/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId}/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].name}`);
     });
 
     it("renders collapsible steps with calculation status", async () => {

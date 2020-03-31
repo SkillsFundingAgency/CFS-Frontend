@@ -163,6 +163,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const FundingLineItem: React.FC<IFundingStructureItem> = ({ fundingStructureItems }) => {
         let fundingType: string = "";
+        const parentFundingLineName :string = fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
         return (
             <React.Fragment>
             {
@@ -176,7 +177,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
                     let linkValue = '';
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId != '') {
-                        linkValue = '/calcs/editTemplateCalculation/' + innerFundingLineItem.calculationId;
+                        linkValue = `/app/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`;
                     }
                     return (
                         <CollapsibleSteps
@@ -197,7 +198,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                       type={innerFundingLineItem.type}
                                                       level={innerFundingLineItem.level}
                                                       name={innerFundingLineItem.name}
-                                                      fundingStructureItems={innerFundingLineItem.fundingStructureItems}/>)
+                                                      fundingStructureItems={innerFundingLineItem.fundingStructureItems}
+                                    parentName={innerFundingLineItem.name}/>)
                                     : null
                             }
                         </CollapsibleSteps>
@@ -270,7 +272,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     viewSpecification.fundingLineStructureResult.map((f, index) => {
                                     let linkValue = '';
                                     if (f.calculationId != null && f.calculationId != '') {
-                                        linkValue = '/calcs/editTemplateCalculation/' + f.calculationId;
+                                        linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
                                     }
 
                                     return <li key={"collapsible-steps-top"+index} className="collapsible-step step-is-shown"><CollapsibleSteps
@@ -292,7 +294,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                                         type={innerFundingLineItem.type}
                                                                         level={innerFundingLineItem.level}
                                                                         name={innerFundingLineItem.name}
-                                                                        fundingStructureItems={innerFundingLineItem.fundingStructureItems} />
+                                                                        fundingStructureItems={innerFundingLineItem.fundingStructureItems}
+                                                parentName={f.name}/>
                                             })
                                         }
                                         </CollapsibleSteps>

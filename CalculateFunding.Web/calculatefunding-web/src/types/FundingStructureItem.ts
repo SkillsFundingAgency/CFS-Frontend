@@ -1,10 +1,11 @@
 export interface IFundingStructureItem{
-    level : number,
-    name : string,
-    calculationId : string,
-    calculationPublishStatus : string,
-    type : FundingStructureType,
-    fundingStructureItems: IFundingStructureItem[]
+    level : number;
+    name : string;
+    calculationId : string;
+    calculationPublishStatus : string;
+    type : FundingStructureType;
+    fundingStructureItems: IFundingStructureItem[];
+    parentName: string;
 }
 
 export enum FundingStructureType{

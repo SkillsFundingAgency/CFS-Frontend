@@ -18,6 +18,7 @@ import {ViewSpecificationResults} from "./pages/Specifications/ViewSpecification
 import {ViewSpecification} from "./pages/Specifications/ViewSpecification";
 import {CreateAdditionalCalculation} from "./pages/Calculations/CreateAdditionalCalculation";
 import {EditAdditionalCalculation} from "./pages/Calculations/EditAdditionalCalculation";
+import {EditTemplateCalculation} from "./pages/Calculations/EditTemplateCalculation";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -37,6 +38,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
        <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
        <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
+       <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />
        <Route path="*">
             <NoMatch />
           </Route>
