@@ -9,7 +9,7 @@
 
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddModule<T>(this IServiceCollection services, T module, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public static IServiceCollection AddModule<T>(this IServiceCollection services, T module, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
             where T : ServiceCollectionModuleBase
         {
             module.Configuration = configuration;
@@ -27,7 +27,7 @@
             return AddModule(services, module, configuration, null);
         }
 
-        public static IServiceCollection AddModule<T>(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public static IServiceCollection AddModule<T>(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
             where T : ServiceCollectionModuleBase, new()
         {
             T module = new T();

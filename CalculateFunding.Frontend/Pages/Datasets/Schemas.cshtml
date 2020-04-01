@@ -2,7 +2,8 @@
 @model CalculateFunding.Frontend.Pages.Datasets.SchemasPageModel
 @using CalculateFunding.Frontend.Properties
 @using CalculateFunding.Frontend.ViewModels.Common
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@using Microsoft.Extensions.Hosting
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnv
 
 @{
     ViewData["Title"] = "Download data schema template";

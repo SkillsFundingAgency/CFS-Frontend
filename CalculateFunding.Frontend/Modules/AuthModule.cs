@@ -6,10 +6,10 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CalculateFunding.Frontend.Modules
 {
@@ -29,7 +29,7 @@ namespace CalculateFunding.Frontend.Modules
                 services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
                 services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
 
-                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                services.AddMvc();
             }
             else
             {
@@ -60,7 +60,7 @@ namespace CalculateFunding.Frontend.Modules
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
 
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                });
             }
         }
     }

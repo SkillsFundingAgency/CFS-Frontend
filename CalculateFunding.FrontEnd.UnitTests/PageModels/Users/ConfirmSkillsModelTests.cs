@@ -11,7 +11,6 @@ using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.Pages.Users;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

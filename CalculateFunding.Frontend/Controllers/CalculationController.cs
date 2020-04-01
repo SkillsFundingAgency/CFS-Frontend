@@ -263,9 +263,9 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{page}")]
-        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId,
-            CalculationType calculationType, int page, [FromQuery]string searchTerm, [FromQuery]string status)
+        [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{pageNumber}")]
+        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId, 
+	        CalculationType calculationType, int pageNumber, [FromQuery]string searchTerm, [FromQuery]string status)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
@@ -278,8 +278,9 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ApiResponse<SearchResults<CalculationSearchResult>> result =
-                await _calcClient.SearchCalculationsForSpecification(specificationId,
-                    calculationType, publishStatus, searchTerm, page);
+                await _calcClient.SearchCalculationsForSpecification(specificationId, 
+	                calculationType, publishStatus, searchTerm, pageNumber);
+
 
             if (result.StatusCode == HttpStatusCode.OK)
             {

@@ -8,7 +8,7 @@
     {
         public IConfiguration Configuration { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostingEnvironment { get; set; }
 
         public abstract void Configure(IServiceCollection services);
 

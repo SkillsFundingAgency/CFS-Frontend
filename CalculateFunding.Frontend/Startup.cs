@@ -3,8 +3,6 @@
     using System;
     using System.IO;
     using System.Threading.Tasks;
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
     using CalculateFunding.Common.Identity.Authorization;
     using CalculateFunding.Common.Interfaces;
     using CalculateFunding.Common.Utility;
@@ -26,14 +24,15 @@
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-
+    using Microsoft.Extensions.Hosting;
+    
     public class Startup
     {
-        private IHostingEnvironment _hostingEnvironment;
+        private IWebHostEnvironment _hostingEnvironment;
 
         private bool _authenticationEnabled;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
             Guard.ArgumentNotNull(configuration, nameof(configuration));
             Guard.ArgumentNotNull(hostingEnvironment, nameof(hostingEnvironment));
@@ -44,12 +43,18 @@
 
         public IConfiguration Configuration { get; }
 
-        public IContainer ApplicationContainer { get; private set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             bool enablePlatformAuth = Configuration.GetValue<bool>("features:enablePlatformAuth");
+
+            services.AddControllers()
+                .AddNewtonsoftJson();
+
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
+            });
 
             if (enablePlatformAuth)
             {
@@ -91,7 +96,7 @@
                                          .Build();
                         config.Filters.Add(new AuthorizeFilter(policy));
 
-                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                    });
                 }
                 else
                 {
@@ -102,7 +107,8 @@
                     services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
                     services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
 
-                    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                    services.AddMvc();
+                    services.Configure<MvcOptions>(options => options.EnableEndpointRouting = false);
                 }
             }
 
@@ -136,12 +142,6 @@
 
             services.AddSignalR().AddAzureSignalR();
 
-            ContainerBuilder builder = new ContainerBuilder();
-
-            builder.Populate(services);
-
-            ApplicationContainer = builder.Build();
-
             services.AddHsts((options) =>
             {
                 options.ExcludedHosts.Add("localhost");
@@ -150,11 +150,11 @@
                 options.MaxAge = new TimeSpan(365, 0, 0, 0, 0);
             });
 
-            return new AutofacServiceProvider(ApplicationContainer);
+            services.AddOptions();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
@@ -191,24 +191,26 @@
                 }
             });
 
+            app.UseRouting();
+
             if (_authenticationEnabled)
             {
                 app.UseAuthentication();
+                app.UseAuthorization();
 
                 app.UseMiddleware<SkillsCheckMiddleware>();
             }
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                      name: "default",
+                      pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapHub<Notifications>("/api/notifications");
             });
-
-            app.UseAzureSignalR(routes =>
-            {
-                routes.MapHub<Notifications>("/api/notifications");
-            });
+                        
         }
     }
 }

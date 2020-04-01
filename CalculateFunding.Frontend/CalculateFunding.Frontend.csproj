@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
     <TypeScriptToolsVersion>3.6</TypeScriptToolsVersion>
     <CodeAnalysisRuleSet>CalculateFunding.ruleset</CodeAnalysisRuleSet>
@@ -66,31 +66,32 @@
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
+    <PackageReference Include="Autofac" Version="5.1.2" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="CalculateFunding.Common" Version="1.40.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="2.0.4" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="1.0.7" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="1.0.14" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="2.0.17" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="1.0.10" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="1.0.25" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="1.0.9" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="1.0.25" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="1.0.28" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="1.0.10" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="1.1.12" />
-
-    <PackageReference Include="CalculateFunding.Common.Models" Version="1.0.8" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="3.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="3.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.0.0" />
+    <PackageReference Include="CalculateFunding.Common.Models" Version="2.0.0" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.0.2" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.4.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
@@ -247,6 +248,10 @@
   <PropertyGroup>
 
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+
+    <ApplicationIcon />
+
+    <Win32Resource />
 
   </PropertyGroup>
 

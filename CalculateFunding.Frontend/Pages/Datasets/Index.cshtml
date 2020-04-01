@@ -1,7 +1,8 @@
 ﻿@page "{pageNumber?}"
 @model CalculateFunding.Frontend.Pages.Datasets.ManageDataIndexPageModel
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnv
 @using CalculateFunding.Frontend.Properties
+@using Microsoft.Extensions.Hosting
 
 @{
     ViewData["Title"] = "Manage data";

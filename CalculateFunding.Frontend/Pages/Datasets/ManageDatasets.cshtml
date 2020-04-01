@@ -1,10 +1,11 @@
 ﻿@page "{pageNumber?}"
 @model CalculateFunding.Frontend.Pages.Datasets.ManageDatasetsPageModel
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnv
 @using CalculateFunding.Frontend.Helpers
 @using CalculateFunding.Frontend.ViewModels.Common
 @using Microsoft.AspNetCore.Hosting
 @using CalculateFunding.Frontend.Properties
+@using Microsoft.Extensions.Hosting
 
 @{
     ViewData["Title"] = "Manage data source files";

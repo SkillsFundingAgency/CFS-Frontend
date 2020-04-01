@@ -1,9 +1,11 @@
 ﻿@page
 @model CalculateFunding.Frontend.Pages.Approvals.ChoosePageModel
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
 @using CalculateFunding.Frontend.Extensions
 @using CalculateFunding.Frontend.Properties
+@using Microsoft.Extensions.Hosting
+
 @{
     ViewData["Title"] = "Choose funding specification";
 }

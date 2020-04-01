@@ -1,11 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using CalculateFunding.Frontend.Controllers;
 using FluentAssertions;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
@@ -19,7 +27,7 @@ namespace CalculateFunding.Frontend.UnitTests
         {
             // Arrange
             IConfigurationRoot configuration = CreateTestConfiguration();
-            IHostingEnvironment hostingEnv = Substitute.For<IHostingEnvironment>();
+            IWebHostEnvironment hostingEnv = Substitute.For<IWebHostEnvironment>();
             hostingEnv.EnvironmentName.Returns("Test");
 
             Startup target = new Startup(configuration, hostingEnv);
@@ -27,6 +35,12 @@ namespace CalculateFunding.Frontend.UnitTests
 
             var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
             httpContextAccessor.HttpContext = Substitute.For<HttpContext>();
+
+            services.AddScoped(_ => Substitute.For<IHostingEnvironment>());
+
+            services.ReplaceAllRegistrationsWith(Substitute.For<ITelemetry>(), ServiceLifetime.Scoped);
+            services.ReplaceAllRegistrationsWith(Substitute.For<ITelemetryInitializer>(), ServiceLifetime.Singleton);
+            services.ReplaceAllRegistrationsWith(Substitute.For<IConfigureOptions<ApplicationInsightsServiceOptions>>(), ServiceLifetime.Singleton);
 
             // Act
             target.ConfigureServices(services);
@@ -104,8 +118,50 @@ namespace CalculateFunding.Frontend.UnitTests
         /// <returns>The resolved type, or null if cannot be resolved</returns>
         protected T ResolveType<T>(ServiceProvider serviceProvider)
         {
-            TypeActivatorCache typeActivatorCache = new TypeActivatorCache();
-            return typeActivatorCache.CreateInstance<T>(serviceProvider, typeof(T));
+            var activator = serviceProvider.GetService<IControllerActivator>();
+
+            var actionContext = new ActionContext(
+                    new DefaultHttpContext
+                    {
+                        RequestServices = serviceProvider
+                    },
+                    new RouteData(),
+                    new ControllerActionDescriptor
+                    {
+                        ControllerTypeInfo = typeof(T).GetTypeInfo()
+                    });
+            var controller = activator.Create(new ControllerContext(actionContext));
+
+            if (controller.GetType() == typeof(T))
+            {
+                return (T)controller;
+            }
+
+            return default;
+        }
+
+
+    }
+
+    public static class ServiceCollectionExtensions
+    {
+        public static void ReplaceAllRegistrationsWith<TService>(this IServiceCollection services, TService serviceInstance,
+            ServiceLifetime serviceLifetime)
+            where TService : class
+        {
+            ServiceDescriptor mockedServiceDescriptor = new ServiceDescriptor(typeof(TService),
+                _ => serviceInstance,
+                serviceLifetime);
+
+            ServiceDescriptor[] actualTelemetryServices = services.Where(_ =>
+                _.ServiceType == typeof(TService)).ToArray();
+
+            foreach (ServiceDescriptor actualTelemetryService in actualTelemetryServices)
+            {
+                services.Remove(actualTelemetryService);
+            }
+
+            services.Add(mockedServiceDescriptor);
         }
     }
 }

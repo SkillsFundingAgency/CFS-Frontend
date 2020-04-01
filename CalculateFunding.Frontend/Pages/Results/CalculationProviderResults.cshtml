@@ -2,8 +2,9 @@
 @*@using CalculateFunding.Frontend.Clients.ResultsClient.Models*@
 @model CalculateFunding.Frontend.Pages.Results.CalculationProviderResultsPageModel;
 @using CalculateFunding.Frontend.ViewModels.Common
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnv
 @using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
 @using CalculateFunding.Frontend.Properties
 
 @{
@@ -120,17 +121,17 @@
     </div>
     <div class="row withjs-show" data-bind="visible: searchPerformed">
         <div class="col-xs-3">
-                <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-3">
-                <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-3">
-                <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
-            </div>
-            <div class="col-xs-3">
-                <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
-            </div>
+            <select id="providertype" data-bind="multiselect2: {nonSelectedText: 'Select provider type', buttonWidth: '100%', disableIfEmpty: true}, options: providerType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderTypes, enable: canSelectFilters" multiple></select>
+        </div>
+        <div class="col-xs-3">
+            <select id="providersubtype" data-bind="multiselect2: {nonSelectedText: 'Select provider subtype', buttonWidth: '100%', disableIfEmpty: true}, options: providerSubType, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedProviderSubTypes, enable: canSelectFilters" multiple></select>
+        </div>
+        <div class="col-xs-3">
+            <select id="localauthority" data-bind="multiselect2: {nonSelectedText: 'Select local authority', buttonWidth: '100%', disableIfEmpty: true}, options: authority, optionsText: 'displayName', optionsValue: 'name', selectedOptions: selectedLocalAuthorities, enable: canSelectFilters" multiple></select>
+        </div>
+        <div class="col-xs-3">
+            <select id="toggleerrors" data-bind="multiselect2: {buttonWidth: '100%', disableIfEmpty: true}, options: errorToggle, value: selectedErrorToggle, optionsCaption: 'Show All', enable:canSelectErrorToggle"></select>
+        </div>
     </div>
 </form>
 <div class="row providers-search">

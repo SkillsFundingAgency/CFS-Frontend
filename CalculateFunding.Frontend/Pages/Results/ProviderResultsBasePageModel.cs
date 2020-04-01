@@ -173,7 +173,7 @@ namespace CalculateFunding.Frontend.Pages.Results
 
                 if (providerResponse.StatusCode == HttpStatusCode.OK && providerResponse.Content != null)
                 {
-                    PopulateResults(providerResponse);
+                    await PopulateResults(providerResponse);
                 }
                 else
                 {
