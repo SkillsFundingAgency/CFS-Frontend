@@ -25,7 +25,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    
+
     public class Startup
     {
         private IWebHostEnvironment _hostingEnvironment;
@@ -178,7 +178,7 @@
             {
                 RewriteOptions options = new RewriteOptions();
                 options.AddRewrite("^app$", "app/index.html", true);
-                options.AddIISUrlRewrite(iisUrlRewriteStreamReader);
+                options.AddIISUrlRewrite(iisUrlRewriteStreamReader, true);
 
                 app.UseRewriter(options);
             }
@@ -210,7 +210,7 @@
                       pattern: "{controller}/{action=Index}/{id?}");
                 endpoints.MapHub<Notifications>("/api/notifications");
             });
-                        
+
         }
     }
 }
