@@ -19,6 +19,8 @@ import {ViewSpecification} from "./pages/Specifications/ViewSpecification";
 import {CreateAdditionalCalculation} from "./pages/Calculations/CreateAdditionalCalculation";
 import {EditAdditionalCalculation} from "./pages/Calculations/EditAdditionalCalculation";
 import {EditTemplateCalculation} from "./pages/Calculations/EditTemplateCalculation";
+import {ManageData} from "./pages/ManageData";
+import {Approvals} from "./pages/Approvals";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -34,11 +36,13 @@ const App: React.FunctionComponent = () => {
        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
        <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
        <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
+       <Route path="/Datasets/ManageData" component={ManageData} />
        <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
        <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
        <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
        <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />
+       <Route path="/Approvals" component={Approvals} />
        <Route path="*">
             <NoMatch />
           </Route>

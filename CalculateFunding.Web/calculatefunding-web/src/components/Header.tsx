@@ -31,7 +31,7 @@ export function Header(props: {location:Section}) {
           <svg role="presentation" focusable="false" className="govuk-header__logotype-crown"
                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 97" height="30" width="36">
             <img src="/assets/images/govuk-logotype-crown.png" className="govuk-header__logotype-crown-fallback-image"
-                 width="36" height="32"/>
+                 width="36" height="32" alt={"govuk logo"}/>
           </svg>
           <span className="govuk-header__logotype-text">
             GOV.UK
