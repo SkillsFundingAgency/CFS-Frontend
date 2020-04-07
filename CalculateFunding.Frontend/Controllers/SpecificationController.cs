@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CalculateFunding.Common.ApiClient.Models;
+﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Extensions;
@@ -353,6 +352,53 @@ namespace CalculateFunding.Frontend.Controllers
 	        }
 
 			return new BadRequestResult();
+        }
+
+        [Route("api/specs/profile-variation-pointers/{specificationId}")]
+        public async Task<IActionResult> GetProfileVariationPointers(string specificationId)
+        {
+            ApiResponse<IEnumerable<ProfileVariationPointer>> apiResponse = 
+	            await _specificationsApiClient.GetProfileVariationPointers(specificationId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(apiResponse.Content);
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [Route("api/specs/profile-variation-pointers/{specificationId}")]
+        [HttpPut]
+        public async Task<IActionResult> SetProfileVariationPointers(
+	        [FromRoute]string specificationId,
+	        [FromBody]IEnumerable<ProfileVariationPointer> profileVariationPointer)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(profileVariationPointer, nameof(profileVariationPointer));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(
+	            User, 
+	            specificationId, 
+	            SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
+            HttpStatusCode response = 
+	            await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointer);
+
+			if (response == HttpStatusCode.OK)
+            {
+	            return new OkObjectResult(response);
+            }
+
+            throw new InvalidOperationException($"An error occurred while updating profile variation pointers. Status code={response}");
         }
     }
 }

@@ -12,22 +12,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
+using NSubstitute.ExceptionExtensions;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
     [TestClass]
     public class SpecificationControllerTests
     {
-        private ISpecificationsApiClient _specificationsApiClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+		private readonly IAuthorizationHelper _authorizationHelper = Substitute.For<IAuthorizationHelper>();
         private SpecificationController _specificationController;
 
         [TestInitialize]
         public void Initialize()
         {
-			
-            _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-			_specificationController = new SpecificationController(_specificationsApiClient, authorizationHelper);
+			_specificationController = new SpecificationController(_specificationsApiClient, _authorizationHelper);
         }
 
         [TestMethod]
@@ -179,6 +179,127 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IActionResult result = await _specificationController.GetDistinctFundingStreamsForSpecifications();
 
 			result.As<OkObjectResult>().Value.As<List<string>>().Count.Should().Be(expectedFundingStreams.Count);
+        }
+
+		[TestMethod]
+        public async Task GetProfileVariationPointers_Returns_Bad_Request_Given_Api_Returns_Bad_Request_Status()
+        {
+	        string aValidSpecificationId = "ABC";
+            _specificationsApiClient
+	            .GetProfileVariationPointers(aValidSpecificationId)
+                .Returns(Task.FromResult(new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.BadRequest)));
+
+            IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
+
+            result.Should().BeOfType<BadRequestResult>();
+        }
+
+        [TestMethod]
+        public async Task GetProfileVariationPointers_Returns_Internal_Server_Error_Api_Result_Is_Not_Ok_or_Bad_Request()
+        {
+            string aValidSpecificationId = "ABC";
+            _specificationsApiClient
+	            .GetProfileVariationPointers(aValidSpecificationId)
+                .Returns(Task.FromResult(new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.ServiceUnavailable)));
+
+            IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
+
+			result.Should().BeEquivalentTo(new StatusCodeResult(500));
+        }
+
+        [TestMethod]
+        public async Task GetProfileVariationPointers_Returns_Funding_Streams_Given_A_Successful_Request()
+        {
+			string aValidSpecificationId = "ABC";
+			var aValidProfileVariationPointers = CreateTestProfileVariationPointers().ToList();
+			_specificationsApiClient
+	            .GetProfileVariationPointers(aValidSpecificationId)
+                .Returns(Task.FromResult(
+		            new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.OK, aValidProfileVariationPointers)));
+
+            IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
+
+			result.As<OkObjectResult>().Value.As<List<ProfileVariationPointer>>().Should()
+				.BeEquivalentTo(aValidProfileVariationPointers);
+        }
+
+        [TestMethod]
+        public async Task SetProfileVariationPointers_Returns_OK_Given_A_Valid_SpecificationId_And_ProfileVariationPointers()
+        {
+            SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
+			string aValidSpecificationId = "ABC";
+			var aValidProfileVariationPointers = CreateTestProfileVariationPointers().ToList();
+            _specificationsApiClient
+                .SetProfileVariationPointers(aValidSpecificationId, aValidProfileVariationPointers)
+                .Returns(HttpStatusCode.OK);
+
+            IActionResult result = await _specificationController.SetProfileVariationPointers(
+	            aValidSpecificationId, 
+	            aValidProfileVariationPointers);
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task SetProfileVariationPointers_Returns_Forbid_Result_Given_User_Does_Not_Have_Edit_Specification_Permission()
+        {
+			string aValidSpecificationId = "ABC";
+			var aValidProfileVariationPointers = CreateTestProfileVariationPointers();
+
+            IActionResult result = await _specificationController.SetProfileVariationPointers(
+	            aValidSpecificationId, 
+                aValidProfileVariationPointers);
+
+            result.Should().BeAssignableTo<ForbidResult>();
+        }
+
+        [TestMethod]
+        public async Task SetProfileVariationPointers_Throws_InvalidOperationException_Given_An_Error_Occurred_While_Updating()
+        {
+            SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
+			string aValidSpecificationId = "ABC";
+			var aValidProfileVariationPointers = CreateTestProfileVariationPointers();
+
+            Func<Task> action = async () => await _specificationController.SetProfileVariationPointers(
+	            aValidSpecificationId, 
+	            aValidProfileVariationPointers);
+
+            action.Should().Throw<InvalidOperationException>();
+        }
+
+        private void SetupAuthorizedUser(SpecificationActionTypes specificationActionType)
+        {
+            _authorizationHelper.DoesUserHavePermission(
+                    _specificationController.User,
+                    Arg.Any<string>(),
+                    specificationActionType)
+                .Returns(true);
+        }
+
+        private static IEnumerable<ProfileVariationPointer> CreateTestProfileVariationPointers()
+        {
+	        IEnumerable<ProfileVariationPointer> aValidProfileVariationPointers = new List<ProfileVariationPointer>
+	        {
+		        new ProfileVariationPointer
+		        {
+			        FundingStreamId = "1",
+			        FundingLineId = "Funding line 1",
+			        PeriodType = "Test PeriodType",
+			        Year = 2020,
+			        Occurrence = 3,
+			        TypeValue = "ABC"
+		        },
+		        new ProfileVariationPointer
+		        {
+			        FundingStreamId = "2",
+			        FundingLineId = "Funding line 2",
+			        PeriodType = "Test PeriodType",
+			        Year = 2021,
+			        Occurrence = 4,
+			        TypeValue = "ABC"
+		        }
+	        };
+	        return aValidProfileVariationPointers;
         }
     }
 }
