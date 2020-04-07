@@ -380,8 +380,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
-                                        <a className="govuk-link govuk-button" data-module="govuk-button"
-                                           href="/datasets/datasetrelationships">Map
+                                        <a id={"dataset-specification-relationship-button"} className="govuk-link govuk-button" data-module="govuk-button"
+                                           href={`/datasets/specificationrelationships?specificationId=${specificationId}`}>Map
                                             data source file to data set</a>
                                     </div>
                                 </div>
