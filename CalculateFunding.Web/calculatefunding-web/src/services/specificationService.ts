@@ -18,7 +18,7 @@ export async function getSpecificationSummaryService(specificationId: string) {
     });
 }
 
-export async  function getAdditionalCalculationsForSpecificationService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
+export async function getAdditionalCalculationsForSpecificationService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
     return axios(`/api/calculations/getcalculationsforspecification`, {
         method: 'POST',
         headers: {
@@ -55,7 +55,7 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(funding
     });
 }
 
-export async function getAllSpecificationsService(searchRequest:SpecificationSearchRequestViewModel ) {
+export async function getAllSpecificationsService(searchRequest: SpecificationSearchRequestViewModel) {
     const queryString = require("query-string");
     const stringSearchRequest = queryString.stringify(searchRequest);
 
@@ -81,7 +81,7 @@ export async function changeFundingLineStateService(specificationId: string) {
     });
 }
 
-export async  function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel) {
+export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel) {
     return axios(`${baseURL}/create`, {
         method: 'POST',
         headers: {
@@ -91,12 +91,21 @@ export async  function createSpecificationService(createSpecificationViewModel: 
     });
 }
 
-export async  function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId:string) {
+export async function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId: string) {
     return axios(`${baseURL}/update/${specificationId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         data: updateSpecificationViewModel
+    });
+}
+
+export async function getDownloadableReportsService(specificationId: string, reportType: string) {
+    return axios(`${baseURL}/${specificationId}/get-report-metadata/${reportType}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
 }

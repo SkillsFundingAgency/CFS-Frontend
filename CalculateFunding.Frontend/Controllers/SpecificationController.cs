@@ -293,23 +293,23 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [Route("api/specs/get-all-specifications")]
-		[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetAllSpecifications([FromQuery]SpecificationSearchRequestViewModel viewModel)
         {
-	        var searchFilterRequest = new SearchFilterRequest
-	        {
-		        Filters = new Dictionary<string, string[]>(),
-				ErrorToggle = false,
-				SearchMode = SearchMode.All,
-				FacetCount = 0,
-				PageSize = viewModel.PageSize,
-				Page = viewModel.Page,
-				IncludeFacets = true,
-				SearchFields = new List<string>(),
-				SearchTerm = ""
-	        };
+            var searchFilterRequest = new SearchFilterRequest
+            {
+                Filters = new Dictionary<string, string[]>(),
+                ErrorToggle = false,
+                SearchMode = SearchMode.All,
+                FacetCount = 0,
+                PageSize = viewModel.PageSize,
+                Page = viewModel.Page,
+                IncludeFacets = true,
+                SearchFields = new List<string>(),
+                SearchTerm = ""
+            };
 
-	        if (viewModel.Status?.Length > 0)
+            if (viewModel.Status?.Length > 0)
             {
                 searchFilterRequest.Filters.Add("status", viewModel.Status.ToArray());
 
@@ -317,24 +317,24 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (viewModel.FundingPeriods?.Length > 0)
             {
-				searchFilterRequest.Filters.Add("fundingPeriodName", viewModel.FundingPeriods.ToArray());
+                searchFilterRequest.Filters.Add("fundingPeriodName", viewModel.FundingPeriods.ToArray());
             }
 
             if (viewModel.FundingStreams?.Length > 0)
             {
-				searchFilterRequest.Filters.Add("fundingStreamNames", viewModel.FundingStreams.ToArray());
+                searchFilterRequest.Filters.Add("fundingStreamNames", viewModel.FundingStreams.ToArray());
             }
 
             if (!string.IsNullOrEmpty(viewModel.SearchText))
             {
-	            searchFilterRequest.SearchTerm = viewModel.SearchText;
+                searchFilterRequest.SearchTerm = viewModel.SearchText;
             }
 
             PagedResult<SpecificationSearchResultItem> result = await _specificationsApiClient.FindSpecifications(searchFilterRequest);
 
             if (result != null)
             {
-				return new OkObjectResult(result);
+                return new OkObjectResult(result);
             }
 
             return new BadRequestResult();
@@ -344,14 +344,54 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateSpecification([FromBody]EditSpecificationModel viewModel, [FromRoute]string specificationId)
         {
-	        ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
+            ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
 
-	        if (result.StatusCode == HttpStatusCode.OK)
-	        {
-		        return new OkResult();
-	        }
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkResult();
+            }
 
-			return new BadRequestResult();
+            return new BadRequestResult();
+        }
+
+        [Route("api/specs/{specificationId}/get-report-metadata/{reportType}")]
+        [HttpGet]
+        public async Task<IActionResult> GetReportMetadata(string specificationId, string reportType)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(reportType, nameof(reportType));
+
+            ApiResponse<IEnumerable<ReportMetadata>> response = await _specificationsApiClient.GetReportMetadataForSpecifications(specificationId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(response.Content.Where(x => x.Category == reportType));
+            }
+
+            return new BadRequestResult();
+        }
+
+        [Route("api/specs/download-report/{filename}")]
+        [HttpGet]
+        public async Task<IActionResult> DownloadReport(string filename)
+        {
+            Guard.IsNullOrWhiteSpace(filename, nameof(filename));
+
+            ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(filename, ReportType.CalcResult);
+
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+	            WebClient client = new WebClient();
+
+	            byte[] data = client.DownloadData(response.Content.Url);
+
+	            FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = filename};
+
+	            return fileContentResult;
+            }
+
+            return new BadRequestResult();
         }
 
         [Route("api/specs/profile-variation-pointers/{specificationId}")]

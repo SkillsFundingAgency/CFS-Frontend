@@ -17,6 +17,9 @@ import {AppState} from "../../states/AppState";
 import {ViewSpecificationResultsState} from "../../states/ViewSpecificationResultsState";
 import Pagination from "../../components/Pagination";
 import {Section} from "../../types/Sections";
+import {getDownloadableReportsService} from "../../services/specificationService";
+import {ReportMetadataViewModel} from "../../types/Specifications/ReportMetadataViewModel";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface ViewSpecificationResultsProps {
     specification: SpecificationSummary;
@@ -33,15 +36,41 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const [templateCalculationsSearchTerm, setTemplateCalculationsSearchTerm] = useState('');
     const [templateStatusFilter, setTemplateStatusFilter] = useState("All");
     const [additionalStatusFilter, setAdditionalStatusFilter] = useState("All");
+    const [downloadableLiveReports, setDownloadableLiveReports] = useState<ReportMetadataViewModel[]>([]);
+    const [downloadablePublishedReports, setDownloadablePublisedReports] = useState<ReportMetadataViewModel[]>([]);
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
     let specificationId = match.params.specificationId;
+
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
         dispatch(getSpecificationSummary(specificationId));
         dispatch(getTemplateCalculations(specificationId, "All", 1, templateCalculationsSearchTerm));
         dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
+
+        const getLiveDownloadableReports = async () => {
+            const downloadableLiveReportsResults = await getDownloadableReportsService(specificationId, "Live");
+            return downloadableLiveReportsResults;
+        };
+        const getPublishedDownloadableReports = async () => {
+            const downloadablePublishedReportsResults = await getDownloadableReportsService(specificationId, "Published");
+            return downloadablePublishedReportsResults;
+        };
+
+        getLiveDownloadableReports().then((result) => {
+            if (result.status === 200) {
+                let response = result.data as ReportMetadataViewModel[];
+                setDownloadableLiveReports(response);
+            }
+        });
+
+        getPublishedDownloadableReports().then((result) => {
+            if (result.status === 200) {
+                let response = result.data as ReportMetadataViewModel[];
+                setDownloadablePublisedReports(response);
+            }
+        });
     }, [specificationId]);
 
     let breadcrumbs: IBreadcrumbs[] = [
@@ -68,6 +97,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         setTemplateStatusFilter(filter);
         dispatch(getTemplateCalculations(specificationId, filter, 1, templateCalculationsSearchTerm));
     }
+
     function updateAdditionalCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
         setAdditionalStatusFilter(filter);
@@ -110,26 +140,28 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="template-calculations">Template Calculations</Tabs.Tab>
                                 <Tabs.Tab label="additional-calculations">Additional Calculations</Tabs.Tab>
+                                <Tabs.Tab label="downloadable-reports">Downloadable Reports</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="template-calculations">
                                 <section className="govuk-tabs__panel" id="template-calculations">
                                     <h2 className="govuk-heading-l">Template Calculations</h2>
                                     <input className="govuk-input govuk-!-width-three-quarters govuk-!-margin-right-1"
-                                           type="text" onChange={(e)=> templatesCalculationsSearch(e)}/>
-                                    <button className="govuk-button" onClick={searchTemplateCalculations}>Search</button>
-                                            <p className="govuk-body">
-                                                Filter by calculation status
-                                            </p>
-                                            <select name="calculationStatus" id="calculationStatus" className="govuk-select"
-                                                    onChange={(e) => {
-                                                        updateTemplateCalculations(e)
-                                                    }}>
-                                                <option value="All">All</option>
-                                                <option value="Draft">Draft</option>
-                                                <option value="Approved">Approved</option>
-                                                <option value="Updated">Updated</option>
-                                                <option value="Archived">Archived</option>
-                                            </select>
+                                           type="text" onChange={(e) => templatesCalculationsSearch(e)}/>
+                                    <button className="govuk-button" onClick={searchTemplateCalculations}>Search
+                                    </button>
+                                    <p className="govuk-body">
+                                        Filter by calculation status
+                                    </p>
+                                    <select name="calculationStatus" id="calculationStatus" className="govuk-select"
+                                            onChange={(e) => {
+                                                updateTemplateCalculations(e)
+                                            }}>
+                                        <option value="All">All</option>
+                                        <option value="Draft">Draft</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Updated">Updated</option>
+                                        <option value="Archived">Archived</option>
+                                    </select>
                                     <table className="govuk-table">
                                         <thead className="govuk-table__head">
                                         <tr className="govuk-table__row">
@@ -148,7 +180,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationResults.templateCalculations.totalCount > 0}>
+                                        <tr className="govuk-table__row"
+                                            hidden={specificationResults.templateCalculations.totalCount > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -206,7 +239,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
                                             </tr>
                                         )}
-                                        <tr className="govuk-table__row" hidden={specificationResults.additionalCalculations.totalCount > 0}>
+                                        <tr className="govuk-table__row"
+                                            hidden={specificationResults.additionalCalculations.totalCount > 0}>
                                             <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
                                         </tr>
                                         </tbody>
@@ -221,6 +255,90 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </div>
                                         <div className="govuk-grid-column-one-third govuk-body govuk-!-padding-top-4">
                                             Showing {specificationResults.additionalCalculations.startItemNumber} - {specificationResults.additionalCalculations.endItemNumber} of {specificationResults.additionalCalculations.totalResults} results
+                                        </div>
+                                    </div>
+                                </section>
+                            </Tabs.Panel>
+                            <Tabs.Panel label="downloadable-reports">
+                                <section className="govuk-tabs__panel" id="downloadable-reports">
+                                    <h2 className="govuk-heading-l">Downloadable reports</h2>
+                                    <div className="govuk-grid-row">
+                                        <div className="govuk-grid-column-full">
+                                            <div hidden={downloadableLiveReports.length === 0}>
+                                                <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
+                                                {downloadableLiveReports.map(dlr => <div>
+                                                        <div className="attachment__thumbnail">
+                                                            <a className="govuk-link" target="_self"
+                                                               aria-hidden="true" href={`/api/specs/download-report/${dlr.blobName}`}>
+                                                                <svg
+                                                                    className="attachment__thumbnail-image thumbnail-image-small "
+                                                                    version="1.1" viewBox="0 0 99 140" width="99"
+                                                                    height="140"
+                                                                    aria-hidden="true">
+                                                                    <path
+                                                                        d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
+                                                                        stroke-width="0"></path>
+                                                                    <path
+                                                                        d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
+                                                                        stroke-width="0"></path>
+                                                                    <path
+                                                                        d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
+                                                                        fill="none" stroke-miterlimit="10"
+                                                                        stroke-width="2"></path>
+                                                                </svg>
+                                                            </a>
+                                                        </div>
+                                                        <div className="attachment__details">
+                                                            <h4 className="govuk-heading-s">
+                                                                <a className="govuk-link" target="_self"
+                                                                   href={`/api/specs/download-report/${dlr.blobName}`}>{dlr.name}</a>
+                                                            </h4>
+                                                            <p className="govuk-body-s">
+                                                                <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
+                                                                utc={false} date={dlr.lastModified}/></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div hidden={downloadablePublishedReports.length === 0}>
+                                                <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
+                                                {downloadablePublishedReports.map(dpr => <div>
+                                                        <div className="attachment__thumbnail">
+                                                            <a className="govuk-link" target="_self"
+                                                               aria-hidden="true" href={`/api/specs/download-report/${dpr.blobName}`}>
+                                                                <svg
+                                                                    className="attachment__thumbnail-image thumbnail-image-small "
+                                                                    version="1.1" viewBox="0 0 99 140" width="99"
+                                                                    height="140"
+                                                                    aria-hidden="true">
+                                                                    <path
+                                                                        d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
+                                                                        stroke-width="0"></path>
+                                                                    <path
+                                                                        d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
+                                                                        stroke-width="0"></path>
+                                                                    <path
+                                                                        d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
+                                                                        fill="none" stroke-miterlimit="10"
+                                                                        stroke-width="2"></path>
+                                                                </svg>
+                                                            </a>
+                                                        </div>
+                                                        <div className="attachment__details">
+                                                            <h4 className="govuk-heading-s">
+                                                                <a className="govuk-link" target="_self"
+                                                                   href={`/api/specs/download-report/${dpr.blobName}`}>{dpr.name}</a>
+                                                            </h4>
+                                                            <p className="govuk-body-s">
+                                                                <span>{dpr.format}</span>, <span>{dpr.size}</span>, Updated: <span><DateFormatter
+                                                                utc={false} date={dpr.lastModified}/></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
                                         </div>
                                     </div>
                                 </section>
