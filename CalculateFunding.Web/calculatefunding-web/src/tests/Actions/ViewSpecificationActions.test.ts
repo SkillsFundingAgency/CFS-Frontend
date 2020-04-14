@@ -1,5 +1,4 @@
 import configureMockStore from 'redux-mock-store';
-import {ProviderActionTypes} from "../../actions/ProviderActions";
 import thunk from "redux-thunk";
 import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActions";
 

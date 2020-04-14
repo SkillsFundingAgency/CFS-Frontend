@@ -2,6 +2,7 @@ import {reduceViewSpecificationState} from "../../reducers/viewSpecificationRedu
 import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../../states/ViewSpecificationState";
 import {FundingStructureType} from "../../types/FundingStructureItem";
+import {FundingLineStructureActionTypes} from "../../actions/FundingLineStructureAction";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -481,12 +482,17 @@ describe('ViewSpecificationReducer ', () => {
                 "content": [],
                 "statusCode": 0,
             },
-            "fundingLineStructureResult": {
-                "calculationId": "test calculationId",
-                "level": 1,
-                "name": "test funding line",
-                "type": 1,
-            },
+            "fundingLineStructureResult": [
+                {
+                    "calculationId": "test calculationId",
+                    "calculationPublishStatus": "",
+                    "fundingStructureItems": [],
+                    "level": 1,
+                    "name": "test funding line",
+                    "parentName": "",
+                    "type": 1,
+                },
+            ],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",
@@ -524,12 +530,185 @@ describe('ViewSpecificationReducer ', () => {
         expect(
             reduceViewSpecificationState(initialState, {
                 type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE,
-                payload: {
+                payload: [{
                     level : 1,
                     name : "test funding line",
                     calculationId : "test calculationId",
-                    type : FundingStructureType.calculation
-                }
+                    calculationPublishStatus : "",
+                    type : FundingStructureType.calculation,
+                    parentName: "",
+                    fundingStructureItems: []
+                }]
+            })
+        ).toEqual(expectedState);
+    });
+
+    it('should handle GET_PROFILEVARIATIONPOINTER', () => {
+        const expectedState =      {
+            "additionalCalculations":  {
+                "calculations":  [],
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets":  [],
+                "pagerState":  {
+                    "currentPage": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages":  [],
+                    "previousPage": 0,
+                },
+                "startItemNumber": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets":  {
+                "content":  [],
+                "statusCode": 0,
+            },
+            "profileVariationPointerResult":  [
+                {
+                    "fundingLineId": "testFundingLineId",
+                    "fundingStreamId": "testFundingStreamId",
+                    "occurrence": 55,
+                    "periodType": "testPeriodType",
+                    "typeValue": "testTypeValue",
+                    "year": 2022,
+                },
+            ],
+            "releaseTimetable":  {
+                "navisionDate":  {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+                "releaseDate":  {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+            },
+            "specification":  {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod":  {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams":  [
+                    {
+                        "id": "",
+                        "name": "",
+                    },
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
+
+        expect(
+            reduceViewSpecificationState(initialState, {
+                type: ViewSpecificationActionTypes.GET_PROFILEVARIATIONPOINTER,
+                payload:
+                    [
+                        {
+                            fundingStreamId: "testFundingStreamId",
+                            fundingLineId: "testFundingLineId",
+                            periodType: "testPeriodType",
+                            typeValue: "testTypeValue",
+                            year: 2022,
+                            occurrence: 55,
+                        }
+                    ]
+            })
+        ).toEqual(expectedState);
+    });
+
+    it('should handle SET_PROFILEVARIATIONPOINTER', () => {
+        const expectedState =      {
+            "additionalCalculations":  {
+                "calculations":  [],
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets":  [],
+                "pagerState":  {
+                    "currentPage": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages":  [],
+                    "previousPage": 0,
+                },
+                "startItemNumber": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets":  {
+                "content":  [],
+                "statusCode": 0,
+            },
+            "profileVariationPointerResult":  [
+                {
+                    "fundingLineId": "testFundingLineId",
+                    "fundingStreamId": "testFundingStreamId",
+                    "occurrence": 55,
+                    "periodType": "testPeriodType",
+                    "typeValue": "testTypeValue",
+                    "year": 2022,
+                },
+            ],
+            "releaseTimetable":  {
+                "navisionDate":  {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+                "releaseDate":  {
+                    "day": "",
+                    "month": "",
+                    "time": "",
+                    "year": "",
+                },
+            },
+            "specification":  {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod":  {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams":  [
+                    {
+                        "id": "",
+                        "name": "",
+                    },
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
+
+        expect(
+            reduceViewSpecificationState(initialState, {
+                type: ViewSpecificationActionTypes.SET_PROFILEVARIATIONPOINTER,
+                payload:
+                    [
+                        {
+                            fundingStreamId: "testFundingStreamId",
+                            fundingLineId: "testFundingLineId",
+                            periodType: "testPeriodType",
+                            typeValue: "testTypeValue",
+                            year: 2022,
+                            occurrence: 55,
+                        }
+                    ]
             })
         ).toEqual(expectedState);
     });
@@ -594,7 +773,7 @@ describe('ViewSpecificationReducer ', () => {
 
         expect(
             reduceViewSpecificationState(initialState, {
-                type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
+                type: FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS,
                 payload: "test specificationId"
             })
         ).toEqual(expectedState);

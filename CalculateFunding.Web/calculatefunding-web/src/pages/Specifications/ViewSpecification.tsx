@@ -13,8 +13,7 @@ import {
     confirmTimetableChanges,
     getAdditionalCalculations,
     getDatasetBySpecificationId,
-    getFundingLineStructure,
-    getReleaseTimetable
+    getFundingLineStructure, getProfileVariationPointers, getReleaseTimetable
 } from "../../actions/ViewSpecificationsActions";
 import {ViewSpecificationState} from "../../states/ViewSpecificationState";
 import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
@@ -70,6 +69,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));
         dispatch(getDatasetBySpecificationId(specificationId));
         dispatch(getReleaseTimetable(specificationId));
+        dispatch(getProfileVariationPointers(specificationId));
     }, [specificationId]);
 
     useEffectOnce(() => {
@@ -421,7 +421,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="release-timetable">
-                            <section className="govuk-tabs__panel" id="additional-calculations">
+                            <section className="govuk-tabs__panel">
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-full">
                                         <h2 className="govuk-heading-l">Release timetable</h2>
@@ -467,6 +467,37 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 <div className="govuk-form-group">
                                     <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated} >Confirm changes</button>
                                 </div>
+                                {
+                                    (viewSpecification.profileVariationPointerResult != null
+                                        && viewSpecification.profileVariationPointerResult.length > 0) ?
+                                    <div className="govuk-grid-row">
+                                        <div className="govuk-grid-column-full">
+                                        <h2 className="govuk-heading-l">Point of variation</h2>
+                                        <p className="govuk-body">Set the installment from which a variation should take effect.</p>
+                                        </div>
+                                        <div className="govuk-grid-column-two-thirds">
+                                        {
+                                            viewSpecification.profileVariationPointerResult.map((f, index) => {
+                                                return (
+                                                <dl key={index} className="govuk-summary-list">
+                                                    <div className="govuk-summary-list__row">
+                                                        <dt className="govuk-summary-list__key">
+                                                            Funding line {index + 1}
+                                                        </dt>
+                                                        <dd className="govuk-summary-list__value">
+                                                            {f.typeValue} {f.year} <br/>
+                                                            Installment {f.occurrence}
+                                                        </dd>
+
+                                                    </div>
+                                                </dl>
+                                                )
+                                            })
+                                        }
+                                        </div>
+                                    </div>
+                                    : null
+                                }
                             </section>
                         </Tabs.Panel>
                     </Tabs>
@@ -474,10 +505,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
         </div>
         <Footer/>
-        <script src="https://assets.publishing.service.gov.uk/static/libs/jquery/jquery-1.12.4-c731c20e2995c576b0509d3bd776f7ab64a66b95363a3b5fae9864299ee594ed.js"></script>
-        <script src="https://assets.publishing.service.gov.uk/static/header-footer-only-6210a252b9670a3fc6e36340f28c427d2a1b43d722bf5cb17eb364117aedec64.js"></script>
-        <script src="https://assets.publishing.service.gov.uk/static/surveys-70eb9715dca54df50152ddc5ea606c651ce9b9ea2060809685edc1616337d16c.js"></script>
-        <script src="https://assets.publishing.service.gov.uk/collections/application-11e083324c70619623a8a1f482760617547dac4cd2200c04129d52cdf97d6c40.js"></script>
     </div>
 }
 

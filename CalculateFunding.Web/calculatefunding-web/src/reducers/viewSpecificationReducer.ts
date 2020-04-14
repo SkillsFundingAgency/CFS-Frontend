@@ -5,6 +5,7 @@ import {DatasetSummary} from "../types/DatasetSummary";
 import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
 import {IFundingStructureItem} from "../types/FundingStructureItem";
 import {FundingLineStructureActionTypes} from "../actions/FundingLineStructureAction";
+import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -61,7 +62,8 @@ const initialState: ViewSpecificationState = {
         }
     },
     fundingLineStructureResult: [],
-    fundingLineStatusResult: ""
+    fundingLineStatusResult: "",
+    profileVariationPointerResult: []
 };
 
 export function reduceViewSpecificationState(state: ViewSpecificationState = initialState, action: ViewSpecificationsActions): ViewSpecificationState {
@@ -76,6 +78,10 @@ export function reduceViewSpecificationState(state: ViewSpecificationState = ini
             return {...state, releaseTimetable: action.payload as ReleaseTimetableViewModel};
         case ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE:
             return {...state, fundingLineStructureResult: action.payload as IFundingStructureItem[]};
+        case ViewSpecificationActionTypes.GET_PROFILEVARIATIONPOINTER:
+            return {...state, profileVariationPointerResult: action.payload as ProfileVariationPointer[]};
+        case ViewSpecificationActionTypes.SET_PROFILEVARIATIONPOINTER:
+            return {...state, profileVariationPointerResult: action.payload as ProfileVariationPointer[]};
         case FundingLineStructureActionTypes.CHANGE_FUNDINGLINESTATUS:
             return {...state, fundingLineStatusResult: action.payload};
         case ViewSpecificationActionTypes.CONFIRM_TIMETABLECHANGES:

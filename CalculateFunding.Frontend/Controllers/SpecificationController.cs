@@ -394,7 +394,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestResult();
         }
 
-        [Route("api/specs/profile-variation-pointers/{specificationId}")]
+        [Route("api/specs/{specificationId}/profile-variation-pointers")]
         public async Task<IActionResult> GetProfileVariationPointers(string specificationId)
         {
             ApiResponse<IEnumerable<ProfileVariationPointer>> apiResponse = 
@@ -413,7 +413,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
-        [Route("api/specs/profile-variation-pointers/{specificationId}")]
+        [Route("api/specs/{specificationId}/profile-variation-pointers")]
         [HttpPut]
         public async Task<IActionResult> SetProfileVariationPointers(
 	        [FromRoute]string specificationId,

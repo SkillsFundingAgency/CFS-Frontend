@@ -239,7 +239,8 @@ export const fakeInitialState: IStoreState = {
             }
         },
         fundingLineStructureResult: [],
-        fundingLineStatusResult: ""
+        fundingLineStatusResult: "",
+        profileVariationPointerResult: []
     },
     viewCalculationResults: {
         providers: {

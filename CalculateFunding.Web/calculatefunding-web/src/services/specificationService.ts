@@ -6,6 +6,7 @@ import {
     CreateSpecificationViewModel
 } from "../types/Specifications/CreateSpecificationViewModel";
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
+import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 
 let baseURL = "/api/specs";
 
@@ -107,5 +108,24 @@ export async function getDownloadableReportsService(specificationId: string, rep
         headers: {
             'Content-Type': 'application/json'
         }
+    });
+}
+
+export async function getProfileVariationPointersService(specificationId: string) {
+    return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}
+
+export async  function setProfileVariationPointersService(specificationId:string, profileVariationPointer: ProfileVariationPointer[]) {
+    return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: profileVariationPointer
     });
 }

@@ -96,6 +96,7 @@ describe("Provider Funding Overview ", () => {
             type: FundingStructureType.fundingLine,
             calculationId: "",
             calculationPublishStatus: "",
+            parentName: "",
             fundingStructureItems:[
                 {
                     level: 2,
@@ -103,12 +104,23 @@ describe("Provider Funding Overview ", () => {
                     type: FundingStructureType.calculation,
                     calculationId: "ABC",
                     calculationPublishStatus: "Draft",
-                    fundingStructureItems:[]
+                    fundingStructureItems:[],
+                    parentName: "",
                 }
             ]
         }
     ],
-    fundingLineStatusResult: "test fundingLineStatusResult"
+    fundingLineStatusResult: "test fundingLineStatusResult",
+    profileVariationPointerResult: [
+        {
+            fundingStreamId: "testFundingStreamId",
+            fundingLineId: "testFundingLineId",
+            periodType: "testPeriodType",
+            typeValue: "testTypeValue",
+            year: 2022,
+            occurrence: 55,
+        }
+    ]
     };
     fakeInitialState.viewSpecification = mockViewSpecificationState;
     const initialState: IStoreState = fakeInitialState;
@@ -118,7 +130,7 @@ describe("Provider Funding Overview ", () => {
 
     const mockViewSpecificationPage = <Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>;
 
-    it("renders the page with 3 tabs", async () => {
+    it("renders the page with the expected number of tabs", async () => {
         const wrapper = mount(mockViewSpecificationPage);
 
         expect(wrapper.find('.govuk-tabs__list').children().length).toBe(4);
@@ -127,7 +139,7 @@ describe("Provider Funding Overview ", () => {
     it("dispatches to Redux the correct number of times", () => {
         mount(mockViewSpecificationPage);
 
-        expect(store.dispatch).toHaveBeenCalledTimes(6);
+        expect(store.dispatch).toHaveBeenCalledTimes(8);
     });
 
     it("shows approve status in funding line structure tab", () => {

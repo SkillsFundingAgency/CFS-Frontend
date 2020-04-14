@@ -3,6 +3,7 @@ import {SpecificationSummary} from "../types/SpecificationSummary";
 import {DatasetSummary} from "../types/DatasetSummary";
 import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
 import {IFundingStructureItem} from "../types/FundingStructureItem";
+import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 
 export interface ViewSpecificationState {
     specification: SpecificationSummary,
@@ -10,5 +11,6 @@ export interface ViewSpecificationState {
     datasets: DatasetSummary,
     releaseTimetable: ReleaseTimetableViewModel,
     fundingLineStructureResult: IFundingStructureItem[],
-    fundingLineStatusResult: string
+    fundingLineStatusResult: string,
+    profileVariationPointerResult: ProfileVariationPointer[]
 }

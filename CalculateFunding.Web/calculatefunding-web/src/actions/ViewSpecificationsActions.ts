@@ -4,8 +4,8 @@ import {CalculationSummary} from "../types/CalculationSummary";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {
     changeFundingLineStateService,
-    getAdditionalCalculationsForSpecificationService,
-    getSpecificationSummaryService
+    getProfileVariationPointersService,
+    getSpecificationSummaryService, setProfileVariationPointersService
 } from "../services/specificationService";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {SpecificationSummary} from "../types/SpecificationSummary";
@@ -26,6 +26,7 @@ import {
 import {getFundingLineStructureService} from "../services/fundingStructuresService";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 import {getCalculationsService} from "../services/calculationService";
+import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 
 export enum ViewSpecificationActionTypes {
     GET_RELEASETIMETABLE = 'getReleaseTimetable',
@@ -33,6 +34,8 @@ export enum ViewSpecificationActionTypes {
     GET_SPECIFICATION = 'getSpecification',
     GET_DATASETS = 'getDatasetBySpecificationId',
     GET_FUNDINGLINESTRUCTURE = 'getFundingLineStructure',
+    GET_PROFILEVARIATIONPOINTER = 'getProfileVariationPointers',
+    SET_PROFILEVARIATIONPOINTER = 'setProfileVariationPointers',
     CHANGE_FUNDINGLINESTATUS = 'changeFundingLineState',
     CONFIRM_TIMETABLECHANGES = 'confirmTimetableChanges'
 }
@@ -62,6 +65,16 @@ export interface GetFundingLineStructureAction {
     payload: IFundingStructureItem[]
 }
 
+export interface GetProfileVariationPointers {
+    type: ViewSpecificationActionTypes.GET_PROFILEVARIATIONPOINTER
+    payload: ProfileVariationPointer[]
+}
+
+export interface SetProfileVariationPointers {
+    type: ViewSpecificationActionTypes.SET_PROFILEVARIATIONPOINTER
+    payload: ProfileVariationPointer[]
+}
+
 export interface ChangeFundingLineStatusAction {
     type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
     payload: string
@@ -78,6 +91,8 @@ export type ViewSpecificationsActions =
     | GetDatasets
     | GetReleaseTimetable
     | GetFundingLineStructureAction
+    | GetProfileVariationPointers
+    | SetProfileVariationPointers
     | ChangeFundingLineStatusAction
     | ConfirmTimetableChanges;
 
@@ -143,6 +158,30 @@ export const getFundingLineStructure:
             dispatch({
                 type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE,
                 payload: response.data as IFundingStructureItem[]
+            });
+        }
+    };
+
+export const getProfileVariationPointers: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> =
+    (specificationId: string) => {
+        return async (dispatch: Dispatch) => {
+            let response = await getProfileVariationPointersService(specificationId);
+
+            dispatch({
+                type: ViewSpecificationActionTypes.GET_PROFILEVARIATIONPOINTER,
+                payload: response.data as ProfileVariationPointer[]
+            });
+        }
+    };
+
+export const setProfileVariationPointers: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> =
+    (specificationId: string, profileVariationPointer: ProfileVariationPointer[]) => {
+        return async (dispatch: Dispatch) => {
+            let response = await setProfileVariationPointersService(specificationId, profileVariationPointer);
+
+            dispatch({
+                type: ViewSpecificationActionTypes.SET_PROFILEVARIATIONPOINTER,
+                payload: response.data as ProfileVariationPointer[]
             });
         }
     };
