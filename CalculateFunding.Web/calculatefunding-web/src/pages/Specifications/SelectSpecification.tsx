@@ -65,7 +65,7 @@ export function SelectSpecification(props: SelectSpecificationProps) {
     }
 
     return <div>
-        <Header location={Section.Specifications}/>
+        <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-grid-row">
