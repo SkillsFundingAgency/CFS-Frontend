@@ -63,12 +63,12 @@ export function Header(props: {location:Section}) {
                                     Manage data
                                 </a>
                             </li>
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Tests ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link"
-                                   href="/scenarios">
-                                    Quality assurance tests
-                                </a>
-                            </li>
+                            {/*<li className={"govuk-header__navigation-item" + (props.location == Section.Tests ? " govuk-header__navigation-item--active" : "")}>*/}
+                            {/*    <a className="govuk-header__link"*/}
+                            {/*       href="/scenarios">*/}
+                            {/*        Quality assurance tests*/}
+                            {/*    </a>*/}
+                            {/*</li>*/}
                             <li className={"govuk-header__navigation-item" + (props.location == Section.Results ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app/results">
                                     View results

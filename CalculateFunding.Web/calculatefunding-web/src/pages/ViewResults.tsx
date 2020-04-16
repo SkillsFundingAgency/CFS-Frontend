@@ -42,12 +42,12 @@ export class ViewResults extends Component {
                                         </div>
                                         <p className="govuk-body">Select a specification to view the calculation and QA results.</p>
                                     </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <div className="govuk-heading-m">
-                                            <a href="/results/TestScenarioResults" className="govuk-link">View QA test result</a>
-                                        </div>
-                                        <p className="govuk-body">View the passes and failures for quality assurances tests.</p>
-                                    </div>
+                                    {/*<div className="govuk-grid-column-one-third">*/}
+                                    {/*    <div className="govuk-heading-m">*/}
+                                    {/*        <a href="/results/TestScenarioResults" className="govuk-link">View QA test result</a>*/}
+                                    {/*    </div>*/}
+                                    {/*    <p className="govuk-body">View the passes and failures for quality assurances tests.</p>*/}
+                                    {/*</div>*/}
                                 </div>
                             </div>
                         </div>
