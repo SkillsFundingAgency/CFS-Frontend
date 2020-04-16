@@ -59,7 +59,7 @@ export function Header(props: {location:Section}) {
                                 </a>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location == Section.Datasets ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/datasets">
+                                <a className="govuk-header__link" href="/app/Datasets/ManageData">
                                     Manage data
                                 </a>
                             </li>
@@ -75,7 +75,7 @@ export function Header(props: {location:Section}) {
                                 </a>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location == Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/approvals">
+                                <a className="govuk-header__link" href="/app/Approvals">
                                     Funding approvals
                                 </a>
                             </li>
