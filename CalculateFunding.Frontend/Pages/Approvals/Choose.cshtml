@@ -107,8 +107,6 @@
             <tr>
                 <th class="min-width-md">Specification</th>
                 <th>Specification status</th>
-                <th>Provider QA coverage</th>
-                <th>QA tests passed</th>
                 <th>Calculations approved</th>
                 <th>
                     <!-- ko ifnot: isSpecificationSelectedForThisFunding -->Choose<!-- /ko -->
@@ -120,8 +118,6 @@
             <tr>
                 <td class="highlight-background"><span class="highlight-title" data-bind="text:name"></span></td>
                 <td rowspan="2" class="text-center" data-bind="class:approvalStatusCssClass"><strong data-bind="text:approvalStatus"></strong></td>
-                <td rowspan="2" class="text-center" data-bind="text:providerQaCoverage"></td>
-                <td rowspan="2" class="text-center"><span data-bind="text:QaTestsPassed"></span>/<span data-bind="text:QaTestsTotal"></span></td>
                 <td rowspan="2" class="text-center"><span data-bind="text:CalculationsApproved"></span>/<span data-bind="text:CalculationsTotal"></span></td>
                 <td rowspan="2" class="text-center">
                     <!-- ko if: isSelectedForFunding -->
