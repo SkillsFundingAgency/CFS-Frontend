@@ -48,33 +48,33 @@ export function Header(props: {location:Section}) {
                     </button>
                     <nav>
                         <ul id="navigation" className="govuk-header__navigation " aria-label="Top Level Navigation">
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Home ? " govuk-header__navigation-item--active" : "")}>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Home ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app">
                                     Home
                                 </a>
                             </li>
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Specifications ? " govuk-header__navigation-item--active" : "")}>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Specifications ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app/SpecificationsList">
                                     Specifications
                                 </a>
                             </li>
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Datasets ? " govuk-header__navigation-item--active" : "")}>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Datasets ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app/Datasets/ManageData">
                                     Manage data
                                 </a>
                             </li>
-                            {/*<li className={"govuk-header__navigation-item" + (props.location == Section.Tests ? " govuk-header__navigation-item--active" : "")}>*/}
+                            {/*<li className={"govuk-header__navigation-item" + (props.location === Section.Tests ? " govuk-header__navigation-item--active" : "")}>*/}
                             {/*    <a className="govuk-header__link"*/}
                             {/*       href="/scenarios">*/}
                             {/*        Quality assurance tests*/}
                             {/*    </a>*/}
                             {/*</li>*/}
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Results ? " govuk-header__navigation-item--active" : "")}>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Results ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app/results">
                                     View results
                                 </a>
                             </li>
-                            <li className={"govuk-header__navigation-item" + (props.location == Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
                                 <a className="govuk-header__link" href="/app/Approvals">
                                     Funding approvals
                                 </a>

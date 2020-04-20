@@ -15,6 +15,9 @@ import Pagination from "../../components/Pagination";
 import {FacetValue} from "../../types/CalculationProviderResult";
 import {SpecificationSearchRequestViewModel} from "../../types/SpecificationSearchRequestViewModel";
 import {Section} from "../../types/Sections";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {getAllSpecificationsService} from "../../services/specificationService";
+import {SpecificationListResults} from "../../types/SpecificationListResults";
 
 
 export function SpecificationsList() {
@@ -29,7 +32,15 @@ export function SpecificationsList() {
         }
     ];
 
-    let specificationListResults: SpecificationState = useSelector((state: AppState) => state.specifications);
+    const [specificationListResults, setSpecificationListResults] = useState<SpecificationListResults>({
+        items: [],
+        facets: [],
+        pageNumber: 0,
+        pageSize: 0,
+        totalErrorItems: 0,
+        totalItems: 0,
+        totalPages: 0
+    });
 
     const dispatch = useDispatch();
 
@@ -52,28 +63,44 @@ export function SpecificationsList() {
     const [initialFundingStreams, setInitialFundingStreams] = useState<FacetValue[]>([]);
     const [initialStatus, setInitialStatus] = useState<FacetValue[]>([]);
 
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    function populateSpecifications(criteria: SpecificationSearchRequestViewModel) {
+        const getAllSpecifications = async () => {
+            const result = getAllSpecificationsService(criteria);
+            return result;
+        };
+        getAllSpecifications().then((result) => {
+            let specifications = result.data as SpecificationListResults;
+            setSpecificationListResults(specifications);
+            setIsLoading(false);
+        });
+    }
 
     useEffectOnce(() => {
-        dispatch(getAllSpecifications(searchCriteria));
-
+        populateSpecifications(searchCriteria);
     });
 
     useEffect(() => {
-        if (!singleFire && specificationListResults.specificationListResults.totalItems > 0) {
+        if (!singleFire && specificationListResults.totalItems > 0) {
             setSingleFire(true);
         }
-    }, [specificationListResults.specificationListResults.totalItems]);
+    }, [specificationListResults.totalItems]);
 
     useEffect(() => {
-        if (specificationListResults.specificationListResults.facets.length > 0) {
-            setStatus(specificationListResults.specificationListResults.facets[0].facetValues);
-            setFundingPeriods(specificationListResults.specificationListResults.facets[1].facetValues);
-            setFundingStreams(specificationListResults.specificationListResults.facets[2].facetValues);
-            setInitialStatus(specificationListResults.specificationListResults.facets[0].facetValues);
-            setInitialFundingPeriods(specificationListResults.specificationListResults.facets[1].facetValues);
-            setInitialFundingStreams(specificationListResults.specificationListResults.facets[2].facetValues);
+        if (specificationListResults.facets.length > 0) {
+            setStatus(specificationListResults.facets[0].facetValues);
+            setFundingPeriods(specificationListResults.facets[1].facetValues);
+            setFundingStreams(specificationListResults.facets[2].facetValues);
+            setInitialStatus(specificationListResults.facets[0].facetValues);
+            setInitialFundingPeriods(specificationListResults.facets[1].facetValues);
+            setInitialFundingStreams(specificationListResults.facets[2].facetValues);
         }
     }, [singleFire]);
+
+    useEffect(() => {
+
+    }, [specificationListResults.items])
 
     function movePage(pageNumber: number) {
         setSearchCriteria(prevState => {
@@ -83,10 +110,10 @@ export function SpecificationsList() {
             }
         });
 
-        let request = searchCriteria;
-        request.page = pageNumber;
+        let criteria = searchCriteria;
+        criteria.page = pageNumber;
 
-        dispatch(getAllSpecifications(request));
+        populateSpecifications(criteria);
     }
 
     function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
@@ -104,7 +131,7 @@ export function SpecificationsList() {
 
         let request = searchCriteria;
         request.fundingPeriods = filterUpdate;
-        dispatch(getAllSpecifications(request));
+        populateSpecifications(request);
     }
 
     function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
@@ -122,7 +149,7 @@ export function SpecificationsList() {
 
         let request = searchCriteria;
         request.fundingStreams = filterUpdate;
-        dispatch(getAllSpecifications(request));
+        populateSpecifications(request);
     }
 
     function filterByStatus(e: React.ChangeEvent<HTMLInputElement>) {
@@ -141,7 +168,7 @@ export function SpecificationsList() {
         let request = searchCriteria;
         request.status = filterUpdate;
 
-        dispatch(getAllSpecifications(searchCriteria));
+        populateSpecifications(searchCriteria);
     }
 
     function filterBySearchTerm(e: React.ChangeEvent<HTMLInputElement>) {
@@ -153,7 +180,7 @@ export function SpecificationsList() {
 
         let request = searchCriteria;
         request.searchText = filterUpdate;
-        dispatch(getAllSpecifications(request));
+        populateSpecifications(request);
     }
 
     function clearFilters() {
@@ -162,7 +189,7 @@ export function SpecificationsList() {
         setFundingPeriods(initialFundingPeriods);
         setFundingStreams(initialFundingStreams);
         setStatus(initialStatus);
-        dispatch(getAllSpecifications(initialSearch));
+        populateSpecifications(initialSearch);
     }
 
     function searchFundingPeriods(e: React.ChangeEvent<HTMLInputElement>) {
@@ -197,7 +224,12 @@ export function SpecificationsList() {
                         </a>
                     </div>
                 </div>
-                <div className="govuk-grid-row">
+                <div className="govuk-grid-row" hidden={!isLoading}>
+                    <LoadingStatus title={"Loading specification list"}
+                                   description={"Please wait whilst the specification list is loading"}
+                                   />
+                </div>
+                <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-one-third">
                         <form id="searchSpecifications">
                             <CollapsiblePanel title="Search" expanded={true}>
@@ -285,8 +317,9 @@ export function SpecificationsList() {
                     </div>
 
                     <div className="govuk-grid-column-two-thirds">
+
                         <table className="govuk-table" id="specification-table"
-                               hidden={specificationListResults.specificationListResults.items.length < 1}>
+                               hidden={specificationListResults.items.length < 1}>
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
                                 <th scope="col"
@@ -301,7 +334,7 @@ export function SpecificationsList() {
                             </tr>
                             </thead>
                             <tbody className="govuk-table__body" id="mainContentResults">
-                            {specificationListResults.specificationListResults.items.map(s => <tr key={s.id}
+                            {specificationListResults.items.map(s => <tr key={s.id}
                                                                                                   className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header"><a
                                     href={"/app/ViewSpecification/" + s.id}>{s.name}</a></th>
@@ -314,15 +347,16 @@ export function SpecificationsList() {
                             </tbody>
                         </table>
                         <p className="govuk-body"
-                           hidden={specificationListResults.specificationListResults.items.length > 0}>There are no records to match your search</p>
+                           hidden={specificationListResults.items.length > 0}>There are no
+                            records to match your search</p>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
                                 <Pagination callback={movePage}
-                                            currentPage={specificationListResults.specificationListResults.pageNumber}
-                                            lastPage={specificationListResults.specificationListResults.totalPages}/>
+                                            currentPage={specificationListResults.pageNumber}
+                                            lastPage={specificationListResults.totalPages}/>
                             </div>
                             <div className="govuk-grid-column-one-third">
-                                <p className="govuk-body-s">Showing {(specificationListResults.specificationListResults.pageNumber * specificationListResults.specificationListResults.pageSize) - (specificationListResults.specificationListResults.pageSize - 1)} - {specificationListResults.specificationListResults.pageSize * specificationListResults.specificationListResults.pageNumber} of {specificationListResults.specificationListResults.totalItems} results</p>
+                                <p className="govuk-body-s">Showing {(specificationListResults.pageNumber * specificationListResults.pageSize) - (specificationListResults.pageSize - 1)} - {specificationListResults.pageSize * specificationListResults.pageNumber} of {specificationListResults.totalItems} results</p>
                             </div>
                         </div>
                     </div>

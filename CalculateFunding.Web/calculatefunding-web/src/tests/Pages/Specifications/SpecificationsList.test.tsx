@@ -16,15 +16,6 @@ const store: Store<IStoreState> = createStore(
 store.dispatch = jest.fn();
 
 describe("<SpecificationsList />", () => {
-    it('will call dispatch 1 time for the initial specs search', () => {
-
-        mount(<Provider store={store}><SpecificationsList />></Provider>);
-
-        expect(store.dispatch).toHaveBeenCalledTimes(1);
-    });
-});
-
-describe("<SpecificationsList />", () => {
     it('will have the correct breadcrumbs', () => {
 
         const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
