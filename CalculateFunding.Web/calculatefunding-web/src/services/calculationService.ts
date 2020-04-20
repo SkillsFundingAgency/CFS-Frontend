@@ -77,3 +77,11 @@ export async function getCodeContextService(specificationId: string) {
         }
     })
 }
+export async function getCalculationVersionHistoryService(calculationId: string) {
+    return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}

@@ -289,5 +289,21 @@ namespace CalculateFunding.Frontend.Controllers
 
             return BadRequest(result.Content);
         }
+
+        [HttpGet]
+        [Route("api/calcs/getcalculationversionhistory/{calculationId}")]
+        public async Task<IActionResult> GetCalculationVersionHistory(string calculationId)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+
+            var response = await _calcClient.GetAllVersionsByCalculationId(calculationId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(response.Content);
+            }
+
+            return new BadRequestObjectResult(response.Content);
+        }
     }
 }

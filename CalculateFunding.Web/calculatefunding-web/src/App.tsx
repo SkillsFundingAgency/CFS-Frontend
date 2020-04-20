@@ -22,6 +22,7 @@ import {EditTemplateCalculation} from "./pages/Calculations/EditTemplateCalculat
 import {ManageData} from "./pages/ManageData";
 import {Approvals} from "./pages/Approvals";
 import {EditVariationPoints} from "./pages/Specifications/EditVariationPoints";
+import {CalculationVersionHistory} from "./pages/Calculations/CalculationVersionHistory";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -44,6 +45,7 @@ const App: React.FunctionComponent = () => {
        <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
        <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />
        <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints} />
+       <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory} />
        <Route path="/Approvals" component={Approvals} />
        <Route path="*">
             <NoMatch />
@@ -56,7 +58,7 @@ const App: React.FunctionComponent = () => {
 function NoMatch() {
   return (
       <div>
-      <Header location={Section.Home} />>
+      <Header location={Section.Home} />
       <div className="govuk-width-container">
           <main className="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
               <div className="govuk-grid-row">
