@@ -48,7 +48,7 @@ export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId:
 }
 
 export async function getSpecificationsByFundingPeriodAndStreamIdService(fundingStreamId: string, fundingPeriodId: string) {
-    return axios(`${baseURL}/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
+    return axios(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
