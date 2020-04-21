@@ -301,23 +301,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         <label className="govuk-label" htmlFor="sort">
                             Funding streams
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" onChange={(e) => selectFundingStream(e)}>
-                            <option value="-1">Select funding Stream</option>
-                            {fundingStreamData.map((fs, index) => <option key={index} value={fs.value}
-                                                                          selected={fs.selected}>{fs.name}</option>)}
-                        </select>
+                        {fundingStreamData.filter(fs => fs.selected).map(fs => <h3 className="govuk-heading-m">{fs.name}</h3>)}
                     </div>
 
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="sort">
                             Funding period
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={fundingPeriodData.length === 0}
-                                onChange={(e) => selectFundingPeriod(e)}>
-                            <option value="-1">Select funding period</option>
-                            {fundingPeriodData.map((fp, index) => <option key={index}
-                                                                          value={fp.value} selected={fp.selected}>{fp.name}</option>)}
-                        </select>
+                        {fundingPeriodData.filter(fp => fp.selected).map(fp => <h3 className="govuk-heading-m">{fp.name}</h3>)}
                     </div>
 
                     <div className="govuk-form-group">
@@ -338,7 +329,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </label>
                         <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8}
                                   aria-describedby="more-detail-hint"
-                                  onChange={(e) => saveDescriptionName(e)} value={selectedDescription} />
+                                  onChange={(e) => saveDescriptionName(e)} value={selectedDescription}/>
                     </div>
                     <div className="govuk-form-group">
                         <button id="submit-specification-button" className="govuk-button govuk-!-margin-right-1"
