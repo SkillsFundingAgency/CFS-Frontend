@@ -4,5 +4,6 @@ export enum Section{
     Datasets,
     Tests,
     Results,
-    Approvals
+    Approvals,
+    FundingPreparation,
 }
