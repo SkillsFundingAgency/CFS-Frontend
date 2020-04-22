@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { dragNodeService, selectNodeService } from "../services/templateBuilderService";
+import { getDragInfo, sendDragInfo, clearDragInfo, sendSelectedNodeInfo, getSelectedNodeInfo } from "../services/templateBuilderService";
 import "../styles/OrganisationChartNode.scss";
-import { FundingLineOrCalculation, FundingLine, Calculation, FundingLineOrCalculationSelectedItem } from "../types/TemplateBuilderDefinitions";
+import { FundingLineOrCalculation, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, NodeType } from "../types/TemplateBuilderDefinitions";
 
 interface OrganisationChartNodeProps {
   id?: string,
@@ -10,8 +10,8 @@ interface OrganisationChartNodeProps {
   draggable?: boolean,
   collapsible?: boolean,
   multipleSelect?: boolean,
-  changeHierarchy: (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
-  cloneNode: (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+  changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+  cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
   onClickNode: (node: FundingLineOrCalculationSelectedItem) => void,
   addNode: (id: string, newChild: FundingLine | Calculation) => Promise<void>,
   openSideBar: (open: boolean) => void,
@@ -60,16 +60,25 @@ function OrganisationChartNode({
     .filter(item => item)
     .join(" ");
 
+  function permissible(sourceNodeKind: NodeType, targetNodeKind: NodeType): boolean {
+    if (sourceNodeKind === NodeType.Calculation) {
+      return true;
+    }
+
+    return targetNodeKind === NodeType.FundingLine;
+  }
+
   useEffect(() => {
-    const subs1 = dragNodeService.getDragInfo().subscribe(draggedInfo => {
-      if (draggedInfo && draggedInfo.draggedNodeId && node && node.current) {
+    const subs1 = getDragInfo().subscribe(draggedInfo => {
+      if (draggedInfo && draggedInfo.draggedNodeId && draggedInfo.draggedNodeKind && node && node.current) {
         const draggedNode = document.querySelector("#" + draggedInfo.draggedNodeId);
         if (draggedNode) {
           const closestNode = draggedNode.closest("li");
           if (closestNode) {
+            const dropTargetNodeKind: NodeType = node.current.getAttribute('data-kind') as NodeType;
             const currentNode = closestNode.querySelector("#" + node.current.id);
             setAllowedDrop(
-              !currentNode
+              !currentNode && permissible(draggedInfo.draggedNodeKind, dropTargetNodeKind)
                 ? true
                 : false
             );
@@ -81,8 +90,7 @@ function OrganisationChartNode({
       }
     });
 
-    const subs2 = selectNodeService
-      .getSelectedNodeInfo()
+    const subs2 = getSelectedNodeInfo()
       .subscribe(selectedNodeInfo => {
         if (selectedNodeInfo) {
           if (multipleSelect) {
@@ -226,8 +234,8 @@ function OrganisationChartNode({
     toggleSiblings(e.target.closest("li"));
   };
 
-  const filterAllowedDropNodes = (id: string) => {
-    dragNodeService.sendDragInfo(id);
+  const filterAllowedDropNodes = (id: string, draggedNodeKind: NodeType) => {
+    sendDragInfo(id, draggedNodeKind);
   };
 
   const clickNodeHandler = () => {
@@ -235,7 +243,7 @@ function OrganisationChartNode({
       onClickNode({ key: dsKey, value: datasource });
     }
 
-    selectNodeService.sendSelectedNodeInfo(datasource.id);
+    sendSelectedNodeInfo(datasource.id);
   };
 
   const dragstartHandler = (event: React.DragEvent<HTMLDivElement>) => {
@@ -245,7 +253,8 @@ function OrganisationChartNode({
     event.dataTransfer.setData("text/plain", JSON.stringify(copyDS));
     // highlight all potential drop targets
     if (node && node.current) {
-      filterAllowedDropNodes(node.current.id);
+      const draggedNodeKind: NodeType = node.current.getAttribute('data-kind') as NodeType;
+      filterAllowedDropNodes(node.current.id, draggedNodeKind);
     }
   };
 
@@ -256,14 +265,14 @@ function OrganisationChartNode({
 
   const dragendHandler = () => {
     // reset background of all potential drop targets
-    dragNodeService.clearDragInfo();
+    clearDragInfo();
   };
 
   const dropHandler = (event: React.DragEvent<HTMLDivElement>) => {
     if (!event.currentTarget.classList.contains("allowedDrop")) {
       return;
     }
-    dragNodeService.clearDragInfo();
+    clearDragInfo();
     const data: FundingLineOrCalculation = JSON.parse(event.dataTransfer.getData("text/plain"));
     const targetDsKey = data.dsKey;
     if (!targetDsKey) {
@@ -292,6 +301,7 @@ function OrganisationChartNode({
       <div
         ref={node}
         id={datasource.id}
+        data-kind={datasource.kind}
         className={nodeClass}
         draggable={draggable ? true : undefined}
         onDragStart={dragstartHandler}

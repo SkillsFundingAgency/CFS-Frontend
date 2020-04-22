@@ -4,7 +4,7 @@ import React, {
   forwardRef,
   useImperativeHandle
 } from "react";
-import { selectNodeService } from "../services/templateBuilderService";
+import { clearSelectedNodeInfo } from "../services/templateBuilderService";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import OrganisationChartNode from "./OrganisationChartNode";
@@ -26,8 +26,8 @@ interface OrganisationChartProps {
   onClickNode: (node: FundingLineOrCalculationSelectedItem) => void,
   onClickChart?: () => void,
   onClickAdd: (id: string, newChild: FundingLine | Calculation) => Promise<void>,
-  changeHierarchy: (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
-  cloneNode: (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+  changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+  cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
   openSideBar: (open: boolean) => void,
   editMode: boolean,
   nextId: number,
@@ -99,7 +99,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
         if (onClickChart) {
           onClickChart();
         }
-        selectNodeService.clearSelectedNodeInfo();
+        clearSelectedNodeInfo();
       }
     };
 

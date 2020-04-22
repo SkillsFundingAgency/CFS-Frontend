@@ -1,9 +1,6 @@
 import React from "react";
 import { TemplateBuilder } from "../../pages/TemplateBuilder";
-import { mount, configure } from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
-
-configure({ adapter: new Adapter() });
+import { mount } from "enzyme";
 
 it("renders in view mode", () => {
     const wrapper = mount(<TemplateBuilder />);
@@ -28,8 +25,8 @@ it("funding line displays add buttons in edit mode", () => {
     const wrapper = mount(<TemplateBuilder />);
     wrapper.find("[data-testid='edit']").simulate('change');
     wrapper.find("[data-testid='add']").simulate('click');
-    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='add-line']")).toHaveLength(1);
-    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='add-calc']")).toHaveLength(1);
+    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(1);
+    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-calc']")).toHaveLength(1);
 });
 
 it("funding line hides add buttons in view mode", () => {
@@ -37,8 +34,8 @@ it("funding line hides add buttons in view mode", () => {
     wrapper.find("[data-testid='edit']").simulate('change');
     wrapper.find("[data-testid='add']").simulate('click');
     wrapper.find("[data-testid='view']").simulate('change');
-    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='add-line']")).toHaveLength(0);
-    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='add-calc']")).toHaveLength(0);
+    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(0);
+    expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-calc']")).toHaveLength(0);
 });
 
 it("displays edit window when clicking on funding line", () => {

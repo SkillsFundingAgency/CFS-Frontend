@@ -89,10 +89,6 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, dsK
                     </select>
                 </div>
                 <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="fl-templateline-id">Template Line Id</label>
-                    <input className="govuk-input govuk-input--width-2" id="fl-templateline-id" name="fl-templateline-id" disabled={true} type="text" value={node.templateLineId} />
-                </div>
-                <div className="govuk-form-group">
                     <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
                         Save and continue
                 </button>

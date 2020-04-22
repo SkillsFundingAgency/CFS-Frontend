@@ -7,7 +7,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import OrganisationChart from "../components/OrganisationChart";
 import TemplateBuilderNode from "../components/TemplateBuilderNode";
-import { NodeType, FundingLineType, FundingLineUpdateModel, CalculationUpdateModel, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem } from '../types/TemplateBuilderDefinitions';
+import { NodeType, FundingLineType, FundingLineUpdateModel, CalculationUpdateModel, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, FundingLineOrCalculation } from '../types/TemplateBuilderDefinitions';
 import "../styles/TemplateBuilder.scss";
 
 enum Mode {
@@ -100,11 +100,12 @@ export function TemplateBuilder() {
         }
     }
 
-    const cloneNode = async (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
+    const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         const sourceFundingLine = ds.find(k => k.key === draggedItemDsKey);
         if (!sourceFundingLine) return;
         const destinationFundingLine = ds.find(k => k.key === dropTargetDsKey);
         if (!destinationFundingLine) return;
+        draggedItemData.dsKey = dropTargetDsKey;
         if (draggedItemData.isRootNode) {
             draggedItemData.isRootNode = false;
         }
@@ -113,12 +114,13 @@ export function TemplateBuilder() {
         setDS([...ds]);
     };
 
-    const changeHierarchy = async (draggedItemData: { id: string, isRootNode: boolean }, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
+    const changeHierarchy = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         const sourceFundingLine = ds.find(k => k.key === draggedItemDsKey);
         if (!sourceFundingLine) return;
         const destinationFundingLine = ds.find(k => k.key === dropTargetDsKey);
         if (!destinationFundingLine) return;
         const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
+        draggedItemData.dsKey = dropTargetDsKey;
         if (draggedItemData.isRootNode) {
             draggedItemData.isRootNode = false;
             await destinationDsDigger.addChildren(dropTargetId, draggedItemData);

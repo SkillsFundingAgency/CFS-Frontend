@@ -52,8 +52,8 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
         </div>
         {editMode &&
           <div className="buttons">
-            <button className="govuk-button" onClick={handleAddLine} data-testid='add-line'>Add Line</button>
-            <button className="govuk-button" onClick={handleAddCalc} data-testid='add-calc'>Add Calculation</button>
+            <button className="govuk-button" onClick={handleAddLine} data-testid={`${node.id}-add-line`}>Add Line</button>
+            <button className="govuk-button" onClick={handleAddCalc} data-testid={`${node.id}-add-calc`}>Add Calculation</button>
           </div>}
       </div>
     );
