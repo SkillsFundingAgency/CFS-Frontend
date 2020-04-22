@@ -13,7 +13,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using NSubstitute.ExceptionExtensions;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {

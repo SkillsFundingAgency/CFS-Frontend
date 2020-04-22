@@ -13,12 +13,15 @@ using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Users;
+using CalculateFunding.Common.Caching;
+using CalculateFunding.Common.Config.ApiClient.Profiling;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.ScenariosClient;
 using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
@@ -186,6 +189,16 @@ namespace CalculateFunding.Frontend.Modules
             services.AddSingleton<IPublishingApiClient, PublishingApiClient>();
 
             services.AddSingleton<ISpecificationsApiClient, SpecificationsApiClient>();
+
+            RedisSettings redisSettings = new RedisSettings();
+
+            Configuration.Bind("redisSettings", redisSettings);
+
+            services.AddSingleton(redisSettings);
+
+            services.AddSingleton<ICacheProvider, StackExchangeRedisClientCacheProvider>();
+
+            services.AddProfilingInterServiceClient(Configuration);
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)
