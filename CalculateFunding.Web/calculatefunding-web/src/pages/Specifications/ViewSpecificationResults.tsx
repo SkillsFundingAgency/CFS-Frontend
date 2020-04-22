@@ -12,7 +12,6 @@ import {
     getTemplateCalculations
 } from "../../actions/ViewSpecificationResultsActions";
 import {useDispatch, useSelector} from "react-redux";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {AppState} from "../../states/AppState";
 import {ViewSpecificationResultsState} from "../../states/ViewSpecificationResultsState";
 import Pagination from "../../components/Pagination";
@@ -21,23 +20,18 @@ import {getDownloadableReportsService} from "../../services/specificationService
 import {ReportMetadataViewModel} from "../../types/Specifications/ReportMetadataViewModel";
 import {DateFormatter} from "../../components/DateFormatter";
 
-export interface ViewSpecificationResultsProps {
-    specification: SpecificationSummary;
-}
-
 export interface ViewSpecificationResultsRoute {
     specificationId: string
 }
 
 
-export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecificationResultsRoute>, props: ViewSpecificationResultsProps) {
+export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecificationResultsRoute>) {
     const dispatch = useDispatch();
     const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState('');
     const [templateCalculationsSearchTerm, setTemplateCalculationsSearchTerm] = useState('');
     const [templateStatusFilter, setTemplateStatusFilter] = useState("All");
     const [additionalStatusFilter, setAdditionalStatusFilter] = useState("All");
-    const [downloadableLiveReports, setDownloadableLiveReports] = useState<ReportMetadataViewModel[]>([]);
-    const [downloadablePublishedReports, setDownloadablePublisedReports] = useState<ReportMetadataViewModel[]>([]);
+    const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
@@ -50,28 +44,16 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
 
         const getLiveDownloadableReports = async () => {
-            const downloadableLiveReportsResults = await getDownloadableReportsService(specificationId, "Live");
-            return downloadableLiveReportsResults;
-        };
-        const getPublishedDownloadableReports = async () => {
-            const downloadablePublishedReportsResults = await getDownloadableReportsService(specificationId, "Published");
-            return downloadablePublishedReportsResults;
+            return getDownloadableReportsService(specificationId);
         };
 
         getLiveDownloadableReports().then((result) => {
             if (result.status === 200) {
                 let response = result.data as ReportMetadataViewModel[];
-                setDownloadableLiveReports(response);
+                setDownloadableReports(response);
             }
         });
-
-        getPublishedDownloadableReports().then((result) => {
-            if (result.status === 200) {
-                let response = result.data as ReportMetadataViewModel[];
-                setDownloadablePublisedReports(response);
-            }
-        });
-    }, [specificationId]);
+            }, [specificationId]);
 
     let breadcrumbs: IBreadcrumbs[] = [
         {
@@ -264,12 +246,12 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <h2 className="govuk-heading-l">Downloadable reports</h2>
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-full">
-                                            <div hidden={downloadableLiveReports.length === 0}>
+                                            <div hidden={downloadableReports.filter(dr => dr.category === "Live").length === 0}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
-                                                {downloadableLiveReports.map(dlr => <div>
+                                                {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
                                                         <div className="attachment__thumbnail">
                                                             <a className="govuk-link" target="_self"
-                                                               aria-hidden="true" href={`/api/specs/download-report/${dlr.blobName}`}>
+                                                               aria-hidden="true" href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
@@ -291,7 +273,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__details">
                                                             <h4 className="govuk-heading-s">
                                                                 <a className="govuk-link" target="_self"
-                                                                   href={`/api/specs/download-report/${dlr.blobName}`}>{dlr.name}</a>
+                                                                   href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>{dlr.name}</a>
                                                             </h4>
                                                             <p className="govuk-body-s">
                                                                 <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
@@ -301,12 +283,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                     </div>
                                                 )}
                                             </div>
-                                            <div hidden={downloadablePublishedReports.length === 0}>
+                                            <div hidden={downloadableReports.filter(dr => dr.category === "Published").length === 0}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
-                                                {downloadablePublishedReports.map(dpr => <div>
+                                                {downloadableReports.filter(dr => dr.category === "Published").map(dlr =>
+                                                    <div>
                                                         <div className="attachment__thumbnail">
                                                             <a className="govuk-link" target="_self"
-                                                               aria-hidden="true" href={`/api/specs/download-report/${dpr.blobName}`}>
+                                                               aria-hidden="true" href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
@@ -328,11 +311,11 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__details">
                                                             <h4 className="govuk-heading-s">
                                                                 <a className="govuk-link" target="_self"
-                                                                   href={`/api/specs/download-report/${dpr.blobName}`}>{dpr.name}</a>
+                                                                   href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>{dlr.name}</a>
                                                             </h4>
                                                             <p className="govuk-body-s">
-                                                                <span>{dpr.format}</span>, <span>{dpr.size}</span>, Updated: <span><DateFormatter
-                                                                utc={false} date={dpr.lastModified}/></span>
+                                                                <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
+                                                                utc={false} date={dlr.lastModified}/></span>
                                                             </p>
                                                         </div>
                                                     </div>

@@ -354,30 +354,35 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestResult();
         }
 
-        [Route("api/specs/{specificationId}/get-report-metadata/{reportType}")]
+        [Route("api/specs/{specificationId}/get-report-metadata/")]
         [HttpGet]
-        public async Task<IActionResult> GetReportMetadata(string specificationId, string reportType)
+        public async Task<IActionResult> GetReportMetadata(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(reportType, nameof(reportType));
 
-            ApiResponse<IEnumerable<ReportMetadata>> response = await _specificationsApiClient.GetReportMetadataForSpecifications(specificationId);
+            ApiResponse<IEnumerable<SpecificationReport>> response = await _specificationsApiClient.GetReportMetadataForSpecifications(specificationId);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return new OkObjectResult(response.Content.Where(x => x.Category == reportType));
+                return new OkObjectResult(response.Content);
             }
 
             return new BadRequestResult();
         }
 
-        [Route("api/specs/download-report/{filename}")]
+        [Route("api/specs/download-report")]
         [HttpGet]
-        public async Task<IActionResult> DownloadReport(string filename)
+        public async Task<IActionResult> DownloadReport([FromQuery]JobType jobType, [FromQuery]string specificationId, [FromQuery]string fundingLineCode, [FromQuery]string fundingPeriodId, [FromQuery]string fundingStreamId)
         {
-            Guard.IsNullOrWhiteSpace(filename, nameof(filename));
 
-            ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(filename, ReportType.CalcResult);
+            ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(new SpecificationReportIdentifier
+            {
+                JobType = JobType.CalcResult,
+                SpecificationId = specificationId,
+                FundingLineCode = fundingLineCode,
+                FundingPeriodId = fundingPeriodId,
+                FundingStreamId = fundingStreamId
+            });
 
 
             if (response.StatusCode == HttpStatusCode.OK)
@@ -386,7 +391,7 @@ namespace CalculateFunding.Frontend.Controllers
 
 	            byte[] data = client.DownloadData(response.Content.Url);
 
-	            FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = filename};
+	            FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = response.Content.FileName};
 
 	            return fileContentResult;
             }
