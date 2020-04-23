@@ -24,6 +24,7 @@ import {Approvals} from "./pages/Approvals";
 import {TemplateBuilder} from "./pages/TemplateBuilder";
 import {EditVariationPoints} from "./pages/Specifications/EditVariationPoints";
 import {CalculationVersionHistory} from "./pages/Calculations/CalculationVersionHistory";
+import {FundingApprovalSelection} from "./pages/FundingApprovals/FundingApprovalSelection";
 
 const App: React.FunctionComponent = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FunctionComponent = () => {
      <Switch>
        <Route exact path="/" component={Home} />
        <Route path="/ViewFunding" component={ViewFundingContainer} />
+       <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection} />
        <Route path="/results" component={ViewResults} />
        <Route path="/SelectSpecification" component={SelectSpecification} />
        <Route path="/SpecificationsList" component={SpecificationsList} />
