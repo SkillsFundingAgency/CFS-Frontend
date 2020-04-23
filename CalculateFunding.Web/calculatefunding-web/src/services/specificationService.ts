@@ -122,7 +122,7 @@ export async function getProfileVariationPointersService(specificationId: string
 
 export async  function setProfileVariationPointersService(specificationId:string, profileVariationPointer: ProfileVariationPointer[]) {
     return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },

@@ -299,3 +299,6 @@ __pycache__/
 /CalculateFunding.Frontend/wwwroot/js
 /CalculateFunding.Frontend/Scripts/*.js
 /CalculateFunding.Frontend/wwwroot/app
+
+# JEST
+test-report.xml

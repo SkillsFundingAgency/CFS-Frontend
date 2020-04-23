@@ -3,9 +3,9 @@ import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
-import {EditSpecification, EditSpecificationRouteProps} from "../../../pages/Specifications/EditSpecification";
 import {createBrowserHistory, createLocation} from "history";
 import {match} from "react-router";
+import {EditVariationPoints, EditVariationPointsRouteProps} from "../../../pages/Specifications/EditVariationPoints";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -16,7 +16,7 @@ const store: Store<IStoreState> = createStore(
 
 const history = createBrowserHistory();
 const location = createLocation("", "", "", {search: "", pathname: "", hash: "", key: "", state: ""});
-const editSpecificationRoutePropsMatch: match<EditSpecificationRouteProps> = {
+const editVariationPointsRouteProps: match<EditVariationPointsRouteProps> = {
     params: {
         specificationId: "056fcfcd-fb12-45ed-8a1b-079a0e2fc8c5",
     },
@@ -27,16 +27,14 @@ const editSpecificationRoutePropsMatch: match<EditSpecificationRouteProps> = {
 
 store.dispatch = jest.fn();
 
-describe("<EditSpecification />", () => {
+describe("<EditVariationPoints />", () => {
     it('will have the correct breadcrumbs', () => {
-
-        const wrapper = mount(<Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider>);
-        expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(3);
+        const wrapper = mount(<Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider>);
+        expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(4);
     });
 
     it('will have the correct <H1 /> title', () => {
-
-        const wrapper = mount(<Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider>);
-        expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Edit specification");
+        const wrapper = mount(<Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider>);
+        expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Variation occurence");
     });
 });

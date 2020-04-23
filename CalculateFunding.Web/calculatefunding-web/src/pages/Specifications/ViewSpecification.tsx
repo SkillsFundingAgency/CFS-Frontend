@@ -543,13 +543,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                             <dl key={index} className="govuk-summary-list">
                                                                 <div className="govuk-summary-list__row">
                                                                     <dt className="govuk-summary-list__key">
-                                                                        Funding line {index + 1}
+                                                                        {f.fundingLineId}
                                                                     </dt>
                                                                     <dd className="govuk-summary-list__value">
                                                                         {f.typeValue} {f.year} <br/>
                                                                         Installment {f.occurrence}
                                                                     </dd>
-
+                                                                    <dd className="govuk-summary-list__actions">
+                                                                        <a className="govuk-link"
+                                                                           href={`/app/specifications/EditVariationPoints/${specificationId}`}>Change<span
+                                                                            className="govuk-visually-hidden"> {f.periodType}</span></a>
+                                                                    </dd>
                                                                 </div>
                                                             </dl>
                                                         )

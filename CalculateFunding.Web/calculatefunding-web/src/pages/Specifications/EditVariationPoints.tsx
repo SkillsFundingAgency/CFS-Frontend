@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {IBreadcrumbs} from "../../types/IBreadcrumbs";
@@ -6,22 +6,52 @@ import {Banner} from "../../components/Banner";
 import {RouteComponentProps} from "react-router";
 import {Section} from "../../types/Sections";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getSpecificationSummaryService} from "../../services/specificationService";
-import {getProfileVariationPointers} from "../../actions/ViewSpecificationsActions";
-import {useDispatch, useSelector} from "react-redux";
-import {ViewSpecificationState} from "../../states/ViewSpecificationState";
-import {AppState} from "../../states/AppState";
-import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
+import {
+    getProfileVariationPointersService,
+    getSpecificationSummaryService, setProfileVariationPointersService
+} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-
+import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
+import {ProfilingInstallments} from "../../types/Profiling";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import { getFutureInstallmentsService
+} from "../../services/profilingService";
 export interface EditVariationPointsRouteProps {
     specificationId: string;
 }
-
 export function EditVariationPoints({match}: RouteComponentProps<EditVariationPointsRouteProps>) {
-    const dispatch = useDispatch();
     const specificationId = match.params.specificationId;
-    const [specificationName, setSpecificationName] = useState<string>("");
+    const specificationSummaryInitialState =
+        {
+            name: "",
+            id: "",
+            approvalStatus: "",
+            isSelectedForFunding: false,
+            description: "",
+            providerVersionId: "",
+            fundingStreams: [{
+                id: "",
+                name: ""
+            }],
+            fundingPeriod: {
+                id: "",
+                name: ""
+            }
+        };
+    const profileVariationPointerInitialState = [{
+        fundingStreamId: "",
+        fundingLineId: "",
+        periodType: "",
+        typeValue: "",
+        year: 0,
+        occurrence: 0,
+    }];
+    const profilingInstallmentsInitialState: ProfilingInstallments[] = [];
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>(specificationSummaryInitialState);
+    const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>(profileVariationPointerInitialState);
+    const [profileVariationPointersFutureInstallment, setProfileVariationPointersFutureInstallment] = useState<ProfileVariationPointer[]>([]);
+    const [profilingInstallments, setProfilingInstallments] = useState<ProfilingInstallments[]>(profilingInstallmentsInitialState);
+    const [isLoading, setIsLoading] = useState(false);
     let breadcrumbs: IBreadcrumbs[] = [
         {
             name: "Calculate funding",
@@ -32,7 +62,7 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
             url: "/app/SpecificationsList"
         },
         {
-            name: specificationName,
+            name: specificationSummary.name,
             url: `/app/ViewSpecification/${specificationId}`
         },
         {
@@ -41,29 +71,157 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
         }
     ];
 
+    function SetFutureInstallment(e: React.ChangeEvent<HTMLSelectElement>) {
+        if (e.target.value !== null && e.target.value !== "-1") {
+            const profileVariationIndex = parseInt(e.target.value.split('-')[0]);
+            const installmentIndex = parseInt(e.target.value.split('-')[1]);
+            if (!isNaN(profileVariationIndex) && !isNaN(installmentIndex)) {
+                const updateProfileVariation = JSON.parse(JSON.stringify(profileVariationPointers));
+                updateProfileVariation[profileVariationIndex].typeValue = profilingInstallments[installmentIndex].installmentMonth;
+                updateProfileVariation[profileVariationIndex].year = profilingInstallments[installmentIndex].installmentYear;
+                updateProfileVariation[profileVariationIndex].occurrence = profilingInstallments[installmentIndex].installmentNumber;
+                setProfileVariationPointersFutureInstallment(updateProfileVariation);
+            } else if (!isNaN(profileVariationIndex) && isNaN(installmentIndex)) {
+                const updateProfileVariation = JSON.parse(JSON.stringify(profileVariationPointers));
+                updateProfileVariation[profileVariationIndex].typeValue = profileVariationPointers[profileVariationIndex].typeValue;
+                updateProfileVariation[profileVariationIndex].year = profileVariationPointers[profileVariationIndex].year;
+                updateProfileVariation[profileVariationIndex].occurrence = profileVariationPointers[profileVariationIndex].occurrence;
+                setProfileVariationPointersFutureInstallment(updateProfileVariation);
+            }
+        }
+    }
+
+    function SetProfileVariationPointers() {
+        if (profileVariationPointersFutureInstallment.length > 0) {
+            setIsLoading(true);
+            const updateProfileVariationPointers = async () => {
+                return setProfileVariationPointersService(specificationId, profileVariationPointersFutureInstallment);
+            };
+            updateProfileVariationPointers().then((result) => {
+                if (result.status === 200) {
+                    window.location.href = `/app/ViewSpecification/${specificationId}`
+                } else {
+                    setIsLoading(false);
+                }
+            }).catch(() => {
+                setIsLoading(false);
+            });
+        }
+    }
+
     useEffectOnce(() => {
+        setIsLoading(true);
         const getSpecification = async () => {
-            const specificationResult = await getSpecificationSummaryService(specificationId);
-            return specificationResult;
+            return getSpecificationSummaryService(specificationId);
         };
-        getSpecification().then((result) => {
-            const viewSpecification = result.data as SpecificationSummary;
-            setSpecificationName(viewSpecification.name);
+        getSpecification().then((specificationResult) => {
+            if (specificationResult.status === 200) {
+                const spec = specificationResult.data as SpecificationSummary;
+                setSpecificationSummary(spec);
+                const getProfileVariationPointers = async () => {
+                    return getProfileVariationPointersService(specificationId);
+                };
+                getProfileVariationPointers().then((profileVariationPointersResult) => {
+                    if (profileVariationPointersResult.status === 200)
+                    {
+                        setProfileVariationPointers(profileVariationPointersResult.data as ProfileVariationPointer[])
+                        const getInstallments = async () => {
+                            return getFutureInstallmentsService(
+                                spec.fundingStreams[0].id,
+                                spec.fundingPeriod.id);
+                        };
+                        getInstallments().then((installmentsResult) => {
+                            const installments = installmentsResult.data as ProfilingInstallments[];
+                            if (installments !== null && installments.length > 0) {
+                                setProfilingInstallments(installments);
+                                setIsLoading(false);
+                            }
+                            else
+                                setIsLoading(false);
+                        });
+                    }
+                    else
+                        setIsLoading(false);
+                });
+            }
+            else
+            {
+                setIsLoading(false);
+            }
         });
     });
-
-
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
             <div className="govuk-main-wrapper">
-                <fieldset className="govuk-fieldset" id="update-specification-fieldset">
+                <LoadingStatus title={"Loading installment variation"} hidden={!isLoading}/>
+                <fieldset className="govuk-fieldset" hidden={isLoading}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Variation occurence
                         </h1>
                     </legend>
+                    {
+                        (profilingInstallments != null &&  profilingInstallments.length > 0) ?
+                            <div className="govuk-form-group">
+                                <div className="govuk-grid-column-two-thirds">
+                                    <div className="govuk-form-group">
+                                        <table className="govuk-table">
+                                            <caption className="govuk-table__caption">Installment variation</caption>
+                                            <thead className="govuk-table__head">
+                                            <tr className="govuk-table__row">
+                                                <th scope="col" className="govuk-table__header app-custom-class">Funding line
+                                                </th>
+                                                <th scope="col" className="govuk-table__header app-custom-class">Current
+                                                    installment
+                                                </th>
+                                                <th scope="col" className="govuk-table__header app-custom-class">Future
+                                                    installment
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody className="govuk-table__body">
+                                            {
+                                                profileVariationPointers.map((f, profileVariationIndex) => {
+                                                    return (
+                                                        <tr key={profileVariationIndex} className="govuk-table__row">
+                                                            <th scope="row" className="govuk-table__header">{f.fundingLineId}</th>
+                                                            <td className="govuk-table__cell">
+                                                                {f.typeValue} {f.year} <br/>
+                                                                Installment {f.occurrence}
+                                                            </td>
+                                                            <td className="govuk-table__cell">
+                                                                <div className="govuk-form-group">
+                                                                    <select className="govuk-select" onChange={(e) => SetFutureInstallment(e)}>
+                                                                        <option value={`${profileVariationIndex}--1`}></option>
+                                                                        {
+                                                                            profilingInstallments.map((installment, installmentIndex) =>
+                                                                            <option key={installmentIndex} value={`${profileVariationIndex}-${installmentIndex}`}>
+                                                                                {installment.installmentMonth} {installment.installmentYear} installment {installment.installmentNumber}
+                                                                            </option>
+                                                                        )}
+                                                                    </select>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })
+                                            }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="govuk-form-group">
+                                        <button className="govuk-button govuk-!-margin-right-1"
+                                                data-module="govuk-button"
+                                                onClick={SetProfileVariationPointers}>
+                                            Save and continue
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            :null
+                    }
                 </fieldset>
             </div>
         </div>
