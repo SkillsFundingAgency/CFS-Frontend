@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "../styles/TemplateBuilderNode.scss";
 import { FundingLineOrCalculation, NodeType, FundingLine, Calculation, FundingLineType, CalculationType } from "../types/TemplateBuilderDefinitions";
 
@@ -8,14 +8,15 @@ interface TemplateBuilderNodeProps {
   openSideBar: (open: boolean) => void,
   onClickNode: () => void,
   editMode: boolean,
+  dsKey: number,
   nextId: number,
 };
 
-function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, editMode, nextId }: TemplateBuilderNodeProps) {
+function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, editMode, dsKey, nextId }: TemplateBuilderNodeProps) {
   const handleAddLine = () => {
     const newChild: FundingLine = {
       id: `n${nextId.toString()}`,
-      isRootNode: false,
+      dsKey: dsKey,
       templateLineId: nextId,
       kind: NodeType.FundingLine,
       type: FundingLineType.Information,
@@ -28,7 +29,7 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
   const handleAddCalc = () => {
     const newChild: Calculation = {
       id: `n${nextId.toString()}`,
-      isRootNode: false,
+      dsKey: dsKey,
       templateCalculationId: nextId,
       kind: NodeType.Calculation,
       type: CalculationType.Information,
@@ -42,12 +43,14 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
     onClickNode();
   }
 
+  const isClone = nodeData.id.includes(":");
+
   if (nodeData.kind === NodeType.FundingLine) {
     const node = nodeData as FundingLine;
     return (
       <div>
         <div onClick={handleClick} data-testid={`node-${node.id}`}>
-          <div className="fundingLine govuk-body-s">{node.name} ({node.fundingLineCode})</div>
+          <div className="fundingLine govuk-body-s">{`${node.name} (${node.fundingLineCode})${isClone ? "*" : ""}`}</div>
           <div className="box govuk-body-s">{node.type}</div>
         </div>
         {editMode &&
@@ -64,7 +67,7 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
   return (
     <div>
       <div onClick={handleClick}>
-        <div className="calculation govuk-body-s">{node.name}</div>
+        <div className="calculation govuk-body-s">{`${node.name}${isClone ? "*" : ""}`}</div>
         <div className="box govuk-body-s">{node.valueFormat !== undefined ? node.type + " (" + node.valueFormat + ")" : node.type}</div>
       </div>
       {editMode &&

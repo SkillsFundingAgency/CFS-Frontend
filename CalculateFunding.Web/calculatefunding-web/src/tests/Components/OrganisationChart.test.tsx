@@ -7,7 +7,6 @@ import { sendDragInfo, clearDragInfo, getDragInfo, sendSelectedNodeInfo, clearSe
 
 const data: FundingLineOrCalculation = {
     id: "n1",
-    isRootNode: true,
     templateLineId: 1,
     kind: NodeType.FundingLine,
     type: FundingLineType.Information,
@@ -15,31 +14,29 @@ const data: FundingLineOrCalculation = {
     fundingLineCode: "Code",
     aggregationType: AggregrationType.Average,
     children: [
-        { id: "n2", isRootNode: false, templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code", aggregationType: AggregrationType.None },
+        { id: "n2", templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code", aggregationType: AggregrationType.None },
         {
             id: "n3",
-            isRootNode: false,
             templateLineId: 3,
             kind: NodeType.FundingLine,
             type: FundingLineType.Payment,
             name: "Funding Line 3",
             fundingLineCode: "Code 3",
             children: [
-                { id: "n4", isRootNode: false, templateCalculationId: 4, kind: NodeType.Calculation, type: CalculationType.Information, name: "Calculation 1", formulaText: "formula", valueFormat: ValueFormatType.Currency, aggregationType: AggregrationType.Sum },
+                { id: "n4", templateCalculationId: 4, kind: NodeType.Calculation, type: CalculationType.Information, name: "Calculation 1", formulaText: "formula", valueFormat: ValueFormatType.Currency, aggregationType: AggregrationType.Sum },
                 {
                     id: "n5",
-                    isRootNode: false,
                     templateLineId: 5,
                     kind: NodeType.FundingLine,
                     type: FundingLineType.Information,
                     name: "Funding Line 4",
                     fundingLineCode: "code",
                     children: [
-                        { id: "n6", isRootNode: false, templateCalculationId: 6, kind: NodeType.Calculation, type: CalculationType.LumpSum, name: "Calculation 2", formulaText: "formula" },
-                        { id: "n7", isRootNode: false, templateCalculationId: 7, kind: NodeType.Calculation, type: CalculationType.ProviderLedFunding, name: "Calculation 3", formulaText: "formula" }
+                        { id: "n6", templateCalculationId: 6, kind: NodeType.Calculation, type: CalculationType.LumpSum, name: "Calculation 2", formulaText: "formula" },
+                        { id: "n7", templateCalculationId: 7, kind: NodeType.Calculation, type: CalculationType.ProviderLedFunding, name: "Calculation 3", formulaText: "formula" }
                     ]
                 },
-                { id: "n8", isRootNode: false, templateCalculationId: 8, kind: NodeType.Calculation, type: CalculationType.Drilldown, name: "Calculation 4", formulaText: "formula" }
+                { id: "n8", templateCalculationId: 8, kind: NodeType.Calculation, type: CalculationType.Drilldown, name: "Calculation 4", formulaText: "formula" }
             ]
         }
     ]

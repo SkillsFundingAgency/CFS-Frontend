@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import JSONDigger from "json-digger";
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { Section } from '../types/Sections';
@@ -7,6 +6,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import OrganisationChart from "../components/OrganisationChart";
 import TemplateBuilderNode from "../components/TemplateBuilderNode";
+import { addNode, removeNode, cloneNode as cloneNodeDatasource, moveNode, updateNode as updateDatasource } from "../services/templateBuilderDatasourceService";
 import { NodeType, FundingLineType, FundingLineUpdateModel, CalculationUpdateModel, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, FundingLineOrCalculation } from '../types/TemplateBuilderDefinitions';
 import "../styles/TemplateBuilder.scss";
 
@@ -16,8 +16,6 @@ enum Mode {
 }
 
 const initialId: number = 0;
-const fundingLineIdField = "id";
-const fundingLineChildrenField = "children";
 
 export function TemplateBuilder() {
     const orgchart = useRef();
@@ -43,18 +41,7 @@ export function TemplateBuilder() {
     };
 
     const updateNode = async (node: FundingLineUpdateModel | CalculationUpdateModel) => {
-        for (let i = 0; i < ds.length; i++) {
-            const fundingLine = ds.find(k => k.key === ds[i].key);
-            if (!fundingLine) continue;
-            const dsDigger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
-            try {
-                await dsDigger.updateNode(node);
-            }
-            catch {
-                // ignore if node doesn't exist in current funding line
-                continue;
-            }
-        };
+        await updateDatasource(ds, node);
         setDS([...ds]);
     }
 
@@ -63,76 +50,28 @@ export function TemplateBuilder() {
         setOpenSidebar(false);
     }
 
+    const incrementNextId = () => {
+        setNextId(nextId + 1);
+    }
+
     const onClickAdd = async (id: string, newChild: FundingLine | Calculation) => {
-        for (let i = 0; i < ds.length; i++) {
-            const fundingLine = ds.find(k => k.key === ds[i].key);
-            if (!fundingLine) return;
-            const dsDigger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
-            setNextId(nextId + 1);
-            try {
-                await dsDigger.addChildren(id, [newChild]);
-            }
-            catch {
-                // ignore - iterates through all funding line trees to update cloned nodes that may exist in other funding lines
-            }
-        }
+        await addNode(ds, id, newChild, incrementNextId);
         setDS([...ds]);
     }
 
-    const onClickDelete = async (id: string, isRootNode: boolean) => {
-        for (let i = 0; i < ds.length; i++) {
-            const fundingLine = ds.find(k => k.key === ds[i].key);
-            if (!fundingLine) return;
-            const dsDigger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
-            try {
-                await dsDigger.findNodeById(id);
-            }
-            catch {
-                continue;
-            }
-            if (isRootNode) {
-                const state = ds.filter(n => n.key !== fundingLine.key);
-                setDS([...state]);
-                continue;
-            }
-            await dsDigger.removeNodes(id);
-            setDS([...ds]);
-        }
+    const onClickDelete = async (id: string) => {
+        await removeNode(ds, id);
+        setDS([...ds]);
     }
 
     const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
-        const sourceFundingLine = ds.find(k => k.key === draggedItemDsKey);
-        if (!sourceFundingLine) return;
-        const destinationFundingLine = ds.find(k => k.key === dropTargetDsKey);
-        if (!destinationFundingLine) return;
-        draggedItemData.dsKey = dropTargetDsKey;
-        if (draggedItemData.isRootNode) {
-            draggedItemData.isRootNode = false;
-        }
-        const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-        await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
+        await cloneNodeDatasource(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
         setDS([...ds]);
     };
 
     const changeHierarchy = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
-        const sourceFundingLine = ds.find(k => k.key === draggedItemDsKey);
-        if (!sourceFundingLine) return;
-        const destinationFundingLine = ds.find(k => k.key === dropTargetDsKey);
-        if (!destinationFundingLine) return;
-        const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-        draggedItemData.dsKey = dropTargetDsKey;
-        if (draggedItemData.isRootNode) {
-            draggedItemData.isRootNode = false;
-            await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
-            const filteredDs = ds.filter(n => n.key !== draggedItemDsKey);
-            setDS([...filteredDs]);
-        }
-        else {
-            await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
-            const sourceDsDigger = new JSONDigger(sourceFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-            await sourceDsDigger.removeNode(draggedItemData.id);
-            setDS([...ds]);
-        }
+        await moveNode(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
+        setDS([...ds]);
     };
 
     const handleAddFundingLineClick = () => {
@@ -142,7 +81,6 @@ export function TemplateBuilder() {
 
         const fundingLine: FundingLine = {
             id: `n${id}`,
-            isRootNode: true,
             templateLineId: id,
             kind: NodeType.FundingLine,
             type: FundingLineType.Information,

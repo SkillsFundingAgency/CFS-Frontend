@@ -7,7 +7,7 @@ export interface SidebarContentProps {
     data: Set<FundingLineOrCalculationSelectedItem>,
     updateNode: (p: FundingLineUpdateModel | CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string, isRootNode: boolean) => Promise<void>,
+    deleteNode: (id: string) => Promise<void>,
 }
 
 export function SidebarContent({ data, updateNode, openSideBar, deleteNode }: SidebarContentProps) {

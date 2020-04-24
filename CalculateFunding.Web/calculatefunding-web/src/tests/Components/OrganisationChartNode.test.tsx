@@ -24,7 +24,6 @@ it("sends drag event info to component", () => {
     const data: FundingLine = {
         id: "n0",
         dsKey: 0,
-        isRootNode: true,
         templateLineId: 0,
         kind: NodeType.FundingLine,
         type: FundingLineType.Information,

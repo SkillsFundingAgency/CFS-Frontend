@@ -6,7 +6,7 @@ export interface FundingLineItemProps {
     node: FundingLine,
     updateNode: (p: FundingLineUpdateModel, dsKey: number) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string, isRootNode: boolean, dsKey: number) => Promise<void>,
+    deleteNode: (id: string, dsKey: number) => Promise<void>,
     dsKey: number,
 }
 
@@ -42,13 +42,14 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, dsK
     }
 
     const handleConfirmDelete = async () => {
-        await deleteNode(node.id, node.isRootNode, dsKey);
+        await deleteNode(node.id, dsKey);
         openSideBar(false);
     }
 
     const handleSubmit = () => {
         var updatedNode: FundingLineUpdateModel = {
             id: node.id,
+            kind: node.kind,
             name: name,
             type: type,
             fundingLineCode: code,

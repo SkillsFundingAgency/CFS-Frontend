@@ -71,12 +71,12 @@ function OrganisationChartNode({
   useEffect(() => {
     const subs1 = getDragInfo().subscribe(draggedInfo => {
       if (draggedInfo && draggedInfo.draggedNodeId && draggedInfo.draggedNodeKind && node && node.current) {
-        const draggedNode = document.querySelector("#" + draggedInfo.draggedNodeId);
+        const draggedNode = document.querySelector("[id='" + draggedInfo.draggedNodeId + "']");
         if (draggedNode) {
           const closestNode = draggedNode.closest("li");
           if (closestNode) {
             const dropTargetNodeKind: NodeType = node.current.getAttribute('data-kind') as NodeType;
-            const currentNode = closestNode.querySelector("#" + node.current.id);
+            const currentNode = closestNode.querySelector("[id='" + node.current.id + "']");
             setAllowedDrop(
               !currentNode && permissible(draggedInfo.draggedNodeKind, dropTargetNodeKind)
                 ? true
@@ -317,6 +317,7 @@ function OrganisationChartNode({
           openSideBar={openSideBar}
           onClickNode={clickNodeHandler}
           editMode={editMode}
+          dsKey={dsKey}
           nextId={nextId}
         />
 

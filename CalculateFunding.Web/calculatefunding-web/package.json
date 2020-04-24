@@ -55,7 +55,8 @@
     "redux-thunk": "^2.3.0",
     "rxjs": "^6.5.4",
     "styled-components": "^4.4.1",
-    "typescript": "3.5.3"
+    "typescript": "3.5.3",
+    "uuid": "^7.0.3"
   },
   "scripts": {
     "start": "set HTTPS=true&&react-scripts start",

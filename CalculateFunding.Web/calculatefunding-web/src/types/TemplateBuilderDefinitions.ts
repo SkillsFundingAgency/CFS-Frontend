@@ -38,7 +38,6 @@ export interface FundingLine {
     id: string,
     relationship?: string,
     dsKey?: number,
-    isRootNode: boolean,
     templateLineId: number,
     kind: NodeType,
     type: FundingLineType,
@@ -52,7 +51,6 @@ export interface FundingLine {
     id: string,
     relationship?: string,
     dsKey?: number,
-    isRootNode: boolean,
     templateCalculationId: number,
     kind: NodeType,
     type: CalculationType,
@@ -63,7 +61,11 @@ export interface FundingLine {
     children?: Array<FundingLineOrCalculation>
   }
 
-  export interface FundingLineUpdateModel {
+  export interface UpdateModel {
+    kind: NodeType
+  }
+
+  export interface FundingLineUpdateModel extends UpdateModel {
     id: string,
     type: FundingLineType,
     name: string,
@@ -71,7 +73,7 @@ export interface FundingLine {
     aggregationType?: AggregrationType
   }
 
-  export interface CalculationUpdateModel {
+  export interface CalculationUpdateModel extends UpdateModel {
     id: string,
     type: CalculationType,
     name: string,
