@@ -362,6 +362,7 @@
                 "additionalLoginParams": [
                     "response_type=code id_token",
                     "resource=https://graph.microsoft.com"
+                ]
             }
         },
         {
