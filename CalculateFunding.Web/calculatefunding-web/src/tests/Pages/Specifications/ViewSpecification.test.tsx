@@ -176,4 +176,11 @@ describe("Provider Funding Overview ", () => {
         expect(wrapper.find('.collapsible-step-header-status').at(1).text())
             .toBe(mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationPublishStatus);
     });
+
+    it("renders back to top link within funding line structure tab", async () => {
+        const wrapper = mount(mockViewSpecificationPage);
+
+        expect(wrapper.find('#fundingline-structure .app-back-to-top__link').prop("href"))
+            .toBe("#fundingline-structure");
+    });
 });
