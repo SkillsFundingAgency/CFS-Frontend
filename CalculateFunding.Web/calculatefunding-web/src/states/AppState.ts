@@ -7,6 +7,7 @@ import {SelectSpecificationState} from "./SelectSpecificationState";
 import {ProviderState} from "./ProviderState";
 import {SpecificationState} from "./SpecificationState";
 import {DatasetState} from "./DatasetState";
+import {FeatureFlagsState} from "./FeatureFlagsState";
 
 export interface AppState {
     selectSpecification: SelectSpecificationState;
@@ -17,5 +18,6 @@ export interface AppState {
     viewCalculationResults: ViewCalculationState;
     provider: ProviderState;
     specifications: SpecificationState,
-    datasets: DatasetState
+    datasets: DatasetState,
+    featureFlags: FeatureFlagsState
 }

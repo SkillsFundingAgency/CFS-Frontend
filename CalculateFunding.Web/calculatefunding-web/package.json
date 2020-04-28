@@ -26,7 +26,6 @@
     "axios-mock-adapter": "^1.18.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "fetch-mock": "^9.4.0",
     "govuk-frontend": "^3.6.0",
     "govuk-react": "^0.7.2",
     "html2canvas": "^1.0.0-rc.5",

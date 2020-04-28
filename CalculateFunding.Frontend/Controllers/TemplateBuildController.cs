@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    public class TemplateBuildController : Controller
+    public class TemplateBuildController : ControllerBase
     {
         private readonly ITemplateBuilderApiClient _client;
 

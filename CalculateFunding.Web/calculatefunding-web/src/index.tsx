@@ -6,9 +6,9 @@ import AppContainer from './containers/AppContainer';
 import {IStoreState, rootReducer} from "./reducers/rootReducer";
 import {composeWithDevTools} from "redux-devtools-extension";
 import logger from "redux-logger";
-import thunk from "redux-thunk";
+import thunk, { ThunkMiddleware } from "redux-thunk";
 
-const middleware = [logger, thunk];
+const middleware = [logger, thunk as ThunkMiddleware<IStoreState>];
 
 const store: Store<IStoreState> = createStore(
     rootReducer,
