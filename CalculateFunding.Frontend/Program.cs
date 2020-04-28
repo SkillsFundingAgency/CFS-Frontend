@@ -19,6 +19,10 @@
            Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
+                    if (string.IsNullOrWhiteSpace(AppConfigConnectionString))
+                    {
+                        return;
+                    }
                     var settings = config.Build();
                     config.AddAzureAppConfiguration(options =>
                     {
