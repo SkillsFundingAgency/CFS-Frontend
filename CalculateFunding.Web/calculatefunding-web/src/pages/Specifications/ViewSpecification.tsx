@@ -21,7 +21,7 @@ import {DateInput} from "../../components/DateInput";
 import {TimeInput} from "../../components/TimeInput";
 import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
-import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
+import {FundingStructureType} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
@@ -30,6 +30,7 @@ import {Section} from "../../types/Sections";
 import {DateFormatter} from "../../components/DateFormatter";
 import {CollapsibleSteps} from "../../components/CollapsibleSteps";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {FundingLineStep} from "../../components/FundingLineStep";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -44,6 +45,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [navisionTime, setNavisionTime] = useState();
     const [releaseTime, setReleaseTime] = useState();
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
+    const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const initialSpecification: SpecificationSummary = {
         name: "",
         approvalStatus: "",
@@ -102,8 +104,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             });
         }
     }, [viewSpecification.fundingLineStructureResult]);
-
-
 
     useEffect(() => {
         document.title = "Specification Results - Calculate Funding";
@@ -197,58 +197,13 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     let fundingLineStatus = specification.approvalStatus;
-    if (viewSpecification.fundingLineStatusResult !== null && viewSpecification.fundingLineStatusResult !== "")
+    if (viewSpecification.fundingLineStatusResult != null && viewSpecification.fundingLineStatusResult !== "")
         fundingLineStatus = viewSpecification.fundingLineStatusResult;
 
-    const FundingLineItem: React.FC<IFundingStructureItem> = ({fundingStructureItems}) => {
-        let fundingType: string = "";
-        const parentFundingLineName: string = fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
-        return (
-            <React.Fragment>
-                {
-                    (fundingStructureItems !== null && fundingStructureItems.length > 0) ? fundingStructureItems.map((innerFundingLineItem, index) => {
-                            let displayFundingType = false;
-                            if (fundingType !== FundingStructureType[innerFundingLineItem.type]) {
-                                displayFundingType = true;
-                                fundingType = FundingStructureType[innerFundingLineItem.type];
-                            }
-
-                            let linkValue = '';
-                            if (innerFundingLineItem.calculationId !== null && innerFundingLineItem.calculationId !== '') {
-                                linkValue = `/app/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`;
-                            }
-                            return (
-                                <CollapsibleSteps
-                                    key={index}
-                                    uniqueKey={index.toString()}
-                                    title={displayFundingType ? fundingType : ""}
-                                    description={innerFundingLineItem.name}
-                                    status={(innerFundingLineItem.calculationPublishStatus !== null && innerFundingLineItem.calculationPublishStatus !== '') ?
-                                        innerFundingLineItem.calculationPublishStatus : ""}
-                                    step={displayFundingType ? innerFundingLineItem.level.toString() : ""}
-                                    expanded={false}
-                                    link={linkValue}
-                                    hasChildren={innerFundingLineItem.fundingStructureItems !== null && innerFundingLineItem.fundingStructureItems.length > 0}>
-                                    {
-                                        innerFundingLineItem.fundingStructureItems ?
-                                            (<FundingLineItem calculationId={innerFundingLineItem.calculationId}
-                                                              calculationPublishStatus={innerFundingLineItem.calculationPublishStatus}
-                                                              type={innerFundingLineItem.type}
-                                                              level={innerFundingLineItem.level}
-                                                              name={innerFundingLineItem.name}
-                                                              fundingStructureItems={innerFundingLineItem.fundingStructureItems}
-                                                              parentName={innerFundingLineItem.name}/>)
-                                            : null
-                                    }
-                                </CollapsibleSteps>
-                            )
-                        }
-                        )
-                        : null
-                }
-            </React.Fragment>
-        )
-    };
+    function openCloseAllFundingLines()
+    {
+        setFundingLinesExpandedStatus(!fundingLinesExpandedStatus);
+    }
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -309,37 +264,43 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                              callback={updateFundingLineState}/>
                                     </div>
                                 </div>
+                                <div className="govuk-accordion__controls"
+                                     hidden={viewSpecification.fundingLineStructureResult == null ||
+                                viewSpecification.fundingLineStructureResult.length === 0}>
+                                    <button type="button" className="govuk-accordion__open-all"
+                                            aria-expanded="false"
+                                            onClick={openCloseAllFundingLines}
+                                            hidden={fundingLinesExpandedStatus}>Open all<span
+                                        className="govuk-visually-hidden"> sections</span></button>
+                                    <button type="button" className="govuk-accordion__open-all"
+                                            aria-expanded="true"
+                                            onClick={openCloseAllFundingLines}
+                                            hidden={!fundingLinesExpandedStatus}>Close all<span
+                                        className="govuk-visually-hidden"> sections</span></button>
+                                </div>
                                 <ul className="collapsible-steps">
                                     {
                                         viewSpecification.fundingLineStructureResult.map((f, index) => {
                                             let linkValue = '';
-                                            if (f.calculationId !== null && f.calculationId !== '') {
+                                            if (f.calculationId != null && f.calculationId !== '') {
                                                 linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
                                             }
-
-                                            return <li key={"collapsible-steps-top" + index}
-                                                       className="collapsible-step step-is-shown"><CollapsibleSteps
-                                                key={"collapsible-steps" + index}
+                                            return <li key={"collapsible-steps-top"+index} className="collapsible-step step-is-shown"><CollapsibleSteps
+                                                key={"collapsible-steps"+ index}
                                                 uniqueKey={index.toString()}
                                                 title={FundingStructureType[f.type]}
                                                 description={f.name}
-                                                status={(f.calculationPublishStatus !== null && f.calculationPublishStatus !== '') ?
-                                                    f.calculationPublishStatus : ""}
+                                                status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
+                                                    f.calculationPublishStatus: ""}
                                                 step={f.level.toString()}
-                                                expanded={false}
+                                                expanded={fundingLinesExpandedStatus}
                                                 link={linkValue}
                                                 hasChildren={f.fundingStructureItems != null}>
                                                 {
-                                                    viewSpecification.fundingLineStructureResult.map(innerFundingLineItem => {
-                                                        return <FundingLineItem
-                                                            key={innerFundingLineItem.name.replace(" ", "") + index}
-                                                            calculationId={innerFundingLineItem.calculationId}
-                                                            calculationPublishStatus={innerFundingLineItem.calculationPublishStatus}
-                                                            type={innerFundingLineItem.type}
-                                                            level={innerFundingLineItem.level}
-                                                            name={innerFundingLineItem.name}
-                                                            fundingStructureItems={innerFundingLineItem.fundingStructureItems}
-                                                            parentName={f.name}/>
+                                                    viewSpecification.fundingLineStructureResult.map(innerFundingLineItem =>{
+                                                        return <FundingLineStep key={innerFundingLineItem.name.replace(" ", "") + index}
+                                                                                expanded={fundingLinesExpandedStatus}
+                                                                                fundingStructureItems={innerFundingLineItem} />
                                                     })
                                                 }
                                             </CollapsibleSteps>

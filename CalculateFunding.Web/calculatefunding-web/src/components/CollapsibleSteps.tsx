@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 interface ICollapsibleStepsProps {
     uniqueKey: string;
@@ -7,14 +7,21 @@ interface ICollapsibleStepsProps {
     title: string;
     description: string;
     status: string;
+    link: string;
     expanded: boolean;
     hasChildren: boolean;
-    link: string;
 }
 
-export const CollapsibleSteps: React.FC<ICollapsibleStepsProps> = props => {
+export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleStepsProps>) {
     const [expanded, setExpanded] = useState(props.expanded);
     const listKey = props.uniqueKey;
+    const expandRef = React.useRef(false);
+    useEffect(() => {
+        if(!expandRef.current) {
+            setExpanded(props.expanded)
+        }
+    }, [props.expanded]);
+
     let description = <span>{props.description}</span>;
     if (props.link !== "") {
         description = <a className={"govuk-link"} href={props.link}>{props.description}</a>;
@@ -44,7 +51,7 @@ export const CollapsibleSteps: React.FC<ICollapsibleStepsProps> = props => {
                         {props.status}
                     </span>
                     <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={() => setExpanded(!expanded)}>
-                        <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}></label>
+                        <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}/>
                     </span>
                 </h2>
             </div>
@@ -54,4 +61,4 @@ export const CollapsibleSteps: React.FC<ICollapsibleStepsProps> = props => {
         </li>
         </ul>
     );
-};
+}
