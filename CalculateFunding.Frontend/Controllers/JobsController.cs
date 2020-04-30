@@ -23,6 +23,7 @@ namespace CalculateFunding.Frontend.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         [Route("api/jobs/{specificationId}/latest/{jobTypes}")]
         public async Task<IActionResult> GetLatestJobForSpecification([FromRoute] string specificationId, [FromRoute] string jobTypes)
         {
@@ -41,6 +42,7 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(jobSummaryViewModel);
         }
 
+        [HttpGet]
         [Route("api/jobs/{specificationId}/last-updated/{jobTypes}")]
         public async Task<IActionResult> GetJobLastUpdatedForSpecification([FromRoute] string specificationId, [FromRoute] string jobTypes)
         {

@@ -33,6 +33,7 @@ namespace CalculateFunding.Frontend.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Get()
         {
             if (!this.Request.Headers.ContainsKey(HealthCheckHeaderName))
@@ -71,6 +72,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new JsonResult(overallHealth);
         }
 
+        [HttpGet]
         private ServiceHealth TryResolveService(Type serviceType)
         {
             ServiceHealth health = new ServiceHealth { Name = serviceType.GetFriendlyName(), HealthOk = false };

@@ -2,8 +2,7 @@
 {
     using System;
     using System.IO;
-    using System.Threading.Tasks;
-    using Common.ApiClient.Bearer;
+    using System.Threading.Tasks;    
     using Common.Identity.Authorization;
     using Common.Utility;
     using CalculateFunding.Common.Interfaces;
@@ -25,8 +24,10 @@
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Hosting;        
+    using Microsoft.OpenApi.Models;    
     using Microsoft.FeatureManagement;
+
 
     public class Startup
     {
@@ -49,7 +50,7 @@
         public void ConfigureServices(IServiceCollection services)
         {
             bool enablePlatformAuth = Configuration.GetValue<bool>("features:enablePlatformAuth");
-
+                
             services.AddControllers()
                 .AddNewtonsoftJson();
 
@@ -67,7 +68,7 @@
                 AzureAdOptions azureAdOptions = new AzureAdOptions();
                 Configuration.Bind("AzureAd", azureAdOptions);
                 _authenticationEnabled = azureAdOptions.IsEnabled;
-
+                
                 if (_authenticationEnabled)
                 {
                     services.AddAuthentication(adOptions =>
@@ -76,7 +77,7 @@
                         adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
                     })
                     .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-                    .AddCookie();
+                    .AddCookie();                                     
 
                     services.AddAuthorization();
 
@@ -153,7 +154,19 @@
             });
 
             services.AddOptions();
+
+            if (EnableSwagger())
+            {
+                services.AddSwaggerGen(
+                    options =>
+                    {
+                        options.SwaggerDoc("v1", new OpenApiInfo { Title = "Calculations Funding Frontend API", Version = "v1" });
+
+                    });
+            }
+
             services.AddFeatureManagement();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -214,6 +227,22 @@
                 endpoints.MapHub<Notifications>("/api/notifications");
             });
 
+            if (EnableSwagger())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(
+                    options =>
+                    {
+                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Calculations Funding Frontend API");
+                        options.DocumentTitle = "Calculations Funding - Swagger";
+                    });
+            }
+        }
+
+        private bool EnableSwagger()
+        {
+            bool enableSwagger = Configuration.GetValue<bool>("FeatureManagement:TemplateBuilderVisible");
+            return enableSwagger;
         }
     }
 }

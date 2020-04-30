@@ -23,7 +23,8 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             _policiesApiClient = policiesApiClient;
         }
-
+        
+        [HttpGet]
         [Route("api/policy/fundingperiods")]
         public async Task<IActionResult> GetFundingPeriods()
         {
@@ -37,6 +38,7 @@ namespace CalculateFunding.Frontend.Controllers
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
 
+        [HttpGet]
         [Route("api/policy/fundingstreams")]
         public async Task<IActionResult> GetFundingStreams()
         {
@@ -50,6 +52,7 @@ namespace CalculateFunding.Frontend.Controllers
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
         }
 
+        [HttpGet]
         [Route("api/policy/fundingperiods/{fundingStreamId}")]
         public async Task<IActionResult> GetFundingPeriods(string fundingStreamId)
         {

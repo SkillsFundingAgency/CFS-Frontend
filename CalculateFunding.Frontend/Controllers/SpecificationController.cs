@@ -32,6 +32,7 @@ namespace CalculateFunding.Frontend.Controllers
             _authorizationHelper = authorizationHelper;
         }
 
+        [HttpGet]
         [Route("api/specs/specifications-selected-for-funding")]
         public async Task<IActionResult> GetSpecificationsSelectedForFunding()
         {
@@ -50,6 +51,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/get-fundingperiods-for-selected-fundingstream/{fundingStreamId}")]
         public async Task<IActionResult> GetFundingPeriodsByFundingStreamIds(string fundingStreamId)
         {
@@ -68,6 +70,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/get-fundingstreams-for-selected-specifications")]
         public async Task<IActionResult> GetFundingStreamsForSelectedSpecifications()
         {
@@ -97,6 +100,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/fundingstream-id-for-specifications")]
         public async Task<IActionResult> GetDistinctFundingStreamsForSpecifications()
         {
@@ -115,6 +119,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/specifications-selected-for-funding-by-period/{fundingPeriodId}")]
         public async Task<IActionResult> GetSpecificationsForFundingByPeriod(string fundingPeriodId)
         {
@@ -135,6 +140,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/selected-specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}")]
         public async Task<IActionResult> GetSpecificationsSelectedForFundingByPeriodAndStream(string fundingPeriodId, string fundingStreamId)
         {
@@ -156,6 +162,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}")]
         public async Task<IActionResult> GetApprovedSpecifications(string fundingPeriodId, string fundingStreamId)
         {
@@ -177,6 +184,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new StatusCodeResult(500);
         }
 
+        [HttpGet]
         [Route("api/specs/specifications-by-fundingperiod-and-fundingstream-trimmed/{fundingPeriodId}/{fundingStreamId}")]
         public async Task<IActionResult> GetApprovedSpecificationsTrimmed(string fundingPeriodId, string fundingStreamId)
         {
@@ -399,6 +407,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestResult();
         }
 
+        [HttpGet]
         [Route("api/specs/{specificationId}/profile-variation-pointers")]
         public async Task<IActionResult> GetProfileVariationPointers(string specificationId)
         {
