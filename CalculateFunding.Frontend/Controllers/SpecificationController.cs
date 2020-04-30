@@ -252,8 +252,8 @@ namespace CalculateFunding.Frontend.Controllers
                 ProviderVersionId = viewModel.ProviderVersionId
             };
 
-
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specification.FundingStreamIds, FundingStreamActionTypes.CanCreateSpecification))
+            var fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+            if (fundingStreamPermissions.All(x => x.CanCreateSpecification == false))
             {
                 return new ForbidResult();
             }

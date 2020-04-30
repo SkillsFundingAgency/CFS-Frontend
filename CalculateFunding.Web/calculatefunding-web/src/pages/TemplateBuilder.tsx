@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { Section } from '../types/Sections';
@@ -6,9 +6,29 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import OrganisationChart from "../components/OrganisationChart";
 import TemplateBuilderNode from "../components/TemplateBuilderNode";
-import { addNode, removeNode, cloneNode as cloneNodeDatasource, moveNode, updateNode as updateDatasource } from "../services/templateBuilderDatasourceService";
-import { NodeType, FundingLineType, FundingLineUpdateModel, CalculationUpdateModel, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, FundingLineOrCalculation } from '../types/TemplateBuilderDefinitions';
+import {
+    addNode,
+    removeNode,
+    cloneNode as cloneNodeDatasource,
+    moveNode,
+    updateNode as updateDatasource
+} from "../services/templateBuilderDatasourceService";
+import { PermissionStatus } from "../components/PermissionStatus";
+import {
+    NodeType,
+    FundingLineType,
+    FundingLineUpdateModel,
+    CalculationUpdateModel,
+    FundingLineDictionaryEntry,
+    FundingLine,
+    Calculation,
+    FundingLineOrCalculationSelectedItem,
+    FundingLineOrCalculation
+} from '../types/TemplateBuilderDefinitions';
+import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import "../styles/TemplateBuilder.scss";
+import { useSelector } from "react-redux";
+import { AppState } from "../states/AppState";
 
 enum Mode {
     View = 'view',
@@ -20,10 +40,60 @@ const initialId: number = 0;
 export function TemplateBuilder() {
     const orgchart = useRef();
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
-    const [mode, setMode] = useState<string>(Mode.View);
+    const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [nextId, setNextId] = useState(initialId); // ToDo: Calculate last id from datasource when loading from server
+    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
+    const [canEditTemplate, setCanEditTemplate] = useState<boolean>(false);
+    const [canDeleteTemplate, setCanDeleteTemplate] = useState<boolean>(false);
+    const [canApproveTemplate, setCanApproveTemplate] = useState<boolean>(false);
+    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
+
+    function getEditPermission() {
+        if (!permissions) {
+            return false;
+        }
+        return permissions.some(p => p.canEditTemplates);
+    }
+
+    function getDeletePermission() {
+        if (!permissions) {
+            return false;
+        }
+        return permissions.some(p => p.canDeleteTemplates);
+    }
+
+    function getApprovePermission() {
+        if (!permissions) {
+            return false;
+        }
+        return permissions.some(p => p.canApproveTemplates);
+    }
+
+    useEffect(() => {
+        let missing: string[] = [];
+
+        if (!canEditTemplate) {
+            missing.push("edit");
+        } else {
+            setMode(Mode.Edit);
+        }
+        if (!canDeleteTemplate) {
+            missing.push("delete");
+        }
+        if (!canApproveTemplate) {
+            missing.push("approve");
+        }
+
+        setMissingPermissions(missing);
+    }, [canEditTemplate, canDeleteTemplate, canApproveTemplate]);
+
+    useEffect(() => {
+        setCanEditTemplate(getEditPermission());
+        setCanDeleteTemplate(getDeletePermission());
+        setCanApproveTemplate(getApprovePermission());
+    }, [permissions]);
 
     const openSideBar = (open: boolean) => {
         setOpenSidebar(open);
@@ -75,7 +145,9 @@ export function TemplateBuilder() {
     };
 
     const handleAddFundingLineClick = () => {
-        const keyCount = ds.length > 0 ? ds.reduce((prev, current) => { return (prev.key > current.key ? prev : current) }).key : 0;
+        const keyCount = ds.length > 0 ? ds.reduce((prev, current) => {
+            return (prev.key > current.key ? prev : current)
+        }).key : 0;
         const id = nextId;
         setNextId(nextId + 1);
 
@@ -99,29 +171,33 @@ export function TemplateBuilder() {
 
     return (
         <div>
-            <Header location={Section.FundingPreparation} />
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
+                <PermissionStatus requiredPermissions={missingPermissions} />
                 <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
                             <h1 className="govuk-heading-l">Build policy template</h1>
-                            <div className="govuk-form-group">
-                                <div className="govuk-radios govuk-radios--inline">
-                                    <div className="govuk-radios__item">
-                                        <input className="govuk-radios__input" id="edit-mode" name="edit-mode" type="radio" value="edit" checked={mode === 'edit'} onChange={handleModeChange} data-testid='edit' />
-                                        <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
-                                            Edit
-                                        </label>
+                            {canEditTemplate &&
+                                <div className="govuk-form-group">
+                                    <div className="govuk-radios govuk-radios--inline">
+                                        <div className="govuk-radios__item">
+                                            <input className="govuk-radios__input" id="edit-mode" name="edit-mode" type="radio" value="edit"
+                                                checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit' />
+                                            <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
+                                                Edit
+                                                </label>
+                                        </div>
+                                        <div className="govuk-radios__item">
+                                            <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view"
+                                                checked={mode === Mode.View} onChange={handleModeChange} data-testid='view' />
+                                            <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
+                                                View
+                                                </label>
+                                        </div>
                                     </div>
-                                    <div className="govuk-radios__item">
-                                        <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view" checked={mode === "view"} onChange={handleModeChange} data-testid='view' />
-                                        <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
-                                            View
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            {mode === "edit" && <button className="govuk-button" data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                                </div>}
+                            {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
                         </div>
                     </div>
                 </div>
@@ -138,7 +214,7 @@ export function TemplateBuilder() {
                         onClickNode={readSelectedNode}
                         onClickChart={clearSelectedNode}
                         openSideBar={openSideBar}
-                        editMode={mode === "edit"}
+                        editMode={mode === Mode.Edit}
                         onClickAdd={onClickAdd}
                         changeHierarchy={changeHierarchy}
                         cloneNode={cloneNode}
@@ -173,6 +249,6 @@ export function TemplateBuilder() {
                 </div>
             </div>
             <Footer />
-        </div >
+        </div>
     )
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Helpers;
@@ -26,19 +27,18 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         private static readonly Guid AdminGroupId = Guid.NewGuid();
 
         [TestMethod]
-        public async Task DoesUserHavePermission_WhenUserHasAccessToAll_ThenReturnTrue()
+        public async Task GetUserFundingStreamPermissions_WhenUserHasAccess_ThenReturnTrue()
         {
             // Arrange
-            IEnumerable<string> fundingStreamIds = new List<string> { "fs1", "fs2", "fs3" };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId);
-            FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<FundingStreamPermission>> permissionsResponse = 
+	            new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new List<FundingStreamPermission>
             {
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = true }
+                new FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
+                new FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
+                new FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = true }
             });
 
             IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
@@ -50,10 +50,10 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
+            FundingStreamPermission result = await authHelper.GetUserFundingStreamPermissions(user, "fs2");
 
             // Assert
-            result.Should().BeTrue();
+            result.CanCreateSpecification.Should().BeTrue();
         }
 
         private static AuthorizationHelper CreateAuthenticationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient)
@@ -69,81 +69,48 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         }
 
         [TestMethod]
-        public async Task DoesUserHavePermission_WhenUserHasAccessToNone_ThenReturnFalse()
+        public async Task GetUserFundingStreamPermissions_WhenUserHasNoAccess_ThenReturnFalse()
         {
-            // Arrange
-            IEnumerable<string> fundingStreamIds = new List<string> { "fs1", "fs2", "fs3" };
-            string userId = "testuser";
-            ClaimsPrincipal user = BuildClaimsPrincipal(userId);
-            FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
+	        // Arrange
+	        string userId = "testuser";
+	        ClaimsPrincipal user = BuildClaimsPrincipal(userId);
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
-            {
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = false },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = false }
-            });
+	        ApiResponse<IEnumerable<FundingStreamPermission>> permissionsResponse = 
+		        new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new List<FundingStreamPermission>
+		        {
+			        new FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
+			        new FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = true },
+			        new FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = false }
+		        });
 
-            IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
-            IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
-            usersClient
-                .GetFundingStreamPermissionsForUser(userId)
-                .Returns(permissionsResponse);
+	        IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+	        IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+	        usersClient
+		        .GetFundingStreamPermissionsForUser(userId)
+		        .Returns(permissionsResponse);
 
-            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+	        AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
-            // Act
-            bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
+	        // Act
+	        FundingStreamPermission result = await authHelper.GetUserFundingStreamPermissions(user, "fs3");
 
-            // Assert
-            result.Should().BeFalse();
+	        // Assert
+	        result.CanCreateSpecification.Should().BeFalse();
         }
 
         [TestMethod]
-        public async Task DoesUserHavePermission_WhenUserHasAccessToSome_ThenReturnFalse()
+        public async Task GetUserFundingStreamPermissions_WhenUserIsAdmin_ThenReturnTrue()
         {
             // Arrange
-            IEnumerable<string> fundingStreamIds = new List<string> { "fs1", "fs2", "fs3" };
-            string userId = "testuser";
-            ClaimsPrincipal user = BuildClaimsPrincipal(userId);
-            FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
-
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
-            {
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = true }
-            });
-
-            IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
-            IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
-            usersClient
-                .GetFundingStreamPermissionsForUser(userId)
-                .Returns(permissionsResponse);
-
-            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
-
-            // Act
-            bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public async Task DoesUserHavePermission_WhenUserIsAdmin_ThenReturnTrue()
-        {
-            // Arrange
-            IEnumerable<string> fundingStreamIds = new List<string> { "fs1", "fs2", "fs3" };
             string userId = "testuser";
             ClaimsPrincipal user = BuildClaimsPrincipal(userId, true);
-            FundingStreamActionTypes permissionRequired = FundingStreamActionTypes.CanCreateSpecification;
 
-            ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>> permissionsResponse = new ApiResponse<IEnumerable<Common.ApiClient.Users.Models.FundingStreamPermission>>(HttpStatusCode.OK, new List<Common.ApiClient.Users.Models.FundingStreamPermission>
+            ApiResponse<IEnumerable<FundingStreamPermission>> permissionsResponse = 
+	            new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new List<FundingStreamPermission>
             {
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
-                new Common.ApiClient.Users.Models.FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = true }
+                new FundingStreamPermission { FundingStreamId = "fs1", CanCreateSpecification = true },
+                new FundingStreamPermission { FundingStreamId = "fs2", CanCreateSpecification = false },
+                new FundingStreamPermission { FundingStreamId = "fs3", CanCreateSpecification = true }
             });
 
             IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
@@ -155,10 +122,10 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 
             // Act
-            bool result = await authHelper.DoesUserHavePermission(user, fundingStreamIds, permissionRequired);
+            FundingStreamPermission result = await authHelper.GetUserFundingStreamPermissions(user, "fs3");
 
             // Assert
-            result.Should().BeTrue();
+            result.CanCreateSpecification.Should().BeTrue();
         }
 
         [TestMethod]

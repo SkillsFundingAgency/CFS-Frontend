@@ -1,4 +1,6 @@
-export interface EffectiveSpecificationPermission{
+﻿export interface FundingStreamPermissions {
+    userId:                     string;
+    fundingStreamId:            string;
     canCreateQaTests:           boolean;
     canReleaseFunding:          boolean;
     canApproveFunding:          boolean;
@@ -12,8 +14,6 @@ export interface EffectiveSpecificationPermission{
     canEditSpecification:       boolean;
     canCreateSpecification:     boolean;
     canAdministerFundingStream: boolean;
-    userId:                     string;
-    specificationId:            string;
     canEditQaTests:             boolean;
     canDeleteQaTests:           boolean;
     canCreateTemplates:         boolean;

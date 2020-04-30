@@ -10,7 +10,8 @@ export enum NavigationLevel {
     ManageData,
     QualityTests,
     ViewResult,
-    FundingApproval
+    FundingApproval,
+    Templates
 }
 
 export class Navigation extends React.Component<INavigationLevel, {}> {
@@ -47,6 +48,10 @@ export class Navigation extends React.Component<INavigationLevel, {}> {
                 <li className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (normalStyle + activeStyle) : (normalStyle)}>
                     <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/approvals"
                        data-topnav="Community">Funding approvals</a>
+                </li>
+                <li className={this.props.currentNavigationLevel === NavigationLevel.Templates ? (normalStyle + activeStyle) : (normalStyle)}>
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/app/templates"
+                       data-topnav="Community">Templates</a>
                 </li>
             </ul>
         </nav>

@@ -25,7 +25,7 @@ describe("featureflagsactions", () => {
 
     const store = mockStore(storeWithData);
 
-    await getFeatureFlags()(store.dispatch, null, null);
+    await getFeatureFlags()(store.dispatch, () => storeWithData, null);
 
     expect(store.getActions()).toEqual(expectedActions);
   });
@@ -125,6 +125,10 @@ const storeWithData: IStoreState = {
       canMapDatasets: false,
       canRefreshFunding: false,
       canReleaseFunding: false,
+      canCreateTemplates: false,
+      canApproveTemplates: false,
+      canDeleteTemplates: false,
+      canEditTemplates: false,
       specificationId: '',
       userId: ''
     },

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,15 @@ namespace CalculateFunding.Frontend.Controllers
             Common.ApiClient.Users.Models.EffectiveSpecificationPermission effectivePermissions = await _authorizationHelper.GetEffectivePermissionsForUser(User, specificationId);
 
             return Ok(effectivePermissions);
+        }
+        
+        [HttpGet]
+        [Route("api/users/permissions/fundingstreams")]
+        public async Task<IActionResult> GetAllFundingStreamPermissions()
+        {
+            var permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+
+            return Ok(permissions);
         }
     }
 }

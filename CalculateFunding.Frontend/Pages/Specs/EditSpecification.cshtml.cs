@@ -154,8 +154,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK && !fundingStreamsResponse.Content.IsNullOrEmpty())
             {
                 // Need to make sure existing funding stream ids on the spec are still included on the list to display in the list as the security trimmed list is based on Create permission not Edit
-                IEnumerable<PolicyModels.FundingStream> existingFundingStreams = 
-	                fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
+                IEnumerable<PolicyModels.FundingStream> existingFundingStreams = fundingStreamsResponse.Content.Where(fs => fs.Id == fundingStreamId);
 
                 IEnumerable<PolicyModels.FundingStream> trimmedResults = await _authorizationHelper.SecurityTrimList(
 	                User, fundingStreamsResponse.Content, FundingStreamActionTypes.CanCreateSpecification);

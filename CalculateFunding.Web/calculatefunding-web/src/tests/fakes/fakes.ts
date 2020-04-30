@@ -2,6 +2,8 @@ import {createBrowserHistory, createLocation} from 'history'
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import {ProvidersEntity} from "../../types/publishedProvider";
+import {fundingStreamPermissionsAction} from "../../actions/UserPermissionsActions";
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 //require('./jsdom');
 
 export const store: Store<IStoreState> = createStore(
@@ -83,6 +85,10 @@ export const fakeInitialState: IStoreState = {
             canMapDatasets: false,
             canRefreshFunding: false,
             canReleaseFunding: false,
+            canCreateTemplates: false,
+            canEditTemplates: false,
+            canDeleteTemplates: false,
+            canApproveTemplates: false,
             specificationId: "",
             userId: ""
         },
@@ -355,5 +361,29 @@ export const fakeInitialState: IStoreState = {
             totalItems: 0,
             totalPages: 0
         }
-    }
+    },
+    userPermissions: {
+    fundingStreamPermissions: 
+    [{  canAdministerFundingStream: false,
+        canApproveFunding: false,
+        canApproveSpecification: false,
+        canChooseFunding: false,
+        canCreateQaTests: false,
+        canCreateSpecification: false,
+        canDeleteCalculations: false,
+        canDeleteQaTests: false,
+        canDeleteSpecification: false,
+        canEditCalculations: false,
+        canEditQaTests: false,
+        canEditSpecification: false,
+        canMapDatasets: false,
+        canRefreshFunding: false,
+        canReleaseFunding: false,
+        canCreateTemplates: false,
+        canEditTemplates: false,
+        canDeleteTemplates: false,
+        canApproveTemplates: false,
+        fundingStreamId: "DSG",
+        userId: ""
+    }]}
 };

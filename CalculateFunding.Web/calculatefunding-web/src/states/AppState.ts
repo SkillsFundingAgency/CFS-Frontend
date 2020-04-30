@@ -7,10 +7,13 @@ import {SelectSpecificationState} from "./SelectSpecificationState";
 import {ProviderState} from "./ProviderState";
 import {SpecificationState} from "./SpecificationState";
 import {DatasetState} from "./DatasetState";
+import {IUserPermissionsState} from "./IUserPermissionsState";
+import {IUserState} from "./IUserState";
 import {FeatureFlagsState} from "./FeatureFlagsState";
 
 export interface AppState {
     selectSpecification: SelectSpecificationState;
+    userPermissions: IUserPermissionsState;
     viewFunding: IViewFundingState;
     fundingLineStructure: IFundingLineStructureState
     viewSpecificationResults: ViewSpecificationResultsState;

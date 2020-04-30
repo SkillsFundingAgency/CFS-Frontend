@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
@@ -33,9 +34,53 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, IEnumerable<string> fundingStreamIds, FundingStreamActionTypes permissionRequired)
+        public Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId)
         {
-            return await Task.FromResult(true);
+	        return Task.FromResult(new FundingStreamPermission
+	        {
+		        CanAdministerFundingStream = true,
+		        CanApproveFunding = true,
+		        CanApproveSpecification = true,
+		        CanChooseFunding = true,
+		        CanCreateQaTests = true,
+		        CanCreateSpecification = true,
+		        CanEditCalculations = true,
+		        CanEditQaTests = true,
+		        CanEditSpecification = true,
+		        CanMapDatasets = true,
+		        CanReleaseFunding = true,
+		        CanRefreshFunding = true,
+		        UserId = user.GetUserProfile()?.Id,
+		        FundingStreamId = fundingStreamId
+	        });
+        }
+
+        public Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user)
+        {
+	        return Task.FromResult(new []
+	        {
+		        new FundingStreamPermission
+		        {
+			        CanAdministerFundingStream = true,
+			        CanApproveFunding = true,
+			        CanApproveSpecification = true,
+			        CanChooseFunding = true,
+			        CanCreateQaTests = true,
+			        CanCreateSpecification = true,
+			        CanEditCalculations = true,
+			        CanEditQaTests = true,
+			        CanEditSpecification = true,
+			        CanMapDatasets = true,
+			        CanReleaseFunding = true,
+			        CanRefreshFunding = true,
+			        CanCreateTemplates = true,
+			        CanEditTemplates = true,
+			        CanDeleteTemplates = true,
+			        CanApproveTemplates = true,
+			        UserId = user.GetUserProfile()?.Id,
+			        FundingStreamId = "DSG"
+		        }
+	        } as IEnumerable<FundingStreamPermission>);
         }
 
         public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
@@ -54,12 +99,12 @@ namespace CalculateFunding.Frontend.Helpers
             return await Task.FromResult(specifications);
         }
 
-        public async Task<Common.ApiClient.Users.Models.EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
+        public async Task<EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            return await Task.FromResult(new Common.ApiClient.Users.Models.EffectiveSpecificationPermission
+            return await Task.FromResult(new EffectiveSpecificationPermission
             {
                 CanAdministerFundingStream = true,
                 CanApproveFunding = true,
@@ -77,7 +122,5 @@ namespace CalculateFunding.Frontend.Helpers
                 UserId = user.GetUserProfile()?.Id,
             });
         }
-
-
     }
 }

@@ -5,5 +5,5 @@ export enum Section{
     Tests,
     Results,
     Approvals,
-    FundingPreparation,
+    Templates
 }

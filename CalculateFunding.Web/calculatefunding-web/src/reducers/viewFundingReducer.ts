@@ -69,6 +69,10 @@ const initialState: IViewFundingState = {
         canMapDatasets: false,
         canRefreshFunding: false,
         canReleaseFunding: false,
+        canCreateTemplates: false,
+        canEditTemplates: false,
+        canDeleteTemplates: false,
+        canApproveTemplates: false,
         specificationId: "",
         userId: ""
     },

@@ -21,6 +21,8 @@ import {reduceDatasetState} from "./datasetReducer";
 import {DatasetState} from "../states/DatasetState";
 import {FeatureFlagsState} from "../states/FeatureFlagsState";
 import {reduceFeatureFlagsState} from "./featureFlagsReducer";
+import {IUserPermissionsState} from "../states/IUserPermissionsState";
+import {reduceUserPermissionsState} from "./userPermissionsReducer";
 import {ICreateAccountAction} from "../actions/userAction";
 import { FundingLineStructureAction } from "../actions/FundingLineStructureAction";
 import { ViewFundingAction } from "../actions/viewFundingAction";
@@ -31,11 +33,13 @@ import { ProviderActions } from "../actions/ProviderActions";
 import { GetAllSpecifications } from "../actions/SpecificationActions";
 import { GetDataSchemaAction } from "../actions/DatasetActions";
 import { GetFeatureFlagsAction } from "../actions/FeatureFlagsActions";
+import { IFundingStreamPermissionsAction } from "../actions/UserPermissionsActions";
 
 export interface IStoreState {
-    viewFundingState: IViewFundingState,
     userState: IUserState,
+    userPermissions: IUserPermissionsState,
     fundingLineStructureState: IFundingLineStructureState,
+    viewFundingState: IViewFundingState,
     viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState,
     viewCalculationResults: ViewCalculationState
@@ -48,10 +52,11 @@ export interface IStoreState {
 
 export type Actions = ICreateAccountAction | FundingLineStructureAction |
     ViewFundingAction | ViewSpecificationResultsActions | SelectSpecificationActions | ViewCalculationResultsActions |
-    ProviderActions | GetAllSpecifications | GetDataSchemaAction | GetFeatureFlagsAction;
+    ProviderActions | GetAllSpecifications | GetDataSchemaAction | GetFeatureFlagsAction | IFundingStreamPermissionsAction;
 
 export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     userState: reduceUserState,
+    userPermissions: reduceUserPermissionsState,
     fundingLineStructureState: reduceFundingLineStructureState,
     viewFundingState: reduceViewFundingState,
     viewSpecificationResults: reduceViewSpecificationResultsState,
