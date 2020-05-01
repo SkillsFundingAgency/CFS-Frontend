@@ -1,44 +1,35 @@
-import * as React from "react"
-import {Component} from "react"
-import {Header} from "../components/Header";
-import {Footer} from "../components/Footer";
-import {Banner} from "../components/Banner";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Section} from "../types/Sections";
+import React, { useEffect } from "react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import { Banner } from "../components/Banner";
+import { IBreadcrumbs } from "../types/IBreadcrumbs";
+import { Section } from "../types/Sections";
+import { FeatureFlagsState } from "../states/FeatureFlagsState";
+import { Link } from "react-router-dom";
 
-export interface IHomeProps {
-}
-
-export class Home extends Component<IHomeProps, {}> {
-    userIsAuthenticated() {
+export const Home = (props: { featureFlags: FeatureFlagsState }) => {
+    useEffect(() => {
         fetch("/api/account/IsAuthenticated", {
             method: 'GET'
-        })
-            .then(function (response) {
-                let username = document.getElementById("username");
+        }).then(function (response) {
+            let username = document.getElementById("username");
 
-                if (username != null) {
-                    username.innerText = "";
-                }
+            if (username != null) {
+                username.innerText = "";
+            }
 
-            });
+        });
 
         document.title = "Calculate Funding";
-    }
+    }, []);
 
+    let breadcrumbs: IBreadcrumbs[] = [];
 
-    componentDidMount() {
-        this.userIsAuthenticated();
-    }
-
-    render() {
-
-        let breadcrumbs: IBreadcrumbs[] = [];
-
-        return <div>
-            <Header location={Section.Home}/>
+    return (
+        <div>
+            <Header location={Section.Home} />
             <div className="govuk-width-container">
-                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle="" />
                 <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
@@ -49,14 +40,14 @@ export class Home extends Component<IHomeProps, {}> {
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/app/SpecificationsList" className="govuk-link">Specifications</a>
+                                            <Link to="/SpecificationsList" className="govuk-link">Specifications</Link>
                                         </div>
                                         <p className="govuk-body">Create and manage the specifications used to calculate
                                             funding.</p>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/app/datasets/managedata" className="govuk-link">Manage data</a>
+                                            <Link to="/datasets/managedata" className="govuk-link">Manage data</Link>
                                         </div>
                                         <p className="govuk-body">Manage data source files or map them to datasets for a
                                             specification.</p>
@@ -69,30 +60,33 @@ export class Home extends Component<IHomeProps, {}> {
                                     {/*</div>*/}
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="/app/results" className="govuk-link">View results</a>
+                                            <Link to="/results" className="govuk-link">View results</Link>
                                         </div>
                                         <p className="govuk-body">View results for providers, calculations and quality
                                             assurance tests.</p>
                                     </div>
                                 </div>
                                 <div className="govuk-grid-row">
-
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <a href="app/Approvals" className="govuk-link">Funding approvals</a>
+                                            <Link to="/Approvals" className="govuk-link">Funding approvals</Link>
                                         </div>
                                         <p className="govuk-body">Approve funding for providers and view how it's been
                                             calculated.</p>
                                     </div>
+                                    {props.featureFlags.templateBuilderVisible &&
+                                        <div className="govuk-grid-column-one-third">
+                                            <div className="govuk-heading-m">
+                                                <Link to="/templates" className="govuk-link">Templates</Link>
+                                            </div>
+                                            <p className="govuk-body">View and create funding templates.</p>
+                                        </div>}
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
-            <Footer/>
-
-        </div>
-    }
+            <Footer />
+        </div>)
 }
