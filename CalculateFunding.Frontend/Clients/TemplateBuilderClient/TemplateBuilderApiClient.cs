@@ -22,7 +22,21 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
         {
             string url = "templates/build";
 
-            return await PostAsync<string, TemplateCreateCommand>(url, command);
+            return await ValidatedPostAsync<string, TemplateCreateCommand>(url, command);
+        }
+
+        public async Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command)
+        {
+            string url = "templates/build/content";
+
+            return await ValidatedPutAsync<string, TemplateContentUpdateCommand>(url, command);
+        }
+
+        public async Task<ValidatedApiResponse<string>> UpdateTemplateMetadata(TemplateMetadataUpdateCommand command)
+        {
+            string url = "templates/build/metadata";
+
+            return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
         }
     }
 }

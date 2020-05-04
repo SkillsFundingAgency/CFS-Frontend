@@ -7,5 +7,7 @@ namespace CalculateFunding.Frontend.Interfaces
     public interface ITemplateBuilderApiClient
     {
         Task<ApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command);
+        Task<ValidatedApiResponse<string>> UpdateTemplateMetadata(TemplateMetadataUpdateCommand command);
+        Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command);
     }
 }
