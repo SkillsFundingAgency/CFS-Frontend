@@ -1,28 +1,20 @@
 import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {
-    CalculationTypes,
-    EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel
-} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {
-    compileCalculationPreviewService,
-    getCalculationByIdService,
-    updateAdditionalCalculationService
-} from "../../services/calculationService";
+import { CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import { compileCalculationPreviewService, getCalculationByIdService, updateAdditionalCalculationService } from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface EditAdditionalCalculationRouteProps {
-    //specificationId: string;
     calculationId: string
 }
 
@@ -50,7 +42,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
-    const initalBuildSuccess = {
+    const initialBuildSuccess = {
         buildSuccess: false,
         compileRun: false,
         previewResponse: {
@@ -61,29 +53,11 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             }
         }
     };
-    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initalBuildSuccess);
+    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
-
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specificationSummary.name,
-            url: `/app/ViewSpecification/${specificationSummary.id}`
-        },
-        {
-            name: "Edit additional calculation",
-            url: null
-        }
-    ];
+    let history = useHistory();
 
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
@@ -136,7 +110,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
                 if (result.status === 200) {
                     let response = result.data as Calculation;
-                    window.location.href = `/app/ViewSpecification/${response.specificationId}`
+                    history.push(`/app/ViewSpecification/${response.specificationId}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -186,14 +160,19 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     }
 
     function updateSourceCode(sourceCode: string) {
-        setAdditionalCalculationBuildSuccess(initalBuildSuccess);
+        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
         setAdditionalCalculationSourceCode(sourceCode);
     }
 
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                <Breadcrumb name={"Edit additional calculation"} />
+            </Breadcrumbs>
             <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"} />
             <fieldset className="govuk-fieldset" hidden={isLoading}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -280,10 +259,10 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                         disabled={!additionalCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
-                <a href={`/app/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
+                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
                    data-module="govuk-button">
                     Cancel
-                </a>
+                </Link>
             </fieldset>
         </div>
     </div>

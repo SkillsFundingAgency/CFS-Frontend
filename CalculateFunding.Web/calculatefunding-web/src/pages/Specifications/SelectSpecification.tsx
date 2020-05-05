@@ -1,8 +1,6 @@
 import {Header} from "../../components/Header";
-import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Footer} from "../../components/Footer";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../../states/AppState";
@@ -13,6 +11,8 @@ import {
     getSpecificationsByFundingPeriodAndStreamId
 } from "../../actions/SelectSpecificationActions";
 import {Section} from "../../types/Sections";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface SelectSpecificationProps {
     fundingStreams: string[];
@@ -34,21 +34,6 @@ export function SelectSpecification(props: SelectSpecificationProps) {
         dispatch(getFundingPeriodsByFundingStreamId(selectedFundingStreamId));
     }, [selectedFundingStreamId]);
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View results",
-            url: "/app/results"
-        },
-        {
-            name: "Select specification",
-            url: null
-        }
-    ];
-
     function updateFundingPeriods(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
         setSelectedFundingStreamId(filter);
@@ -67,7 +52,11 @@ export function SelectSpecification(props: SelectSpecificationProps) {
     return <div>
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View results"} url={"/results"} legacy={true}/>
+                <Breadcrumb name={"Select specification"} />
+            </Breadcrumbs>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <h2 className="govuk-heading-l">Select specification</h2>
@@ -123,11 +112,11 @@ export function SelectSpecification(props: SelectSpecificationProps) {
                 </fieldset>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <a href={selectedSpecificationId === ''? `#` : `/app/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
+                        <Link to={selectedSpecificationId === ''? `#` : `/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
                            className={`govuk-button govuk-button ${selectedSpecificationId === ''? "govuk-button--disabled":"govuk-button govuk-button"}`}
                            data-module="govuk-button">
                             Continue
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

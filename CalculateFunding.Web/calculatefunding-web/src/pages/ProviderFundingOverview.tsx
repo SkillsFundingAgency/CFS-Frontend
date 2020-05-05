@@ -2,8 +2,6 @@ import React, {useEffect} from 'react';
 import {RouteComponentProps} from "react-router";
 import {Footer} from "../components/Footer";
 import {Header} from "../components/Header";
-import {Banner} from "../components/Banner";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {useDispatch, useSelector} from "react-redux";
 import {getProfiling, getProviderByIdAndVersion, getPublishedProviderTransactions} from "../actions/ProviderActions";
 import {getSpecification} from "../actions/ViewSpecificationsActions";
@@ -14,6 +12,7 @@ import {Tabs} from "../components/Tabs";
 import {useEffectOnce} from "../hooks/useEffectOnce";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 import {Section} from "../types/Sections";
+import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string
@@ -25,30 +24,7 @@ export interface ProviderFundingOverviewRoute {
     specificationId: string;
 }
 
-export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFundingOverviewRoute>, props: ProviderFundingOverviewProps) => {
-    const breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Funding Approvals",
-            url: "/approvals"
-        },
-        {
-            name: "Select specification",
-            url: "/app/SelectSpecification"
-        },
-        {
-            name: "Funding approval results",
-            url: "/app/ViewFunding"
-        },
-        {
-            name: "Provider funding overview",
-            url: null
-        }
-    ];
-
+export function ProviderFundingOverview ({match}: RouteComponentProps<ProviderFundingOverviewRoute>, props: ProviderFundingOverviewProps){
     const dispatch = useDispatch();
 
     useEffectOnce(() => {
@@ -64,11 +40,16 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
         dispatch(getProfiling(specification.specification.fundingStreams[0].id, specification.specification.fundingPeriod.id, match.params.providerId));
     }, [specification.specification.fundingPeriod.id, specification.specification.fundingStreams[0].id]);
 
-    return (
-        <div>
+    return <div>
             <Header location={Section.Approvals}/>
             <div className="govuk-width-container">
-                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+                <Breadcrumbs>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Funding Approvals"} url={"/approvals"} legacy={true} />
+                    <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
+                    <Breadcrumb name={"Funding approval results"} url={"/ViewFunding"} />
+                    <Breadcrumb name={"Provider funding overview"} />
+                </Breadcrumbs>
                 <div className="govuk-grid-row govuk-!-margin-bottom-5">
                     <div className="govuk-grid-column-two-thirds">
                         <span className="govuk-caption-xl">Provider name</span>
@@ -190,11 +171,8 @@ export const ProviderFundingOverview = ({match}: RouteComponentProps<ProviderFun
                         </Tabs>
                     </div>
                 </div>
-                <div className="govuk-clearfix">
-
-                </div>
+                <div className="govuk-clearfix"></div>
             </div>
             <Footer/>
-        </div>);
-
+        </div>;
 };

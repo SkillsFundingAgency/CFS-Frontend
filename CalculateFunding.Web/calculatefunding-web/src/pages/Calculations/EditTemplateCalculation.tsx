@@ -1,25 +1,18 @@
 import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {
-    CalculationTypes,
-    EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel
-} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {
-    compileCalculationPreviewService,
-    getCalculationByIdService,
-    updateAdditionalCalculationService
-} from "../../services/calculationService";
+import { CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import { compileCalculationPreviewService, getCalculationByIdService, updateAdditionalCalculationService } from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -29,7 +22,6 @@ export interface EditTemplateCalculationRouteProps {
 export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplateCalculationRouteProps>) {
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
-
     const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
         id: "",
         name: "",
@@ -47,8 +39,6 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             PSG: ""
         }
     });
-
-
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
@@ -67,25 +57,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
-
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specificationSummary.name,
-            url: `/app/ViewSpecification/${specificationSummary.id}`
-        },
-        {
-            name: "Edit template calculation",
-            url: null
-        }
-    ];
+    let history = useHistory();
 
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
@@ -138,7 +110,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
                 if (result.status === 200) {
                     let response = result.data as Calculation;
-                    window.location.href = `/app/ViewSpecification/${response.specificationId}`
+                    history.push(`/app/ViewSpecification/${response.specificationId}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -194,7 +166,12 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                <Breadcrumb name={"Edit template calculation"} />
+            </Breadcrumbs>
             <LoadingStatus title={"Updating template calculation"} hidden={!isLoading}
                            subTitle={"Please wait whilst the calculation is updated"}/>
             <fieldset className="govuk-fieldset" hidden={isLoading}>
@@ -240,15 +217,13 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     </div>
                 </div>
 
-                <div
-                    className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <div
-                        className="govuk-body">Your calculation’s build output must be successful before you can save it
+                <div className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    <div className="govuk-body">
+                        Your calculation’s build output must be successful before you can save it
                     </div>
                 </div>
 
-                <div
-                    hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
+                <div hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
@@ -271,10 +246,9 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         disabled={!templateCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
-                <a href={`/app/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
-                   data-module="govuk-button">
+                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">
                     Cancel
-                </a>
+                </Link>
             </fieldset>
         </div>
     </div>

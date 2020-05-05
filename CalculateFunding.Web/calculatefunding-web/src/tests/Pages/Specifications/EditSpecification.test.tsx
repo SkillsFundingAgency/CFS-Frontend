@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import {mount} from "enzyme";
 import {EditSpecification, EditSpecificationRouteProps} from "../../../pages/Specifications/EditSpecification";
 import {createBrowserHistory, createLocation} from "history";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -30,13 +30,13 @@ store.dispatch = jest.fn();
 describe("<EditSpecification />", () => {
     it('will have the correct breadcrumbs', () => {
 
-        const wrapper = mount(<Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(3);
     });
 
     it('will have the correct <H1 /> title', () => {
 
-        const wrapper = mount(<Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Edit specification");
     });
 });

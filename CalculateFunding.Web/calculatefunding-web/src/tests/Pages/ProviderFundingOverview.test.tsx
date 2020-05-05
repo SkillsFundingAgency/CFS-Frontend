@@ -1,7 +1,7 @@
 import React from "react";
 import {ProviderFundingOverview, ProviderFundingOverviewRoute} from "../../pages/ProviderFundingOverview";
 import {createBrowserHistory, createLocation} from "history";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
@@ -27,35 +27,23 @@ describe("Provider Funding Overview ", () => {
         url: ""
     };
     store.dispatch = jest.fn();
-    const mockProvider = <Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider>;
 
     it("renders the page", async () => {
-        const wrapper = mount(mockProvider);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
         expect(wrapper.find('.govuk-caption-xl').first().text()).toBe('Provider name');
     });
 
     it("dispatches to Redux the correct number of times",()=>{
-        mount(mockProvider);
+        mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
         expect(store.dispatch).toHaveBeenCalledTimes(8);
     });
 
     it('has profiling tab in correct order', () => {
-        const wrapper = mount(mockProvider);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
 
         let actual = wrapper.find("Tab");
 
         expect(actual.length).toBe(2);
         expect(actual.at(1).text()).toBe("Profiling");
     });
-/*
-    it('shows total allocation value with correct formatting in profiling panel', () => {
-
-        const wrapper = mount(mockProvider);
-
-        let profilingPanel = wrapper.find("Panel").at(1);
-        let actual = profilingPanel.find("FormattedNumber");
-
-        expect(actual.length).toBe(2);
-    });
-*/
 });

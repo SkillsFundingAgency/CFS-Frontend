@@ -1,21 +1,18 @@
 import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {
-    CalculationTypes,
-    CreateAdditionalCalculationViewModel
-} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import { CalculationTypes, CreateAdditionalCalculationViewModel } from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {compileCalculationPreviewService, createAdditionalCalculationService} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface CreateAdditionalCalculationRouteProps {
     specificationId: string;
@@ -43,7 +40,7 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
-    const initalBuildSuccess = {
+    const initialBuildSuccess = {
         buildSuccess: false,
         compileRun: false,
         previewResponse: {
@@ -54,29 +51,13 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
             }
         }
     };
-    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initalBuildSuccess);
+    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    let history = useHistory();
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specificationSummary.name,
-            url: `/app/ViewSpecification/${specificationSummary.id}`
-        },
-        {
-            name: "Create additional calculation",
-            url: "/app/View"
-        }
-    ];
+
 
     useEffectOnce(() => {
         const getSpecification = async () => {
@@ -113,7 +94,7 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
 
                 if (result.status === 200) {
                     let response = result.data as Calculation;
-                    window.location.href = `/app/ViewSpecification/${response.specificationId}`
+                    history.push(`/app/ViewSpecification/${response.specificationId}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -163,14 +144,20 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
     }
 
     function updateSourceCode(sourceCode: string) {
-        setAdditionalCalculationBuildSuccess(initalBuildSuccess);
+        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
         setAdditionalCalculationSourceCode(sourceCode);
     }
 
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                <Breadcrumb name={"Create additional calculation"} />
+            </Breadcrumbs>
+
             <LoadingStatus title={"Creating additional calculation"} hidden={!isLoading}
                            subTitle={"Please wait whilst the calculation is created"}/>
             <fieldset className="govuk-fieldset" hidden={isLoading}>
@@ -224,8 +211,7 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                         className="govuk-body">Your calculation’s build output must be successful before you can save it
                     </div>
                 </div>
-                <div
-                    hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
+                <div hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
@@ -248,10 +234,10 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                         disabled={!additionalCalculationBuildSuccess.buildSuccess} type={"button"}>
                     Save and continue
                 </button>
-                <a href={`/app/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
+                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
                    data-module="govuk-button">
                     Cancel
-                </a>
+                </Link>
             </fieldset>
         </div>
     </div>

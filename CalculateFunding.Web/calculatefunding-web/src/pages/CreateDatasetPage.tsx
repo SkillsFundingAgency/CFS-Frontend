@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {RouteComponentProps} from "react-router";
 import {Header} from "../components/Header";
-import {Banner} from "../components/Banner";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {getSpecification} from "../actions/ViewSpecificationsActions";
 import {useDispatch, useSelector} from "react-redux";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
@@ -13,6 +11,8 @@ import {assignDatasetSchemaUpdateService} from "../services/datasetService";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {ConfirmationPanel} from "../components/ConfirmationPanel";
 import {Section} from "../types/Sections";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 
 interface CreateDatasetPageRoute {
     specificationId: string
@@ -53,24 +53,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
         dispatch(getDatasetSchema());
     }, [specificationId]);
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: viewSpecification.specification.name,
-            url: `/app/ViewSpecification/${specificationId}`
-        },
-        {
-            name: "Create dataset",
-            url: null
-        }
-    ];
+
 
     function setAsDataProvider(e: React.ChangeEvent<HTMLInputElement>) {
         setDatasetAsDataProvider(Boolean(JSON.parse(e.target.value)));
@@ -204,7 +187,12 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
     return <div>
         <Header location={Section.Datasets}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={viewSpecification.specification.name} url={`/ViewSpecification/${specificationId}`}/>
+                <Breadcrumb name={"Create dataset"} />
+            </Breadcrumbs>
             <ConfirmationPanel title={"Dataset created"} body={"Your dataset has been created."} hidden={!addAnother}/>
             <LoadingStatus title={"Creating Dataset"} hidden={!isLoading} id={"create-dataset-loader"}
                            subTitle={"Please wait whilst your dataset is created"}
@@ -218,8 +206,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                                 <h1 className="govuk-heading-xl">Create dataset</h1>
                             </legend>
 
-                            <div
-                                className={"govuk-form-group" + (datasetDataschema.isValid ? "" : " govuk-form-group--error")}>
+                            <div className={"govuk-form-group" + (datasetDataschema.isValid ? "" : " govuk-form-group--error")}>
                                 <label className="govuk-label" htmlFor="sort">
                                     Select data schema
                                 </label>
@@ -237,23 +224,23 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                                 </div>
                             </div>
 
-                            <div
-                                className={"govuk-form-group" + (datasetName.isValid ? "" : " govuk-form-group--error")}>
+                            <div className={"govuk-form-group" + (datasetName.isValid ? "" : " govuk-form-group--error")}>
                                 <label className="govuk-label" htmlFor="address-line-1">
                                     Dataset name
                                 </label>
-                                <span id="event-name-hint"
-                                      className="govuk-hint">Use a descriptive unique name other users can understand</span>
+                                <span id="event-name-hint" className="govuk-hint">
+                                    Use a descriptive unique name other users can understand
+                                </span>
                                 <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
                                        onChange={(e) => changeDatasetName(e)}/>
                                 <div hidden={datasetName.isValid}>
-                                <span id="dataset-name-error"
-                                      className="govuk-error-message">Please provide a name for the dataset</span>
+                                <span id="dataset-name-error" className="govuk-error-message">
+                                    Please provide a name for the dataset
+                                </span>
                                 </div>
                             </div>
 
-                            <div
-                                className={"govuk-form-group" + (datasetDescription.isValid ? "" : " govuk-form-group--error")}>
+                            <div className={"govuk-form-group" + (datasetDescription.isValid ? "" : " govuk-form-group--error")}>
                                 <label className="govuk-label" htmlFor="more-detail">
                                     Description
                                 </label>
@@ -261,8 +248,9 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                                           aria-describedby="more-detail-hint"
                                           onChange={(e) => changeDatasetDescription(e)}/>
                                 <div hidden={datasetDescription.isValid}>
-                                <span id="dataset-description-error"
-                                      className="govuk-error-message">Please provide a description for the dataset</span>
+                                <span id="dataset-description-error" className="govuk-error-message">
+                                    Please provide a description for the dataset
+                                </span>
                                 </div>
                             </div>
 
@@ -306,9 +294,9 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                     <button className="govuk-button govuk-button--secondary" data-module="govuk-button"
                             onClick={() => saveDataset(true)}>Save and add another
                     </button>
-                    <a href={`/app/ViewSpecification/${specificationId}`}
+                    <Link to={`/ViewSpecification/${specificationId}`}
                        className="govuk-button govuk-button--warning govuk-!-margin-left-1"
-                       data-module="govuk-button">Cancel</a>
+                       data-module="govuk-button">Cancel</Link>
                 </div>
             </div>
         </div>

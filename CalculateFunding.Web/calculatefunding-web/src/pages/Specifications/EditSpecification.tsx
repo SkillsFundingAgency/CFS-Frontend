@@ -9,16 +9,16 @@ import {
 } from "../../services/specificationService";
 import {FundingPeriod} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
 import {CoreProviderSummary} from "../../types/CoreProviderSummary";
 import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpecificationViewModel";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -42,7 +42,6 @@ interface EditSpecificationCoreProvider {
     selected: boolean
 }
 
-
 interface EditSpecificationSelection {
     fundingStreams: [{
         name: string,
@@ -51,23 +50,8 @@ interface EditSpecificationSelection {
 }
 
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: "Edit specification",
-            url: null
-        }
-    ];
 
     const specificationId = match.params.specificationId;
-
     const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
         id: "",
         name: "",
@@ -98,6 +82,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         formValid: false
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    let history = useHistory();
 
     useEffectOnce(() => {
         const getSpecification = async () => {
@@ -257,7 +243,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
-                    window.location.href = `/app/ViewSpecification/${specificationId}`
+                    history.push(`/app/ViewSpecification/${specificationId}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -272,7 +258,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={"Edit specification"} />
+            </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <LoadingStatus title={"Updating Specification"}
                                subTitle={"Please wait whilst we update the specification"}
@@ -337,11 +327,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 onClick={submitUpdateSpecification}>
                             Save and continue
                         </button>
-                        <a id="cancel-update-specification" href={`/app/ViewSpecification/${specificationSummary.id}`}
+                        <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationSummary.id}`}
                            className="govuk-button govuk-button--secondary"
                            data-module="govuk-button">
                             Cancel
-                        </a>
+                        </Link>
                     </div>
                 </fieldset>
             </div>

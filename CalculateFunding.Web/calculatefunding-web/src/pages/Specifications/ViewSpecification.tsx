@@ -1,9 +1,7 @@
 import {RouteComponentProps} from "react-router";
 import {Header} from "../../components/Header";
-import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {useDispatch, useSelector} from "react-redux";
@@ -31,6 +29,8 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {CollapsibleSteps} from "../../components/CollapsibleSteps";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {FundingLineStep} from "../../components/FundingLineStep";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -132,20 +132,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         return () => setCanTimetableBeUpdated(true);
     }, [viewSpecification]);
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View specification",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specification.name,
-            url: null
-        }
-    ];
 
     function confirmChanges() {
         setCanTimetableBeUpdated(false);
@@ -208,7 +194,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specification.name}/>
+            </Breadcrumbs>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-l">Specification Name</span>
@@ -225,16 +215,13 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
                         <li>
-                            <a className="govuk-link"
-                               href={`/app/specifications/editspecification/${specificationId}`}>Edit specification</a>
+                            <Link to={`/specifications/editspecification/${specificationId}`} className="govuk-link">Edit specification</Link>
                         </li>
                         <li>
-                            <a className="govuk-link"
-                               href={`/app/specifications/createadditionalcalculation/${specificationId}`}>Create
-                                additional calculation</a>
+                            <Link to={`/specifications/createadditionalcalculation/${specificationId}`} className="govuk-link">Create additional calculation</Link>
                         </li>
                         <li>
-                            <a className="govuk-link" href={`/app/Datasets/CreateDataset/${specificationId}`}>Create dataset</a>
+                            <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
                     </ul>
                 </div>
@@ -311,8 +298,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                      data-module="app-back-to-top"
                                      hidden={viewSpecification.fundingLineStructureResult == null ||
                                      viewSpecification.fundingLineStructureResult.length === 0}>
-                                    <a className="govuk-link govuk-link--no-visited-state app-back-to-top__link"
-                                       href={"#fundingline-structure"}>
+                                    <a href={"#fundingline-structure"} className="govuk-link govuk-link--no-visited-state app-back-to-top__link">
                                         <svg role="presentation" focusable="false" className="app-back-to-top__icon"
                                              xmlns="http://www.w3.org/2000/svg"
                                              width="13" height="17" viewBox="0 0 13 17">
@@ -364,8 +350,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <tbody className="govuk-table__body">
                                     {viewSpecification.additionalCalculations.results.map((ac, index) =>
                                         <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell"><a
-                                                href={`/app/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</a>
+                                            <td className="govuk-table__cell">
+                                                <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
                                             </td>
                                             <td className="govuk-table__cell">{ac.status}</td>
                                             <td className="govuk-table__cell">{ac.valueType}</td>
@@ -381,10 +367,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
-                                        No additional calculations available. <a
-                                        href={`/app/specifications/createadditionalcalculation/${specificationId}`}>Create
-                                        a
-                                        calculation</a>
+                                        No additional calculations available.
+                                        <Link to={`/specifications/createadditionalcalculation/${specificationId}`}>
+                                        Create a calculation
+                                        </Link>
                                     </strong>
                                 </div>
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
@@ -412,10 +398,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
-                                        <a id={"dataset-specification-relationship-button"}
-                                           className="govuk-link govuk-button" data-module="govuk-button"
-                                           href={`/datasets/specificationrelationships?specificationId=${specificationId}`}>Map
-                                            data source file to data set</a>
+                                        <Link to={`/datasets/specificationrelationships?specificationId=${specificationId}`}
+                                           id={"dataset-specification-relationship-button"}
+                                           className="govuk-link govuk-button" data-module="govuk-button">
+                                            Map data source file to data set</Link>
                                     </div>
                                 </div>
                                 <table className="govuk-table">
@@ -498,9 +484,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                callback={updateReleaseTime}/>
                                 </div>
                                 <div className="govuk-form-group">
-                                    <button className="govuk-button" onClick={confirmChanges}
-                                            disabled={!canTimetableBeUpdated}>Confirm changes
-                                    </button>
+                                    <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated}>Confirm changes</button>
                                 </div>
                                 {
                                     (viewSpecification.profileVariationPointerResult != null
@@ -525,9 +509,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                                         Installment {f.occurrence}
                                                                     </dd>
                                                                     <dd className="govuk-summary-list__actions">
-                                                                        <a className="govuk-link"
-                                                                           href={`/app/specifications/EditVariationPoints/${specificationId}`}>Change<span
-                                                                            className="govuk-visually-hidden"> {f.periodType}</span></a>
+                                                                        <Link to={`/specifications/EditVariationPoints/${specificationId}`} className="govuk-link">
+                                                                            Change<span className="govuk-visually-hidden"> {f.periodType}</span>
+                                                                        </Link>
                                                                     </dd>
                                                                 </div>
                                                             </dl>

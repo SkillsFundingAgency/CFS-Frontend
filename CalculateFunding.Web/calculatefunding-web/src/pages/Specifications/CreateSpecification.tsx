@@ -10,29 +10,17 @@ import {
 import {FundingPeriod} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
 import {CoreProviderSummary} from "../../types/CoreProviderSummary";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
 import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Section} from "../../types/Sections";
+import {Link} from "react-router-dom";
+import {useHistory} from "react-router";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export function CreateSpecification() {
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: "Create specification",
-            url: null
-        }
-    ];
+
 
     const [fundingStreamData, setFundingStreamData] = useState<string[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
@@ -47,6 +35,7 @@ export function CreateSpecification() {
         formValid: false
     });
     const [isLoading, setIsLoading] = useState(false);
+    let history = useHistory();
 
     useEffectOnce(() => {
         const getStreams = async () => {
@@ -130,7 +119,7 @@ export function CreateSpecification() {
 
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
-                    window.location.href = `/app/ViewSpecification/${response.id}`
+                                        history.push(`/app/ViewSpecification/${response.id}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -145,7 +134,11 @@ export function CreateSpecification() {
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={"Create specification"} />
+            </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <LoadingStatus title={"Creating Specification"}
                                subTitle={"Please wait whilst we create the specification"}
@@ -213,10 +206,10 @@ export function CreateSpecification() {
                                 onClick={submitSaveSpecification}>
                             Save and continue
                         </button>
-                        <a id="cancel-create-specification" href="/app/SpecificationsList" className="govuk-button govuk-button--secondary"
+                        <Link id="cancel-create-specification" to="/SpecificationsList" className="govuk-button govuk-button--secondary"
                            data-module="govuk-button">
                             Cancel
-                        </a>
+                        </Link>
                     </div>
                 </fieldset>
             </div>

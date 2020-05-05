@@ -5,7 +5,7 @@ import {
     ViewCalculationResultsRoute
 } from "../../pages/ViewCalculationResults";
 import {createLocation, createMemoryHistory} from "history";
-import {match, RouteComponentProps, StaticContext} from "react-router";
+import {match, MemoryRouter, RouteComponentProps, StaticContext} from "react-router";
 import {applyMiddleware, createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import { Provider } from 'react-redux';
@@ -36,7 +36,7 @@ store.dispatch = jest.fn();
 describe("<ViewCalculationResults />", () => {
     it('will call dispatch 2 times', () => {
 
-        mount(<Provider store={store}><ViewCalculationResults history={history} location={location} match={matchMock}/>></Provider>);
+        mount(<MemoryRouter><Provider store={store}><ViewCalculationResults history={history} location={location} match={matchMock}/>></Provider></MemoryRouter>);
 
         expect(store.dispatch).toHaveBeenCalledTimes(2);
     });

@@ -4,7 +4,7 @@ import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
 import {createBrowserHistory, createLocation} from "history";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 import {
     CalculationVersionHistory,
     CalculationVersionHistoryRoute
@@ -33,15 +33,13 @@ store.dispatch = jest.fn();
 describe("<CalculationVersionHistory />", () => {
     it('will have the correct breadcrumbs', () => {
 
-        const wrapper = mount(<Provider store={store}><CalculationVersionHistory match={calculationVersionHistoryRoutePropsMatch} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><CalculationVersionHistory match={calculationVersionHistoryRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(5);
     });
-});
 
-describe("<CalculationVersionHistory />", () => {
     it('will have a disabled compare button', () => {
 
-        const wrapper = mount(<Provider store={store}><CalculationVersionHistory match={calculationVersionHistoryRoutePropsMatch} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><CalculationVersionHistory match={calculationVersionHistoryRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find("#compare-button").prop('disabled')).toBeTruthy();
     });
 });

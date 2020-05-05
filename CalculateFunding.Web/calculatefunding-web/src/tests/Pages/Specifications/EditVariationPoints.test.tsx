@@ -4,7 +4,7 @@ import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
 import {createBrowserHistory, createLocation} from "history";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 import {EditVariationPoints, EditVariationPointsRouteProps} from "../../../pages/Specifications/EditVariationPoints";
 
 const Adapter = require('enzyme-adapter-react-16');
@@ -29,12 +29,12 @@ store.dispatch = jest.fn();
 
 describe("<EditVariationPoints />", () => {
     it('will have the correct breadcrumbs', () => {
-        const wrapper = mount(<Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(4);
     });
 
     it('will have the correct <H1 /> title', () => {
-        const wrapper = mount(<Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Variation occurence");
     });
 });

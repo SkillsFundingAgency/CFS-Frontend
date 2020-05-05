@@ -1,7 +1,5 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
-import {Banner} from "../components/Banner";
 import {Footer} from "../components/Footer";
 import {Header} from "../components/Header";
 import {RouteComponentProps} from "react-router";
@@ -19,6 +17,7 @@ import {getSpecificationSummary} from "../actions/ViewSpecificationResultsAction
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
+import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -123,29 +122,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }, [singleFire]);
 
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View results",
-            url: "/results"
-        },
-        {
-            name: "Select specification",
-            url: `/app/SelectSpecification`
-        },
-        {
-            name: specificationResults.specification.name,
-            url: `/app/ViewSpecification/${specificationResults.specification.id}`
-        },
-        {
-            name: calculationSummary.calculation.name,
-            url: null
-        }
-    ];
-
     function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = calculationProviderSearchRequest.providerType;
         if (e.target.checked) {
@@ -240,7 +216,13 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     return <div>
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View results"} url={"/results"}/>
+                <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
+                <Breadcrumb name={specificationResults.specification.name} url={`/ViewSpecification/${specificationResults.specification.id}`}/>
+                <Breadcrumb name={calculationSummary.calculation.name}/>
+            </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
@@ -359,7 +341,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                     <div id={"accordion-default-content-" + cpr.id}
                                          className="govuk-accordion__section-content">
                                         <a className="govuk-link"
-                                           href={"/results/ProviderTemplateCalculations?providerId=" + cpr.providerId + "&fundingPeriodId=" + specificationResults.specification.fundingPeriod.id + "&specificationProviderVersion=" + specificationResults.specification.providerVersionId}>View provider calculations</a>
+                                           href={"/results/ProviderTemplateCalculations?providerId=" + cpr.providerId + "&fundingPeriodId=" + specificationResults.specification.fundingPeriod.id + "&specificationProviderVersion=" + specificationResults.specification.providerVersionId}>View
+                                            provider calculations</a>
                                         <dl className="govuk-summary-list govuk-!-margin-top-5">
                                             <div className="govuk-summary-list__row">
                                                 <dt className="govuk-summary-list__key">

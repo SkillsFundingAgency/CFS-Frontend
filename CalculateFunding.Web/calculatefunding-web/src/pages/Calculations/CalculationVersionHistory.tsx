@@ -1,11 +1,8 @@
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import React, {useEffect, useState} from "react";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {Banner} from "../../components/Banner";
-import {getCalculationById} from "../../actions/ViewCalculationResultsActions";
-import {Calculation, CalculationSummary} from "../../types/CalculationSummary";
+import {Calculation} from "../../types/CalculationSummary";
 import {getCalculationByIdService, getCalculationVersionHistoryService} from "../../services/calculationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -13,6 +10,8 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {CalculationVersionHistorySummary} from "../../types/Calculations/CalculationVersionHistorySummary";
 import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -52,29 +51,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
     const [disableCompare, setDisableCompare] = useState<boolean>(true);
     const [calculationVersionHistory, setCalculationVersionHistory] = useState<CalculationVersionHistorySummary[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specification.name,
-            url: `/app/ViewSpecification/${specification.id}`
-        },
-        {
-            name: calculation.name,
-            url: null
-        },
-        {
-            name: "Calculation version history",
-            url: null
-        }
-    ];
+    let history = useHistory();
 
     function populateCalculation() {
         const getCalculationData = async () => {
@@ -151,14 +128,21 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
 
     function compareVersions() {
         if (!disableCompare) {
-            window.location.href = `/app/Calculations/CompareCalculationVersions/${checkedVersions[0]}/${checkedVersions[1]}`;
+            history.push(`/app/Calculations/CompareCalculationVersions/${checkedVersions[0]}/${checkedVersions[1]}`);
         }
     }
 
     return <div><Header location={Section.Specifications}/>
-            <LoadingStatus title={"Loading calculation version history"} description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading}/>
+        <LoadingStatus title={"Loading calculation version history"}
+                       description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading}/>
         <div className="govuk-width-container" hidden={isLoading}>
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
+                <Breadcrumb name={calculation.name} />
+                <Breadcrumb name={"Calculation version history"} />
+            </Breadcrumbs>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl">{calculation.name}</h1>
@@ -199,19 +183,20 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                                 </th>
                                 <td className="govuk-table__cell">{cvh.publishStatus}</td>
                                 <td className="govuk-table__cell">{cvh.version}</td>
-                                <td className="govuk-table__cell"><DateFormatter date={cvh.lastUpdated} utc={false}/>
+                                <td className="govuk-table__cell">
+                                    <DateFormatter date={cvh.lastUpdated} utc={false}/>
                                 </td>
                                 <td className="govuk-table__cell">{cvh.author.name}</td>
                             </tr>
                         )}
                         </tbody>
                     </table>
-                    <button id={"compare-button"} data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
-                            disabled={disableCompare} onClick={compareVersions}>
-                        Compare calculations
+                    <button id={"compare-button"} data-prevent-double-click="true" className="govuk-button"
+                            data-module="govuk-button"
+                            disabled={disableCompare} onClick={compareVersions}>Compare calculations
                     </button>
                     <br/>
-                    <a href={`/app/ViewSpecification/${specification.id}`} className="govuk-back-link">Back</a>
+                    <Link to={`/ViewSpecification/${specification.id}`} className="govuk-back-link">Back</Link>
                 </div>
             </div>
         </div>

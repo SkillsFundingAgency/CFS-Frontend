@@ -1,10 +1,8 @@
 import * as React from "react";
 import {Header} from "../components/Header";
-import {Banner} from "../components/Banner";
 import {Footer} from "../components/Footer";
 import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
 import {FacetsEntity, ProvidersEntity} from "../types/publishedProvider";
-import {IBreadcrumbs} from "../types/IBreadcrumbs";
 import {NotificationSignal} from "../signals/NotificationSignal";
 import {Navigation, NavigationLevel} from "../components/Navigation";
 import {BackButton} from "../components/BackButton";
@@ -17,6 +15,8 @@ import {JobMessage} from "../types/jobMessage";
 import {AutoComplete} from "../components/AutoComplete";
 import {ErrorSummary} from "../components/ErrorSummary";
 import {Section} from "../types/Sections";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 
 export interface IViewFundingProps {
     getLocalAuthorities: any;
@@ -87,7 +87,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         status: "",
         pageSize: 50,
         jobId: "",
-        jobStatus:"",
+        jobStatus: "",
         jobMessage: "",
         jobSuggestion: ""
     };
@@ -166,10 +166,10 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         this.props.releaseFunding(this.props.specifications.id);
     };
 
-    refreshProviderResults = (status:string, message:string, suggestion:string) => {
+    refreshProviderResults = (status: string, message: string, suggestion: string) => {
         this.props.getPublishedProviderResults(this.state.fundingPeriod, this.state.fundingStream, this.state.specification);
         this.props.changePageState("IDLE");
-        this.setState({jobStatus: status, jobMessage:message, jobSuggestion: suggestion})
+        this.setState({jobStatus: status, jobMessage: message, jobSuggestion: suggestion})
     };
 
     movePage = (pageNumber: string) => {
@@ -182,19 +182,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
 
 
     render() {
-        let breadcrumbs: IBreadcrumbs[] = [
-            {
-                url: "/app",
-                name: "Calculate Funding"
-            },
-            {
-                url: "/app/ViewFunding",
-                name: "Funding Approvals"
-            },
-            {
-                url: null,
-                name: "Approve and release funding"
-            }];
 
         let lastRefreshDate = "Not Available";
         if (this.props.specifications.id != null && this.props.specifications.id.length > 0) {
@@ -222,8 +209,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <Header location={Section.Approvals}/>
                 <div className="govuk-width-container">
                     <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
-                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
-                            subtitle="You can approve and release funding for payment for completed specifications"/>
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate Funding"} url={"/"}/>
+                        <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"}/>
+                        <Breadcrumb name={"Approve and release funding"}/>
+                    </Breadcrumbs>
                     <div className="govuk-main-wrapper govuk-main-wrapper--l"
                          hidden={this.props.specificationSelected}>
 
@@ -287,8 +277,11 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <Header location={Section.Approvals}/>
                 <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <div className="govuk-width-container">
-                    <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="Approve and release funding"
-                            subtitle="You can approve and release funding for payment for completed specifications"/>
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate Funding"} url={"/"}/>
+                        <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"}/>
+                        <Breadcrumb name={"Approve and release funding"}/>
+                    </Breadcrumbs>
                     <PermissionStatus requiredPermissions={missingPermissions}/>
                     <LoadingStatus title={`${this.props.latestJob.jobType} of funding in progress`}
                                    subTitle={"Please wait, this could take several minutes"}
@@ -315,13 +308,14 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                 <h2 className="govuk-heading-m">{this.props.specifications.fundingPeriod.name}</h2>
                                 <span className="govuk-caption-m">Funding stream</span>
                                 <h2 className="govuk-heading-m">{
-                                    this.props.specifications.fundingStreams.length > 0?
-                                    this.props.specifications.fundingStreams[0].name : ""}</h2>
+                                    this.props.specifications.fundingStreams.length > 0 ?
+                                        this.props.specifications.fundingStreams[0].name : ""}</h2>
                             </div>
                         </div>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
-                                <ErrorSummary title={this.state.jobMessage} error={this.state.jobStatus} suggestion={this.state.jobSuggestion}/>
+                                <ErrorSummary title={this.state.jobMessage} error={this.state.jobStatus}
+                                              suggestion={this.state.jobSuggestion}/>
                             </div>
                         </div>
                         <div className="govuk-grid-row viewfunding-filter">
@@ -339,7 +333,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label">Local Authority</label>
-                                <AutoComplete suggestions={this.props.filterTypes[1].facetValues.map(x => x.name)} callback={this.filterLocalAuthority}/>
+                                <AutoComplete suggestions={this.props.filterTypes[1].facetValues.map(x => x.name)}
+                                              callback={this.filterLocalAuthority}/>
                             </div>
                             <div className="govuk-grid-column-one-quarter">
                                 <label className="govuk-label" htmlFor="Status">Status</label>
@@ -403,8 +398,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                                     <tbody className="govuk-table__body">
                                     {this.props.publishedProviderResults.providers.map(fp =>
                                         <tr className="govuk-table__body" key={fp.id}>
-                                            <td className="govuk-table__cell"><a
-                                                href={"/app/FundingApprovals/ProviderFundingOverview/" + fp.specificationId + "/" + fp.ukprn + "/" + this.props.specifications.providerVersionId}>{fp.providerName}</a>
+                                            <td className="govuk-table__cell">
+                                                <Link
+                                                    to={"/FundingApprovals/ProviderFundingOverview/" + fp.specificationId + "/" + fp.ukprn + "/" + this.props.specifications.providerVersionId}>{fp.providerName}</Link>
                                             </td>
                                             <td className="govuk-table__cell">{fp.ukprn}</td>
                                             <td className="govuk-table__cell">{fp.fundingStatus}</td>
@@ -536,7 +532,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                             </div>
                         </div>
                     </div>
-                    <main className="govuk-width-container" hidden={this.props.pageState !== "PUBLISH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
+                    <main className="govuk-width-container"
+                          hidden={this.props.pageState !== "PUBLISH_FUNDING" || (this.props.latestJob.runningStatus !== 'Completed' && this.props.latestJob.runningStatus !== '')}>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <BackButton name="Back" callback={this.dismissLoader}/>

@@ -1,5 +1,5 @@
 import React from "react";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 import {Provider} from "react-redux";
 import {IStoreState} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
@@ -28,18 +28,18 @@ describe("Provider Funding Overview ", () => {
     store.dispatch = jest.fn();
 
     it("renders the page with 3 tabs", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('.govuk-tabs__list').children().length).toBe(3);
     });
 
     it("dispatches to Redux the correct number of times", () => {
-        mount(<Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         expect(store.dispatch).toHaveBeenCalledTimes(6);
     });
 
     it("has a downloadable reports tab", () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find("#downloadable-reports")).toBeTruthy();
     })

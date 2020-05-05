@@ -1,36 +1,18 @@
 import React, {useState} from "react";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {Banner} from "../../components/Banner";
 import {
     getFundingPeriodsByFundingStreamIdService,
     getFundingStreamsService,
     getSpecificationsByFundingPeriodAndStreamIdService
 } from "../../services/specificationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {FundingPeriod, FundingStream, Specification} from "../../types/viewFundingTypes";
-import {
-    getFundingPeriodsByFundingStreamId,
-    getSpecificationsByFundingPeriodAndStreamId
-} from "../../actions/SelectSpecificationActions";
+import {FundingPeriod} from "../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export function FundingApprovalSelection() {
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "Funding approvals",
-            url: "/app/Approvals"
-        },
-        {
-            name: "Select specification",
-            url: null
-        }
-    ];
 
     const [fundingStreams, setFundingStreams] = useState<string[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
@@ -89,7 +71,12 @@ export function FundingApprovalSelection() {
     return <div>
         <Header location={Section.Datasets}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+          <Breadcrumbs>
+              <Breadcrumb name={"Calculate funding"} url={"/"} />
+              <Breadcrumb name={"Funding approvals"} url={"/Approvals"} />
+              <Breadcrumb name={"Select specification"} />
+          </Breadcrumbs>
+
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row  govuk-!-margin-bottom-9">
                     <div className="govuk-grid-column-full">
@@ -123,10 +110,10 @@ export function FundingApprovalSelection() {
                     </label>
                     <h3 className="govuk-heading-m">{selectedSpecification}</h3>
 
-                    <a href={`/app/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification}`}
+                    <Link to={`/app/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification}`}
                        className="govuk-button" data-module="govuk-button">
                         View funding
-                    </a>
+                    </Link>
 
                 </div>
             </div>

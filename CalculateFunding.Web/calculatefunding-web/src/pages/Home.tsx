@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { Banner } from "../components/Banner";
-import { IBreadcrumbs } from "../types/IBreadcrumbs";
 import { Section } from "../types/Sections";
 import { FeatureFlagsState } from "../states/FeatureFlagsState";
 import { Link } from "react-router-dom";
 
-export const Home = (props: { featureFlags: FeatureFlagsState }) => {
+export function Home(props: { featureFlags: FeatureFlagsState }){
     useEffect(() => {
         fetch("/api/account/IsAuthenticated", {
             method: 'GET'
@@ -23,13 +21,9 @@ export const Home = (props: { featureFlags: FeatureFlagsState }) => {
         document.title = "Calculate Funding";
     }, []);
 
-    let breadcrumbs: IBreadcrumbs[] = [];
-
-    return (
-        <div>
+    return <div>
             <Header location={Section.Home} />
             <div className="govuk-width-container">
-                <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle="" />
                 <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
@@ -54,7 +48,7 @@ export const Home = (props: { featureFlags: FeatureFlagsState }) => {
                                     </div>
                                     {/*<div className="govuk-grid-column-one-third">*/}
                                     {/*    <div className="govuk-heading-m">*/}
-                                    {/*        <a href="/scenarios" className="govuk-link">Quality assurance tests</a>*/}
+                                    {/*        <Link to="/scenarios" className="govuk-link">Quality assurance tests</a>*/}
                                     {/*    </div>*/}
                                     {/*    <p className="govuk-body">Design tests to check calculations and data.</p>*/}
                                     {/*</div>*/}
@@ -88,5 +82,5 @@ export const Home = (props: { featureFlags: FeatureFlagsState }) => {
                 </div>
             </div>
             <Footer />
-        </div>)
+        </div>
 }

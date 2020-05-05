@@ -1,9 +1,7 @@
 import React, {useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
-import {Banner} from "../../components/Banner";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {
@@ -16,6 +14,7 @@ import {ProfilingInstallments} from "../../types/Profiling";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import { getFutureInstallmentsService
 } from "../../services/profilingService";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 export interface EditVariationPointsRouteProps {
     specificationId: string;
 }
@@ -52,24 +51,8 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
     const [profileVariationPointersFutureInstallment, setProfileVariationPointersFutureInstallment] = useState<ProfileVariationPointer[]>([]);
     const [profilingInstallments, setProfilingInstallments] = useState<ProfilingInstallments[]>(profilingInstallmentsInitialState);
     const [isLoading, setIsLoading] = useState(false);
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View specifications",
-            url: "/app/SpecificationsList"
-        },
-        {
-            name: specificationSummary.name,
-            url: `/app/ViewSpecification/${specificationId}`
-        },
-        {
-            name: "Edit specification",
-            url: null
-        }
-    ];
+
+    let history = useHistory();
 
     function SetFutureInstallment(e: React.ChangeEvent<HTMLSelectElement>) {
         if (e.target.value !== null && e.target.value !== "-1") {
@@ -99,7 +82,7 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
             };
             updateProfileVariationPointers().then((result) => {
                 if (result.status === 200) {
-                    window.location.href = `/app/ViewSpecification/${specificationId}`
+                    history.push(`/app/ViewSpecification/${specificationId}`);
                 } else {
                     setIsLoading(false);
                 }
@@ -153,7 +136,12 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationId}`}/>
+                <Breadcrumb name={"Edit specification"} />
+            </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <LoadingStatus title={"Loading installment variation"} hidden={!isLoading}/>
                 <fieldset className="govuk-fieldset" hidden={isLoading}>

@@ -1,15 +1,9 @@
-import {Banner} from "../../components/Banner";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Header} from "../../components/Header";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
-import {useDispatch, useSelector} from "react-redux";
-import {getAllSpecifications} from "../../actions/SpecificationActions";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {AppState} from "../../states/AppState";
-import {SpecificationState} from "../../states/SpecificationState";
 import {DateFormatter} from "../../components/DateFormatter";
 import Pagination from "../../components/Pagination";
 import {FacetValue} from "../../types/CalculationProviderResult";
@@ -18,20 +12,10 @@ import {Section} from "../../types/Sections";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {getAllSpecificationsService} from "../../services/specificationService";
 import {SpecificationListResults} from "../../types/SpecificationListResults";
-
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export function SpecificationsList() {
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View specifications",
-            url: null
-        }
-    ];
-
     const [specificationListResults, setSpecificationListResults] = useState<SpecificationListResults>({
         items: [],
         facets: [],
@@ -41,9 +25,6 @@ export function SpecificationsList() {
         totalItems: 0,
         totalPages: 0
     });
-
-    const dispatch = useDispatch();
-
     const initialSearch: SpecificationSearchRequestViewModel = {
         searchText: "",
         fundingPeriods: [],
@@ -54,15 +35,12 @@ export function SpecificationsList() {
     };
     const [singleFire, setSingleFire] = useState(false);
     const [searchCriteria, setSearchCriteria] = useState(initialSearch);
-
     const [filterFundingPeriods, setFundingPeriods] = useState<FacetValue[]>([]);
     const [filterFundingStreams, setFundingStreams] = useState<FacetValue[]>([]);
     const [filterStatus, setStatus] = useState<FacetValue[]>([]);
-
     const [initialFundingPeriods, setInitialFundingPeriods] = useState<FacetValue[]>([]);
     const [initialFundingStreams, setInitialFundingStreams] = useState<FacetValue[]>([]);
     const [initialStatus, setInitialStatus] = useState<FacetValue[]>([]);
-
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     function populateSpecifications(criteria: SpecificationSearchRequestViewModel) {
@@ -207,27 +185,28 @@ export function SpecificationsList() {
     return <div>
         <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
-            <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row  govuk-!-margin-bottom-4">
                     <div className="govuk-grid-column-full ">
-                        <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+                        <Breadcrumbs>
+                            <Breadcrumb name={"Calculate funding"} url={"/"} />
+                            <Breadcrumb name={"View specifications"} />
+                        </Breadcrumbs>
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Specifications</h1>
                     </div>
                 </div>
-
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third">
-                        <a href="/app/Specifications/CreateSpecification" id={"create-specification-link"}
-                           className="govuk-button govuk-button--primary"
-                           data-module="govuk-button">
+                        <Link to="/Specifications/CreateSpecification" id={"create-specification-link"}
+                              className="govuk-button govuk-button--primary"
+                              data-module="govuk-button">
                             Create specification
-                        </a>
+                        </Link>
                     </div>
                 </div>
                 <div className="govuk-grid-row" hidden={!isLoading}>
                     <LoadingStatus title={"Loading specification list"}
                                    description={"Please wait whilst the specification list is loading"}
-                                   />
+                    />
                 </div>
                 <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-one-third">
@@ -315,9 +294,7 @@ export function SpecificationsList() {
                             </button>
                         </form>
                     </div>
-
                     <div className="govuk-grid-column-two-thirds">
-
                         <table className="govuk-table" id="specification-table"
                                hidden={specificationListResults.items.length < 1}>
                             <thead className="govuk-table__head">
@@ -334,11 +311,12 @@ export function SpecificationsList() {
                             </tr>
                             </thead>
                             <tbody className="govuk-table__body" id="mainContentResults">
-                            {specificationListResults.items.map(s => <tr key={s.id}
-                                                                                                  className="govuk-table__row">
-                                <th scope="row" className="govuk-table__header"><a
-                                    href={"/app/ViewSpecification/" + s.id}>{s.name}</a></th>
-                                <td className="govuk-table__cell"><DateFormatter date={s.lastUpdatedDate} utc={false}/>
+                            {specificationListResults.items.map(s => <tr key={s.id} className="govuk-table__row">
+                                <th scope="row" className="govuk-table__header">
+                                    <Link to={`/ViewSpecification/${s.id}`}>{s.name}</Link>
+                                </th>
+                                <td className="govuk-table__cell">
+                                    <DateFormatter date={s.lastUpdatedDate} utc={false}/>
                                 </td>
                                 <td className="govuk-table__cell">{s.status}</td>
                             </tr>)}
@@ -346,9 +324,7 @@ export function SpecificationsList() {
 
                             </tbody>
                         </table>
-                        <p className="govuk-body"
-                           hidden={specificationListResults.items.length > 0}>There are no
-                            records to match your search</p>
+                        <p className="govuk-body" hidden={specificationListResults.items.length > 0}>There are no records to match your search</p>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
                                 <Pagination callback={movePage}
@@ -361,7 +337,6 @@ export function SpecificationsList() {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
         <Footer/>
     </div>

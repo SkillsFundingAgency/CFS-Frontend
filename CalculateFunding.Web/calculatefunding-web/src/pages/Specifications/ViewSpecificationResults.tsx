@@ -1,9 +1,7 @@
 import * as React from "react"
 import {useEffect, useState} from "react"
 import {Footer} from "../../components/Footer";
-import {Banner} from "../../components/Banner";
 import {Header} from "../../components/Header";
-import {IBreadcrumbs} from "../../types/IBreadcrumbs";
 import {Tabs} from "../../components/Tabs";
 import {RouteComponentProps} from "react-router";
 import {
@@ -19,6 +17,8 @@ import {Section} from "../../types/Sections";
 import {getDownloadableReportsService} from "../../services/specificationService";
 import {ReportMetadataViewModel} from "../../types/Specifications/ReportMetadataViewModel";
 import {DateFormatter} from "../../components/DateFormatter";
+import {Link} from "react-router-dom";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -55,24 +55,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         });
             }, [specificationId]);
 
-    let breadcrumbs: IBreadcrumbs[] = [
-        {
-            name: "Calculate funding",
-            url: "/app"
-        },
-        {
-            name: "View results",
-            url: "/app/results"
-        },
-        {
-            name: "Select specification",
-            url: "/app/SelectSpecification"
-        },
-        {
-            name: specificationResults.specification.name,
-            url: null
-        }
-    ];
+
 
     function updateTemplateCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
@@ -105,7 +88,12 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     return <div>
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
-            <Banner bannerType="Left" breadcrumbs={breadcrumbs} title="" subtitle=""/>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View results"} url={"/results"} legacy={true}/>
+                <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
+                <Breadcrumb name={specificationResults.specification.name} />
+            </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
@@ -113,11 +101,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                         <h2 className="govuk-caption-xl">{specificationResults.specification.fundingPeriod.name}</h2>
                     </div>
                 </div>
-
-
                 <div className="govuk-grid-row govuk-!-padding-top-5">
                     <div className="govuk-grid-column-full">
-
                         <Tabs initialTab="template-calculations">
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="template-calculations">Template Calculations</Tabs.Tab>
@@ -155,8 +140,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         <tbody className="govuk-table__body">
                                         {specificationResults.templateCalculations.results.map(tc =>
                                             <tr key={tc.id} className="govuk-table__row">
-                                                <td className="govuk-table__cell"><a
-                                                    href={`/app/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
+                                                <td className="govuk-table__cell">
+                                                    <Link to={`/ViewCalculationResults/${tc.id}`}>{tc.name}</Link>
                                                 </td>
                                                 <td className="govuk-table__cell">{tc.status}</td>
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
@@ -214,8 +199,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         <tbody className="govuk-table__body">
                                         {specificationResults.additionalCalculations.results.map(tc =>
                                             <tr className="govuk-table__row">
-                                                <td className="govuk-table__cell"><a
-                                                    href={`/ViewCalculationResults/${tc.id}`}>{tc.name}</a>
+                                                <td className="govuk-table__cell">
+                                                    <Link to={`/ViewCalculationResults/${tc.id}`}>{tc.name}</Link>
                                                 </td>
                                                 <td className="govuk-table__cell">{tc.status}</td>
                                                 <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
@@ -250,8 +235,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
                                                 {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
                                                         <div className="attachment__thumbnail">
-                                                            <a className="govuk-link" target="_self"
-                                                               aria-hidden="true" href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>
+                                                            <a href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`} className="govuk-link" target="_self"
+                                                               aria-hidden="true">
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
@@ -324,7 +309,6 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                     </div>
                                                 )}
                                             </div>
-
                                         </div>
                                     </div>
                                 </section>
@@ -335,6 +319,5 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             </div>
         </div>
         <Footer/>
-
     </div>
 }

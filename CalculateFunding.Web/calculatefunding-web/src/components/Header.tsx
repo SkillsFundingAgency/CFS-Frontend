@@ -1,5 +1,6 @@
 import React from "react";
 import {Section} from "../types/Sections";
+import {Link} from "react-router-dom";
 
 export function Header(props: {location:Section}) {
 
@@ -26,7 +27,7 @@ export function Header(props: {location:Section}) {
         <header className="govuk-header " role="banner" data-module="govuk-header">
             <div className="govuk-header__container govuk-width-container">
                 <div className="govuk-header__logo">
-                    <a href="/app" className="govuk-header__link govuk-header__link--homepage">
+                    <Link to="/" className="govuk-header__link govuk-header__link--homepage">
         <span className="govuk-header__logotype">
           <svg role="presentation" focusable="false" className="govuk-header__logotype-crown"
                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 97" height="30" width="36">
@@ -37,7 +38,7 @@ export function Header(props: {location:Section}) {
             GOV.UK
           </span>
         </span>
-                    </a>
+                    </Link>
                 </div>
                 <div className="govuk-header__content">
                     <span className="govuk-header__product-name">
@@ -49,35 +50,35 @@ export function Header(props: {location:Section}) {
                     <nav>
                         <ul id="navigation" className="govuk-header__navigation " aria-label="Top Level Navigation">
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Home ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/app">
+                                <Link className="govuk-header__link" to="/">
                                     Home
-                                </a>
+                                </Link>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Specifications ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/app/SpecificationsList">
+                                <Link className="govuk-header__link" to="/SpecificationsList">
                                     Specifications
-                                </a>
+                                </Link>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Datasets ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/app/Datasets/ManageData">
+                                <Link className="govuk-header__link" to="/Datasets/ManageData">
                                     Manage data
-                                </a>
+                                </Link>
                             </li>
                             {/*<li className={"govuk-header__navigation-item" + (props.location === Section.Tests ? " govuk-header__navigation-item--active" : "")}>*/}
-                            {/*    <a className="govuk-header__link"*/}
-                            {/*       href="/scenarios">*/}
+                            {/*    <Link className="govuk-header__link"*/}
+                            {/*       to="/scenarios">*/}
                             {/*        Quality assurance tests*/}
-                            {/*    </a>*/}
+                            {/*    </Link>*/}
                             {/*</li>*/}
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Results ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/app/results">
+                                <Link className="govuk-header__link" to="/results">
                                     View results
-                                </a>
+                                </Link>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
-                                <a className="govuk-header__link" href="/app/Approvals">
+                                <Link className="govuk-header__link" to="/Approvals">
                                     Funding approvals
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </nav>

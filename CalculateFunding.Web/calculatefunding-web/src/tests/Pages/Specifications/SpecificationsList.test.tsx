@@ -2,9 +2,9 @@ import React from 'react';
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
-import {mount} from "enzyme";
+import {mount, shallow} from "enzyme";
 import {SpecificationsList} from "../../../pages/Specifications/SpecificationsList";
-
+import {MemoryRouter} from "react-router";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -16,43 +16,34 @@ const store: Store<IStoreState> = createStore(
 store.dispatch = jest.fn();
 
 describe("<SpecificationsList />", () => {
+    beforeEach(() => {
+    })
     it('will have the correct breadcrumbs', () => {
 
-        const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><SpecificationsList/></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(2);
     });
-});
 
-
-describe("<SpecificationsList />", () => {
     it('will have the correct <H1 /> title', () => {
 
-        const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><SpecificationsList/></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-heading-xl").text()).toBe("Specifications");
     });
-});
 
-describe("<SpecificationsList />", () => {
     it('will have the correct link to Create Specifications', () => {
-
-        const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
-        expect(wrapper.find("#create-specification-link").text()).toBe("Create specification");
+        const wrapper = mount(<MemoryRouter><Provider store={store}><SpecificationsList/></Provider></MemoryRouter>);
+        expect(wrapper.find("#create-specification-link").first().text()).toBe("Create specification");
     });
-});
 
-
-describe("<SpecificationsList />", () => {
     it('will have the specification table defined', () => {
 
-        const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><SpecificationsList/>></Provider></MemoryRouter>);
         expect(wrapper.find("#specification-table").children().length).toBeGreaterThan(0);
     });
-});
 
-describe("<SpecificationsList />", () => {
     it('will have the <CollapsiblePanels /> and Clear filters <Button />', () => {
 
-        const wrapper = mount(<Provider store={store}><SpecificationsList/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><SpecificationsList/>></Provider></MemoryRouter>);
         expect(wrapper.find("#searchSpecifications").children().length).toBe(5);
     });
 });

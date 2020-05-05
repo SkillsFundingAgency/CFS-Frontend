@@ -4,6 +4,7 @@ import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
 import {CreateSpecification} from "../../../pages/Specifications/CreateSpecification";
+import {MemoryRouter} from "react-router";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -17,15 +18,13 @@ store.dispatch = jest.fn();
 describe("<CreateSpecification />", () => {
     it('will have the correct breadcrumbs', () => {
 
-        const wrapper = mount(<Provider store={store}><CreateSpecification/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><CreateSpecification/>></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(3);
     });
-});
 
-describe("<CreateSpecification />", () => {
     it('will have the correct <H1 /> title', () => {
 
-        const wrapper = mount(<Provider store={store}><CreateSpecification/>></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><CreateSpecification/>></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Create specification");
     });
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import {match} from "react-router";
+import {match, MemoryRouter} from "react-router";
 import {Provider} from "react-redux";
 import {IStoreState} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
@@ -129,19 +129,19 @@ describe("Provider Funding Overview ", () => {
     store.dispatch = jest.fn();
 
     it("renders the page with the expected number of tabs", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('.govuk-tabs__list').children().length).toBe(4);
     });
 
     it("dispatches to Redux the correct number of times", () => {
-        mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(store.dispatch).toHaveBeenCalledTimes(8);
     });
 
     it("shows approve status in funding line structure tab", () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         let actual = wrapper.find("ApproveStatusButton");
 
         expect(actual.length).toBe(1);
@@ -149,19 +149,19 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders collapsible steps", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('.collapsible-steps').length).toBe(1);
     });
 
     it("renders correct number of collapsible steps", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('CollapsibleSteps').length).toBe(2);
     });
 
     it("renders collapsible steps with calculation linked to edit calculation page", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').length).toBe(1);
         expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').prop("href"))
@@ -169,21 +169,21 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders collapsible steps with calculation status", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('.collapsible-step-header-status').at(1).text())
             .toBe(mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationPublishStatus);
     });
 
     it("renders back to top link within funding line structure tab", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('#fundingline-structure .app-back-to-top__link').prop("href"))
             .toBe("#fundingline-structure");
     });
 
     it("renders open all button within funding line structure tab with correct values on initial load", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
 
         expect(openAllButton.prop("hidden")).toBe(false);
@@ -191,7 +191,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders close all button within funding line structure tab with correct values on initial load", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         const closeAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(1);
 
         expect(closeAllButton.prop("hidden")).toBe(true);
@@ -199,7 +199,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("display close all button within funding line structure tab given open all button is clicked", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
 
         openAllButton.simulate('click');
@@ -211,7 +211,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("display open all button within funding line structure tab given close all button is clicked", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
         openAllButton.simulate('click');
@@ -225,14 +225,14 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders all funding lines closed on initial load", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         expect(wrapper.find('CollapsibleSteps').at(0).prop("expanded")).toBe(false);
         expect(wrapper.find('CollapsibleSteps').at(1).prop("expanded")).toBe(false);
     });
 
     it("expand all funding lines given open all button is clicked", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
 
         openAllButton.simulate('click');
@@ -242,7 +242,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("collapse all funding lines given close all button is clicked", async () => {
-        const wrapper = mount(<Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider>);
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
         openAllButton.simulate('click');
