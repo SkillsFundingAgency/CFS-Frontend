@@ -273,19 +273,21 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__details">
                                                             <h4 className="govuk-heading-s">
                                                                 <a className="govuk-link" target="_self"
-                                                                   href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>{dlr.name}</a>
+                                                                   href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
                                                             </h4>
                                                             <p className="govuk-body-s">
                                                                 <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
                                                                 utc={false} date={dlr.lastModified}/></span>
                                                             </p>
                                                         </div>
+                                                    <div className="govuk-clearfix"></div>
                                                     </div>
+
                                                 )}
                                             </div>
-                                            <div hidden={downloadableReports.filter(dr => dr.category === "Published").length === 0}>
+                                            <div hidden={downloadableReports.filter(dr => dr.category === "History").length === 0}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
-                                                {downloadableReports.filter(dr => dr.category === "Published").map(dlr =>
+                                                {downloadableReports.filter(dr => dr.category === "History").map(dlr =>
                                                     <div>
                                                         <div className="attachment__thumbnail">
                                                             <a className="govuk-link" target="_self"
@@ -318,6 +320,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                                 utc={false} date={dlr.lastModified}/></span>
                                                             </p>
                                                         </div>
+                                                        <div className="govuk-clearfix"></div>
                                                     </div>
                                                 )}
                                             </div>

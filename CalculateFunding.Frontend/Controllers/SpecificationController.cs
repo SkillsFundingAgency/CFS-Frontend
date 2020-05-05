@@ -378,19 +378,12 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestResult();
         }
 
-        [Route("api/specs/download-report")]
+        [Route("api/specs/{specificationReportId}/download-report")]
         [HttpGet]
-        public async Task<IActionResult> DownloadReport([FromQuery]JobType jobType, [FromQuery]string specificationId, [FromQuery]string fundingLineCode, [FromQuery]string fundingPeriodId, [FromQuery]string fundingStreamId)
+        public async Task<IActionResult> DownloadReport(string specificationReportId)
         {
 
-            ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(new SpecificationReportIdentifier
-            {
-                JobType = JobType.CalcResult,
-                SpecificationId = specificationId,
-                FundingLineCode = fundingLineCode,
-                FundingPeriodId = fundingPeriodId,
-                FundingStreamId = fundingStreamId
-            });
+            ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(specificationReportId);
 
 
             if (response.StatusCode == HttpStatusCode.OK)
