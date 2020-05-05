@@ -1,10 +1,14 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Interfaces;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Interfaces;
+using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
+using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
@@ -37,6 +41,19 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             string url = "templates/build/metadata";
 
             return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
+        }
+
+        public Task<ApiResponse<List<TemplateVersionResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
+        {
+	        Guard.ArgumentNotNull(templateId, nameof(templateId));
+	        string templateStatusesParam = string.Join(",", statuses);
+	        string url = $"templates/build/{templateId}/versions";
+	        if (!string.IsNullOrWhiteSpace(templateStatusesParam))
+	        {
+		        url += $"?statuses={templateStatusesParam}";
+	        }
+
+	        return GetAsync<List<TemplateVersionResource>>(url);
         }
     }
 }

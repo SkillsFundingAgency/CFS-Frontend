@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
@@ -45,7 +46,7 @@ namespace CalculateFunding.Frontend.Controllers
                 _logger.Error($"User [{User?.Identity?.Name}] has insufficient permissions to create a {createModel.FundingStreamId} template");
                 return Forbid(new AuthenticationProperties());
             }
-            
+
             ApiResponse<string> result = await _client.CreateDraftTemplate(new TemplateCreateCommand
             {
                 Name = createModel.Name,
@@ -124,6 +125,25 @@ namespace CalculateFunding.Frontend.Controllers
                     return StatusCode((int)result.StatusCode, 
                         result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
             }
+        }
+
+        [HttpGet]
+        [Route("api/templates/build/{templateId}/versions")]
+        public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
+        {
+	        ApiResponse<List<TemplateVersionResource>> result = await _client.GetTemplateVersions(templateId, statuses);     
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+	            return Ok(result.Content);
+            }
+
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+	            return BadRequest(result.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
     }
 }
