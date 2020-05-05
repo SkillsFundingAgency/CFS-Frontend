@@ -8,7 +8,6 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Interfaces;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
-using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
@@ -20,6 +19,33 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             ICancellationTokenProvider cancellationTokenProvider = null)
             : base(httpClientFactory, HttpClientKeys.Policies, logger, cancellationTokenProvider)
         {
+        }
+
+        public async Task<ApiResponse<TemplateResource>> GetTemplate(string templateId)
+        {
+            string url = $"templates/build/{templateId}";
+
+            return await GetAsync<TemplateResource>(url);
+        }
+
+        public async Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version)
+        {
+            string url = $"templates/build/{templateId}/versions/{version}";
+
+            return await GetAsync<TemplateResource>(url);
+        }
+
+        public async Task<ApiResponse<List<TemplateVersionResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
+        {
+            Guard.ArgumentNotNull(templateId, nameof(templateId));
+            string templateStatusesParam = string.Join(",", statuses);
+            string url = $"templates/build/{templateId}/versions";
+            if (!string.IsNullOrWhiteSpace(templateStatusesParam))
+            {
+                url += $"?statuses={templateStatusesParam}";
+            }
+
+            return await GetAsync<List<TemplateVersionResource>>(url);
         }
 
         public async Task<ApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command)
@@ -41,19 +67,6 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             string url = "templates/build/metadata";
 
             return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
-        }
-
-        public Task<ApiResponse<List<TemplateVersionResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
-        {
-	        Guard.ArgumentNotNull(templateId, nameof(templateId));
-	        string templateStatusesParam = string.Join(",", statuses);
-	        string url = $"templates/build/{templateId}/versions";
-	        if (!string.IsNullOrWhiteSpace(templateStatusesParam))
-	        {
-		        url += $"?statuses={templateStatusesParam}";
-	        }
-
-	        return GetAsync<List<TemplateVersionResource>>(url);
         }
     }
 }

@@ -12,5 +12,7 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ValidatedApiResponse<string>> UpdateTemplateMetadata(TemplateMetadataUpdateCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command);
         Task<ApiResponse<List<TemplateVersionResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
+        Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
+        Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
     }
 }

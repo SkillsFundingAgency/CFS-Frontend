@@ -29,6 +29,42 @@ namespace CalculateFunding.Frontend.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        [Route("api/templates/build/{templateId}")]
+        public async Task<IActionResult> GetTemplate([FromRoute] string templateId)
+        {
+            ApiResponse<TemplateResource> result = await _client.GetTemplate(templateId);
+
+            if (result.StatusCode.IsSuccess())
+                return Ok(result.Content);
+
+            return StatusCode((int) result.StatusCode);
+        }
+
+        [HttpGet]
+        [Route("api/templates/build/{templateId}/versions/{version}")]
+        public async Task<IActionResult> GetTemplateVersion([FromRoute] string templateId, [FromRoute] string version)
+        {
+            ApiResponse<TemplateResource> result = await _client.GetTemplateVersion(templateId, version);
+
+            if (result.StatusCode.IsSuccess())
+                return Ok(result.Content);
+
+            return StatusCode((int) result.StatusCode);
+        }
+
+        [HttpGet]
+        [Route("api/templates/build/{templateId}/versions")]
+        public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
+        {
+            ApiResponse<List<TemplateVersionResource>> result = await _client.GetTemplateVersions(templateId, statuses);
+
+            if (result.StatusCode.IsSuccess())
+                return Ok(result.Content);
+
+            return StatusCode((int) result.StatusCode);
+        }
+
         [HttpPost]
         [Route("api/templates/build")]
         public async Task<IActionResult> CreateDraftTemplate([FromBody] TemplateCreateModel createModel)
@@ -92,7 +128,7 @@ namespace CalculateFunding.Frontend.Controllers
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:
-                    return StatusCode((int)result.StatusCode, 
+                    return StatusCode((int) result.StatusCode,
                         result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
             }
         }
@@ -122,28 +158,9 @@ namespace CalculateFunding.Frontend.Controllers
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:
-                    return StatusCode((int)result.StatusCode, 
+                    return StatusCode((int) result.StatusCode,
                         result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
             }
-        }
-
-        [HttpGet]
-        [Route("api/templates/build/{templateId}/versions")]
-        public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
-        {
-	        ApiResponse<List<TemplateVersionResource>> result = await _client.GetTemplateVersions(templateId, statuses);     
-
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-	            return Ok(result.Content);
-            }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-	            return BadRequest(result.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
     }
 }
