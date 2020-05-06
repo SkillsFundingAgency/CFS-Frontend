@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Profiling;
@@ -12,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    public class ProfilingController : Controller
+	public class ProfilingController : Controller
     {
 	    private readonly IProfilingApiClient _profilingApiClient;
 
