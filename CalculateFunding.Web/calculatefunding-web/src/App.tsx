@@ -22,7 +22,7 @@ import { ViewSpecification } from "./pages/Specifications/ViewSpecification";
 import { CreateAdditionalCalculation } from "./pages/Calculations/CreateAdditionalCalculation";
 import { EditAdditionalCalculation } from "./pages/Calculations/EditAdditionalCalculation";
 import { EditTemplateCalculation } from "./pages/Calculations/EditTemplateCalculation";
-import { ManageData } from "./pages/ManageData";
+import { ManageData } from "./pages/Datasets/ManageData";
 import { Approvals } from "./pages/Approvals";
 import { EditVariationPoints } from "./pages/Specifications/EditVariationPoints";
 import { CalculationVersionHistory } from "./pages/Calculations/CalculationVersionHistory";
@@ -32,6 +32,7 @@ import { getFeatureFlags } from "./actions/FeatureFlagsActions";
 import { getUserFundingStreamPermissions } from "./actions/UserPermissionsActions";
 import { IStoreState } from './reducers/rootReducer';
 import { FeatureFlagsState } from './states/FeatureFlagsState';
+import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -61,6 +62,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
                 <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
                 <Route path="/Datasets/ManageData" component={ManageData} />
+                <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}

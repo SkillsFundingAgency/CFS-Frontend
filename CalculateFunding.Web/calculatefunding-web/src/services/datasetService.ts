@@ -1,7 +1,9 @@
 import axios from "axios";
 import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatasetSchemaUpdateViewModel";
+import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
 
 const baseUrl = "/api/datasets";
+
 export async function getDatasetBySpecificationIdService(specificationId: string) {
     return axios(`${baseUrl}/getdatasetsbyspecificationid/${specificationId}`, {
         method: 'GET',
@@ -20,12 +22,12 @@ export async function getDatasetDefinitionsService() {
     });
 }
 
-export async function assignDatasetSchemaUpdateService(name: string, description: string, dataSchemaId: string, specificationId:string, isSetAsProviderData:boolean) {
-    let data :AssignDatasetSchemaUpdateViewModel = {
-        datasetDefinitionId:dataSchemaId,
+export async function assignDatasetSchemaUpdateService(name: string, description: string, dataSchemaId: string, specificationId: string, isSetAsProviderData: boolean) {
+    let data: AssignDatasetSchemaUpdateViewModel = {
+        datasetDefinitionId: dataSchemaId,
         description: description,
-        name:name,
-        isSetAsProviderData:isSetAsProviderData
+        name: name,
+        isSetAsProviderData: isSetAsProviderData
     };
     return axios(`${baseUrl}/assignDatasetSchema/${specificationId}`, {
         method: 'PUT',
@@ -34,4 +36,19 @@ export async function assignDatasetSchemaUpdateService(name: string, description
         },
         data: data
     });
+}
+
+export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
+    return axios(`/api/dataset-definitions/search`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        params: {
+            searchTerm: request.searchTerm,
+            pageNumber: request.pageNumber,
+            includeFacets: request.includeFacets,
+            pageSize: request.pageSize
+        }
+    })
 }

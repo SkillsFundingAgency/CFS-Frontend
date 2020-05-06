@@ -2,7 +2,7 @@ import React from 'react';
 import {createStore, Store} from "redux";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
-import {ManageData} from "../../pages/ManageData";
+import {ManageData} from "../../pages/Datasets/ManageData";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import {MemoryRouter} from "react-router";
 
@@ -37,7 +37,7 @@ describe("<ManageData />", () => {
     });
 
     it('will have the correct <H3 /> title for Download data schemas', () => {
-        const wrapper = mount(<MemoryRouter><Provider store={store}><ManageData/>></Provider></MemoryRouter>);
-        expect(wrapper.find("h3#download-data-schemas-title>a").text()).toBe("Download data schemas");
+        const wrapper = mount(<MemoryRouter><ManageData/></MemoryRouter>);
+        expect(wrapper.find("#download-data-schemas-title>Link").text()).toBe("Download data schemas");
     });
 });

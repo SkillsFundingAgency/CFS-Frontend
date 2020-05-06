@@ -1,7 +1,9 @@
 import React from "react";
-import {Header} from "../components/Header";
-import {Section} from "../types/Sections";
-import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
+import {Header} from "../../components/Header";
+import {Section} from "../../types/Sections";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {Link} from "react-router-dom";
+import {Footer} from "../../components/Footer";
 
 export function ManageData() {
     return <div>
@@ -33,12 +35,13 @@ export function ManageData() {
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"download-data-schemas-title"} className="govuk-heading-m">
-                            <a href="/datasets/schemas">Download data schemas</a>
+                            <Link to="/datasets/DownloadDataSchema">Download data schemas</Link>
                         </h3>
-                        <p className="govuk-body">Download the data schme for data source.</p>
+                        <p className="govuk-body">Download the data schema for data source.</p>
                     </div>
                 </div>
             </div>
         </div>
+        <Footer />
     </div>
 }
