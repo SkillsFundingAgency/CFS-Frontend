@@ -57,7 +57,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/{templateId}/versions")]
         public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
         {
-            ApiResponse<List<TemplateVersionResource>> result = await _client.GetTemplateVersions(templateId, statuses);
+            ApiResponse<List<TemplateResource>> result = await _client.GetTemplateVersions(templateId, statuses);
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);

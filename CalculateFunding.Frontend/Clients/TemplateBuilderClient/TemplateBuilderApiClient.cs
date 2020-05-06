@@ -35,7 +35,7 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await GetAsync<TemplateResource>(url);
         }
 
-        public async Task<ApiResponse<List<TemplateVersionResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
+        public async Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
         {
             Guard.ArgumentNotNull(templateId, nameof(templateId));
             string templateStatusesParam = string.Join(",", statuses);
@@ -45,7 +45,7 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
                 url += $"?statuses={templateStatusesParam}";
             }
 
-            return await GetAsync<List<TemplateVersionResource>>(url);
+            return await GetAsync<List<TemplateResource>>(url);
         }
 
         public async Task<ApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command)
