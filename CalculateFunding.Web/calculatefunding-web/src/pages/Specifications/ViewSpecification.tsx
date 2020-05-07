@@ -31,6 +31,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {FundingLineStep} from "../../components/FundingLineStep";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {BackToTop} from "../../components/BackToTop";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -294,19 +295,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                             </li>
                                         })}
                                 </ul>
-                                <div className="app-back-to-top app-back-to-top--fixed govuk-!-margin-top-4"
-                                     data-module="app-back-to-top"
-                                     hidden={viewSpecification.fundingLineStructureResult == null ||
-                                     viewSpecification.fundingLineStructureResult.length === 0}>
-                                    <a href={"#fundingline-structure"} className="govuk-link govuk-link--no-visited-state app-back-to-top__link">
-                                        <svg role="presentation" focusable="false" className="app-back-to-top__icon"
-                                             xmlns="http://www.w3.org/2000/svg"
-                                             width="13" height="17" viewBox="0 0 13 17">
-                                            <path fill="currentColor" d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"/>
-                                        </svg>
-                                        Back to top
-                                    </a>
-                                </div>
+                                <BackToTop id={"fundingline-structure"} hidden={viewSpecification.fundingLineStructureResult == null ||
+                                viewSpecification.fundingLineStructureResult.length === 0}/>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
