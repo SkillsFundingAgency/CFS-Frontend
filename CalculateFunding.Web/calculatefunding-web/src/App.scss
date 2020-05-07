@@ -537,3 +537,9 @@
 svg.app-back-to-top__icon {
   margin-right: 8px;
 }
+
+/// Max width and overflow rules for very long calculation names
+.govuk-table__header, .text-overflow {
+  max-width: 500px;
+  overflow-wrap: break-word;
+}

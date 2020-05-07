@@ -340,7 +340,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <tbody className="govuk-table__body">
                                     {viewSpecification.additionalCalculations.results.map((ac, index) =>
                                         <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell">
+                                            <td className="govuk-table__cell text-overflow">
                                                 <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
                                             </td>
                                             <td className="govuk-table__cell">{ac.status}</td>
