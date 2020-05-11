@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
@@ -12,6 +14,7 @@ using CalculateFunding.Frontend.Interfaces;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -38,7 +41,7 @@ namespace CalculateFunding.Frontend.Controllers
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
 
-            return StatusCode((int) result.StatusCode);
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpGet]
@@ -50,7 +53,7 @@ namespace CalculateFunding.Frontend.Controllers
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
 
-            return StatusCode((int) result.StatusCode);
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpGet]
@@ -62,7 +65,7 @@ namespace CalculateFunding.Frontend.Controllers
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
 
-            return StatusCode((int) result.StatusCode);
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpPost]
@@ -128,7 +131,7 @@ namespace CalculateFunding.Frontend.Controllers
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:
-                    return StatusCode((int) result.StatusCode,
+                    return StatusCode((int)result.StatusCode,
                         result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
             }
         }
@@ -158,9 +161,46 @@ namespace CalculateFunding.Frontend.Controllers
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:
-                    return StatusCode((int) result.StatusCode,
+                    return StatusCode((int)result.StatusCode,
                         result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
             }
+        }
+
+        [HttpGet]
+        [Route("api/templates/build/{templateId}/export")]
+        public async Task<IActionResult> Export([FromRoute] string templateId, [FromQuery] string version)
+        {
+            ApiResponse<TemplateResource> result;
+
+            if (!string.IsNullOrWhiteSpace(version))
+            {
+                result = await _client.GetTemplateVersion(templateId, version);
+            }
+            else
+            {
+                result = await _client.GetTemplate(templateId);
+            }
+
+            if (result.StatusCode.IsSuccess())
+            {
+	            TemplateResource template = result.Content;
+	            string templateJson = result.Content.TemplateJson;
+	            byte[] templateBytes = !string.IsNullOrWhiteSpace(templateJson)
+		            ? Encoding.ASCII.GetBytes(templateJson)
+		            : new byte[] { };
+	            string fileName = $"template-{template.FundingStreamId}-{template.FundingPeriodId}-{template.MajorVersion}-{template.MinorVersion}.json";
+
+                Response.Headers[HeaderNames.ContentDisposition] = new ContentDisposition
+                {
+                    FileName = fileName,
+                    DispositionType = DispositionTypeNames.Inline,
+                    Inline = true
+                }.ToString();
+
+                return new FileContentResult(templateBytes, "application/json");
+            }
+
+            return StatusCode((int)result.StatusCode);
         }
     }
 }
