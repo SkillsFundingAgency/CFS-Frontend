@@ -35,7 +35,7 @@ enum Mode {
     Edit = 'edit'
 }
 
-const initialId: number = 0;
+const initialId: number = 0; // ToDo: Calculate last id from datasource when loading from server
 
 export function TemplateBuilder() {
     const orgchart = useRef();
@@ -43,7 +43,7 @@ export function TemplateBuilder() {
     const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
-    const [nextId, setNextId] = useState(initialId); // ToDo: Calculate last id from datasource when loading from server
+    const [nextId, setNextId] = useState(initialId);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [canEditTemplate, setCanEditTemplate] = useState<boolean>(false);
     const [canDeleteTemplate, setCanDeleteTemplate] = useState<boolean>(false);
@@ -207,7 +207,7 @@ export function TemplateBuilder() {
                         NodeTemplate={TemplateBuilderNode}
                         datasource={ds}
                         chartClass="myChart"
-                        collapsible={true}
+                        collapsible={false}
                         draggable={true}
                         pan={true}
                         zoom={true}

@@ -16,7 +16,6 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
   const handleAddLine = () => {
     const newChild: FundingLine = {
       id: `n${nextId.toString()}`,
-      dsKey: dsKey,
       templateLineId: nextId,
       kind: NodeType.FundingLine,
       type: FundingLineType.Information,

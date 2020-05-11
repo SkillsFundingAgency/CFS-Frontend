@@ -4,13 +4,12 @@ import "../styles/CalculationItem.scss";
 
 export interface CalculationItemProps {
     node: Calculation,
-    updateNode: (p: CalculationUpdateModel, dsKey: number) => void,
+    updateNode: (p: CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string, dsKey: number) => Promise<void>,
-    dsKey: number,
+    deleteNode: (id: string) => Promise<void>
 }
 
-export function CalculationItem({ node, updateNode, openSideBar, deleteNode, dsKey }: CalculationItemProps) {
+export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [formulaText, setFormulaText] = useState<string | undefined>(node.formulaText);
@@ -47,7 +46,7 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode, dsK
     }
 
     const handleConfirmDelete = async () => {
-        await deleteNode(node.id, dsKey);
+        await deleteNode(node.id);
         openSideBar(false);
     }
 
@@ -62,7 +61,7 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode, dsK
             aggregationType: aggregationType
         };
 
-        updateNode(updatedNode, dsKey);
+        updateNode(updatedNode);
         openSideBar(false);
     }
 

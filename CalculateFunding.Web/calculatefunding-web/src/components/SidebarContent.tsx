@@ -24,7 +24,6 @@ export function SidebarContent({ data, updateNode, openSideBar, deleteNode }: Si
                             updateNode={updateNode}
                             openSideBar={openSideBar}
                             deleteNode={deleteNode}
-                            dsKey={d.key}
                         />
                     )
                 }
@@ -37,7 +36,6 @@ export function SidebarContent({ data, updateNode, openSideBar, deleteNode }: Si
                         updateNode={updateNode}
                         openSideBar={openSideBar}
                         deleteNode={deleteNode}
-                        dsKey={d.key}
                     />
                 )
             })}

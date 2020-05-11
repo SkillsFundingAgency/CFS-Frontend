@@ -4,13 +4,12 @@ import '../styles/FundingLineItem.scss';
 
 export interface FundingLineItemProps {
     node: FundingLine,
-    updateNode: (p: FundingLineUpdateModel, dsKey: number) => void,
+    updateNode: (p: FundingLineUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string, dsKey: number) => Promise<void>,
-    dsKey: number,
+    deleteNode: (id: string) => Promise<void>
 }
 
-export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, dsKey }: FundingLineItemProps) {
+export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: FundingLineItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<FundingLineType>(node.type);
     const [code, setCode] = useState<string>(node.fundingLineCode);
@@ -42,7 +41,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, dsK
     }
 
     const handleConfirmDelete = async () => {
-        await deleteNode(node.id, dsKey);
+        await deleteNode(node.id);
         openSideBar(false);
     }
 
@@ -56,7 +55,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, dsK
             aggregationType: aggregationType
         };
 
-        updateNode(updatedNode, dsKey);
+        updateNode(updatedNode);
         openSideBar(false);
     }
 

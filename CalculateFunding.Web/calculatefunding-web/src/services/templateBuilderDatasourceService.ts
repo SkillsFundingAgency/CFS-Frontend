@@ -1,6 +1,6 @@
 import JSONDigger from "json-digger";
 import { v4 as uuidv4 } from 'uuid';
-import { FundingLine, FundingLineUpdateModel, CalculationUpdateModel, Calculation, FundingLineOrCalculation, FundingLineDictionaryEntry } from "../types/TemplateBuilderDefinitions";
+import { FundingLine, FundingLineUpdateModel, CalculationUpdateModel, Calculation, FundingLineOrCalculation, FundingLineDictionaryEntry, NodeType, Template, TemplateFundingLine, FundingLineType, TemplateCalculation, CalculationType, AggregrationType, ValueFormatType } from "../types/TemplateBuilderDefinitions";
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
@@ -53,7 +53,7 @@ export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: stri
         if (!fundingLine) return;
 
         const digger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
-        
+
         const clonedNodeIds = await findAllClonedNodeIds(fundingLine.value, id);
         for (let j = 0; j < clonedNodeIds.length; j++) {
             try {
@@ -146,4 +146,80 @@ export const updateNode = async (ds: Array<FundingLineDictionaryEntry>, updateMo
             // ignore
         }
     };
+}
+
+let id: number = 0;
+
+function initialiseId() {
+    id = 0;
+}
+
+function getId() {
+    return id++;
+}
+
+function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Array<TemplateCalculation> | undefined,
+    id: number, key: number): Array<FundingLineOrCalculation> {
+    let children: Array<FundingLineOrCalculation> = [];
+    if (fundingLinesOrCalculations) {
+        for (let i = 0; i < fundingLinesOrCalculations.length; i++) {
+            const node: TemplateFundingLine | TemplateCalculation = fundingLinesOrCalculations[i];
+            if ('templateLineId' in node) {
+                const childFundingLine = getFundingLine(node, id, key)
+                children.push(childFundingLine);
+            }
+            else {
+                const childCalculation = getCalculation(node, id, key)
+                children.push(childCalculation);
+            }
+        }
+    }
+    return children;
+}
+
+function getCalculation(templateCalculation: TemplateCalculation, id: number, key: number): Calculation {
+    let currentId = id;
+    const childCalculations = getChildren(templateCalculation.calculations, currentId, key);
+    return {
+        id: `n${getId()}`,
+        templateCalculationId: templateCalculation.templateCalculationId,
+        kind: NodeType.Calculation,
+        type: <CalculationType>templateCalculation.type,
+        name: templateCalculation.name,
+        aggregationType: templateCalculation.aggregationType ? <AggregrationType>templateCalculation.aggregationType : undefined,
+        dsKey: key,
+        formulaText: templateCalculation.formulaText,
+        valueFormat: templateCalculation.valueFormat ? <ValueFormatType>templateCalculation.valueFormat : undefined,
+        children: childCalculations
+    }
+}
+
+function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, key: number): FundingLine {
+    let currentId = id;
+    const childFundingLines = getChildren(templateFundingLine.fundingLines, currentId, key);
+    const childCalculations = getChildren(templateFundingLine.calculations, currentId, key);
+    return {
+        id: `n${getId()}`,
+        templateLineId: templateFundingLine.templateLineId,
+        type: <FundingLineType>templateFundingLine.type,
+        fundingLineCode: templateFundingLine.fundingLineCode,
+        name: templateFundingLine.name,
+        aggregationType: templateFundingLine.aggregationType ? <AggregrationType>templateFundingLine.aggregationType : undefined,
+        kind: NodeType.FundingLine,
+        dsKey: key,
+        children: childFundingLines.concat(childCalculations)
+    };
+}
+
+export const templateToDatasource = (template: Template): Array<FundingLineDictionaryEntry> => {
+    initialiseId();
+    let datasource: Array<FundingLineDictionaryEntry> = [];
+    const templateFundingLines: Array<TemplateFundingLine> = template.fundingLines;
+    let id = 0;
+    for (let i = 0; i < templateFundingLines.length; i++) {
+        const key: number = i + 1;
+        const fundingLine: FundingLine = getFundingLine(templateFundingLines[i], id, key);
+        datasource.push({ key, value: fundingLine })
+    }
+    return datasource;
 }

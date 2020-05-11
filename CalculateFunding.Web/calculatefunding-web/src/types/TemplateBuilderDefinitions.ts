@@ -47,6 +47,16 @@ export interface FundingLine {
     children?: Array<FundingLineOrCalculation>
   }
 
+  export interface TemplateFundingLine {
+    templateLineId: number,
+    type: FundingLineType | string,
+    name: string,
+    fundingLineCode: string,
+    aggregationType?: AggregrationType,
+    fundingLines?: Array<TemplateFundingLine>,
+    calculations?: Array<TemplateCalculation>
+  }
+
   export interface Calculation {
     id: string,
     relationship?: string,
@@ -59,6 +69,20 @@ export interface FundingLine {
     formulaText?: string,
     valueFormat?: ValueFormatType,
     children?: Array<FundingLineOrCalculation>
+  }
+
+  export interface TemplateCalculation {
+    templateCalculationId: number,
+    type: CalculationType | string,
+    name: string,
+    aggregationType?: AggregrationType | string,
+    formulaText?: string,
+    valueFormat?: ValueFormatType | string,
+    calculations?: Array<TemplateCalculation>
+  }
+
+  export interface Template {
+    fundingLines: Array<TemplateFundingLine>
   }
 
   export interface UpdateModel {
