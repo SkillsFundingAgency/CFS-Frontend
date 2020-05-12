@@ -25,7 +25,7 @@ export function SelectSpecification(props: SelectSpecificationProps) {
 
     let selectSpecification: SelectSpecificationState = useSelector((state: AppState) => state.selectSpecification);
 
-    document.title = "Select Specification - Calculate Funding";
+    document.title = "Select Specification - Calculate funding";
 
     if (selectSpecification.fundingStreams.length === 0)
         dispatch(getFundingStreams());
@@ -54,7 +54,7 @@ export function SelectSpecification(props: SelectSpecificationProps) {
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View results"} url={"/results"} legacy={true}/>
+                <Breadcrumb name={"View results"} url={"/results"} />
                 <Breadcrumb name={"Select specification"} />
             </Breadcrumbs>
             <div className="govuk-grid-row">

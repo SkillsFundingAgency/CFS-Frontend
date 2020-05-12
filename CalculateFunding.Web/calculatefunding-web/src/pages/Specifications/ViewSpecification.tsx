@@ -107,7 +107,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [viewSpecification.fundingLineStructureResult]);
 
     useEffect(() => {
-        document.title = "Specification Results - Calculate Funding";
+        document.title = "Specification Results - Calculate funding";
         dispatch(getAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm));
         dispatch(getDatasetBySpecificationId(specificationId));
         dispatch(getReleaseTimetable(specificationId));

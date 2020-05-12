@@ -15,12 +15,12 @@ it('shows the Beta panel', () => {
     expect(actual).toBeTruthy();
 });
 
-it('shows Calculate Funding in the service name', ()=>{
+it('shows Calculate funding in the service name', ()=>{
    const wrapper = shallow(<Header/>);
 
    let actual = wrapper.find('govuk-header__link--service-name');
 
-   expect(actual.contains("Calculate Funding"));
+   expect(actual.contains("Calculate funding"));
 });
 
 it('shows GOV.UK in the logotype text area', ()=>{

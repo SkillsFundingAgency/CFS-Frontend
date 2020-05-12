@@ -75,7 +75,7 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
     componentDidMount(): void {
         this.props.getAllFundingStreams();
 
-        document.title = "Approve and release funding - Calculate Funding";
+        document.title = "Approve and release funding - Calculate funding";
     }
 
     state = {
@@ -208,10 +208,9 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
             return <div>
                 <Header location={Section.Approvals}/>
                 <div className="govuk-width-container">
-                    <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                     <Breadcrumbs>
-                        <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                        <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"}/>
+                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                        <Breadcrumb name={"Funding approvals"} url={"/Approvals"}/>
                         <Breadcrumb name={"Approve and release funding"}/>
                     </Breadcrumbs>
                     <div className="govuk-main-wrapper govuk-main-wrapper--l"
@@ -278,8 +277,8 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
                 <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <div className="govuk-width-container">
                     <Breadcrumbs>
-                        <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                        <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"}/>
+                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                        <Breadcrumb name={"Funding approvals"} url={"/Approvals"}/>
                         <Breadcrumb name={"Approve and release funding"}/>
                     </Breadcrumbs>
                     <PermissionStatus requiredPermissions={missingPermissions}/>

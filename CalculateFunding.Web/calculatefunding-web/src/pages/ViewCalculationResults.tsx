@@ -29,7 +29,7 @@ export interface ViewCalculationResultsRoute {
 
 export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculationResultsRoute>, props: ViewCalculationResultsProps) {
 
-    document.title = "Calculation Results - Calculate Funding";
+    document.title = "Calculation Results - Calculate funding";
     const [singleFire, setSingleFire] = useState(false);
 
     const dispatch = useDispatch();

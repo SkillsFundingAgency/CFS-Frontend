@@ -3,6 +3,7 @@ import {Header} from "../components/Header";
 import {Section} from "../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
+import {Footer} from "../components/Footer";
 
 export function Approvals() {
 
@@ -23,7 +24,7 @@ export function Approvals() {
                 <div className="govuk-grid-row govuk-!-margin-bottom-9 govuk-!-margin-top-9">
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"choose-specification-approval-title"} className="govuk-heading-m">
-                            <Link to="/SelectSpecification">Choose a specification to approve and release</Link>
+                            <Link to="/Approvals/FundingApprovalSelection">Choose a specification to approve and release</Link>
                         </h3>
                         <p className="govuk-body">Select a specification for a funding period and a funding stream</p>
                     </div>
@@ -36,5 +37,6 @@ export function Approvals() {
                 </div>
             </div>
         </div>
+        <Footer />
     </div>
 }

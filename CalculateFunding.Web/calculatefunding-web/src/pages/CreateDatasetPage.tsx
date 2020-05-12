@@ -48,7 +48,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
     const [addAnother, setAddAnother] = useState(false);
 
     useEffect(() => {
-        document.title = "Specification Results - Calculate Funding";
+        document.title = "Specification Results - Calculate funding";
         dispatch(getSpecification(specificationId));
         dispatch(getDatasetSchema());
     }, [specificationId]);

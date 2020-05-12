@@ -38,7 +38,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     let specificationId = match.params.specificationId;
 
     useEffect(() => {
-        document.title = "Specification Results - Calculate Funding";
+        document.title = "Specification Results - Calculate funding";
         dispatch(getSpecificationSummary(specificationId));
         dispatch(getTemplateCalculations(specificationId, "All", 1, templateCalculationsSearchTerm));
         dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
@@ -90,7 +90,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View results"} url={"/results"} legacy={true}/>
+                <Breadcrumb name={"View results"} url={"/results"} />
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
                 <Breadcrumb name={specificationResults.specification.name} />
             </Breadcrumbs>

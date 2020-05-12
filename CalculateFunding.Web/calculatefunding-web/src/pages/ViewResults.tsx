@@ -10,7 +10,7 @@ export function ViewResults() {
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate Funding"} url={"/"}/>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"View results"}/>
             </Breadcrumbs>
             <div className="govuk-grid-row">

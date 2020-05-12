@@ -18,7 +18,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }){
 
         });
 
-        document.title = "Calculate Funding";
+        document.title = "Calculate funding";
     }, []);
 
     return <div>
