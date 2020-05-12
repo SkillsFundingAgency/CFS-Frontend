@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
@@ -14,5 +15,6 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
         Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
         Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
+        Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
     }
 }

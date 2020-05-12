@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient;
@@ -8,6 +10,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Interfaces;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
+using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
@@ -33,6 +36,22 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             string url = $"templates/build/{templateId}/versions/{version}";
 
             return await GetAsync<TemplateResource>(url);
+        }
+
+        public async Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment)
+        {
+            string url = $"templates/build/{templateId}/approve";
+
+            if (!string.IsNullOrWhiteSpace(version))
+            {
+                url = QueryHelpers.AddQueryString(url, "version", version);
+            }
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                url = QueryHelpers.AddQueryString(url, "comment", comment);
+            }
+
+            return await ValidatedPostAsync<dynamic>(url, null);
         }
 
         public async Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
