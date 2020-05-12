@@ -114,9 +114,8 @@ export function DownloadDataSchema() {
                     <table className="govuk-table" hidden={datasetDefinitions.totalResults === 0}>
                         <thead className="govuk-table__head">
                         <tr className="govuk-table__row">
-                            <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data schema template</th>
-                            <th scope="col" className="govuk-table__header">Last updated</th>
-                            <th scope="col" className="govuk-table__header"></th>
+                            <th scope="col" className="govuk-table__header">Data schema template</th>
+                            <th scope="col" className="govuk-table__header text-stretch">Last updated</th>
                             <th scope="col" className="govuk-table__header">Download</th>
                         </tr>
                         </thead>
@@ -141,7 +140,6 @@ export function DownloadDataSchema() {
                                     </div>
                                 </th>
                                 <td className="govuk-table__cell"><DateFormatter date={d.lastUpdatedDate} utc={false}/></td>
-                                <td className="govuk-table__cell"></td>
                                 <td className="govuk-table__cell">
                                     <div className="attachment__thumbnail">
                                         <a className="govuk-link" target="_self" tabIndex={-1} aria-hidden="true" href={`/api/datasets/download-dataset-schema/${d.id}`}>
