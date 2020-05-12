@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac.Core;
+using CalculateFunding.Common.ApiClient.Profiling;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Interfaces.Services;
@@ -34,7 +37,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             if (!this.Request.Headers.ContainsKey(HealthCheckHeaderName))
             {
@@ -67,12 +70,26 @@ namespace CalculateFunding.Frontend.Controllers
             overallHealth.Services.Add(TryResolveService(typeof(ISpecificationSearchService)));
             overallHealth.Services.Add(TryResolveService(typeof(IUserProfileService)));
 
+            await AddAdditionalServiceHealths(overallHealth.Services);
+
             overallHealth.OverallHealthOk = overallHealth.Services.Min(x => x.HealthOk);
 
             return new JsonResult(overallHealth);
         }
 
-        [HttpGet]
+        private async Task AddAdditionalServiceHealths(ICollection<ServiceHealth> existingServiceHealths)
+        {
+            (bool Ok, string Message) profilingApiHealth =
+                await ((IProfilingApiClient)this.HttpContext.RequestServices.GetService(typeof(IProfilingApiClient))).IsHealthOk();
+
+            existingServiceHealths.Add(new ServiceHealth
+            {
+                HealthOk = profilingApiHealth.Ok,
+                Message = profilingApiHealth.Message,
+                Name = nameof(IProfilingApiClient)
+            });
+        }
+
         private ServiceHealth TryResolveService(Type serviceType)
         {
             ServiceHealth health = new ServiceHealth { Name = serviceType.GetFriendlyName(), HealthOk = false };
