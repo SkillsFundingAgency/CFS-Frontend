@@ -38,6 +38,18 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await GetAsync<TemplateResource>(url);
         }
 
+        public async Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId)
+        {
+            string url = $"templates/build/versions/search";
+
+            return await PostAsync<IEnumerable<TemplateResource>, FindTemplateVersionQuery>(url, new FindTemplateVersionQuery
+            {
+                FundingStreamId = fundingStreamId,
+                FundingPeriodId = fundingPeriodId,
+                Statuses = new List<TemplateStatus> {TemplateStatus.Published}
+            });
+        }
+
         public async Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment)
         {
             string url = $"templates/build/{templateId}/approve";

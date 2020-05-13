@@ -107,7 +107,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     AuthorId = "author",
                     AuthorName = "name",
                     Comments = "A comment",
-                    Status = TemplateStatus.Approved,
+                    Status = TemplateStatus.Published,
                     Version = 1,
                     MinorVersion = 1,
                     MajorVersion = 0
@@ -138,7 +138,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             string templateId = Guid.NewGuid().ToString();
-            List<TemplateStatus> statuses = new List<TemplateStatus> { TemplateStatus.Draft, TemplateStatus.Updated };
+            List<TemplateStatus> statuses = new List<TemplateStatus> { TemplateStatus.Draft, TemplateStatus.Published };
             List<TemplateResource> returnedContent = new List<TemplateResource>
             {
                new TemplateResource {
@@ -168,7 +168,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 	               AuthorId = "author",
 	               AuthorName = "name",
 	               Comments = "A comment",
-	               Status = TemplateStatus.Updated,
+	               Status = TemplateStatus.Published,
 	               Version = 1,
                    MinorVersion = 1,
                    MajorVersion = 0

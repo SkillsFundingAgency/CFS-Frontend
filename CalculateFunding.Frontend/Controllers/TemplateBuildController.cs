@@ -57,6 +57,19 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
+        [Route("api/templates/build/fundingStream/{fundingStreamId}/fundingPeriod/{fundingPeriodId}/published")]
+        public async Task<IActionResult> GetPublishedTemplatesByFundingStreamAndPeriod([FromRoute] string fundingStreamId, [FromRoute] string fundingPeriodId)
+        {
+            ApiResponse<IEnumerable<TemplateResource>> result = await _client
+                .GetPublishedTemplatesByFundingStreamAndPeriod(fundingStreamId, fundingPeriodId);
+
+            if (result.StatusCode.IsSuccess())
+                return Ok(result.Content);
+
+            return StatusCode((int) result.StatusCode);
+        }
+
+        [HttpGet]
         [Route("api/templates/build/{templateId}/versions")]
         public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
         {

@@ -15,6 +15,8 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
         Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
         Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
+        Task<ApiResponse<IEnumerable<TemplateResource>>>
+            GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
         Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
     }
 }
