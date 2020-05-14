@@ -100,14 +100,36 @@ describe("Provider Funding Overview ", () => {
             fundingStructureItems:[
                 {
                     level: 2,
-                    name: "step 2 title",
+                    name: "step 2 title 2",
                     type: FundingStructureType.calculation,
                     calculationId: "ABC",
                     calculationPublishStatus: "Draft",
                     fundingStructureItems:[],
                     parentName: "",
+                    expanded: false
+                },
+                {
+                    level: 2,
+                    name: "step 2 title 1",
+                    type: FundingStructureType.calculation,
+                    calculationId: "ABC",
+                    calculationPublishStatus: "Draft",
+                    fundingStructureItems:[],
+                    parentName: "",
+                    expanded: false
+                },
+                {
+                    level: 2,
+                    name: "step 2 title 2",
+                    type: FundingStructureType.calculation,
+                    calculationId: "ABC",
+                    calculationPublishStatus: "Draft",
+                    fundingStructureItems:[],
+                    parentName: "",
+                    expanded: false
                 }
-            ]
+            ],
+            expanded: false
         }
     ],
     fundingLineStatusResult: "test fundingLineStatusResult",
@@ -157,15 +179,15 @@ describe("Provider Funding Overview ", () => {
     it("renders correct number of collapsible steps", async () => {
         const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
-        expect(wrapper.find('CollapsibleSteps').length).toBe(2);
+        expect(wrapper.find('CollapsibleSteps').length).toBe(4);
     });
 
     it("renders collapsible steps with calculation linked to edit calculation page", async () => {
         const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
 
-        expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').length).toBe(1);
-        expect(wrapper.find('.collapsible-step .collapsible-step-header-description a').prop("href"))
-            .toBe(`/app/Specifications/EditTemplateCalculation/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId}/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].name}`);
+        expect(wrapper.find('.collapsible-step .collapsible-step-header-description Link').length).toBe(3);
+        expect(wrapper.find('.collapsible-step .collapsible-step-header-description Link').at(0).prop("to"))
+            .toBe(`/Specifications/EditTemplateCalculation/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].calculationId}/${mockViewSpecificationState.fundingLineStructureResult[0].fundingStructureItems[0].name}`);
     });
 
     it("renders collapsible steps with calculation status", async () => {
@@ -251,5 +273,20 @@ describe("Provider Funding Overview ", () => {
 
         expect(wrapper.find('CollapsibleSteps').at(0).prop("expanded")).toBe(false);
         expect(wrapper.find('CollapsibleSteps').at(1).prop("expanded")).toBe(false);
+    });
+
+    it("renders search box with an autocomplete input in funding line structure tab", async () => {
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
+
+        expect(wrapper.find('#fundingline-structure .search-container').length).toBe(1);
+        expect(wrapper.find('#fundingline-structure .search-container AutoComplete').length).toBe(1);
+    });
+
+    it('renders funding line structure search autocomplete with correctly ordered and unique calculation names as suggestions', () => {
+        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
+
+        let actual = wrapper.find('#fundingline-structure .search-container AutoComplete');
+
+        expect(actual.prop("suggestions")).toEqual(["step 2 title 1", "step 2 title 2"]);
     });
 });

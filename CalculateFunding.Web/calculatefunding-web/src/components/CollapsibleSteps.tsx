@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-
+import {Link} from "react-router-dom";
 interface ICollapsibleStepsProps {
     uniqueKey: string;
     step: string;
@@ -18,14 +18,15 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
     const expandRef = React.useRef(false);
     useEffect(() => {
         if(!expandRef.current) {
-            setExpanded(props.expanded)
+            setExpanded(props.expanded);
         }
     }, [props.expanded]);
 
     let description = <span>{props.description}</span>;
     if (props.link !== "") {
-        description = <a className={"govuk-link"} href={props.link}>{props.description}</a>;
+        description = <Link to={props.link} className="govuk-link">{props.description}</Link>;
     }
+
     return (
         <ul>
         <li key={"step" + listKey} className="collapsible-step step-is-shown">

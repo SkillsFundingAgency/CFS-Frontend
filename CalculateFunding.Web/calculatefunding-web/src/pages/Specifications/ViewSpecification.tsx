@@ -19,7 +19,7 @@ import {DateInput} from "../../components/DateInput";
 import {TimeInput} from "../../components/TimeInput";
 import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
-import {FundingStructureType} from "../../types/FundingStructureItem";
+import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
@@ -28,10 +28,15 @@ import {Section} from "../../types/Sections";
 import {DateFormatter} from "../../components/DateFormatter";
 import {CollapsibleSteps} from "../../components/CollapsibleSteps";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {FundingLineStep} from "../../components/FundingLineStep";
+import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
+import {AutoComplete} from "../../components/AutoComplete";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {BackToTop} from "../../components/BackToTop";
+import {
+    expandCalculationsByName,
+    getDistinctOrderedFundingLineCalculations, updateFundingLineExpandStatus
+} from "../../components/fundingLineStructure/FundingLineStructure";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -72,6 +77,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         additionalCalculations: true,
         datasets:true
     });
+    const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
+    const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
+    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
 
     useEffect(() => {
         if (viewSpecification.additionalCalculations.currentPage !== 0) {
@@ -83,6 +91,16 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             });
         }
     }, [viewSpecification.additionalCalculations.results]);
+
+    useEffect(() => {
+        if (viewSpecification.fundingLineStructureResult.length !== 0) {
+            if (fundingLinesOriginalData.length === 0) {
+                setFundingLines(viewSpecification.fundingLineStructureResult);
+                setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(viewSpecification.fundingLineStructureResult));
+                setFundingLinesOriginalData(JSON.parse(JSON.stringify(viewSpecification.fundingLineStructureResult)));
+            }
+        }
+    }, [viewSpecification.fundingLineStructureResult]);
 
     useEffect(() => {
         if (viewSpecification.fundingLineStructureResult.length === 0) {
@@ -132,7 +150,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     useEffect(() => {
         return () => setCanTimetableBeUpdated(true);
     }, [viewSpecification]);
-
 
     function confirmChanges() {
         setCanTimetableBeUpdated(false);
@@ -190,6 +207,13 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     function openCloseAllFundingLines()
     {
         setFundingLinesExpandedStatus(!fundingLinesExpandedStatus);
+        updateFundingLineExpandStatus(fundingLines, !fundingLinesExpandedStatus);
+    }
+
+    function searchFundingLines(calculationName: string) {
+        const fundingLinesCopy: IFundingStructureItem[] = JSON.parse(JSON.stringify(fundingLinesOriginalData));
+        expandCalculationsByName(fundingLinesCopy, calculationName);
+        setFundingLines(fundingLinesCopy);
     }
 
     return <div>
@@ -246,15 +270,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
                                     </div>
-                                    <div className="govuk-grid-column-one-third ">
+                                    <div className="govuk-grid-column-one-third">
                                         <ApproveStatusButton id={specification.id}
                                                              status={fundingLineStatus}
                                                              callback={updateFundingLineState}/>
                                     </div>
+                                    <div className="govuk-grid-column-two-thirds">
+                                        <div className="govuk-form-group search-container">
+                                            <label className="govuk-label">
+                                                Search by calculation
+                                            </label>
+                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="govuk-accordion__controls"
-                                     hidden={viewSpecification.fundingLineStructureResult == null ||
-                                viewSpecification.fundingLineStructureResult.length === 0}>
+                                     hidden={fundingLines == null || fundingLines.length === 0}>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="false"
                                             onClick={openCloseAllFundingLines}
@@ -268,7 +299,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </div>
                                 <ul className="collapsible-steps">
                                     {
-                                        viewSpecification.fundingLineStructureResult.map((f, index) => {
+                                        fundingLines.map((f, index) => {
                                             let linkValue = '';
                                             if (f.calculationId != null && f.calculationId !== '') {
                                                 linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
@@ -281,16 +312,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                 status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
                                                     f.calculationPublishStatus: ""}
                                                 step={f.level.toString()}
-                                                expanded={fundingLinesExpandedStatus}
+                                                expanded={fundingLinesExpandedStatus || f.expanded}
                                                 link={linkValue}
                                                 hasChildren={f.fundingStructureItems != null}>
-                                                {
-                                                    viewSpecification.fundingLineStructureResult.map(innerFundingLineItem =>{
-                                                        return <FundingLineStep key={innerFundingLineItem.name.replace(" ", "") + index}
-                                                                                expanded={fundingLinesExpandedStatus}
-                                                                                fundingStructureItems={innerFundingLineItem} />
-                                                    })
-                                                }
+                                                    <FundingLineStep key={f.name.replace(" ", "") + index}
+                                                                            expanded={fundingLinesExpandedStatus}
+                                                                            fundingStructureItem={f} />
                                             </CollapsibleSteps>
                                             </li>
                                         })}

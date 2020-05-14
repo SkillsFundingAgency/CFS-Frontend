@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { FundingLine, FundingLineType, AggregrationType, FundingLineUpdateModel } from '../types/TemplateBuilderDefinitions';
-import '../styles/FundingLineItem.scss';
+import { FundingLine, FundingLineType, AggregrationType, FundingLineUpdateModel } from '../../types/TemplateBuilderDefinitions';
+import '../../styles/FundingLineItem.scss';
 
 export interface FundingLineItemProps {
     node: FundingLine,

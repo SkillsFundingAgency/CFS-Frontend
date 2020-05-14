@@ -1,4 +1,4 @@
-export interface IFundingStructureItem{
+export interface IFundingStructureItem {
     level : number;
     name : string;
     calculationId : string;
@@ -6,6 +6,7 @@ export interface IFundingStructureItem{
     type : FundingStructureType;
     fundingStructureItems: IFundingStructureItem[];
     parentName: string;
+    expanded: boolean;
 }
 
 export enum FundingStructureType{

@@ -6,21 +6,23 @@ import {FundingLineStructureActionTypes} from "../../actions/FundingLineStructur
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
-        calculations: [],
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        pagerState: {
-            currentPage: 0,
-            displayNumberOfPages: 0,
-            lastPage: 0,
-            nextPage: 0,
-            pages: [],
-            previousPage: 0
-        },
-        startItemNumber: 0,
+        totalCount: 0,
+        results: [],
+        totalResults: 0,
         totalErrorResults: 0,
-        totalResults: 0
+        currentPage: 0,
+        lastPage: 0,
+        startItemNumber: 0,
+        endItemNumber: 0,
+        pagerState: {
+            displayNumberOfPages: 0,
+            previousPage: 0,
+            nextPage: 0,
+            lastPage: 0,
+            pages: [],
+            currentPage: 0,
+        },
+        facets: [],
     },
     specification: {
         name: "",
@@ -55,17 +57,20 @@ const initialState: ViewSpecificationState = {
             year: "",
             time: ""
         }
-    }
+    },
+    fundingLineStructureResult: [],
+    fundingLineStatusResult: "",
+    profileVariationPointerResult: []
 };
 
 describe('ViewSpecificationReducer ', () => {
     it('should handle GET_ADDITIONALCALCULATIONS', () => {
         const expectedState = {
             "additionalCalculations": {
-                "calculations": [],
-                "currentPage": 1,
+                "currentPage": 0,
                 "endItemNumber": 1,
                 "facets": [],
+                "lastPage": 0,
                 "pagerState": {
                     "currentPage": 1,
                     "displayNumberOfPages": 2,
@@ -76,7 +81,9 @@ describe('ViewSpecificationReducer ', () => {
                     ],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 1,
+                "totalCount": 1,
                 "totalErrorResults": 0,
                 "totalResults": 1,
             },
@@ -84,6 +91,9 @@ describe('ViewSpecificationReducer ', () => {
                 "content": [],
                 "statusCode": 0,
             },
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",
@@ -117,25 +127,28 @@ describe('ViewSpecificationReducer ', () => {
                 "providerVersionId": "",
             },
         };
+
         expect(
             reduceViewSpecificationState(initialState, {
                 type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
                 payload: {
+                    totalCount: 1,
+                    results: [],
                     totalResults: 1,
-                    endItemNumber: 1,
-                    startItemNumber: 1,
-                    pagerState: {
-                        previousPage: 0,
-                        pages: [2],
-                        nextPage: 2,
-                        displayNumberOfPages: 2,
-                        lastPage: 2,
-                        currentPage: 1
-                    },
                     totalErrorResults: 0,
+                    currentPage: 0,
+                    lastPage: 0,
+                    startItemNumber: 1,
+                    endItemNumber: 1,
+                    pagerState: {
+                        displayNumberOfPages: 2,
+                        previousPage: 0,
+                        nextPage: 2,
+                        lastPage: 2,
+                        pages: [2],
+                        currentPage: 1,
+                    },
                     facets: [],
-                    currentPage: 1,
-                    calculations: [],
                 }
             })
         ).toEqual(expectedState);
@@ -145,10 +158,10 @@ describe('ViewSpecificationReducer ', () => {
     it('should handle GET_SPECIFICATION', () => {
         const expectedState = {
             "additionalCalculations": {
-                "calculations": [],
                 "currentPage": 0,
                 "endItemNumber": 0,
                 "facets": [],
+                "lastPage": 0,
                 "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
@@ -157,7 +170,9 @@ describe('ViewSpecificationReducer ', () => {
                     "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
@@ -165,6 +180,9 @@ describe('ViewSpecificationReducer ', () => {
                 "content": [],
                 "statusCode": 0,
             },
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",
@@ -193,6 +211,7 @@ describe('ViewSpecificationReducer ', () => {
                 "providerVersionId": "PROVIDER-VERSION-ID",
             },
         };
+
         expect(
             reduceViewSpecificationState(initialState, {
                 type: ViewSpecificationActionTypes.GET_SPECIFICATION,
@@ -216,10 +235,10 @@ describe('ViewSpecificationReducer ', () => {
     it('should handle GET_DATASETS', () => {
         const expectedState = {
             "additionalCalculations": {
-                "calculations": [],
                 "currentPage": 0,
                 "endItemNumber": 0,
                 "facets": [],
+                "lastPage": 0,
                 "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
@@ -228,7 +247,9 @@ describe('ViewSpecificationReducer ', () => {
                     "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
@@ -248,6 +269,9 @@ describe('ViewSpecificationReducer ', () => {
                 ],
                 "statusCode": 200,
             },
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",
@@ -304,61 +328,65 @@ describe('ViewSpecificationReducer ', () => {
 
     it('should handle GET_RELEASETIMETABLE', () => {
         const expectedState = {
-                "additionalCalculations": {
-                    "calculations": [],
+            "additionalCalculations": {
+                "currentPage": 0,
+                "endItemNumber": 0,
+                "facets": [],
+                "lastPage": 0,
+                "pagerState": {
                     "currentPage": 0,
-                    "endItemNumber": 0,
-                    "facets": [],
-                    "pagerState": {
-                        "currentPage": 0,
-                        "displayNumberOfPages": 0,
-                        "lastPage": 0,
-                        "nextPage": 0,
-                        "pages": [],
-                        "previousPage": 0,
-                    },
-                    "startItemNumber": 0,
-                    "totalErrorResults": 0,
-                    "totalResults": 0,
+                    "displayNumberOfPages": 0,
+                    "lastPage": 0,
+                    "nextPage": 0,
+                    "pages": [],
+                    "previousPage": 0,
                 },
-                "datasets": {
-                    "content": [],
-                    "statusCode": 0,
+                "results": [],
+                "startItemNumber": 0,
+                "totalCount": 0,
+                "totalErrorResults": 0,
+                "totalResults": 0,
+            },
+            "datasets": {
+                "content": [],
+                "statusCode": 0,
+            },
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
+            "releaseTimetable": {
+                "navisionDate": {
+                    "day": "26",
+                    "month": "10",
+                    "time": "01:20",
+                    "year": "1985",
                 },
-                "releaseTimetable": {
-                    "navisionDate": {
-                        "day": "26",
-                        "month": "10",
-                        "time": "01:20",
-                        "year": "1985",
-                    },
-                    "releaseDate": {
-                        "day": "21",
-                        "month": "1",
-                        "time": "03:56",
-                        "year": "2015",
-                    },
+                "releaseDate": {
+                    "day": "21",
+                    "month": "1",
+                    "time": "03:56",
+                    "year": "2015",
                 },
-                "specification": {
-                    "approvalStatus": "",
-                    "description": "",
-                    "fundingPeriod": {
+            },
+            "specification": {
+                "approvalStatus": "",
+                "description": "",
+                "fundingPeriod": {
+                    "id": "",
+                    "name": "",
+                },
+                "fundingStreams": [
+                    {
                         "id": "",
                         "name": "",
                     },
-                    "fundingStreams": [
-                        {
-                            "id": "",
-                            "name": "",
-                        },
-                    ],
-                    "id": "",
-                    "isSelectedForFunding": false,
-                    "name": "",
-                    "providerVersionId": "",
-                },
-            }
-        ;
+                ],
+                "id": "",
+                "isSelectedForFunding": false,
+                "name": "",
+                "providerVersionId": "",
+            },
+        };
 
         expect(
             reduceViewSpecificationState(initialState, {
@@ -382,50 +410,55 @@ describe('ViewSpecificationReducer ', () => {
     });
 
     it('should handle CONFIRM_TIMETABLECHANGES', () => {
-        const expectedState =   {
-            "additionalCalculations":  {
-                "calculations":  [],
+        const expectedState = {
+            "additionalCalculations": {
                 "currentPage": 0,
                 "endItemNumber": 0,
-                "facets":  [],
-                "pagerState":  {
+                "facets": [],
+                "lastPage": 0,
+                "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
                     "lastPage": 0,
                     "nextPage": 0,
-                    "pages":  [],
+                    "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
-            "datasets":  {
-                "content":  [],
+            "datasets": {
+                "content": [],
                 "statusCode": 0,
             },
-            "releaseTimetable":  {
-                "navisionDate":  {
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
+            "releaseTimetable": {
+                "navisionDate": {
                     "day": "26",
                     "month": "10",
                     "time": "01:20",
                     "year": "1985",
                 },
-                "releaseDate":  {
+                "releaseDate": {
                     "day": "21",
                     "month": "1",
                     "time": "03:56",
                     "year": "2015",
                 },
             },
-            "specification":  {
+            "specification": {
                 "approvalStatus": "",
                 "description": "",
-                "fundingPeriod":  {
+                "fundingPeriod": {
                     "id": "",
                     "name": "",
                 },
-                "fundingStreams":  [
+                "fundingStreams": [
                     {
                         "id": "",
                         "name": "",
@@ -462,10 +495,10 @@ describe('ViewSpecificationReducer ', () => {
     it('should handle GET_FUNDINGLINESTRUCTURE', () => {
         const expectedState = {
             "additionalCalculations": {
-                "calculations": [],
                 "currentPage": 0,
                 "endItemNumber": 0,
                 "facets": [],
+                "lastPage": 0,
                 "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
@@ -474,7 +507,9 @@ describe('ViewSpecificationReducer ', () => {
                     "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
@@ -482,10 +517,12 @@ describe('ViewSpecificationReducer ', () => {
                 "content": [],
                 "statusCode": 0,
             },
+            "fundingLineStatusResult": "",
             "fundingLineStructureResult": [
                 {
                     "calculationId": "test calculationId",
                     "calculationPublishStatus": "",
+                    "expanded": false,
                     "fundingStructureItems": [],
                     "level": 1,
                     "name": "test funding line",
@@ -493,6 +530,7 @@ describe('ViewSpecificationReducer ', () => {
                     "type": 1,
                 },
             ],
+            "profileVariationPointerResult": [],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",
@@ -537,36 +575,41 @@ describe('ViewSpecificationReducer ', () => {
                     calculationPublishStatus : "",
                     type : FundingStructureType.calculation,
                     parentName: "",
-                    fundingStructureItems: []
+                    fundingStructureItems: [],
+                    expanded: false
                 }]
             })
         ).toEqual(expectedState);
     });
 
     it('should handle GET_PROFILEVARIATIONPOINTER', () => {
-        const expectedState =      {
-            "additionalCalculations":  {
-                "calculations":  [],
+        const expectedState = {
+            "additionalCalculations": {
                 "currentPage": 0,
                 "endItemNumber": 0,
-                "facets":  [],
-                "pagerState":  {
+                "facets": [],
+                "lastPage": 0,
+                "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
                     "lastPage": 0,
                     "nextPage": 0,
-                    "pages":  [],
+                    "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
-            "datasets":  {
-                "content":  [],
+            "datasets": {
+                "content": [],
                 "statusCode": 0,
             },
-            "profileVariationPointerResult":  [
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [
                 {
                     "fundingLineId": "testFundingLineId",
                     "fundingStreamId": "testFundingStreamId",
@@ -576,28 +619,28 @@ describe('ViewSpecificationReducer ', () => {
                     "year": 2022,
                 },
             ],
-            "releaseTimetable":  {
-                "navisionDate":  {
+            "releaseTimetable": {
+                "navisionDate": {
                     "day": "",
                     "month": "",
                     "time": "",
                     "year": "",
                 },
-                "releaseDate":  {
+                "releaseDate": {
                     "day": "",
                     "month": "",
                     "time": "",
                     "year": "",
                 },
             },
-            "specification":  {
+            "specification": {
                 "approvalStatus": "",
                 "description": "",
-                "fundingPeriod":  {
+                "fundingPeriod": {
                     "id": "",
                     "name": "",
                 },
-                "fundingStreams":  [
+                "fundingStreams": [
                     {
                         "id": "",
                         "name": "",
@@ -629,29 +672,33 @@ describe('ViewSpecificationReducer ', () => {
     });
 
     it('should handle SET_PROFILEVARIATIONPOINTER', () => {
-        const expectedState =      {
-            "additionalCalculations":  {
-                "calculations":  [],
+        const expectedState = {
+            "additionalCalculations": {
                 "currentPage": 0,
                 "endItemNumber": 0,
-                "facets":  [],
-                "pagerState":  {
+                "facets": [],
+                "lastPage": 0,
+                "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
                     "lastPage": 0,
                     "nextPage": 0,
-                    "pages":  [],
+                    "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
-            "datasets":  {
-                "content":  [],
+            "datasets": {
+                "content": [],
                 "statusCode": 0,
             },
-            "profileVariationPointerResult":  [
+            "fundingLineStatusResult": "",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [
                 {
                     "fundingLineId": "testFundingLineId",
                     "fundingStreamId": "testFundingStreamId",
@@ -661,28 +708,28 @@ describe('ViewSpecificationReducer ', () => {
                     "year": 2022,
                 },
             ],
-            "releaseTimetable":  {
-                "navisionDate":  {
+            "releaseTimetable": {
+                "navisionDate": {
                     "day": "",
                     "month": "",
                     "time": "",
                     "year": "",
                 },
-                "releaseDate":  {
+                "releaseDate": {
                     "day": "",
                     "month": "",
                     "time": "",
                     "year": "",
                 },
             },
-            "specification":  {
+            "specification": {
                 "approvalStatus": "",
                 "description": "",
-                "fundingPeriod":  {
+                "fundingPeriod": {
                     "id": "",
                     "name": "",
                 },
-                "fundingStreams":  [
+                "fundingStreams": [
                     {
                         "id": "",
                         "name": "",
@@ -716,10 +763,10 @@ describe('ViewSpecificationReducer ', () => {
     it('should handle CHANGE_FUNDINGLINESTATUS', () => {
         const expectedState = {
             "additionalCalculations": {
-                "calculations": [],
                 "currentPage": 0,
                 "endItemNumber": 0,
                 "facets": [],
+                "lastPage": 0,
                 "pagerState": {
                     "currentPage": 0,
                     "displayNumberOfPages": 0,
@@ -728,7 +775,9 @@ describe('ViewSpecificationReducer ', () => {
                     "pages": [],
                     "previousPage": 0,
                 },
+                "results": [],
                 "startItemNumber": 0,
+                "totalCount": 0,
                 "totalErrorResults": 0,
                 "totalResults": 0,
             },
@@ -737,6 +786,8 @@ describe('ViewSpecificationReducer ', () => {
                 "statusCode": 0,
             },
             "fundingLineStatusResult": "test specificationId",
+            "fundingLineStructureResult": [],
+            "profileVariationPointerResult": [],
             "releaseTimetable": {
                 "navisionDate": {
                     "day": "",

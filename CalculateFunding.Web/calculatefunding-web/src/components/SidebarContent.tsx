@@ -1,5 +1,5 @@
 import React from "react";
-import { FundingLineItem } from "./FundingLineItem";
+import { FundingLineItem } from "./fundingLineStructure/FundingLineItem";
 import { CalculationItem } from "./CalculationItem";
 import { Calculation, NodeType, FundingLine, FundingLineUpdateModel, CalculationUpdateModel, FundingLineOrCalculationSelectedItem } from '../types/TemplateBuilderDefinitions';
 

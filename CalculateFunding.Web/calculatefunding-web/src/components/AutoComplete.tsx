@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export function AutoComplete(props: { suggestions: string[], callback: any }) {
 
@@ -9,9 +9,16 @@ export function AutoComplete(props: { suggestions: string[], callback: any }) {
         userInput: ""
     });
 
+    useEffect(() => {
+        setAutoCompleteState(prevState => {
+            return {...prevState, suggestions: props.suggestions}
+        });
+    }, [props.suggestions]);
+
     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const userInput = e.currentTarget.value;
         e.currentTarget.value.length === 0 ? setAutoCompleteState(prevState => {
+            props.callback("");
             return {...prevState, showSuggestions: false, userInput: userInput}
         }) : setAutoCompleteState(prevState => {
             return {...prevState, showSuggestions: true, userInput: userInput}
@@ -33,7 +40,6 @@ export function AutoComplete(props: { suggestions: string[], callback: any }) {
             suggestion =>
                 suggestion.toLowerCase().includes(e.toLowerCase())
         );
-
         setAutoCompleteState(prevState => {
             return {...prevState, filteredSuggestions: filteredSuggestionsArray}
         });

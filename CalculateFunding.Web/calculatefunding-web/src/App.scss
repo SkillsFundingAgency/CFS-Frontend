@@ -103,49 +103,54 @@
 /////////////////////////////////////
 /////      funding line         /////
 /////////////////////////////////////
-.funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) {
-  width: 10%;
-}
-
-.funding-lines-table tr td {
-  &:nth-child(2) {
-    width: 20%;
+#fundingline-structure {
+  .funding-lines-table tr td:nth-child(1), #funding-lines-table tr th:nth-child(1) {
+    width: 10%;
   }
 
-  &:nth-child(3) {
-    width: 70%;
+  .funding-lines-table tr td {
+    &:nth-child(2) {
+      width: 20%;
+    }
+
+    &:nth-child(3) {
+      width: 70%;
+    }
   }
-}
 
-.funding-line-status-container {
-  float: right !important;
+  .funding-line-status-container {
+    float: right !important;
 
-  .govuk-button {
-    margin-bottom: 0 !important;
-    padding: 8px 5px 7px !important;
+    .govuk-button {
+      margin-bottom: 0 !important;
+      padding: 8px 5px 7px !important;
+    }
   }
-}
 
-.approval-status-Draft {
-  background-color: #768693 !important;
-}
+  .approval-status-Draft {
+    background-color: #768693 !important;
+  }
 
-.approval-status-Approved {
-  background-color: #28a197 !important;
-}
+  .approval-status-Approved {
+    background-color: #28a197 !important;
+  }
 
-.approval-status-Updated {
-  background-color: #f47738 !important;
-}
+  .approval-status-Updated {
+    background-color: #f47738 !important;
+  }
 
-.approve-button-container {
-  float: right;
-}
+  .approve-button-container {
+    float: right;
+  }
 
+  .viewfunding-filter {
+    background-color: $govuk-border-colour;
+    padding: 10px;
+  }
 
-.viewfunding-filter {
-  background-color: $govuk-border-colour;
-  padding: 10px;
+  .search-container ul.autocomplete {
+    width: 777px;
+  }
 }
 
 .pagination {
@@ -316,8 +321,9 @@
     border-left: 2px solid $govuk-input-border-colour;
     border-top: none;
     position: absolute;
-    width: 224px;
+    width: 274px;
     background-color: $govuk-body-background-colour;
+    z-index: 5;
     li{
       padding-right: 5px;
       padding-left: 5px;
@@ -400,7 +406,8 @@
     font-size: 16px;
     font-weight: bold;
     line-height: 28px;
-    border: solid 5px $govuk-border-colour
+    border: solid 5px $govuk-border-colour;
+    z-index: 3;
   }
 
   .collapsible-step-circle-inner {

@@ -81,6 +81,16 @@ describe('<AutoComplete />', () => {
         expect(actual.children().length).toBe(validData.length);
     });
 
+    it(' triggers a call back with empty value when the input is cleared', () => {
+        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData}/>);
 
+        wrapper.find('input').simulate("change", {
+            currentTarget: {
+                value: ""
+            }
+        });
+
+        expect(callbackFunction).toHaveBeenCalled();
+    });
 
 });
