@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
+using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 
 namespace CalculateFunding.Frontend.Interfaces
@@ -18,5 +18,6 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<IEnumerable<TemplateResource>>>
             GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
         Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
+        Task<ApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request);
     }
 }

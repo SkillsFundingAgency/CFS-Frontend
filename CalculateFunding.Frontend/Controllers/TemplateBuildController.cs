@@ -11,6 +11,7 @@ using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces;
+using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -228,6 +229,20 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return StatusCode((int) result.StatusCode);
+        }
+
+        [HttpPost]
+        [Route("api/templates/build/search")]
+        public async Task<IActionResult> SearchTemplates([FromBody] SearchRequestViewModel request)
+        {
+	        ApiResponse<SearchResults<TemplateIndex>> result = await _client.SearchTemplates(request);
+
+	        if (result.StatusCode.IsSuccess())
+	        {
+		        return Ok(result.Content);
+	        }
+
+	        return StatusCode((int)result.StatusCode);
         }
     }
 }

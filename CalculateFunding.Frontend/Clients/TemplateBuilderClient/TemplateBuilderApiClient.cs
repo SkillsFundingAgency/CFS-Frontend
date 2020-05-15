@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient;
@@ -9,6 +7,7 @@ using CalculateFunding.Common.Interfaces;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Interfaces;
+using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
@@ -98,6 +97,14 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             string url = "templates/build/metadata";
 
             return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
+        }
+
+        public async Task<ApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request)
+        {
+	        string url = "templates/templates-search";
+
+	        return await PostAsync<SearchResults<TemplateIndex>, SearchRequestViewModel>(url, request);
+
         }
     }
 }
