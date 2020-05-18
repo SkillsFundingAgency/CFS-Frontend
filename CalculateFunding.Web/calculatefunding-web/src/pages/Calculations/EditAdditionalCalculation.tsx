@@ -57,6 +57,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [nameErrorMessage, setNameErrorMessage] = useState("")
     let history = useHistory();
 
     useEffectOnce(() => {
@@ -87,16 +88,17 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     });
 
     function submitAdditionalCalculation() {
-        if (additionalCalculationName === "" || additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
+        if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
             setFormValid({formSubmitted: true, formValid: false});
-        }
-
-        if (additionalCalculationName !== "" && additionalCalculationSourceCode !== "" && additionalCalculationBuildSuccess.buildSuccess && additionalCalculationBuildSuccess.compileRun) {
+        } else if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
+            setNameErrorMessage("Please use a name between 4 and 180 characters");
+            setFormValid({formSubmitted: true, formValid: false});
+        } else if ((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) && additionalCalculationSourceCode !== "" && additionalCalculationBuildSuccess.buildSuccess && additionalCalculationBuildSuccess.compileRun) {
             setFormValid({formSubmitted: true, formValid: true});
-
+            setNameErrorMessage("");
             setIsLoading(true);
             let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
-              calculationName: additionalCalculationName,
+                calculationName: additionalCalculationName,
                 calculationType: additionalCalculationType,
                 sourceCode: additionalCalculationSourceCode,
             };
@@ -180,14 +182,18 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                         Edit additional calculation
                     </h1>
                 </legend>
-
-                <div className="govuk-form-group">
+                <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="address-line-1">
                         Calculation name
                     </label>
-                    <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
+                    <input className="govuk-input" id="calculation-name" name="calculation-name" type="text" pattern="[A-Za-z0-9]+"
                            value={additionalCalculationName}
-                           onChange={(e) => setAdditionalCalculationName(e.target.value)} readOnly={false}/>
+                           onChange={(e) => setAdditionalCalculationName(e.target.value)}/>
+                    <div hidden={nameErrorMessage === ""}>
+                        <span id="calculation-name-error" className="govuk-error-message">
+                            <span className="govuk-visually-hidden">Error:</span> Calculation name must be between 4 and 180 characters
+                        </span>
+                    </div>
                 </div>
 
                 <div className="govuk-form-group">

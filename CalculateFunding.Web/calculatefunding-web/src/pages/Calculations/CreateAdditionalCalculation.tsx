@@ -55,9 +55,9 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [nameErrorMessage, setNameErrorMessage] = useState("")
+
     let history = useHistory();
-
-
 
     useEffectOnce(() => {
         const getSpecification = async () => {
@@ -72,12 +72,14 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
     });
 
     function submitAdditionalCalculation() {
-        if (additionalCalculationName === "" || additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
+        if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
             setFormValid({formSubmitted: true, formValid: false});
-        }
-
-        if (additionalCalculationName !== "" && additionalCalculationSourceCode !== "" && additionalCalculationBuildSuccess.buildSuccess && additionalCalculationBuildSuccess.compileRun) {
-            setFormValid({formValid: true, formSubmitted: true});
+        } else if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
+            setNameErrorMessage("Please use a name between 4 and 180 characters");
+            setFormValid({formSubmitted: true, formValid: false});
+        } else if ((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) && additionalCalculationSourceCode !== "" && additionalCalculationBuildSuccess.buildSuccess && additionalCalculationBuildSuccess.compileRun) {
+            setFormValid({formSubmitted: true, formValid: true});
+            setNameErrorMessage("");
             setIsLoading(true);
             let createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel = {
                 calculationName: additionalCalculationName,
@@ -96,9 +98,13 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                     let response = result.data as Calculation;
                     history.push(`/app/ViewSpecification/${response.specificationId}`);
                 } else {
+                    setErrorMessage(result.data);
+                    setFormValid(prevState => {return {...prevState, formSubmitted: true, formValid: false}});
                     setIsLoading(false);
                 }
-            }).catch(() => {
+            }).catch((ex) => {
+                setErrorMessage(ex.response.data);
+                setFormValid({formSubmitted: true, formValid: false});
                 setIsLoading(false);
             });
         } else {
@@ -167,12 +173,17 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                     </h1>
                 </legend>
 
-                <div className="govuk-form-group">
+                <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="address-line-1">
                         Calculation name
                     </label>
-                    <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
+                    <input className="govuk-input" id="calculation-name" name="calculation-name" type="text" pattern="[A-Za-z0-9]+"
                            onChange={(e) => setAdditionalCalculationName(e.target.value)}/>
+                    <div hidden={nameErrorMessage === ""}>
+                        <span id="calculation-name-error" className="govuk-error-message">
+                            <span className="govuk-visually-hidden">Error:</span> Calculation name must be between 4 and 180 characters
+                        </span>
+                    </div>
                 </div>
 
                 <div className="govuk-form-group">
