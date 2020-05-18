@@ -50,6 +50,10 @@ namespace CalculateFunding.Frontend.Helpers
 		        CanMapDatasets = true,
 		        CanReleaseFunding = true,
 		        CanRefreshFunding = true,
+		        CanCreateTemplates = true,
+		        CanEditTemplates = true,
+		        CanDeleteTemplates = true,
+		        CanApproveTemplates = true,
 		        UserId = user.GetUserProfile()?.Id,
 		        FundingStreamId = fundingStreamId
 	        });

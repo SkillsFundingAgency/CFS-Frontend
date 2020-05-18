@@ -85,6 +85,13 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPostAsync<string, TemplateCreateCommand>(url, command);
         }
 
+        public async Task<ApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command)
+        {
+            string url = "templates/build/clone";
+
+            return await ValidatedPostAsync<string, TemplateCreateAsCloneCommand>(url, command);
+        }
+
         public async Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command)
         {
             string url = "templates/build/content";

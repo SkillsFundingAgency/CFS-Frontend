@@ -121,6 +121,39 @@ namespace CalculateFunding.Frontend.Controllers
             return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 
+        [HttpPost]
+        [Route("api/templates/build/clone")]
+        public async Task<IActionResult> CreateTemplateAsClone([FromBody] TemplateCreateAsCloneCommand createModel)
+        {
+            Guard.ArgumentNotNull(createModel, nameof(createModel));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, createModel.FundingStreamId);
+            if (!permissions.CanCreateTemplates)
+            {
+                _logger.Error($"User [{User?.Identity?.Name}] has insufficient permissions to create a {createModel.FundingStreamId} template");
+                return Forbid(new AuthenticationProperties());
+            }
+
+            ApiResponse<string> result = await _client.CreateTemplateAsClone(createModel);
+
+            if (result.StatusCode == HttpStatusCode.Created)
+            {
+                return Created($"api/templates/build/{result.Content}", result.Content);
+            }
+
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(result.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+        }
+
         [HttpPut]
         [Route("api/templates/build/content")]
         public async Task<IActionResult> UpdateTemplateContent([FromBody] TemplateContentUpdateModel model)
