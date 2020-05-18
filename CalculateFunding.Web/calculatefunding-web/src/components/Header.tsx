@@ -92,7 +92,7 @@ export function Header(props: {location:Section}) {
                         beta
                     </strong>
                     <span className="govuk-phase-banner__text">
-      This is a new service – your <a className="govuk-link" href="/get-in-touch">feedback</a> will help us to improve it.
+      This is a new service – your <a className="govuk-link" href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-YJWVbwgF21Alt5-BoBqL_RUNjY%20xSlJVTFhWR0wwTkgyRzc2RVdDN0VEMC4u">feedback</a> will help us to improve it.
     </span>
                 </p>
                 <hr/>

@@ -18,6 +18,7 @@ import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export function CreateSpecification() {
 
@@ -35,6 +36,7 @@ export function CreateSpecification() {
         formValid: false
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
     let history = useHistory();
 
     useEffectOnce(() => {
@@ -49,9 +51,11 @@ export function CreateSpecification() {
 
     function populateFundingPeriods(fundingStream: string) {
         if (fundingStream !== "") {
+        setFundingPeriodIsLoading(true);
             const getFundingPeriods = async () => {
                 const periodResult = await getFundingPeriodsByFundingStreamIdService(fundingStream);
                 setFundingPeriodData(periodResult.data)
+                setFundingPeriodIsLoading(false);
             };
             getFundingPeriods().then(result => {
                 return true;
@@ -176,10 +180,11 @@ export function CreateSpecification() {
                         <label className="govuk-label" htmlFor="sort">
                             Funding period
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={fundingPeriodData.length === 0} onChange={(e) => selectFundingPeriod(e)}>
+                        <select className="govuk-select" id="sort" name="sort" disabled={fundingPeriodData.length === 0 || fundingPeriodIsLoading} onChange={(e) => selectFundingPeriod(e)}>
                             <option value="-1">Select funding period</option>
                             {fundingPeriodData.map((fp, index) => <option key={index} value={fp.id}>{fp.name}</option>)}
                         </select>
+                        <LoadingFieldStatus title={"Funding streams loading"} hidden={!fundingPeriodIsLoading} />
                     </div>
 
                     <div className="govuk-form-group">

@@ -308,6 +308,19 @@
     height: 2em;
   }
 }
+.loader-small{
+  margin: 0 0 -5px 10px;
+  display: inline-block;
+}
+.loader-inline{
+  display: inline-block;
+}
+.loader-text{
+  display: inline-block;
+  margin: 0 0 0 10px;
+}
+
+
 .loader-full {
   width: 10em;
   height: 10em;
