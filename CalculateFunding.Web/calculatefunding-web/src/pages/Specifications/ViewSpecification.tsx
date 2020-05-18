@@ -103,7 +103,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [viewSpecification.fundingLineStructureResult]);
 
     useEffect(() => {
-        if (viewSpecification.fundingLineStructureResult.length === 0) {
+        if (viewSpecification.fundingLineStructureResult.length !== 0) {
             setIsLoading(prevState => {
                 return {
                     ...prevState,
@@ -284,8 +284,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         </div>
                                     </div>
                                 </div>
-                                <div className="govuk-accordion__controls"
-                                     hidden={fundingLines == null || fundingLines.length === 0}>
+                                <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure}>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="false"
                                             onClick={openCloseAllFundingLines}
