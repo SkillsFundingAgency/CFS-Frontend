@@ -36,10 +36,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             string templateId = Guid.NewGuid().ToString();
             apiClient
                 .CreateDraftTemplate(Arg.Any<TemplateCreateCommand>())
-                .Returns(new ApiResponse<string>(System.Net.HttpStatusCode.Created, templateId));
+                .Returns(new ValidatedApiResponse<string>(HttpStatusCode.Created, templateId));
             var authHelper = Substitute.For<IAuthorizationHelper>();
             authHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Is(model.FundingStreamId))
-                .Returns(new FundingStreamPermission { CanCreateTemplates = true, FundingStreamId = model.FundingStreamId });
+                .Returns(new FundingStreamPermission {CanCreateTemplates = true, FundingStreamId = model.FundingStreamId});
             TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
 
             IActionResult result = await controller.CreateDraftTemplate(model);
@@ -48,12 +48,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Should()
                 .BeAssignableTo<CreatedResult>();
 
-            string resultId = (result as CreatedResult).Value as string;
+            string resultId = (result as CreatedResult)?.Value as string;
             resultId
                 .Should()
                 .Be(templateId);
 
-            string resultLocation = (result as CreatedResult).Location;
+            string resultLocation = (result as CreatedResult)?.Location;
             resultLocation
                 .Should()
                 .Be($"api/templates/build/{templateId}");
@@ -73,10 +73,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             string templateId = Guid.NewGuid().ToString();
             apiClient
                 .CreateDraftTemplate(Arg.Any<TemplateCreateCommand>())
-                .Returns(new ApiResponse<string>(HttpStatusCode.Created, templateId));
+                .Returns(new ValidatedApiResponse<string>(HttpStatusCode.Created, templateId));
             var authHelper = Substitute.For<IAuthorizationHelper>();
             authHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Is(model.FundingStreamId))
-                .Returns(new FundingStreamPermission { CanCreateTemplates = false, FundingStreamId = model.FundingStreamId });
+                .Returns(new FundingStreamPermission {CanCreateTemplates = false, FundingStreamId = model.FundingStreamId});
             TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
 
             IActionResult result = await controller.CreateDraftTemplate(model);
@@ -96,14 +96,15 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             List<TemplateStatus> statuses = new List<TemplateStatus>();
             List<TemplateResource> returnedContent = new List<TemplateResource>
             {
-                new TemplateResource {
+                new TemplateResource
+                {
                     TemplateId = "123",
                     FundingPeriodId = "ABC",
                     FundingStreamId = "XYZ",
                     Description = "Test",
                     LastModificationDate = DateTime.Now,
                     SchemaVersion = "1.1",
-	                PublishStatus = PublishStatus.Approved,
+                    PublishStatus = PublishStatus.Approved,
                     AuthorId = "author",
                     AuthorName = "name",
                     Comments = "A comment",
@@ -130,7 +131,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             results
                 .Should()
                 .Equal(returnedContent);
-
         }
 
         [TestMethod]
@@ -138,41 +138,43 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             string templateId = Guid.NewGuid().ToString();
-            List<TemplateStatus> statuses = new List<TemplateStatus> { TemplateStatus.Draft, TemplateStatus.Published };
+            List<TemplateStatus> statuses = new List<TemplateStatus> {TemplateStatus.Draft, TemplateStatus.Published};
             List<TemplateResource> returnedContent = new List<TemplateResource>
             {
-               new TemplateResource {
-	               TemplateId = "123",
-	               FundingPeriodId = "ABC",
-	               FundingStreamId = "XYZ",
-	               Description = "Test",
-	               LastModificationDate = DateTime.Now,
-	               SchemaVersion = "1.1",
-	               PublishStatus = PublishStatus.Draft,
-	               AuthorId = "author",
-	               AuthorName = "name",
-	               Comments = "A comment",
-	               Status = TemplateStatus.Draft,
-	               Version = 1,
-                   MinorVersion = 1,
-                   MajorVersion = 0
+                new TemplateResource
+                {
+                    TemplateId = "123",
+                    FundingPeriodId = "ABC",
+                    FundingStreamId = "XYZ",
+                    Description = "Test",
+                    LastModificationDate = DateTime.Now,
+                    SchemaVersion = "1.1",
+                    PublishStatus = PublishStatus.Draft,
+                    AuthorId = "author",
+                    AuthorName = "name",
+                    Comments = "A comment",
+                    Status = TemplateStatus.Draft,
+                    Version = 1,
+                    MinorVersion = 1,
+                    MajorVersion = 0
                 },
-               new TemplateResource {
-	               TemplateId = "123",
-	               FundingPeriodId = "ABC",
-	               FundingStreamId = "XYZ",
-	               Description = "Test",
-	               LastModificationDate = DateTime.Now,
-	               SchemaVersion = "1.1",
-	               PublishStatus = PublishStatus.Draft,
-	               AuthorId = "author",
-	               AuthorName = "name",
-	               Comments = "A comment",
-	               Status = TemplateStatus.Published,
-	               Version = 1,
-                   MinorVersion = 1,
-                   MajorVersion = 0
-               }
+                new TemplateResource
+                {
+                    TemplateId = "123",
+                    FundingPeriodId = "ABC",
+                    FundingStreamId = "XYZ",
+                    Description = "Test",
+                    LastModificationDate = DateTime.Now,
+                    SchemaVersion = "1.1",
+                    PublishStatus = PublishStatus.Draft,
+                    AuthorId = "author",
+                    AuthorName = "name",
+                    Comments = "A comment",
+                    Status = TemplateStatus.Published,
+                    Version = 1,
+                    MinorVersion = 1,
+                    MajorVersion = 0
+                }
             };
             apiClient
                 .GetTemplateVersions(templateId, statuses)
@@ -190,7 +192,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             results
                 .Should()
                 .Equal(returnedContent);
-
         }
     }
 }

@@ -59,7 +59,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/templates/build/fundingStream/{fundingStreamId}/fundingPeriod/{fundingPeriodId}/published")]
-        public async Task<IActionResult> GetPublishedTemplatesByFundingStreamAndPeriod([FromRoute] string fundingStreamId, [FromRoute] string fundingPeriodId)
+        public async Task<IActionResult> GetPublishedTemplatesByFundingStreamAndPeriod([FromRoute] string fundingStreamId,
+            [FromRoute] string fundingPeriodId)
         {
             ApiResponse<IEnumerable<TemplateResource>> result = await _client
                 .GetPublishedTemplatesByFundingStreamAndPeriod(fundingStreamId, fundingPeriodId);
@@ -100,7 +101,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Forbid(new AuthenticationProperties());
             }
 
-            ApiResponse<string> result = await _client.CreateDraftTemplate(new TemplateCreateCommand
+            ValidatedApiResponse<string> result = await _client.CreateDraftTemplate(new TemplateCreateCommand
             {
                 Name = createModel.Name,
                 Description = createModel.Description,
@@ -108,17 +109,15 @@ namespace CalculateFunding.Frontend.Controllers
                 SchemaVersion = createModel.SchemaVersion
             });
 
-            if (result.StatusCode == HttpStatusCode.Created)
+            switch (result.StatusCode)
             {
-                return Created($"api/templates/build/{result.Content}", result.Content);
+                case HttpStatusCode.Created:
+                    return Created($"api/templates/build/{result.Content}", result.Content);
+                case HttpStatusCode.BadRequest:
+                    return BadRequest(result.ModelState);
+                default:
+                    return StatusCode((int) result.StatusCode);
             }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(result.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 
         [HttpPost]
@@ -139,19 +138,17 @@ namespace CalculateFunding.Frontend.Controllers
                 return Forbid(new AuthenticationProperties());
             }
 
-            ApiResponse<string> result = await _client.CreateTemplateAsClone(createModel);
+            ValidatedApiResponse<string> result = await _client.CreateTemplateAsClone(createModel);
 
-            if (result.StatusCode == HttpStatusCode.Created)
+            switch (result.StatusCode)
             {
-                return Created($"api/templates/build/{result.Content}", result.Content);
+                case HttpStatusCode.Created:
+                    return Created($"api/templates/build/{result.Content}", result.Content);
+                case HttpStatusCode.BadRequest:
+                    return BadRequest(result.ModelState);
+                default:
+                    return StatusCode((int) result.StatusCode);
             }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(result.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 
         [HttpPut]
@@ -214,15 +211,18 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost("api/templates/build/{templateId}/approve")]
-        public async Task<IActionResult> ApproveTemplate([FromRoute] string templateId, [FromQuery] string version = null, [FromQuery] string comment = null)
+        public async Task<IActionResult> ApproveTemplate([FromRoute] string templateId, [FromQuery] string version = null,
+            [FromQuery] string comment = null)
         {
             Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
 
             NoValidatedContentApiResponse result = await _client.ApproveTemplate(templateId, version, comment);
 
             if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
                 return BadRequest(result.ModelState);
-            
+            }
+
             return StatusCode((int) result.StatusCode);
         }
 
@@ -268,14 +268,17 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/search")]
         public async Task<IActionResult> SearchTemplates([FromBody] SearchRequestViewModel request)
         {
-	        ApiResponse<SearchResults<TemplateIndex>> result = await _client.SearchTemplates(request);
+            ValidatedApiResponse<SearchResults<TemplateIndex>> result = await _client.SearchTemplates(request);
 
-	        if (result.StatusCode.IsSuccess())
-	        {
-		        return Ok(result.Content);
-	        }
-
-	        return StatusCode((int)result.StatusCode);
+            switch (result.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return Ok();
+                case HttpStatusCode.BadRequest:
+                    return BadRequest(result.ModelState);
+                default:
+                    return StatusCode((int) result.StatusCode);
+            }
         }
     }
 }

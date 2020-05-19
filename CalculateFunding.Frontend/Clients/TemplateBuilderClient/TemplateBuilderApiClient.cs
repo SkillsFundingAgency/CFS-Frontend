@@ -78,14 +78,14 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await GetAsync<List<TemplateResource>>(url);
         }
 
-        public async Task<ApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command)
+        public async Task<ValidatedApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command)
         {
             string url = "templates/build";
 
             return await ValidatedPostAsync<string, TemplateCreateCommand>(url, command);
         }
 
-        public async Task<ApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command)
+        public async Task<ValidatedApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command)
         {
             string url = "templates/build/clone";
 
@@ -106,11 +106,11 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
         }
 
-        public async Task<ApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request)
+        public async Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request)
         {
 	        string url = "templates/templates-search";
 
-	        return await PostAsync<SearchResults<TemplateIndex>, SearchRequestViewModel>(url, request);
+	        return await ValidatedPostAsync<SearchResults<TemplateIndex>, SearchRequestViewModel>(url, request);
 
         }
     }

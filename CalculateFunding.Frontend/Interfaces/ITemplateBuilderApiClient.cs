@@ -9,8 +9,8 @@ namespace CalculateFunding.Frontend.Interfaces
 {
     public interface ITemplateBuilderApiClient
     {
-        Task<ApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command);
-        Task<ApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command);
+        Task<ValidatedApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command);
+        Task<ValidatedApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateMetadata(TemplateMetadataUpdateCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command);
         Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
@@ -19,6 +19,6 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<IEnumerable<TemplateResource>>>
             GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
         Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
-        Task<ApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request);
+        Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request);
     }
 }
