@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface IFundingStructureItem {
     level : number;
     name : string;
@@ -7,6 +9,7 @@ export interface IFundingStructureItem {
     fundingStructureItems: IFundingStructureItem[];
     parentName: string;
     expanded: boolean;
+    customRef: React.MutableRefObject<null>;
 }
 
 export enum FundingStructureType{

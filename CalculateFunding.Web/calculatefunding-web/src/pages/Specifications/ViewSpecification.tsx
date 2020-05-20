@@ -1,7 +1,7 @@
 import {RouteComponentProps} from "react-router";
 import {Header} from "../../components/Header";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {useDispatch, useSelector} from "react-redux";
@@ -80,7 +80,28 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
+    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState();
+    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState();
+    const fundingLineStepReactRef = useRef(null);
+    
+    useEffect(() => {
+        if (!fundingLineRenderInternalState) {
+            return
+        }
+        if (fundingLineStepReactRef != null && fundingLineStepReactRef.current != null) {
+            fundingLineStepReactRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+        }
+        setFundingLineRenderInternalState(false);
+    }, [fundingLineRenderInternalState]);
 
+    useEffect(() => {
+        setFundingLineRenderInternalState(true);
+    }, [rerenderFundingLineSteps]);
+
+    useEffect(() => {
+        setFundingLineRenderInternalState(true);
+    }, [fundingLines]);
+    
     useEffect(() => {
         if (viewSpecification.additionalCalculations.currentPage !== 0) {
             setIsLoading(prevState => {
@@ -212,9 +233,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     function searchFundingLines(calculationName: string) {
         const fundingLinesCopy: IFundingStructureItem[] = JSON.parse(JSON.stringify(fundingLinesOriginalData));
-        expandCalculationsByName(fundingLinesCopy, calculationName);
+        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef);
         setFundingLines(fundingLinesCopy);
-    }
+        setRerenderFundingLineSteps(true);
+    }   
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -304,6 +326,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                 linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
                                             }
                                             return <li key={"collapsible-steps-top"+index} className="collapsible-step step-is-shown"><CollapsibleSteps
+                                                customRef={f.customRef}
                                                 key={"collapsible-steps"+ index}
                                                 uniqueKey={index.toString()}
                                                 title={FundingStructureType[f.type]}

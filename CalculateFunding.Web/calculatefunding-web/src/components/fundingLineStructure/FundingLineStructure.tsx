@@ -1,6 +1,7 @@
 import {
     FundingStructureType, IFundingStructureItem
 } from "../../types/FundingStructureItem";
+import React from "react";
 
 export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: IFundingStructureItem[])
 {
@@ -18,13 +19,19 @@ export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: 
     return [...new Set(calculationNames.sort((a, b) => a.localeCompare(b)))]
 }
 
-export function expandCalculationsByName(fundingLinesToFilter: IFundingStructureItem[], keyword: string)
+export function expandCalculationsByName(fundingLinesToFilter: IFundingStructureItem[], keyword: string, customRef: React.MutableRefObject<null>)
 {
+    let isRefAlreadyAssigned = false;
     fundingLinesToFilter.map(
         function searchFundingLines(fundingStructureItem: IFundingStructureItem) {
             if (fundingStructureItem.name.toLowerCase() === keyword.toLowerCase()
                 && fundingStructureItem.type === FundingStructureType.Calculation) {
                 fundingStructureItem.expanded = true;
+                if (!isRefAlreadyAssigned)
+                {
+                    fundingStructureItem.customRef = customRef;
+                    isRefAlreadyAssigned = true;
+                }
             }
             if (fundingStructureItem.fundingStructureItems) {
                 fundingStructureItem.fundingStructureItems.map(searchFundingLines);

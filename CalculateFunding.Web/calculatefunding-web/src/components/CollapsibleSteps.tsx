@@ -10,6 +10,7 @@ interface ICollapsibleStepsProps {
     link: string;
     expanded: boolean;
     hasChildren: boolean;
+    customRef: React.MutableRefObject<null>;
 }
 
 export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleStepsProps>) {
@@ -29,7 +30,7 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
 
     return (
         <ul>
-        <li key={"step" + listKey} className="collapsible-step step-is-shown">
+        <li ref={props.customRef} key={"step" + listKey} className="collapsible-step step-is-shown">
             <div key={listKey + "header"} className="collapsible-step-header-container">
                 <h2 className={props.step === "1" ? "govuk-heading-s first-step-title" : "govuk-heading-s"}>
                     <span className="collapsible-step-circle collapsible-step-circle-number" hidden={props.step === ""}>

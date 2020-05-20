@@ -23,6 +23,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                     }
                     return (
                         <CollapsibleSteps
+                            customRef={innerFundingLineItem.customRef}
                             key={index}
                             uniqueKey={index.toString()}
                             title={displayFundingType?fundingType: ""}
