@@ -96,7 +96,7 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
 
                 if (result.status === 200) {
                     let response = result.data as Calculation;
-                    history.push(`/app/ViewSpecification/${response.specificationId}`);
+                    history.push(`/ViewSpecification/${response.specificationId}`);
                 } else {
                     setErrorMessage(result.data);
                     setFormValid(prevState => {return {...prevState, formSubmitted: true, formValid: false}});
