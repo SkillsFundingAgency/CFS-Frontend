@@ -1,4 +1,4 @@
-import { Template, FundingLineDictionaryEntry, NodeType, FundingLineType, CalculationType, AggregrationType, ValueFormatType } from "../../types/TemplateBuilderDefinitions";
+import { FundingLineDictionaryEntry, NodeType, FundingLineType, CalculationType, AggregrationType, ValueFormatType, TemplateFundingLine } from "../../types/TemplateBuilderDefinitions";
 
 export const singleNodeDs: Array<FundingLineDictionaryEntry> = [
     {
@@ -17,18 +17,17 @@ export const singleNodeDs: Array<FundingLineDictionaryEntry> = [
     }
 ];
 
-export const singleNodeTemplate: Template = {
-    "fundingLines": [
-        {
-            "name": "Funding Line 0",
-            "fundingLineCode": "Code 0",
-            "templateLineId": 0,
-            "type": "Information",
-            "fundingLines": [],
-            "calculations": []
-        }
-    ]
-};
+export const singleNodeTemplate: Array<TemplateFundingLine> = [
+    {
+        "name": "Funding Line 0",
+        "fundingLineCode": "Code 0",
+        "templateLineId": 0,
+        "type": "Information",
+        "aggregationType": undefined,
+        "fundingLines": [],
+        "calculations": []
+    }
+];
 
 export const withChildFundingLineDs: Array<FundingLineDictionaryEntry> = [
     {
@@ -59,24 +58,25 @@ export const withChildFundingLineDs: Array<FundingLineDictionaryEntry> = [
     }
 ];
 
-export const withChildFundingLineTemplate: Template = {
-    "fundingLines": [
-        {
-            "name": "Funding Line 0",
-            "fundingLineCode": "Code 0",
-            "templateLineId": 0,
+export const withChildFundingLineTemplate: Array<TemplateFundingLine> = [
+    {
+        "name": "Funding Line 0",
+        "fundingLineCode": "Code 0",
+        "templateLineId": 0,
+        "type": "Information",
+        "aggregationType": undefined,
+        "fundingLines": [{
+            "name": "Funding Line 1",
+            "fundingLineCode": "Code 1",
+            "templateLineId": 1,
             "type": "Information",
-            "fundingLines": [{
-                "name": "Funding Line 1",
-                "fundingLineCode": "Code 1",
-                "templateLineId": 1,
-                "type": "Information",
-                "fundingLines": []
-            }],
+            "aggregationType": undefined,
+            "fundingLines": [],
             "calculations": []
-        }
-    ]
-}
+        }],
+        "calculations": []
+    }
+];
 
 export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEntry> = [
     {
@@ -129,39 +129,43 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
     }
 ];
 
-export const withChildFundingLineAndCalculationTemplate: Template = {
-    "fundingLines": [
-        {
-            "name": "Funding Line 0",
-            "fundingLineCode": "Code 0",
-            "templateLineId": 0,
+export const withChildFundingLineAndCalculationTemplate: Array<TemplateFundingLine> = [
+    {
+        "name": "Funding Line 0",
+        "fundingLineCode": "Code 0",
+        "templateLineId": 0,
+        "type": "Information",
+        "aggregationType": undefined,
+        "fundingLines": [{
+            "name": "Funding Line 1",
+            "fundingLineCode": "Code 1",
+            "templateLineId": 1,
             "type": "Information",
-            "fundingLines": [{
-                "name": "Funding Line 1",
-                "fundingLineCode": "Code 1",
-                "templateLineId": 1,
-                "type": "Information",
-                "fundingLines": [
-                    {
-                        "name": "Funding Line 2",
-                        "fundingLineCode": "Code 2",
-                        "templateLineId": 2,
-                        "type": "Payment",
-                        "fundingLines": []
-                    }
-                ]
-            }],
-            "calculations": [{
-                "templateCalculationId": 3,
-                "name": "Calculation 3",
-                "type": "PupilNumber",
-                "aggregationType": "Sum",
-                "formulaText": "",
-                "valueFormat": "Currency"
-            }]
-        }
-    ]
-}
+            "aggregationType": undefined,
+            "fundingLines": [
+                {
+                    "name": "Funding Line 2",
+                    "fundingLineCode": "Code 2",
+                    "templateLineId": 2,
+                    "type": "Payment",
+                    "aggregationType": undefined,
+                    "fundingLines": [],
+                    "calculations": []
+                }
+            ],
+            "calculations": []
+        }],
+        "calculations": [{
+            "templateCalculationId": 3,
+            "name": "Calculation 3",
+            "type": "PupilNumber",
+            "aggregationType": "Sum",
+            "formulaText": "",
+            "valueFormat": "Currency",
+            "calculations": []
+        }]
+    }
+];
 
 export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
     {
@@ -232,47 +236,52 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
     }
 ];
 
-export const multipleFundingLinesTemplate: Template = {
-    "fundingLines": [
-        {
-            "name": "Funding Line 0",
-            "fundingLineCode": "Code 0",
-            "templateLineId": 0,
-            "type": "Information",
-            "fundingLines": [],
-            "calculations": []
-        },
-        {
-            "name": "Funding Line 1",
-            "fundingLineCode": "Code 1",
-            "templateLineId": 1,
-            "type": "Information",
-            "fundingLines": [
-                {
-                    "name": "Funding Line 3",
-                    "fundingLineCode": "Code 3",
-                    "templateLineId": 3,
-                    "type": "Information"
-                }
-            ],
-            "calculations": [
-                {
-                    "name": "Calculation 4",
-                    "templateCalculationId": 4,
-                    "type": "Cash",
-                    "valueFormat": "Number",
-                    "formulaText": "",
-                    "aggregationType": "Sum"
-                }
-            ]
-        },
-        {
-            "name": "Funding Line 2",
-            "fundingLineCode": "Code 2",
-            "templateLineId": 2,
-            "type": "Payment",
-            "fundingLines": [],
-            "calculations": []
-        }
-    ]
-};
+export const multipleFundingLinesTemplate: Array<TemplateFundingLine> = [
+    {
+        "name": "Funding Line 0",
+        "fundingLineCode": "Code 0",
+        "templateLineId": 0,
+        "aggregationType": undefined,
+        "type": "Information",
+        "fundingLines": [],
+        "calculations": []
+    },
+    {
+        "name": "Funding Line 1",
+        "fundingLineCode": "Code 1",
+        "templateLineId": 1,
+        "type": "Information",
+        "aggregationType": undefined,
+        "fundingLines": [
+            {
+                "name": "Funding Line 3",
+                "aggregationType": undefined,
+                "fundingLineCode": "Code 3",
+                "templateLineId": 3,
+                "type": "Information",
+                "fundingLines": [],
+                "calculations": []
+            }
+        ],
+        "calculations": [
+            {
+                "name": "Calculation 4",
+                "templateCalculationId": 4,
+                "type": "Cash",
+                "valueFormat": "Number",
+                "formulaText": "",
+                "aggregationType": "Sum",
+                "calculations": []
+            }
+        ]
+    },
+    {
+        "name": "Funding Line 2",
+        "fundingLineCode": "Code 2",
+        "templateLineId": 2,
+        "aggregationType": undefined,
+        "type": "Payment",
+        "fundingLines": [],
+        "calculations": []
+    }
+];

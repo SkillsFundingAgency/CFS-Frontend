@@ -1,5 +1,5 @@
 import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateToDatasource } from "../../services/templateBuilderDatasourceService";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines } from "../../services/templateBuilderDatasourceService";
 import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, FundingLine } from "../../types/TemplateBuilderDefinitions";
 
 const key1RootId = "n1";
@@ -288,22 +288,42 @@ it("clones nodes", async () => {
 });
 
 it("transforms single node template into datasource", async () => {
-    const datasource = templateToDatasource(singleNodeTemplate);
+    const datasource = templateFundingLinesToDatasource(singleNodeTemplate);
     expect(datasource).toStrictEqual(singleNodeDs);
 });
 
 it("transforms template with children into datasource", async () => {
-    const datasource = templateToDatasource(withChildFundingLineTemplate);
+    const datasource = templateFundingLinesToDatasource(withChildFundingLineTemplate);
     expect(datasource).toStrictEqual(withChildFundingLineDs);
 });
 
 it("transforms template with children of type funding line and calculation into datasource", async () => {
-    const datasource = templateToDatasource(withChildFundingLineAndCalculationTemplate);
+    const datasource = templateFundingLinesToDatasource(withChildFundingLineAndCalculationTemplate);
     expect(datasource).toStrictEqual(withChildFundingLineAndCalculationDs);
 });
 
 it("transforms template with multiple funding lines into datasource", async () => {
-    const datasource = templateToDatasource(multipleFundingLinesTemplate);
+    const datasource = templateFundingLinesToDatasource(multipleFundingLinesTemplate);
     expect(datasource).toStrictEqual(multipleFundingLinesDs);
+});
+
+it("transforms single node datasource into template", async () => {
+    const template = datasourceToTemplateFundingLines(singleNodeDs);
+    expect(template).toStrictEqual(singleNodeTemplate);
+});
+
+it("transforms datasource with children into template", async () => {
+    const template = datasourceToTemplateFundingLines(withChildFundingLineDs);
+    expect(template).toStrictEqual(withChildFundingLineTemplate);
+});
+
+it("transforms datasource with children of type funding line and calculation into template", async () => {
+    const template = datasourceToTemplateFundingLines(withChildFundingLineAndCalculationDs);
+    expect(template).toStrictEqual(withChildFundingLineAndCalculationTemplate);
+});
+
+it("transforms datasource with multiple funding lines into template", async () => {
+    const template = datasourceToTemplateFundingLines(multipleFundingLinesDs);
+    expect(template).toStrictEqual(multipleFundingLinesTemplate);
 });
 

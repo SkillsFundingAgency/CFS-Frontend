@@ -53,8 +53,8 @@ export interface FundingLine {
     name: string,
     fundingLineCode: string,
     aggregationType?: AggregrationType,
-    fundingLines?: Array<TemplateFundingLine>,
-    calculations?: Array<TemplateCalculation>
+    fundingLines: Array<TemplateFundingLine>,
+    calculations: Array<TemplateCalculation>
   }
 
   export interface Calculation {
@@ -78,11 +78,34 @@ export interface FundingLine {
     aggregationType?: AggregrationType | string,
     formulaText?: string,
     valueFormat?: ValueFormatType | string,
-    calculations?: Array<TemplateCalculation>
+    calculations: Array<TemplateCalculation>
   }
 
   export interface Template {
+    $schema: string,
+    schemaVersion: string,
+    fundingTemplate: FundingTemplate
+  }
+
+  export interface FundingTemplate {
+    fundingTemplateVersion: string,
+    fundingStream: TemplateFundingStream,
+    fundingPeriod: TemplateFundingPeriod,
     fundingLines: Array<TemplateFundingLine>
+  }
+
+  export interface TemplateFundingStream {
+    code: string,
+    name: string
+  }
+
+  export interface TemplateFundingPeriod {
+    id: string,
+    period: string,
+    name: string,
+    type: string,
+    startDate: string,
+    endDate: string
   }
 
   export interface UpdateModel {
