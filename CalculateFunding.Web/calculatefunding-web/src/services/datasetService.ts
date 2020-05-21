@@ -1,6 +1,7 @@
 import axios from "axios";
 import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatasetSchemaUpdateViewModel";
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
+import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -52,3 +53,18 @@ export async function searchDatasetDefinitionsService(request: DatasetDefinition
         }
     })
 }
+
+export async function getDatasetHistoryService(datasetId: string, pageNumber: number, pageSize: number) {
+    return axios(`${baseUrl}/getdatasetversions/${datasetId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        params: {
+            pageNumber: pageNumber,
+            pageSize: pageSize
+        }
+    })
+}
+
+

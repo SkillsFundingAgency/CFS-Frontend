@@ -1,4 +1,10 @@
-﻿namespace CalculateFunding.Frontend.Controllers
+﻿using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
+using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
+using CalculateFunding.Frontend.Extensions;
+
+namespace CalculateFunding.Frontend.Controllers
 {
     using System.Threading.Tasks;
     using CalculateFunding.Common.Utility;
@@ -14,17 +20,29 @@
         public DatasetSearchController(IDatasetSearchService datasetSearchService)
         {
             Guard.ArgumentNotNull(datasetSearchService, nameof(datasetSearchService));
-
             _datasetSearchService = datasetSearchService;
         }
 
         [HttpPost]
         [Route("api/datasets/search")]
-        public async Task<IActionResult> SearchDatasets([FromBody] SearchRequestViewModel request)
+        public async Task<IActionResult> SearchDatasets([FromBody] DatasetSearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            DatasetSearchResultViewModel result = await _datasetSearchService.PerformSearch(request);
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel
+            {
+                Filters = request.Filters,
+                ErrorToggle = request.ErrorToggle,
+                FacetCount = request.FacetCount,
+                IncludeFacets = request.IncludeFacets,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                SearchMode = request.SearchMode,
+                SearchTerm = request.SearchTerm
+            };
+
+
+            DatasetSearchResultViewModel result = await _datasetSearchService.PerformSearch(searchRequest);
             if (result != null)
             {
                 return Ok(result);
@@ -32,6 +50,38 @@
             else
             {
                 return new StatusCodeResult(500);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("api/datasets/getdatasetversions/{datasetId}")]
+        public async Task<IActionResult> GetDatasetVersions(string datasetId, [FromQuery]int pageNumber, [FromQuery]int pageSize)
+        {
+            Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
+
+            Dictionary<string, string[]> datasetIdFilter = new Dictionary<string, string[]>
+                {{"datasetId", new[] {datasetId}}};
+
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Filters = datasetIdFilter,
+                IncludeFacets = true
+            };
+
+            DatasetVersionSearchResultViewModel searchResult =
+                await _datasetSearchService.PerformSearchDatasetVersion(searchRequest);
+            
+            if (searchResult != null)
+            {
+                return new OkObjectResult(searchResult);
+            }
+            else
+            {
+                return new InternalServerErrorResult(
+                    "There was an error retrieving data sources from the Search Version Index.");
             }
         }
     }

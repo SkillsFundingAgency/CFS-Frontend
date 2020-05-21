@@ -2,8 +2,8 @@ import React from 'react';
 import {createStore, Store} from "redux";
 import {Provider} from 'react-redux';
 import {mount} from "enzyme";
-import {ManageData} from "../../pages/Datasets/ManageData";
-import {IStoreState, rootReducer} from "../../reducers/rootReducer";
+import {ManageData} from "../../../pages/Datasets/ManageData";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {MemoryRouter} from "react-router";
 
 const Adapter = require('enzyme-adapter-react-16');
@@ -28,7 +28,7 @@ describe("<ManageData />", () => {
 
     it('will have the correct <H3 /> title for Manage data source files', () => {
         const wrapper = mount(<MemoryRouter><Provider store={store}><ManageData/>></Provider></MemoryRouter>);
-        expect(wrapper.find("h3#manage-data-source-files-title>a").text()).toBe("Manage data source files");
+        expect(wrapper.find("h3#manage-data-source-files-title>Link").text()).toBe("Manage data source files");
     });
 
     it('will have the correct <H3 /> title for Map data source files to datasets for a specification', () => {

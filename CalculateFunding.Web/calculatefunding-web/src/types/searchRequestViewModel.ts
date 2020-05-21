@@ -1,3 +1,5 @@
+import {SearchMode} from "./SearchMode";
+
 export interface SearchRequestViewModel {
     pageNumber: number,
     searchTerm: string,
@@ -11,11 +13,6 @@ export interface SearchRequestViewModel {
     pageSize: number
     facetCount: number,
     searchMode: SearchMode
-}
-
-export enum SearchMode {
-    Any,
-    All
 }
 
 export interface CalculationProviderSearchRequestViewModel {

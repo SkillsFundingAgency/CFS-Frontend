@@ -1,4 +1,4 @@
-import {SearchMode} from "../searchRequestViewModel";
+import {SearchMode} from "../SearchMode";
 
 export interface DatasetDefinitionRequestViewModel {
     pageNumber?: number;

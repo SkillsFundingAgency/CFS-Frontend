@@ -3,12 +3,13 @@ import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingT
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
 import {IViewFundingState} from "../states/IViewFundingState";
-import {SearchMode, SearchRequestViewModel} from "../types/searchRequestViewModel";
+import {SearchRequestViewModel} from "../types/searchRequestViewModel";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {JobMessage} from "../types/jobMessage";
 import {GetLatestJobForSpecification} from "../services/jobService";
 import {getLocalAuthoritiesService} from "../services/publishService";
+import {SearchMode} from "../types/SearchMode";
 
 export enum ViewFundingActionTypes {
     GET_SPECIFICATIONS = 'getSelectedSpecifications',

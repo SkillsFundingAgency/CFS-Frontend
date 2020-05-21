@@ -3,7 +3,6 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {searchDatasetDefinitionsService} from "../../services/datasetService";
-import {SearchMode} from "../../types/searchRequestViewModel";
 import {DatasetDefinitionRequestViewModel} from "../../types/Datasets/DatasetDefinitionRequestViewModel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {DatasetDefinitionResponseViewModel} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
@@ -13,6 +12,7 @@ import {Footer} from "../../components/Footer";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {WarningText} from "../../components/WarningText";
 import {BackToTop} from "../../components/BackToTop";
+import {SearchMode} from "../../types/SearchMode";
 
 export function DownloadDataSchema() {
 

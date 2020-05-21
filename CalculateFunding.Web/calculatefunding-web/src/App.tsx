@@ -33,6 +33,7 @@ import { getUserFundingStreamPermissions } from "./actions/UserPermissionsAction
 import { IStoreState } from './reducers/rootReducer';
 import { FeatureFlagsState } from './states/FeatureFlagsState';
 import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
+import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -63,6 +64,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
                 <Route path="/Datasets/ManageData" component={ManageData} />
                 <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
+                <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}

@@ -23,7 +23,7 @@ export function ManageData() {
                 <div className="govuk-grid-row govuk-!-margin-bottom-9  govuk-!-margin-top-9">
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"manage-data-source-files-title"} className="govuk-heading-m">
-                            <a href="/datasets/manageDatasets">Manage data source files</a>
+                           <Link to={"/Datasets/ManageDataSourceFiles"}>Manage data source files</Link>
                         </h3>
                         <p className="govuk-body">Load a new data source file or download an existing one.</p>
                     </div>

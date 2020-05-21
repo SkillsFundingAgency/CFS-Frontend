@@ -11,13 +11,14 @@ import {ViewCalculationState} from "../states/ViewCalculationState";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {getCalculationById, getCalculationResults} from "../actions/ViewCalculationResultsActions";
 import {FundingStream} from "../types/viewFundingTypes";
-import {CalculationProviderSearchRequestViewModel, SearchMode} from "../types/searchRequestViewModel";
+import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
 import {FacetValue} from "../types/CalculationProviderResult";
 import {getSpecificationSummary} from "../actions/ViewSpecificationResultsActions";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
+import {SearchMode} from "../types/SearchMode";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
