@@ -1,6 +1,22 @@
 import JSONDigger from "json-digger";
-import { v4 as uuidv4 } from 'uuid';
-import { FundingLine, FundingLineUpdateModel, CalculationUpdateModel, Calculation, FundingLineOrCalculation, FundingLineDictionaryEntry, NodeType, TemplateFundingLine, FundingLineType, TemplateCalculation, CalculationType, AggregrationType, ValueFormatType } from "../types/TemplateBuilderDefinitions";
+import {v4 as uuidv4} from 'uuid';
+import {
+    AggregrationType,
+    Calculation,
+    CalculationType,
+    CalculationUpdateModel,
+    FundingLine,
+    FundingLineDictionaryEntry,
+    FundingLineOrCalculation,
+    FundingLineType,
+    FundingLineUpdateModel,
+    NodeType,
+    TemplateCalculation,
+    TemplateFundingLine,
+    ValueFormatType
+} from "../types/TemplateBuilderDefinitions";
+import {TemplateSearchRequest} from "../types/searchRequestViewModel";
+import axios from "axios";
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
@@ -309,3 +325,10 @@ export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionary
     const templateFundingLines = getTemplateFundingLinesFromDatasource(ds);
     return templateFundingLines;
 }
+
+export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
+    return await axios(`/api/templates/build/search`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: searchRequest
+    })}

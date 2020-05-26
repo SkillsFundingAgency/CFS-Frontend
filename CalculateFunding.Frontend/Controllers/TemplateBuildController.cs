@@ -266,14 +266,14 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/templates/build/search")]
-        public async Task<IActionResult> SearchTemplates([FromBody] SearchRequestViewModel request)
+        public async Task<IActionResult> SearchTemplates([FromBody] SearchModel request)
         {
             ValidatedApiResponse<SearchResults<TemplateIndex>> result = await _client.SearchTemplates(request);
 
             switch (result.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    return Ok();
+                    return Ok(result.Content);
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:

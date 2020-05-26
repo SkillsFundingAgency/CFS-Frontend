@@ -86,6 +86,39 @@ export interface FundingLine {
     schemaVersion: string,
     fundingTemplate: FundingTemplate
   }
+  
+  export interface TemplateSummary {
+    id: string,
+    name: string,
+    fundingStreamId: string,
+    fundingStreamName: string,
+    fundingPeriodId: string,
+    fundingPeriodName: string,
+    lastUpdatedAuthorName: string,
+    lastUpdatedDate: Date,
+    version: number,
+    currentMajorVersion: number,
+    currentMinorVersion: number,
+    publishedMajorVersion: number,
+    publishedMinorVersion: number,
+    hasReleasedVersion: boolean
+  }
+  
+  export interface TemplateSearchResponse {
+    totalCount: number,
+    totalErrorCount: number,
+    facets: SearchFacet[],
+    results: TemplateSummary[]
+  }
+
+  export interface SearchFacet {
+    name: string;
+    facetValues: SearchFacetValue[];
+  }
+  export interface SearchFacetValue {
+    name: string;
+    count: number;
+  }
 
   export interface FundingTemplate {
     fundingTemplateVersion: string,

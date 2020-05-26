@@ -37,7 +37,8 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await GetAsync<TemplateResource>(url);
         }
 
-        public async Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId)
+        public async Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId,
+            string fundingPeriodId)
         {
             string url = $"templates/build/versions/search";
 
@@ -57,6 +58,7 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             {
                 url = QueryHelpers.AddQueryString(url, "version", version);
             }
+
             if (!string.IsNullOrWhiteSpace(comment))
             {
                 url = QueryHelpers.AddQueryString(url, "comment", comment);
@@ -106,12 +108,11 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
         }
 
-        public async Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchRequestViewModel request)
+        public async Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchModel request)
         {
-	        string url = "templates/templates-search";
+            string url = "templates/templates-search";
 
-	        return await ValidatedPostAsync<SearchResults<TemplateIndex>, SearchRequestViewModel>(url, request);
-
+            return await ValidatedPostAsync<SearchResults<TemplateIndex>, SearchModel>(url, request);
         }
     }
 }

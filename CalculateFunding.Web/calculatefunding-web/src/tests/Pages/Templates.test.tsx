@@ -82,12 +82,40 @@ describe("Templates homepage when I have permissions to create templates", () =>
     
     it("renders a create template link", () => {
         const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find(Link).at(7).prop('to')).toBe('/templatebuilder');
-        expect(wrapper.find('p.govuk-body').text()).toBe("Start building a new template");
+        expect(wrapper.find("#create-template").text()).toContain("Start building a new template");
+        expect(wrapper.find("#create-template").find(Link).prop('to')).toBe('/templatebuilder');
     });
 
     it("does not render a permission status warning", () => {
         const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
         expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
     });
+});
+
+describe("Templates homepage when there are NO templates to list", () => {
+    beforeEach(() => {
+        useSelectorSpy.mockClear();
+        useSelectorSpy.mockReturnValue(permissionsState);
+    });
+
+    it("does not renders the template listing table", () => {
+        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
+        expect(wrapper.find("#templates-table")).toHaveLength(0);
+    });
+});
+
+describe("Templates homepage when there are templates to list", () => {
+    beforeEach(() => {
+        useSelectorSpy.mockClear();
+        useSelectorSpy.mockReturnValue(permissionsState);
+    });
+    
+    /* TODO:
+    it("renders the template", () => {
+        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
+        expect(wrapper.find("#templates-table")).toHaveLength(1);
+        expect(wrapper.find("#templates-table").find(Link)).toHaveLength(1);
+        expect(wrapper.find("#templates-table").find(Link).prop('to')).toBe('/templatebuilder/' + template.Id);
+        expect(wrapper.find("#templates-table").find(Link).text()).toBe(template.Name);
+    });*/
 });

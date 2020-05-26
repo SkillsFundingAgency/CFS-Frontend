@@ -34,10 +34,12 @@ import { GetAllSpecifications } from "../actions/SpecificationActions";
 import { GetDataSchemaAction } from "../actions/DatasetActions";
 import { GetFeatureFlagsAction } from "../actions/FeatureFlagsActions";
 import { IFundingStreamPermissionsAction } from "../actions/UserPermissionsActions";
+import {ITemplatesState} from "../states/ITemplatesState";
 
 export interface IStoreState {
     userState: IUserState,
     userPermissions: IUserPermissionsState,
+    templates: ITemplatesState,
     fundingLineStructureState: IFundingLineStructureState,
     viewFundingState: IViewFundingState,
     viewSpecificationResults: ViewSpecificationResultsState,
