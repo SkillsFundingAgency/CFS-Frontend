@@ -1,5 +1,5 @@
 import JSONDigger from "json-digger";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import {
     AggregrationType,
     Calculation,
@@ -13,10 +13,11 @@ import {
     NodeType,
     TemplateCalculation,
     TemplateFundingLine,
-    ValueFormatType
+    ValueFormatType,
+    TemplateResponse
 } from "../types/TemplateBuilderDefinitions";
-import {TemplateSearchRequest} from "../types/searchRequestViewModel";
-import axios from "axios";
+import { TemplateSearchRequest } from "../types/searchRequestViewModel";
+import axios, { AxiosResponse } from "axios";
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
@@ -329,6 +330,16 @@ export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionary
 export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
     return await axios(`/api/templates/build/search`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         data: searchRequest
-    })}
+    })
+}
+
+export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
+    return await axios.get(`/api/templates/build/${templateId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}

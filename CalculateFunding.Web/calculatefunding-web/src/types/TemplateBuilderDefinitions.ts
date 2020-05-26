@@ -81,6 +81,25 @@ export interface FundingLine {
     calculations: Array<TemplateCalculation>
   }
 
+  export interface TemplateResponse {
+    templateId: string,
+    templateJson: string,
+    schemaVersion: string,
+    fundingStreamId: string,
+    fundingPeriodId: string,
+    name: string,
+    status: string,
+    publishStatus: string,
+    description: string,
+    minorVersion: number,
+    majorVersion: number,
+    version: number,
+    authorId: string,
+    authorName: string,
+    comments: string,
+    lastModificationDate: Date
+  }
+
   export interface Template {
     $schema: string,
     schemaVersion: string,

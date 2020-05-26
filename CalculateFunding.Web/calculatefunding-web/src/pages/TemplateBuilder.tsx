@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { Section } from '../types/Sections';
@@ -11,7 +12,10 @@ import {
     removeNode,
     cloneNode as cloneNodeDatasource,
     moveNode,
-    updateNode as updateDatasource
+    updateNode as updateDatasource,
+    datasourceToTemplateFundingLines,
+    getTemplateById,
+    templateFundingLinesToDatasource
 } from "../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../components/PermissionStatus";
 import {
@@ -23,27 +27,31 @@ import {
     FundingLine,
     Calculation,
     FundingLineOrCalculationSelectedItem,
-    FundingLineOrCalculation
+    FundingLineOrCalculation,
+    TemplateFundingLine,
+    Template,
+    TemplateResponse
 } from '../types/TemplateBuilderDefinitions';
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import "../styles/TemplateBuilder.scss";
 import { useSelector } from "react-redux";
 import { AppState } from "../states/AppState";
+import { useEffectOnce } from '../hooks/useEffectOnce';
+import { DateFormatter } from '../components/DateFormatter';
 
 enum Mode {
     View = 'view',
     Edit = 'edit'
 }
 
-const initialId: number = 0; // ToDo: Calculate last id from datasource when loading from server
-
 export function TemplateBuilder() {
     const orgchart = useRef();
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
+    const [template, setTemplate] = useState<TemplateResponse>();
     const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
-    const [nextId, setNextId] = useState(initialId);
+    const [nextId, setNextId] = useState(0);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [canEditTemplate, setCanEditTemplate] = useState<boolean>(false);
     const [canDeleteTemplate, setCanDeleteTemplate] = useState<boolean>(false);
@@ -70,6 +78,36 @@ export function TemplateBuilder() {
         }
         return permissions.some(p => p.canApproveTemplates);
     }
+
+    let { templateId } = useParams();
+
+    function getLastUsedFundingLineId(fundingLines: TemplateFundingLine[]): number {
+        let ids = [];
+        const flString = JSON.stringify(fundingLines);
+        const flMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
+        for (const match of flMatches) {
+            ids.push(parseInt(match[1].replace(',', ''), 10));
+        }
+        const calcMatches = flString.matchAll(/"templateCalculationId":(.*?)"/g);
+        for (const match of calcMatches) {
+            ids.push(parseInt(match[1].replace(',', ''), 10));
+        }
+        return Math.max(...ids);
+    }
+
+    const fetchData = async () => {
+        const templateResult = await getTemplateById(templateId);
+        const templateResponse = templateResult.data as TemplateResponse;
+        setTemplate(templateResponse);
+        const template = JSON.parse(templateResponse.templateJson) as Template;
+        const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines)
+        setDS(fundingLines);
+        setNextId(getLastUsedFundingLineId(template.fundingTemplate.fundingLines) + 1);
+    };
+
+    useEffectOnce(() => {
+        fetchData();
+    });
 
     useEffect(() => {
         let missing: string[] = [];
@@ -144,6 +182,10 @@ export function TemplateBuilder() {
         setDS([...ds]);
     };
 
+    const handleSaveClick = () => {
+        const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
+    };
+
     const handleAddFundingLineClick = () => {
         const keyCount = ds.length > 0 ? ds.reduce((prev, current) => {
             return (prev.key > current.key ? prev : current)
@@ -177,7 +219,27 @@ export function TemplateBuilder() {
                 <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
-                            <h1 className="govuk-heading-l">Build policy template</h1>
+                            {template !== undefined && <>
+                                <h1 className="govuk-heading-l">{template.name}</h1>
+                                <span className="govuk-caption-m">Funding stream</span>
+                                <h3 className="govuk-heading-m">{template.fundingStreamId}</h3>
+                                <span className="govuk-caption-m">Funding period</span>
+                                <h3 className="govuk-heading-m">{template.fundingPeriodId}</h3>
+                                <span className="govuk-caption-m">Description</span>
+                                <h3 className="govuk-heading-m">{template.description}</h3>
+                                <span className="govuk-caption-m">Major Version</span>
+                                <h3 className="govuk-heading-m">{template.majorVersion}</h3>
+                                <span className="govuk-caption-m">Minor Version</span>
+                                <h3 className="govuk-heading-m">{template.minorVersion}</h3>
+                                <span className="govuk-caption-m">Status</span>
+                                <h3 className="govuk-heading-m">{template.status}</h3>
+                                <span className="govuk-caption-m">Version</span>
+                                <h3 className="govuk-heading-m">Version {template.version}</h3>
+                                <span className="govuk-caption-m">Last Updated Date</span>
+                                <h3 className="govuk-heading-m"><DateFormatter date={template.lastModificationDate} utc={false} /></h3>
+                                <span className="govuk-caption-m">Last Updated Author</span>
+                                <h3 className="govuk-heading-m">{template.authorName}</h3>
+                            </>}
                             {canEditTemplate &&
                                 <div className="govuk-form-group">
                                     <div className="govuk-radios govuk-radios--inline">
@@ -197,7 +259,8 @@ export function TemplateBuilder() {
                                         </div>
                                     </div>
                                 </div>}
-                            {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                            {canEditTemplate && mode === Mode.Edit && <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                            {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='save' onClick={handleSaveClick}>Save and continue</button>}
                         </div>
                     </div>
                 </div>

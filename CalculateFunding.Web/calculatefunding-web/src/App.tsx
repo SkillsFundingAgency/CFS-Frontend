@@ -68,7 +68,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}
-                {featureFlagsState.templateBuilderVisible && <Route path="/TemplateBuilder" component={TemplateBuilder} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/TemplateBuilder/:templateId" component={TemplateBuilder} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />
