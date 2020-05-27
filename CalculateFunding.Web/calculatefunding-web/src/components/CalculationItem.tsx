@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB } from '../types/TemplateBuilderDefinitions';
+import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType } from '../types/TemplateBuilderDefinitions';
 import "../styles/CalculationItem.scss";
 
 export interface CalculationItemProps {
@@ -13,8 +13,11 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string | undefined>(node.allowedEnumTypeValues);
-    const [groupRate, setGroupRate] = useState<GroupRate | undefined>(node.groupRate);
-    const [percentageChangeBetweenAandB, setPercentageChangeBetweenAandB] = useState<PercentageChangeBetweenAandB | undefined>(node.percentageChangeBetweenAandB);
+    const [numerator, setNumerator] = useState<number | string>(node.groupRate ? node.groupRate.numerator : '');
+    const [denominator, setDenominator] = useState<number | string>(node.groupRate ? node.groupRate.denominator : '');
+    const [calculationA, setCalculationA] = useState<number | string>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationA : '');
+    const [calculationB, setCalculationB] = useState<number | string>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationB : '');
+    const [calculationAggregationType, setcalculationAggregationType] = useState<CalculationAggregationType>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationAggregationType : CalculationAggregationType.Sum);
     const [formulaText, setFormulaText] = useState<string>(node.formulaText);
     const [valueFormat, setValueFormat] = useState<ValueFormatType>(node.valueFormat);
     const [aggregationType, setAggregationType] = useState<AggregrationType>(node.aggregationType);
@@ -40,6 +43,46 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
         setAggregationType(AggregrationType[e.target.value as keyof typeof AggregrationType]);
     }
 
+    const handleNumeratorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const numerator = parseInt(e.target.value, 10);
+        if (isNaN(numerator)) {
+            setNumerator('');
+            return;
+        }
+        setNumerator(numerator);
+    }
+
+    const handleDenominatorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const denominator = parseInt(e.target.value, 10);
+        if (isNaN(denominator)) {
+            setDenominator('');
+            return;
+        }
+        setDenominator(denominator);
+    }
+
+    const handleCalculationAChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const calculationA = parseInt(e.target.value, 10);
+        if (isNaN(calculationA)) {
+            setCalculationA('');
+            return;
+        }
+        setCalculationA(calculationA);
+    }
+
+    const handleCalculationBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const calculationB = parseInt(e.target.value, 10);
+        if (isNaN(calculationB)) {
+            setCalculationB('');
+            return;
+        }
+        setCalculationB(calculationB);
+    }
+
+    const handleCalculationAggregationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setcalculationAggregationType(CalculationAggregationType[e.target.value as keyof typeof CalculationAggregationType]);
+    }
+
     const handleAllowedEnumTypeValuesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAllowedEnumTypeValues(e.target.value);
     }
@@ -58,7 +101,18 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
     }
 
     const handleSubmit = () => {
-        var updatedNode: CalculationUpdateModel = {
+        const groupRate: GroupRate = {
+            numerator: numerator !== '' ? numerator as number : 0,
+            denominator: denominator !== '' ? denominator as number : 0
+        };
+
+        const percentageChangeBetweenAandB: PercentageChangeBetweenAandB = {
+            calculationA: calculationA !== '' ? calculationA as number : 0,
+            calculationB: calculationB !== '' ? calculationB as number : 0,
+            calculationAggregationType: calculationAggregationType
+        };
+
+        const updatedNode: CalculationUpdateModel = {
             id: node.id,
             kind: node.kind,
             name: name,
@@ -67,8 +121,8 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
             valueFormat: valueFormat,
             aggregationType: aggregationType,
             allowedEnumTypeValues: type !== CalculationType.Enum ? "" : allowedEnumTypeValues,
-            groupRate: groupRate,
-            percentageChangeBetweenAandB: percentageChangeBetweenAandB
+            groupRate: aggregationType !== AggregrationType.GroupRate ? undefined : groupRate,
+            percentageChangeBetweenAandB: aggregationType !== AggregrationType.PercentageChangeBetweenAandB ? undefined : percentageChangeBetweenAandB
         };
 
         updateNode(updatedNode);
@@ -126,6 +180,37 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                         <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
                     </select>
                 </div>
+                {aggregationType === AggregrationType.GroupRate &&
+                    <>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="calc-numerator">Numerator</label>
+                            <input className="govuk-input govuk-!-width-one-third" id="calc-numerator" name="calc-numerator" type="text" value={numerator} onChange={handleNumeratorChange} />
+                        </div>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="calc-denominator">Denominator</label>
+                            <input className="govuk-input govuk-!-width-one-third" id="calc-denominator" name="calc-denominator" type="text" value={denominator} onChange={handleDenominatorChange} />
+                        </div>
+                    </>
+                }
+                {aggregationType === AggregrationType.PercentageChangeBetweenAandB &&
+                    <>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="calc-calculation-a">Calculation A</label>
+                            <input className="govuk-input govuk-!-width-one-third" id="calc-calculation-a" name="calc-calculation-a" type="text" value={calculationA} onChange={handleCalculationAChange} />
+                        </div>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="calc-calculation-b">Calculation B</label>
+                            <input className="govuk-input govuk-!-width-one-third" id="calc-calculation-b" name="calc-calculation-b" type="text" value={calculationB} onChange={handleCalculationBChange} />
+                        </div>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="calc-calculation-aggregation-type">Calculation Aggregation Type</label>
+                            <select className="govuk-select" id="calc-calculation-aggregation-type" name="calc-calculation-aggregation-type" value={calculationAggregationType} onChange={handleCalculationAggregationTypeChange} >
+                                <option value={CalculationAggregationType.Average}>Average</option>
+                                <option value={CalculationAggregationType.Sum}>Sum</option>
+                            </select>
+                        </div>
+                    </>
+                }
                 <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
                     Save and continue
                 </button>

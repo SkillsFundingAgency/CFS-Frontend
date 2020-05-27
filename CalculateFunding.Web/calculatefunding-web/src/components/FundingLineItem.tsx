@@ -46,7 +46,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
             kind: node.kind,
             name: name,
             type: type,
-            fundingLineCode: code
+            fundingLineCode: type === FundingLineType.Payment ? code : undefined
         };
 
         updateNode(updatedNode);
@@ -69,11 +69,15 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
                         <option value={FundingLineType.Information}>Information</option>
                     </select>
                 </div>
-                <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="fl-code">Funding Line Code</label>
-                    <span id="fl-code-hint" className="govuk-hint">The funding line code (e.g. PSG-0001)</span>
-                    <input className="govuk-input govuk-!-width-two-thirds" id="fl-code" name="fl-code" type="text" value={code} onChange={handleCodeChange} />
-                </div>
+                {type === FundingLineType.Payment &&
+                    <>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="fl-code">Funding Line Code</label>
+                            <span id="fl-code-hint" className="govuk-hint">The funding line code (e.g. PSG-0001)</span>
+                            <input className="govuk-input govuk-!-width-two-thirds" id="fl-code" name="fl-code" type="text" value={code} onChange={handleCodeChange} />
+                        </div>
+                    </>
+                }
                 <div className="govuk-form-group">
                     <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
                         Save and continue
