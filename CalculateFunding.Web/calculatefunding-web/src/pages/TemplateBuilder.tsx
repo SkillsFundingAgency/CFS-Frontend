@@ -219,7 +219,7 @@ export function TemplateBuilder() {
             kind: NodeType.FundingLine,
             type: FundingLineType.Information,
             name: `Funding Line ${id}`,
-            fundingLineCode: `Code ${id}`
+            fundingLineCode: null
         };
 
         const fundingLineEntry: FundingLineDictionaryEntry = {

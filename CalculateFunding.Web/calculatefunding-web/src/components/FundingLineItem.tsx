@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { FundingLine, FundingLineType, AggregrationType, FundingLineUpdateModel } from '../../types/TemplateBuilderDefinitions';
-import '../../styles/FundingLineItem.scss';
+import { FundingLine, FundingLineType, FundingLineUpdateModel } from '../types/TemplateBuilderDefinitions';
+import '../styles/FundingLineItem.scss';
 
 export interface FundingLineItemProps {
     node: FundingLine,
@@ -12,8 +12,7 @@ export interface FundingLineItemProps {
 export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: FundingLineItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<FundingLineType>(node.type);
-    const [code, setCode] = useState<string>(node.fundingLineCode);
-    const [aggregationType, setAggregationType] = useState<AggregrationType | undefined>(node.aggregationType);
+    const [code, setCode] = useState<string | undefined>(node.fundingLineCode);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,10 +25,6 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
 
     const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCode(e.target.value);
-    }
-
-    const handleAggregationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setAggregationType(AggregrationType[e.target.value as keyof typeof AggregrationType]);
     }
 
     const handleDelete = () => {
@@ -51,8 +46,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
             kind: node.kind,
             name: name,
             type: type,
-            fundingLineCode: code,
-            aggregationType: aggregationType
+            fundingLineCode: code
         };
 
         updateNode(updatedNode);
@@ -79,14 +73,6 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
                     <label className="govuk-label" htmlFor="fl-code">Funding Line Code</label>
                     <span id="fl-code-hint" className="govuk-hint">The funding line code (e.g. PSG-0001)</span>
                     <input className="govuk-input govuk-!-width-two-thirds" id="fl-code" name="fl-code" type="text" value={code} onChange={handleCodeChange} />
-                </div>
-                <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="fl-aggregation-type">Aggregation Type</label>
-                    <select className="govuk-select" id="fl-aggregation-type" name="fl-aggregation-type" value={aggregationType} onChange={handleAggregationChange} >
-                        <option value={AggregrationType.None}>None</option>
-                        <option value={AggregrationType.Sum}>Sum</option>
-                        <option value={AggregrationType.Average}>Average</option>
-                    </select>
                 </div>
                 <div className="govuk-form-group">
                     <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >

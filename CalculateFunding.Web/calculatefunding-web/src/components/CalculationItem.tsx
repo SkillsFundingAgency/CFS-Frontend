@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType } from '../types/TemplateBuilderDefinitions';
+import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB } from '../types/TemplateBuilderDefinitions';
 import "../styles/CalculationItem.scss";
 
 export interface CalculationItemProps {
@@ -12,9 +12,12 @@ export interface CalculationItemProps {
 export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
-    const [formulaText, setFormulaText] = useState<string | undefined>(node.formulaText);
-    const [valueFormat, setValueFormat] = useState<ValueFormatType | undefined>(node.valueFormat);
-    const [aggregationType, setAggregationType] = useState<AggregrationType | undefined>(node.aggregationType);
+    const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string | undefined>(node.allowedEnumTypeValues);
+    const [groupRate, setGroupRate] = useState<GroupRate | undefined>(node.groupRate);
+    const [percentageChangeBetweenAandB, setPercentageChangeBetweenAandB] = useState<PercentageChangeBetweenAandB | undefined>(node.percentageChangeBetweenAandB);
+    const [formulaText, setFormulaText] = useState<string>(node.formulaText);
+    const [valueFormat, setValueFormat] = useState<ValueFormatType>(node.valueFormat);
+    const [aggregationType, setAggregationType] = useState<AggregrationType>(node.aggregationType);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +38,10 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
 
     const handleAggregationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setAggregationType(AggregrationType[e.target.value as keyof typeof AggregrationType]);
+    }
+
+    const handleAllowedEnumTypeValuesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAllowedEnumTypeValues(e.target.value);
     }
 
     const handleDelete = () => {
@@ -58,7 +65,10 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
             type: type,
             formulaText: formulaText,
             valueFormat: valueFormat,
-            aggregationType: aggregationType
+            aggregationType: aggregationType,
+            allowedEnumTypeValues: type !== CalculationType.Enum ? "" : allowedEnumTypeValues,
+            groupRate: groupRate,
+            percentageChangeBetweenAandB: percentageChangeBetweenAandB
         };
 
         updateNode(updatedNode);
@@ -80,16 +90,19 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                         <option value={CalculationType.Cash}>Cash</option>
                         <option value={CalculationType.Rate}>Rate</option>
                         <option value={CalculationType.PupilNumber}>Pupil Number</option>
-                        <option value={CalculationType.Weighting}>Weighting</option>
-                        <option value={CalculationType.Scope}>Scope</option>
-                        <option value={CalculationType.Information}>Information</option>
-                        <option value={CalculationType.Drilldown}>Drilldown</option>
-                        <option value={CalculationType.PerPupilFunding}>Per Pupil Funding</option>
-                        <option value={CalculationType.LumpSum}>Lump Sum</option>
-                        <option value={CalculationType.ProviderLedFunding}>Provider Led Funding</option>
                         <option value={CalculationType.Number}>Number</option>
+                        <option value={CalculationType.Weighting}>Weighting</option>
+                        <option value={CalculationType.Boolean}>Boolean</option>
+                        <option value={CalculationType.Enum}>Enum</option>
                     </select>
                 </div>
+                {type === CalculationType.Enum &&
+                    <div className="govuk-form-group">
+                        <label className="govuk-label" htmlFor="calc-enum-values">Allowed Enum Values</label>
+                        <span id="calculation-enum-values-hint" className="govuk-hint">E.g. Option 1, Option2, Option3</span>
+                        <input className="govuk-input" id="calc-formula-text" name="calc-enum-values" type="text" value={allowedEnumTypeValues ? allowedEnumTypeValues : ""} onChange={handleAllowedEnumTypeValuesChange} />
+                    </div>
+                }
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-formula-text">Formula Text</label>
                     <input className="govuk-input govuk-!-width-two-thirds" id="calc-formula-text" name="calc-formula-text" type="text" value={formulaText} onChange={handleFormulaTextChange} />
@@ -98,7 +111,6 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                     <label className="govuk-label" htmlFor="calc-value-format">Value Format</label>
                     <span id="calculation-name-hint" className="govuk-hint">The way the value should show</span>
                     <select className="govuk-select" id="calc-value-format" name="calc-value-format" value={valueFormat} onChange={handleValueFormatChange} >
-                        <option value=""></option>
                         <option value={ValueFormatType.Number}>Number</option>
                         <option value={ValueFormatType.Percentage}>Percentage</option>
                         <option value={ValueFormatType.Currency}>Currency</option>
@@ -107,10 +119,11 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-aggregation-type">Aggregation Type</label>
                     <select className="govuk-select" id="calc-aggregation-type" name="calc-aggregation-type" value={aggregationType} onChange={handleAggregationChange} >
-                        <option value=""></option>
                         <option value={AggregrationType.None}>None</option>
-                        <option value={AggregrationType.Sum}>Sum</option>
                         <option value={AggregrationType.Average}>Average</option>
+                        <option value={AggregrationType.Sum}>Sum</option>
+                        <option value={AggregrationType.GroupRate}>GroupRate</option>
+                        <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
                     </select>
                 </div>
                 <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >

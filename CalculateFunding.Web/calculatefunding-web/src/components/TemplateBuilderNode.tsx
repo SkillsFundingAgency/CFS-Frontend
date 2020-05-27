@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/TemplateBuilderNode.scss";
-import { FundingLineOrCalculation, NodeType, FundingLine, Calculation, FundingLineType, CalculationType } from "../types/TemplateBuilderDefinitions";
+import { FundingLineOrCalculation, NodeType, FundingLine, Calculation, FundingLineType, CalculationType, AggregrationType, ValueFormatType } from "../types/TemplateBuilderDefinitions";
 
 interface TemplateBuilderNodeProps {
   nodeData: FundingLineOrCalculation,
@@ -20,7 +20,7 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
       kind: NodeType.FundingLine,
       type: FundingLineType.Information,
       name: `Funding Line ${nextId}`,
-      fundingLineCode: `Code ${nextId}`,
+      fundingLineCode: null,
     };
     addNode(nodeData.id, newChild);
   };
@@ -31,8 +31,14 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
       dsKey: dsKey,
       templateCalculationId: nextId,
       kind: NodeType.Calculation,
-      type: CalculationType.Information,
+      type: CalculationType.Boolean,
       name: `Calculation ${nextId}`,
+      aggregationType: AggregrationType.None,
+      formulaText: "Enter formula text",
+      valueFormat: ValueFormatType.Number,
+      allowedEnumTypeValues: null,
+      groupRate: null,
+      percentageChangeBetweenAandB: null
     };
     addNode(nodeData.id, newChild);
   };
@@ -46,10 +52,14 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
 
   if (nodeData.kind === NodeType.FundingLine) {
     const node = nodeData as FundingLine;
+    const fundingLineName = node.fundingLineCode ?
+      `${node.name} (${node.fundingLineCode})${isClone ? "*" : ""}` :
+      `${node.name} ${isClone ? "*" : ""}`;
+      
     return (
       <div>
         <div onClick={handleClick} data-testid={`node-${node.id}`}>
-          <div className="fundingLine govuk-body-s">{`${node.name} (${node.fundingLineCode})${isClone ? "*" : ""}`}</div>
+          <div className="fundingLine govuk-body-s">{fundingLineName}</div>
           <div className="box govuk-body-s">{node.type}</div>
         </div>
         {editMode &&

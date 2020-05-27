@@ -194,6 +194,22 @@ function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Ar
     return children;
 }
 
+export function getStringArray(options: string | undefined): string[] | undefined {
+    if (!options || options.length === 0) {
+        return undefined;
+    }
+
+    return options.split(",").map(s => s.trim());
+}
+
+export function stringArrayToString(options: string[] | undefined): string | undefined {
+    if (!options || options.length === 0) {
+        return undefined;
+    }
+
+    return options.join(", ").trimEnd();
+}
+
 function getCalculation(templateCalculation: TemplateCalculation, id: number, key: number): Calculation {
     let currentId = id;
     const childCalculations = getChildren(templateCalculation.calculations, currentId, key);
@@ -203,10 +219,13 @@ function getCalculation(templateCalculation: TemplateCalculation, id: number, ke
         kind: NodeType.Calculation,
         type: <CalculationType>templateCalculation.type,
         name: templateCalculation.name,
-        aggregationType: templateCalculation.aggregationType ? <AggregrationType>templateCalculation.aggregationType : undefined,
+        aggregationType: <AggregrationType>templateCalculation.aggregationType,
         dsKey: key,
         formulaText: templateCalculation.formulaText,
-        valueFormat: templateCalculation.valueFormat ? <ValueFormatType>templateCalculation.valueFormat : undefined,
+        valueFormat: <ValueFormatType>templateCalculation.valueFormat,
+        allowedEnumTypeValues: stringArrayToString(templateCalculation.allowedEnumTypeValues),
+        groupRate: templateCalculation.groupRate,
+        percentageChangeBetweenAandB: templateCalculation.percentageChangeBetweenAandB,
         children: childCalculations
     }
 }
@@ -221,7 +240,6 @@ function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, ke
         type: <FundingLineType>templateFundingLine.type,
         fundingLineCode: templateFundingLine.fundingLineCode,
         name: templateFundingLine.name,
-        aggregationType: templateFundingLine.aggregationType ? <AggregrationType>templateFundingLine.aggregationType : undefined,
         kind: NodeType.FundingLine,
         dsKey: key,
         children: childFundingLines.concat(childCalculations)
@@ -288,6 +306,9 @@ function getTemplateCalculation(calculation: Calculation) {
         aggregationType: calculation.aggregationType,
         formulaText: calculation.formulaText,
         valueFormat: calculation.valueFormat,
+        allowedEnumTypeValues: getStringArray(calculation.allowedEnumTypeValues),
+        groupRate: calculation.groupRate,
+        percentageChangeBetweenAandB: calculation.percentageChangeBetweenAandB,
         calculations: childCalculations
     };
 
@@ -303,7 +324,6 @@ function getTemplateFundingLine(fundingLine: FundingLine) {
         type: fundingLine.type,
         name: fundingLine.name,
         fundingLineCode: fundingLine.fundingLineCode,
-        aggregationType: fundingLine.aggregationType,
         fundingLines: childFundingLines,
         calculations: childCalculations
     };

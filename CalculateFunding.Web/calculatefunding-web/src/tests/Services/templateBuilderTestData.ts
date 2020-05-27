@@ -10,7 +10,6 @@ export const singleNodeDs: Array<FundingLineDictionaryEntry> = [
             "type": FundingLineType.Information,
             "name": "Funding Line 0",
             "fundingLineCode": "Code 0",
-            "aggregationType": undefined,
             "dsKey": 1,
             "children": []
         }
@@ -23,7 +22,6 @@ export const singleNodeTemplate: Array<TemplateFundingLine> = [
         "fundingLineCode": "Code 0",
         "templateLineId": 0,
         "type": "Information",
-        "aggregationType": undefined,
         "fundingLines": [],
         "calculations": []
     }
@@ -39,7 +37,6 @@ export const withChildFundingLineDs: Array<FundingLineDictionaryEntry> = [
             "type": FundingLineType.Information,
             "name": "Funding Line 0",
             "fundingLineCode": "Code 0",
-            "aggregationType": undefined,
             "dsKey": 1,
             "children": [
                 {
@@ -50,7 +47,6 @@ export const withChildFundingLineDs: Array<FundingLineDictionaryEntry> = [
                     "type": FundingLineType.Information,
                     "name": "Funding Line 1",
                     "fundingLineCode": "Code 1",
-                    "aggregationType": undefined,
                     "children": []
                 }
             ]
@@ -64,13 +60,11 @@ export const withChildFundingLineTemplate: Array<TemplateFundingLine> = [
         "fundingLineCode": "Code 0",
         "templateLineId": 0,
         "type": "Information",
-        "aggregationType": undefined,
         "fundingLines": [{
             "name": "Funding Line 1",
             "fundingLineCode": "Code 1",
             "templateLineId": 1,
             "type": "Information",
-            "aggregationType": undefined,
             "fundingLines": [],
             "calculations": []
         }],
@@ -88,7 +82,6 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
             "type": FundingLineType.Information,
             "name": "Funding Line 0",
             "fundingLineCode": "Code 0",
-            "aggregationType": undefined,
             "dsKey": 1,
             "children": [
                 {
@@ -99,7 +92,6 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
                     "type": FundingLineType.Information,
                     "name": "Funding Line 1",
                     "fundingLineCode": "Code 1",
-                    "aggregationType": undefined,
                     "children": [{
                         "id": "n0",
                         "dsKey": 1,
@@ -108,7 +100,6 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
                         "type": FundingLineType.Payment,
                         "name": "Funding Line 2",
                         "fundingLineCode": "Code 2",
-                        "aggregationType": undefined,
                         "children": []
                     }]
                 },
@@ -117,11 +108,14 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
                     "dsKey": 1,
                     "templateCalculationId": 3,
                     "kind": NodeType.Calculation,
-                    "type": CalculationType.PupilNumber,
+                    "type": CalculationType.Enum,
                     "name": "Calculation 3",
-                    "aggregationType": AggregrationType.Sum,
+                    "aggregationType": AggregrationType.None,
                     "formulaText": "",
                     "valueFormat": ValueFormatType.Currency,
+                    "allowedEnumTypeValues": "Option1, Option2, Option3",
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
                     "children": []
                 }
             ]
@@ -135,20 +129,17 @@ export const withChildFundingLineAndCalculationTemplate: Array<TemplateFundingLi
         "fundingLineCode": "Code 0",
         "templateLineId": 0,
         "type": "Information",
-        "aggregationType": undefined,
         "fundingLines": [{
             "name": "Funding Line 1",
             "fundingLineCode": "Code 1",
             "templateLineId": 1,
             "type": "Information",
-            "aggregationType": undefined,
             "fundingLines": [
                 {
                     "name": "Funding Line 2",
                     "fundingLineCode": "Code 2",
                     "templateLineId": 2,
                     "type": "Payment",
-                    "aggregationType": undefined,
                     "fundingLines": [],
                     "calculations": []
                 }
@@ -158,10 +149,13 @@ export const withChildFundingLineAndCalculationTemplate: Array<TemplateFundingLi
         "calculations": [{
             "templateCalculationId": 3,
             "name": "Calculation 3",
-            "type": "PupilNumber",
-            "aggregationType": "Sum",
+            "type": "Enum",
+            "aggregationType": "None",
             "formulaText": "",
             "valueFormat": "Currency",
+            "allowedEnumTypeValues": ["Option1", "Option2", "Option3"],
+            "groupRate": undefined,
+            "percentageChangeBetweenAandB": undefined,
             "calculations": []
         }]
     }
@@ -177,7 +171,6 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
             "type": FundingLineType.Information,
             "name": "Funding Line 0",
             "fundingLineCode": "Code 0",
-            "aggregationType": undefined,
             "dsKey": 1,
             "children": []
         }
@@ -191,7 +184,6 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
             "type": FundingLineType.Information,
             "name": "Funding Line 1",
             "fundingLineCode": "Code 1",
-            "aggregationType": undefined,
             "dsKey": 2,
             "children": [
                 {
@@ -201,7 +193,6 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
                     "type": FundingLineType.Information,
                     "name": "Funding Line 3",
                     "fundingLineCode": "Code 3",
-                    "aggregationType": undefined,
                     "dsKey": 2,
                     "children": []
                 },
@@ -214,6 +205,9 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
                     "aggregationType": AggregrationType.Sum,
                     "formulaText": "",
                     "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
                     "dsKey": 2,
                     "children": []
                 }
@@ -229,7 +223,6 @@ export const multipleFundingLinesDs: Array<FundingLineDictionaryEntry> = [
             "type": FundingLineType.Payment,
             "name": "Funding Line 2",
             "fundingLineCode": "Code 2",
-            "aggregationType": undefined,
             "dsKey": 3,
             "children": []
         }
@@ -241,7 +234,6 @@ export const multipleFundingLinesTemplate: Array<TemplateFundingLine> = [
         "name": "Funding Line 0",
         "fundingLineCode": "Code 0",
         "templateLineId": 0,
-        "aggregationType": undefined,
         "type": "Information",
         "fundingLines": [],
         "calculations": []
@@ -251,11 +243,9 @@ export const multipleFundingLinesTemplate: Array<TemplateFundingLine> = [
         "fundingLineCode": "Code 1",
         "templateLineId": 1,
         "type": "Information",
-        "aggregationType": undefined,
         "fundingLines": [
             {
                 "name": "Funding Line 3",
-                "aggregationType": undefined,
                 "fundingLineCode": "Code 3",
                 "templateLineId": 3,
                 "type": "Information",
@@ -271,6 +261,9 @@ export const multipleFundingLinesTemplate: Array<TemplateFundingLine> = [
                 "valueFormat": "Number",
                 "formulaText": "",
                 "aggregationType": "Sum",
+                "allowedEnumTypeValues": undefined,
+                "groupRate": undefined,
+                "percentageChangeBetweenAandB": undefined,
                 "calculations": []
             }
         ]
@@ -279,7 +272,6 @@ export const multipleFundingLinesTemplate: Array<TemplateFundingLine> = [
         "name": "Funding Line 2",
         "fundingLineCode": "Code 2",
         "templateLineId": 2,
-        "aggregationType": undefined,
         "type": "Payment",
         "fundingLines": [],
         "calculations": []

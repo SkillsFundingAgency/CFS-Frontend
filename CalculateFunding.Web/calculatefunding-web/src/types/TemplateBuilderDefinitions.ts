@@ -12,21 +12,24 @@ export enum CalculationType {
   Cash = "Cash",
   Rate = "Rate",
   PupilNumber = "PupilNumber",
+  Number = "Number",
   Weighting = "Weighting",
-  Scope = "Scope",
-  Information = "Information",
-  Drilldown = "Drilldown",
-  PerPupilFunding = "PerPupilFunding",
-  LumpSum = "LumpSum",
-  ProviderLedFunding = "ProviderLedFunding",
-  Number = "Number"
+  Boolean = "Boolean",
+  Enum = "Enum"
 }
 
 export enum AggregrationType {
   None = "None",
+  Average = "Average",
+  Sum = "Sum",
+  GroupRate = "GroupRate",
+  PercentageChangeBetweenAandB = "PercentageChangeBetweenAandB"
+}
+
+export enum CalculationAggregationType {
   Sum = "Sum",
   Average = "Average"
-}
+} 
 
 export enum ValueFormatType {
   Number = "Number",
@@ -34,161 +37,178 @@ export enum ValueFormatType {
   Currency = "Currency"
 }
 
+export interface GroupRate {
+  numerator: number,
+  denominator: number
+}
+
+export interface PercentageChangeBetweenAandB {
+  calculationA: number,
+  calculationB: number,
+  calculationAggregationType: CalculationAggregationType
+}
+
 export interface FundingLine {
-    id: string,
-    relationship?: string,
-    dsKey?: number,
-    templateLineId: number,
-    kind: NodeType,
-    type: FundingLineType,
-    name: string,
-    fundingLineCode: string,
-    aggregationType?: AggregrationType,
-    children?: Array<FundingLineOrCalculation>
-  }
+  id: string,
+  relationship?: string,
+  dsKey?: number,
+  templateLineId: number,
+  kind: NodeType,
+  type: FundingLineType,
+  name: string,
+  fundingLineCode?: string,
+  children?: Array<FundingLineOrCalculation>
+}
 
-  export interface TemplateFundingLine {
-    templateLineId: number,
-    type: FundingLineType | string,
-    name: string,
-    fundingLineCode: string,
-    aggregationType?: AggregrationType,
-    fundingLines: Array<TemplateFundingLine>,
-    calculations: Array<TemplateCalculation>
-  }
+export interface TemplateFundingLine {
+  templateLineId: number,
+  type: FundingLineType | string,
+  name: string,
+  fundingLineCode?: string,
+  fundingLines: Array<TemplateFundingLine>,
+  calculations: Array<TemplateCalculation>
+}
 
-  export interface Calculation {
-    id: string,
-    relationship?: string,
-    dsKey?: number,
-    templateCalculationId: number,
-    kind: NodeType,
-    type: CalculationType,
-    name: string,
-    aggregationType?: AggregrationType,
-    formulaText?: string,
-    valueFormat?: ValueFormatType,
-    children?: Array<FundingLineOrCalculation>
-  }
+export interface Calculation {
+  id: string,
+  relationship?: string,
+  dsKey?: number,
+  templateCalculationId: number,
+  kind: NodeType,
+  type: CalculationType,
+  name: string,
+  aggregationType: AggregrationType,
+  formulaText: string,
+  valueFormat: ValueFormatType,
+  allowedEnumTypeValues?: string,
+  groupRate?: GroupRate,
+  percentageChangeBetweenAandB?: PercentageChangeBetweenAandB,
+  children?: Array<FundingLineOrCalculation>
+}
 
-  export interface TemplateCalculation {
-    templateCalculationId: number,
-    type: CalculationType | string,
-    name: string,
-    aggregationType?: AggregrationType | string,
-    formulaText?: string,
-    valueFormat?: ValueFormatType | string,
-    calculations: Array<TemplateCalculation>
-  }
+export interface TemplateCalculation {
+  templateCalculationId: number,
+  type: CalculationType | string,
+  name: string,
+  aggregationType: AggregrationType | string,
+  formulaText: string,
+  valueFormat: ValueFormatType | string,
+  allowedEnumTypeValues?: string[],
+  groupRate?: GroupRate,
+  percentageChangeBetweenAandB?: PercentageChangeBetweenAandB,
+  calculations: Array<TemplateCalculation>
+}
 
-  export interface TemplateResponse {
-    templateId: string,
-    templateJson: string,
-    schemaVersion: string,
-    fundingStreamId: string,
-    fundingPeriodId: string,
-    name: string,
-    status: string,
-    publishStatus: string,
-    description: string,
-    minorVersion: number,
-    majorVersion: number,
-    version: number,
-    authorId: string,
-    authorName: string,
-    comments: string,
-    lastModificationDate: Date
-  }
+export interface TemplateResponse {
+  templateId: string,
+  templateJson: string,
+  schemaVersion: string,
+  fundingStreamId: string,
+  fundingPeriodId: string,
+  name: string,
+  status: string,
+  publishStatus: string,
+  description: string,
+  minorVersion: number,
+  majorVersion: number,
+  version: number,
+  authorId: string,
+  authorName: string,
+  comments: string,
+  lastModificationDate: Date
+}
 
-  export interface Template {
-    $schema: string,
-    schemaVersion: string,
-    fundingTemplate: FundingTemplate
-  }
-  
-  export interface TemplateSummary {
-    id: string,
-    name: string,
-    fundingStreamId: string,
-    fundingStreamName: string,
-    fundingPeriodId: string,
-    fundingPeriodName: string,
-    lastUpdatedAuthorName: string,
-    lastUpdatedDate: Date,
-    version: number,
-    currentMajorVersion: number,
-    currentMinorVersion: number,
-    publishedMajorVersion: number,
-    publishedMinorVersion: number,
-    hasReleasedVersion: boolean
-  }
-  
-  export interface TemplateSearchResponse {
-    totalCount: number,
-    totalErrorCount: number,
-    facets: SearchFacet[],
-    results: TemplateSummary[]
-  }
+export interface Template {
+  $schema: string,
+  schemaVersion: string,
+  fundingTemplate: FundingTemplate
+}
 
-  export interface SearchFacet {
-    name: string;
-    facetValues: SearchFacetValue[];
-  }
-  export interface SearchFacetValue {
-    name: string;
-    count: number;
-  }
+export interface TemplateSummary {
+  id: string,
+  name: string,
+  fundingStreamId: string,
+  fundingStreamName: string,
+  fundingPeriodId: string,
+  fundingPeriodName: string,
+  lastUpdatedAuthorName: string,
+  lastUpdatedDate: Date,
+  version: number,
+  currentMajorVersion: number,
+  currentMinorVersion: number,
+  publishedMajorVersion: number,
+  publishedMinorVersion: number,
+  hasReleasedVersion: boolean
+}
 
-  export interface FundingTemplate {
-    fundingTemplateVersion: string,
-    fundingStream: TemplateFundingStream,
-    fundingPeriod: TemplateFundingPeriod,
-    fundingLines: Array<TemplateFundingLine>
-  }
+export interface TemplateSearchResponse {
+  totalCount: number,
+  totalErrorCount: number,
+  facets: SearchFacet[],
+  results: TemplateSummary[]
+}
 
-  export interface TemplateFundingStream {
-    code: string,
-    name: string
-  }
+export interface SearchFacet {
+  name: string;
+  facetValues: SearchFacetValue[];
+}
+export interface SearchFacetValue {
+  name: string;
+  count: number;
+}
 
-  export interface TemplateFundingPeriod {
-    id: string,
-    period: string,
-    name: string,
-    type: string,
-    startDate: string,
-    endDate: string
-  }
+export interface FundingTemplate {
+  fundingTemplateVersion: string,
+  fundingStream: TemplateFundingStream,
+  fundingPeriod: TemplateFundingPeriod,
+  fundingLines: Array<TemplateFundingLine>
+}
 
-  export interface UpdateModel {
-    kind: NodeType
-  }
+export interface TemplateFundingStream {
+  code: string,
+  name: string
+}
 
-  export interface FundingLineUpdateModel extends UpdateModel {
-    id: string,
-    type: FundingLineType,
-    name: string,
-    fundingLineCode: string,
-    aggregationType?: AggregrationType
-  }
+export interface TemplateFundingPeriod {
+  id: string,
+  period: string,
+  name: string,
+  type: string,
+  startDate: string,
+  endDate: string
+}
 
-  export interface CalculationUpdateModel extends UpdateModel {
-    id: string,
-    type: CalculationType,
-    name: string,
-    aggregationType?: AggregrationType,
-    formulaText?: string,
-    valueFormat?: ValueFormatType
-  }
+export interface UpdateModel {
+  kind: NodeType
+}
 
-  export type FundingLineOrCalculation = FundingLine | Calculation;
+export interface FundingLineUpdateModel extends UpdateModel {
+  id: string,
+  type: FundingLineType,
+  name: string,
+  fundingLineCode?: string
+}
 
-  export type FundingLineDictionaryEntry = {
-    key: number,
-    value: FundingLine
-  }
+export interface CalculationUpdateModel extends UpdateModel {
+  id: string,
+  type: CalculationType,
+  name: string,
+  aggregationType: AggregrationType,
+  formulaText: string,
+  valueFormat: ValueFormatType,
+  allowedEnumTypeValues?: string,
+  groupRate?: GroupRate,
+  percentageChangeBetweenAandB?: PercentageChangeBetweenAandB
+}
 
-  export type FundingLineOrCalculationSelectedItem = {
-    key: number,
-    value: FundingLineOrCalculation
-  }
+export type FundingLineOrCalculation = FundingLine | Calculation;
+
+export type FundingLineDictionaryEntry = {
+  key: number,
+  value: FundingLine
+}
+
+export type FundingLineOrCalculationSelectedItem = {
+  key: number,
+  value: FundingLineOrCalculation
+}
