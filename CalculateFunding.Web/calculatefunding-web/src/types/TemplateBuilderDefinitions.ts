@@ -124,6 +124,11 @@ export interface Template {
   fundingTemplate: FundingTemplate
 }
 
+  export interface TemplateContentUpdateCommand {
+    templateId: string,
+    templateJson: string
+  }
+  
 export interface TemplateSummary {
   id: string,
   name: string,

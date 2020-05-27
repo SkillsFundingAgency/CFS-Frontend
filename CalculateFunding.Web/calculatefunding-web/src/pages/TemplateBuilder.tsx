@@ -15,7 +15,8 @@ import {
     updateNode as updateDatasource,
     datasourceToTemplateFundingLines,
     getTemplateById,
-    templateFundingLinesToDatasource
+    templateFundingLinesToDatasource, 
+    saveTemplateContent
 } from "../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../components/PermissionStatus";
 import {
@@ -30,7 +31,7 @@ import {
     FundingLineOrCalculation,
     TemplateFundingLine,
     Template,
-    TemplateResponse
+    TemplateResponse, TemplateContentUpdateCommand, TemplateFundingPeriod
 } from '../types/TemplateBuilderDefinitions';
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import "../styles/TemplateBuilder.scss";
@@ -40,6 +41,8 @@ import { useEffectOnce } from '../hooks/useEffectOnce';
 import { DateFormatter } from '../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
 import { LoadingStatus } from '../components/LoadingStatus';
+import {getFundingPeriodsByFundingStreamIdService} from "../services/specificationService";
+import {FundingPeriod, FundingStream} from "../types/viewFundingTypes";
 
 enum Mode {
     View = 'view',
@@ -53,16 +56,25 @@ export function TemplateBuilder() {
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
+    const [fundingPeriod, setFundingPeriod] = useState<FundingPeriod>();
+    const [fundingStream, setFundingStream] = useState<FundingStream>();
     const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [nextId, setNextId] = useState(0);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [canEditTemplate, setCanEditTemplate] = useState<boolean>(false);
+    const [canCreateTemplate, setCanCreateTemplate] = useState<boolean>(false);
     const [canDeleteTemplate, setCanDeleteTemplate] = useState<boolean>(false);
     const [canApproveTemplate, setCanApproveTemplate] = useState<boolean>(false);
     let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
 
+    function getCreatePermission() {
+        if (!permissions) {
+            return false;
+        }
+        return permissions.some(p => p.canCreateTemplates);
+    }
     function getEditPermission() {
         if (!permissions) {
             return false;
@@ -125,7 +137,7 @@ export function TemplateBuilder() {
         }
     };
 
-    useEffectOnce(() => {
+        useEffectOnce(() => {
         fetchData();
     });
 
@@ -148,6 +160,7 @@ export function TemplateBuilder() {
     }, [canEditTemplate, canDeleteTemplate, canApproveTemplate]);
 
     useEffect(() => {
+        setCanCreateTemplate(getCreatePermission());
         setCanEditTemplate(getEditPermission());
         setCanDeleteTemplate(getDeletePermission());
         setCanApproveTemplate(getApprovePermission());
@@ -202,8 +215,38 @@ export function TemplateBuilder() {
         setDS([...ds]);
     };
 
-    const handleSaveClick = () => {
+    const handleSaveContentClick = async () => {
+        if (template == undefined) {
+            setIsError(true);
+            setErrorMessages(errors => [...errors, "Can't find template data to update"]);
+            return;
+        }
         const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
+        const templateUpdated: Template =  {
+            $schema: "https://fundingschemas.blob.core.windows.net/schemas/funding-template-schema-1.1.json",
+            schemaVersion: "1.1",
+            fundingTemplate: { 
+                fundingLines: fundingLines, 
+                fundingPeriod: { 
+                    id: template.fundingPeriodId,
+                    period: "2021",
+                    name: template.fundingPeriodId,
+                    type: "FY",
+                    startDate: "2020-04-01T00:00:00+00:00",
+                    endDate: "2021-03-31T00:00:00+00:00"
+                }, 
+                fundingStream: {
+                    code: template.fundingStreamId,
+                    name: template.fundingStreamId
+                }, 
+                fundingTemplateVersion: "#version#"
+            }
+        };
+        const templateContentUpdateCommand: TemplateContentUpdateCommand = {
+            templateId: template.templateId, 
+            templateJson: JSON.stringify(templateUpdated)
+        }
+        await saveTemplateContent(templateContentUpdateCommand);
     };
 
     const handleAddFundingLineClick = () => {
@@ -286,8 +329,12 @@ export function TemplateBuilder() {
                                                 </div>
                                             </div>
                                         </div>}
-                                    {canEditTemplate && mode === Mode.Edit && <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
-                                    {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='save' onClick={handleSaveClick}>Save and continue</button>}
+                                {mode === Mode.Edit && canEditTemplate && 
+                                    <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' 
+                                            onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                                {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&  
+                                    <button className="govuk-button" data-testid='save' 
+                                            onClick={handleSaveContentClick}>Save and continue</button>}
                                 </div>
                             </div>
                         </div>

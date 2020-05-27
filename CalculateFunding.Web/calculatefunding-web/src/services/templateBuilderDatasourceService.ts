@@ -14,7 +14,7 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse
+    TemplateResponse, Template, TemplateContentUpdateCommand
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axios, { AxiosResponse } from "axios";
@@ -345,6 +345,14 @@ function getTemplateFundingLinesFromDatasource(fundingLines: Array<FundingLineDi
 export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionaryEntry>): Array<TemplateFundingLine> => {
     const templateFundingLines = getTemplateFundingLinesFromDatasource(ds);
     return templateFundingLines;
+}
+
+export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
+    return await axios(`/api/templates/build/content`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: command
+    })
 }
 
 export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
