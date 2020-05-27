@@ -38,6 +38,8 @@ import { useSelector } from "react-redux";
 import { AppState } from "../states/AppState";
 import { useEffectOnce } from '../hooks/useEffectOnce';
 import { DateFormatter } from '../components/DateFormatter';
+import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
+import { LoadingStatus } from '../components/LoadingStatus';
 
 enum Mode {
     View = 'view',
@@ -46,6 +48,7 @@ enum Mode {
 
 export function TemplateBuilder() {
     const orgchart = useRef();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
@@ -99,6 +102,7 @@ export function TemplateBuilder() {
 
     const fetchData = async () => {
         try {
+            setIsLoading(true);
             const templateResult = await getTemplateById(templateId);
             const templateResponse = templateResult.data as TemplateResponse;
             setTemplate(templateResponse);
@@ -112,8 +116,10 @@ export function TemplateBuilder() {
                 setIsError(true);
                 setErrorMessages(errors => [...errors, "The template content could not be loaded."]);
             }
+            setIsLoading(false);
         }
         catch (err) {
+            setIsLoading(false);
             setIsError(true);
             setErrorMessages(errors => [...errors, err.message]);
         }
@@ -230,102 +236,108 @@ export function TemplateBuilder() {
             <Header location={Section.Templates} />
             <div className="govuk-width-container">
                 <PermissionStatus requiredPermissions={missingPermissions} />
-                {!isError ? <>
-                    <div className="govuk-main-wrapper">
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
-                                {template !== undefined && <>
-                                    <h1 className="govuk-heading-l">{template.name}</h1>
+                <LoadingStatus title={"Loading Template"} hidden={!isLoading} id={"template-builder-loader"}
+                    subTitle={"Please wait while the template loads."} />
+                <Breadcrumbs>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/templates"} />
+                    <Breadcrumb name={template ? template.name : ""} />
+                </Breadcrumbs>
+                {!isError ?
+                    <>
+                        <div className="govuk-main-wrapper">
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-full">
+                                    <h1 className="govuk-heading-l">{template && template.name}</h1>
                                     <span className="govuk-caption-m">Funding stream</span>
-                                    <h3 className="govuk-heading-m">{template.fundingStreamId}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.fundingStreamId}</h3>
                                     <span className="govuk-caption-m">Funding period</span>
-                                    <h3 className="govuk-heading-m">{template.fundingPeriodId}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.fundingPeriodId}</h3>
                                     <span className="govuk-caption-m">Description</span>
-                                    <h3 className="govuk-heading-m">{template.description}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.description}</h3>
                                     <span className="govuk-caption-m">Major Version</span>
-                                    <h3 className="govuk-heading-m">{template.majorVersion}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.majorVersion}</h3>
                                     <span className="govuk-caption-m">Minor Version</span>
-                                    <h3 className="govuk-heading-m">{template.minorVersion}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.minorVersion}</h3>
                                     <span className="govuk-caption-m">Status</span>
-                                    <h3 className="govuk-heading-m">{template.status}</h3>
+                                    <h3 className="govuk-heading-m">{template && template.status}</h3>
                                     <span className="govuk-caption-m">Version</span>
-                                    <h3 className="govuk-heading-m">Version {template.version}</h3>
+                                    <h3 className="govuk-heading-m">Version {template && template.version}</h3>
                                     <span className="govuk-caption-m">Last Updated Date</span>
-                                    <h3 className="govuk-heading-m"><DateFormatter date={template.lastModificationDate} utc={false} /></h3>
+                                    <h3 className="govuk-heading-m"><DateFormatter date={template ? template.lastModificationDate : null} utc={false} /></h3>
                                     <span className="govuk-caption-m">Last Updated Author</span>
-                                    <h3 className="govuk-heading-m">{template.authorName}</h3>
-                                </>}
-                                {canEditTemplate &&
-                                    <div className="govuk-form-group">
-                                        <div className="govuk-radios govuk-radios--inline">
-                                            <div className="govuk-radios__item">
-                                                <input className="govuk-radios__input" id="edit-mode" name="edit-mode" type="radio" value="edit"
-                                                    checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit' />
-                                                <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
-                                                    Edit
+                                    <h3 className="govuk-heading-m">{template && template.authorName}</h3>
+                                    {canEditTemplate &&
+                                        <div className="govuk-form-group">
+                                            <div className="govuk-radios govuk-radios--inline">
+                                                <div className="govuk-radios__item">
+                                                    <input className="govuk-radios__input" id="edit-mode" name="edit-mode" type="radio" value="edit"
+                                                        checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit' />
+                                                    <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
+                                                        Edit
                                                 </label>
-                                            </div>
-                                            <div className="govuk-radios__item">
-                                                <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view"
-                                                    checked={mode === Mode.View} onChange={handleModeChange} data-testid='view' />
-                                                <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
-                                                    View
+                                                </div>
+                                                <div className="govuk-radios__item">
+                                                    <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view"
+                                                        checked={mode === Mode.View} onChange={handleModeChange} data-testid='view' />
+                                                    <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
+                                                        View
                                                 </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>}
-                                {canEditTemplate && mode === Mode.Edit && <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
-                                {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='save' onClick={handleSaveClick}>Save and continue</button>}
+                                        </div>}
+                                    {canEditTemplate && mode === Mode.Edit && <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                                    {canEditTemplate && mode === Mode.Edit && <button className="govuk-button" data-testid='save' onClick={handleSaveClick}>Save and continue</button>}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="gov-org-chart-container">
-                        <OrganisationChart
-                            ref={orgchart}
-                            NodeTemplate={TemplateBuilderNode}
-                            datasource={ds}
-                            chartClass="myChart"
-                            collapsible={false}
-                            draggable={true}
-                            pan={true}
-                            zoom={true}
-                            onClickNode={readSelectedNode}
-                            onClickChart={clearSelectedNode}
-                            openSideBar={openSideBar}
-                            editMode={mode === Mode.Edit}
-                            onClickAdd={onClickAdd}
-                            changeHierarchy={changeHierarchy}
-                            cloneNode={cloneNode}
-                            nextId={nextId}
-                        />
-                        {mode === Mode.Edit &&
-                            <Sidebar
-                                sidebar={<SidebarContent
-                                    data={selectedNodes}
-                                    updateNode={updateNode}
-                                    openSideBar={openSideBar}
-                                    deleteNode={onClickDelete}
-                                />}
-                                open={openSidebar}
-                                onSetOpen={openSideBar}
-                                pullRight={true}
-                                styles={{
-                                    sidebar: {
-                                        background: "white",
-                                        position: "fixed",
-                                        padding: "20px 20px",
-                                        width: "500px"
-                                    }, root: { position: "undefined" }, content: {
-                                        position: "undefined",
-                                        top: "undefined",
-                                        left: "undefined",
-                                        right: "undefined",
-                                        bottom: "undefined"
-                                    }
-                                }}
-                            ><span></span></Sidebar>}
-                    </div>
-                </> :
+                        <div className="gov-org-chart-container">
+                            <OrganisationChart
+                                ref={orgchart}
+                                NodeTemplate={TemplateBuilderNode}
+                                datasource={ds}
+                                chartClass="myChart"
+                                collapsible={false}
+                                draggable={true}
+                                pan={true}
+                                zoom={true}
+                                onClickNode={readSelectedNode}
+                                onClickChart={clearSelectedNode}
+                                openSideBar={openSideBar}
+                                editMode={mode === Mode.Edit}
+                                onClickAdd={onClickAdd}
+                                changeHierarchy={changeHierarchy}
+                                cloneNode={cloneNode}
+                                nextId={nextId}
+                            />
+                            {mode === Mode.Edit &&
+                                <Sidebar
+                                    sidebar={<SidebarContent
+                                        data={selectedNodes}
+                                        updateNode={updateNode}
+                                        openSideBar={openSideBar}
+                                        deleteNode={onClickDelete}
+                                    />}
+                                    open={openSidebar}
+                                    onSetOpen={openSideBar}
+                                    pullRight={true}
+                                    styles={{
+                                        sidebar: {
+                                            background: "white",
+                                            position: "fixed",
+                                            padding: "20px 20px",
+                                            width: "500px"
+                                        }, root: { position: "undefined" }, content: {
+                                            position: "undefined",
+                                            top: "undefined",
+                                            left: "undefined",
+                                            right: "undefined",
+                                            bottom: "undefined"
+                                        }
+                                    }}
+                                ><span></span></Sidebar>}
+                        </div>
+                    </> :
                     <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert">
                         <h2 className="govuk-error-summary__title" id="error-summary-title">
                             There is a problem
