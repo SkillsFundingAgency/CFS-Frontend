@@ -119,15 +119,17 @@ export function TemplateBuilder() {
             const templateResult = await getTemplateById(templateId);
             const templateResponse = templateResult.data as TemplateResponse;
             setTemplate(templateResponse);
-            const template = JSON.parse(templateResponse.templateJson) as Template;
-            if (template && template !== null) {
-                const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines)
-                setDS(fundingLines);
-                setNextId(getLastUsedId(template.fundingTemplate.fundingLines) + 1);
-            }
-            else {
-                setIsError(true);
-                setErrorMessages(errors => [...errors, "The template content could not be loaded."]);
+            if (templateResponse.templateJson) {
+                const template = JSON.parse(templateResponse.templateJson) as Template;
+                if (template && template !== null) {
+                    const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines)
+                    setDS(fundingLines);
+                    setNextId(getLastUsedId(template.fundingTemplate.fundingLines) + 1);
+                }
+                else {
+                    setIsError(true);
+                    setErrorMessages(errors => [...errors, "The template content could not be loaded."]);
+                }
             }
             setIsLoading(false);
         }
@@ -252,7 +254,7 @@ export function TemplateBuilder() {
             await saveTemplateContent(templateContentUpdateCommand);
             await fetchData();
             setSaveErrorMessage("Saved!");
-            setTimeout(function(){ setSaveErrorMessage(""); }, 3000);
+            setTimeout(function () { setSaveErrorMessage(""); }, 3000);
         }
         catch (err) {
             setSaveErrorMessage(`Template could not be saved: ${err.message}.`);
