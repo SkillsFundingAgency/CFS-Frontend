@@ -4,7 +4,6 @@ import {Footer} from "../components/Footer";
 import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
 import {FacetsEntity, ProvidersEntity} from "../types/publishedProvider";
 import {NotificationSignal} from "../signals/NotificationSignal";
-import {Navigation, NavigationLevel} from "../components/Navigation";
 import {BackButton} from "../components/BackButton";
 import Pagination from "../components/Pagination";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
@@ -274,7 +273,6 @@ export default class ViewFundingPage extends React.Component<IViewFundingProps, 
         if (this.props.specificationSelected) {
             return <div>
                 <Header location={Section.Approvals}/>
-                <Navigation currentNavigationLevel={NavigationLevel.FundingApproval}/>
                 <div className="govuk-width-container">
                     <Breadcrumbs>
                         <Breadcrumb name={"Calculate funding"} url={"/"}/>

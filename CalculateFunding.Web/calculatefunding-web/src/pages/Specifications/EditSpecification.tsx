@@ -243,7 +243,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
-                    history.push(`/app/ViewSpecification/${specificationId}`);
+                    history.push(`/ViewSpecification/${specificationId}`);
                 } else {
                     setIsLoading(false);
                 }

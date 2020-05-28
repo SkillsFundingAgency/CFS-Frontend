@@ -110,7 +110,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
                 if (result.status === 200) {
                     let response = result.data as Calculation;
-                    history.push(`/app/ViewSpecification/${response.specificationId}`);
+                    history.push(`/ViewSpecification/${response.specificationId}`);
                 } else {
                     setIsLoading(false);
                 }

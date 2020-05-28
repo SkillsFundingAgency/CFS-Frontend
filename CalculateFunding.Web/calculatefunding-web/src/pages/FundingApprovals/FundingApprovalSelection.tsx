@@ -110,7 +110,7 @@ export function FundingApprovalSelection() {
                     </label>
                     <h3 className="govuk-heading-m">{selectedSpecification}</h3>
 
-                    <Link to={`/app/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification}`}
+                    <Link to={`/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification}`}
                        className="govuk-button" data-module="govuk-button">
                         View funding
                     </Link>

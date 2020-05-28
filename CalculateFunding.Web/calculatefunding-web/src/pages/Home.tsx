@@ -56,8 +56,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }){
                                         <div className="govuk-heading-m">
                                             <Link to="/results" className="govuk-link">View results</Link>
                                         </div>
-                                        <p className="govuk-body">View results for providers, calculations and quality
-                                            assurance tests.</p>
+                                        <p className="govuk-body">View results for providers and calculations.</p>
                                     </div>
                                 </div>
                                 <div className="govuk-grid-row">

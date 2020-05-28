@@ -123,7 +123,7 @@ export function CreateSpecification() {
 
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
-                                        history.push(`/app/ViewSpecification/${response.id}`);
+                                        history.push(`/ViewSpecification/${response.id}`);
                 } else {
                     setIsLoading(false);
                 }
