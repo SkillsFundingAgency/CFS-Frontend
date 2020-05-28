@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
