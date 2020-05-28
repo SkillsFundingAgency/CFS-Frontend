@@ -15,7 +15,7 @@ import {
     updateNode as updateDatasource,
     datasourceToTemplateFundingLines,
     getTemplateById,
-    templateFundingLinesToDatasource, 
+    templateFundingLinesToDatasource,
     saveTemplateContent
 } from "../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../components/PermissionStatus";
@@ -41,8 +41,8 @@ import { useEffectOnce } from '../hooks/useEffectOnce';
 import { DateFormatter } from '../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
 import { LoadingStatus } from '../components/LoadingStatus';
-import {getFundingPeriodsByFundingStreamIdService} from "../services/specificationService";
-import {FundingPeriod, FundingStream} from "../types/viewFundingTypes";
+import { getFundingPeriodsByFundingStreamIdService } from "../services/specificationService";
+import { FundingPeriod, FundingStream } from "../types/viewFundingTypes";
 
 enum Mode {
     View = 'view',
@@ -54,6 +54,7 @@ export function TemplateBuilder() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
     const [fundingPeriod, setFundingPeriod] = useState<FundingPeriod>();
@@ -137,7 +138,7 @@ export function TemplateBuilder() {
         }
     };
 
-        useEffectOnce(() => {
+    useEffectOnce(() => {
         fetchData();
     });
 
@@ -216,37 +217,45 @@ export function TemplateBuilder() {
     };
 
     const handleSaveContentClick = async () => {
-        if (template == undefined) {
-            setIsError(true);
-            setErrorMessages(errors => [...errors, "Can't find template data to update"]);
-            return;
-        }
-        const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
-        const templateUpdated: Template =  {
-            $schema: "https://fundingschemas.blob.core.windows.net/schemas/funding-template-schema-1.1.json",
-            schemaVersion: "1.1",
-            fundingTemplate: { 
-                fundingLines: fundingLines, 
-                fundingPeriod: { 
-                    id: template.fundingPeriodId,
-                    period: "2021",
-                    name: template.fundingPeriodId,
-                    type: "FY",
-                    startDate: "2020-04-01T00:00:00+00:00",
-                    endDate: "2021-03-31T00:00:00+00:00"
-                }, 
-                fundingStream: {
-                    code: template.fundingStreamId,
-                    name: template.fundingStreamId
-                }, 
-                fundingTemplateVersion: "#version#"
+        try {
+            if (template == undefined) {
+                setIsError(true);
+                setErrorMessages(errors => [...errors, "Can't find template data to update"]);
+                return;
             }
-        };
-        const templateContentUpdateCommand: TemplateContentUpdateCommand = {
-            templateId: template.templateId, 
-            templateJson: JSON.stringify(templateUpdated)
+            setSaveErrorMessage("Saving template...");
+            const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
+            const templateUpdated: Template = {
+                $schema: "https://fundingschemas.blob.core.windows.net/schemas/funding-template-schema-1.1.json",
+                schemaVersion: "1.1",
+                fundingTemplate: {
+                    fundingLines: fundingLines,
+                    fundingPeriod: {
+                        id: template.fundingPeriodId,
+                        period: "2021",
+                        name: template.fundingPeriodId,
+                        type: "FY",
+                        startDate: "2020-04-01T00:00:00+00:00",
+                        endDate: "2021-03-31T00:00:00+00:00"
+                    },
+                    fundingStream: {
+                        code: template.fundingStreamId,
+                        name: template.fundingStreamId
+                    },
+                    fundingTemplateVersion: "#version#"
+                }
+            };
+            const templateContentUpdateCommand: TemplateContentUpdateCommand = {
+                templateId: template.templateId,
+                templateJson: JSON.stringify(templateUpdated)
+            }
+            await saveTemplateContent(templateContentUpdateCommand);
+            setSaveErrorMessage("Saved!");
+            setTimeout(function(){ setSaveErrorMessage(""); }, 3000);
         }
-        await saveTemplateContent(templateContentUpdateCommand);
+        catch (err) {
+            setSaveErrorMessage(`Template could not be saved: ${err.message}.`);
+        }
     };
 
     const handleAddFundingLineClick = () => {
@@ -329,12 +338,14 @@ export function TemplateBuilder() {
                                                 </div>
                                             </div>
                                         </div>}
-                                {mode === Mode.Edit && canEditTemplate && 
-                                    <button className="govuk-button govuk-!-margin-right-2 " data-testid='add' 
+                                    {mode === Mode.Edit && canEditTemplate &&
+                                        <button className="govuk-button govuk-!-margin-right-2 " data-testid='add'
                                             onClick={handleAddFundingLineClick}>Add new funding line</button>}
-                                {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&  
-                                    <button className="govuk-button" data-testid='save' 
-                                            onClick={handleSaveContentClick}>Save and continue</button>}
+                                    {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&
+                                        <button className="govuk-button" data-testid='save'
+                                            onClick={handleSaveContentClick}>Save and continue
+                                        </button>}
+                                    {saveErrorMessage.length > 0 ? <span className="govuk-error-message">{saveErrorMessage}</span> : null}
                                 </div>
                             </div>
                         </div>
