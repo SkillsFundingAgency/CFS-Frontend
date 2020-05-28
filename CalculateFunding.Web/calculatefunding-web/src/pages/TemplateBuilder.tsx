@@ -250,6 +250,7 @@ export function TemplateBuilder() {
                 templateJson: JSON.stringify(templateUpdated)
             }
             await saveTemplateContent(templateContentUpdateCommand);
+            await fetchData();
             setSaveErrorMessage("Saved!");
             setTimeout(function(){ setSaveErrorMessage(""); }, 3000);
         }
