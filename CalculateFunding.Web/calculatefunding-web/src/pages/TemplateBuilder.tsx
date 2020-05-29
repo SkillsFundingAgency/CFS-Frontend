@@ -16,7 +16,8 @@ import {
     datasourceToTemplateFundingLines,
     getTemplateById,
     templateFundingLinesToDatasource,
-    saveTemplateContent
+    saveTemplateContent,
+    getLastUsedId
 } from "../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../components/PermissionStatus";
 import {
@@ -54,7 +55,7 @@ export function TemplateBuilder() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
-    const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
+    const [saveMessage, setSaveMessage] = useState<string>('');
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
     const [fundingPeriod, setFundingPeriod] = useState<FundingPeriod>();
@@ -98,20 +99,6 @@ export function TemplateBuilder() {
     }
 
     let { templateId } = useParams();
-
-    function getLastUsedId(fundingLines: TemplateFundingLine[]): number {
-        let ids = [];
-        const flString = JSON.stringify(fundingLines);
-        const flMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
-        for (const match of flMatches) {
-            ids.push(parseInt(match[1].replace(',', ''), 10));
-        }
-        const calcMatches = flString.matchAll(/"templateCalculationId":(.*?)"/g);
-        for (const match of calcMatches) {
-            ids.push(parseInt(match[1].replace(',', ''), 10));
-        }
-        return Math.max(...ids);
-    }
 
     const fetchData = async () => {
         try {
@@ -218,6 +205,11 @@ export function TemplateBuilder() {
         setDS([...ds]);
     };
 
+    function showSaveMessageOnce(message: string) {
+        setSaveMessage(message);
+        setTimeout(function () { setSaveMessage(""); }, 5000);
+    }
+
     const handleSaveContentClick = async () => {
         try {
             if (template == undefined) {
@@ -225,8 +217,13 @@ export function TemplateBuilder() {
                 setErrorMessages(errors => [...errors, "Can't find template data to update"]);
                 return;
             }
-            setSaveErrorMessage("Saving template...");
+    
+            setSaveMessage("Saving template...");
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
+            if (!fundingLines || fundingLines.length === 0 || fundingLines === null) {
+                showSaveMessageOnce("You can't save an empty template. Add one or more funding lines and try again.");
+                return;
+            }
             const templateUpdated: Template = {
                 $schema: "https://fundingschemas.blob.core.windows.net/schemas/funding-template-schema-1.1.json",
                 schemaVersion: "1.1",
@@ -251,13 +248,13 @@ export function TemplateBuilder() {
                 templateId: template.templateId,
                 templateJson: JSON.stringify(templateUpdated)
             }
+
             await saveTemplateContent(templateContentUpdateCommand);
             await fetchData();
-            setSaveErrorMessage("Saved!");
-            setTimeout(function () { setSaveErrorMessage(""); }, 3000);
+            showSaveMessageOnce("Template saved successfully.");
         }
         catch (err) {
-            setSaveErrorMessage(`Template could not be saved: ${err.message}.`);
+            setSaveMessage(`Template could not be saved: ${err.message}.`);
         }
     };
 
@@ -348,7 +345,7 @@ export function TemplateBuilder() {
                                         <button className="govuk-button" data-testid='save'
                                             onClick={handleSaveContentClick}>Save and continue
                                         </button>}
-                                    {saveErrorMessage.length > 0 ? <span className="govuk-error-message">{saveErrorMessage}</span> : null}
+                                    {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                                 </div>
                             </div>
                         </div>

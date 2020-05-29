@@ -347,6 +347,20 @@ export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionary
     return templateFundingLines;
 }
 
+export function getLastUsedId(fundingLines: TemplateFundingLine[]): number {
+    let ids = [];
+    const flString = JSON.stringify(fundingLines);
+    const flMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
+    for (const match of flMatches) {
+        ids.push(parseInt(match[1].replace(',', ''), 10));
+    }
+    const calcMatches = flString.matchAll(/"templateCalculationId":(.*?)"/g);
+    for (const match of calcMatches) {
+        ids.push(parseInt(match[1].replace(',', ''), 10));
+    }
+    return Math.max(...ids);
+}
+
 export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
     return await axios(`/api/templates/build/content`, {
         method: 'PUT',

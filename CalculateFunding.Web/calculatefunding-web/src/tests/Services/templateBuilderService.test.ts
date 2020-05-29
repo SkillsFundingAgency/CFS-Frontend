@@ -1,5 +1,5 @@
 import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines } from "../../services/templateBuilderDatasourceService";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId } from "../../services/templateBuilderDatasourceService";
 import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, FundingLine } from "../../types/TemplateBuilderDefinitions";
 
 const key1RootId = "n1";
@@ -325,5 +325,12 @@ it("transforms datasource with children of type funding line and calculation int
 it("transforms datasource with multiple funding lines into template", async () => {
     const template = datasourceToTemplateFundingLines(multipleFundingLinesDs);
     expect(template).toStrictEqual(multipleFundingLinesTemplate);
+});
+
+it("calculates lastUsedId correctly", () => {
+    expect(getLastUsedId(singleNodeTemplate)).toBe(0);
+    expect(getLastUsedId(withChildFundingLineTemplate)).toBe(1);
+    expect(getLastUsedId(withChildFundingLineAndCalculationTemplate)).toBe(3);
+    expect(getLastUsedId(multipleFundingLinesTemplate)).toBe(4);
 });
 
