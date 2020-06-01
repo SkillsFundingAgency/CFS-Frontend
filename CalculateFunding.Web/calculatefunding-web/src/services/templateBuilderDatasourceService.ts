@@ -71,19 +71,15 @@ export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: stri
 
         const digger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
 
-        const clonedNodeIds = await findAllClonedNodeIds(fundingLine.value, id);
-        for (let j = 0; j < clonedNodeIds.length; j++) {
-            try {
-                const clonedNodeId = clonedNodeIds[j];
-                if (isRootNode(ds, clonedNodeId)) {
-                    rootNodesToDelete.push(fundingLine.key);
-                    break;
-                }
-                await digger.removeNode(clonedNodeId);
+        try {
+            if (isRootNode(ds, id)) {
+                rootNodesToDelete.push(fundingLine.key);
+                break;
             }
-            catch {
-                // ignore
-            }
+            await digger.removeNode(id);
+        }
+        catch {
+            // ignore
         }
     }
 
@@ -166,13 +162,20 @@ export const updateNode = async (ds: Array<FundingLineDictionaryEntry>, updateMo
 }
 
 let id: number = 0;
+let templateLineAndCalculationIds: any = {};
 
 function initialiseId() {
     id = 0;
+    templateLineAndCalculationIds = {};
 }
 
-function getId() {
-    return id++;
+function getId(templateLineOrCalculationId: number) {
+    if (templateLineAndCalculationIds.hasOwnProperty(`n${templateLineOrCalculationId}`)) {
+        return `${templateLineAndCalculationIds[`n${templateLineOrCalculationId}`]}:${uuidv4()}`.replace(/-/gi, "");
+    }
+    const nodeId = id++;
+    templateLineAndCalculationIds[`n${templateLineOrCalculationId}`] = nodeId;
+    return nodeId;
 }
 
 function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Array<TemplateCalculation> | undefined,
@@ -213,8 +216,9 @@ export function stringArrayToString(options: string[] | undefined): string | und
 function getCalculation(templateCalculation: TemplateCalculation, id: number, key: number): Calculation {
     let currentId = id;
     const childCalculations = getChildren(templateCalculation.calculations, currentId, key);
+
     return {
-        id: `n${getId()}`,
+        id: `n${getId(templateCalculation.templateCalculationId)}`,
         templateCalculationId: templateCalculation.templateCalculationId,
         kind: NodeType.Calculation,
         type: <CalculationType>templateCalculation.type,
@@ -235,7 +239,7 @@ function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, ke
     const childFundingLines = getChildren(templateFundingLine.fundingLines, currentId, key);
     const childCalculations = getChildren(templateFundingLine.calculations, currentId, key);
     return {
-        id: `n${getId()}`,
+        id: `n${getId(templateFundingLine.templateLineId)}`,
         templateLineId: templateFundingLine.templateLineId,
         type: <FundingLineType>templateFundingLine.type,
         fundingLineCode: templateFundingLine.fundingLineCode,

@@ -1,6 +1,8 @@
-import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate } from "./templateBuilderTestData";
+import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate } from "./templateBuilderTestData";
 import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId } from "../../services/templateBuilderDatasourceService";
 import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, FundingLine } from "../../types/TemplateBuilderDefinitions";
+import { v4 as uuidv4 } from 'uuid';
+jest.mock('uuid');
 
 const key1RootId = "n1";
 const cloneOfKey1RootId = "n1:12345";
@@ -225,16 +227,16 @@ it("deletes a node", async () => {
     expect(ds.length).toBe(1);
 });
 
-it("deletes cloned nodes", async () => {
+it("does not delete cloned nodes", async () => {
     await removeNode(ds, key1RootId);
     expect(ds.length).toBe(1);
-    expect(ds[0].value?.children?.length).toBe(1);
+    expect(ds[0].value?.children?.length).toBe(2);
 });
 
-it("deletes original node when clone is deleted", async () => {
+it("does not delete original node when clone is deleted", async () => {
     await removeNode(ds, cloneOfKey1RootId);
-    expect(ds.length).toBe(1);
-    expect(ds[0].value?.children?.length).toBe(1);
+    expect(ds.length).toBe(2);
+    expect(ds[1].value?.children?.length).toBe(1);
 });
 
 it("moves nodes", async () => {
@@ -292,6 +294,12 @@ it("transforms single node template into datasource", async () => {
     expect(datasource).toStrictEqual(singleNodeDs);
 });
 
+it("transforms cloned node template into datasource", async () => {
+    uuidv4.mockImplementation(() => '12345');
+    const template = templateFundingLinesToDatasource(clonedNodeTemplate);
+    expect(template).toStrictEqual(clonedNodeDs);
+});
+
 it("transforms template with children into datasource", async () => {
     const datasource = templateFundingLinesToDatasource(withChildFundingLineTemplate);
     expect(datasource).toStrictEqual(withChildFundingLineDs);
@@ -310,6 +318,11 @@ it("transforms template with multiple funding lines into datasource", async () =
 it("transforms single node datasource into template", async () => {
     const template = datasourceToTemplateFundingLines(singleNodeDs);
     expect(template).toStrictEqual(singleNodeTemplate);
+});
+
+it("transforms datasource with cloned node into template", async () => {
+    const template = datasourceToTemplateFundingLines(clonedNodeDs);
+    expect(template).toStrictEqual(clonedNodeTemplate);
 });
 
 it("transforms datasource with children into template", async () => {
