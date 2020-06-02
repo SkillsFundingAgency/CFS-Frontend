@@ -1,3 +1,5 @@
+import {PublishStatus} from "../PublishStatusModel";
+
 export interface CreateAdditionalCalculationViewModel {
     sourceCode:string;
     calculationName:string;
@@ -7,8 +9,9 @@ export interface CreateAdditionalCalculationViewModel {
 export interface EditAdditionalCalculationViewModel {
     sourceCode:string;
     specificationId: string;
-    valueType: CalculationTypes
-    name: string
+    valueType: CalculationTypes;
+    name: string;
+    publishStatus: PublishStatus;
 }
 
 export interface UpdateAdditionalCalculationViewModel {

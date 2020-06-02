@@ -13,6 +13,7 @@ import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {PublishStatus} from "../../types/PublishStatusModel";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -42,6 +43,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
+    const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
     const initialBuildSuccess = {
         buildSuccess: false,
         compileRun: false,
@@ -76,6 +78,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             setTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
             setTemplateCalculationName(templateCalculationResult.name);
             setTemplateCalculationType(templateCalculationResult.valueType);
+            setTemplateCalculationStatus(templateCalculationResult.publishStatus);
 
             getSpecification(templateCalculationResult.specificationId).then((result) => {
                 const specificationResult = result.data as EditSpecificationViewModel;
@@ -180,13 +183,13 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         Edit template calculation
                     </h1>
                 </legend>
-
                 <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="address-line-1">
-                        Calculation name
-                    </label>
-                    <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
-                           value={templateCalculationName} readOnly={true} disabled={true}/>
+                        <span className="govuk-caption-m">Calculation status</span>
+                        <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2">{templateCalculationStatus} </strong>
+                </div>
+                <div className="govuk-form-group">
+                        <span className="govuk-caption-m">Name</span>
+                        <h2 className="govuk-heading-m">{templateCalculationName}</h2>
                 </div>
 
                 <div className="govuk-form-group">

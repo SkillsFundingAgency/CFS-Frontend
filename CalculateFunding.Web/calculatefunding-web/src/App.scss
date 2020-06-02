@@ -567,3 +567,10 @@ svg.app-back-to-top__icon {
   min-width: 250px;
   overflow-wrap: break-word;
 }
+
+
+/// Custom Tag Colours ////
+.govuk-tag--green{
+  color: govuk-colour("green");
+  background: #CCE2D8;
+}
