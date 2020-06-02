@@ -112,9 +112,26 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
 
 export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, targetCalculationId: string, sourceCalculationId: string) => {
     const targetCalculation = await findNodeById(ds, targetCalculationId);
+    const currentDsKey = targetCalculation.dsKey;
     const sourceCalculation = await findNodeById(ds, sourceCalculationId);
     Object.keys(targetCalculation).forEach(e => targetCalculation[e] = sourceCalculation[e]);
     targetCalculation.id = getNewCloneId(sourceCalculationId);
+    targetCalculation.dsKey = currentDsKey;
+    if (sourceCalculation.children && sourceCalculation.children.length > 0) {
+        targetCalculation.children = JSON.parse(JSON.stringify(sourceCalculation.children));
+        cloneChildCalculations(targetCalculation.children, currentDsKey);
+    }
+}
+
+function cloneChildCalculations(calculations: any, dsKey: number) {
+    if (!calculations) {
+        return;
+    }
+    for (let i = 0; i < calculations.length; i++) {
+        calculations[i].id = getNewCloneId(calculations[i].id);
+        calculations[i].dsKey = dsKey;
+        cloneChildCalculations(calculations[i].children, dsKey);
+    }
 }
 
 export const moveNode = async (ds: Array<FundingLineDictionaryEntry>, draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
@@ -412,15 +429,15 @@ export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDict
 function compare(a: CalculationDictionaryItem, b: CalculationDictionaryItem) {
     const nameA = a.name.toUpperCase();
     const nameB = b.name.toUpperCase();
-  
+
     let comparison = 0;
     if (nameA > nameB) {
-      comparison = 1;
+        comparison = 1;
     } else if (nameA < nameB) {
-      comparison = -1;
+        comparison = -1;
     }
     return comparison;
-  }
+}
 
 function visitNode(node: Calculation, hashMap: any, array: CalculationDictionaryItem[]) {
     if (!node.id.includes(":") && !hashMap[node.id]) {
