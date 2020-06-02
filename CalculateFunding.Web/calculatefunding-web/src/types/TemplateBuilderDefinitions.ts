@@ -206,6 +206,12 @@ export interface CalculationUpdateModel extends UpdateModel {
   percentageChangeBetweenAandB?: PercentageChangeBetweenAandB
 }
 
+export interface CalculationDictionaryItem {
+  id: string,
+  templateCalculationId: number,
+  name: string
+}
+
 export type FundingLineOrCalculation = FundingLine | Calculation;
 
 export type FundingLineDictionaryEntry = {

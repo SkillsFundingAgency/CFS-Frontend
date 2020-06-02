@@ -1,6 +1,6 @@
 import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate } from "./templateBuilderTestData";
 import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId } from "../../services/templateBuilderDatasourceService";
-import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, FundingLine } from "../../types/TemplateBuilderDefinitions";
+import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel } from "../../types/TemplateBuilderDefinitions";
 import { v4 as uuidv4 } from 'uuid';
 jest.mock('uuid');
 
@@ -345,5 +345,6 @@ it("calculates lastUsedId correctly", () => {
     expect(getLastUsedId(withChildFundingLineTemplate)).toBe(1);
     expect(getLastUsedId(withChildFundingLineAndCalculationTemplate)).toBe(3);
     expect(getLastUsedId(multipleFundingLinesTemplate)).toBe(4);
+    expect(getLastUsedId(clonedNodeTemplate)).toBe(4);
 });
 

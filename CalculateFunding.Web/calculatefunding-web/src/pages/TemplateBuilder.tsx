@@ -17,7 +17,9 @@ import {
     getTemplateById,
     templateFundingLinesToDatasource,
     saveTemplateContent,
-    getLastUsedId
+    getLastUsedId,
+    getAllCalculations,
+    cloneCalculation
 } from "../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../components/PermissionStatus";
 import {
@@ -32,7 +34,7 @@ import {
     FundingLineOrCalculation,
     TemplateFundingLine,
     Template,
-    TemplateResponse, TemplateContentUpdateCommand, TemplateFundingPeriod
+    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem
 } from '../types/TemplateBuilderDefinitions';
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import "../styles/TemplateBuilder.scss";
@@ -42,8 +44,6 @@ import { useEffectOnce } from '../hooks/useEffectOnce';
 import { DateFormatter } from '../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
 import { LoadingStatus } from '../components/LoadingStatus';
-import { getFundingPeriodsByFundingStreamIdService } from "../services/specificationService";
-import { FundingPeriod, FundingStream } from "../types/viewFundingTypes";
 
 enum Mode {
     View = 'view',
@@ -58,8 +58,6 @@ export function TemplateBuilder() {
     const [saveMessage, setSaveMessage] = useState<string>('');
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
-    const [fundingPeriod, setFundingPeriod] = useState<FundingPeriod>();
-    const [fundingStream, setFundingStream] = useState<FundingStream>();
     const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
@@ -96,6 +94,11 @@ export function TemplateBuilder() {
             return false;
         }
         return permissions.some(p => p.canApproveTemplates);
+    }
+
+    function getCalculations(): CalculationDictionaryItem[] {
+        const fundingLines: FundingLine[] = ds.map(fl => fl.value);
+        return getAllCalculations(fundingLines);
     }
 
     let { templateId } = useParams();
@@ -204,6 +207,11 @@ export function TemplateBuilder() {
         await moveNode(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
         setDS([...ds]);
     };
+
+    const onCloneCalculation = async (targetCalculationId: string, sourceCalculationId: string) => {
+        await cloneCalculation(ds, targetCalculationId, sourceCalculationId);
+        setDS([...ds]);
+    }
 
     function showSaveMessageOnce(message: string) {
         setSaveMessage(message);
@@ -352,9 +360,11 @@ export function TemplateBuilder() {
                                 <Sidebar
                                     sidebar={<SidebarContent
                                         data={selectedNodes}
+                                        calcs={getCalculations()}
                                         updateNode={updateNode}
                                         openSideBar={openSideBar}
                                         deleteNode={onClickDelete}
+                                        cloneCalculation={onCloneCalculation}
                                     />}
                                     open={openSidebar}
                                     onSetOpen={openSideBar}

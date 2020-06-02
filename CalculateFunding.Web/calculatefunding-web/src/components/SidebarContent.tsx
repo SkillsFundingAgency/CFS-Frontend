@@ -1,16 +1,18 @@
 import React from "react";
 import { FundingLineItem } from "./FundingLineItem";
 import { CalculationItem } from "./CalculationItem";
-import { Calculation, NodeType, FundingLine, FundingLineUpdateModel, CalculationUpdateModel, FundingLineOrCalculationSelectedItem } from '../types/TemplateBuilderDefinitions';
+import { Calculation, NodeType, FundingLine, FundingLineUpdateModel, CalculationUpdateModel, FundingLineOrCalculationSelectedItem, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
 
 export interface SidebarContentProps {
     data: Set<FundingLineOrCalculationSelectedItem>,
+    calcs: CalculationDictionaryItem[],
     updateNode: (p: FundingLineUpdateModel | CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
     deleteNode: (id: string) => Promise<void>,
+    cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
 }
 
-export function SidebarContent({ data, updateNode, openSideBar, deleteNode }: SidebarContentProps) {
+export function SidebarContent({ data, calcs, updateNode, openSideBar, deleteNode, cloneCalculation }: SidebarContentProps) {
     const dataArray = Array.from(data);
     return (
         <div className="sidebar-content">
@@ -33,6 +35,8 @@ export function SidebarContent({ data, updateNode, openSideBar, deleteNode }: Si
                     <CalculationItem
                         key={node.id}
                         node={node}
+                        calcs={calcs}
+                        cloneCalculation={cloneCalculation}
                         updateNode={updateNode}
                         openSideBar={openSideBar}
                         deleteNode={deleteNode}

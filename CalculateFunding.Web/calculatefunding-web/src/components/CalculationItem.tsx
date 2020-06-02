@@ -1,27 +1,32 @@
 import React, { useState } from "react";
-import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType } from '../types/TemplateBuilderDefinitions';
+import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
 import "../styles/CalculationItem.scss";
 
 export interface CalculationItemProps {
     node: Calculation,
+    calcs: CalculationDictionaryItem[],
     updateNode: (p: CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string) => Promise<void>
+    deleteNode: (id: string) => Promise<void>,
+    cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
 }
 
-export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: CalculationItemProps) {
+export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNode, cloneCalculation }: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string | undefined>(node.allowedEnumTypeValues);
-    const [numerator, setNumerator] = useState<number | string>(node.groupRate ? node.groupRate.numerator : '');
-    const [denominator, setDenominator] = useState<number | string>(node.groupRate ? node.groupRate.denominator : '');
-    const [calculationA, setCalculationA] = useState<number | string>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationA : '');
-    const [calculationB, setCalculationB] = useState<number | string>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationB : '');
+    const [numerator, setNumerator] = useState<number>(node.groupRate ? node.groupRate.numerator : 0);
+    const [denominator, setDenominator] = useState<number>(node.groupRate ? node.groupRate.denominator : 0);
+    const [calculationA, setCalculationA] = useState<number>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationA : 0);
+    const [calculationB, setCalculationB] = useState<number>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationB : 0);
     const [calculationAggregationType, setcalculationAggregationType] = useState<CalculationAggregationType>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationAggregationType : CalculationAggregationType.Sum);
     const [formulaText, setFormulaText] = useState<string>(node.formulaText);
     const [valueFormat, setValueFormat] = useState<ValueFormatType>(node.valueFormat);
     const [aggregationType, setAggregationType] = useState<AggregrationType>(node.aggregationType);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [cloneId, setCloneId] = useState<string>('');
+
+    const isClone = node.id.includes(":");
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -43,40 +48,20 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
         setAggregationType(AggregrationType[e.target.value as keyof typeof AggregrationType]);
     }
 
-    const handleNumeratorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const numerator = parseInt(e.target.value, 10);
-        if (isNaN(numerator)) {
-            setNumerator('');
-            return;
-        }
-        setNumerator(numerator);
+    const handleNumeratorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setNumerator(parseInt(e.target.value, 10));
     }
 
-    const handleDenominatorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const denominator = parseInt(e.target.value, 10);
-        if (isNaN(denominator)) {
-            setDenominator('');
-            return;
-        }
-        setDenominator(denominator);
+    const handleDenominatorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setDenominator(parseInt(e.target.value, 10));
     }
 
-    const handleCalculationAChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const calculationA = parseInt(e.target.value, 10);
-        if (isNaN(calculationA)) {
-            setCalculationA('');
-            return;
-        }
-        setCalculationA(calculationA);
+    const handleCalculationAChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setCalculationA(parseInt(e.target.value, 10));
     }
 
-    const handleCalculationBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const calculationB = parseInt(e.target.value, 10);
-        if (isNaN(calculationB)) {
-            setCalculationB('');
-            return;
-        }
-        setCalculationB(calculationB);
+    const handleCalculationBChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setCalculationB(parseInt(e.target.value, 10));
     }
 
     const handleCalculationAggregationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -85,6 +70,10 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
 
     const handleAllowedEnumTypeValuesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAllowedEnumTypeValues(e.target.value);
+    }
+
+    const handleCloneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setCloneId(e.target.value);
     }
 
     const handleDelete = () => {
@@ -100,15 +89,23 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
         openSideBar(false);
     }
 
+    const handleCloneClick = async () => {
+        if (cloneId.length === 0) {
+            return;
+        }
+        await cloneCalculation(node.id, cloneId);
+        openSideBar(false);
+    }
+
     const handleSubmit = () => {
         const groupRate: GroupRate = {
-            numerator: numerator !== '' ? numerator as number : 0,
-            denominator: denominator !== '' ? denominator as number : 0
+            numerator: numerator,
+            denominator: denominator
         };
 
         const percentageChangeBetweenAandB: PercentageChangeBetweenAandB = {
-            calculationA: calculationA !== '' ? calculationA as number : 0,
-            calculationB: calculationB !== '' ? calculationB as number : 0,
+            calculationA: calculationA,
+            calculationB: calculationB,
             calculationAggregationType: calculationAggregationType
         };
 
@@ -184,11 +181,19 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                     <>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-numerator">Numerator</label>
-                            <input className="govuk-input govuk-!-width-one-third" id="calc-numerator" name="calc-numerator" type="text" value={numerator} onChange={handleNumeratorChange} />
+                            <select className="govuk-select" id="calc-numerator" name="calc-numerator" value={numerator} onChange={handleNumeratorChange} >
+                                {calcs && calcs
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                            </select>
                         </div>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-denominator">Denominator</label>
-                            <input className="govuk-input govuk-!-width-one-third" id="calc-denominator" name="calc-denominator" type="text" value={denominator} onChange={handleDenominatorChange} />
+                            <select className="govuk-select" id="calc-denominator" name="calc-denominator" value={denominator} onChange={handleDenominatorChange} >
+                                {calcs && calcs
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                            </select>
                         </div>
                     </>
                 }
@@ -196,11 +201,19 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                     <>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-calculation-a">Calculation A</label>
-                            <input className="govuk-input govuk-!-width-one-third" id="calc-calculation-a" name="calc-calculation-a" type="text" value={calculationA} onChange={handleCalculationAChange} />
+                            <select className="govuk-select" id="calc-calculation-a" name="calc-calculation-a" value={calculationA} onChange={handleCalculationAChange} >
+                                {calcs && calcs
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                            </select>
                         </div>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-calculation-b">Calculation B</label>
-                            <input className="govuk-input govuk-!-width-one-third" id="calc-calculation-b" name="calc-calculation-b" type="text" value={calculationB} onChange={handleCalculationBChange} />
+                            <select className="govuk-select" id="calc-calculation-b" name="calc-calculation-b" value={calculationB} onChange={handleCalculationBChange} >
+                                {calcs && calcs
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                            </select>
                         </div>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-calculation-aggregation-type">Calculation Aggregation Type</label>
@@ -214,6 +227,22 @@ export function CalculationItem({ node, updateNode, openSideBar, deleteNode }: C
                 <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
                     Save and continue
                 </button>
+                {
+                    !isClone &&
+                    <>
+                        <div className="govuk-form-group">
+                            <select className="govuk-select" id="calc-clones" name="calc-clones" value={cloneId} onChange={handleCloneChange} >
+                                <option value=''>Select a calculation</option>
+                                {calcs && calcs
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .map(c => <option key={c.templateCalculationId} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+                        <button className="govuk-button" data-module="govuk-button" onClick={handleCloneClick} >
+                            Clone
+                </button>
+                    </>
+                }
                 <div className="govuk-warning-text">
                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                     <strong className="govuk-warning-text__text">

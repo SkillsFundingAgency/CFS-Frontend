@@ -14,7 +14,7 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse, Template, TemplateContentUpdateCommand
+    TemplateResponse, Template, TemplateContentUpdateCommand, CalculationDictionaryItem
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axios, { AxiosResponse } from "axios";
@@ -47,14 +47,19 @@ export const addNode = async (ds: Array<FundingLineDictionaryEntry>, id: string,
     }
 }
 
-const nodeExistsInFundingLine = async (digger: any, id: string) => {
-    try {
-        await digger.findNodeById(id);
-        return true;
+export const findNodeById = async (ds: Array<FundingLineDictionaryEntry>, id: string) => {
+    for (let fl = 0; fl < ds.length; fl++) {
+        const digger = new JSONDigger(ds[fl].value, fundingLineIdField, fundingLineChildrenField);
+        try {
+            const node = await digger.findNodeById(id);
+            return node;
+        }
+        catch {
+            // Node does not exist in current funding line
+        }
     }
-    catch {
-        return false;
-    }
+
+    throw new Error(`Node with id ${id} not found.`);
 }
 
 function isRootNode(ds: Array<FundingLineDictionaryEntry>, id: string): boolean {
@@ -103,6 +108,13 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
     draggedItemData.id = id;
     const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
     await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
+}
+
+export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, targetCalculationId: string, sourceCalculationId: string) => {
+    const targetCalculation = await findNodeById(ds, targetCalculationId);
+    const sourceCalculation = await findNodeById(ds, sourceCalculationId);
+    Object.keys(targetCalculation).forEach(e => targetCalculation[e] = sourceCalculation[e]);
+    targetCalculation.id = getNewCloneId(sourceCalculationId);
 }
 
 export const moveNode = async (ds: Array<FundingLineDictionaryEntry>, draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
@@ -363,6 +375,58 @@ export function getLastUsedId(fundingLines: TemplateFundingLine[]): number {
         ids.push(parseInt(match[1].replace(',', ''), 10));
     }
     return Math.max(...ids);
+}
+
+export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDictionaryItem[] => {
+    const result: CalculationDictionaryItem[] = [];
+
+    for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
+        let stack: FundingLineOrCalculation[] = [];
+        let array: CalculationDictionaryItem[] = [];
+        let hashMap: any = {};
+
+        stack.push(fundingLines[fundingLine]);
+
+        while (stack.length !== 0) {
+            const node = stack.pop();
+            if (node && (node.children === undefined || node.children.length === 0)) {
+                node.kind === NodeType.Calculation && visitNode(node as Calculation, hashMap, array);
+            } else {
+                if (node && node.children && node.children.length > 0) {
+                    for (let i: number = node.children.length - 1; i >= 0; i--) {
+                        stack.push(node.children[i]);
+                    }
+                }
+            }
+
+            if (node && node.kind === NodeType.Calculation) {
+                visitNode(node as Calculation, hashMap, array);
+            }
+        }
+        result.push(...array);
+    }
+
+    return result.sort(compare);
+}
+
+function compare(a: CalculationDictionaryItem, b: CalculationDictionaryItem) {
+    const nameA = a.name.toUpperCase();
+    const nameB = b.name.toUpperCase();
+  
+    let comparison = 0;
+    if (nameA > nameB) {
+      comparison = 1;
+    } else if (nameA < nameB) {
+      comparison = -1;
+    }
+    return comparison;
+  }
+
+function visitNode(node: Calculation, hashMap: any, array: CalculationDictionaryItem[]) {
+    if (!node.id.includes(":") && !hashMap[node.id]) {
+        hashMap[node.id] = true;
+        array.push({ id: node.id, templateCalculationId: node.templateCalculationId, name: node.name });
+    }
 }
 
 export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
