@@ -4,6 +4,6 @@
     {
         public string TemplateId { get; set; }
         
-        public string TemplateJson { get; set; }
+        public string TemplateFundingLinesJson { get; set; }
     }
 }

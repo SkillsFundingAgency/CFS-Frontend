@@ -165,7 +165,7 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<string> result = await _client.UpdateTemplateContent(new TemplateContentUpdateCommand
             {
                 TemplateId = model.TemplateId,
-                TemplateJson = model.TemplateJson
+                TemplateFundingLinesJson = model.TemplateFundingLinesJson
             });
 
             switch (result.StatusCode)

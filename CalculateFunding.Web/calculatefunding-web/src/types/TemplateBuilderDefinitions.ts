@@ -126,7 +126,7 @@ export interface Template {
 
   export interface TemplateContentUpdateCommand {
     templateId: string,
-    templateJson: string
+    templateFundingLinesJson: string
   }
   
 export interface TemplateSummary {

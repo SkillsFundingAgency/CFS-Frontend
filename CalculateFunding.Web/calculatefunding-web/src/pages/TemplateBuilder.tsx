@@ -224,29 +224,9 @@ export function TemplateBuilder() {
                 showSaveMessageOnce("You can't save an empty template. Add one or more funding lines and try again.");
                 return;
             }
-            const templateUpdated: Template = {
-                $schema: "https://fundingschemas.blob.core.windows.net/schemas/funding-template-schema-1.1.json",
-                schemaVersion: "1.1",
-                fundingTemplate: {
-                    fundingLines: fundingLines,
-                    fundingPeriod: {
-                        id: template.fundingPeriodId,
-                        period: "2021",
-                        name: template.fundingPeriodId,
-                        type: "FY",
-                        startDate: "2020-04-01T00:00:00+00:00",
-                        endDate: "2021-03-31T00:00:00+00:00"
-                    },
-                    fundingStream: {
-                        code: template.fundingStreamId,
-                        name: template.fundingStreamId
-                    },
-                    fundingTemplateVersion: "#version#"
-                }
-            };
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
                 templateId: template.templateId,
-                templateJson: JSON.stringify(templateUpdated)
+                templateFundingLinesJson: JSON.stringify(fundingLines)
             }
 
             await saveTemplateContent(templateContentUpdateCommand);
