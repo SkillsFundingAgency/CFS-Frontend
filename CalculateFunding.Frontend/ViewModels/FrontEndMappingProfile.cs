@@ -48,6 +48,7 @@ namespace CalculateFunding.Frontend.ViewModels
                         .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
                         .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
                         .ForMember(m => m.DateClosed, opt => opt.Ignore())
+                        .ForMember(m => m.DateOpened, opt => opt.MapFrom(src => src.DateOpened != null ? src.DateOpened.Value.DateTime : DateTime.MinValue))
                         .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
 
             CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
@@ -79,7 +80,8 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<Calculation, CalculationViewModel>()
                 .ForMember(m => m.Description, opt => opt.MapFrom(p => p.Description))
-                .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.LastUpdated))
+                .ForMember(m => m.LastModified, opt => opt.MapFrom(p => p.LastUpdated != null ? p.LastUpdated.Value.Date : DateTime.MinValue))
+                .ForMember(m => m.SpecificationId, opt => opt.MapFrom(p => p.SpecificationId))
                 .ForMember(m => m.Version, opt => opt.Ignore())
                 .ForMember(m => m.LastModifiedByName, opt => opt.MapFrom(p => p.Author != null ? p.Author.Name : "Unknown"))
                 .ForMember(m => m.SourceCode, opt => opt.MapFrom(p => p.SourceCode))
@@ -112,7 +114,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<CalculationVersion, CalculationVersionViewModel>()
-	            .ForMember(m => m.Date, opt => opt.MapFrom(s => s.LastUpdated))
+	            .ForMember(m => m.Date, opt => opt.MapFrom(s => s.LastUpdated != null ? s.LastUpdated.Value.DateTime : DateTime.MinValue))
 	            .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
 	            .ForMember(m => m.Status, opt => opt.Ignore())
 	            .AfterMap((src, dest) => dest.Status = src.PublishStatus.ToString());
@@ -191,6 +193,7 @@ namespace CalculateFunding.Frontend.ViewModels
 	            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
 	            .ForMember(d => d.ValueType, opt => opt.Ignore())
 	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+	            .ForMember(d => d.LastModified, opt => opt.Ignore())
                 .ForMember(d => d.Description, opt => opt.Ignore());
 
             CreateMap<SpecificationSummary, EditSpecificationViewModel>()
@@ -214,7 +217,7 @@ namespace CalculateFunding.Frontend.ViewModels
         {
             CreateMap<DatasetIndex, DatasetSearchResultItemViewModel>()
                .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
-               .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate))
+               .ForMember(m => m.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
                .AfterMap((DatasetIndex source, DatasetSearchResultItemViewModel destination) =>
                {
                    destination.LastUpdatedDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
@@ -230,6 +233,7 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<ProviderVersionSearchResult, ProviderViewModel>()
               .ForMember(m => m.DateOpenedDisplay, opt => opt.Ignore())
+              .ForMember(m => m.DateOpened, opt => opt.MapFrom(c => c.DateOpened != null ? c.DateOpened.Value.DateTime : DateTime.MinValue))
               .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(c => c.Authority))
               .ForMember(m => m.Upin, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UPIN) ? 0 : Convert.ToInt32(c.UPIN)))
               .ForMember(m => m.Ukprn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UKPRN) ? 0 : Convert.ToInt32(c.UKPRN)))
@@ -242,6 +246,7 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<DatasetVersionResponseViewModel, DatasetVersionFullViewModel>()
                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+               .ForMember(dest => dest.LastUpdatedDate, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.PublishStatus))
                .AfterMap((DatasetVersionResponseViewModel source, DatasetVersionFullViewModel destination) =>
                {
@@ -295,8 +300,9 @@ namespace CalculateFunding.Frontend.ViewModels
 
         private void MapCommon()
         {
-            CreateMap<SearchFacet, SearchFacetViewModel>();
-            CreateMap<Facet, SearchFacetViewModel>();
+            CreateMap<SearchFacet, SearchFacetViewModel>().ForMember(m => m.FacetValues, opt => opt.MapFrom(src => src.FacetValues));
+            CreateMap<FacetValue, SearchFacetValueViewModel>();
+            CreateMap<Facet, SearchFacetViewModel>().ForMember(m => m.FacetValues, opt => opt.MapFrom(src => src.FacetValues));
             CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
             CreateMap<Reference, ReferenceViewModel>();
             CreateMap<PublishStatus, PublishStatusViewModel>();

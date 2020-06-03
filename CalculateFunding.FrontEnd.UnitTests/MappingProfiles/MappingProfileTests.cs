@@ -88,6 +88,7 @@ namespace CalculateFunding.Frontend.MappingProfiles
 						CalculationType =  CalculationType.Additional,
                         SourceCode = "Pack my box with five dozen liquor jugs",
 						PublishStatus = PublishStatus.Approved,
+                        SpecificationId = "ABC123"
                 },
                 new CalculationViewModel
                 {
@@ -95,7 +96,8 @@ namespace CalculateFunding.Frontend.MappingProfiles
                     LastModified = new DateTime(1, 2, 3, 4, 5, 6),
                     SourceCode = "Pack my box with five dozen liquor jugs",
                     CalculationType = CalculationTypeViewModel.Additional,
-                    PublishStatus = PublishStatusViewModel.Approved
+                    PublishStatus = PublishStatusViewModel.Approved,
+                    SpecificationId = "ABC123"
                 }
             };
         }

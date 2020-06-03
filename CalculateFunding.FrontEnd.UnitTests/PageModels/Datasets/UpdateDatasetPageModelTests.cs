@@ -54,7 +54,8 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Datasets
                 .Should()
                 .BeEquivalentTo(datasetVersionResponse, c => c.WithAutoConversion()
 	                .Excluding(_ => _.PublishStatus)
-	                .Excluding(_ => _.LastUpdatedDate));
+	                .Excluding(_ => _.LastUpdatedDate)
+                    .Excluding(_ => _.FundingStream));
         }
 
         [TestMethod]
