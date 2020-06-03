@@ -2,6 +2,7 @@ import axios from "axios";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
+import {PublishStatusModel} from "../types/PublishStatusModel";
 
 export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
@@ -79,6 +80,25 @@ export async function getCodeContextService(specificationId: string) {
 }
 export async function getCalculationVersionHistoryService(calculationId: string) {
     return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export async function approveCalculationService(publishStatusModel: PublishStatusModel, specificationId: string, calculationId: string) {
+    return axios(`/api/specs/${specificationId}/calculations/${calculationId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: publishStatusModel
+    })
+}
+
+export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
+    return axios(`/api/calcs/${calculationId}/approvepermission`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

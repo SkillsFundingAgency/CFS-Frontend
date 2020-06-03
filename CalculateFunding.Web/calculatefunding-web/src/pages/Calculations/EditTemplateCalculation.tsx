@@ -5,15 +5,25 @@ import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import { CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import { compileCalculationPreviewService, getCalculationByIdService, updateAdditionalCalculationService } from "../../services/calculationService";
+import {
+    CalculationTypes,
+    EditAdditionalCalculationViewModel,
+    UpdateAdditionalCalculationViewModel
+} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {
+    approveCalculationService,
+    compileCalculationPreviewService,
+    getCalculationByIdService,
+    getIsUserAllowedToApproveCalculationService,
+    updateAdditionalCalculationService
+} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {PublishStatus} from "../../types/PublishStatusModel";
+import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -56,6 +66,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
         }
     };
     const [templateCalculationBuildSuccess, setTemplateCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
+    const [calculationApproveError, setCalculationApproveError] = useState<string>();
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
@@ -125,6 +136,37 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
         }
     }
 
+    function approveTemplateCalculation() {
+
+        setIsLoading(true);
+        setCalculationApproveError("");
+
+        getIsUserAllowedToApproveCalculationService(calculationId)
+            .then((userPermissionResult) => {
+            if (userPermissionResult.status === 200) {
+                let userCanApprove = userPermissionResult.data as boolean;
+                if (userCanApprove) {
+                    const publishStatusModel: PublishStatusModel = {
+                        publishStatus: PublishStatus.Approved
+                    };
+                    approveCalculationService(publishStatusModel, specificationId, calculationId)
+                        .then((result) => {
+                            if (result.status === 200) {
+                                const response: PublishStatusModel = result.data as PublishStatusModel;
+                                setTemplateCalculationStatus(response.publishStatus);
+                            }
+                        });
+                }
+                else
+                {
+                    setCalculationApproveError("Calculation can not be approved by calculation writer");
+                }
+            }
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    }
+
     function buildCalculation() {
         const compileCode = async () => {
             const compileCodeResult = await compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode);
@@ -177,13 +219,33 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             </Breadcrumbs>
             <LoadingStatus title={"Updating template calculation"} hidden={!isLoading}
                            subTitle={"Please wait whilst the calculation is updated"}/>
+
+            <div hidden={(calculationApproveError == null || calculationApproveError === "" || isLoading)}
+                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 data-module="govuk-error-summary">
+                <h2 className="govuk-error-summary__title">
+                    There is a problem
+                </h2>
+                <div className="govuk-error-summary__body">
+                    <ul className="govuk-list govuk-error-summary__list">
+                        <li>
+                            <a href="#calculation-status">Calculation can not be approved by calculation writer</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             <fieldset className="govuk-fieldset" hidden={isLoading}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading">
                         Edit template calculation
                     </h1>
                 </legend>
-                <div className="govuk-form-group">
+                <div id="calculation-status"
+                      className={"govuk-form-group" + (calculationApproveError != null && calculationApproveError !== "" ? " govuk-form-group--error" : "")}>
+                        <span className="govuk-error-message">
+                          <span className="govuk-visually-hidden">Error:</span> {calculationApproveError}
+                        </span>
                         <span className="govuk-caption-m">Calculation status</span>
                         <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2">{templateCalculationStatus} </strong>
                 </div>
@@ -248,6 +310,11 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         onClick={submitTemplateCalculation}
                         disabled={!templateCalculationBuildSuccess.buildSuccess}>
                     Save and continue
+                </button>
+                <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                        onClick={approveTemplateCalculation}
+                        disabled={templateCalculationStatus === PublishStatus.Approved}>
+                    Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">
                     Cancel

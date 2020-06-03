@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -159,6 +160,23 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
             }
+        }
+
+        [Route("api/calcs/{calculationId}/approvepermission")]
+        [HttpGet]
+        public async Task<IActionResult> GetIsUserAllowedToApproveCalculation([FromRoute]string calculationId)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+
+            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+
+            if (calculationResult.StatusCode == HttpStatusCode.OK)
+            {
+	            
+	            return Ok(User.GetUserProfile()?.Id == calculationResult.Content.Author.Id);
+            }
+            
+            return BadRequest(calculationResult.Content);
         }
 
         [HttpPost]
