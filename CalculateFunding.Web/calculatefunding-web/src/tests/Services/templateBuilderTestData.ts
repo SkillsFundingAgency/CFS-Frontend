@@ -423,3 +423,118 @@ export const clonedNodeTemplate: Array<TemplateFundingLine> = [
         "calculations": []
     }
 ];
+
+export const multipleCalculationsDs: Array<FundingLineDictionaryEntry> = [
+    {
+        "key": 1,
+        "value": {
+            "id": "n0",
+            "templateLineId": 0,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 0",
+            "fundingLineCode": "Code 0",
+            "dsKey": 1,
+            "children": []
+        }
+    },
+    {
+        "key": 2,
+        "value": {
+            "id": "n5",
+            "templateLineId": 5,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 5",
+            "fundingLineCode": "Code 5",
+            "dsKey": 2,
+            "children": [
+                {
+                    "id": "n1",
+                    "templateLineId": 1,
+                    "kind": NodeType.FundingLine,
+                    "type": FundingLineType.Information,
+                    "name": "Funding Line 1",
+                    "fundingLineCode": "Code 1",
+                    "dsKey": 2,
+                    "children": []
+                },
+                {
+                    "id": "n2",
+                    "templateCalculationId": 2,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Cash,
+                    "name": "Calculation 2",
+                    "aggregationType": AggregrationType.Sum,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
+                    "dsKey": 2,
+                    "children": []
+                },
+                {
+                    "id": "n4",
+                    "templateCalculationId": 4,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Cash,
+                    "name": "Calculation 4",
+                    "aggregationType": AggregrationType.Sum,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
+                    "dsKey": 2,
+                    "children": [
+                        {
+                            "id": "n3",
+                            "templateCalculationId": 3,
+                            "kind": NodeType.Calculation,
+                            "type": CalculationType.Cash,
+                            "name": "Calculation 3",
+                            "aggregationType": AggregrationType.Sum,
+                            "formulaText": "",
+                            "valueFormat": ValueFormatType.Number,
+                            "allowedEnumTypeValues": undefined,
+                            "groupRate": undefined,
+                            "percentageChangeBetweenAandB": undefined,
+                            "dsKey": 2,
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "key": 3,
+        "value": {
+            "id": "n7",
+            "templateLineId": 7,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Payment,
+            "name": "Funding Line 7",
+            "fundingLineCode": "Code 7",
+            "dsKey": 3,
+            "children": [
+                {
+                    "id": "n6",
+                    "templateCalculationId": 6,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Cash,
+                    "name": "Calculation 6",
+                    "aggregationType": AggregrationType.Sum,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
+                    "dsKey": 3,
+                    "children": []
+                }
+            ]
+        }
+    }
+];

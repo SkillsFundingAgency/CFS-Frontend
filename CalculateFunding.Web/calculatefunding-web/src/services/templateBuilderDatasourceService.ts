@@ -18,6 +18,7 @@ import {
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axios, { AxiosResponse } from "axios";
+import cloneDeep from 'lodash/cloneDeep';
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
@@ -111,15 +112,25 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
 }
 
 export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, targetCalculationId: string, sourceCalculationId: string) => {
-    const targetCalculation = await findNodeById(ds, targetCalculationId);
-    const currentDsKey = targetCalculation.dsKey;
-    const sourceCalculation = await findNodeById(ds, sourceCalculationId);
-    Object.keys(targetCalculation).forEach(e => targetCalculation[e] = sourceCalculation[e]);
+    const targetCalculation: Calculation = await findNodeById(ds, targetCalculationId);
+    const sourceCalculation: Calculation = await findNodeById(ds, sourceCalculationId);
+
+    const targetDsKey = cloneDeep(targetCalculation.dsKey) || 0;
+
     targetCalculation.id = getNewCloneId(sourceCalculationId);
-    targetCalculation.dsKey = currentDsKey;
+    targetCalculation.templateCalculationId = cloneDeep(sourceCalculation.templateCalculationId);
+    targetCalculation.type = cloneDeep(sourceCalculation.type);
+    targetCalculation.name = cloneDeep(sourceCalculation.name);
+    targetCalculation.aggregationType = cloneDeep(sourceCalculation.aggregationType);
+    targetCalculation.formulaText = cloneDeep(sourceCalculation.formulaText);
+    targetCalculation.valueFormat = cloneDeep(sourceCalculation.valueFormat);
+    targetCalculation.allowedEnumTypeValues = cloneDeep(sourceCalculation.allowedEnumTypeValues);
+    targetCalculation.groupRate = cloneDeep(sourceCalculation.groupRate);
+    targetCalculation.percentageChangeBetweenAandB = cloneDeep(sourceCalculation.percentageChangeBetweenAandB);
+
     if (sourceCalculation.children && sourceCalculation.children.length > 0) {
-        targetCalculation.children = JSON.parse(JSON.stringify(sourceCalculation.children));
-        cloneChildCalculations(targetCalculation.children, currentDsKey);
+        targetCalculation.children = cloneDeep(sourceCalculation.children);
+        cloneChildCalculations(targetCalculation.children, targetDsKey);
     }
 }
 

@@ -149,7 +149,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
         return;
       } else {
         setPanning(true);
-        setCursor("move");
+        setCursor("grabbing");
       }
       let lastX = 0;
       let lastY = 0;

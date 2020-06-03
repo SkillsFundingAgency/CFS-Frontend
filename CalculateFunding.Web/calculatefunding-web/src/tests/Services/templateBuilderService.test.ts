@@ -1,6 +1,7 @@
-import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId } from "../../services/templateBuilderDatasourceService";
-import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel } from "../../types/TemplateBuilderDefinitions";
+import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs } from "./templateBuilderTestData";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, cloneCalculation } from "../../services/templateBuilderDatasourceService";
+import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationType, AggregrationType, ValueFormatType } from "../../types/TemplateBuilderDefinitions";
+import cloneDeep from 'lodash/cloneDeep';
 import { v4 as uuidv4 } from 'uuid';
 jest.mock('uuid');
 
@@ -289,6 +290,25 @@ it("clones nodes", async () => {
     expect(clonedNode.id).toMatch(/n3:/);
 });
 
+it("clones calculations", async () => {
+    const dsCalcs: Array<FundingLineDictionaryEntry> = cloneDeep(multipleCalculationsDs);
+
+    expect(getAllCalculations(dsCalcs.map(d => d.value))).toEqual([
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
+        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+    ]);
+
+    await cloneCalculation(dsCalcs, "n4", "n3");
+
+    expect(getAllCalculations(dsCalcs.map(d => d.value))).toEqual([
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+    ]);
+});
+
 it("transforms single node template into datasource", async () => {
     const datasource = templateFundingLinesToDatasource(singleNodeTemplate);
     expect(datasource).toStrictEqual(singleNodeDs);
@@ -348,3 +368,16 @@ it("calculates lastUsedId correctly", () => {
     expect(getLastUsedId(clonedNodeTemplate)).toBe(4);
 });
 
+it("calculates getAllCalculations correctly", () => {
+    expect(getAllCalculations(singleNodeDs.map(d => d.value))).toEqual([]);
+    expect(getAllCalculations(withChildFundingLineDs.map(d => d.value))).toEqual([]);
+    expect(getAllCalculations(withChildFundingLineAndCalculationDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 3", "templateCalculationId": 3}]);
+    expect(getAllCalculations(multipleFundingLinesDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 4", "templateCalculationId": 4}]);
+    expect(getAllCalculations(clonedNodeDs.map(d => d.value))).toEqual([{"id": "n0", "name": "Calculation 4", "templateCalculationId": 4}]);
+    expect(getAllCalculations(multipleCalculationsDs.map(d => d.value))).toEqual([
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
+        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+    ]);
+});
