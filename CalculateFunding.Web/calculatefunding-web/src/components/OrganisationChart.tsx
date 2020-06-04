@@ -13,16 +13,16 @@ import { FundingLineOrCalculation, FundingLineDictionaryEntry, FundingLine, Calc
 
 interface OrganisationChartProps {
   datasource: Array<FundingLineDictionaryEntry>,
-  pan?: boolean,
-  zoom?: boolean,
+  pan: boolean,
+  zoom: boolean,
   zoomoutLimit?: number,
   zoominLimit?: number,
   containerClass?: string,
   chartClass?: string,
   NodeTemplate: React.ReactType,
-  draggable?: boolean,
-  collapsible?: boolean,
-  multipleSelect?: boolean,
+  draggable: boolean,
+  collapsible: boolean,
+  multipleSelect: boolean,
   onClickNode: (node: FundingLineOrCalculationSelectedItem) => void,
   onClickChart?: () => void,
   onClickAdd: (id: string, newChild: FundingLine | Calculation) => Promise<void>,
@@ -36,7 +36,7 @@ interface OrganisationChartProps {
 const defaultProps = {
   pan: false,
   zoom: false,
-  zoomoutLimit: 0.1,
+  zoomoutLimit: 0.03,
   zoominLimit: 1,
   containerClass: "",
   chartClass: "",
@@ -78,7 +78,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
     const [startY, setStartY] = useState(0);
     const [transform, setTransform] = useState("");
     const [panning, setPanning] = useState(false);
-    const [cursor, setCursor] = useState("default");
+    const [cursor, setCursor] = useState("grab");
     const [exporting, setExporting] = useState(false);
     const [dataURL, setDataURL] = useState("");
     const [download, setDownload] = useState("");
@@ -105,7 +105,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
 
     const panEndHandler = () => {
       setPanning(false);
-      setCursor("default");
+      setCursor("grab");
     };
 
     const panHandler = (e: any) => {
@@ -201,6 +201,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
           }
         }
       }
+      chart && chart.current && chart.current.scrollIntoView({ block: "center", inline: "center" });
     };
 
     const zoomHandler = (e: { deltaY: number; }) => {
@@ -307,6 +308,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
       <div
         ref={container}
         className={"orgchart-container " + containerClass}
+        style={{ cursor: cursor }}
         onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >

@@ -59,6 +59,7 @@
   }
   .orgchart ul li .oc-node:hover {
     background-color: rgba(238, 217, 54, 0.5);
+    cursor: pointer;
   }
   /* excluding root node */
   .orgchart > div > ul > li > ul li > .oc-node::before {

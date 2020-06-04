@@ -347,6 +347,7 @@ export function TemplateBuilder() {
                                 draggable={true}
                                 pan={true}
                                 zoom={true}
+                                multipleSelect={false}
                                 onClickNode={readSelectedNode}
                                 onClickChart={clearSelectedNode}
                                 openSideBar={openSideBar}

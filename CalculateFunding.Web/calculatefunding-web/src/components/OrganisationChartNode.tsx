@@ -7,9 +7,9 @@ interface OrganisationChartNodeProps {
   id?: string,
   datasource: FundingLineOrCalculation,
   NodeTemplate: React.ReactType,
-  draggable?: boolean,
-  collapsible?: boolean,
-  multipleSelect?: boolean,
+  draggable: boolean,
+  collapsible: boolean,
+  multipleSelect: boolean,
   changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
   cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
   onClickNode: (node: FundingLineOrCalculationSelectedItem) => void,
@@ -303,7 +303,7 @@ function OrganisationChartNode({
         id={datasource.id}
         data-kind={datasource.kind}
         className={nodeClass}
-        draggable={draggable ? true : undefined}
+        draggable={draggable}
         onDragStart={dragstartHandler}
         onDragOver={dragoverHandler}
         onDragEnd={dragendHandler}
