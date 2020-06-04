@@ -1,12 +1,8 @@
 import React, {
   useState,
-  useRef,
-  forwardRef,
-  useImperativeHandle
+  useRef
 } from "react";
 import { clearSelectedNodeInfo } from "../services/templateBuilderService";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import OrganisationChartNode from "./OrganisationChartNode";
 import "../styles/OrganisationChart.scss";
 import { FundingLineOrCalculation, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem } from "../types/TemplateBuilderDefinitions";
@@ -45,8 +41,7 @@ const defaultProps = {
   multipleSelect: false
 };
 
-const OrganisationChart = forwardRef<any, OrganisationChartProps>(
-  (
+function OrganisationChart(
     {
       datasource,
       pan,
@@ -67,21 +62,16 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
       openSideBar,
       editMode,
       nextId,
-    },
-    ref
-  ) => {
+    }: OrganisationChartProps
+  ) {
     const container = useRef<HTMLDivElement>(null);
     const chart = useRef<HTMLDivElement>(null);
-    const downloadButton = useRef<HTMLAnchorElement>(null);
 
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
     const [transform, setTransform] = useState("");
     const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState("grab");
-    const [exporting, setExporting] = useState(false);
-    const [dataURL, setDataURL] = useState("");
-    const [download, setDownload] = useState("");
 
     const attachRel = (data: FundingLineOrCalculation, flags: string) => {
       data.relationship =
@@ -209,101 +199,6 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
       updateChartScale(newScale);
     };
 
-    const exportPDF = (canvas: HTMLCanvasElement, exportFilename: string) => {
-      const canvasWidth = Math.floor(canvas.width);
-      const canvasHeight = Math.floor(canvas.height);
-      const doc =
-        canvasWidth > canvasHeight
-          ? new jsPDF({
-            orientation: "landscape",
-            unit: "px",
-            format: [canvasWidth, canvasHeight]
-          })
-          : new jsPDF({
-            orientation: "portrait",
-            unit: "px",
-            format: [canvasHeight, canvasWidth]
-          });
-      doc.addImage(canvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 0);
-      doc.save(exportFilename + ".pdf");
-    };
-
-    const exportPNG = (canvas: HTMLCanvasElement, exportFilename: string) => {
-      if (downloadButton && downloadButton.current) {
-        const isWebkit = "WebkitAppearance" in document.documentElement.style;
-        const isFf = !!(window as any).sidebar;
-        const isEdge =
-          navigator.appName === "Microsoft Internet Explorer" ||
-          (navigator.appName === "Netscape" &&
-            navigator.appVersion.indexOf("Edge") > -1);
-
-        if ((!isWebkit && !isFf) || isEdge) {
-          window.navigator.msSaveBlob((canvas as any).msToBlob(), exportFilename + ".png");
-        } else {
-          setDataURL(canvas.toDataURL());
-          setDownload(exportFilename + ".png");
-          downloadButton.current.click();
-        }
-      }
-    };
-
-    useImperativeHandle(ref, () => ({
-      exportTo: (exportFilename: string, exportFileextension: string) => {
-        if (container && container.current && chart && chart.current) {
-          exportFilename = exportFilename || "OrgChart";
-          exportFileextension = exportFileextension || "png";
-          setExporting(true);
-          const originalScrollLeft = container.current.scrollLeft;
-          container.current.scrollLeft = 0;
-          const originalScrollTop = container.current.scrollTop;
-          container.current.scrollTop = 0;
-          html2canvas(chart.current, {
-            width: chart.current.clientWidth,
-            height: chart.current.clientHeight,
-            onclone: function (clonedDoc: any) {
-              clonedDoc.querySelector(".orgchart").style.background = "none";
-              clonedDoc.querySelector(".orgchart").style.transform = "";
-            }
-          }).then(
-            canvas => {
-              if (container && container.current) {
-                if (exportFileextension.toLowerCase() === "pdf") {
-                  exportPDF(canvas, exportFilename);
-                } else {
-                  exportPNG(canvas, exportFilename);
-                }
-                setExporting(false);
-                container.current.scrollLeft = originalScrollLeft;
-                container.current.scrollTop = originalScrollTop;
-              }
-            },
-            () => {
-              if (container && container.current) {
-                setExporting(false);
-                container.current.scrollLeft = originalScrollLeft;
-                container.current.scrollTop = originalScrollTop;
-              }
-            }
-          );
-        }
-      },
-      expandAllNodes: () => {
-        if (chart && chart.current) {
-          chart.current
-            .querySelectorAll(
-              ".oc-node.hidden, .oc-hierarchy.hidden, .isSiblingsCollapsed, .isAncestorsCollapsed"
-            )
-            .forEach((el: { classList: { remove: (arg0: string, arg1: string, arg2: string) => void; }; }) => {
-              el.classList.remove(
-                "hidden",
-                "isSiblingsCollapsed",
-                "isAncestorsCollapsed"
-              );
-            });
-        }
-      }
-    }));
-
     return (
       <div
         ref={container}
@@ -342,21 +237,9 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
             </div>
           )}
         </div>
-        <a
-          className="oc-download-btn hidden"
-          ref={downloadButton}
-          href={dataURL}
-          download={download}
-        >
-          &nbsp;
-          </a>
-        <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
-          <i className="oci oci-spinner spinner"></i>
-        </div>
       </div>
     );
-  }
-);
+  };
 
 OrganisationChart.defaultProps = defaultProps;
 

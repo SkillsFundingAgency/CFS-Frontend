@@ -44,6 +44,7 @@ import { useEffectOnce } from '../hooks/useEffectOnce';
 import { DateFormatter } from '../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
 import { LoadingStatus } from '../components/LoadingStatus';
+import deepClone from 'lodash/cloneDeep';
 
 enum Mode {
     View = 'view',
@@ -176,7 +177,7 @@ export function TemplateBuilder() {
 
     const updateNode = async (node: FundingLineUpdateModel | CalculationUpdateModel) => {
         await updateDatasource(ds, node);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     }
 
     const handleModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,27 +191,27 @@ export function TemplateBuilder() {
 
     const onClickAdd = async (id: string, newChild: FundingLine | Calculation) => {
         await addNode(ds, id, newChild, incrementNextId);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     }
 
     const onClickDelete = async (id: string) => {
         await removeNode(ds, id);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     }
 
     const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         await cloneNodeDatasource(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     };
 
     const changeHierarchy = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         await moveNode(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     };
 
     const onCloneCalculation = async (targetCalculationId: string, sourceCalculationId: string) => {
         await cloneCalculation(ds, targetCalculationId, sourceCalculationId);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     }
 
     function showSaveMessageOnce(message: string) {
@@ -268,7 +269,7 @@ export function TemplateBuilder() {
         };
 
         ds.push(fundingLineEntry);
-        setDS([...ds]);
+        setDS(deepClone(ds));
     }
 
     return (
