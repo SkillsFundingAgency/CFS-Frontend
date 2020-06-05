@@ -20,7 +20,7 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
       kind: NodeType.FundingLine,
       type: FundingLineType.Information,
       name: `Funding Line ${nextId}`,
-      fundingLineCode: null,
+      fundingLineCode: undefined
     };
     addNode(nodeData.id, newChild);
   };
@@ -31,14 +31,14 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
       dsKey: dsKey,
       templateCalculationId: nextId,
       kind: NodeType.Calculation,
-      type: CalculationType.Boolean,
+      type: CalculationType.Cash,
       name: `Calculation ${nextId}`,
       aggregationType: AggregrationType.None,
       formulaText: "Enter formula text",
       valueFormat: ValueFormatType.Number,
-      allowedEnumTypeValues: null,
-      groupRate: null,
-      percentageChangeBetweenAandB: null
+      allowedEnumTypeValues: undefined,
+      groupRate: undefined,
+      percentageChangeBetweenAandB: undefined
     };
     addNode(nodeData.id, newChild);
   };

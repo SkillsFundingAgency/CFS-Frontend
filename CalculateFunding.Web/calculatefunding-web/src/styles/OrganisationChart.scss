@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin: 10px;
     background-color: #fff;
     border: 1px solid #aaa;
@@ -13,11 +13,13 @@
     text-align: center;
     background-image: linear-gradient(90deg, rgba(200, 0, 0, 0.15) 10%, rgba(0, 0, 0, 0) 10%), linear-gradient(rgba(200, 0, 0, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
     background-size: 10px 10px;
+    height: 500px;
   }
   
   .orgchart {
     box-sizing: border-box;
     display: flex;
+    justify-content: center;
     flex: 1 0 auto;
     border: 1px dashed rgba(0,0,0,0);
     padding: 20px 20px 0 20px;

@@ -1,6 +1,7 @@
 import React, {
   useState,
-  useRef
+  useRef,
+  forwardRef,
 } from "react";
 import { clearSelectedNodeInfo } from "../services/templateBuilderService";
 import OrganisationChartNode from "./OrganisationChartNode";
@@ -32,7 +33,7 @@ interface OrganisationChartProps {
 const defaultProps = {
   pan: false,
   zoom: false,
-  zoomoutLimit: 0.03,
+  zoomoutLimit: 0.05,
   zoominLimit: 1,
   containerClass: "",
   chartClass: "",
@@ -41,7 +42,8 @@ const defaultProps = {
   multipleSelect: false
 };
 
-function OrganisationChart(
+const OrganisationChart = forwardRef<any, OrganisationChartProps>(
+  (
     {
       datasource,
       pan,
@@ -62,8 +64,8 @@ function OrganisationChart(
       openSideBar,
       editMode,
       nextId,
-    }: OrganisationChartProps
-  ) {
+    }, ref
+  ) => {
     const container = useRef<HTMLDivElement>(null);
     const chart = useRef<HTMLDivElement>(null);
 
@@ -239,7 +241,8 @@ function OrganisationChart(
         </div>
       </div>
     );
-  };
+  }
+);
 
 OrganisationChart.defaultProps = defaultProps;
 

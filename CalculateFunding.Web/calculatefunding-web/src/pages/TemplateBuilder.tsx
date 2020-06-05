@@ -305,7 +305,7 @@ export function TemplateBuilder() {
                                     <span className="govuk-caption-m">Version</span>
                                     <h3 className="govuk-heading-m">Version {template && template.version}</h3>
                                     <span className="govuk-caption-m">Last Updated Date</span>
-                                    <h3 className="govuk-heading-m"><DateFormatter date={template ? template.lastModificationDate : null} utc={false} /></h3>
+                                    <h3 className="govuk-heading-m"><DateFormatter date={template ? template.lastModificationDate : new Date() } utc={false} /></h3>
                                     <span className="govuk-caption-m">Last Updated Author</span>
                                     <h3 className="govuk-heading-m">{template && template.authorName}</h3>
                                     {canEditTemplate &&
