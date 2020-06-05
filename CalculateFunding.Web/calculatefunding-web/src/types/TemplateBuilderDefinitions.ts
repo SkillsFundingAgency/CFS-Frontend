@@ -34,7 +34,9 @@ export enum CalculationAggregationType {
 export enum ValueFormatType {
   Number = "Number",
   Percentage = "Percentage",
-  Currency = "Currency"
+  Currency = "Currency",
+  Boolean = "Boolean",
+  String = "String"
 }
 
 export interface GroupRate {

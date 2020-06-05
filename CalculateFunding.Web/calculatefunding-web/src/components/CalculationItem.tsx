@@ -33,7 +33,13 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     }
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setType(CalculationType[e.target.value as keyof typeof CalculationType]);
+        const newType = CalculationType[e.target.value as keyof typeof CalculationType];
+        if (newType === CalculationType.Boolean) {
+            setValueFormat(ValueFormatType.Boolean);
+        } else if (newType === CalculationType.Enum) {
+            setValueFormat(ValueFormatType.String)
+        }
+        setType(newType);
     }
 
     const handleFormulaTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,9 +168,16 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                     <label className="govuk-label" htmlFor="calc-value-format">Value Format</label>
                     <span id="calculation-name-hint" className="govuk-hint">The way the value should show</span>
                     <select className="govuk-select" id="calc-value-format" name="calc-value-format" value={valueFormat} onChange={handleValueFormatChange} >
-                        <option value={ValueFormatType.Number}>Number</option>
-                        <option value={ValueFormatType.Percentage}>Percentage</option>
-                        <option value={ValueFormatType.Currency}>Currency</option>
+                        {
+                            type !== CalculationType.Boolean && type !== CalculationType.Enum &&
+                            <>
+                                <option value={ValueFormatType.Number}>Number</option>
+                                <option value={ValueFormatType.Percentage}>Percentage</option>
+                                <option value={ValueFormatType.Currency}>Currency</option>
+                            </>
+                        }
+                        {type === CalculationType.Boolean && <option value={ValueFormatType.Boolean}>Boolean</option>}
+                        {type === CalculationType.Enum && <option value={ValueFormatType.String}>String</option>}
                     </select>
                 </div>
                 <div className="govuk-form-group">
