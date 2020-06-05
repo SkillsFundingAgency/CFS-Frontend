@@ -100,3 +100,20 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
         data: file
     })
 }
+
+export async function searchDatasetService(request: DatasetSearchRequestViewModel) {
+    return axios(`${baseUrl}/search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            searchTerm: request.searchTerm,
+            pageNumber: request.pageNumber,
+            includeFacets: request.includeFacets,
+            pageSize: request.pageSize,
+            fundingStreams: request.fundingStreams,
+            dataSchemas: request.dataSchemas
+        }
+    })
+}

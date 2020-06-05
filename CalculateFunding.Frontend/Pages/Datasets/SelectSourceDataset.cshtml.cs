@@ -148,9 +148,9 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                         Name = datasetVersionModel.Name,
                         IsSelected = datasetVersionModel.SelectedVersion.HasValue,
                         Versions = datasetVersionModel.Versions.Select(m =>
-                            new DatasetVersionItemViewModel(datasetVersionModel.Id, datasetVersionModel.Name, m)
+                            new DatasetVersionItemViewModel(datasetVersionModel.Id, datasetVersionModel.Name, m.Version)
                             {
-                                IsSelected = datasetVersionModel.SelectedVersion.HasValue && datasetVersionModel.SelectedVersion.Value == m
+                                IsSelected = datasetVersionModel.SelectedVersion.HasValue && datasetVersionModel.SelectedVersion.Value == m.Version
                             }).ToArraySafe()
                     });
 

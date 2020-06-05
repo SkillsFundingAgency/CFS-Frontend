@@ -20,5 +20,9 @@ namespace CalculateFunding.Frontend.ViewModels.Common
         public int FacetCount { get; set; } = 10;
 
         public SearchMode SearchMode { get;  set; }
+
+        public string[] FundingStreams { get; set; }
+
+        public string[] DataSchemas { get; set; }
     }
 }

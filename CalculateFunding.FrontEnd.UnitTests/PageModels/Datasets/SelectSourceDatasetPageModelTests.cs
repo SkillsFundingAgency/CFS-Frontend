@@ -12,6 +12,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Datasets;
 using CalculateFunding.Frontend.UnitTests.Helpers;
+using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -130,7 +131,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
         public async Task OnGetAsync_GivenRelationshipIdAndGetsModelWithDatasets_Returns200()
         {
             // Arrange
-            SelectDatasourceModel sourceModel = new SelectDatasourceModel {Datasets = new[] {new DatasetVersions {Id = "ds-id", Name = "ds name", Versions = new[] {1}}}};
+            SelectDatasourceModel sourceModel = new SelectDatasourceModel {Datasets = new[] {new DatasetVersions {Id = "ds-id", Name = "ds name", Versions = Builder<DatasetVersionModel>.CreateListOfSize(10).Build()}}};
 
             ApiResponse<SelectDatasourceModel> sourcesResponse = new ApiResponse<SelectDatasourceModel>(HttpStatusCode.OK, sourceModel);
 
@@ -174,7 +175,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		        {
 			        Id = "ds-id",
 			        Name = "ds name",
-			        Versions = new[] { 1 }
+                    Versions = Builder<DatasetVersionModel>.CreateListOfSize(10).Build()
 		        }
 	        };
 

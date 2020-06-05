@@ -25,13 +25,13 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/datasets/search")]
-        public async Task<IActionResult> SearchDatasets([FromBody] DatasetSearchRequestViewModel request)
+        public async Task<IActionResult> SearchDatasets([FromBody]DatasetSearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
-
+            
             SearchRequestViewModel searchRequest = new SearchRequestViewModel
             {
-                Filters = request.Filters,
+                Filters = new Dictionary<string, string[]>(),
                 ErrorToggle = request.ErrorToggle,
                 FacetCount = request.FacetCount,
                 IncludeFacets = request.IncludeFacets,
@@ -41,7 +41,16 @@ namespace CalculateFunding.Frontend.Controllers
                 SearchTerm = request.SearchTerm
             };
 
-
+            if (request.FundingStreams?.Length > 0)
+            {
+                searchRequest.Filters.Add("fundingStreamName", request.FundingStreams.ToArray());
+            }
+            
+            if (request.DataSchemas?.Length > 0)
+            {
+                searchRequest.Filters.Add("definitionName", request.DataSchemas.ToArray());
+            }
+            
             DatasetSearchResultViewModel result = await _datasetSearchService.PerformSearch(searchRequest);
             if (result != null)
             {
