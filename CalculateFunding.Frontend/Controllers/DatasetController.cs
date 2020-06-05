@@ -51,7 +51,11 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/datasets")]
         public async Task<IActionResult> SaveDataset([FromBody] CreateDatasetViewModel vm)
         {
-            Guard.ArgumentNotNull(vm, nameof(vm));
+            Guard.ArgumentNotNull(vm.Name, nameof(vm.Name));
+            Guard.ArgumentNotNull(vm.Description, nameof(vm.Description));
+            Guard.ArgumentNotNull(vm.Filename, nameof(vm.Filename));
+            Guard.ArgumentNotNull(vm.FundingStreamId, nameof(vm.FundingStreamId));
+            Guard.ArgumentNotNull(vm.DataDefinitionId, nameof(vm.DataDefinitionId));
 
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.CreateNewDataset(
                 new CreateNewDatasetModel
@@ -59,7 +63,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Name = vm.Name,
                     DefinitionId = vm.DataDefinitionId,
                     Description = vm.Description,
-                    Filename = vm.Filename
+                    Filename = vm.Filename,
+                    FundingStreamId = vm.FundingStreamId
                 });
 
             if (response.ModelState != null && response.ModelState.Keys.Any())
@@ -329,6 +334,5 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new StatusCodeResult(500);
         }
-
     }
 }

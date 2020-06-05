@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from "react";
 
-export function AutoComplete(props: { suggestions: string[], callback: any }) {
+export function AutoComplete(props: { suggestions: string[], hidden?: boolean, disabled?:boolean, callback: any }) {
 
     const [autoCompleteState, setAutoCompleteState] = useState({
         suggestions: props.suggestions,
         filteredSuggestions: [] as string[],
         showSuggestions: false,
-        userInput: ""
+        userInput: "",
+        hidden: props.hidden,
+        disabled: props.disabled
     });
 
     useEffect(() => {
@@ -55,9 +57,9 @@ export function AutoComplete(props: { suggestions: string[], callback: any }) {
     }
 
     return (
-        <div className="govuk-form-group">
+        <div className="govuk-form-group" hidden={props.hidden}>
             <input className="govuk-input" id="input-auto-complete"
-                   type="text"
+                   type="text" disabled={autoCompleteState.disabled} autoComplete={"off"}
                    onChange={onChange} onClick={onClickInput} value={autoCompleteState.userInput}
             />
             <ul hidden={!autoCompleteState.showSuggestions} className="govuk-list autocomplete">

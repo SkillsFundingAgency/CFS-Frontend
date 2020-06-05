@@ -9,5 +9,7 @@
         public string DataDefinitionId { get; set; }
 
         public string Filename { get; set; }
+        
+        public string FundingStreamId { get; set; }
     }
 }

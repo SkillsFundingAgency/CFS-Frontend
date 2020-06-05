@@ -129,3 +129,13 @@ export async  function setProfileVariationPointersService(specificationId:string
         data: profileVariationPointer
     });
 }
+
+export async function getFundingStreamsForSelectedSpecifications() {
+    return axios('/api/specs/get-fundingstreams-for-selected-specifications', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+

@@ -34,6 +34,7 @@ import { IStoreState } from './reducers/rootReducer';
 import { FeatureFlagsState } from './states/FeatureFlagsState';
 import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
+import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -65,6 +66,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageData" component={ManageData} />
                 <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
                 <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
+                <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}

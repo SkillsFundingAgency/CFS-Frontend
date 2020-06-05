@@ -31,7 +31,7 @@ namespace CalculateFunding.Frontend.Controllers
 	    private static Mock<IAuthorizationHelper> _mockAuthorisationHelper;
 
 	    [TestMethod]
-        public void SaveDataset_GivenViewModelIsNull_ThowsArgumentNullException()
+        public void SaveDataset_GivenViewModelIsNull_ThrowsArgumentNullException()
         {
             // Arrange
             CreateDatasetViewModel viewModel = null;
@@ -44,7 +44,7 @@ namespace CalculateFunding.Frontend.Controllers
             // Assert
             test
                .Should()
-               .ThrowExactly<ArgumentNullException>();
+               .ThrowExactly<NullReferenceException>();
         }
 
         [TestMethod]
@@ -56,7 +56,14 @@ namespace CalculateFunding.Frontend.Controllers
 	            ModelState = new Dictionary<string, IEnumerable<string>> {{"Name", new[] {"Invalid name"}}}
             };
 
-            CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
+            CreateDatasetViewModel viewModel = new CreateDatasetViewModel
+            {
+                Description = "Description",
+                Filename = "Filename.xlsx",
+                Name = "Name",
+                DataDefinitionId = "0123456789",
+                FundingStreamId = "DSG"
+            };
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
@@ -86,7 +93,14 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.InternalServerError);
 
-            CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
+            CreateDatasetViewModel viewModel = new CreateDatasetViewModel
+            {
+                Description = "Description",
+                Filename = "Filename.xlsx",
+                Name = "Name",
+                DataDefinitionId = "0123456789",
+                FundingStreamId = "DSG"
+            };
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
@@ -128,7 +142,14 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.OK, responseModel);
 
-            CreateDatasetViewModel viewModel = new CreateDatasetViewModel();
+            CreateDatasetViewModel viewModel = new CreateDatasetViewModel
+            {
+                Description = "Description",
+                Filename = "Filename.xlsx",
+                Name = "Name",
+                DataDefinitionId = "0123456789",
+                FundingStreamId = "DSG"
+            };
 
             IDatasetsApiClient apiClient = CreateApiClient();
             apiClient
