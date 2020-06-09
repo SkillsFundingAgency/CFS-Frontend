@@ -159,9 +159,9 @@ export function ManageDataSourceFiles() {
 
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-two-thirds">
-                        <a href="createDatasets" id={"upload-dataset-link"} className="govuk-button govuk-button--primary button-createSpecification" data-module="govuk-button">
+                        <Link to="/Datasets/LoadNewDataSource" id={"upload-dataset-link"} className="govuk-button govuk-button--primary button-createSpecification" data-module="govuk-button">
                             Upload a new data source
-                        </a>
+                        </Link>
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <br/>
