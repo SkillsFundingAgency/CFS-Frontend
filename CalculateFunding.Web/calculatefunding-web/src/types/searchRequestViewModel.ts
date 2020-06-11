@@ -7,9 +7,9 @@ export interface SearchRequestViewModel {
     includeFacets: boolean,
     fundingStreamId: string,
     fundingPeriodId: string,
-    localAuthority: string,
-    status: string,
-    providerType: string,
+    localAuthority: string[],
+    status: string[],
+    providerType: string[],
     pageSize: number
     facetCount: number,
     searchMode: SearchMode

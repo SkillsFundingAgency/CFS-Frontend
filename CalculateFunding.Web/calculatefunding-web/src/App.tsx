@@ -38,6 +38,7 @@ import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {CreateTemplate} from "./pages/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
+import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -56,8 +57,9 @@ const App: React.FunctionComponent = () => {
         <BrowserRouter basename="/app">
             <Switch>
                 <Route exact path="/"><Home featureFlags={featureFlagsState} /></Route>
-                <Route path="/ViewFunding" component={ViewFundingContainer} />
+                <Route path="/ViewFunding" component={FundingApprovalSelection} />
                 <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection} />
+                <Route path="/Approvals/FundingApprovalResults/:fundingStreamId/:fundingPeriodId/:specificationId" component={FundingApprovalResults} />
                 <Route path="/results" component={ViewResults} />
                 <Route path="/SelectSpecification" component={SelectSpecification} />
                 <Route path="/SpecificationsList" component={SpecificationsList} />

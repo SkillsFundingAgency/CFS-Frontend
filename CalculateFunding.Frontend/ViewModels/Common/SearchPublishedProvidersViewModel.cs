@@ -16,11 +16,11 @@ namespace CalculateFunding.Frontend.ViewModels.Common
 
 		public string FundingStreamId { get; set; }
 
-		public string ProviderType { get; set; }
+		public string[] ProviderType { get; set; }
 
-		public string LocalAuthority { get; set; }
+		public string[] LocalAuthority { get; set; }
 
-		public string Status { get; set; }
+		public string[] Status { get; set; }
 
 		public int? PageSize { get; set; }
 

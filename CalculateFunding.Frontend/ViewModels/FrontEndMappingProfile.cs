@@ -7,6 +7,7 @@ using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Extensions;
@@ -307,6 +308,7 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<Reference, ReferenceViewModel>();
             CreateMap<PublishStatus, PublishStatusViewModel>();
             CreateMap<JobSummary, JobSummaryViewModel>();
+            CreateMap<PublishedProviderSearchItem, PublishedProviderSearchResultItemViewModel>();
         }
     }
 }

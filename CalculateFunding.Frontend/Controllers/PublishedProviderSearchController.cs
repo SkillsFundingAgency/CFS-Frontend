@@ -22,44 +22,50 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/publishedprovider/searchpublishedproviders")]
-        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody] SearchPublishedProvidersViewModel viewModel)
+        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody]SearchPublishedProvidersViewModel viewModel)
         {
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
 
-			IDictionary<string, string[]> filters = new Dictionary<string, string[]>();
+            IDictionary<string, string[]> filters = new Dictionary<string, string[]>();
 
-			if (!string.IsNullOrEmpty(viewModel.LocalAuthority) && !string.IsNullOrWhiteSpace(viewModel.LocalAuthority))
-			{
-				filters.Add("localAuthority", new []{viewModel.LocalAuthority});
-			}
-			if (!string.IsNullOrEmpty(viewModel.FundingPeriodId) && !string.IsNullOrWhiteSpace(viewModel.FundingPeriodId))
-			{
-				filters.Add("fundingPeriodId", new []{viewModel.FundingPeriodId });
-			}
-			if (!string.IsNullOrEmpty(viewModel.FundingStreamId) && !string.IsNullOrWhiteSpace(viewModel.FundingStreamId))
-			{
-				filters.Add("fundingStreamId", new []{viewModel.FundingStreamId});
-			}
-			if (!string.IsNullOrEmpty(viewModel.ProviderType) && !string.IsNullOrWhiteSpace(viewModel.ProviderType))
-			{
-				filters.Add("providerType", new []{viewModel.ProviderType });
-			}
-			if (!string.IsNullOrEmpty(viewModel.Status) && !string.IsNullOrWhiteSpace(viewModel.Status))
-			{
-				filters.Add("fundingStatus", new []{viewModel.Status });
-			}
+            if (viewModel.LocalAuthority != null && viewModel.LocalAuthority.Length > 0)
+            {
+                filters.Add("localAuthority", viewModel.LocalAuthority);
+            }
+
+            if (!string.IsNullOrEmpty(viewModel.FundingPeriodId) &&
+                !string.IsNullOrWhiteSpace(viewModel.FundingPeriodId))
+            {
+                filters.Add("fundingPeriodId", new[] {viewModel.FundingPeriodId});
+            }
+
+            if (!string.IsNullOrEmpty(viewModel.FundingStreamId) &&
+                !string.IsNullOrWhiteSpace(viewModel.FundingStreamId))
+            {
+                filters.Add("fundingStreamId", new[] {viewModel.FundingStreamId});
+            }
+
+            if (viewModel.ProviderType != null && viewModel.ProviderType.Length > 0)
+            {
+                filters.Add("providerType", viewModel.ProviderType);
+            }
+
+            if (viewModel.Status != null && viewModel.Status.Length > 0)
+            {
+                filters.Add("fundingStatus", viewModel.Status);
+            }
 
 
             SearchRequestViewModel request = new SearchRequestViewModel
             {
-	            SearchTerm = viewModel.SearchTerm,
-				PageNumber = viewModel.PageNumber,
-				Filters = filters,
-				SearchMode = viewModel.SearchMode,
-				ErrorToggle = viewModel.ErrorToggle,
-				FacetCount = viewModel.FacetCount,
-				IncludeFacets = viewModel.IncludeFacets,
-				PageSize = viewModel.PageSize
+                SearchTerm = viewModel.SearchTerm,
+                PageNumber = viewModel.PageNumber,
+                Filters = filters,
+                SearchMode = viewModel.SearchMode,
+                ErrorToggle = viewModel.ErrorToggle,
+                FacetCount = viewModel.FacetCount,
+                IncludeFacets = viewModel.IncludeFacets,
+                PageSize = viewModel.PageSize
             };
 
             PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(request);

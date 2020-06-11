@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {HubConnection, HubConnectionBuilder} from "@aspnet/signalr";
 import {JobMessage} from "../types/jobMessage";
+import {LoadingStatus} from "../components/LoadingStatus";
 
 export function NotificationSignal(props: { jobId: string, message: string, jobType: string, callback:any }) {
 
@@ -50,10 +51,6 @@ const callback = props.callback;
 
     let message: string = props.message;
     return (
-        <div className="center-block">
-            <h1 className="govuk-heading-xl">{message}</h1>
-            <h2 className="govuk-heading-l">Please wait, this can take several minutes</h2>
-            <img src="/assets/images/loader.gif" alt="Loading"/>
-        </div>
+        <LoadingStatus title={message} subTitle={"Please wait, this can take several minutes"} />
     )
 }

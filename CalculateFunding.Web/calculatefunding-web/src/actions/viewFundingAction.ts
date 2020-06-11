@@ -7,9 +7,9 @@ import {SearchRequestViewModel} from "../types/searchRequestViewModel";
 import {FacetsEntity, PublishedProviderItems} from "../types/publishedProvider";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {JobMessage} from "../types/jobMessage";
-import {GetLatestJobForSpecification} from "../services/jobService";
-import {getLocalAuthoritiesService} from "../services/publishService";
 import {SearchMode} from "../types/SearchMode";
+import {getLatestJobForSpecificationService} from "../services/jobService";
+import {getLocalAuthoritiesService} from "../services/providerService";
 
 export enum ViewFundingActionTypes {
     GET_SPECIFICATIONS = 'getSelectedSpecifications',
@@ -227,7 +227,7 @@ export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IView
 
 export const getLatestJobForSpecification: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await GetLatestJobForSpecification(specificationId);
+        const response = await getLatestJobForSpecificationService(specificationId);
         let jobMessage = response.data as JobMessage;
         dispatch({
             type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION,
