@@ -34,6 +34,7 @@ import { IStoreState } from './reducers/rootReducer';
 import { FeatureFlagsState } from './states/FeatureFlagsState';
 import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
+import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {CreateTemplate} from "./pages/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
@@ -68,6 +69,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageData" component={ManageData} />
                 <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
                 <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
+                <Route path="/Datasets/UpdateDataSourceFile/:datasetId" component={UpdateDataSourceFile} />
                 <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />

@@ -1,10 +1,10 @@
 import {Author} from "../Calculations/CalculationVersionHistorySummary";
 
 export interface NewDatasetVersionResponseViewModel {
-    blobUrl:string;
-    datasetId:string;
+    blobUrl: string;
+    datasetId: string;
     author: Author;
-    version:number;
+    version: number;
 }
 
 export interface NewDatasetVersionResponseErrorModel {

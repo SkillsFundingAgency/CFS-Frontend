@@ -232,7 +232,7 @@ export function ManageDataSourceFiles() {
                             <tbody className="govuk-table__body" id="mainContentResults">
                             {datasetSearchData.datasets.map(ds =>
                                     <tr className="govuk-table__row" key={ds.id}>
-                                        <th scope="row" className="govuk-table__header"><a href="updateDataset">{ds.name}</a>
+                                        <th scope="row" className="govuk-table__header"><Link className="govuk-link" to={`UpdateDataSourceFile/${ds.id}`}>{ds.name}</Link>
 
                                             <div className="govuk-!-margin-top-4">
                                                 <details className="govuk-details govuk-!-margin-top-0" data-module="govuk-details">

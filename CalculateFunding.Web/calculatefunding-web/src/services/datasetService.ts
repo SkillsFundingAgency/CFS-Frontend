@@ -1,8 +1,8 @@
 import axios from "axios";
 import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatasetSchemaUpdateViewModel";
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
-import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
+import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -84,6 +84,18 @@ export async function createDatasetService(request: CreateDatasetRequestViewMode
     })
 }
 
+export async function updateDatasetService(datasetId: string, fileName: string) {
+    return axios(`${baseUrl}/${datasetId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            fileName: fileName
+        }
+    })
+}
+
 export async function uploadDataSourceService(blobUrl: string, file: File, datasetId: string, authorName: string, authorId: string, definitionId: string, name: string, description: string) {
     return axios(`${blobUrl}`, {
         method: 'PUT',
@@ -98,6 +110,48 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
             "x-ms-meta-description": encodeURI(description),
         },
         data: file
+    })
+}
+
+export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
+    return axios(`${blobUrl}`, {
+        method: 'PUT',
+        headers: {
+            "x-ms-blob-type": "BlockBlob",
+            "x-ms-meta-dataDefinitionId": definitionId,
+            "x-ms-meta-datasetId": datasetId,
+            "x-ms-meta-authorName": authorName,
+            "x-ms-meta-authorId": authorId,
+            "x-ms-meta-filename": file.name,
+            "x-ms-meta-name": name,
+            "x-ms-meta-version": version,
+        },
+        data: file
+    })
+}
+
+export async function validateDatasetService(datasetId: string, filename: string, version: string, description: string, changeNote: string) {
+    return axios(`${baseUrl}/validate-dataset`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            datasetId: datasetId,
+            filename: filename,
+            version: version,
+            description: description,
+            comment: changeNote
+        }
+    })
+}
+
+export async function getDatasetValidateStatusService(operationId: string) {
+    return axios(`/api/dataset-validate-status/${operationId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
 }
 
