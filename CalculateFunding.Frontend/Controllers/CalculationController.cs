@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Common.ApiClient.Users.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -150,6 +151,15 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
+            if(publishStatusEditModel.PublishStatus == PublishStatus.Approved)
+            {
+                var (canApprove, _) = await CanUserAllowedToApproveCalculation(calculationId);
+                if (!canApprove)
+                {
+                    return new ForbidResult();
+                }
+            }
+
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
 
             if (response.StatusCode == HttpStatusCode.OK)
@@ -168,15 +178,8 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
-
-            if (calculationResult.StatusCode == HttpStatusCode.OK)
-            {
-	            
-	            return Ok(User.GetUserProfile()?.Id == calculationResult.Content.Author.Id);
-            }
-            
-            return BadRequest(calculationResult.Content);
+            var (canApprove, content) = await CanUserAllowedToApproveCalculation(calculationId);
+            return canApprove ? Ok(true) : (IActionResult)BadRequest(content);
         }
 
         [HttpPost]
@@ -322,6 +325,21 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new BadRequestObjectResult(response.Content);
+        }
+
+        private async Task<(bool, object)> CanUserAllowedToApproveCalculation(string calculationId)
+        {
+            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+
+            if (calculationResult.StatusCode == HttpStatusCode.OK)
+            {
+                FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, calculationResult.Content.FundingStreamId);
+
+                return (permissions.CanApproveAnyCalculations || (permissions.CanApproveCalculations && User.GetUserProfile()?.Id != calculationResult.Content.Author.Id), null);
+               
+            }
+
+            return (false, calculationResult.Content);
         }
     }
 }
