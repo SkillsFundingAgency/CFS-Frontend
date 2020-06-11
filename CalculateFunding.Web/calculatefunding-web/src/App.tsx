@@ -35,6 +35,7 @@ import { FeatureFlagsState } from './states/FeatureFlagsState';
 import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
+import {CreateTemplate} from "./pages/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 
 const App: React.FunctionComponent = () => {
@@ -73,6 +74,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/TemplateBuilder/:templateId" component={TemplateBuilder} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/CreateTemplate" component={CreateTemplate} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />

@@ -121,7 +121,7 @@
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
 
-            services.AddModule<ApiModule>(Configuration);
+            services.AddModule<ApiModule>(Configuration, _hostingEnvironment);
 
             if (!_hostingEnvironment.IsDevelopment())
             {

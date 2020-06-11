@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { Section } from '../types/Sections';
@@ -334,6 +334,11 @@ export function TemplateBuilder() {
                                         <button className="govuk-button" data-testid='save'
                                             onClick={handleSaveContentClick}>Save and continue
                                         </button>}
+                                    &nbsp;
+                                    <Link id="cancel-create-template" to="/Templates" className="govuk-button govuk-button--secondary"
+                                          data-module="govuk-button">
+                                        Cancel
+                                    </Link>
                                     {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                                 </div>
                             </div>

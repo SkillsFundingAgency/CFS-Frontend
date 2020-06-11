@@ -4,6 +4,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Utility;
@@ -83,6 +84,18 @@ namespace CalculateFunding.Frontend.Controllers
             return StatusCode((int) result.StatusCode);
         }
 
+        [HttpGet]
+        [Route("api/templates/build/available-stream-periods")]
+        public async Task<IActionResult> GetFundingStreamPeriodsWithoutTemplates()
+        {
+            ApiResponse<List<FundingStreamWithPeriods>> result = await _client.GetFundingStreamPeriodsWithoutTemplates();
+
+            if (result.StatusCode.IsSuccess())
+                return Ok(result.Content);
+
+            return StatusCode((int) result.StatusCode);
+        }
+
         [HttpPost]
         [Route("api/templates/build")]
         public async Task<IActionResult> CreateDraftTemplate([FromBody] TemplateCreateModel createModel)
@@ -103,10 +116,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<string> result = await _client.CreateDraftTemplate(new TemplateCreateCommand
             {
-                Name = createModel.Name,
                 Description = createModel.Description,
                 FundingStreamId = createModel.FundingStreamId,
-                SchemaVersion = createModel.SchemaVersion
+                FundingPeriodId = createModel.FundingPeriodId,
+                SchemaVersion = "1.1"
             });
 
             switch (result.StatusCode)

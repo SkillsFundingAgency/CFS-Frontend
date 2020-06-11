@@ -25,6 +25,7 @@ using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Polly;
 
 namespace CalculateFunding.Frontend.Modules
@@ -33,12 +34,13 @@ namespace CalculateFunding.Frontend.Modules
     {
         public override void Configure(IServiceCollection services)
         {
-            TimeSpan[] retryTimeSpans = { TimeSpan.FromMilliseconds(500), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5) };
+            TimeSpan[] retryTimeSpans = HostingEnvironment.IsDevelopment() ? 
+                new[] { TimeSpan.FromMinutes(10) } :
+                new[] { TimeSpan.FromMilliseconds(500), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5) };
             int numberOfExceptionsBeforeCircuitBreaker = 100;
-            TimeSpan circuitBreakerFailurePeriod = TimeSpan.FromMinutes(1);
+            TimeSpan circuitBreakerFailurePeriod = HostingEnvironment.IsDevelopment() ? TimeSpan.FromMinutes(10) : TimeSpan.FromMinutes(1);
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
-
 
             services.AddHttpClient(HttpClientKeys.Calculations,
                 c =>

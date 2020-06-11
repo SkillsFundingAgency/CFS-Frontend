@@ -302,3 +302,6 @@ __pycache__/
 
 # JEST
 test-report.xml
+
+# vscode
+.vscode/

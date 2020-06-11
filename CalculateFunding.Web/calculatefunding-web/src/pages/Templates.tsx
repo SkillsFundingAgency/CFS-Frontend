@@ -72,11 +72,15 @@ export const Templates = () => {
                 <PermissionStatus requiredPermissions={missingPermissions} />
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Templates</h1>
-                    {canCreateTemplate && <div className="govuk-form-group" id="create-template">
-                        <div className="govuk-heading-m">
-                            <Link to="/templatebuilder" className="govuk-link">Create a new template</Link>
+                    {canCreateTemplate &&
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-one-third">
+                            <Link to="/CreateTemplate" id="create-template-link"
+                                  className="govuk-button govuk-button--primary"
+                                  data-module="govuk-button">
+                                Create a new template
+                            </Link>
                         </div>
-                        <p className="govuk-body">Start building a new template</p>
                     </div>}
                 </div>
 
@@ -86,16 +90,7 @@ export const Templates = () => {
                     />
                 </div>
                 <div className="govuk-grid-row" hidden={isLoading}>
-                    <div className="govuk-grid-column-one-third">
-                        <form id="searchTemplates">
-                            <CollapsiblePanel title="Search" expanded={true}>
-                                <fieldset className="govuk-fieldset">
-                                    <label className="govuk-label">Search</label>
-                                </fieldset>
-                            </CollapsiblePanel>
-                        </form>
-                    </div>
-                <div className="govuk-grid-column-two-thirds">
+                <div className="govuk-grid-column-full">
                     {haveResults &&
                     <table className="govuk-table" id="templates-table">
                         <thead className="govuk-table__head">
@@ -104,7 +99,7 @@ export const Templates = () => {
                             <th scope="col" className="govuk-table__header govuk-!-width-one-half">Funding Stream</th>
                             <th scope="col" className="govuk-table__header govuk-!-width-one-half">Funding Period</th>
                             <th scope="col" className="govuk-table__header govuk-!-width-one-half">Last Amend</th>
-                            <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">Template Status</th>
+                            <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">Status</th>
                         </tr>
                         </thead>
                         <tbody className="govuk-table__body" id="mainContentResults">

@@ -1,3 +1,5 @@
+import {FundingPeriod, FundingStream} from "./viewFundingTypes";
+
 export enum NodeType {
   FundingLine = "FundingLine",
   Calculation = "Calculation"
@@ -118,6 +120,11 @@ export interface TemplateResponse {
   authorName: string,
   comments: string,
   lastModificationDate: Date
+}
+
+export interface FundingStreamWithPeriodsResponse {
+  fundingStream: FundingStream,
+  fundingPeriods: FundingPeriod[]
 }
 
 export interface Template {

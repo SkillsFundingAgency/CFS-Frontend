@@ -83,6 +83,48 @@ namespace CalculateFunding.Frontend.Helpers
 			        CanApproveTemplates = true,
 			        UserId = user.GetUserProfile()?.Id,
 			        FundingStreamId = "DSG"
+		        },
+		        new FundingStreamPermission
+		        {
+			        CanAdministerFundingStream = true,
+			        CanApproveFunding = true,
+			        CanApproveSpecification = true,
+			        CanChooseFunding = true,
+			        CanCreateQaTests = true,
+			        CanCreateSpecification = true,
+			        CanEditCalculations = true,
+			        CanEditQaTests = true,
+			        CanEditSpecification = true,
+			        CanMapDatasets = true,
+			        CanReleaseFunding = true,
+			        CanRefreshFunding = true,
+			        CanCreateTemplates = true,
+			        CanEditTemplates = true,
+			        CanDeleteTemplates = true,
+			        CanApproveTemplates = true,
+			        UserId = user.GetUserProfile()?.Id,
+			        FundingStreamId = "PSG"
+		        },
+		        new FundingStreamPermission
+		        {
+			        CanAdministerFundingStream = true,
+			        CanApproveFunding = true,
+			        CanApproveSpecification = true,
+			        CanChooseFunding = true,
+			        CanCreateQaTests = true,
+			        CanCreateSpecification = true,
+			        CanEditCalculations = true,
+			        CanEditQaTests = true,
+			        CanEditSpecification = true,
+			        CanMapDatasets = true,
+			        CanReleaseFunding = true,
+			        CanRefreshFunding = true,
+			        CanCreateTemplates = true,
+			        CanEditTemplates = true,
+			        CanDeleteTemplates = true,
+			        CanApproveTemplates = true,
+			        UserId = user.GetUserProfile()?.Id,
+			        FundingStreamId = "DSG-AT"
 		        }
 	        } as IEnumerable<FundingStreamPermission>);
         }

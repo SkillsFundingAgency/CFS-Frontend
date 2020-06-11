@@ -1,11 +1,12 @@
-﻿import React from "react";
-import {Templates} from "../../pages/Templates";
-import { mount } from "enzyme";
+﻿import React from 'react';
+import {CreateTemplate} from "../../pages/CreateTemplate";
+import {mount} from "enzyme";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
-import {Link} from "react-router-dom";
-
+/*import axios from 'axios';
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;*/
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
@@ -56,65 +57,76 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true
 }];
 
-describe("Templates homepage when I don't have permissions to create templates", () => {
+
+describe("Create Template page when I have no create permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(noPermissionsState);
     });
 
-    it("does not render a create template link", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find("[href='/app/templatebuilder']")).toHaveLength(0);
-    });
-
     it("renders a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
         expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1);
-        expect(wrapper.find("[data-testid='permission-alert-message']").text()).toBe("You do not have permissions to perform the following actions: create");
     });
 });
 
-describe("Templates homepage when I have permissions to create templates", () => {
+describe("Create Template page when I have create permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
     });
-    
-    it("renders a create template link", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find("#create-template-link").find(Link).prop('to')).toBe('/CreateTemplate');
-    });
 
     it("does not render a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
         expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
     });
 });
 
-describe("Templates homepage when there are NO templates to list", () => {
+describe("Create Template page when no funding streams exist", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
     });
 
-    it("does not renders the template listing table", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find("#templates-table")).toHaveLength(0);
+    it("does not render a permission status warning", () => {
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
+        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
     });
 });
 
-describe("Templates homepage when there are templates to list", () => {
+describe("Create Template page when a funding stream exists but I don't have permissions for it", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
     });
-    
-    /* TODO:
-    it("renders the template", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find("#templates-table")).toHaveLength(1);
-        expect(wrapper.find("#templates-table").find(Link)).toHaveLength(1);
-        expect(wrapper.find("#templates-table").find(Link).prop('to')).toBe('/templatebuilder/' + template.Id);
-        expect(wrapper.find("#templates-table").find(Link).text()).toBe(template.Name);
-    });*/
+
+    it("does render funding streams drop down list", () => {
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
+        expect(wrapper.find("#fundingStreamId")).toHaveLength(1);
+    });
+
+    it("does not render any funding streams in drop down list", () => {
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
+
+        let actual = wrapper.find("#fundingStreamId");
+
+        expect(actual.find('option').length).toBe(0);
+    });
+});
+
+describe("Create Template page when a funding stream exists for which I have permissions", () => {
+    beforeEach(() => {
+        useSelectorSpy.mockClear();
+        useSelectorSpy.mockReturnValue(permissionsState);
+        /*mockedAxios.get.mockRejectedValue('Network error: Something went wrong');
+        mockedAxios.get.mockResolvedValue({ data: {
+                fundingStream: {id: "XXX", name: "XXXXXX"},
+                fundingPeriods: [{id: "2021", name: "2020-2021"}]}
+        });*/
+    });
+
+    it("does render funding streams drop down list", () => {
+        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
+        expect(wrapper.find("#fundingStreamId")).toHaveLength(1);
+    });
 });

@@ -14,7 +14,7 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse, Template, TemplateContentUpdateCommand, CalculationDictionaryItem
+    TemplateResponse, Template, TemplateContentUpdateCommand, CalculationDictionaryItem, FundingStreamWithPeriodsResponse
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axios, { AxiosResponse } from "axios";
@@ -480,4 +480,21 @@ export async function getTemplateById(templateId: string): Promise<AxiosResponse
             'Content-Type': 'application/json'
         }
     });
+}
+
+export async function getAllFundingStreamsWithAvailablePeriods(): Promise<AxiosResponse<FundingStreamWithPeriodsResponse[]>> {
+    return await axios.get(`/api/templates/build/available-stream-periods`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+export async function createNewDraftTemplate(fundingStreamId: string, fundingPeriodId: string, description: string): Promise<AxiosResponse<string>> {
+    return await axios(`/api/templates/build`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: {fundingStreamId, fundingPeriodId, description}
+    })
 }

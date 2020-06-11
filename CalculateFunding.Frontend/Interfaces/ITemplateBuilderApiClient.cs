@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 
 namespace CalculateFunding.Frontend.Interfaces
@@ -16,9 +15,9 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
         Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
         Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
-        Task<ApiResponse<IEnumerable<TemplateResource>>>
-            GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
+        Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
         Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
         Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchModel request);
+        Task<ApiResponse<List<FundingStreamWithPeriods>>> GetFundingStreamPeriodsWithoutTemplates();
     }
 }

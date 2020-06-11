@@ -28,10 +28,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             TemplateCreateModel model = new TemplateCreateModel
             {
-                Name = "Test Name",
                 Description = "Test Description",
                 FundingStreamId = "TEST",
-                SchemaVersion = "1.1"
+                FundingPeriodId = "TEST"
             };
             string templateId = Guid.NewGuid().ToString();
             apiClient
@@ -65,10 +64,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             TemplateCreateModel model = new TemplateCreateModel
             {
-                Name = "Test Name",
                 Description = "Test Description",
                 FundingStreamId = "TEST",
-                SchemaVersion = "1.1"
+                FundingPeriodId = "TEST"
             };
             string templateId = Guid.NewGuid().ToString();
             apiClient
