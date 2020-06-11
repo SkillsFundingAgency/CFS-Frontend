@@ -104,11 +104,15 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
     if (!sourceFundingLine) return;
     const destinationFundingLine = ds.find(k => k.key === dropTargetDsKey);
     if (!destinationFundingLine) return;
-    draggedItemData.dsKey = dropTargetDsKey;
-    const id = getNewCloneId(draggedItemData.id);
-    draggedItemData.id = id;
+    draggedItemData.dsKey = cloneDeep(dropTargetDsKey);
+    draggedItemData.id = getNewCloneId(draggedItemData.id);
+    
+    if (draggedItemData.children && draggedItemData.children.length > 0) {
+        cloneChildNodes(draggedItemData.children, dropTargetDsKey);
+    }
+
     const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-    await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
+    await destinationDsDigger.addChildren(dropTargetId, cloneDeep(draggedItemData));
 }
 
 export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, targetCalculationId: string, sourceCalculationId: string) => {
@@ -130,18 +134,18 @@ export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, ta
 
     if (sourceCalculation.children && sourceCalculation.children.length > 0) {
         targetCalculation.children = cloneDeep(sourceCalculation.children);
-        cloneChildCalculations(targetCalculation.children, targetDsKey);
+        cloneChildNodes(targetCalculation.children, targetDsKey);
     }
 }
 
-function cloneChildCalculations(calculations: any, dsKey: number) {
-    if (!calculations) {
+function cloneChildNodes(nodes: any, dsKey: number) {
+    if (!nodes) {
         return;
     }
-    for (let i = 0; i < calculations.length; i++) {
-        calculations[i].id = getNewCloneId(calculations[i].id);
-        calculations[i].dsKey = dsKey;
-        cloneChildCalculations(calculations[i].children, dsKey);
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].id = getNewCloneId(nodes[i].id);
+        nodes[i].dsKey = cloneDeep(dsKey);
+        cloneChildNodes(nodes[i].children, dsKey);
     }
 }
 

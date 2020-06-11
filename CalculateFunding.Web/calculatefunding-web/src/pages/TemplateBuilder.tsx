@@ -349,7 +349,7 @@ export function TemplateBuilder() {
                                 NodeTemplate={TemplateBuilderNode}
                                 datasource={ds}
                                 chartClass="myChart"
-                                collapsible={false}
+                                collapsible={true}
                                 draggable={true}
                                 pan={true}
                                 zoom={true}

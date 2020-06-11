@@ -189,6 +189,7 @@ it("adds a new child to all cloned nodes", async () => {
     expect(originalNodeChildren?.length).toBe(1);
     expect(clonedNodeChildren?.length).toBe(1);
     expect(originalNodeAddedChild.id).toBe("n4");
+    expect(clonedNodeClonedChild.id).not.toBe("n4");
     expect(clonedNodeClonedChild.id).toMatch(/n4:*/);
     expect(incrementNextId).toBeCalledTimes(2);
 });

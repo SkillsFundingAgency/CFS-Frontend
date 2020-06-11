@@ -43,11 +43,8 @@ function OrganisationChartNode({
 }: OrganisationChartNodeProps) {
   const node = useRef<HTMLDivElement>(null);
 
-  const [isChildrenCollapsed, setIsChildrenCollapsed] = useState<boolean>(false);
-  const [topEdgeExpanded, setTopEdgeExpanded] = useState<boolean>();
-  const [rightEdgeExpanded, setRightEdgeExpanded] = useState<boolean>();
+  const [isChildrenCollapsed, setIsChildrenCollapsed] = useState<boolean>(datasource.id.includes(":"));
   const [bottomEdgeExpanded, setBottomEdgeExpanded] = useState<boolean>();
-  const [leftEdgeExpanded, setLeftEdgeExpanded] = useState<boolean>();
   const [allowedDrop, setAllowedDrop] = useState<boolean>(false);
   const [selected, setSelected] = useState<boolean>(false);
 
@@ -122,17 +119,11 @@ function OrganisationChartNode({
       node.parentNode.children
     ).some(item => item.classList.contains("hidden"));
 
-    setTopEdgeExpanded(!isAncestorsCollapsed);
-    setRightEdgeExpanded(!isSiblingsCollapsed);
-    setLeftEdgeExpanded(!isSiblingsCollapsed);
     setBottomEdgeExpanded(!isChildrenCollapsed);
   };
 
   const removeArrows = () => {
-    setTopEdgeExpanded(undefined);
-    setRightEdgeExpanded(undefined);
     setBottomEdgeExpanded(undefined);
-    setLeftEdgeExpanded(undefined);
   };
 
   const toggleAncestors = (actionNode: HTMLElement) => {
@@ -147,13 +138,10 @@ function OrganisationChartNode({
         const isSiblingsCollapsed = Array.from(
           actionNode.parentElement.children
         ).some(item => item.classList.contains("hidden"));
-        if (!isSiblingsCollapsed) {
-          toggleSiblings(actionNode);
-        }
+
         actionNode.classList.add(
           ...(
-            "isAncestorsCollapsed" +
-            (isSiblingsCollapsed ? "" : " isSiblingsCollapsed")
+            "isAncestorsCollapsed"
           ).split(" ")
         );
         node.firstElementChild.classList.add("hidden");
@@ -175,63 +163,10 @@ function OrganisationChartNode({
     }
   };
 
-  const topEdgeClickHandler = (e: any) => {
-    e.stopPropagation();
-    setTopEdgeExpanded(!topEdgeExpanded);
-    toggleAncestors(e.target.closest("li"));
-  };
-
   const bottomEdgeClickHandler = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();
     setIsChildrenCollapsed(!isChildrenCollapsed);
     setBottomEdgeExpanded(!bottomEdgeExpanded);
-  };
-
-  const toggleSiblings = (actionNode: HTMLElement) => {
-    if (actionNode && actionNode.previousElementSibling && actionNode.parentElement) {
-      let node = actionNode.previousElementSibling;
-      const isSiblingsCollapsed = Array.from(
-        actionNode.parentElement.children
-      ).some(item => item.classList.contains("hidden"));
-      actionNode.classList.toggle("isSiblingsCollapsed", !isSiblingsCollapsed);
-      while (node) {
-        if (isSiblingsCollapsed) {
-          node.classList.remove("hidden");
-        } else {
-          node.classList.add("hidden");
-        }
-        node = node.previousElementSibling as Element;
-      }
-      node = actionNode.nextElementSibling as Element;
-      while (node) {
-        if (isSiblingsCollapsed) {
-          node.classList.remove("hidden");
-        } else {
-          node.classList.add("hidden");
-        }
-        node = node.nextElementSibling as Element;
-      }
-      const parentElement = actionNode.parentElement;
-      if (parentElement) {
-        const closest = parentElement.closest("li");
-        if (closest) {
-          const firstElementChild = closest.firstElementChild;
-          if (firstElementChild) {
-            const isAncestorsCollapsed = firstElementChild.classList.contains("hidden");
-            if (isAncestorsCollapsed) {
-              toggleAncestors(actionNode);
-            }
-          }
-        }
-      }
-    }
-  };
-
-  const hEdgeClickHandler = (e: any) => {
-    e.stopPropagation();
-    setLeftEdgeExpanded(!leftEdgeExpanded);
-    setRightEdgeExpanded(!rightEdgeExpanded);
-    toggleSiblings(e.target.closest("li"));
   };
 
   const filterAllowedDropNodes = (id: string, draggedNodeKind: NodeType) => {
@@ -320,47 +255,6 @@ function OrganisationChartNode({
           dsKey={dsKey}
           nextId={nextId}
         />
-
-        {collapsible &&
-          datasource.relationship &&
-          datasource.relationship.charAt(0) === "1" && (
-            <i
-              className={`oc-edge verticalEdge topEdge oci ${
-                topEdgeExpanded === undefined
-                  ? ""
-                  : topEdgeExpanded
-                    ? "oci-chevron-down"
-                    : "oci-chevron-up"
-                }`}
-              onClick={topEdgeClickHandler}
-            />
-          )}
-        {collapsible &&
-          datasource.relationship &&
-          datasource.relationship.charAt(1) === "1" && (
-            <>
-              <i
-                className={`oc-edge horizontalEdge rightEdge oci ${
-                  rightEdgeExpanded === undefined
-                    ? ""
-                    : rightEdgeExpanded
-                      ? "oci-chevron-left"
-                      : "oci-chevron-right"
-                  }`}
-                onClick={hEdgeClickHandler}
-              />
-              <i
-                className={`oc-edge horizontalEdge leftEdge oci ${
-                  leftEdgeExpanded === undefined
-                    ? ""
-                    : leftEdgeExpanded
-                      ? "oci-chevron-right"
-                      : "oci-chevron-left"
-                  }`}
-                onClick={hEdgeClickHandler}
-              />
-            </>
-          )}
         {collapsible &&
           datasource.relationship &&
           datasource.relationship.charAt(2) === "1" && (
