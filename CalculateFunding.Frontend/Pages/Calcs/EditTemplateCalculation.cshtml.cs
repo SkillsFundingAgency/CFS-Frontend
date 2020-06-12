@@ -66,6 +66,8 @@ namespace CalculateFunding.Frontend.Pages.Calcs
 
         public string FundingPeriodName { get; set; }
 
+        public string FundingPeriodId { get; set; }
+
         public string SpecificationName { get; set; }
 
         public string DoesUserHavePermissionToApproveOrEdit { get; set; }
@@ -144,10 +146,11 @@ namespace CalculateFunding.Frontend.Pages.Calcs
             FundingStreamName = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Name;
             FundingStreamId = specificationResponse.Content.FundingStreams.FirstOrDefault()?.Id;
             FundingPeriodName = specificationResponse.Content.FundingPeriod.Name;
+            FundingPeriodId = specificationResponse.Content.FundingPeriod.Id;
 
             string templateVersion = specificationResponse.Content.TemplateIds[FundingStreamId];
 
-            ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(FundingStreamId, templateVersion);
+            ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(FundingStreamId, FundingPeriodId, templateVersion);
 
             if (templateMetadataContentsResponse == null || !templateMetadataContentsResponse.StatusCode.IsSuccess())
             {

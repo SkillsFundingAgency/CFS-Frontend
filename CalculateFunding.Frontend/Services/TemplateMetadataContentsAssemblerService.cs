@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
@@ -49,7 +48,7 @@ namespace CalculateFunding.Frontend.Services
                 {
                     string templateVersion = specification.TemplateIds[fundingStreamId];
 
-                    ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, templateVersion);
+                    ApiResponse<TemplateMetadataContents> templateMetadataContentsResponse = await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, specification.FundingPeriod.Id, templateVersion);
 
                     //AB: We will need to revisit this and throw an exception here but while the data is a bit naf 
                     //just want to make sure we can load the page while testing

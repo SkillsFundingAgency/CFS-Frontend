@@ -307,6 +307,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             string specificationName = "Spec name";
             string fundingStreamName = "Bob";
             string fundingStreamId = "5678";
+            string fundingPeriodId = "5678";
             string fundingPeriodName = "Alice";
             string templateVersion = "1";
             string calculationName = "calculationName";
@@ -315,7 +316,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             {
                 Name = specificationName,
                 FundingStreams = new[] { new Reference(fundingStreamId, fundingStreamName) },
-                FundingPeriod = new Reference("a", fundingPeriodName),
+                FundingPeriod = new Reference(fundingPeriodId, fundingPeriodName),
                 TemplateIds = new Dictionary<string, string>
                 {
                     {fundingStreamId, templateVersion}
@@ -348,7 +349,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             };
 
             policiesApiClient
-                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion)
                 .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
 
             string specificationId = "12345";
@@ -406,7 +407,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             await policiesApiClient
                 .Received(1)
-                .GetFundingTemplateContents(fundingStreamId, templateVersion);
+                .GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion);
 
             await calcClient
                 .Received(1)
@@ -451,7 +452,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(specificationResponse);
 
             policiesApiClient
-                .GetFundingTemplateContents(Arg.Any<string>(), Arg.Any<string>())
+                .GetFundingTemplateContents(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
                 .Returns(getFundingTemplateContentsResponse);
 
             EditTemplateCalculationPageModel pageModel = new EditTemplateCalculationPageModel(specsClient,
@@ -500,6 +501,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
             string fundingStreamId = "fundingStreamId";
+            string fundingPeriodId = "fundingPeriodId";
             string templateVersion = "templateVersion";
 
             ApiResponse<SpecificationSummary> specificationResponse = new ApiResponse<SpecificationSummary>(HttpStatusCode.OK,
@@ -511,7 +513,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                                     new Reference(fundingStreamId, "fundingStreamName"),
                                     new Reference("b", "c")
                     },
-                    FundingPeriod = new Reference("a", "fundingPeriodName"),
+                    FundingPeriod = new Reference(fundingPeriodId, "fundingPeriodName"),
                     TemplateIds = new Dictionary<string, string>
                     {
                         { fundingStreamId, templateVersion }
@@ -541,7 +543,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             };
 
             policiesApiClient
-                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion)
                 .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
 
             calcClient
@@ -572,7 +574,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
 
             await policiesApiClient
                 .Received(1)
-                .GetFundingTemplateContents(fundingStreamId, templateVersion);
+                .GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion);
         }
 
         private static IEnumerable<object[]> HandleGetTemplateMappingNotOkTestCases()
@@ -705,13 +707,14 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
                 .Returns(calculationViewModel);
 
             string fundingStreamId = "1";
+            string fundingPeriodId = "1";
             string templateVersion = "1";
 
             SpecificationSummary specificationSummary = new SpecificationSummary
             {
                 Name = "A",
                 FundingStreams = new[] { new Reference(fundingStreamId, "Kochanski") },
-                FundingPeriod = new Reference(),
+                FundingPeriod = new Reference(fundingPeriodId, "fundingPeriodId"),
                 TemplateIds = new Dictionary<string, string>
                 {
                     {fundingStreamId, templateVersion}
@@ -744,7 +747,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Calcs
             };
 
             policiesApiClient
-                .GetFundingTemplateContents(fundingStreamId, templateVersion)
+                .GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion)
                 .Returns(new ApiResponse<Common.TemplateMetadata.Models.TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
 
             TemplateMapping templateMapping = new TemplateMapping

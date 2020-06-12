@@ -52,10 +52,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             IPoliciesApiClient policiesApiClient = CreatePoliciesClient();
             policiesApiClient
-                .GetFundingTemplateContents(Arg.Is("fs-1"), Arg.Is("1.0"))
+                .GetFundingTemplateContents(Arg.Is("fs-1"), Arg.Is("fp-1"), Arg.Is("1.0"))
                 .Returns(new ApiResponse<TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
             policiesApiClient
-               .GetFundingTemplateContents(Arg.Is("fs-2"), Arg.Is("1.0"))
+               .GetFundingTemplateContents(Arg.Is("fs-2"), Arg.Is("fp-1"), Arg.Is("1.0"))
                .Returns((ApiResponse<TemplateMetadataContents>)null);
 
             TemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateService(policiesApiClient: policiesApiClient);
@@ -85,10 +85,10 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             IPoliciesApiClient policiesApiClient = CreatePoliciesClient();
             policiesApiClient
-                .GetFundingTemplateContents(Arg.Is("fs-1"), Arg.Is("1.0"))
+                .GetFundingTemplateContents(Arg.Is("fs-1"), Arg.Is("fp-1"), Arg.Is("1.0"))
                 .Returns(new ApiResponse<TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContentsFs1));
             policiesApiClient
-               .GetFundingTemplateContents(Arg.Is("fs-2"), Arg.Is("1.0"))
+               .GetFundingTemplateContents(Arg.Is("fs-2"), Arg.Is("fp-1"), Arg.Is("1.0"))
                .Returns(new ApiResponse<TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContentsFs2));
 
             TemplateMetadataContentsAssemblerService templateMetadataContentsAssemblerService = CreateService(policiesApiClient: policiesApiClient);
@@ -130,6 +130,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     new Reference("fs-1", "Funding Stream 1"),
                     new Reference("fs-2", "Funding Stream 2"),
                 },
+                FundingPeriod = new Reference("fp-1", "Funding Period 1"),
                 TemplateIds = new Dictionary<string, string>
                 {
                     { "fs-1", "1.0" },

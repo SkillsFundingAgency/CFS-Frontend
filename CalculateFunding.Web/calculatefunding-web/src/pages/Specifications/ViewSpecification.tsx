@@ -162,7 +162,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         getSpecification().then((result) => {
             if (result.status === 200) {
                 const response = result.data as SpecificationSummary;
-                dispatch(getFundingLineStructure(response.id, response.fundingStreams[0].id));
+                dispatch(getFundingLineStructure(response.id, response.fundingPeriod.id, response.fundingStreams[0].id));
             }
             return true;
         });

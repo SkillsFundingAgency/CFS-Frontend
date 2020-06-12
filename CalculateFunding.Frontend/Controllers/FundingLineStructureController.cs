@@ -36,10 +36,11 @@ namespace CalculateFunding.Frontend.Controllers
 			_calculationsApiClient = calculationsApiClient;
 		}
 
-		[Route("api/fundingstructures/specifications/{specificationId}/fundingstreams/{fundingStreamId}")]
+		[Route("api/fundingstructures/specifications/{specificationId}/fundingperiods/{fundingPeriodId}/fundingstreams/{fundingStreamId}")]
 		[HttpGet]
 		public async Task<IActionResult> GetFundingStructures(
 			[FromRoute] string fundingStreamId,
+			[FromRoute] string fundingPeriodId,
 			[FromRoute] string specificationId)
 		{
 			SpecificationSummary specificationSummary;
@@ -67,7 +68,7 @@ namespace CalculateFunding.Frontend.Controllers
 					$"Specification contains no matching template version for funding stream '{fundingStreamId}'");
 
 			ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
-				await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, templateVersion);
+				await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion);
 
 			if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.OK)
 			{

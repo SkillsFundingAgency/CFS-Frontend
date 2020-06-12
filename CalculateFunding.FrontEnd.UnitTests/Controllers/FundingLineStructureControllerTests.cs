@@ -22,6 +22,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class FundingLineStructureControllerTests
     {
         private const string FundingStreamId = "DSG";
+        private const string FundingPeriodId = "AY-2021";
         private const string TemplateVersion = "1.0";
         private const string SpecificationId = "680898bd-9ddc-4d11-9913-2a2aa34f213c";
         private const string CalculationId = "aValidCalculationId";
@@ -39,7 +40,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             FundingLineStructureController controller = new FundingLineStructureController(
                 _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 
-            IActionResult apiResponseResult = await controller.GetFundingStructures(FundingStreamId, SpecificationId);
+            IActionResult apiResponseResult = await controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
 
             var expectedFundingStructureItems = GetValidMappedFundingStructureItems();
             apiResponseResult.Should().BeOfType<OkObjectResult>();
@@ -112,7 +113,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _specificationsApiClient.GetSpecificationSummaryById(SpecificationId)
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
-            _policiesApiClient.GetFundingTemplateContents(FundingStreamId, TemplateVersion)
+            _policiesApiClient.GetFundingTemplateContents(FundingStreamId, FundingPeriodId, TemplateVersion)
                 .Returns(new ApiResponse<TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
 
             _calculationsApiClient.GetTemplateMapping(SpecificationId, FundingStreamId)

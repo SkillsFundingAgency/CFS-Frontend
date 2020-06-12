@@ -152,9 +152,9 @@ export const getReleaseTimetable: ActionCreator<ThunkAction<Promise<any>, ViewSp
 
 export const getFundingLineStructure:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> =
-    (specificationId: string, fundingStreamId: string) => {
+    (specificationId: string, fundingPeriodId: string, fundingStreamId: string) => {
         return async (dispatch: Dispatch) => {
-            const response = await getFundingLineStructureService(specificationId, fundingStreamId);
+            const response = await getFundingLineStructureService(specificationId, fundingPeriodId, fundingStreamId);
             dispatch({
                 type: ViewSpecificationActionTypes.GET_FUNDINGLINESTRUCTURE,
                 payload: response.data as IFundingStructureItem[]
