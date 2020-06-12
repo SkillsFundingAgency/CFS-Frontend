@@ -221,7 +221,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"View results"} url={"/results"}/>
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
-                <Breadcrumb name={specificationResults.specification.name} url={`/ViewSpecification/${specificationResults.specification.id}`}/>
+                <Breadcrumb name={specificationResults.specification.name} url={`/ViewSpecificationResults/${specificationResults.specification.id}`}/>
                 <Breadcrumb name={calculationSummary.calculation.name}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
