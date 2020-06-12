@@ -146,7 +146,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Version = vm.Version,
                     Filename = vm.Filename,
                     Description = vm.Description,
-                    Comment = vm.Comment
+                    Comment = vm.Comment,
+                    FundingStreamId = vm.FundingStreamId
                 });
 
             if (apiResponse == null)

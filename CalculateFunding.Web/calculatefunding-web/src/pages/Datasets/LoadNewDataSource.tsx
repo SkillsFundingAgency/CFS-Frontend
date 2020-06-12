@@ -3,7 +3,15 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {AutoComplete} from "../../components/AutoComplete";
-import {createDatasetService, getDatasetDefinitionsService, uploadDataSourceService} from "../../services/datasetService";
+import {
+    createDatasetService, 
+    getDatasetDefinitionsService, 
+    uploadDataSourceService, 
+    getDatasetHistoryService, getDatasetValidateStatusService,
+    updateDatasetService,
+    uploadDatasetVersionService,
+    validateDatasetService
+} from "../../services/datasetService";
 import {DatasetDefinition} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
 import {CreateDatasetRequestViewModel} from "../../types/Datasets/CreateDatasetRequestViewModel";
 import {useHistory} from "react-router";
@@ -15,6 +23,8 @@ import {NewDatasetVersionResponseErrorModel, NewDatasetVersionResponseViewModel}
 import {AxiosError} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
+import { empty } from "rxjs";
+import { DatasetValidateStatusResponse, ValidationStates } from "../../types/Datasets/UpdateDatasetRequestViewModel";
 
 export function LoadNewDataSource() {
 
@@ -22,7 +32,9 @@ export function LoadNewDataSource() {
     const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DatasetDefinition[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
-
+    const [validationFailures, setValidationFailures] = useState<{ [key: string]: string[] }>();
+    const [isLoading, setIsLoading] = useState(false);   
+    const [loadingStatus, setLoadingStatus] = useState<string>("Update data source");
     const [description, setDescription] = useState<string>("");
     const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
@@ -53,6 +65,43 @@ export function LoadNewDataSource() {
     );
 
     let history = useHistory();
+
+    function getDatasetValidateStatus(operationId: string)
+    {
+        getDatasetValidateStatusService(operationId).then((datasetValidateStatusResponse) => {
+            if (datasetValidateStatusResponse.status === 200 || datasetValidateStatusResponse.status === 201) {
+                const result: DatasetValidateStatusResponse = datasetValidateStatusResponse.data;
+                if (result.currentOperation === "Validated") {
+                    history.push("/Datasets/ManageDataSourceFiles");
+                    return;
+                } else if (result.currentOperation === "FailedValidation") {
+                    setValidationFailures(result.validationFailures);
+                    setIsLoading(false);
+                    return;
+                } else {
+                    let message: string = ValidationStates[result.currentOperation];
+                    if (!message) {
+                        message = "Unknown state: " + result.currentOperation;
+                    }
+                    setLoadingStatus(message);
+                }
+            }
+            else
+            {
+                setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
+                setIsLoading(false);
+                return;
+            }
+
+            setTimeout(function () {
+                getDatasetValidateStatus(operationId);
+            }, 2500);
+
+        }).catch(() => {
+            setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
+            setIsLoading(false);
+        });
+    }
 
     function updateFundingStreamSelection(e: string) {
         const result = fundingStreamSuggestions.filter(x => x.name === e)[0];
@@ -91,9 +140,35 @@ export function LoadNewDataSource() {
 
     function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
         if (uploadFile !== undefined) {
-            uploadDataSourceService(request.blobUrl, uploadFile, request.datasetId, request.author.name, request.author.id, selectedDataSchema, datasetSourceFileName, description).then((result) => {
+            uploadDataSourceService(request.blobUrl, uploadFile, request.datasetId, request.fundingStreamId, request.author.name, request.author.id, selectedDataSchema, datasetSourceFileName, description).then((result) => {
                 if (result.status === 200 || result.status === 201) {
-                    history.push("/Datasets/ManageDataSourceFiles")
+                    validateDatasetService(
+                        request.datasetId,
+                        request.fundingStreamId,
+                        request.filename,
+                        request.version.toString(),
+                        description,
+                        "").then((validateDatasetResponse) => {
+                        if (validateDatasetResponse.status === 200 || validateDatasetResponse.status === 201) {
+                            const validateOperationId: any = validateDatasetResponse.data.operationId;
+                            if (!validateOperationId)
+                            {
+                                setValidationFailures({"error-message": ["Unable to locate dataset validate operationId"]});
+                                setIsLoading(false);
+                                return;
+                            }
+                            getDatasetValidateStatus(validateOperationId)
+                        }
+                        else
+                        {
+                            setValidationFailures({"error-message": ["Unable to validate dataset"]});
+                            setIsLoading(false);
+                            return;
+                        }
+                    }).catch(() => {
+                        setValidationFailures({"error-message": ["Unable to validate dataset"]});
+                        setIsLoading(false);
+                    })
                 }
             })
         }

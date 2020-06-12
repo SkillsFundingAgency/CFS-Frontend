@@ -4,6 +4,8 @@
     {
         public string DatasetId { get; set; }
 
+        public string FundingStreamId { get; set; }
+
         public int Version { get; set; }
 
         public string Filename { get; set; }

@@ -3,6 +3,7 @@ import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatase
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
+import { getFundingPeriodsByFundingStreamId } from "../actions/SelectSpecificationActions";
 
 const baseUrl = "/api/datasets";
 
@@ -96,12 +97,13 @@ export async function updateDatasetService(datasetId: string, fileName: string) 
     })
 }
 
-export async function uploadDataSourceService(blobUrl: string, file: File, datasetId: string, authorName: string, authorId: string, definitionId: string, name: string, description: string) {
+export async function uploadDataSourceService(blobUrl: string, file: File, datasetId: string, fundingStreamId: string, authorName: string, authorId: string, definitionId: string, name: string, description: string) {
     return axios(`${blobUrl}`, {
         method: 'PUT',
         headers: {
             "x-ms-blob-type": "BlockBlob",
             "x-ms-meta-datasetId": datasetId,
+            "x-ms-meta-fundingStreamId": fundingStreamId,
             "x-ms-meta-authorName": authorName,
             "x-ms-meta-authorId": authorId,
             "x-ms-meta-dataDefinitionId": definitionId,
@@ -113,13 +115,14 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
     })
 }
 
-export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
+export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, fundingStreamId:string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
     return axios(`${blobUrl}`, {
         method: 'PUT',
         headers: {
             "x-ms-blob-type": "BlockBlob",
             "x-ms-meta-dataDefinitionId": definitionId,
             "x-ms-meta-datasetId": datasetId,
+            "x-ms-meta-fundingStreamId": fundingStreamId,
             "x-ms-meta-authorName": authorName,
             "x-ms-meta-authorId": authorId,
             "x-ms-meta-filename": file.name,
@@ -130,7 +133,7 @@ export async function uploadDatasetVersionService(blobUrl: string, file: File, d
     })
 }
 
-export async function validateDatasetService(datasetId: string, filename: string, version: string, description: string, changeNote: string) {
+export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, description: string, changeNote: string) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
         headers: {
@@ -138,6 +141,7 @@ export async function validateDatasetService(datasetId: string, filename: string
         },
         data: {
             datasetId: datasetId,
+            fundingStreamId: fundingStreamId,
             filename: filename,
             version: version,
             description: description,

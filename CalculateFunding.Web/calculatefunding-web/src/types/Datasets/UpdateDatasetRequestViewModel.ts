@@ -7,6 +7,7 @@ export interface UpdateNewDatasetVersionResponseViewModel {
     author: Author;
     name: string;
     description: string;
+    fundingStreamId: string;
     filename: string;
     version: number;
 }

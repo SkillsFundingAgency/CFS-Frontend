@@ -92,6 +92,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 request.blobUrl,
                 uploadFile,
                 request.datasetId,
+                request.fundingStreamId,
                 request.author.name,
                 request.author.id,
                 request.definitionId,
@@ -101,6 +102,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     if (uploadDatasetVersionResponse.status === 200 || uploadDatasetVersionResponse.status === 201) {
                         validateDatasetService(
                             request.datasetId,
+                            request.fundingStreamId,
                             request.filename,
                             request.version.toString(),
                             description,
