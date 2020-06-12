@@ -70,7 +70,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }){
                                     {props.featureFlags.templateBuilderVisible &&
                                         <div className="govuk-grid-column-one-third">
                                             <div className="govuk-heading-m">
-                                                <Link to="/templates" className="govuk-link">Templates</Link>
+                                                <Link to="/Templates/View" className="govuk-link">Templates</Link>
                                             </div>
                                             <p className="govuk-body">View and create funding templates.</p>
                                         </div>}

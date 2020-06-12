@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Home } from "./pages/Home";
-import ViewFundingContainer from "./containers/ViewFundingContainer";
 import './App.scss'
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
@@ -12,8 +11,9 @@ import { ProviderFundingOverview } from "./pages/ProviderFundingOverview";
 import { CreateSpecification } from "./pages/Specifications/CreateSpecification";
 import { CreateDatasetPage } from "./pages/CreateDatasetPage";
 import { EditSpecification } from "./pages/Specifications/EditSpecification";
-import { Templates } from "./pages/Templates";
-import { TemplateBuilder } from "./pages/TemplateBuilder";
+import { ViewTemplates } from "./pages/Templates/ViewTemplates";
+// import { PublishTemplate } from "./pages/Templates/PublishTemplate";
+import { TemplateBuilder } from "./pages/Templates/TemplateBuilder";
 import { Section } from "./types/Sections";
 import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
 import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
@@ -36,7 +36,7 @@ import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
-import {CreateTemplate} from "./pages/CreateTemplate";
+import {CreateTemplate} from "./pages/Templates/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 
@@ -76,9 +76,10 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
-                {featureFlagsState.templateBuilderVisible && <Route path="/Templates" component={Templates} />}
-                {featureFlagsState.templateBuilderVisible && <Route path="/TemplateBuilder/:templateId" component={TemplateBuilder} />}
-                {featureFlagsState.templateBuilderVisible && <Route path="/CreateTemplate" component={CreateTemplate} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/View" component={ViewTemplates} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Build/:templateId" component={TemplateBuilder} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate} />}
+                {/*{featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish" component={PublishTemplate} />}*/}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />

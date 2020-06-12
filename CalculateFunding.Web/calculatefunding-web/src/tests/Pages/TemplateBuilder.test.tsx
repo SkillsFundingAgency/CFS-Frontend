@@ -1,5 +1,5 @@
 import React from "react";
-import {TemplateBuilder} from "../../pages/TemplateBuilder";
+import {TemplateBuilder} from "../../pages/Templates/TemplateBuilder";
 import {mount} from "enzyme";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import * as redux from "react-redux";

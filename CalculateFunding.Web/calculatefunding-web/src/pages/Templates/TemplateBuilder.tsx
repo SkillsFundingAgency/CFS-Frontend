@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {Link, useParams} from 'react-router-dom';
 import Sidebar from "react-sidebar";
-import { SidebarContent } from "../components/SidebarContent";
-import { Section } from '../types/Sections';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import OrganisationChart from "../components/OrganisationChart";
-import TemplateBuilderNode from "../components/TemplateBuilderNode";
+import { SidebarContent } from "../../components/SidebarContent";
+import { Section } from '../../types/Sections';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import OrganisationChart from "../../components/OrganisationChart";
+import TemplateBuilderNode from "../../components/TemplateBuilderNode";
 import {
     addNode,
     removeNode,
@@ -20,8 +20,8 @@ import {
     getLastUsedId,
     getAllCalculations,
     cloneCalculation
-} from "../services/templateBuilderDatasourceService";
-import { PermissionStatus } from "../components/PermissionStatus";
+} from "../../services/templateBuilderDatasourceService";
+import { PermissionStatus } from "../../components/PermissionStatus";
 import {
     NodeType,
     FundingLineType,
@@ -35,15 +35,15 @@ import {
     TemplateFundingLine,
     Template,
     TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem
-} from '../types/TemplateBuilderDefinitions';
-import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
-import "../styles/TemplateBuilder.scss";
+} from '../../types/TemplateBuilderDefinitions';
+import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
+import "../../styles/TemplateBuilder.scss";
 import { useSelector } from "react-redux";
-import { AppState } from "../states/AppState";
-import { useEffectOnce } from '../hooks/useEffectOnce';
-import { DateFormatter } from '../components/DateFormatter';
-import { Breadcrumbs, Breadcrumb } from '../components/Breadcrumbs';
-import { LoadingStatus } from '../components/LoadingStatus';
+import { AppState } from "../../states/AppState";
+import { useEffectOnce } from '../../hooks/useEffectOnce';
+import { DateFormatter } from '../../components/DateFormatter';
+import { Breadcrumbs, Breadcrumb } from '../../components/Breadcrumbs';
+import { LoadingStatus } from '../../components/LoadingStatus';
 import deepClone from 'lodash/cloneDeep';
 
 enum Mode {
@@ -281,7 +281,7 @@ export function TemplateBuilder() {
                     subTitle={"Please wait while the template loads."} />
                 <Breadcrumbs>
                     <Breadcrumb name={"Calculate funding"} url={"/"} />
-                    <Breadcrumb name={"Templates"} url={"/templates"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/View"} />
                     <Breadcrumb name={template ? template.name : ""} />
                 </Breadcrumbs>
                 {!isError ?
@@ -335,7 +335,7 @@ export function TemplateBuilder() {
                                             onClick={handleSaveContentClick}>Save and continue
                                         </button>}
                                     &nbsp;
-                                    <Link id="cancel-create-template" to="/Templates" className="govuk-button govuk-button--secondary"
+                                    <Link id="cancel-create-template" to="/Templates/View" className="govuk-button govuk-button--secondary"
                                           data-module="govuk-button">
                                         Cancel
                                     </Link>

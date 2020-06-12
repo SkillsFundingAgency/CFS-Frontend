@@ -1,19 +1,19 @@
-﻿import React, {useEffect, useState} from 'react';
+﻿﻿import React, {useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import {useHistory} from 'react-router-dom';
-import {Header} from "../components/Header";
-import {Footer} from "../components/Footer";
-import {AppState} from "../states/AppState";
-import {Section} from "../types/Sections";
-import {FundingPeriod, FundingStream} from "../types/viewFundingTypes";
-import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
-import {FundingStreamWithPeriodsResponse} from "../types/TemplateBuilderDefinitions";
-import {PermissionStatus} from "../components/PermissionStatus";
+import {Header} from "../../components/Header";
+import {Footer} from "../../components/Footer";
+import {AppState} from "../../states/AppState";
+import {Section} from "../../types/Sections";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
+import {FundingStreamWithPeriodsResponse} from "../../types/TemplateBuilderDefinitions";
+import {PermissionStatus} from "../../components/PermissionStatus";
 import {useSelector} from "react-redux";
-import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
-import {useEffectOnce} from "../hooks/useEffectOnce";
-import {LoadingStatus} from "../components/LoadingStatus";
-import {createNewDraftTemplate, getAllFundingStreamsWithAvailablePeriods} from "../services/templateBuilderDatasourceService";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {useEffectOnce} from "../../hooks/useEffectOnce";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {createNewDraftTemplate, getAllFundingStreamsWithAvailablePeriods} from "../../services/templateBuilderDatasourceService";
 
 export const CreateTemplate = () => {
     const [canCreateTemplate, setCanCreateTemplate] = useState<boolean>(false);
@@ -149,7 +149,7 @@ export const CreateTemplate = () => {
             if (result.status === 201) {
                 showSaveMessageOnce(`Template created successfully`);
 
-                history.push("/TemplateBuilder/" + result.data);
+                history.push("/Templates/Build/" + result.data);
             } else {
                 setErrorMessages(errors => [...errors, `Template creation failed: ` + result.status + ` ` + result.statusText + ` ` + result.data]);
             }
@@ -165,7 +165,7 @@ export const CreateTemplate = () => {
             <div className="govuk-width-container">
                 <Breadcrumbs>
                     <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates"}/>
+                    <Breadcrumb name={"Templates"} url={"/Templates/View"}/>
                     <Breadcrumb name={"Create a new template"}/>
                 </Breadcrumbs>
                 <PermissionStatus requiredPermissions={missingPermissions}/>
@@ -257,7 +257,7 @@ export const CreateTemplate = () => {
                             <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
                                 Template</button>}
                             &nbsp;
-                            <Link id="cancel-create-template" to="/Templates" className="govuk-button govuk-button--secondary"
+                            <Link id="cancel-create-template" to="/Templates/View" className="govuk-button govuk-button--secondary"
                                   data-module="govuk-button">
                                 Back
                             </Link>
