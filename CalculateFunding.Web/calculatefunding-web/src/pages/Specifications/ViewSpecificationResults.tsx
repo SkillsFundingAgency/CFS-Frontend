@@ -231,11 +231,14 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <h2 className="govuk-heading-l">Downloadable reports</h2>
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-full">
+                                            <div className="govuk-body-l" hidden={downloadableReports.length > 0}>
+                                                There are no reports available for this Specification
+                                            </div>
                                             <div hidden={downloadableReports.filter(dr => dr.category === "Live").length === 0}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
                                                 {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
                                                         <div className="attachment__thumbnail">
-                                                            <a href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`} className="govuk-link" target="_self"
+                                                            <a href={`api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
                                                                aria-hidden="true">
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
@@ -275,8 +278,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 {downloadableReports.filter(dr => dr.category === "History").map(dlr =>
                                                     <div>
                                                         <div className="attachment__thumbnail">
-                                                            <a className="govuk-link" target="_self"
-                                                               aria-hidden="true" href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>
+                                                            <a href={`api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
+                                                               aria-hidden="true">
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
