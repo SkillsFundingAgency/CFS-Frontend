@@ -221,7 +221,6 @@ export function TemplateBuilder() {
     }
 
     const handleSaveContentClick = async () => {
-        console.log(await findNodeById(ds, "n2"))
         try {
             if (template == undefined) {
                 setIsError(true);
@@ -325,7 +324,7 @@ export function TemplateBuilder() {
                                                         checked={mode === Mode.View} onChange={handleModeChange} data-testid='view' />
                                                     <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
                                                         View
-                                                </label>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>}

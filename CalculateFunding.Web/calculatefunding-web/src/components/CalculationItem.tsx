@@ -35,14 +35,20 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newType = CalculationType[e.target.value as keyof typeof CalculationType];
-        if (newType === CalculationType.Boolean) {
-            setValueFormat(ValueFormatType.Boolean);
-        } else if (newType === CalculationType.Enum) {
-            setValueFormat(ValueFormatType.String);
-            setAggregationType(AggregrationType.None);
-        } else if (newType === CalculationType.Cash) {
-            setValueFormat(ValueFormatType.Currency);
+
+        switch (newType) {
+            case CalculationType.Boolean:
+                setValueFormat(ValueFormatType.Boolean);
+                break;
+            case CalculationType.Enum:
+                setValueFormat(ValueFormatType.String);
+                setAggregationType(AggregrationType.None);
+                break;
+            case CalculationType.Cash:
+                setValueFormat(ValueFormatType.Currency);
+                break;
         }
+
         setType(newType);
     }
 
@@ -166,7 +172,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         }
         return new Set(values.map(v => v.toLowerCase())).size === values.map(v => v.toLowerCase()).length
     }
-    
+
     const isAllowedEnumTypeValuesValid = allowedEnumTypeValuesValid();
     const isNameValid = name.length > 0;
     const isGroupRateValid = aggregationType !== AggregrationType.GroupRate ||
@@ -177,8 +183,8 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     const isFormValid = () => {
         const hasAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
         return (
-            isNameValid && 
-            !hasAllowedEnumTypes && 
+            isNameValid &&
+            !hasAllowedEnumTypes &&
             isAllowedEnumTypeValuesValid &&
             isGroupRateValid &&
             isPecentageChangeBetweenAandBValid
