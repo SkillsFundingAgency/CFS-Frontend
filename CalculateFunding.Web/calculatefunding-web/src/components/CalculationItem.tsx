@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
 import "../styles/CalculationItem.scss";
+import { getStringArray } from "../services/templateBuilderDatasourceService";
 
 export interface CalculationItemProps {
     node: Calculation,
@@ -14,7 +15,7 @@ export interface CalculationItemProps {
 export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNode, cloneCalculation }: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
-    const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string | undefined>(node.allowedEnumTypeValues);
+    const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string>(node.allowedEnumTypeValues || "");
     const [numerator, setNumerator] = useState<number>(node.groupRate ? node.groupRate.numerator : 0);
     const [denominator, setDenominator] = useState<number>(node.groupRate ? node.groupRate.denominator : 0);
     const [calculationA, setCalculationA] = useState<number>(node.percentageChangeBetweenAandB ? node.percentageChangeBetweenAandB.calculationA : 0);
@@ -37,7 +38,10 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         if (newType === CalculationType.Boolean) {
             setValueFormat(ValueFormatType.Boolean);
         } else if (newType === CalculationType.Enum) {
-            setValueFormat(ValueFormatType.String)
+            setValueFormat(ValueFormatType.String);
+            setAggregationType(AggregrationType.None);
+        } else if (newType === CalculationType.Cash) {
+            setValueFormat(ValueFormatType.Currency);
         }
         setType(newType);
     }
@@ -123,7 +127,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
             formulaText: formulaText,
             valueFormat: valueFormat,
             aggregationType: aggregationType,
-            allowedEnumTypeValues: type !== CalculationType.Enum ? "" : allowedEnumTypeValues,
+            allowedEnumTypeValues: type !== CalculationType.Enum ? undefined : allowedEnumTypeValues,
             groupRate: aggregationType !== AggregrationType.GroupRate ? undefined : groupRate,
             percentageChangeBetweenAandB: aggregationType !== AggregrationType.PercentageChangeBetweenAandB ? undefined : percentageChangeBetweenAandB
         };
@@ -132,13 +136,65 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         openSideBar(false);
     }
 
+    const renderValueFormatOptions = (): JSX.Element => {
+        if (type === CalculationType.Boolean) {
+            return <option value={ValueFormatType.Boolean}>Boolean</option>
+        }
+        if (type === CalculationType.Enum) {
+            return <option value={ValueFormatType.String}>String</option>
+        }
+        if (type === CalculationType.Cash) {
+            return <option value={ValueFormatType.Currency}>Currency</option>
+        }
+
+        return (
+            <>
+                <option value={ValueFormatType.Number}>Number</option>
+                <option value={ValueFormatType.Percentage}>Percentage</option>
+                <option value={ValueFormatType.Currency}>Currency</option>
+            </>
+        );
+    }
+
+    const allowedEnumTypeValuesValid = () => {
+        if (type !== CalculationType.Enum) {
+            return true;
+        }
+        const values = getStringArray(allowedEnumTypeValues);
+        if (!values) {
+            return true; // Empty case handled by isFormValid to prevent error being displayed on render
+        }
+        return new Set(values.map(v => v.toLowerCase())).size === values.map(v => v.toLowerCase()).length
+    }
+    
+    const isAllowedEnumTypeValuesValid = allowedEnumTypeValuesValid();
+    const isNameValid = name.length > 0;
+    const isGroupRateValid = aggregationType !== AggregrationType.GroupRate ||
+        aggregationType === AggregrationType.GroupRate && numerator !== 0 && denominator !== 0;
+    const isPecentageChangeBetweenAandBValid = aggregationType !== AggregrationType.PercentageChangeBetweenAandB ||
+        aggregationType === AggregrationType.PercentageChangeBetweenAandB && calculationA !== 0 && calculationB !== 0;
+
+    const isFormValid = () => {
+        const hasAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
+        return (
+            isNameValid && 
+            !hasAllowedEnumTypes && 
+            isAllowedEnumTypeValuesValid &&
+            isGroupRateValid &&
+            isPecentageChangeBetweenAandBValid
+        );
+    }
+
     return (
         <>
             <h2 className="govuk-heading-l">Edit Calculation</h2>
             <fieldset className="govuk-fieldset" key={node.id}>
-                <div className="govuk-form-group">
+                <div className={`govuk-form-group ${isNameValid ? "" : "govuk-form-group--error"}`}>
                     <label className="govuk-label" htmlFor="calc-name">Name</label>
                     <span id="calculation-name-hint" className="govuk-hint">The name of the calculation</span>
+                    {!isNameValid && <span id="name-error" className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> Name must be not be blank
+                    </span>}
                     <input className="govuk-input" id="calc-name" name="calc-name" type="text" value={name} onChange={handleNameChange} />
                 </div>
                 <div className="govuk-form-group">
@@ -154,10 +210,14 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                     </select>
                 </div>
                 {type === CalculationType.Enum &&
-                    <div className="govuk-form-group">
+                    <div className={`govuk-form-group ${isAllowedEnumTypeValuesValid ? "" : "govuk-form-group--error"}`}>
                         <label className="govuk-label" htmlFor="calc-enum-values">Allowed Enum Values</label>
                         <span id="calculation-enum-values-hint" className="govuk-hint">E.g. Option 1, Option2, Option3</span>
-                        <input className="govuk-input" id="calc-formula-text" name="calc-enum-values" type="text" value={allowedEnumTypeValues ? allowedEnumTypeValues : ""} onChange={handleAllowedEnumTypeValuesChange} />
+                        {!isAllowedEnumTypeValuesValid &&
+                            <span id="name-error" className="govuk-error-message">
+                                <span className="govuk-visually-hidden">Error:</span>Allowed Enum Values must contain unique values
+                            </span>}
+                        <input className="govuk-input" id="calc-enum-values" name="calc-enum-values" type="text" placeholder="Please enter options..." value={allowedEnumTypeValues} onChange={handleAllowedEnumTypeValuesChange} />
                     </div>
                 }
                 <div className="govuk-form-group">
@@ -168,44 +228,45 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                     <label className="govuk-label" htmlFor="calc-value-format">Value Format</label>
                     <span id="calculation-name-hint" className="govuk-hint">The way the value should show</span>
                     <select className="govuk-select" id="calc-value-format" name="calc-value-format" value={valueFormat} onChange={handleValueFormatChange} >
-                        {
-                            type !== CalculationType.Boolean && type !== CalculationType.Enum &&
-                            <>
-                                <option value={ValueFormatType.Number}>Number</option>
-                                <option value={ValueFormatType.Percentage}>Percentage</option>
-                                <option value={ValueFormatType.Currency}>Currency</option>
-                            </>
-                        }
-                        {type === CalculationType.Boolean && <option value={ValueFormatType.Boolean}>Boolean</option>}
-                        {type === CalculationType.Enum && <option value={ValueFormatType.String}>String</option>}
+                        {renderValueFormatOptions()}
                     </select>
                 </div>
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-aggregation-type">Aggregation Type</label>
                     <select className="govuk-select" id="calc-aggregation-type" name="calc-aggregation-type" value={aggregationType} onChange={handleAggregationChange} >
                         <option value={AggregrationType.None}>None</option>
-                        <option value={AggregrationType.Average}>Average</option>
-                        <option value={AggregrationType.Sum}>Sum</option>
-                        <option value={AggregrationType.GroupRate}>GroupRate</option>
-                        <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
+                        {type !== CalculationType.Enum &&
+                            <>
+                                <option value={AggregrationType.Average}>Average</option>
+                                <option value={AggregrationType.Sum}>Sum</option>
+                                <option value={AggregrationType.GroupRate}>GroupRate</option>
+                                <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
+                            </>
+                        }
                     </select>
                 </div>
                 {aggregationType === AggregrationType.GroupRate &&
                     <>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-numerator">Numerator</label>
-                            <select className="govuk-select" id="calc-numerator" name="calc-numerator" value={numerator} onChange={handleNumeratorChange} >
+                            <select className="govuk-select" id="calc-numerator" name="calc-numerator" value={numerator} onChange={handleNumeratorChange}>
+                                <option value="0">Please select</option>
                                 {calcs && calcs
-                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
-                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                        c.aggregationType === AggregrationType.Sum &&
+                                        c.templateCalculationId !== denominator)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
                             </select>
                         </div>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-denominator">Denominator</label>
                             <select className="govuk-select" id="calc-denominator" name="calc-denominator" value={denominator} onChange={handleDenominatorChange} >
+                                <option value="0">Please select</option>
                                 {calcs && calcs
-                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
-                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                        c.aggregationType === AggregrationType.Sum &&
+                                        c.templateCalculationId !== numerator)
+                                    .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
                             </select>
                         </div>
                     </>
@@ -215,16 +276,20 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-calculation-a">Calculation A</label>
                             <select className="govuk-select" id="calc-calculation-a" name="calc-calculation-a" value={calculationA} onChange={handleCalculationAChange} >
+                                <option value="">Please select</option>
                                 {calcs && calcs
-                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                        c.templateCalculationId !== calculationB)
                                     .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
                             </select>
                         </div>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="calc-calculation-b">Calculation B</label>
                             <select className="govuk-select" id="calc-calculation-b" name="calc-calculation-b" value={calculationB} onChange={handleCalculationBChange} >
+                                <option value="">Please select</option>
                                 {calcs && calcs
-                                    .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                    .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                        c.templateCalculationId !== calculationA)
                                     .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
                             </select>
                         </div>
@@ -237,7 +302,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                         </div>
                     </>
                 }
-                <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
+                <button className="govuk-button" id="save-button" data-module="govuk-button" onClick={handleSubmit} disabled={!isFormValid()}>
                     Save and continue
                 </button>
                 {
@@ -253,7 +318,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                         </div>
                         <button className="govuk-button" data-module="govuk-button" onClick={handleCloneClick} >
                             Clone
-                </button>
+                        </button>
                     </>
                 }
                 <div className="govuk-warning-text">

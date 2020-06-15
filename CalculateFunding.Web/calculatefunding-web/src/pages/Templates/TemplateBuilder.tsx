@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {Link, useParams} from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../../components/SidebarContent";
 import { Section } from '../../types/Sections';
@@ -19,7 +19,8 @@ import {
     saveTemplateContent,
     getLastUsedId,
     getAllCalculations,
-    cloneCalculation
+    cloneCalculation,
+    findNodeById
 } from "../../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import {
@@ -220,13 +221,14 @@ export function TemplateBuilder() {
     }
 
     const handleSaveContentClick = async () => {
+        console.log(await findNodeById(ds, "n2"))
         try {
             if (template == undefined) {
                 setIsError(true);
                 setErrorMessages(errors => [...errors, "Can't find template data to update"]);
                 return;
             }
-    
+
             setSaveMessage("Saving template...");
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
             if (!fundingLines || fundingLines.length === 0 || fundingLines === null) {
@@ -305,7 +307,7 @@ export function TemplateBuilder() {
                                     <span className="govuk-caption-m">Version</span>
                                     <h3 className="govuk-heading-m">Version {template && template.version}</h3>
                                     <span className="govuk-caption-m">Last Updated Date</span>
-                                    <h3 className="govuk-heading-m"><DateFormatter date={template ? template.lastModificationDate : new Date() } utc={false} /></h3>
+                                    <h3 className="govuk-heading-m"><DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false} /></h3>
                                     <span className="govuk-caption-m">Last Updated Author</span>
                                     <h3 className="govuk-heading-m">{template && template.authorName}</h3>
                                     {canEditTemplate &&
@@ -330,15 +332,6 @@ export function TemplateBuilder() {
                                     {mode === Mode.Edit && canEditTemplate &&
                                         <button className="govuk-button govuk-!-margin-right-2 " data-testid='add'
                                             onClick={handleAddFundingLineClick}>Add new funding line</button>}
-                                    {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&
-                                        <button className="govuk-button" data-testid='save'
-                                            onClick={handleSaveContentClick}>Save and continue
-                                        </button>}
-                                    &nbsp;
-                                    <Link id="cancel-create-template" to="/Templates/View" className="govuk-button govuk-button--secondary"
-                                          data-module="govuk-button">
-                                        Cancel
-                                    </Link>
                                     {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                                 </div>
                             </div>
@@ -363,6 +356,14 @@ export function TemplateBuilder() {
                                 cloneNode={cloneNode}
                                 nextId={nextId}
                             />
+                            {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&
+                                <button className="govuk-button govuk-!-margin-right-1" data-testid='save'
+                                    onClick={handleSaveContentClick}>Save and continue
+                                </button>}
+                            <Link id="cancel-create-template" to="/Templates/View" className="govuk-button govuk-button--secondary"
+                                data-module="govuk-button">
+                                Back
+                            </Link>
                             {mode === Mode.Edit &&
                                 <Sidebar
                                     sidebar={<SidebarContent

@@ -106,7 +106,7 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
     if (!destinationFundingLine) return;
     draggedItemData.dsKey = cloneDeep(dropTargetDsKey);
     draggedItemData.id = getNewCloneId(draggedItemData.id);
-    
+
     if (draggedItemData.children && draggedItemData.children.length > 0) {
         cloneChildNodes(draggedItemData.children, dropTargetDsKey);
     }
@@ -457,8 +457,34 @@ function compare(a: CalculationDictionaryItem, b: CalculationDictionaryItem) {
 function visitNode(node: Calculation, hashMap: any, array: CalculationDictionaryItem[]) {
     if (!node.id.includes(":") && !hashMap[node.id]) {
         hashMap[node.id] = true;
-        array.push({ id: node.id, templateCalculationId: node.templateCalculationId, name: node.name });
+        array.push({
+            id: node.id,
+            templateCalculationId: node.templateCalculationId,
+            aggregationType: node.aggregationType,
+            name: node.name
+        });
     }
+}
+
+export const isChildOf = async (datasource: FundingLineDictionaryEntry[], parentId: string, childId: string): Promise<boolean> => {
+    const parent: FundingLineOrCalculation = await findNodeById(datasource, parentId);
+    if (!parent.children || parent.children.length === 0 || parentId === childId) {
+        return false;
+    }
+    return childMatches(parent.children, childId);
+}
+
+function childMatches(children: FundingLineOrCalculation[] | undefined, childId: string): boolean {
+    if (children && children.length > 0) {
+        let match = false;
+        for (let childIndex = 0; childIndex < children.length; childIndex++) {
+            match = children[childIndex].id === childId || childMatches(children[childIndex].children, childId);
+            if (match) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
@@ -499,6 +525,6 @@ export async function createNewDraftTemplate(fundingStreamId: string, fundingPer
     return await axios(`/api/templates/build`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: {fundingStreamId, fundingPeriodId, description}
+        data: { fundingStreamId, fundingPeriodId, description }
     })
 }

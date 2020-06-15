@@ -53,13 +53,19 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
         openSideBar(false);
     }
 
+    const isNameValid = name.length > 0;
+    const isFormValid = isNameValid;
+
     return (
         <div>
             <h2 className="govuk-heading-l">Edit Funding Line</h2>
             <fieldset className="govuk-fieldset" key={node.id}>
-                <div className="govuk-form-group">
+                <div className={`govuk-form-group ${isNameValid ? "" : "govuk-form-group--error"}`}>
                     <label className="govuk-label" htmlFor="fl-name">Name</label>
                     <span id="fl-name-hint" className="govuk-hint">The name of the funding line (e.g. 'Total Funding Line')</span>
+                    {!isNameValid && <span id="name-error" className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> Name must be not be blank
+                    </span>}
                     <input className="govuk-input" id="fl-name" name="fl-name" type="text" value={name} onChange={handleNameChange} />
                 </div>
                 <div className="govuk-form-group">
@@ -79,9 +85,9 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
                     </>
                 }
                 <div className="govuk-form-group">
-                    <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} >
+                    <button className="govuk-button" data-module="govuk-button" onClick={handleSubmit} disabled={!isFormValid}>
                         Save and continue
-                </button>
+                    </button>
                 </div>
                 <div className="govuk-warning-text">
                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>

@@ -12,9 +12,8 @@ const data: FundingLineOrCalculation = {
     type: FundingLineType.Information,
     name: "Funding Line 1",
     fundingLineCode: "Code",
-    aggregationType: AggregrationType.Average,
     children: [
-        { id: "n2", templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code", aggregationType: AggregrationType.None },
+        { id: "n2", templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code" },
         {
             id: "n3",
             templateLineId: 3,
@@ -23,7 +22,7 @@ const data: FundingLineOrCalculation = {
             name: "Funding Line 3",
             fundingLineCode: "Code 3",
             children: [
-                { id: "n4", templateCalculationId: 4, kind: NodeType.Calculation, type: CalculationType.Information, name: "Calculation 1", formulaText: "formula", valueFormat: ValueFormatType.Currency, aggregationType: AggregrationType.Sum },
+                { id: "n4", templateCalculationId: 4, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 1", formulaText: "formula", valueFormat: ValueFormatType.Currency, aggregationType: AggregrationType.Sum },
                 {
                     id: "n5",
                     templateLineId: 5,
@@ -32,11 +31,11 @@ const data: FundingLineOrCalculation = {
                     name: "Funding Line 4",
                     fundingLineCode: "code",
                     children: [
-                        { id: "n6", templateCalculationId: 6, kind: NodeType.Calculation, type: CalculationType.LumpSum, name: "Calculation 2", formulaText: "formula" },
-                        { id: "n7", templateCalculationId: 7, kind: NodeType.Calculation, type: CalculationType.ProviderLedFunding, name: "Calculation 3", formulaText: "formula" }
+                        { id: "n6", templateCalculationId: 6, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 2", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number },
+                        { id: "n7", templateCalculationId: 7, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 3", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number }
                     ]
                 },
-                { id: "n8", templateCalculationId: 8, kind: NodeType.Calculation, type: CalculationType.Drilldown, name: "Calculation 4", formulaText: "formula" }
+                { id: "n8", templateCalculationId: 8, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 4", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number }
             ]
         }
     ]
@@ -72,6 +71,11 @@ it("renders all nodes in datasource", () => {
         openSideBar={openSideBar}
         editMode={true}
         nextId={9}
+        pan={true}
+        zoom={true}
+        draggable={true}
+        collapsible={true}
+        multipleSelect={false}
     />);
 
     expect(wrapper.find('OrganisationChartNode')).toHaveLength(8);
@@ -88,6 +92,11 @@ it("adds new lines", () => {
         openSideBar={openSideBar}
         editMode={true}
         nextId={9}
+        pan={true}
+        zoom={true}
+        draggable={true}
+        collapsible={true}
+        multipleSelect={false}
     />);
 
     const button = wrapper.find("[data-testid='n1-add-line']");
@@ -108,6 +117,11 @@ it("handles drag and drop of a Funding Line (clone)", () => {
         openSideBar={openSideBar}
         editMode={true}
         nextId={9}
+        pan={true}
+        zoom={true}
+        draggable={true}
+        collapsible={true}
+        multipleSelect={false}
     />);
 
     const sourceNode = wrapper.find("div#n2");
@@ -135,6 +149,11 @@ it("handles drag and drop of a Funding Line (copy)", () => {
         openSideBar={openSideBar}
         editMode={true}
         nextId={9}
+        pan={true}
+        zoom={true}
+        draggable={true}
+        collapsible={true}
+        multipleSelect={false}
     />);
 
     const sourceNode = wrapper.find("div#n2");
@@ -162,6 +181,11 @@ it("handles drag and drop of a Calculation", () => {
         openSideBar={openSideBar}
         editMode={true}
         nextId={9}
+        pan={true}
+        zoom={true}
+        draggable={true}
+        collapsible={true}
+        multipleSelect={false}
     />);
 
     const node = wrapper.find("div#n4");

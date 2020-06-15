@@ -1,5 +1,5 @@
 import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, cloneCalculation } from "../../services/templateBuilderDatasourceService";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, cloneCalculation, isChildOf } from "../../services/templateBuilderDatasourceService";
 import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationType, AggregrationType, ValueFormatType } from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
 import { v4 as uuidv4 } from 'uuid';
@@ -295,68 +295,68 @@ it("clones calculations", async () => {
     const dsCalcs: Array<FundingLineDictionaryEntry> = cloneDeep(multipleCalculationsDs);
 
     expect(getAllCalculations(dsCalcs.map(d => d.value))).toEqual([
-        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
-        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
-        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4},
-        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2, "aggregationType": "Sum"},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3, "aggregationType": "Sum"},
+        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6, "aggregationType": "Sum"}
     ]);
 
     await cloneCalculation(dsCalcs, "n4", "n3");
 
     expect(getAllCalculations(dsCalcs.map(d => d.value))).toEqual([
-        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
-        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
-        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2, "aggregationType": "Sum"},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3, "aggregationType": "Sum"},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6, "aggregationType": "Sum"}
     ]);
 });
 
-it("transforms single node template into datasource", async () => {
+it("transforms single node template into datasource", () => {
     const datasource = templateFundingLinesToDatasource(singleNodeTemplate);
     expect(datasource).toStrictEqual(singleNodeDs);
 });
 
-it("transforms cloned node template into datasource", async () => {
+it("transforms cloned node template into datasource", () => {
     uuidv4.mockImplementation(() => '12345');
     const template = templateFundingLinesToDatasource(clonedNodeTemplate);
     expect(template).toStrictEqual(clonedNodeDs);
 });
 
-it("transforms template with children into datasource", async () => {
+it("transforms template with children into datasource", () => {
     const datasource = templateFundingLinesToDatasource(withChildFundingLineTemplate);
     expect(datasource).toStrictEqual(withChildFundingLineDs);
 });
 
-it("transforms template with children of type funding line and calculation into datasource", async () => {
+it("transforms template with children of type funding line and calculation into datasource", () => {
     const datasource = templateFundingLinesToDatasource(withChildFundingLineAndCalculationTemplate);
     expect(datasource).toStrictEqual(withChildFundingLineAndCalculationDs);
 });
 
-it("transforms template with multiple funding lines into datasource", async () => {
+it("transforms template with multiple funding lines into datasource", () => {
     const datasource = templateFundingLinesToDatasource(multipleFundingLinesTemplate);
     expect(datasource).toStrictEqual(multipleFundingLinesDs);
 });
 
-it("transforms single node datasource into template", async () => {
+it("transforms single node datasource into template", () => {
     const template = datasourceToTemplateFundingLines(singleNodeDs);
     expect(template).toStrictEqual(singleNodeTemplate);
 });
 
-it("transforms datasource with cloned node into template", async () => {
+it("transforms datasource with cloned node into template", () => {
     const template = datasourceToTemplateFundingLines(clonedNodeDs);
     expect(template).toStrictEqual(clonedNodeTemplate);
 });
 
-it("transforms datasource with children into template", async () => {
+it("transforms datasource with children into template", () => {
     const template = datasourceToTemplateFundingLines(withChildFundingLineDs);
     expect(template).toStrictEqual(withChildFundingLineTemplate);
 });
 
-it("transforms datasource with children of type funding line and calculation into template", async () => {
+it("transforms datasource with children of type funding line and calculation into template", () => {
     const template = datasourceToTemplateFundingLines(withChildFundingLineAndCalculationDs);
     expect(template).toStrictEqual(withChildFundingLineAndCalculationTemplate);
 });
 
-it("transforms datasource with multiple funding lines into template", async () => {
+it("transforms datasource with multiple funding lines into template", () => {
     const template = datasourceToTemplateFundingLines(multipleFundingLinesDs);
     expect(template).toStrictEqual(multipleFundingLinesTemplate);
 });
@@ -372,13 +372,21 @@ it("calculates lastUsedId correctly", () => {
 it("calculates getAllCalculations correctly", () => {
     expect(getAllCalculations(singleNodeDs.map(d => d.value))).toEqual([]);
     expect(getAllCalculations(withChildFundingLineDs.map(d => d.value))).toEqual([]);
-    expect(getAllCalculations(withChildFundingLineAndCalculationDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 3", "templateCalculationId": 3}]);
-    expect(getAllCalculations(multipleFundingLinesDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 4", "templateCalculationId": 4}]);
-    expect(getAllCalculations(clonedNodeDs.map(d => d.value))).toEqual([{"id": "n0", "name": "Calculation 4", "templateCalculationId": 4}]);
+    expect(getAllCalculations(withChildFundingLineAndCalculationDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 3", "templateCalculationId": 3, "aggregationType": "None"}]);
+    expect(getAllCalculations(multipleFundingLinesDs.map(d => d.value))).toEqual([{"id": "n2", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"}]);
+    expect(getAllCalculations(clonedNodeDs.map(d => d.value))).toEqual([{"id": "n0", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"}]);
     expect(getAllCalculations(multipleCalculationsDs.map(d => d.value))).toEqual([
-        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2},
-        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3},
-        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4},
-        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6}
+        {"id": "n2", "name": "Calculation 2", "templateCalculationId": 2, "aggregationType": "Sum"},
+        {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3, "aggregationType": "Sum"},
+        {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+        {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6, "aggregationType": "Sum"}
     ]);
+});
+
+it("calculates isChildOf correctly", async () => {
+    expect(await isChildOf(multipleCalculationsDs, "n5", "n1")).toBeTruthy();
+    expect(await isChildOf(multipleCalculationsDs, "n5", "n2")).toBeTruthy();
+    expect(await isChildOf(multipleCalculationsDs, "n5", "n3")).toBeTruthy();
+    expect(await isChildOf(multipleCalculationsDs, "n5", "n7")).toBeFalsy();
+    expect(await isChildOf(multipleCalculationsDs, "n7", "n6")).toBeTruthy();
 });

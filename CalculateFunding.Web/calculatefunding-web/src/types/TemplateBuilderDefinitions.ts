@@ -218,6 +218,7 @@ export interface CalculationUpdateModel extends UpdateModel {
 export interface CalculationDictionaryItem {
   id: string,
   templateCalculationId: number,
+  aggregationType: AggregrationType,
   name: string
 }
 
