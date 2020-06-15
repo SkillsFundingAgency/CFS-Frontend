@@ -38,11 +38,12 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [isLoading, setIsLoading] = useState(false);
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();
+    const [uploadFileExtension, setUploadFileExtension] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [changeNote, setChangeNote] = useState<string>("");
     const [loadingStatus, setLoadingStatus] = useState<string>("Update data source");
     const [validationFailures, setValidationFailures] = useState<{ [key: string]: string[] }>();
-    const validExtensions = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
+    const validExtensions = [".csv", ".xls", ".xlsx"];
     const [validation, setValidation] = useState({
         fileValid: true,
         changeNoteValid: true
@@ -205,7 +206,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             isValid = false;
         }
         else {
-            if (validExtensions.indexOf(uploadFile.type.toLowerCase()) < 0)
+            if (validExtensions.indexOf(uploadFileExtension) < 0)
             {
                 setValidation(prevState => {
                     return {
@@ -237,6 +238,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             if (file != null) {
                 setUploadFileName(file.name);
                 setUploadFile(file);
+                setUploadFileExtension(file.name.substring(file.name.lastIndexOf('.')).toLowerCase());
             }
         }
     }
