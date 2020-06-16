@@ -323,7 +323,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 <Breadcrumb name={"Select specification"} url={"/ViewFunding"}/>
                 <Breadcrumb name={"Funding approval results"}/>
             </Breadcrumbs>
-            <PermissionStatus requiredPermissions={missingPermissions}/>
+            <PermissionStatus requiredPermissions={missingPermissions} />
             <LoadingStatus title={`${latestJob.jobType} of funding in progress`}
                            subTitle={"Please wait, this could take several minutes"}
                            hidden={latestJob.runningStatus === 'Completed' || latestJob.runningStatus === ''}/>
@@ -337,8 +337,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     <h1 className="govuk-heading-m">{specificationSummary.fundingStreams[0].name}</h1>
                 </div>
             </div>
-
-            <div className="govuk-grid-row " hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row " hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '') ||
+            (publishedProviderResults.providers == null || publishedProviderResults.providers.length === 0)}>
                 <div className="govuk-grid-column-one-third">
                     <CollapsiblePanel title={"Search"} expanded={true}>
                         <span className="govuk-body-s">Search by provider name, UPIN, UKPRN, URN, or establishment number</span>
@@ -462,7 +462,18 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     </div>
                 </div>
             </div>
-
+            <div className="govuk-grid-row" hidden={(publishedProviderResults.providers != null && publishedProviderResults.providers.length > 0) || tableIsLoading}>
+                <div className="govuk-grid-column-full">
+                    <div className="govuk-warning-text">
+                        <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong className="govuk-warning-text__text">
+                            <span className="govuk-warning-text__assistive">Warning</span>
+                            No providers are available for the selected specification
+                        </strong>
+                        <Link to={"/ViewFunding"} className="govuk-back-link govuk-!-margin-top-7">Back</Link>
+                    </div>
+                </div>
+            </div>
             <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "REFRESH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <BackButton name="Back" callback={dismissLoader}/>
                 <NotificationSignal jobType="RefreshFundingJob"
