@@ -280,7 +280,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__thumbnail">
                                                             <a href={`api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
                                                                aria-hidden="true">
-                                                                <svg
+                                                            <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
                                                                     height="140"
@@ -301,7 +301,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__details">
                                                             <h4 className="govuk-heading-s">
                                                                 <a className="govuk-link" target="_self"
-                                                                   href={`/api/specs/download-report/?specificationId=${dlr.specificationReportIdentifier.specificationId}&jobType=${dlr.specificationReportIdentifier.jobType}&fundingLineCode=${dlr.specificationReportIdentifier.fundingLineCode}&fundingPeriodId=${dlr.specificationReportIdentifier.fundingPeriodId}&fundingStreamId=${dlr.specificationReportIdentifier.fundingStreamId}`}>{dlr.name}</a>
+                                                                   href={`api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
                                                             </h4>
                                                             <p className="govuk-body-s">
                                                                 <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
