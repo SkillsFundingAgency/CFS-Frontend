@@ -72,7 +72,7 @@
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="3.2.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.0.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="2.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="4.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.2.0" />

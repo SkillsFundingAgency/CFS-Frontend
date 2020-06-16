@@ -9,6 +9,7 @@ export interface Dataset {
    changeNote: string;
    lastUpdatedByName: string;
    definitionName: string;
+   fundingStreamId: string;
    id: string;
    name: string;
 }

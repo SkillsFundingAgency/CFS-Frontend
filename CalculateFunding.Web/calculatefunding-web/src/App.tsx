@@ -71,7 +71,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageData" component={ManageData} />
                 <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
                 <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
-                <Route path="/Datasets/UpdateDataSourceFile/:datasetId" component={UpdateDataSourceFile} />
+                <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile} />
                 <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />

@@ -70,13 +70,13 @@ export function ManageDataSourceFiles() {
             setDatasetSearchData(response);
 
             if (filterFundingStreams.length === 0) {
-                if(response.facets != undefined && response.facets.length > 5) {
+                if(response.facets !== undefined && response.facets.length > 5) {
                     setFundingStreams(response.facets[5].facetValues)
                 }
             }
 
             if (filterDataSchemas.length === 0) {
-                if(response.facets != undefined && response.facets.length > 2) {
+                if(response.facets !== undefined && response.facets.length > 2) {
                     setDataSchema(response.facets[2].facetValues)
                 }
             }
@@ -232,7 +232,7 @@ export function ManageDataSourceFiles() {
                             <tbody className="govuk-table__body" id="mainContentResults">
                             {datasetSearchData.datasets.map(ds =>
                                     <tr className="govuk-table__row" key={ds.id}>
-                                        <th scope="row" className="govuk-table__header"><Link className="govuk-link" to={`UpdateDataSourceFile/${ds.id}`}>{ds.name}</Link>
+                                        <th scope="row" className="govuk-table__header"><Link className="govuk-link" to={`UpdateDataSourceFile/${ds.fundingStreamId}/${ds.id}`}>{ds.name}</Link>
 
                                             <div className="govuk-!-margin-top-4">
                                                 <details className="govuk-details govuk-!-margin-top-0" data-module="govuk-details">

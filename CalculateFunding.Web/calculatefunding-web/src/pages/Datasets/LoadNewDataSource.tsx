@@ -1,15 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
+import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {AutoComplete} from "../../components/AutoComplete";
 import {
     createDatasetService, 
     getDatasetDefinitionsService, 
     uploadDataSourceService, 
-    getDatasetHistoryService, getDatasetValidateStatusService,
-    updateDatasetService,
-    uploadDatasetVersionService,
+    getDatasetValidateStatusService,
     validateDatasetService
 } from "../../services/datasetService";
 import {DatasetDefinition} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
@@ -23,7 +22,6 @@ import {NewDatasetVersionResponseErrorModel, NewDatasetVersionResponseViewModel}
 import {AxiosError} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
-import { empty } from "rxjs";
 import { DatasetValidateStatusResponse, ValidationStates } from "../../types/Datasets/UpdateDatasetRequestViewModel";
 
 export function LoadNewDataSource() {
@@ -34,7 +32,7 @@ export function LoadNewDataSource() {
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
     const [validationFailures, setValidationFailures] = useState<{ [key: string]: string[] }>();
     const [isLoading, setIsLoading] = useState(false);   
-    const [loadingStatus, setLoadingStatus] = useState<string>("Update data source");
+    const [loadingStatus, setLoadingStatus] = useState<string>("Create data source");
     const [description, setDescription] = useState<string>("");
     const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
@@ -113,7 +111,7 @@ export function LoadNewDataSource() {
     }
 
     function updateDataSchemaSelection(e: string) {
-        let selection = dataSchemaSuggestions.filter(x => x.name == e)[0];
+        let selection = dataSchemaSuggestions.filter(x => x.name === e)[0];
 
         if (selection != null) {
             setSelectedDataSchema(selection.id);
@@ -183,6 +181,8 @@ export function LoadNewDataSource() {
             fundingStreamId: selectedFundingStream
         }
 
+        setIsLoading(true);
+                                
         setCreateDatasetRequest(request);
 
         if (request.name !== "" && request.filename !== "" && request.description !== "" && request.dataDefinitionId !== "" && request.fundingStreamId !== "") {
@@ -378,11 +378,13 @@ export function LoadNewDataSource() {
                         </Breadcrumbs>
                     </div>
                 </div>
-                <div className="govuk-grid-row">
+                <LoadingStatus title={loadingStatus} hidden={!isLoading}
+                           subTitle={"Please wait whilst the data source is created"}/>
+                <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-two-thirds">
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
                         <p className="govuk-body">Load a new data source file to create a dataset to use in calculations.</p>
-                        <div className="" hidden={errorResponse.Filename.length === 0}>
+                        <div className="govuk-form-group" hidden={errorResponse.Filename.length === 0}>
                             <ErrorSummary title={"Correct errors to continue with the process"} error={errorResponse.Filename.length > 0 ? errorResponse.Filename[0] : ""} suggestion={""}/>
                         </div>
                         <div className={"govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")}>

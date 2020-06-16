@@ -85,8 +85,8 @@ export async function createDatasetService(request: CreateDatasetRequestViewMode
     })
 }
 
-export async function updateDatasetService(datasetId: string, fileName: string) {
-    return axios(`${baseUrl}/${datasetId}`, {
+export async function updateDatasetService(fundingStreamId: string, datasetId: string, fileName: string) {
+    return axios(`${baseUrl}/${fundingStreamId}/${datasetId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'

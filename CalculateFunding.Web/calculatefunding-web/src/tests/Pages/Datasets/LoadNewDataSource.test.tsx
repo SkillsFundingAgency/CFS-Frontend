@@ -20,6 +20,6 @@ describe("<DatasetHistory />", () => {
 
     it('will find the description Load a new data source file to create a dataset to use in calculations.', () => {
         const wrapper = mount(<MemoryRouter><LoadNewDataSource/></MemoryRouter>);
-        expect(wrapper.find("p.govuk-body").text()).toBe("Load a new data source file to create a dataset to use in calculations.");
+        expect(wrapper.find("p.govuk-body").at(1).text()).toBe("Load a new data source file to create a dataset to use in calculations.");
     });
 });

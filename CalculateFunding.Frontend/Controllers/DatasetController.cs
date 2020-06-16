@@ -89,8 +89,9 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPut]
-        [Route("api/datasets/{datasetId}")]
-        public async Task<IActionResult> UpdateDatasetVersion([FromRoute] string datasetId,
+        [Route("api/datasets/{fundingStreamId}/{datasetId}")]
+        public async Task<IActionResult> UpdateDatasetVersion([FromRoute] string fundingStreamId,
+            [FromRoute] string datasetId,
             [FromBody] DatasetUpdateViewModel vm)
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
@@ -104,6 +105,7 @@ namespace CalculateFunding.Frontend.Controllers
                 await _datasetApiClient.DatasetVersionUpdate(new DatasetVersionUpdateModel
                 {
                     DatasetId = datasetId,
+                    FundingStreamId = fundingStreamId,
                     Filename = vm.Filename
                 });
 

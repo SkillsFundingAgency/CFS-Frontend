@@ -19,6 +19,7 @@ import {
     ValidationStates
 } from "../../types/Datasets/UpdateDatasetRequestViewModel";
 export interface UpdateDataSourceFileRouteProps {
+    fundingStreamId: string;
     datasetId: string;
 }
 
@@ -71,7 +72,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
         setIsLoading(true);
 
-        updateDatasetService(match.params.datasetId, uploadFileName).then((result) => {
+        updateDatasetService(match.params.fundingStreamId, match.params.datasetId, uploadFileName).then((result) => {
             if (result.status === 200 || result.status === 201) {
                 const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
                 uploadFileToServer(newDataset);
@@ -263,8 +264,18 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 <div className="govuk-error-summary__body">
                     <ul className="govuk-list govuk-error-summary__list">
                         {
-                            (validationFailures !== undefined || !validation.fileValid) ?
-                                <li><a href={"#select-data-source"}>Upload a xls or xlsx file</a></li>
+                            (!validation.fileValid) ?
+                            <li><a href={"#select-data-source"}>Upload a xls or xlsx file</a></li>
+                            : ""
+                        }
+                        {
+                            (validationFailures !== undefined && validationFailures["error-message"] != null) ?
+                                <li>{validationFailures["error-message"]}</li>
+                                : ""
+                        }
+                        {
+                            (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
+                                <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
                                 : ""
                         }
                         {

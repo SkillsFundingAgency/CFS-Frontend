@@ -20,5 +20,7 @@
         public string LastUpdatedByName { get; set; }
 
         public string DefinitionName { get; set; }
+
+        public string FundingStreamId { get; set; }
     }
 }
