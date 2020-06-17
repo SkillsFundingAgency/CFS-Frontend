@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import { SidebarContent } from "../../components/SidebarContent";
@@ -19,8 +19,7 @@ import {
     saveTemplateContent,
     getLastUsedId,
     getAllCalculations,
-    cloneCalculation,
-    findNodeById
+    cloneCalculation
 } from "../../services/templateBuilderDatasourceService";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import {
@@ -64,46 +63,58 @@ export function TemplateBuilder() {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [nextId, setNextId] = useState(0);
-    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
-    const [canEditTemplate, setCanEditTemplate] = useState<boolean>(false);
-    const [canCreateTemplate, setCanCreateTemplate] = useState<boolean>(false);
-    const [canDeleteTemplate, setCanDeleteTemplate] = useState<boolean>(false);
-    const [canApproveTemplate, setCanApproveTemplate] = useState<boolean>(false);
-    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
 
-    function getCreatePermission() {
+    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
+    let { templateId } = useParams();
+
+    const canCreateTemplate = useMemo(() => {
         if (!permissions) {
             return false;
         }
         return permissions.some(p => p.canCreateTemplates);
-    }
-    function getEditPermission() {
+    }, [permissions]);
+
+    const canEditTemplate = useMemo(() => {
         if (!permissions) {
             return false;
         }
         return permissions.some(p => p.canEditTemplates);
-    }
+    }, [permissions]);
 
-    function getDeletePermission() {
+    const canDeleteTemplate = useMemo(() => {
         if (!permissions) {
             return false;
         }
         return permissions.some(p => p.canDeleteTemplates);
-    }
+    }, [permissions]);
 
-    function getApprovePermission() {
+    const canApproveTemplate = useMemo(() => {
         if (!permissions) {
             return false;
         }
         return permissions.some(p => p.canApproveTemplates);
-    }
+    }, [permissions]);
+
+    const missingPermissions = useMemo(() => {
+        let missing: string[] = [];
+        if (!canEditTemplate) {
+            missing.push("edit");
+        } else {
+            setMode(Mode.Edit);
+        }
+        if (!canDeleteTemplate) {
+            missing.push("delete");
+        }
+        if (!canApproveTemplate) {
+            missing.push("approve");
+        }
+        return missing;
+    }, [canEditTemplate, canDeleteTemplate, canApproveTemplate]);
 
     function getCalculations(): CalculationDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
         return getAllCalculations(fundingLines);
     }
-
-    let { templateId } = useParams();
 
     const fetchData = async () => {
         try {
@@ -112,11 +123,11 @@ export function TemplateBuilder() {
             const templateResponse = templateResult.data as TemplateResponse;
             setTemplate(templateResponse);
             if (templateResponse.templateJson) {
-                const template = JSON.parse(templateResponse.templateJson) as Template;
-                if (template && template !== null) {
-                    const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines)
+                const templateJson = JSON.parse(templateResponse.templateJson) as Template;
+                if (templateJson && templateJson !== null) {
+                    const fundingLines = templateFundingLinesToDatasource(templateJson.fundingTemplate.fundingLines)
                     setDS(fundingLines);
-                    setNextId(getLastUsedId(template.fundingTemplate.fundingLines) + 1);
+                    setNextId(getLastUsedId(templateJson.fundingTemplate.fundingLines) + 1);
                 }
                 else {
                     setIsError(true);
@@ -135,31 +146,6 @@ export function TemplateBuilder() {
     useEffectOnce(() => {
         fetchData();
     });
-
-    useEffect(() => {
-        let missing: string[] = [];
-
-        if (!canEditTemplate) {
-            missing.push("edit");
-        } else {
-            setMode(Mode.Edit);
-        }
-        if (!canDeleteTemplate) {
-            missing.push("delete");
-        }
-        if (!canApproveTemplate) {
-            missing.push("approve");
-        }
-
-        setMissingPermissions(missing);
-    }, [canEditTemplate, canDeleteTemplate, canApproveTemplate]);
-
-    useEffect(() => {
-        setCanCreateTemplate(getCreatePermission());
-        setCanEditTemplate(getEditPermission());
-        setCanDeleteTemplate(getDeletePermission());
-        setCanApproveTemplate(getApprovePermission());
-    }, [permissions]);
 
     const openSideBar = (open: boolean) => {
         setOpenSidebar(open);
@@ -222,7 +208,7 @@ export function TemplateBuilder() {
 
     const handleSaveContentClick = async () => {
         try {
-            if (template == undefined) {
+            if (template === undefined) {
                 setIsError(true);
                 setErrorMessages(errors => [...errors, "Can't find template data to update"]);
                 return;
@@ -331,7 +317,6 @@ export function TemplateBuilder() {
                                     {mode === Mode.Edit && canEditTemplate &&
                                         <button className="govuk-button govuk-!-margin-right-2 " data-testid='add'
                                             onClick={handleAddFundingLineClick}>Add new funding line</button>}
-                                    {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                                 </div>
                             </div>
                         </div>
@@ -363,6 +348,7 @@ export function TemplateBuilder() {
                                 data-module="govuk-button">
                                 Back
                             </Link>
+                            {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                             {mode === Mode.Edit &&
                                 <Sidebar
                                     sidebar={<SidebarContent

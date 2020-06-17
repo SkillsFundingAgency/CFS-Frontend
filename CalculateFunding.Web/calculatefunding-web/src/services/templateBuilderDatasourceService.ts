@@ -504,7 +504,7 @@ export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
 }
 
 export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
-    return await axios.get(`/api/templates/build/${templateId}`, {
+    return axios.get(`/api/templates/build/${templateId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
