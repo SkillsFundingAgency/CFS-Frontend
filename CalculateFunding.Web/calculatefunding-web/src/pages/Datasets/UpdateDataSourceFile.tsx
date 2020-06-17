@@ -274,6 +274,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 : ""
                         }
                         {
+                            (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
+                                <li>{validationFailures["FundingStreamId"]}</li>
+                                : ""
+                        }
+                        {
                             (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
                                 <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
                                 : ""
@@ -320,6 +325,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 {
                                     (validationFailures !== undefined && validationFailures["error-message"] != null) ?
                                         validationFailures["error-message"]
+                                        : ""
+                                }
+                                {
+                                    (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
+                                        validationFailures["FundingStreamId"]
                                         : ""
                                 }
                                 {

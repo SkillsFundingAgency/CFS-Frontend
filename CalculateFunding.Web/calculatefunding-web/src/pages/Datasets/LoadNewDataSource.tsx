@@ -14,7 +14,6 @@ import {
 import {DatasetDefinition} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
 import {CreateDatasetRequestViewModel} from "../../types/Datasets/CreateDatasetRequestViewModel";
 import {useHistory} from "react-router";
-import {getFundingStreamsForSelectedSpecifications} from "../../services/specificationService";
 import {FundingStream} from "../../types/viewFundingTypes";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
@@ -23,6 +22,7 @@ import {AxiosError} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
 import { DatasetValidateStatusResponse, ValidationStates } from "../../types/Datasets/UpdateDatasetRequestViewModel";
+import { getFundingStreamsService } from "../../services/policyService";
 
 export function LoadNewDataSource() {
 
@@ -130,7 +130,7 @@ export function LoadNewDataSource() {
 
     function populateFundingStreamSuggestions() {
         setFundingStreamIsLoading(true);
-        getFundingStreamsForSelectedSpecifications().then((result) => {
+        getFundingStreamsService().then((result) => {
             setFundingStreamSuggestions(result.data as FundingStream[])
             setFundingStreamIsLoading(false);
         })
@@ -380,6 +380,32 @@ export function LoadNewDataSource() {
                 </div>
                 <LoadingStatus title={loadingStatus} hidden={!isLoading}
                            subTitle={"Please wait whilst the data source is created"}/>
+                <div hidden={(validationFailures === undefined || isLoading)}
+                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 data-module="govuk-error-summary">
+                <h2 className="govuk-error-summary__title">
+                    There is a problem
+                </h2>
+                <div className="govuk-error-summary__body">
+                    <ul className="govuk-list govuk-error-summary__list">
+                        {
+                            (validationFailures !== undefined && validationFailures["error-message"] != null) ?
+                                <li>{validationFailures["error-message"]}</li>
+                                : ""
+                        }
+                        {
+                            (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
+                                <li>{validationFailures["FundingStreamId"]}</li>
+                                : ""
+                        }
+                        {
+                            (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
+                                <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
+                                : ""
+                        }
+                    </ul>
+                </div>
+            </div>
                 <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-two-thirds">
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
@@ -427,6 +453,28 @@ export function LoadNewDataSource() {
                                 <label className="govuk-label" htmlFor="file-upload-1">
                                     Upload data source file
                                 </label>
+                                {
+                                    (validationFailures !== undefined) ?
+                                        <span className="govuk-error-message">
+                                            <span className="govuk-visually-hidden">Error:</span>
+                                            {
+                                                (validationFailures !== undefined && validationFailures["error-message"] != null) ?
+                                                    validationFailures["error-message"]
+                                                    : ""
+                                            }
+                                            {
+                                                (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
+                                                    validationFailures["FundingStreamId"]
+                                                    : ""
+                                            }
+                                            {
+                                                (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
+                                                    <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
+                                                    : ""
+                                            }
+                                        </span>
+                                    : ""
+                                }
                                 <input className="govuk-file-upload" id="file-upload-1" name="file-upload-1" type="file" onChange={(e) => storeFileUpload(e)}/>
                             </div>
                         </div>
