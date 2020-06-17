@@ -144,6 +144,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
  const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
 
     useEffectOnce(() => {
+        getUserPermissions();
         getPublishedProviderResultsService(initialSearch).then((result) => {
             const response = result.data as PublishProviderSearchResultViewModel;
             setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
@@ -167,10 +168,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             if (result.status === 200) {
                 setLatestJob(result.data as JobMessage);
             }
-        });
-
-        getUserPermissionsService(specificationId).then((result) => {
-            setUserPermissions(result.data as EffectiveSpecificationPermission);
         });
     })
 
@@ -296,23 +293,27 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         setPageState("IDLE");
     };
 
-    useEffect(() => {
-        if (!userPermissions.canApproveFunding) {
-            if(!missingPermissions.find(x => x == "publish")) {
-                setMissingPermissions(prevState => [...prevState, "publish"]);
+    function getUserPermissions() {
+        getUserPermissionsService(specificationId).then((result) => {
+            const specificationPermissions = result.data as EffectiveSpecificationPermission;
+            setUserPermissions(specificationPermissions);
+            if (!specificationPermissions.canApproveFunding) {
+                if(!missingPermissions.find(x => x == "approve")) {
+                    setMissingPermissions(prevState => [...prevState, "approve"]);
+                }
             }
-        }
-        if (!userPermissions.canReleaseFunding) {
-            if(!missingPermissions.find(x => x == "release")) {
-                setMissingPermissions(prevState => [...prevState, "release"]);
+            if (!specificationPermissions.canReleaseFunding) {
+                if(!missingPermissions.find(x => x == "release")) {
+                    setMissingPermissions(prevState => [...prevState, "release"]);
+                }
             }
-        }
-        if (!userPermissions.canRefreshFunding) {
-            if(!missingPermissions.find(x => x == "refresh")) {
-                setMissingPermissions(prevState => [...prevState, "refresh"]);
+            if (!specificationPermissions.canRefreshFunding) {
+                if(!missingPermissions.find(x => x == "refresh")) {
+                    setMissingPermissions(prevState => [...prevState, "refresh"]);
+                }
             }
-        }
-    })
+        });
+    }
 
     return <div>
         <Header location={Section.Datasets}/>
