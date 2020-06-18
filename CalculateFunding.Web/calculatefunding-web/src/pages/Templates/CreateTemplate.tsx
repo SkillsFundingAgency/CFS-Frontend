@@ -104,13 +104,6 @@ export const CreateTemplate = () => {
         return result.data;
     }
 
-    function showSaveMessageOnce(message: string) {
-        setSaveMessage(message);
-        setTimeout(function () {
-            setSaveMessage("");
-        }, 5000);
-    }
-
     const handleFundingStreamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const fundingStreamId = e.target.value;
         setSelectedFundingStreamId(fundingStreamId);
@@ -147,8 +140,6 @@ export const CreateTemplate = () => {
 
             const result = await createNewDraftTemplate(selectedFundingStreamId, selectedFundingPeriodId, description);
             if (result.status === 201) {
-                showSaveMessageOnce(`Template created successfully`);
-
                 history.push("/Templates/Build/" + result.data);
             } else {
                 setErrorMessages(errors => [...errors, `Template creation failed: ` + result.status + ` ` + result.statusText + ` ` + result.data]);

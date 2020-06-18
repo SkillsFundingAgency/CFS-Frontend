@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
+import { usePermissions } from '../../hooks/usePermissions';
 import { SidebarContent } from "../../components/SidebarContent";
 import { Section } from '../../types/Sections';
 import { Header } from '../../components/Header';
@@ -36,10 +37,7 @@ import {
     Template,
     TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem
 } from '../../types/TemplateBuilderDefinitions';
-import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import "../../styles/TemplateBuilder.scss";
-import { useSelector } from "react-redux";
-import { AppState } from "../../states/AppState";
 import { useEffectOnce } from '../../hooks/useEffectOnce';
 import { DateFormatter } from '../../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../../components/Breadcrumbs';
@@ -63,53 +61,16 @@ export function TemplateBuilder() {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [nextId, setNextId] = useState(0);
-
-    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
+    const {canCreateTemplate, canEditTemplate, missingPermissions} = usePermissions(["edit"], template ? [template.fundingStreamId] : []);
     let { templateId } = useParams();
 
-    const canCreateTemplate = useMemo(() => {
-        if (!permissions) {
-            return false;
-        }
-        return permissions.some(p => p.canCreateTemplates);
-    }, [permissions]);
-
-    const canEditTemplate = useMemo(() => {
-        if (!permissions) {
-            return false;
-        }
-        return permissions.some(p => p.canEditTemplates);
-    }, [permissions]);
-
-    const canDeleteTemplate = useMemo(() => {
-        if (!permissions) {
-            return false;
-        }
-        return permissions.some(p => p.canDeleteTemplates);
-    }, [permissions]);
-
-    const canApproveTemplate = useMemo(() => {
-        if (!permissions) {
-            return false;
-        }
-        return permissions.some(p => p.canApproveTemplates);
-    }, [permissions]);
-
-    const missingPermissions = useMemo(() => {
-        let missing: string[] = [];
-        if (!canEditTemplate) {
-            missing.push("edit");
-        } else {
+    useEffect(() => {
+        if (canEditTemplate) {
             setMode(Mode.Edit);
+        } else {
+            setMode(Mode.View);
         }
-        if (!canDeleteTemplate) {
-            missing.push("delete");
-        }
-        if (!canApproveTemplate) {
-            missing.push("approve");
-        }
-        return missing;
-    }, [canEditTemplate, canDeleteTemplate, canApproveTemplate]);
+    }, [canEditTemplate]);
 
     function getCalculations(): CalculationDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
@@ -263,7 +224,7 @@ export function TemplateBuilder() {
         <div>
             <Header location={Section.Templates} />
             <div className="govuk-width-container">
-                <PermissionStatus requiredPermissions={missingPermissions} />
+                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
                 <LoadingStatus title={"Loading Template"} hidden={!isLoading} id={"template-builder-loader"}
                     subTitle={"Please wait while the template loads."} />
                 <Breadcrumbs>

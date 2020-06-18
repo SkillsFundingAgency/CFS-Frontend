@@ -1,0 +1,152 @@
+import { usePermissions } from "../../Hooks/usePermissions";
+import * as redux from "react-redux";
+import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
+import { renderHook } from '@testing-library/react-hooks';
+
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+
+export const permissionsState: FundingStreamPermissions[] = [{
+    fundingStreamId: "DSG",
+    userId: "",
+    canAdministerFundingStream: false,
+    canApproveFunding: false,
+    canApproveSpecification: false,
+    canChooseFunding: false,
+    canCreateQaTests: false,
+    canCreateSpecification: false,
+    canDeleteCalculations: false,
+    canDeleteQaTests: false,
+    canDeleteSpecification: false,
+    canEditCalculations: false,
+    canEditQaTests: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canCreateTemplates: false,
+    canEditTemplates: false,
+    canDeleteTemplates: true,
+    canApproveTemplates: true
+},
+{
+    fundingStreamId: "GAG",
+    userId: "",
+    canAdministerFundingStream: false,
+    canApproveFunding: false,
+    canApproveSpecification: false,
+    canChooseFunding: false,
+    canCreateQaTests: false,
+    canCreateSpecification: false,
+    canDeleteCalculations: false,
+    canDeleteQaTests: false,
+    canDeleteSpecification: false,
+    canEditCalculations: false,
+    canEditQaTests: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canCreateTemplates: false,
+    canEditTemplates: false,
+    canDeleteTemplates: false,
+    canApproveTemplates: false
+},
+{
+    fundingStreamId: "1619",
+    userId: "",
+    canAdministerFundingStream: false,
+    canApproveFunding: false,
+    canApproveSpecification: false,
+    canChooseFunding: false,
+    canCreateQaTests: false,
+    canCreateSpecification: false,
+    canDeleteCalculations: false,
+    canDeleteQaTests: false,
+    canDeleteSpecification: false,
+    canEditCalculations: false,
+    canEditQaTests: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canCreateTemplates: false,
+    canEditTemplates: true,
+    canDeleteTemplates: false,
+    canApproveTemplates: false
+}];
+
+beforeEach(() => {
+    useSelectorSpy.mockClear();
+    useSelectorSpy.mockReturnValue(permissionsState);
+});
+
+it("handles empty parameters correctly", () => {
+    const { result } = renderHook(() => usePermissions([]));
+    expect(result.current.missingPermissions).toEqual([]);
+    expect(result.current.canEditTemplate).toBeTruthy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeTruthy();
+    expect(result.current.canApproveTemplate).toBeTruthy();
+});
+
+it("handles all parameters used correctly", () => {
+    const { result } = renderHook(() => usePermissions(["edit", "create", "delete", "approve"], ["DSG", "GAG", "1619"]));
+    expect(result.current.missingPermissions).toEqual(["create"]);
+    expect(result.current.canEditTemplate).toBeTruthy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeTruthy();
+    expect(result.current.canApproveTemplate).toBeTruthy();
+});
+
+it("calculates missing create permissions correctly", () => {
+    const { result } = renderHook(() => usePermissions(["create"]));
+    expect(result.current.missingPermissions).toEqual(["create"]);
+});
+
+it("calculates permissions correctly for a funding stream", () => {
+    const { result } = renderHook(() => usePermissions(["delete", "approve"], ["DSG"]));
+    expect(result.current.missingPermissions).toEqual([]);
+    expect(result.current.canEditTemplate).toBeFalsy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeTruthy();
+    expect(result.current.canApproveTemplate).toBeTruthy();
+});
+
+it("calculates permissions correctly for multiple funding streams", () => {
+    const { result } = renderHook(() => usePermissions(["delete", "approve"], ["DSG", "1619"]));
+    expect(result.current.missingPermissions).toEqual([]);
+    expect(result.current.canEditTemplate).toBeTruthy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeTruthy();
+    expect(result.current.canApproveTemplate).toBeTruthy();
+});
+
+it("calculates required funding streams correctly when user has permission", () => {
+    const { result } = renderHook(() => usePermissions(["edit"], ["1619"]));
+    expect(result.current.missingPermissions).toEqual([]);
+    expect(result.current.canEditTemplate).toBeTruthy();
+});
+
+it("calculates required funding streams correctly when user does not have permission", () => {
+    const { result } = renderHook(() => usePermissions(["edit"], ["DSG"]));
+    expect(result.current.missingPermissions).toEqual(["edit"]);
+    expect(result.current.canEditTemplate).toBeFalsy();
+});
+
+it("calculates correctly when user has no permissions for a funding stream", () => {
+    const { result } = renderHook(() => usePermissions(["create", "edit", "delete", "approve"], ["GAG"]));
+    expect(result.current.missingPermissions).toEqual(["edit", "create", "delete", "approve"]);
+    expect(result.current.canEditTemplate).toBeFalsy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeFalsy();
+    expect(result.current.canApproveTemplate).toBeFalsy();
+});
+
+it("calculates correctly when user has permissions across multiple funding streams", () => {
+    const { result } = renderHook(() => usePermissions(["create", "edit", "delete", "approve"], ["GAG", "1619"]));
+    expect(result.current.missingPermissions).toEqual(["create", "delete", "approve"]);
+    expect(result.current.canEditTemplate).toBeTruthy();
+    expect(result.current.canCreateTemplate).toBeFalsy();
+    expect(result.current.canDeleteTemplate).toBeFalsy();
+    expect(result.current.canApproveTemplate).toBeFalsy();
+});
