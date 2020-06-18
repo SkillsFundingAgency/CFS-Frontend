@@ -49,21 +49,11 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             });
         }
 
-        public async Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment)
+        public async Task<NoValidatedContentApiResponse> PublishTemplate(TemplatePublishModel model)
         {
-            string url = $"templates/build/{templateId}/approve";
-
-            if (!string.IsNullOrWhiteSpace(version))
-            {
-                url = QueryHelpers.AddQueryString(url, "version", version);
-            }
-
-            if (!string.IsNullOrWhiteSpace(comment))
-            {
-                url = QueryHelpers.AddQueryString(url, "comment", comment);
-            }
-
-            return await ValidatedPostAsync<dynamic>(url, null);
+            string url = $"templates/build/{model.TemplateId}/publish";
+            
+            return await ValidatedPostAsync(url, model);
         }
 
         public async Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)

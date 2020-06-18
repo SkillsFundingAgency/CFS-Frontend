@@ -528,3 +528,11 @@ export async function createNewDraftTemplate(fundingStreamId: string, fundingPer
         data: { fundingStreamId, fundingPeriodId, description }
     })
 }
+
+export async function publishTemplate(templateId: string, note: string): Promise<AxiosResponse<string>> {
+    return await axios(`/api/templates/build/${templateId}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: {templateId, note}
+    })
+}

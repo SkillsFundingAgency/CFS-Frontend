@@ -223,13 +223,12 @@ namespace CalculateFunding.Frontend.Controllers
             }
         }
 
-        [HttpPost("api/templates/build/{templateId}/approve")]
-        public async Task<IActionResult> ApproveTemplate([FromRoute] string templateId, [FromQuery] string version = null,
-            [FromQuery] string comment = null)
+        [HttpPost("api/templates/build/{templateId}/publish")]
+        public async Task<IActionResult> PublishTemplate([FromRoute] string templateId, [FromBody] TemplatePublishModel model)
         {
-            Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
+            Guard.ArgumentNotNull(model, nameof(model));
 
-            NoValidatedContentApiResponse result = await _client.ApproveTemplate(templateId, version, comment);
+            NoValidatedContentApiResponse result = await _client.PublishTemplate(model);
 
             if (result.StatusCode == HttpStatusCode.BadRequest)
             {

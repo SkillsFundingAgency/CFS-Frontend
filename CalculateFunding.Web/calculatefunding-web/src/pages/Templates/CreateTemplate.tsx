@@ -1,4 +1,6 @@
-﻿﻿import React, {useEffect, useState} from 'react';
+﻿import {ErrorMessage} from "../../types/ErrorMessage";
+
+﻿import React, {useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import {useHistory} from 'react-router-dom';
 import {Header} from "../../components/Header";
@@ -26,12 +28,11 @@ export const CreateTemplate = () => {
     const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string>();
     const [selectedFundingPeriodId, setSelectedFundingPeriodId] = useState<string>();
     const [description, setDescription] = useState<string>("");
-    const [fundingStreamErrorMessages, setFundingStreamErrorMessages] = useState<string[]>([]);
-    const [fundingPeriodErrorMessages, setFundingPeriodErrorMessages] = useState<string[]>([]);
-    const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [saveMessage, setSaveMessage] = useState<string>('');
     const [enableSaveButton, setEnableSaveButton] = useState<boolean>(false);
     let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
+    let errorCount = 0;
     const history = useHistory();
 
     useEffectOnce(() => {
@@ -42,7 +43,7 @@ export const CreateTemplate = () => {
             };
             loadData();
         } catch (err) {
-            setErrorMessages(errors => [...errors, `Template options could not be loaded: ${err.message}.`]);
+            addErrorMessage(`Template options could not be loaded: ${err.message}.`);
             setIsLoading(false);
         }
     });
@@ -75,21 +76,30 @@ export const CreateTemplate = () => {
     }, [fundingStreams]);
 
     useEffect(() => {
-        setFundingPeriodErrorMessages([]);
-        setFundingStreamErrorMessages([]);
+        clearErrorMessages();
         const streamWithPeriods = permittedFundingStreamsWithPeriods.find(item => item.fundingStream.id === selectedFundingStreamId);
         if (streamWithPeriods != undefined) {
             populateFundingPeriods(streamWithPeriods.fundingPeriods);
         }
     }, [selectedFundingStreamId]);
 
+    function addErrorMessage(errorMessage: string, fieldName?: string) {
+        const error: ErrorMessage = {id: ++errorCount, fieldName: fieldName, message: errorMessage};
+        setErrors(errors => [...errors, error]);
+    }
+
+    function clearErrorMessages() {
+        errorCount = 0;
+        setErrors([]);
+    }
+
     function populateFundingPeriods(fundingPeriods: FundingPeriod[]) {
         setFundingPeriods([]);
 
         // get funding periods
         if (fundingPeriods == undefined || fundingPeriods.length === 0) {
-            setFundingPeriodErrorMessages(errors => [...errors,
-                "No funding periods available for this funding stream. You will not be able to select a funding period if a template for this funding stream and period already exists. Please select a different funding stream."]);
+            addErrorMessage("No funding periods available for this funding stream. You will not be able to select a funding period if a template for this funding stream and period already exists. Please select a different funding stream.",
+                "fundingPeriodId");
             setEnableSaveButton(false);
             return;
         }
@@ -110,7 +120,7 @@ export const CreateTemplate = () => {
     }
 
     const handleFundingPeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFundingPeriodErrorMessages([]);
+        clearErrorMessages();
         const fundingPeriodId = e.target.value;
         setSelectedFundingPeriodId(fundingPeriodId);
         setEnableSaveButton(true);
@@ -128,11 +138,11 @@ export const CreateTemplate = () => {
         setEnableSaveButton(false);
         try {
             if (selectedFundingStreamId == undefined) {
-                setFundingStreamErrorMessages(errors => [...errors, "Funding stream is not defined"]);
+                addErrorMessage("Funding stream is not defined", "fundingStreamId");
                 return;
             }
             if (selectedFundingPeriodId == undefined) {
-                setFundingPeriodErrorMessages(errors => [...errors, "Funding period is not defined"]);
+                addErrorMessage("Funding period is not defined", "fundingPeriodId");
                 return;
             }
 
@@ -142,9 +152,10 @@ export const CreateTemplate = () => {
             if (result.status === 201) {
                 history.push("/Templates/Build/" + result.data);
             } else {
-                setErrorMessages(errors => [...errors, `Template creation failed: ` + result.status + ` ` + result.statusText + ` ` + result.data]);
+                addErrorMessage(`Template creation failed: ` + result.status + ` ` + result.statusText + ` ` + result.data);
             }
         } catch (err) {
+            addErrorMessage(`Template could not be saved: ${err.message}.`);
             setSaveMessage(`Template could not be saved: ${err.message}.`);
             setEnableSaveButton(true);
         }
@@ -160,6 +171,25 @@ export const CreateTemplate = () => {
                     <Breadcrumb name={"Create a new template"}/>
                 </Breadcrumbs>
                 <PermissionStatus requiredPermissions={missingPermissions}/>
+
+                {errors.length > 0 &&
+                <div className="govuk-error-summary"
+                     aria-labelledby="error-summary-title" role="alert" tabIndex="-1" data-module="govuk-error-summary">
+                    <h2 className="govuk-error-summary__title" id="error-summary-title">
+                        There is a problem
+                    </h2>
+                    <div className="govuk-error-summary__body">
+                        <ul className="govuk-list govuk-error-summary__list">
+                            {errors.map((error, index) =>
+                                <li key={error.id}>
+                                    {error.fieldName && <a href={"#" + error.fieldName}>{error.message}</a>}
+                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                </div>}
+
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Create a new template</h1>
                     <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Build a new funding policy template</h3>
@@ -172,7 +202,8 @@ export const CreateTemplate = () => {
                     <div className="govuk-grid-row" hidden={isLoading}>
                         <div className="govuk-grid-column-full">
                             <form id="createTemplate">
-                                <div className={"govuk-form-group " + (fundingStreamErrorMessages.length ? 'govuk-form-group--error' : '')}>
+                                <div
+                                    className={"govuk-form-group " + (errors.some(error => error.fieldName === "fundingStreamId") ? 'govuk-form-group--error' : '')}>
                                     <label className="govuk-label" htmlFor="fundingStreamId">
                                         Select a funding stream
                                     </label>
@@ -183,19 +214,15 @@ export const CreateTemplate = () => {
                                             <option key={stream.id} value={stream.id}>{stream.name}</option>)
                                         }
                                     </select>}
-                                    {fundingStreamErrorMessages && <div className="govuk-error-summary__body">
-                                        <ul className="govuk-list govuk-error-summary__list govuk-error-message">
-                                            {fundingStreamErrorMessages.map((error, index) =>
-                                                <li key={index}>
-                                                    <p>{error}</p>
-                                                </li>
-                                            )}
-                                        </ul>
-                                    </div>}
+                                    {errors.map(error => error.fieldName === "fundingStreamId" &&
+                                        <span className="govuk-error-message">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
+                                    )}
                                 </div>
-                                {fundingStreams.length > 0 && 
-                                    <div className={"govuk-form-group " + (fundingPeriodErrorMessages.length ? 'govuk-form-group--error' : '')}>
-                                        <label className="govuk-label" htmlFor="fundingPeriodId">
+                                {fundingStreams.length > 0 &&
+                                <div
+                                    className={"govuk-form-group " + (errors.some(error => error.fieldName === "fundingPeriodId") ? 'govuk-form-group--error' : '')}>
+                                    <label className="govuk-label" htmlFor="fundingPeriodId">
                                         Select a funding period
                                     </label>
                                     {fundingPeriods.length > 0 &&
@@ -205,17 +232,10 @@ export const CreateTemplate = () => {
                                             <option key={period.id} value={period.id}>{period.name}</option>)
                                         }
                                     </select>}
-                                    {fundingPeriodErrorMessages.length > 0 &&
-                                    <div className="govuk-error-govuk-error-message" role="alert">
-                                        <span className="govuk-visually-hidden">Error:</span>
-                                        <ul className="govuk-list govuk-error-summary__list govuk-error-message">
-                                                {fundingPeriodErrorMessages.map((error, index) =>
-                                                    <li key={index}>
-                                                        <p>{error}</p>
-                                                    </li>
-                                                )}
-                                            </ul>
-                                    </div>}
+                                    {errors.map(error => error.fieldName === "fundingPeriodId" &&
+                                        <span className="govuk-error-message">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
+                                    )}
                                 </div>
                                 }
                                 <div className="govuk-form-group">
@@ -228,22 +248,6 @@ export const CreateTemplate = () => {
                                               onChange={handleDescriptionChange}/>
                                 </div>
                             </form>
-                            {errorMessages && errorMessages.length > 0 &&
-                            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert">
-                                <h2 className="govuk-error-summary__title" id="error-summary-title">
-                                    There is a problem
-                                </h2>
-                                <div className="govuk-error-summary__body">
-                                    <ul className="govuk-list govuk-error-summary__list">
-                                        {errorMessages.map((error, index) =>
-                                            <li key={index}>
-                                                <p>{error}</p>
-                                            </li>
-                                        )}
-                                    </ul>
-                                </div>
-                            </div>
-                            }
                             {selectedFundingPeriodId && selectedFundingStreamId &&
                             <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
                                 Template</button>}

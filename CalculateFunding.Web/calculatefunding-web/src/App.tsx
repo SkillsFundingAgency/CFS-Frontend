@@ -12,7 +12,7 @@ import { CreateSpecification } from "./pages/Specifications/CreateSpecification"
 import { CreateDatasetPage } from "./pages/CreateDatasetPage";
 import { EditSpecification } from "./pages/Specifications/EditSpecification";
 import { ViewTemplates } from "./pages/Templates/ViewTemplates";
-// import { PublishTemplate } from "./pages/Templates/PublishTemplate";
+import { PublishTemplate } from "./pages/Templates/PublishTemplate";
 import { TemplateBuilder } from "./pages/Templates/TemplateBuilder";
 import { Section } from "./types/Sections";
 import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
@@ -79,7 +79,7 @@ const App: React.FunctionComponent = () => {
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/View" component={ViewTemplates} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Build/:templateId" component={TemplateBuilder} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate} />}
-                {/*{featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish" component={PublishTemplate} />}*/}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />

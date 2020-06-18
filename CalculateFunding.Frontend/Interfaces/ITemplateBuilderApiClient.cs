@@ -16,7 +16,7 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
         Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
         Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);
-        Task<NoValidatedContentApiResponse> ApproveTemplate(string templateId, string version, string comment);
+        Task<NoValidatedContentApiResponse> PublishTemplate(TemplatePublishModel model);
         Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchModel request);
         Task<ApiResponse<List<FundingStreamWithPeriods>>> GetFundingStreamPeriodsWithoutTemplates();
     }
