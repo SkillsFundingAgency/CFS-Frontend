@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Header} from "../components/Header";
 import {getSpecification} from "../actions/ViewSpecificationsActions";
 import {useDispatch, useSelector} from "react-redux";
@@ -22,6 +22,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
     const specificationId = match.params.specificationId;
     const dispatch = useDispatch();
 
+    let history = useHistory();
     let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
     let datasets: DatasetState = useSelector((state: AppState) => state.datasets);
 
@@ -134,7 +135,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                     clearFormData();
                     setAddAnother(true);
                 } else {
-                    window.location.href = `/datasets/ListDatasetSchemas/${specificationId}`
+                    history.push(`/ViewSpecification/${specificationId}`)
                 }
             }).catch(() => {
                 setSaveDatasetResult(prevState => {
@@ -185,7 +186,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
     }
 
     return <div>
-        <Header location={Section.Datasets}/>
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
