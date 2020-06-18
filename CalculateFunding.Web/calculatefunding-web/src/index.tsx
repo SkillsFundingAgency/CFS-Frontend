@@ -7,6 +7,7 @@ import {IStoreState, rootReducer} from "./reducers/rootReducer";
 import {composeWithDevTools} from "redux-devtools-extension";
 import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
+import './auth/authProvider'
 
 const middleware = [logger, thunk as ThunkMiddleware<IStoreState>];
 

@@ -28,7 +28,6 @@
     using Microsoft.OpenApi.Models;    
     using Microsoft.FeatureManagement;
 
-
     public class Startup
     {
         private IWebHostEnvironment _hostingEnvironment;

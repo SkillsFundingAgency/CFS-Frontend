@@ -1,10 +1,10 @@
-import axios from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 
 let baseURL = "/api/users";
 
 export async function getUserPermissionsService(specificationId: string) {
     const jobTypes = "RefreshFundingJob,ApproveFundingJob,PublishProviderFundingJob,ApproveFunding";
-    return axios(`${baseURL}/effectivepermissions/${specificationId}`, {
+    return axiosInstance(`${baseURL}/effectivepermissions/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -17,8 +17,9 @@ import {
     TemplateResponse, Template, TemplateContentUpdateCommand, CalculationDictionaryItem, FundingStreamWithPeriodsResponse
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
-import axios, { AxiosResponse } from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 import cloneDeep from 'lodash/cloneDeep';
+import { AxiosResponse } from "axios";
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
@@ -488,7 +489,7 @@ function childMatches(children: FundingLineOrCalculation[] | undefined, childId:
 }
 
 export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
-    return await axios(`/api/templates/build/content`, {
+    return await axiosInstance(`/api/templates/build/content`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         data: command
@@ -496,7 +497,7 @@ export async function saveTemplateContent(command: TemplateContentUpdateCommand)
 }
 
 export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
-    return await axios(`/api/templates/build/search`, {
+    return await axiosInstance(`/api/templates/build/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: searchRequest
@@ -504,7 +505,7 @@ export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
 }
 
 export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
-    return axios.get(`/api/templates/build/${templateId}`, {
+    return axiosInstance.get(`/api/templates/build/${templateId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -513,7 +514,7 @@ export async function getTemplateById(templateId: string): Promise<AxiosResponse
 }
 
 export async function getAllFundingStreamsWithAvailablePeriods(): Promise<AxiosResponse<FundingStreamWithPeriodsResponse[]>> {
-    return await axios.get(`/api/templates/build/available-stream-periods`, {
+    return await axiosInstance.get(`/api/templates/build/available-stream-periods`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -522,7 +523,7 @@ export async function getAllFundingStreamsWithAvailablePeriods(): Promise<AxiosR
 }
 
 export async function createNewDraftTemplate(fundingStreamId: string, fundingPeriodId: string, description: string): Promise<AxiosResponse<string>> {
-    return await axios(`/api/templates/build`, {
+    return await axiosInstance(`/api/templates/build`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: { fundingStreamId, fundingPeriodId, description }

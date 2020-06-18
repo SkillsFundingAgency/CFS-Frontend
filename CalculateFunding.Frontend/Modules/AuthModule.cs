@@ -33,10 +33,15 @@ namespace CalculateFunding.Frontend.Modules
             }
             else
             {
-                services.AddAuthentication(adOptions =>
+                services.AddAuthentication(opts =>
                 {
-                    adOptions.DefaultAuthenticateScheme = AzureAuthenticationDefaults.AuthenticationScheme;
-                    adOptions.DefaultChallengeScheme = AzureAuthenticationDefaults.AuthenticationScheme;
+                    opts.DefaultAuthenticateScheme = AzureAuthenticationDefaults.AuthenticationScheme;
+                    opts.DefaultChallengeScheme = AzureAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = $"https://login.windows.net/{azureAdOptions.TenantId}/";
+                    options.Audience = $"api://{azureAdOptions.ClientId}";
                 })
                 .AddAzureAuthentication();
 
@@ -59,7 +64,6 @@ namespace CalculateFunding.Frontend.Modules
                                      .RequireClaim(ClaimTypes.Role, azureAdOptions.Groups?.Split(","))
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
-
                 });
             }
         }

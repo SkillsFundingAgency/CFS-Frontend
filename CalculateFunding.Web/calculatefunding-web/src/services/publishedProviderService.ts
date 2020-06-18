@@ -1,12 +1,12 @@
 import {SearchRequestViewModel} from "../types/searchRequestViewModel";
-import axios from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 
 const baseUrl = "/api/publishedprovider";
 
 
 export async function getPublishedProviderResultsService(criteria: SearchRequestViewModel) {
 
-    return axios(`${baseUrl}/searchpublishedproviders`, {
+    return axiosInstance(`${baseUrl}/searchpublishedproviders`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -1,14 +1,14 @@
-import axios from "axios";
 import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatasetSchemaUpdateViewModel";
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 import { getFundingPeriodsByFundingStreamId } from "../actions/SelectSpecificationActions";
+import axiosInstance from "../services/axiosInterceptor"
 
 const baseUrl = "/api/datasets";
 
 export async function getDatasetBySpecificationIdService(specificationId: string) {
-    return axios(`${baseUrl}/getdatasetsbyspecificationid/${specificationId}`, {
+    return axiosInstance(`${baseUrl}/getdatasetsbyspecificationid/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ export async function getDatasetBySpecificationIdService(specificationId: string
 }
 
 export async function getDatasetDefinitionsService() {
-    return axios(`${baseUrl}/get-dataset-definitions/`, {
+    return axiosInstance(`${baseUrl}/get-dataset-definitions/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -32,7 +32,7 @@ export async function assignDatasetSchemaUpdateService(name: string, description
         name: name,
         isSetAsProviderData: isSetAsProviderData
     };
-    return axios(`${baseUrl}/assignDatasetSchema/${specificationId}`, {
+    return axiosInstance(`${baseUrl}/assignDatasetSchema/${specificationId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export async function assignDatasetSchemaUpdateService(name: string, description
 }
 
 export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
-    return axios(`/api/dataset-definitions/search`, {
+    return axiosInstance(`/api/dataset-definitions/search`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ export async function searchDatasetDefinitionsService(request: DatasetDefinition
 }
 
 export async function getDatasetHistoryService(datasetId: string, pageNumber: number, pageSize: number) {
-    return axios(`${baseUrl}/getdatasetversions/${datasetId}`, {
+    return axiosInstance(`${baseUrl}/getdatasetversions/${datasetId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ export async function getDatasetHistoryService(datasetId: string, pageNumber: nu
 }
 
 export async function createDatasetService(request: CreateDatasetRequestViewModel) {
-    return axios(`${baseUrl}`, {
+    return axiosInstance(`${baseUrl}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ export async function createDatasetService(request: CreateDatasetRequestViewMode
 }
 
 export async function updateDatasetService(fundingStreamId: string, datasetId: string, fileName: string) {
-    return axios(`${baseUrl}/${fundingStreamId}/${datasetId}`, {
+    return axiosInstance(`${baseUrl}/${fundingStreamId}/${datasetId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ export async function updateDatasetService(fundingStreamId: string, datasetId: s
 }
 
 export async function uploadDataSourceService(blobUrl: string, file: File, datasetId: string, fundingStreamId: string, authorName: string, authorId: string, definitionId: string, name: string, description: string) {
-    return axios(`${blobUrl}`, {
+    return axiosInstance(`${blobUrl}`, {
         method: 'PUT',
         headers: {
             "x-ms-blob-type": "BlockBlob",
@@ -116,7 +116,7 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
 }
 
 export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, fundingStreamId:string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
-    return axios(`${blobUrl}`, {
+    return axiosInstance(`${blobUrl}`, {
         method: 'PUT',
         headers: {
             "x-ms-blob-type": "BlockBlob",
@@ -134,7 +134,7 @@ export async function uploadDatasetVersionService(blobUrl: string, file: File, d
 }
 
 export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, description: string, changeNote: string) {
-    return axios(`${baseUrl}/validate-dataset`, {
+    return axiosInstance(`${baseUrl}/validate-dataset`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -151,7 +151,7 @@ export async function validateDatasetService(datasetId: string, fundingStreamId:
 }
 
 export async function getDatasetValidateStatusService(operationId: string) {
-    return axios(`/api/dataset-validate-status/${operationId}`, {
+    return axiosInstance(`/api/dataset-validate-status/${operationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ export async function getDatasetValidateStatusService(operationId: string) {
 }
 
 export async function searchDatasetService(request: DatasetSearchRequestViewModel) {
-    return axios(`${baseUrl}/search`, {
+    return axiosInstance(`${baseUrl}/search`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

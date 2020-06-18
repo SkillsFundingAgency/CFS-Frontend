@@ -3,10 +3,8 @@ import {mount} from "enzyme";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
 import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
-import {PublishTemplate} from "../pages/Templates/PublishTemplate";
-import {TemplateResponse} from "../types/TemplateBuilderDefinitions";
-import {AxiosResponse} from "axios";
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+import { waitFor } from "@testing-library/react"
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
@@ -86,10 +84,10 @@ describe("Publish Template page when I don't have approve permissions ", () => {
         useSelectorSpy.mockReturnValue(noPermissionsState);
         setupGetTemplate();
     });
-    it("renders a permission status warning", () => {
+    it("renders a permission status warning", async () => {
         const { PublishTemplate } = require("../pages/Templates/PublishTemplate");
         const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1);
+        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
     });
 });
 describe("Publish Template page when I have approve permissions ", () => {
@@ -98,9 +96,9 @@ describe("Publish Template page when I have approve permissions ", () => {
         useSelectorSpy.mockReturnValue(permissionsState);
         setupGetTemplate();
     });
-    it("does not render a permission status warning", () => {
+    it("does not render a permission status warning", async () => {
         const { PublishTemplate } = require("../pages/Templates/PublishTemplate");
         const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
+        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
     });
 });

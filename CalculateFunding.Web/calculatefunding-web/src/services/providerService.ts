@@ -1,9 +1,9 @@
-import axios from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 
 let baseURL = "/api/provider";
 
 export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) {
-    return axios(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`, {
+    return axiosInstance(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`, {
         method: 'GET',
         headers: {
             'Content-Type':'application/json'
@@ -11,7 +11,7 @@ export async function getProviderByIdAndVersionService(providerId:string, provid
     })
 }
 export async function getProviderTransactionsService(specificationId:string, providerId:string) {
-    return axios(`${baseURL}/getProviderTransactions/${specificationId}/${providerId}`, {
+    return axiosInstance(`${baseURL}/getProviderTransactions/${specificationId}/${providerId}`, {
         method: 'GET',
         headers: {
             'Content-Type':'application/json'
@@ -19,7 +19,7 @@ export async function getProviderTransactionsService(specificationId:string, pro
     })
 }
 export async function getProfilingService(fundingStreamId: string, fundingPeriodId: string, providerId: string) {
-    return axios(`${baseURL}/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileTotals`, {
+    return axiosInstance(`${baseURL}/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileTotals`, {
         method: 'GET',
         headers: {
             'Content-Type':'application/json'
@@ -28,7 +28,7 @@ export async function getProfilingService(fundingStreamId: string, fundingPeriod
 }
 
 export async function getLocalAuthoritiesService(fundingStreamId: string, fundingPeriodId: string, searchText: string) {
-    return axios(`${baseURL}/getlocalauthorities/${fundingStreamId}/${fundingPeriodId}/?searchText=${searchText}`, {
+    return axiosInstance(`${baseURL}/getlocalauthorities/${fundingStreamId}/${fundingPeriodId}/?searchText=${searchText}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

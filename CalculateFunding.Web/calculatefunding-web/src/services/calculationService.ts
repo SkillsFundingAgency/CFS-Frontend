@@ -1,11 +1,11 @@
-import axios from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
 
 export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
-    return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
+    return axiosInstance(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ export async function getCalculationsService(calculationSearchRequestViewModel: 
 }
 
 export async function getCalculationByIdService(calculationId: string) {
-    return axios(`/api/calcs/getcalculationbyid/${calculationId}`, {
+    return axiosInstance(`/api/calcs/getcalculationbyid/${calculationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -29,7 +29,7 @@ export async function getCalculationByIdService(calculationId: string) {
 }
 
 export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel) {
-    return axios(`/api/results/calculationproviderresultssearch`, {
+    return axiosInstance(`/api/results/calculationproviderresultssearch`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export async function getCalculationProvidersService(calculationProviderSearchRe
 }
 
 export async function createAdditionalCalculationService(createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel, specificationId:string) {
-    return axios(`/api/specs/${specificationId}/calculations/createadditionalcalculation`, {
+    return axiosInstance(`/api/specs/${specificationId}/calculations/createadditionalcalculation`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export async function createAdditionalCalculationService(createAdditionalCalcula
     })
 }
 export async function updateAdditionalCalculationService(updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel, specificationId:string, calculationId:string) {
-    return axios(`/api/specs/${specificationId}/calculations/${calculationId}/editadditionalcalculation`, {
+    return axiosInstance(`/api/specs/${specificationId}/calculations/${calculationId}/editadditionalcalculation`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ export async function updateAdditionalCalculationService(updateAdditionalCalcula
 
 export async function compileCalculationPreviewService(specificationId:string, calculationId:string, sourceCode:string)
 {
-    return axios(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
+    return axiosInstance(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
         method: 'POST',
         headers:{
             'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ export async function compileCalculationPreviewService(specificationId:string, c
 }
 
 export async function getCodeContextService(specificationId: string) {
-    return axios(`/api/specs/${specificationId}/codeContext`, {
+    return axiosInstance(`/api/specs/${specificationId}/codeContext`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -79,7 +79,7 @@ export async function getCodeContextService(specificationId: string) {
     })
 }
 export async function getCalculationVersionHistoryService(calculationId: string) {
-    return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
+    return axiosInstance(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ export async function getCalculationVersionHistoryService(calculationId: string)
 }
 
 export async function approveCalculationService(publishStatusModel: PublishStatusModel, specificationId: string, calculationId: string) {
-    return axios(`/api/specs/${specificationId}/calculations/${calculationId}/status`, {
+    return axiosInstance(`/api/specs/${specificationId}/calculations/${calculationId}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ export async function approveCalculationService(publishStatusModel: PublishStatu
 }
 
 export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
-    return axios(`/api/calcs/${calculationId}/approvepermission`, {
+    return axiosInstance(`/api/calcs/${calculationId}/approvepermission`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
