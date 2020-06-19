@@ -1,29 +1,31 @@
-import {IUserState} from "../states/IUserState";
-import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
-import {IViewFundingState} from "../states/IViewFundingState";
-import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
-import {ViewCalculationState} from "../states/ViewCalculationState";
-import {combineReducers, Reducer} from "redux";
-import {reduceUserState} from "./userReducer";
-import {reduceFundingLineStructureState} from "./fundingLineStructureReducer";
-import {reduceViewSpecificationState} from "./viewSpecificationReducer";
-import {reduceViewFundingState} from "./viewFundingReducer";
-import {reduceViewSpecificationResultsState} from "./viewSpecificationResultsReducer";
-import {reduceSelectSpecificationState} from "./selectSpecificationReducer";
-import {SelectSpecificationState} from "../states/SelectSpecificationState";
-import {reduceCalculationResultsState} from "./viewCalculationResultsReducer";
-import {ProviderState} from "../states/ProviderState";
-import {reduceProvider} from "./providerReducer";
-import {reduceSpecificationState} from "./specificationReducer";
-import {SpecificationState} from "../states/SpecificationState";
-import {reduceDatasetState} from "./datasetReducer";
-import {DatasetState} from "../states/DatasetState";
-import {FeatureFlagsState} from "../states/FeatureFlagsState";
-import {reduceFeatureFlagsState} from "./featureFlagsReducer";
-import {IUserPermissionsState} from "../states/IUserPermissionsState";
-import {reduceUserPermissionsState} from "./userPermissionsReducer";
-import {ICreateAccountAction} from "../actions/userAction";
+import { IUserState } from "../states/IUserState";
+import { IFundingLineStructureState } from "../states/IFundingLineStructureState";
+import { IViewFundingState } from "../states/IViewFundingState";
+import { ViewSpecificationResultsState } from "../states/ViewSpecificationResultsState";
+import { ViewSpecificationState } from "../states/ViewSpecificationState";
+import { ViewCalculationState } from "../states/ViewCalculationState";
+import { combineReducers, Reducer } from "redux";
+import { reduceUserState } from "./userReducer";
+import { reduceFundingLineStructureState } from "./fundingLineStructureReducer";
+import { reduceViewSpecificationState } from "./viewSpecificationReducer";
+import { reduceViewFundingState } from "./viewFundingReducer";
+import { reduceViewSpecificationResultsState } from "./viewSpecificationResultsReducer";
+import { reduceSelectSpecificationState } from "./selectSpecificationReducer";
+import { SelectSpecificationState } from "../states/SelectSpecificationState";
+import { reduceCalculationResultsState } from "./viewCalculationResultsReducer";
+import { ProviderState } from "../states/ProviderState";
+import { reduceProvider } from "./providerReducer";
+import { reduceSpecificationState } from "./specificationReducer";
+import { SpecificationState } from "../states/SpecificationState";
+import { reduceDatasetState } from "./datasetReducer";
+import { DatasetState } from "../states/DatasetState";
+import { FeatureFlagsState } from "../states/FeatureFlagsState";
+import { ITemplateBuilderState } from "../states/ITemplateBuilderState";
+import { reduceTemplateBuilderState } from "./templateBuilderReducer";
+import { reduceFeatureFlagsState } from "./featureFlagsReducer";
+import { IUserPermissionsState } from "../states/IUserPermissionsState";
+import { reduceUserPermissionsState } from "./userPermissionsReducer";
+import { ICreateAccountAction } from "../actions/userAction";
 import { FundingLineStructureAction } from "../actions/FundingLineStructureAction";
 import { ViewFundingAction } from "../actions/viewFundingAction";
 import { ViewSpecificationResultsActions } from "../actions/ViewSpecificationResultsActions";
@@ -34,12 +36,12 @@ import { GetAllSpecifications } from "../actions/SpecificationActions";
 import { GetDataSchemaAction } from "../actions/DatasetActions";
 import { GetFeatureFlagsAction } from "../actions/FeatureFlagsActions";
 import { IFundingStreamPermissionsAction } from "../actions/UserPermissionsActions";
-import {ITemplatesState} from "../states/ITemplatesState";
+import { ViewSpecificationsActions } from "../actions/ViewSpecificationsActions";
+import { TemplateBuilderAction } from "../actions/TemplateBuilderActions";
 
 export interface IStoreState {
     userState: IUserState,
     userPermissions: IUserPermissionsState,
-    templates: ITemplatesState,
     fundingLineStructureState: IFundingLineStructureState,
     viewFundingState: IViewFundingState,
     viewSpecificationResults: ViewSpecificationResultsState,
@@ -49,12 +51,15 @@ export interface IStoreState {
     provider: ProviderState,
     specifications: SpecificationState,
     datasets: DatasetState,
-    featureFlags: FeatureFlagsState
+    featureFlags: FeatureFlagsState,
+    templateBuilder: ITemplateBuilderState
 }
 
 export type Actions = ICreateAccountAction | FundingLineStructureAction |
-    ViewFundingAction | ViewSpecificationResultsActions | SelectSpecificationActions | ViewCalculationResultsActions |
-    ProviderActions | GetAllSpecifications | GetDataSchemaAction | GetFeatureFlagsAction | IFundingStreamPermissionsAction;
+    ViewFundingAction | ViewSpecificationResultsActions | ViewSpecificationsActions |
+    SelectSpecificationActions | ViewCalculationResultsActions |
+    ProviderActions | GetAllSpecifications | GetDataSchemaAction | GetFeatureFlagsAction |
+    IFundingStreamPermissionsAction | TemplateBuilderAction;
 
 export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     userState: reduceUserState,
@@ -69,6 +74,7 @@ export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     specifications: reduceSpecificationState,
     datasets: reduceDatasetState,
     featureFlags: reduceFeatureFlagsState,
+    templateBuilder: reduceTemplateBuilderState
 });
 
 export type AppState = ReturnType<typeof rootReducer>

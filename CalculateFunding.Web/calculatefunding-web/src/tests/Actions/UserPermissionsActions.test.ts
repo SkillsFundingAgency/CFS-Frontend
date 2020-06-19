@@ -1,13 +1,13 @@
 ﻿import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInterceptor"
 import MockAdapter from "axios-mock-adapter";
 import { IStoreState } from "../../reducers/rootReducer";
 import {getUserFundingStreamPermissions, UserPermissionsActionTypes} from "../../actions/UserPermissionsActions";
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-const fetchMock = new MockAdapter(axios);
+const fetchMock = new MockAdapter(axiosInstance);
 
 describe("user-permissions-actions", () => {
     beforeEach(() => {
@@ -84,6 +84,10 @@ const storeWithData: IStoreState = {
             canMapDatasets: false,
             canRefreshFunding: false,
             canReleaseFunding: false,
+            canApproveTemplates: false,
+            canCreateTemplates: false,
+            canDeleteTemplates: false,
+            canEditTemplates: false,
             specificationId: '',
             userId: ''
         },

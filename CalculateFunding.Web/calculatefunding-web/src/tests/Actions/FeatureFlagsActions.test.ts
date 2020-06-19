@@ -1,13 +1,13 @@
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInterceptor";
 import MockAdapter from "axios-mock-adapter";
 import { getFeatureFlags, FeatureFlagsActionTypes } from "../../actions/FeatureFlagsActions";
 import { IStoreState } from "../../reducers/rootReducer";
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-const fetchMock = new MockAdapter(axios);
+const fetchMock = new MockAdapter(axiosInstance);
 
 describe("featureflagsactions", () => {
   beforeEach(() => {

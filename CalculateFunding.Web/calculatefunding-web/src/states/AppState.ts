@@ -8,19 +8,20 @@ import {ProviderState} from "./ProviderState";
 import {SpecificationState} from "./SpecificationState";
 import {DatasetState} from "./DatasetState";
 import {IUserPermissionsState} from "./IUserPermissionsState";
-import {IUserState} from "./IUserState";
 import {FeatureFlagsState} from "./FeatureFlagsState";
+import {ITemplateBuilderState} from "./ITemplateBuilderState";
 
 export interface AppState {
-    selectSpecification: SelectSpecificationState;
-    userPermissions: IUserPermissionsState;
-    viewFunding: IViewFundingState;
+    selectSpecification: SelectSpecificationState,
+    userPermissions: IUserPermissionsState,
+    viewFunding: IViewFundingState,
     fundingLineStructure: IFundingLineStructureState
-    viewSpecificationResults: ViewSpecificationResultsState;
-    viewSpecification: ViewSpecificationState;
-    viewCalculationResults: ViewCalculationState;
-    provider: ProviderState;
+    viewSpecificationResults: ViewSpecificationResultsState,
+    viewSpecification: ViewSpecificationState,
+    viewCalculationResults: ViewCalculationState,
+    provider: ProviderState,
     specifications: SpecificationState,
     datasets: DatasetState,
-    featureFlags: FeatureFlagsState
+    featureFlags: FeatureFlagsState,
+    templateBuilderState: ITemplateBuilderState
 }

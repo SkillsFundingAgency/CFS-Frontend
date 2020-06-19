@@ -1,7 +1,3 @@
-/**
- * Actions are payloads of information that send data from your application to your store.
- */
-
 export enum UserActionTypes {
     CREATE_ACCOUNT = 'userActionCreateAccount'
 }

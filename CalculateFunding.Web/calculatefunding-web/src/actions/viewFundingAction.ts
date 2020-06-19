@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from "../services/axiosInterceptor"
 import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
@@ -111,7 +111,7 @@ export type ViewFundingAction =
 
 export const getSelectedSpecifications: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (fundingPeriodId: string, fundingStreamId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/specs/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
+        const response = await axiosInstance(`/api/specs/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -126,7 +126,7 @@ export const getSelectedSpecifications: ActionCreator<ThunkAction<Promise<any>, 
 
 export const getAllFundingStreams: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = () => {
     return async (dispatch: Dispatch) => {
-        const response = await axios('/api/specs/get-fundingstreams-for-selected-specifications', {
+        const response = await axiosInstance('/api/specs/get-fundingstreams-for-selected-specifications', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -141,7 +141,7 @@ export const getAllFundingStreams: ActionCreator<ThunkAction<Promise<any>, IView
 
 export const getSelectedFundingPeriods: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (id: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/specs/get-fundingperiods-for-selected-fundingstream/${id}`, {
+        const response = await axiosInstance(`/api/specs/get-fundingperiods-for-selected-fundingstream/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -172,7 +172,7 @@ export const getPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>
             searchTerm: "",
         };
 
-        const response = await axios(`/api/publishedprovider/searchpublishedproviders`, {
+        const response = await axiosInstance(`/api/publishedprovider/searchpublishedproviders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ export const getPublishedProviderResults: ActionCreator<ThunkAction<Promise<any>
 
 export const getUserPermissions: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/users/effectivepermissions/${specificationId}`, {
+        const response = await axiosInstance(`/api/users/effectivepermissions/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -206,7 +206,7 @@ export const getUserPermissions: ActionCreator<ThunkAction<Promise<any>, IViewFu
 export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     const jobTypes = "RefreshFundingJob";
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/jobs/${specificationId}/last-updated/${jobTypes}`, {
+        const response = await axiosInstance(`/api/jobs/${specificationId}/last-updated/${jobTypes}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -254,7 +254,7 @@ export const filterPublishedProviderResults: ActionCreator<ThunkAction<Promise<a
             searchTerm: "",
         };
 
-        const response = await axios(`/api/publishedprovider/searchpublishedproviders`, {
+        const response = await axiosInstance(`/api/publishedprovider/searchpublishedproviders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -270,7 +270,7 @@ export const filterPublishedProviderResults: ActionCreator<ThunkAction<Promise<a
 
 export const refreshFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/publish/refreshfunding/${specificationId}`, {
+        const response = await axiosInstance(`/api/publish/refreshfunding/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -285,7 +285,7 @@ export const refreshFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundin
 
 export const approveFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/publish/approvefunding/${specificationId}`, {
+        const response = await axiosInstance(`/api/publish/approvefunding/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -300,7 +300,7 @@ export const approveFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundin
 
 export const releaseFunding: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axios(`/api/publish/publishfunding/${specificationId}`, {
+        const response = await axiosInstance(`/api/publish/publishfunding/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

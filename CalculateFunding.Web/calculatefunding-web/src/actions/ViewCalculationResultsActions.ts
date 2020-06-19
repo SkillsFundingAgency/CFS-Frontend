@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
 import {Calculation} from "../types/CalculationSummary";
@@ -21,7 +20,6 @@ export interface GetCalculationResults {
 export interface GetCalculationById {
     type: ViewCalculationResultsActionTypes.GET_CALCULATIONBYID;
     payload: Calculation
-
 }
 
 export type ViewCalculationResultsActions = GetCalculationResults | GetCalculationById;

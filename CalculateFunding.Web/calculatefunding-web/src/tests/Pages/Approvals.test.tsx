@@ -6,9 +6,6 @@ import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import {Approvals} from "../../pages/Approvals";
 import {MemoryRouter} from "react-router";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
 const store: Store<IStoreState> = createStore(
     rootReducer
 );

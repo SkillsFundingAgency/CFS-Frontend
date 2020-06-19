@@ -1,6 +1,6 @@
 ﻿import {ActionCreator, Dispatch} from "redux";
 import {ThunkAction} from "redux-thunk";
-import axios from "axios";
+import axiosInstance from "../services/axiosInterceptor"
 import {IUserPermissionsState} from "../states/IUserPermissionsState";
 import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
 
@@ -30,7 +30,7 @@ export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<
             return;
         }
 
-        const response = await axios(`/api/users/permissions/fundingstreams`, {
+        const response = await axiosInstance(`/api/users/permissions/fundingstreams`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
