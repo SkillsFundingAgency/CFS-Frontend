@@ -1,4 +1,4 @@
-﻿﻿﻿import React, {useEffect, useRef, useState} from 'react';
+﻿﻿﻿import React, {useRef, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
 import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
@@ -107,7 +107,8 @@ export const PublishTemplate = () => {
         validateForm();
     }
 
-    const handlePublishClick = async () => {
+    const handlePublishClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
         try {
             if (validateForm()) {
                 setPublishMessage("Publishing template...");
@@ -124,6 +125,7 @@ export const PublishTemplate = () => {
             setIsPublishing(false);
             const errorMessage = `Template could not be published: ${err.message}.`;
             addErrorMessage(errorMessage);
+            setPublishMessage("");
             setPublishErrorMessage(errorMessage);
             setTimeout(function () {setPublishErrorMessage("");}, 5000);
         }
@@ -187,7 +189,7 @@ export const PublishTemplate = () => {
                                     <span className="govuk-caption-m">Status</span>
                                     <h3 className="govuk-heading-m" id="status">{template && template.status}</h3>
                                     {errors.map(error => error.fieldName === "status" &&
-                                        <span id={"status-error-" + error.id} className="govuk-error-message">
+                                        <span key={error.id} id={"status-error-" + error.id} className="govuk-error-message">
                                             <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
                                     )}
                                 </div>
@@ -201,7 +203,7 @@ export const PublishTemplate = () => {
                                               onClick={clearErrorMessages}
                                               onChange={handlePublishNoteChange}/>
                                     {errors.map(error => error.fieldName === "publishNote" &&
-                                        <span id={"publishNote-error-" + error.id} className="govuk-error-message">
+                                        <span key={error.id} id={"publishNote-error-" + error.id} className="govuk-error-message">
                                             <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
                                     )}
                                 </div>
@@ -224,7 +226,7 @@ export const PublishTemplate = () => {
                                             <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
                                     )}
                                 </div>
-                                {publishMessage.length > 0 ?
+                                {publishMessage.length > 0 && errors.length === 0 ?
                                     <div className="govuk-form-group"><strong className="govuk-tag govuk-tag--green">{publishMessage}</strong></div>
                                     : null}
                                 {publishErrorMessage.length > 0 ?
@@ -233,7 +235,7 @@ export const PublishTemplate = () => {
 
                                 {template && template.status !== "Published" &&
                                 <button className="govuk-button" data-testid="publish"
-                                        disabled={isPublishing || isLoading || !canApproveTemplate || !template || errors.length > 0}
+                                        disabled={isPublishing || isLoading || !canApproveTemplate || !template}
                                         onClick={handlePublishClick}>Publish
                                 </button>}
                                 &nbsp;

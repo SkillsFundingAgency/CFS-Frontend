@@ -14,7 +14,10 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, FundingStreamWithPeriodsResponse
+    TemplateResponse, 
+    TemplateContentUpdateCommand, 
+    CalculationDictionaryItem, 
+    FundingStreamWithPeriodsResponse
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axiosInstance from "../services/axiosInterceptor"
@@ -531,7 +534,7 @@ export async function createNewDraftTemplate(fundingStreamId: string, fundingPer
 }
 
 export async function publishTemplate(templateId: string, note: string): Promise<AxiosResponse<string>> {
-    return await axios(`/api/templates/build/${templateId}/publish`, {
+    return await axiosInstance(`/api/templates/build/${templateId}/publish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: {templateId, note}
