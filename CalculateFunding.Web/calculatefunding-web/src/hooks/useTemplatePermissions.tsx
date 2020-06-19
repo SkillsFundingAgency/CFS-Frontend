@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "../states/AppState";
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 
-export const usePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
+export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
     let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
 
     const canCreateTemplate = useMemo(() => {
@@ -12,7 +12,7 @@ export const usePermissions = (requiredPermissions: string[], requiredFundingStr
         }
         return permissions.some(p => p.canCreateTemplates &&
             (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
-    }, [permissions, requiredPermissions, requiredFundingStreams]);
+    }, [permissions, requiredFundingStreams]);
 
     const canEditTemplate = useMemo(() => {
         if (!permissions) {
@@ -20,7 +20,7 @@ export const usePermissions = (requiredPermissions: string[], requiredFundingStr
         }
         return permissions.some(p => p.canEditTemplates &&
         (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
-    }, [permissions, requiredPermissions, requiredFundingStreams]);
+    }, [permissions, requiredFundingStreams]);
 
     const canDeleteTemplate = useMemo(() => {
         if (!permissions) {
@@ -28,7 +28,7 @@ export const usePermissions = (requiredPermissions: string[], requiredFundingStr
         }
         return permissions.some(p => p.canDeleteTemplates &&
             (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
-    }, [permissions, requiredPermissions, requiredFundingStreams]);
+    }, [permissions, requiredFundingStreams]);
 
     const canApproveTemplate = useMemo(() => {
         if (!permissions) {
@@ -36,7 +36,7 @@ export const usePermissions = (requiredPermissions: string[], requiredFundingStr
         }
         return permissions.some(p => p.canApproveTemplates &&
             (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
-    }, [permissions, requiredPermissions, requiredFundingStreams]);
+    }, [permissions, requiredFundingStreams]);
 
     const missingPermissions = useMemo(() => {
         let missing: string[] = [];
@@ -53,7 +53,7 @@ export const usePermissions = (requiredPermissions: string[], requiredFundingStr
             missing.push("approve");
         }
         return missing;
-    }, [canEditTemplate, canCreateTemplate, canDeleteTemplate, canApproveTemplate]);
+    }, [canEditTemplate, canCreateTemplate, canDeleteTemplate, canApproveTemplate, requiredPermissions]);
 
     return {
         canCreateTemplate,

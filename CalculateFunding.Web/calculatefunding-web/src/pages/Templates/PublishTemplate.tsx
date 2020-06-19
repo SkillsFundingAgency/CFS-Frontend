@@ -4,7 +4,7 @@ import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
 import {Section} from "../../types/Sections";
 import {ErrorMessage} from "../../types/ErrorMessage";
-import {usePermissions} from "../../hooks/usePermissions";
+import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -34,7 +34,7 @@ export const PublishTemplate = () => {
     const orgchart = useRef();
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
-    const {canApproveTemplate, missingPermissions} = usePermissions(["approve"], template ? [template.fundingStreamId] : []);
+    const {canApproveTemplate, missingPermissions} = useTemplatePermissions(["approve"], template ? [template.fundingStreamId] : []);
     let errorCount = 0;
     let {templateId} = useParams();
 

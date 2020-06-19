@@ -14,7 +14,7 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse, Template, TemplateContentUpdateCommand, CalculationDictionaryItem, FundingStreamWithPeriodsResponse
+    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, FundingStreamWithPeriodsResponse
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axiosInstance from "../services/axiosInterceptor"
@@ -266,12 +266,12 @@ function getCalculation(templateCalculation: TemplateCalculation, id: number, ke
         id: `n${getId(templateCalculation.templateCalculationId)}`,
         templateCalculationId: templateCalculation.templateCalculationId,
         kind: NodeType.Calculation,
-        type: <CalculationType>templateCalculation.type,
+        type: templateCalculation.type as CalculationType,
         name: templateCalculation.name,
-        aggregationType: <AggregrationType>templateCalculation.aggregationType,
+        aggregationType: templateCalculation.aggregationType as AggregrationType,
         dsKey: key,
         formulaText: templateCalculation.formulaText,
-        valueFormat: <ValueFormatType>templateCalculation.valueFormat,
+        valueFormat: templateCalculation.valueFormat as ValueFormatType,
         allowedEnumTypeValues: stringArrayToString(templateCalculation.allowedEnumTypeValues),
         groupRate: templateCalculation.groupRate,
         percentageChangeBetweenAandB: templateCalculation.percentageChangeBetweenAandB,

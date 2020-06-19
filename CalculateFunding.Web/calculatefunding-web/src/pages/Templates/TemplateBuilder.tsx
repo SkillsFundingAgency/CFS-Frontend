@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
-import { usePermissions } from '../../hooks/usePermissions';
+import { useTemplatePermissions } from '../../hooks/useTemplatePermissions';
 import { SidebarContent } from "../../components/SidebarContent";
 import { Section } from '../../types/Sections';
 import { Header } from '../../components/Header';
@@ -61,7 +61,7 @@ export function TemplateBuilder() {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [nextId, setNextId] = useState(0);
-    const {canCreateTemplate, canEditTemplate, missingPermissions} = usePermissions(["edit"], template ? [template.fundingStreamId] : []);
+    const {canCreateTemplate, canEditTemplate, missingPermissions} = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     let { templateId } = useParams();
 
     useEffect(() => {

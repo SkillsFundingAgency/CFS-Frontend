@@ -109,58 +109,11 @@ function OrganisationChartNode({
   }, [multipleSelect, datasource]);
 
   const addArrows = (e: any) => {
-    const node = e.target.closest("li");
-    const parent = node.parentNode.closest("li");
-    const isAncestorsCollapsed: boolean =
-      node && parent
-        ? parent.firstChild.classList.contains("hidden")
-        : undefined;
-    const isSiblingsCollapsed: boolean = Array.from<HTMLElement>(
-      node.parentNode.children
-    ).some(item => item.classList.contains("hidden"));
-
     setBottomEdgeExpanded(!isChildrenCollapsed);
   };
 
   const removeArrows = () => {
     setBottomEdgeExpanded(undefined);
-  };
-
-  const toggleAncestors = (actionNode: HTMLElement) => {
-    if (actionNode && actionNode.parentElement) {
-      let node = actionNode.parentElement.closest("li");
-      if (!node || !node.firstElementChild) return;
-      const isAncestorsCollapsed = node.firstElementChild.classList.contains("hidden");
-      if (isAncestorsCollapsed) {
-        actionNode.classList.remove("isAncestorsCollapsed");
-        node.firstElementChild.classList.remove("hidden");
-      } else {
-        const isSiblingsCollapsed = Array.from(
-          actionNode.parentElement.children
-        ).some(item => item.classList.contains("hidden"));
-
-        actionNode.classList.add(
-          ...(
-            "isAncestorsCollapsed"
-          ).split(" ")
-        );
-        node.firstElementChild.classList.add("hidden");
-
-        const parent = node.parentElement;
-
-        if (parent) {
-          const closest = parent.closest("li");
-          if (closest) {
-            const firstChild = closest.firstElementChild;
-            if (firstChild) {
-              if (!firstChild.classList.contains("hidden")) {
-                toggleAncestors(node);
-              }
-            }
-          }
-        }
-      }
-    }
   };
 
   const bottomEdgeClickHandler = (e: { stopPropagation: () => void; }) => {

@@ -176,9 +176,9 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     const isAllowedEnumTypeValuesValid = allowedEnumTypeValuesValid();
     const isNameValid = name.length > 0;
     const isGroupRateValid = aggregationType !== AggregrationType.GroupRate ||
-        aggregationType === AggregrationType.GroupRate && numerator !== 0 && denominator !== 0;
+        (aggregationType === AggregrationType.GroupRate && numerator !== 0 && denominator !== 0);
     const isPecentageChangeBetweenAandBValid = aggregationType !== AggregrationType.PercentageChangeBetweenAandB ||
-        aggregationType === AggregrationType.PercentageChangeBetweenAandB && calculationA !== 0 && calculationB !== 0;
+        (aggregationType === AggregrationType.PercentageChangeBetweenAandB && calculationA !== 0 && calculationB !== 0);
 
     const isFormValid = () => {
         const hasAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
