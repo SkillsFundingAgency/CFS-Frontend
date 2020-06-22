@@ -23,6 +23,22 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             _policiesApiClient = policiesApiClient;
         }
+
+        [HttpGet]
+        [Route("api/policy/templates/{fundingStreamId}/{fundingPeriodId}/{templateVersion}")]
+        public async Task<IActionResult> GetTemplates(string fundingStreamId, string fundingPeriodId, string templateVersion)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(templateVersion, nameof(templateVersion));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<FundingTemplateContents> apiResponse =
+	            await _policiesApiClient.GetFundingTemplate(fundingStreamId, fundingPeriodId, templateVersion);
+
+		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(FundingTemplateContents));
+
+		    return errorResult ?? Ok(apiResponse.Content);
+        }
         
         [HttpGet]
         [Route("api/policy/fundingperiods")]
