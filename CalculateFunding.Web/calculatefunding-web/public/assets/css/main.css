@@ -1724,16 +1724,16 @@ input[type=number] {
 
 @font-face {
   font-family: 'glyphicons-halflings-regular';
-  src: url("/assets/libs/fonts/glyphicons-halflings-regular.eot");
-  src: url("/assets/libs/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("/assets/libs/fonts/glyphicons-halflings-regular.woff2") format("woff"), url("/assets/libs/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("/assets/libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
+  src: url("/app/assets/libs/fonts/glyphicons-halflings-regular.eot");
+  src: url("/app/assets/libs/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("/app/assets/libs/fonts/glyphicons-halflings-regular.woff2") format("woff"), url("/app/assets/libs/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("/app/assets/libs/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
 
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url("/assets/libs/fonts/MaterialIcons-Regular.eot");
+  src: url("/app/assets/libs/fonts/MaterialIcons-Regular.eot");
   /* For IE6-8 */
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url("/assets/libs/fonts/MaterialIcons-Regular.woff2") format("woff2"), url("/assets/libs/fonts/MaterialIcons-Regular.woff") format("woff"), url("/asssets/libs/fonts/MaterialIcons-Regular.ttf") format("truetype"); }
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url("/app/assets/libs/fonts/MaterialIcons-Regular.woff2") format("woff2"), url("/app/assets/libs/fonts/MaterialIcons-Regular.woff") format("woff"), url("/app/assets/libs/fonts/MaterialIcons-Regular.ttf") format("truetype"); }
 
 .material-icons {
   font-family: 'Material Icons';
@@ -1799,7 +1799,7 @@ blockquote {
 .button-start {
   background-repeat: no-repeat;
   background-position: 100% 50%;
-  background-image: url("/assets/images/icon-pointer.png"); }
+  background-image: url("/app/assets/images/icon-pointer.png"); }
 
 .govuk-related-items {
   margin-top: 30px;
@@ -1848,7 +1848,7 @@ blockquote {
   padding: 0; }
 
 .breadcrumbs li {
-  background-image: url("/assets/images/separator.png");
+  background-image: url("/app/assets/images/separator.png");
   background-position: 0% 50%;
   background-repeat: no-repeat; }
   .breadcrumbs li:first-child {
@@ -1967,7 +1967,7 @@ blockquote {
   width: 16px;
   height: 16px;
   position: absolute;
-  background-image: url("/assets/images/icon-plus.png");
+  background-image: url("/app/assets/images/icon-plus.png");
   color: #0b0c0c;
   top: 50%;
   transform: translateY(-50%);
@@ -1978,7 +1978,7 @@ blockquote {
 
 .jscollapse-container .jscollapse-jsenabled-header .collapse-title.jscollapse-jsenabled-active:before {
   content: "";
-  background-image: url("/assets/images/icon-minus.png"); }
+  background-image: url("/app/assets/images/icon-minus.png"); }
 
 .rightcolumn-container {
   border-top: 5px solid #005ea5;
@@ -2735,7 +2735,7 @@ blockquote {
   width: 16px;
   height: 16px;
   position: absolute;
-  background-image: url("/assets/images/icon-plus.png");
+  background-image: url("/app/assets/images/icon-plus.png");
   color: #0b0c0c;
   top: 50%;
   transform: translateY(-50%);
@@ -2746,7 +2746,7 @@ blockquote {
   background-color: #f8f8f8; }
   .esfa-collapse#esfa-list .panel-heading.active:before {
     content: "";
-    background-image: url("/assets/images/icon-minus.png"); }
+    background-image: url("/app/assets/images/icon-minus.png"); }
 
 .esfa-collapse#esfa-filter {
   margin-top: 36px; }
