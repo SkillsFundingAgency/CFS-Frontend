@@ -19,6 +19,11 @@ import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
+import {getLatestJobForSpecificationService} from "../services/jobService";
+import {JobSummary} from "../types/jobSummary";
+import {HubConnectionBuilder} from "@aspnet/signalr";
+import {JobMessage} from "../types/jobMessage";
+import {JobSummaryDetails} from "../components/JobSummaryDetails";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -28,16 +33,15 @@ export interface ViewCalculationResultsRoute {
     calculationId: string
 }
 
-export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculationResultsRoute>, props: ViewCalculationResultsProps) {
+export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculationResultsRoute>) {
 
     document.title = "Calculation Results - Calculate funding";
     const [singleFire, setSingleFire] = useState(false);
-
     const dispatch = useDispatch();
     const [autoExpand, setAutoExpand] = useState(false);
     const [filterProviderTypes, setProviderTypes] = useState<FacetValue[]>([]);
     const [filterProviderSubTypes, setProviderSubTypes] = useState<FacetValue[]>([]);
-    const [filterResultsStatus, setResultsStatus] = useState([{
+    const [filterResultsStatus] = useState([{
         name: "With exceptions",
         selected: false
     }, {
@@ -60,10 +64,22 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         searchTerm: "",
         calculationId: match.params.calculationId,
     };
-
     const [calculationProviderSearchRequest, setcalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
-
     const calculationId = match.params.calculationId;
+    const jobSummaryInitial = {
+        jobId: "",
+        jobType: "",
+        specificationId: "",
+        entityId: "",
+        runningStatus: 0,
+        completionStatus: 0,
+        invokerUserId: "",
+        invokerUserDisplayName: "",
+        parentJobId: "",
+        lastUpdated: new Date(),
+        created: new Date(),
+    };
+    const [jobSummary, setJobSummary] = useState<JobSummary>(jobSummaryInitial);
     let calculationSummary: ViewCalculationState = useSelector((state: AppState) => state.viewCalculationResults);
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
     let fundingStream: FundingStream = {
@@ -85,8 +101,19 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     useEffect(() => {
         if (calculationSummary.calculation.specificationId !== "") {
             dispatch(getSpecificationSummary(calculationSummary.calculation.specificationId));
+            getLatestJobForSpecification();
+            createHubConnection(calculationSummary.calculation.specificationId);
         }
     }, [calculationSummary.calculation.specificationId]);
+
+    function getLatestJobForSpecification()
+    {
+        getLatestJobForSpecificationService(calculationSummary.calculation.specificationId, "CreateInstructAllocationJob").then((jobSummaryResponse) => {
+            if (jobSummaryResponse.status === 200 || jobSummaryResponse.status === 201) {
+                setJobSummary(jobSummaryResponse.data as JobSummary);
+            }
+        });
+    }
 
     useEffect(() => {
         fundingStream = specificationResults.specification.fundingStreams[0];
@@ -122,6 +149,23 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         }
     }, [singleFire]);
 
+    async function createHubConnection(specificationId: string) {
+        const hubConnect = new HubConnectionBuilder()
+            .withUrl(`/api/notifications`)
+            .build();
+        try {
+            await hubConnect.start();
+
+            hubConnect.on('NotificationEvent', (message: JobMessage) => {
+                getLatestJobForSpecification();
+            });
+
+            await hubConnect.invoke("StartWatchingForSpecificationNotifications", specificationId);
+
+        } catch (err) {
+            await hubConnect.stop();
+        }
+    }
 
     function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = calculationProviderSearchRequest.providerType;
@@ -230,6 +274,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         <h2 className="govuk-caption-xl">{specificationResults.specification.fundingPeriod.name}</h2>
                         <h1 className="govuk-heading-xl">{calculationSummary.calculation.name}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
+                        <JobSummaryDetails jobSummary={jobSummary} hidden={jobSummary.jobId === ""} />
                         <a href={`/calcs/edit${calculationSummary.calculation.calculationType}calculation/${calculationSummary.calculation.id}`}
                            role="button" className="govuk-button">
                             View calculation

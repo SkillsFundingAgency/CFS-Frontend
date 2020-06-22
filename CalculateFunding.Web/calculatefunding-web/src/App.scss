@@ -577,3 +577,12 @@ svg.app-back-to-top__icon {
   color: govuk-colour("green");
   background: #CCE2D8;
 }
+
+/// Custom Error Summary ////
+.govuk-error-summary-green {
+  border: 5px solid #00703c;
+}
+
+.govuk-error-summary-orange {
+  border: 5px solid #f47738
+}

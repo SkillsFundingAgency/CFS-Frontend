@@ -227,7 +227,8 @@ export const getLatestRefreshDate: ActionCreator<ThunkAction<Promise<any>, IView
 
 export const getLatestJobForSpecification: ActionCreator<ThunkAction<Promise<any>, IViewFundingState, null, ViewFundingAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await getLatestJobForSpecificationService(specificationId);
+        const jobTypes = "RefreshFundingJob,ApproveFundingJob,PublishProviderFundingJob,ApproveFunding";
+        const response = await getLatestJobForSpecificationService(specificationId, jobTypes);
         let jobMessage = response.data as JobMessage;
         dispatch({
             type: ViewFundingActionTypes.GET_LATESTJOBFORSPECIFICATION,

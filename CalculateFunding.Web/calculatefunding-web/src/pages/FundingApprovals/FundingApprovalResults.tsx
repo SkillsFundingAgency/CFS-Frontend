@@ -35,6 +35,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     const fundingStreamId = match.params.fundingStreamId;
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
+    const jobTypes = "RefreshFundingJob,ApproveFundingJob,PublishProviderFundingJob,ApproveFunding";
 
     const [publishedProviderResults, setPublishedProviderResults] = useState<PublishProviderSearchResultViewModel>({
         facets: [],
@@ -164,7 +165,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             }
         });
 
-        getLatestJobForSpecificationService(specificationId).then((result) => {
+        getLatestJobForSpecificationService(specificationId, jobTypes).then((result) => {
             if (result.status === 200) {
                 setLatestJob(result.data as JobMessage);
             }
