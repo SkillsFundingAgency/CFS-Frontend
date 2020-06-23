@@ -19,10 +19,10 @@ import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {HubConnectionBuilder} from "@aspnet/signalr";
+import {JobMessage} from "../../types/jobMessage";
 
 export function CreateSpecification() {
-
-
     const [fundingStreamData, setFundingStreamData] = useState<string[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<CoreProviderSummary[]>([]);
@@ -37,9 +37,14 @@ export function CreateSpecification() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
+    const [createSpecificationFailOutcome, setCreateSpecificationFailOutcome] = useState<string>("");
+    const [createSpecificationFailed, setCreateSpecificationFailed] = useState<boolean>(false);
     let history = useHistory();
 
     useEffectOnce(() => {
+
+        createHubConnection();
+
         const getStreams = async () => {
             const streamResult = await getFundingStreamsService();
             setFundingStreamData(streamResult.data);
@@ -106,6 +111,7 @@ export function CreateSpecification() {
         if (selectedName !== "" && selectedFundingStream !== "" && selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
+            setCreateSpecificationFailed(false);
             let createSpecificationViewModel: CreateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriod,
@@ -118,20 +124,41 @@ export function CreateSpecification() {
                 const createSpecificationResult = await createSpecificationService(createSpecificationViewModel);
                 return createSpecificationResult;
             };
-
             createSpecification().then((result) => {
-
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
                                         history.push(`/ViewSpecification/${response.id}`);
                 } else {
+                    setCreateSpecificationFailed(true);
                     setIsLoading(false);
                 }
             }).catch(() => {
+                setCreateSpecificationFailed(true);
                 setIsLoading(false);
             });
         } else {
             setFormValid({formSubmitted: true, formValid: false})
+        }
+    }
+
+    async function createHubConnection() {
+        const hubConnect = new HubConnectionBuilder()
+            .withUrl(`/api/notifications`)
+            .build();
+        try {
+            await hubConnect.start();
+
+            hubConnect.on('NotificationEvent', (message: JobMessage) => {
+                if (message.jobType === "CreateSpecificationJob" && message.completionStatus !== "Succeeded") {
+                    setCreateSpecificationFailOutcome(message.outcome);
+                    hubConnect.stop();
+                }
+            });
+
+            await hubConnect.invoke("StartWatchingForAllNotifications");
+
+        } catch (err) {
+            await hubConnect.stop();
         }
     }
 
@@ -148,6 +175,27 @@ export function CreateSpecification() {
                                subTitle={"Please wait whilst we create the specification"}
                                description={"This can take a few minutes"} id={"create-specification"}
                                hidden={!isLoading}/>
+                <div hidden={!createSpecificationFailed}
+                     className="govuk-error-summary"
+                     aria-labelledby="error-summary-title" role="alert"
+                     data-module="govuk-error-summary">
+                    <h2 className="govuk-error-summary__title">
+                        There is a problem
+                    </h2>
+                    <div className="govuk-error-summary__body">
+                        <ul className="govuk-list govuk-error-summary__list">
+                            <li>
+                                <p className="govuk-body">
+                                    Specification failed to create, please try again
+                                </p>
+                            </li>
+                            <li>
+                                {createSpecificationFailOutcome}
+                            </li>
+                            <li>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></li>
+                        </ul>
+                    </div>
+                </div>
                 <fieldset className="govuk-fieldset" id="create-specification-fieldset" hidden={isLoading}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
