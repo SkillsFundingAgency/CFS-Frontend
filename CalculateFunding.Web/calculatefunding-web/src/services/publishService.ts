@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
 import {ActionCreator, Dispatch} from "redux";
 import {ThunkAction} from "redux-thunk";
@@ -8,7 +8,7 @@ import {ViewFundingAction, ViewFundingActionTypes} from "../actions/viewFundingA
 const baseUrl = "/api/publish";
 
 export async function getReleaseTimetableForSpecificationService(specificationId: string) {
-    return axiosInstance(`${baseUrl}/gettimetable/${specificationId}`, {
+    return axios(`${baseUrl}/gettimetable/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ export async function getReleaseTimetableForSpecificationService(specificationId
 }
 
 export async function saveReleaseTimetableForSpecificationService(saveReleaseTimetable: SaveReleaseTimetableViewModel) {
-    return axiosInstance(`${baseUrl}/savetimetable`, {
+    return axios(`${baseUrl}/savetimetable`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -28,7 +28,7 @@ export async function saveReleaseTimetableForSpecificationService(saveReleaseTim
 
 
 export async function refreshFundingService(specificationId: string) {
-    return axiosInstance(`${baseUrl}/refreshfunding/${specificationId}`, {
+    return axios(`${baseUrl}/refreshfunding/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ export async function refreshFundingService(specificationId: string) {
 
 export async function approveFundingService(specificationId: string) {
 
-    return axiosInstance(`${baseUrl}/approvefunding/${specificationId}`, {
+    return axios(`${baseUrl}/approvefunding/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export async function approveFundingService(specificationId: string) {
 };
 
 export async function releaseFundingService(specificationId: string){
-        return axiosInstance(`${baseUrl}/publishfunding/${specificationId}`, {
+        return axios(`${baseUrl}/publishfunding/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

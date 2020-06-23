@@ -1,9 +1,9 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 
 let baseURL = "/api/providerversions";
 
 export async function getProviderByFundingStreamIdService(fundingStreamId:string) {
-    return axiosInstance(`${baseURL}/getbyfundingstream/${fundingStreamId}`, {
+    return axios(`${baseURL}/getbyfundingstream/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type':'application/json'

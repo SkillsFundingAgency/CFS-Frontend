@@ -1,13 +1,13 @@
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import axiosInstance from "../../services/axiosInterceptor";
+import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { getFeatureFlags, FeatureFlagsActionTypes } from "../../actions/FeatureFlagsActions";
 import { IStoreState } from "../../reducers/rootReducer";
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-const fetchMock = new MockAdapter(axiosInstance);
+const fetchMock = new MockAdapter(axios);
 
 describe("featureflagsactions", () => {
   beforeEach(() => {
@@ -303,7 +303,7 @@ const storeWithData: IStoreState = {
     calculation: {
       lastUpdatedDateDisplay: '',
       id: '',
-      lastUpdatedDate: '2020-04-28T09:26:01.094Z',
+      lastUpdatedDate: new Date('2020-04-28T09:26:01.094Z'),
       status: '',
       fundingStreamId: '',
       name: '',
@@ -389,5 +389,29 @@ const storeWithData: IStoreState = {
   },
   featureFlags: {
     templateBuilderVisible: false
-  }
+  },
+  userPermissions: {
+    fundingStreamPermissions: 
+    [{  canAdministerFundingStream: false,
+        canApproveFunding: false,
+        canApproveSpecification: false,
+        canChooseFunding: false,
+        canCreateQaTests: false,
+        canCreateSpecification: false,
+        canDeleteCalculations: false,
+        canDeleteQaTests: false,
+        canDeleteSpecification: false,
+        canEditCalculations: false,
+        canEditQaTests: false,
+        canEditSpecification: false,
+        canMapDatasets: false,
+        canRefreshFunding: false,
+        canReleaseFunding: false,
+        canApproveTemplates: false,
+        canCreateTemplates: false,
+        canDeleteTemplates: false,
+        canEditTemplates: false,
+        fundingStreamId: 'DSG',
+        userId: ''
+    }]}
 };

@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
@@ -35,7 +35,7 @@ export type ViewSpecificationResultsActions =
 
 export const getSpecificationSummary: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationResultsState, null, ViewSpecificationResultsActions>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axiosInstance(`/api/specs/specification-summary-by-id/${specificationId}`, {
+        const response = await axios(`/api/specs/specification-summary-by-id/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

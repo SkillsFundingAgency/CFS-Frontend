@@ -39,6 +39,7 @@ import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {CreateTemplate} from "./pages/Templates/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
+import { initialiseAxios } from './services/axiosInterceptor';
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -49,10 +50,13 @@ const App: React.FunctionComponent = () => {
         dispatch(getUserFundingStreamPermissions());
     }
 
+    
+    initialiseAxios();
+
     useEffect(() => {
         initialise();
     }, []);
-
+    
     return (
         <BrowserRouter basename="/app">
             <Switch>

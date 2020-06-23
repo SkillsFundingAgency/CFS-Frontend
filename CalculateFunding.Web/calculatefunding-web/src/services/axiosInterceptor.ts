@@ -1,19 +1,24 @@
 import axios from "axios";
 import { authProvider } from '../auth/authProvider';
-const configuration = require('../setupConfig');
+import { Config } from '../types/Config';
+const configurationPromise:Promise<Config> = (window as any)['configuration'];
 
-const axiosInstance = axios.create();
+export function initialiseAxios() {
+  configurationPromise.then(response => {
+    let configuration = response;
 
-axiosInstance.interceptors.request.use(async function (config) {
-    if (configuration.handlerEnabled) {
-        const token = await authProvider.getAccessToken();
-        // Do something before request is sent
-        config.headers.Authorization =  'Bearer ' + token.accessToken;
-    }
-    return config;
-  }, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
+    axios.interceptors.request.use(async function (config) {
+        if (configuration.handlerEnabled) {
+            const token = await authProvider(configuration.clientId,
+            configuration.tenantId,
+            configuration.cacheLocation,
+            configuration.scopes).getAccessToken();
+            config.headers.Authorization =  'Bearer ' + token.accessToken;
+        }
+        return config;
+        }, function (error) {
+        // Do something with request error
+        return Promise.reject(error);
+        });
   });
-
-export default axiosInstance;
+} 

@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
@@ -11,7 +11,7 @@ import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationP
 let baseURL = "/api/specs";
 
 export async function getSpecificationSummaryService(specificationId: string) {
-    return axiosInstance(`${baseURL}/specification-summary-by-id/${specificationId}`, {
+    return axios(`${baseURL}/specification-summary-by-id/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ export async function getSpecificationSummaryService(specificationId: string) {
 }
 
 export async function getAdditionalCalculationsForSpecificationService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
-    return axiosInstance(`/api/calculations/getcalculationsforspecification`, {
+    return axios(`/api/calculations/getcalculationsforspecification`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export async function getAdditionalCalculationsForSpecificationService(calculati
 }
 
 export async function getFundingStreamsService() {
-    return axiosInstance(`${baseURL}/fundingstream-id-for-specifications`, {
+    return axios(`${baseURL}/fundingstream-id-for-specifications`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export async function getFundingStreamsService() {
 }
 
 export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId: string) {
-    return axiosInstance(`/api/policy/fundingperiods/${fundingStreamId}`, {
+    return axios(`/api/policy/fundingperiods/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId:
 }
 
 export async function getSpecificationsByFundingPeriodAndStreamIdService(fundingStreamId: string, fundingPeriodId: string) {
-    return axiosInstance(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
+    return axios(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ export async function getAllSpecificationsService(searchRequest: SpecificationSe
     const queryString = require("query-string");
     const stringSearchRequest = queryString.stringify(searchRequest);
 
-    return axiosInstance(`${baseURL}/get-all-specifications/?${stringSearchRequest}`, {
+    return axios(`${baseURL}/get-all-specifications/?${stringSearchRequest}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ export async function changeFundingLineStateService(specificationId: string) {
         publishStatus: PublishStatus.Approved
     };
 
-    return axiosInstance(`${baseURL}/${specificationId}/status`, {
+    return axios(`${baseURL}/${specificationId}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ export async function changeFundingLineStateService(specificationId: string) {
 }
 
 export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel) {
-    return axiosInstance(`${baseURL}/create`, {
+    return axios(`${baseURL}/create`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ export async function createSpecificationService(createSpecificationViewModel: C
 }
 
 export async function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId: string) {
-    return axiosInstance(`${baseURL}/update/${specificationId}`, {
+    return axios(`${baseURL}/update/${specificationId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -103,7 +103,7 @@ export async function updateSpecificationService(updateSpecificationViewModel: U
 }
 
 export async function getDownloadableReportsService(specificationId: string) {
-    return axiosInstance(`${baseURL}/${specificationId}/get-report-metadata/`, {
+    return axios(`${baseURL}/${specificationId}/get-report-metadata/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ export async function getDownloadableReportsService(specificationId: string) {
 }
 
 export async function getProfileVariationPointersService(specificationId: string) {
-    return axiosInstance(`${baseURL}/${specificationId}/profile-variation-pointers`, {
+    return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ export async function getProfileVariationPointersService(specificationId: string
 }
 
 export async  function setProfileVariationPointersService(specificationId:string, profileVariationPointer: ProfileVariationPointer[]) {
-    return axiosInstance(`${baseURL}/${specificationId}/profile-variation-pointers`, {
+    return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -131,7 +131,7 @@ export async  function setProfileVariationPointersService(specificationId:string
 }
 
 export async function getFundingStreamsForSelectedSpecifications() {
-    return axiosInstance('/api/specs/get-fundingstreams-for-selected-specifications', {
+    return axios('/api/specs/get-fundingstreams-for-selected-specifications', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

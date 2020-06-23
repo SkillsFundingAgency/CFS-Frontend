@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 
 let baseURL = "/api/jobs";
 
@@ -12,7 +12,7 @@ export async function getLatestJobForSpecificationService(specificationId: strin
 }
 export async function getLastUpdateJobForSpecificationService(specificationId: string) {
     const jobTypes = "RefreshFundingJob";
-    return axiosInstance(`${baseURL}/${specificationId}/last-updated/${jobTypes}`, {
+    return axios(`${baseURL}/${specificationId}/last-updated/${jobTypes}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Action} from "redux";
 import {FeatureFlag} from "../types/FeatureFlag";
@@ -15,7 +15,7 @@ export interface GetFeatureFlagsAction extends Action<string> {
 
 export const getFeatureFlags: ActionCreator<ThunkAction<Promise<void>, IStoreState, unknown, GetFeatureFlagsAction>> = () => {
     return async dispatch => {
-        const response = await axiosInstance('/api/featureflags', {
+        const response = await axios('/api/featureflags', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

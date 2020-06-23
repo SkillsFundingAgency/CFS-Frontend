@@ -385,5 +385,8 @@ export const fakeInitialState: IStoreState = {
         canApproveTemplates: false,
         fundingStreamId: "DSG",
         userId: ""
-    }]}
+    }]},
+    featureFlags: {
+        templateBuilderVisible: false
+    }
 };

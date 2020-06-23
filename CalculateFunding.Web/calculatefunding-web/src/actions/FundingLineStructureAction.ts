@@ -1,4 +1,4 @@
-import axiosInstance from "../services/axiosInterceptor"
+import axios from "axios"
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
 import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
@@ -36,7 +36,7 @@ export const getFundingLineStructure:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> =
     (specificationId: string, fundingStreamId: string) => {
         return async (dispatch: Dispatch) => {
-            const response = await axiosInstance(`/api/fundingstructures/specifications/${specificationId}/fundingstreams/${fundingStreamId}`, {
+            const response = await axios(`/api/fundingstructures/specifications/${specificationId}/fundingstreams/${fundingStreamId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ export const getFundingLineStructure:
 export const getSpecificationById:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId:string) => {
     return async (dispatch: Dispatch) => {
-        const response = await axiosInstance(`/api/specs/specification-summary-by-id/${specificationId}`, {
+        const response = await axios(`/api/specs/specification-summary-by-id/${specificationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ export const changeFundingLineState:
             publishStatus: PublishStatus.Approved
         };
 
-        const response = await axiosInstance(`api/specs/${specificationId}/status`, {
+        const response = await axios(`api/specs/${specificationId}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

@@ -7,7 +7,7 @@
     {
         public void OnGet()
         {
-            Response.Redirect("/app");
+            Response.Redirect("/app/");
         }
     }
 }
