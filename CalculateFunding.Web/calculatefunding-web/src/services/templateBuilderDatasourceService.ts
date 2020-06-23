@@ -14,9 +14,9 @@ import {
     TemplateCalculation,
     TemplateFundingLine,
     ValueFormatType,
-    TemplateResponse, 
-    TemplateContentUpdateCommand, 
-    CalculationDictionaryItem, 
+    TemplateResponse,
+    TemplateContentUpdateCommand,
+    CalculationDictionaryItem,
     FundingStreamWithPeriodsResponse
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
@@ -166,9 +166,9 @@ export const moveNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIte
         ds.splice(fundingLineKeyIndex, 1);
     }
     else {
-        await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
         const sourceDsDigger = new JSONDigger(sourceFundingLine.value, fundingLineIdField, fundingLineChildrenField);
         await sourceDsDigger.removeNode(draggedItemData.id);
+        await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
     }
 }
 
@@ -537,6 +537,6 @@ export async function publishTemplate(templateId: string, note: string): Promise
     return await axiosInstance(`/api/templates/build/${templateId}/publish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: {templateId, note}
+        data: { templateId, note }
     })
 }

@@ -2,7 +2,7 @@
 import {mount} from "enzyme";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
-import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 import { waitFor } from "@testing-library/react"
 
@@ -55,7 +55,7 @@ export const permissionsState: FundingStreamPermissions[] = [{
 }];
 
 export const setupGetTemplate = function () {
-    jest.mock('../services/templateBuilderDatasourceService', () => ({
+    jest.mock('../../services/templateBuilderDatasourceService', () => ({
         getTemplateById: jest.fn(() => Promise.resolve({
             data: {
                 templateId: "12352346",
@@ -85,7 +85,7 @@ describe("Publish Template page when I don't have approve permissions ", () => {
         setupGetTemplate();
     });
     it("renders a permission status warning", async () => {
-        const { PublishTemplate } = require("../pages/Templates/PublishTemplate");
+        const { PublishTemplate } = require("../../pages/Templates/PublishTemplate");
         const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
     });
@@ -97,7 +97,7 @@ describe("Publish Template page when I have approve permissions ", () => {
         setupGetTemplate();
     });
     it("does not render a permission status warning", async () => {
-        const { PublishTemplate } = require("../pages/Templates/PublishTemplate");
+        const { PublishTemplate } = require("../../pages/Templates/PublishTemplate");
         const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
     });

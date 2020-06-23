@@ -20,8 +20,6 @@ import { SpecificationState } from "../states/SpecificationState";
 import { reduceDatasetState } from "./datasetReducer";
 import { DatasetState } from "../states/DatasetState";
 import { FeatureFlagsState } from "../states/FeatureFlagsState";
-import { ITemplateBuilderState } from "../states/ITemplateBuilderState";
-import { reduceTemplateBuilderState } from "./templateBuilderReducer";
 import { reduceFeatureFlagsState } from "./featureFlagsReducer";
 import { IUserPermissionsState } from "../states/IUserPermissionsState";
 import { reduceUserPermissionsState } from "./userPermissionsReducer";
@@ -37,7 +35,6 @@ import { GetDataSchemaAction } from "../actions/DatasetActions";
 import { GetFeatureFlagsAction } from "../actions/FeatureFlagsActions";
 import { IFundingStreamPermissionsAction } from "../actions/UserPermissionsActions";
 import { ViewSpecificationsActions } from "../actions/ViewSpecificationsActions";
-import { TemplateBuilderAction } from "../actions/TemplateBuilderActions";
 
 export interface IStoreState {
     userState: IUserState,
@@ -51,15 +48,14 @@ export interface IStoreState {
     provider: ProviderState,
     specifications: SpecificationState,
     datasets: DatasetState,
-    featureFlags: FeatureFlagsState,
-    templateBuilder: ITemplateBuilderState
+    featureFlags: FeatureFlagsState
 }
 
 export type Actions = ICreateAccountAction | FundingLineStructureAction |
     ViewFundingAction | ViewSpecificationResultsActions | ViewSpecificationsActions |
     SelectSpecificationActions | ViewCalculationResultsActions |
     ProviderActions | GetAllSpecifications | GetDataSchemaAction | GetFeatureFlagsAction |
-    IFundingStreamPermissionsAction | TemplateBuilderAction;
+    IFundingStreamPermissionsAction;
 
 export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     userState: reduceUserState,
@@ -73,8 +69,7 @@ export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     provider: reduceProvider,
     specifications: reduceSpecificationState,
     datasets: reduceDatasetState,
-    featureFlags: reduceFeatureFlagsState,
-    templateBuilder: reduceTemplateBuilderState
+    featureFlags: reduceFeatureFlagsState
 });
 
 export type AppState = ReturnType<typeof rootReducer>

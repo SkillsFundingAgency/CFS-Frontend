@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime'
 import Adapter from "enzyme-adapter-react-16";
 import 'jest-canvas-mock';
 import MutationObserver from '@sheerun/mutationobserver-shim';
+require('jest-localstorage-mock');
 
 window.MutationObserver = MutationObserver;
 

@@ -43,6 +43,8 @@ import { DateFormatter } from '../../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../../components/Breadcrumbs';
 import { LoadingStatus } from '../../components/LoadingStatus';
 import deepClone from 'lodash/cloneDeep';
+import { useTemplateUndo } from "../../hooks/useTemplateUndo";
+import { useEventListener } from "../../hooks/useEventListener";
 
 enum Mode {
     View = 'view',
@@ -51,18 +53,46 @@ enum Mode {
 
 export function TemplateBuilder() {
     const orgchart = useRef();
+    let { templateId } = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
     const [saveMessage, setSaveMessage] = useState<string>('');
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
+    const [nextId, setNextId] = useState(0);
     const [template, setTemplate] = useState<TemplateResponse>();
     const [mode, setMode] = useState<string>(Mode.Edit);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
-    const [nextId, setNextId] = useState(0);
-    const {canCreateTemplate, canEditTemplate, missingPermissions} = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
-    let { templateId } = useParams();
+    const { canCreateTemplate, canEditTemplate, missingPermissions } = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
+    const {
+        initialiseState,
+        updatePresentState,
+        undo,
+        redo,
+        clearPresentState,
+        clearRedoState,
+        clearUndoState,
+        canUndo,
+        canRedo
+    } = useTemplateUndo(setDS);
+    
+    const keyPressHandler = (e: React.KeyboardEvent) => {
+        if (e.keyCode === 90 && e.ctrlKey) {
+            undo();
+        }
+        if (e.keyCode === 89 && e.ctrlKey) {
+            redo();
+        }
+    }
+    useEventListener('keydown', keyPressHandler);
+
+    useEffectOnce(() => {
+        fetchData();
+        clearPresentState();
+        clearUndoState();
+        clearRedoState();
+    });
 
     useEffect(() => {
         if (canEditTemplate) {
@@ -87,7 +117,7 @@ export function TemplateBuilder() {
                 const templateJson = JSON.parse(templateResponse.templateJson) as Template;
                 if (templateJson && templateJson !== null) {
                     const fundingLines = templateFundingLinesToDatasource(templateJson.fundingTemplate.fundingLines)
-                    setDS(fundingLines);
+                    initialiseState(fundingLines);
                     setNextId(getLastUsedId(templateJson.fundingTemplate.fundingLines) + 1);
                 }
                 else {
@@ -104,9 +134,9 @@ export function TemplateBuilder() {
         }
     };
 
-    useEffectOnce(() => {
-        fetchData();
-    });
+    const update = (ds: FundingLineDictionaryEntry[]) => {
+        updatePresentState(ds);
+    }
 
     const openSideBar = (open: boolean) => {
         setOpenSidebar(open);
@@ -125,7 +155,7 @@ export function TemplateBuilder() {
 
     const updateNode = async (node: FundingLineUpdateModel | CalculationUpdateModel) => {
         await updateDatasource(ds, node);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     }
 
     const handleModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,27 +169,27 @@ export function TemplateBuilder() {
 
     const onClickAdd = async (id: string, newChild: FundingLine | Calculation) => {
         await addNode(ds, id, newChild, incrementNextId);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     }
 
     const onClickDelete = async (id: string) => {
         await removeNode(ds, id);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     }
 
     const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         await cloneNodeDatasource(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     };
 
     const changeHierarchy = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         await moveNode(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     };
 
     const onCloneCalculation = async (targetCalculationId: string, sourceCalculationId: string) => {
         await cloneCalculation(ds, targetCalculationId, sourceCalculationId);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
     }
 
     function showSaveMessageOnce(message: string) {
@@ -168,6 +198,9 @@ export function TemplateBuilder() {
     }
 
     const handleSaveContentClick = async () => {
+        clearUndoState();
+        clearRedoState();
+
         try {
             if (template === undefined) {
                 setIsError(true);
@@ -217,7 +250,15 @@ export function TemplateBuilder() {
         };
 
         ds.push(fundingLineEntry);
-        setDS(deepClone(ds));
+        update((deepClone(ds)));
+    }
+
+    const handleUndo = () => {
+        undo();
+    }
+
+    const handleRedo = () => {
+        redo();
     }
 
     return (
@@ -276,8 +317,20 @@ export function TemplateBuilder() {
                                             </div>
                                         </div>}
                                     {mode === Mode.Edit && canEditTemplate &&
-                                        <button className="govuk-button govuk-!-margin-right-2 " data-testid='add'
-                                            onClick={handleAddFundingLineClick}>Add new funding line</button>}
+                                        <>
+                                            <button className="govuk-button govuk-!-margin-right-1" data-testid='add'
+                                                onClick={handleAddFundingLineClick}>
+                                                Add new funding line
+                                                </button>
+                                            <button className="govuk-button govuk-button--secondary govuk-!-margin-right-1 " data-testid='undo'
+                                                onClick={handleUndo} disabled={!canUndo}>
+                                                Undo
+                                            </button>
+                                            <button className="govuk-button govuk-button--secondary" data-testid='redo'
+                                                onClick={handleRedo} disabled={!canRedo}>
+                                                Redo
+                                            </button>
+                                        </>}
                                 </div>
                             </div>
                         </div>

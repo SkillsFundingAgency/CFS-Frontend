@@ -9,7 +9,6 @@ import {SpecificationState} from "./SpecificationState";
 import {DatasetState} from "./DatasetState";
 import {IUserPermissionsState} from "./IUserPermissionsState";
 import {FeatureFlagsState} from "./FeatureFlagsState";
-import {ITemplateBuilderState} from "./ITemplateBuilderState";
 
 export interface AppState {
     selectSpecification: SelectSpecificationState,
@@ -22,6 +21,5 @@ export interface AppState {
     provider: ProviderState,
     specifications: SpecificationState,
     datasets: DatasetState,
-    featureFlags: FeatureFlagsState,
-    templateBuilderState: ITemplateBuilderState
+    featureFlags: FeatureFlagsState
 }
