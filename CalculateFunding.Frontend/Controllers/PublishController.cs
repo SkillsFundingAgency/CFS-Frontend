@@ -118,12 +118,26 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<JobCreationResponse> result =
                 await _publishingApiClient.ApproveFundingForSpecification(specificationId);
 
-            if (result.Content.JobId != null)
+            
+            if (result.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(result.Content.JobId);
+                if (result.Content?.JobId != null)
+                {
+                    return new OkObjectResult(result.Content.JobId);
+                }
             }
 
-            return BadRequest(-1);
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            if (result.StatusCode == HttpStatusCode.PreconditionFailed)
+            {
+                return new PreconditionFailedResult("Preconditions for this approval have not been met.");
+            }
+
+            return new InternalServerErrorResult("There was an error approving funding for this specification.");
         }
 
         [Route("api/publish/publishfunding/{specificationId}")]
