@@ -238,7 +238,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
                                                 {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
                                                         <div className="attachment__thumbnail">
-                                                            <a href={`api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
+                                                            <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
                                                                aria-hidden="true">
                                                                 <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
@@ -278,7 +278,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                 {downloadableReports.filter(dr => dr.category === "History").map(dlr =>
                                                     <div>
                                                         <div className="attachment__thumbnail">
-                                                            <a href={`api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
+                                                            <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
                                                                aria-hidden="true">
                                                             <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
@@ -301,7 +301,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__details">
                                                             <h4 className="govuk-heading-s">
                                                                 <a className="govuk-link" target="_self"
-                                                                   href={`api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
+                                                                   href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
                                                             </h4>
                                                             <p className="govuk-body-s">
                                                                 <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
