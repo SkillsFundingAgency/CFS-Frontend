@@ -1,4 +1,4 @@
-window['configuration'] = fetch('./config.json', {
+window['configuration'] = fetch('/app/config.json', {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',
