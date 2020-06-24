@@ -41,6 +41,13 @@ export enum ValueFormatType {
   String = "String"
 }
 
+export enum TemplatePermissions {
+  Create = "create",
+  Edit = "edit",
+  Delete = "delete",
+  Approve = "approve"
+}
+
 export interface GroupRate {
   numerator: number,
   denominator: number

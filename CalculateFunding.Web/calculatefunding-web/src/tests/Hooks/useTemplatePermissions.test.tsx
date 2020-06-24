@@ -150,3 +150,39 @@ it("calculates correctly when user has permissions across multiple funding strea
     expect(result.current.canDeleteTemplate).toBeFalsy();
     expect(result.current.canApproveTemplate).toBeFalsy();
 });
+
+it("calculates funding stream permissions correctly", () => {
+    const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "delete", "approve"]));
+    expect(result.current.fundingStreamPermissions).toEqual([
+        {
+            "fundingStreamId": "DSG",
+            "permission": "approve"
+        },
+        {
+            "fundingStreamId": "DSG",
+            "permission": "delete"
+        },
+        {
+            "fundingStreamId": "1619",
+            "permission": "edit"
+        },
+    ]);
+});
+
+it("calculates funding stream permissions correctly (regardless of required permissions)", () => {
+    const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "delete"]));
+    expect(result.current.fundingStreamPermissions).toEqual([
+        {
+            "fundingStreamId": "DSG",
+            "permission": "approve"
+        },
+        {
+            "fundingStreamId": "DSG",
+            "permission": "delete"
+        },
+        {
+            "fundingStreamId": "1619",
+            "permission": "edit"
+        },
+    ]);
+});

@@ -81,6 +81,7 @@
   },
   "devDependencies": {
     "@sheerun/mutationobserver-shim": "^0.3.3",
+    "@testing-library/jest-dom": "^5.10.1",
     "@testing-library/react": "^10.2.1",
     "jest-canvas-mock": "^2.2.0",
     "jest-junit": "^10.0.0",

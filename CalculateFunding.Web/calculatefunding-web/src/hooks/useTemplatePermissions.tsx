@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { AppState } from "../states/AppState";
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
+import { TemplatePermissions } from "../types/TemplateBuilderDefinitions";
 
 export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
     let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
@@ -19,7 +20,7 @@ export const useTemplatePermissions = (requiredPermissions: string[], requiredFu
             return false;
         }
         return permissions.some(p => p.canEditTemplates &&
-        (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
+            (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId)));
     }, [permissions, requiredFundingStreams]);
 
     const canDeleteTemplate = useMemo(() => {
@@ -40,26 +41,50 @@ export const useTemplatePermissions = (requiredPermissions: string[], requiredFu
 
     const missingPermissions = useMemo(() => {
         let missing: string[] = [];
-        if (!canEditTemplate && requiredPermissions.includes("edit")) {
-            missing.push("edit");
+        if (!canEditTemplate && requiredPermissions.includes(TemplatePermissions.Edit)) {
+            missing.push(TemplatePermissions.Edit);
         }
-        if (!canCreateTemplate && requiredPermissions.includes("create")) {
-            missing.push("create");
+        if (!canCreateTemplate && requiredPermissions.includes(TemplatePermissions.Create)) {
+            missing.push(TemplatePermissions.Create);
         }
-        if (!canDeleteTemplate && requiredPermissions.includes("delete")) {
-            missing.push("delete");
+        if (!canDeleteTemplate && requiredPermissions.includes(TemplatePermissions.Delete)) {
+            missing.push(TemplatePermissions.Delete);
         }
-        if (!canApproveTemplate && requiredPermissions.includes("approve")) {
-            missing.push("approve");
+        if (!canApproveTemplate && requiredPermissions.includes(TemplatePermissions.Approve)) {
+            missing.push(TemplatePermissions.Approve);
         }
         return missing;
     }, [canEditTemplate, canCreateTemplate, canDeleteTemplate, canApproveTemplate, requiredPermissions]);
+
+    const fundingStreamPermissions = useMemo(() => {
+        let permissibleFundingStreams: { "fundingStreamId": string, "permission": string }[] = permissions.map(p => {
+            return [{
+                "fundingStreamId": p.fundingStreamId,
+                "permission": p.canCreateTemplates ? TemplatePermissions.Create : ""
+            },
+            {
+                "fundingStreamId": p.fundingStreamId,
+                "permission": p.canEditTemplates ? TemplatePermissions.Edit : ""
+            },
+            {
+                "fundingStreamId": p.fundingStreamId,
+                "permission": p.canApproveTemplates ? TemplatePermissions.Approve : ""
+            },
+            {
+                "fundingStreamId": p.fundingStreamId,
+                "permission": p.canDeleteTemplates ? TemplatePermissions.Delete : ""
+            }].filter(f => f.permission.length > 0);
+        }).flat();
+
+        return permissibleFundingStreams;
+    }, [permissions, requiredPermissions, requiredFundingStreams])
 
     return {
         canCreateTemplate,
         canEditTemplate,
         canDeleteTemplate,
         canApproveTemplate,
-        missingPermissions
+        missingPermissions,
+        fundingStreamPermissions
     }
 }

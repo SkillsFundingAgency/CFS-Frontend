@@ -1,12 +1,14 @@
 ﻿import React from 'react';
-import {CreateTemplate} from "../../pages/Templates/CreateTemplate";
-import {mount} from "enzyme";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
-import {MemoryRouter} from "react-router";
-/*import axios from 'axios';
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;*/
+import { waitFor, screen, render } from "@testing-library/react";
+import '@testing-library/jest-dom/extend-expect';
+import { MemoryRouter } from 'react-router-dom';
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
+import { CreateTemplate } from '../../pages/Templates/CreateTemplate';
+
+const fetchMock = new MockAdapter(axios);
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
@@ -57,16 +59,31 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true
 }];
 
-
 describe("Create Template page when I have no create permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(noPermissionsState);
+        fetchMock.onGet("/api/templates/build/available-stream-periods").reply(200, [{
+            "fundingStream": {
+                "id": "DSG",
+                "name": "Dedicated Schools Grant"
+            },
+            "fundingPeriods": [{
+                "id": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61",
+                "name": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61 test period"
+            }]
+        }]);
     });
 
-    it("renders a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1);
+    afterEach(() => {
+        fetchMock.reset();
+    })
+
+    it("renders a permission status warning", async () => {
+        const { getByTestId } = render(<MemoryRouter><CreateTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByTestId("permission-alert-message")).toBeInTheDocument();
+        });
     });
 });
 
@@ -74,11 +91,39 @@ describe("Create Template page when I have create permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
+        fetchMock.onGet("/api/templates/build/available-stream-periods").reply(200, [{
+            "fundingStream": {
+                "id": "DSG",
+                "name": "Dedicated Schools Grant"
+            },
+            "fundingPeriods": [{
+                "id": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61",
+                "name": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61 test period"
+            }]
+        }]);
     });
 
-    it("does not render a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
+    afterEach(() => {
+        fetchMock.reset();
+    });
+
+    it("does not render a permission status warning", async () => {
+        render(<MemoryRouter><CreateTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(screen.queryByText("You do not have permissions to perform the following actions")).not.toBeInTheDocument();
+        });
+    });
+
+    it("does render funding streams drop down list with correct options", async () => {
+        const { getByTestId, container } = render(<MemoryRouter><CreateTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByTestId("fundingPeriodId")).toBeInTheDocument();
+            expect(getByTestId("fundingStreamId")).toBeInTheDocument();
+            expect(screen.queryByText("There is a problem")).not.toBeInTheDocument();
+            expect(container.querySelector('option')).toBeInTheDocument();
+            expect(screen.getByDisplayValue("Dedicated Schools Grant")).toBeInTheDocument();
+            expect(screen.getByDisplayValue("FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61 test period")).toBeInTheDocument();
+        });
     });
 });
 
@@ -86,11 +131,21 @@ describe("Create Template page when no funding streams exist", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
+        fetchMock.onGet("/api/templates/build/available-stream-periods").reply(200, []);
     });
 
-    it("does not render a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
+    afterEach(() => {
+        fetchMock.reset();
+    });
+
+    it("does render funding streams drop down list", async () => {
+        const { getByTestId, container } = render(<MemoryRouter><CreateTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByTestId("fundingStreamId")).toBeInTheDocument();
+            expect(screen.queryByTestId("fundingPeriodId")).not.toBeInTheDocument();
+            expect(screen.queryByText("There is a problem")).toBeInTheDocument();
+            expect(container.querySelector('option')).not.toBeInTheDocument();
+        });
     });
 });
 
@@ -98,35 +153,29 @@ describe("Create Template page when a funding stream exists but I don't have per
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
+        fetchMock.onGet("/api/templates/build/available-stream-periods").reply(200, [{
+            "fundingStream": {
+                "id": "PSG",
+                "name": "PE & Sports Grant"
+            },
+            "fundingPeriods": [{
+                "id": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61",
+                "name": "FY-55aaae78-022d-4c3a-b9b7-4e5ccd741b61 test period"
+            }]
+        }]);
     });
 
-    it("does render funding streams drop down list", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-        expect(wrapper.find("#fundingStreamId")).toHaveLength(1);
+    afterEach(() => {
+        fetchMock.reset();
     });
 
-    it("does not render any funding streams in drop down list", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-
-        let actual = wrapper.find("#fundingStreamId");
-
-        expect(actual.find('option').length).toBe(0);
-    });
-});
-
-describe("Create Template page when a funding stream exists for which I have permissions", () => {
-    beforeEach(() => {
-        useSelectorSpy.mockClear();
-        useSelectorSpy.mockReturnValue(permissionsState);
-        /*mockedAxios.get.mockRejectedValue('Network error: Something went wrong');
-        mockedAxios.get.mockResolvedValue({ data: {
-                fundingStream: {id: "XXX", name: "XXXXXX"},
-                fundingPeriods: [{id: "2021", name: "2020-2021"}]}
-        });*/
-    });
-
-    it("does render funding streams drop down list", () => {
-        const wrapper = mount(<MemoryRouter><CreateTemplate /></MemoryRouter>);
-        expect(wrapper.find("#fundingStreamId")).toHaveLength(1);
+    it("does render funding streams drop down list but with no options", async () => {
+        const { getByTestId, getByText, container } = render(<MemoryRouter><CreateTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByText("There is a problem")).toBeInTheDocument();
+            expect(getByTestId("fundingStreamId")).toBeInTheDocument();
+            expect(screen.queryByTestId("fundingPeriodId")).not.toBeInTheDocument();
+            expect(container.querySelector('option')).not.toBeInTheDocument();
+        });
     });
 });

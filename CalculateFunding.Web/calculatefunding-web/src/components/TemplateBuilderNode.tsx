@@ -35,7 +35,7 @@ function TemplateBuilderNode({ nodeData, addNode, openSideBar, onClickNode, edit
       name: `Calculation ${nextId}`,
       aggregationType: AggregrationType.None,
       formulaText: "Enter formula text",
-      valueFormat: ValueFormatType.Number,
+      valueFormat: ValueFormatType.Currency,
       allowedEnumTypeValues: undefined,
       groupRate: undefined,
       percentageChangeBetweenAandB: undefined
