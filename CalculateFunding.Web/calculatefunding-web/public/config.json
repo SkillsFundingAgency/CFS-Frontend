@@ -1,7 +1,7 @@
 {
     "handlerEnabled": false,
-    "tenantId": "tenantId",
-    "clientId": "clientId",
-    "cacheLocation": "sessionStorage",
-    "scopes": ["scope"]
+    "loginType": "aad",
+    "baseUrl": "",
+    "debugOn": true,
+    "tracingOn": true
 }

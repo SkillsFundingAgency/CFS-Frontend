@@ -38,11 +38,6 @@ namespace CalculateFunding.Frontend.Modules
                     opts.DefaultAuthenticateScheme = AzureAuthenticationDefaults.AuthenticationScheme;
                     opts.DefaultChallengeScheme = AzureAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = $"https://login.windows.net/{azureAdOptions.TenantId}/";
-                    options.Audience = $"api://{azureAdOptions.ClientId}";
-                })
                 .AddAzureAuthentication();
 
                 services.AddAuthorization();

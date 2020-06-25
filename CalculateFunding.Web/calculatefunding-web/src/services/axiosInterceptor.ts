@@ -1,5 +1,5 @@
 import axios from "axios";
-import { authProvider } from '../auth/authProvider';
+import { LoginService } from '../auth/authProvider';
 import { Config } from '../types/Config';
 import { AuthenticationParameters } from "msal";
 const configurationPromise:Promise<Config> = (window as any)['configuration'];
@@ -7,20 +7,40 @@ const configurationPromise:Promise<Config> = (window as any)['configuration'];
 export function initialiseAxios() {
   configurationPromise.then(response => {
     let configuration = response;
+    let loginService:LoginService | null;
 
-    axios.interceptors.request.use(async function (config) {
-        if (configuration.handlerEnabled) {
-            const authParameters:AuthenticationParameters = { scopes:configuration.scopes };
-            const token = await authProvider(configuration.clientId,
-            configuration.tenantId,
-            configuration.cacheLocation,
-            configuration.scopes).getAccessToken(authParameters);
-            config.headers.Authorization =  'Bearer ' + token.accessToken;
+    if (configuration.handlerEnabled)
+    {
+      loginService = new LoginService(configuration.baseUrl);       
+    }
+                        
+    axios.interceptors.request.use(async function (config) 
+    {
+      if (loginService) 
+      {
+        if (loginService.userTokenInfo)
+        {
+          config.headers.Authorization = `Bearer ${loginService.userTokenInfo.access_token}`;
         }
-        return config;
-        }, function (error) {
-        // Do something with request error
-        return Promise.reject(error);
-        });
+        else
+        {
+          return loginService.login(configuration.loginType).then(() => 
+          {
+            if (loginService && loginService.userTokenInfo)
+            {
+              config.headers.Authorzation = `Bearer ${loginService.userTokenInfo.access_token}`;
+            }
+
+            return Promise.resolve(config);
+          });
+        }
+      }
+
+      return config;
+    }, 
+    error => {
+      // Do something with request error
+      return Promise.reject(error);
+    });
   });
 } 
