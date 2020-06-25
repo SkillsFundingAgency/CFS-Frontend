@@ -142,18 +142,15 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         canApproveFunding: false,
         canAdministerFundingStream: false
     });
- const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
+    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
+
+    useEffect(() => {
+        getPublishedProviderResults(searchCriteria);
+    }, [searchCriteria]);
 
     useEffectOnce(() => {
         getUserPermissions();
-        getPublishedProviderResultsService(initialSearch).then((result) => {
-            const response = result.data as PublishProviderSearchResultViewModel;
-            setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
-            setFilterProviderType(response.facets[0].facetValues);
-            setFilterLocalAuthority(response.facets[1].facetValues)
-            setFilterStatus(response.facets[2].facetValues)
-            setTableIsLoading(false);
-        });
+        getPublishedProviderResults(initialSearch);
 
         getSpecificationSummaryService(specificationId).then((result) => {
             setSpecificationSummary(result.data as SpecificationSummary);
@@ -170,7 +167,18 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 setLatestJob(result.data as JobMessage);
             }
         });
-    })
+    });
+
+    function getPublishedProviderResults(searchRequestViewModel: SearchRequestViewModel) {
+        getPublishedProviderResultsService(searchRequestViewModel).then((result) => {
+            const response = result.data as PublishProviderSearchResultViewModel;
+            setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
+            setFilterProviderType(response.facets[0].facetValues);
+            setFilterLocalAuthority(response.facets[1].facetValues)
+            setFilterStatus(response.facets[2].facetValues)
+            setTableIsLoading(false);
+        });
+    }
 
     function pageChange(pageNumber: string) {
         setSearchCriteria(prevState => {
@@ -290,7 +298,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         setJobState({jobStatus: status, jobMessage: message, jobSuggestion: suggestion})
     };
 
-    function dismissLoader(){
+    function dismissLoader() {
         setPageState("IDLE");
     };
 
@@ -299,17 +307,17 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             const specificationPermissions = result.data as EffectiveSpecificationPermission;
             setUserPermissions(specificationPermissions);
             if (!specificationPermissions.canApproveFunding) {
-                if(!missingPermissions.find(x => x == "approve")) {
+                if (!missingPermissions.find(x => x == "approve")) {
                     setMissingPermissions(prevState => [...prevState, "approve"]);
                 }
             }
             if (!specificationPermissions.canReleaseFunding) {
-                if(!missingPermissions.find(x => x == "release")) {
+                if (!missingPermissions.find(x => x == "release")) {
                     setMissingPermissions(prevState => [...prevState, "release"]);
                 }
             }
             if (!specificationPermissions.canRefreshFunding) {
-                if(!missingPermissions.find(x => x == "refresh")) {
+                if (!missingPermissions.find(x => x == "refresh")) {
                     setMissingPermissions(prevState => [...prevState, "refresh"]);
                 }
             }
@@ -325,11 +333,12 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 <Breadcrumb name={"Select specification"} url={"/ViewFunding"}/>
                 <Breadcrumb name={"Funding approval results"}/>
             </Breadcrumbs>
-            <PermissionStatus requiredPermissions={missingPermissions} />
+            <PermissionStatus requiredPermissions={missingPermissions}/>
             <LoadingStatus title={`${latestJob.jobType} of funding in progress`}
                            subTitle={"Please wait, this could take several minutes"}
                            hidden={latestJob.runningStatus === 'Completed' || latestJob.runningStatus === ''}/>
-            <div className="govuk-grid-row govuk-!-margin-bottom-5" hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-bottom-5"
+                 hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-xl">Specification</span>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{specificationSummary.name}</h1>
@@ -339,8 +348,9 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     <h1 className="govuk-heading-m">{specificationSummary.fundingStreams[0].name}</h1>
                 </div>
             </div>
-            <div className="govuk-grid-row " hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '') ||
-            (publishedProviderResults.providers == null || publishedProviderResults.providers.length === 0)}>
+            <div className="govuk-grid-row "
+                 hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '') ||
+                 (publishedProviderResults.providers == null || publishedProviderResults.providers.length === 0)}>
                 <div className="govuk-grid-column-one-third">
                     <CollapsiblePanel title={"Search"} expanded={true}>
                         <span className="govuk-body-s">Search by provider name, UPIN, UKPRN, URN, or establishment number</span>
@@ -419,7 +429,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                             <th className="govuk-table__header govuk-body">Status</th>
                             <th className="govuk-table__header govuk-body">
                                 Funding total<br/>
-                                <FormattedNumber value={publishedProviderResults.totalFundingAmount} type={NumberType.FormattedMoney}/><br/>
+                                <FormattedNumber value={publishedProviderResults.totalFundingAmount}
+                                                 type={NumberType.FormattedMoney}/><br/>
                                 <p className="govuk-body-s">of filtered providers</p>
                             </th>
                         </tr>
@@ -442,9 +453,13 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                         </tbody>
                     </table>
                     <BackToTop id="top"/>
-                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation" aria-label="Pagination">
-                        <div className="pagination__summary">Showing {publishedProviderResults.startItemNumber} - {publishedProviderResults.endItemNumber} of {publishedProviderResults.totalResults} results</div>
-                        <Pagination callback={pageChange} currentPage={publishedProviderResults.pagerState.currentPage} lastPage={publishedProviderResults.pagerState.lastPage}/>
+                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                         aria-label="Pagination">
+                        <div
+                            className="pagination__summary">Showing {publishedProviderResults.startItemNumber} - {publishedProviderResults.endItemNumber} of {publishedProviderResults.totalResults} results
+                        </div>
+                        <Pagination callback={pageChange} currentPage={publishedProviderResults.pagerState.currentPage}
+                                    lastPage={publishedProviderResults.pagerState.lastPage}/>
                     </nav>
                     <div className="right-align">
                         <button className="govuk-button govuk-!-margin-right-1"
@@ -464,7 +479,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     </div>
                 </div>
             </div>
-            <div className="govuk-grid-row" hidden={(publishedProviderResults.providers != null && publishedProviderResults.providers.length > 0) || tableIsLoading}>
+            <div className="govuk-grid-row"
+                 hidden={(publishedProviderResults.providers != null && publishedProviderResults.providers.length > 0) || tableIsLoading}>
                 <div className="govuk-grid-column-full">
                     <div className="govuk-warning-text">
                         <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -476,7 +492,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     </div>
                 </div>
             </div>
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "REFRESH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
+                 hidden={pageState !== "REFRESH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <BackButton name="Back" callback={dismissLoader}/>
                 <NotificationSignal jobType="RefreshFundingJob"
                                     jobId={pageState === "REFRESH_FUNDING" ? specificationId : ""}
@@ -484,7 +501,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                     callback={refreshProviderResults}/>
             </div>
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "APPROVE_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
+                 hidden={pageState !== "APPROVE_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
                         <BackButton name="Back" callback={dismissLoader}/>
@@ -568,7 +586,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 </div>
             </div>
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "PUBLISH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
+                 hidden={pageState !== "PUBLISH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
                         <BackButton name="Back" callback={dismissLoader}/>
@@ -652,7 +671,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 </div>
             </div>
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "APPROVE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
+                 hidden={pageState !== "APPROVE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <BackButton name="Back" callback={dismissLoader}/>
                 <NotificationSignal jobType="ApproveFunding"
                                     jobId={pageState === "APPROVE_FUNDING_JOB" ? specificationId : ""}
@@ -660,7 +680,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                     callback={refreshProviderResults}/>
             </div>
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1" hidden={pageState !== "RELEASE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
+                 hidden={pageState !== "RELEASE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
                 <BackButton name="Back" callback={dismissLoader}/>
                 <NotificationSignal jobType="PublishProviderFundingJob"
                                     jobId={pageState === "RELEASE_FUNDING_JOB" ? specificationId : ""}
