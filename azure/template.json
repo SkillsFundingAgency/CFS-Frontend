@@ -351,9 +351,9 @@
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
-                "unauthenticatedClientAction": 0,
+                "unauthenticatedClientAction": "AllowAnonymous",
                 "tokenStoreEnabled": true,
-                "defaultProvider": 0,
+                "defaultProvider": "AzureActiveDirectory",
                 "clientId": "[parameters('aadClientId')]",
                 "clientSecret": "[parameters('aadClientSecret')]",
                 "issuer": "[parameters('aadAuthIssuer')]",
