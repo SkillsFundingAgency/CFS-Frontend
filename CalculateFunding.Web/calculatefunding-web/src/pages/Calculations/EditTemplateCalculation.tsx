@@ -59,7 +59,20 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
         compileRun: false,
         previewResponse: {
             compilerOutput: {
-                compilerMessages: [],
+                compilerMessages: [{
+                    location: {
+                        endChar: 0,
+                        endLine: 0,
+                        owner: {
+                            id: "",
+                            name: ""
+                        },
+                        startChar: 0,
+                        startLine: 0
+                    },
+                    message: "",
+                    severity: ""
+                }],
                 sourceFiles: [],
                 success: false
             }
@@ -168,12 +181,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     }
 
     function buildCalculation() {
-        const compileCode = async () => {
-            const compileCodeResult = await compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode);
-            return compileCodeResult;
-        };
-
-        compileCode().then((result) => {
+        compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode).then((result) => {
             if (result.status === 200) {
                 let response = result.data as PreviewResponse;
                 setTemplateCalculationBuildSuccess(prevState => {
@@ -196,7 +204,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 });
                 setErrorMessage((result.data as SourceFile).sourceCode);
             }
-        }).catch(err => {
+        }).catch(() => {
             setTemplateCalculationBuildSuccess(prevState => {
                 return {...prevState, compileRun: true, buildSuccess: false}
             });
@@ -298,10 +306,29 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                             There was a compilation error
                         </h2>
                         <div className="govuk-error-summary__body">
+                            <table className={"govuk-table"}>
+                                <thead className={"govuk-table__head"}>
+                                <tr className={"govuk-table__row"}>
+                                    <th className="govuk-table__header">Error message</th>
+                                    <th className="govuk-table__header">Start line</th>
+                                    <th className="govuk-table__header">Start char</th>
+                                    <th className="govuk-table__header">End line</th>
+                                    <th className="govuk-table__header">End char</th>
+                                </tr>
+                                </thead>
+                                {templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
+                                    <tr key={index} className={"govuk-table__row"}>
+                                        <td className="govuk-table__cell">{cm.message}</td>
+                                        <td className="govuk-table__cell">{cm.location.startLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.startChar}</td>
+                                        <td className="govuk-table__cell">{cm.location.endLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.endChar}</td>
+                                    </tr>
+                                )}
+                            </table>
                             <ul className="govuk-error-summary__list">
-                                {templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map(cm =>
-                                    <li>{cm.message}</li>)}
                                 <li hidden={errorMessage.length === 0}>{errorMessage}</li>
+
                             </ul>
                         </div>
                     </div>

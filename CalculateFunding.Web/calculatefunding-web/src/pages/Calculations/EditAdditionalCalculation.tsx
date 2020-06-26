@@ -5,10 +5,10 @@ import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import { CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import { compileCalculationPreviewService, getCalculationByIdService, updateAdditionalCalculationService } from "../../services/calculationService";
+import {CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {compileCalculationPreviewService, getCalculationByIdService, updateAdditionalCalculationService} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
-import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
+import {CompilerMessage, CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
@@ -42,13 +42,29 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
-    const initialBuildSuccess = {
+    const initialBuildSuccess: CompilerOutputViewModel = {
         buildSuccess: false,
         compileRun: false,
         previewResponse: {
             compilerOutput: {
-                compilerMessages: [],
-                sourceFiles: [],
+                compilerMessages: [{
+                    location: {
+                        endChar: 0,
+                        endLine: 0,
+                        owner: {
+                            id: "",
+                            name: ""
+                        },
+                        startChar: 0,
+                        startLine: 0
+                    },
+                    message: "",
+                    severity: ""
+                }],
+                sourceFiles: [{
+                    fileName: "",
+                    sourceCode: ""
+                }],
                 success: false
             }
         }
@@ -58,6 +74,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [nameErrorMessage, setNameErrorMessage] = useState("")
+
     let history = useHistory();
 
     useEffectOnce(() => {
@@ -125,12 +142,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     }
 
     function buildCalculation() {
-        const compileCode = async () => {
-            const compileCodeResult = await compileCalculationPreviewService(specificationId, calculationId, additionalCalculationSourceCode);
-            return compileCodeResult;
-        };
-
-        compileCode().then((result) => {
+        compileCalculationPreviewService(specificationId, calculationId, additionalCalculationSourceCode).then((result) => {
             if (result.status === 200) {
                 let response = result.data as PreviewResponse;
                 setAdditionalCalculationBuildSuccess(prevState => {
@@ -154,7 +166,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
                 setErrorMessage((result.data as SourceFile).sourceCode);
             }
-        }).catch(err => {
+        }).catch(() => {
             setAdditionalCalculationBuildSuccess(prevState => {
                 return {...prevState, compileRun: true, buildSuccess: false}
             });
@@ -173,9 +185,9 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
                 <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
-                <Breadcrumb name={"Edit additional calculation"} />
+                <Breadcrumb name={"Edit additional calculation"}/>
             </Breadcrumbs>
-            <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"} />
+            <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"}/>
             <fieldset className="govuk-fieldset" hidden={isLoading}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading">
@@ -252,10 +264,29 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                             There was a compilation error
                         </h2>
                         <div className="govuk-error-summary__body">
+                            <table className={"govuk-table"}>
+                                <thead className={"govuk-table__head"}>
+                                <tr className={"govuk-table__row"}>
+                                    <th className="govuk-table__header">Error message</th>
+                                    <th className="govuk-table__header">Start line</th>
+                                    <th className="govuk-table__header">Start char</th>
+                                    <th className="govuk-table__header">End line</th>
+                                    <th className="govuk-table__header">End char</th>
+                                </tr>
+                                </thead>
+                                {additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
+                                    <tr key={index} className={"govuk-table__row"}>
+                                        <td className="govuk-table__cell">{cm.message}</td>
+                                        <td className="govuk-table__cell">{cm.location.startLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.startChar}</td>
+                                        <td className="govuk-table__cell">{cm.location.endLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.endChar}</td>
+                                    </tr>
+                                )}
+                            </table>
                             <ul className="govuk-error-summary__list">
-                                {additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map(cm =>
-                                    <li>{cm.message}</li>)}
                                 <li hidden={errorMessage.length === 0}>{errorMessage}</li>
+
                             </ul>
                         </div>
                     </div>
@@ -266,7 +297,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     Save and continue
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
-                   data-module="govuk-button">
+                      data-module="govuk-button">
                     Cancel
                 </Link>
             </fieldset>

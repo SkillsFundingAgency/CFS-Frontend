@@ -1,14 +1,11 @@
-import {Calculation} from "../CalculationSummary";
-
 export interface PreviewResponse {
-   // calculation: Calculation,
     compilerOutput: CompilerOutput
 }
 
-export interface CompilerOutputViewModel{
- buildSuccess: boolean;
- compileRun: boolean;
- previewResponse: PreviewResponse
+export interface CompilerOutputViewModel {
+    buildSuccess: boolean;
+    compileRun: boolean;
+    previewResponse: PreviewResponse
 }
 
 export interface CompilerMessage {
@@ -26,4 +23,15 @@ export interface CompilerOutput {
     success: boolean;
     compilerMessages: CompilerMessage[];
     sourceFiles: SourceFile[];
+}
+
+export interface Location {
+    startChar: number;
+    endChar: number;
+    startLine: number;
+    endLine: number;
+    owner: {
+        id: string;
+        name: string;
+    }
 }
