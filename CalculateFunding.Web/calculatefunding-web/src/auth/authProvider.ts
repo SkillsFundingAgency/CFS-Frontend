@@ -58,12 +58,14 @@ export class LoginService {
 
     refresh = (loginType: string): Promise<string> => {
       return new Promise((resolve, reject) => {
+          if(this.userTokenInfo)
+          {
             axios.get<IdentityTokenInfo[]>(
                 `${this.baseUrl}/.auth/refresh`, 
                 {
                     method: 'GET',
                     headers: {
-                        'X-ZUMO-AUTH': this.azureServiceClient.currentUser.mobileServiceAuthenticationToken
+                        'X-ZUMO-AUTH': this.userTokenInfo.access_token
                     }
                 }
             ).then(response => {
@@ -85,6 +87,16 @@ export class LoginService {
                   reject("Refresh failed.");
                 });
             });
+          }
+          else
+          {
+            this.login(loginType).then((user:string) => {
+              resolve(user);
+            })
+            .catch(error => {
+              reject("Refresh failed.");
+            });
+          }
       });
     }
 
