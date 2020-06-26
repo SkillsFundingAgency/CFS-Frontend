@@ -170,13 +170,14 @@ export class LoginService {
             this.azureServiceClient.login(loginType).done(
                 (results: { userId: string | PromiseLike<string> | undefined; }) => {
                 resolve(results.userId);
+                let authToken:string = this.azureServiceClient.currentUser.mobileServiceAuthenticationToken;
 
                 fetch(
                     `${this.baseUrl}/.auth/me`, 
                     {
                         method: 'GET',
                         headers: {
-                            'X-ZUMO-AUTH': this.azureServiceClient.currentUser.mobileServiceAuthenticationToken
+                            'X-ZUMO-AUTH': authToken
                         }
                     }
                 )
@@ -187,7 +188,7 @@ export class LoginService {
                     this.userIdentity = identities[0];
 
                     // Set the auth token here so we can refresh the token if required
-                    this.userIdentity.auth_token = this.azureServiceClient.currentUser.mobileServiceAuthenticationToken;
+                    this.userIdentity.auth_token = authToken;
                     
                      // Write out userIdentity to local storage
                      localStorage.setItem( this.storageTokenKey, JSON.stringify(this.userIdentity));
