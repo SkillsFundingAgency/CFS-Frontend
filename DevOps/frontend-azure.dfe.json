@@ -621,6 +621,10 @@
             {
               "name": "features:exceptionMessagesEnabled",
               "value": "[parameters('EnableExceptionMessages')]"
+            },
+            {
+              "name": "features:enablePlatformAuth",
+              "value": "[if(parameters('enablePlatformAuth'), 'True', 'False')]"
             }
           ]
         }
