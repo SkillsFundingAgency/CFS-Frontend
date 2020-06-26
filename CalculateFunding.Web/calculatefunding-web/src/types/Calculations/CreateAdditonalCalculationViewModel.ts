@@ -12,6 +12,7 @@ export interface EditAdditionalCalculationViewModel {
     valueType: CalculationTypes;
     name: string;
     publishStatus: PublishStatus;
+    lastUpdated: Date
 }
 
 export interface UpdateAdditionalCalculationViewModel {

@@ -24,6 +24,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -54,6 +55,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
     const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
+    const [templateCalculationLastUpdated, setTemplateCalculationLastUpdated] = useState<Date>(new Date());
     const initialBuildSuccess = {
         buildSuccess: false,
         compileRun: false,
@@ -103,6 +105,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             setTemplateCalculationName(templateCalculationResult.name);
             setTemplateCalculationType(templateCalculationResult.valueType);
             setTemplateCalculationStatus(templateCalculationResult.publishStatus);
+            setTemplateCalculationLastUpdated(new Date(templateCalculationResult.lastUpdated));
 
             getSpecification(templateCalculationResult.specificationId).then((result) => {
                 const specificationResult = result.data as EditSpecificationViewModel;
@@ -261,12 +264,24 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         <span className="govuk-caption-m">Name</span>
                         <h2 className="govuk-heading-m">{templateCalculationName}</h2>
                 </div>
+                <div className="govuk-form-group">
+                        <span className="govuk-caption-m">Value type</span>
+                        <h2 className="govuk-heading-m">{templateCalculationType}</h2>
+                </div>
 
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="sort">
                         Funding line
                     </label>
-                    <input type="text" className="govuk-input" value={match.params.fundingLineItem}/>
+                    <h2 className="govuk-heading-m">{match.params.fundingLineItem}</h2>
+                </div>
+
+                <div className="govuk-form-group">
+                    <label className="govuk-label" htmlFor="sort">
+                        Last saved
+                    </label>
+                    <h2 className="govuk-heading-m"><DateFormatter date={templateCalculationLastUpdated} utc={false} /></h2>
+                    <Link to={`/Calculations/CalculationVersionHistory/${calculationId}`} className="govuk-link">View calculation history</Link>
                 </div>
 
                 <div

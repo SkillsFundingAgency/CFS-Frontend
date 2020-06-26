@@ -196,7 +196,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                             disabled={disableCompare} onClick={compareVersions}>Compare calculations
                     </button>
                     <br/>
-                    <Link to={`/ViewSpecification/${specification.id}`} className="govuk-back-link">Back</Link>
+                    <a href="#" onClick={history.goBack} className="govuk-back-link">Back</a>
                 </div>
             </div>
         </div>
