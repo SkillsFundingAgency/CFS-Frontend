@@ -1,12 +1,19 @@
 import React from "react";
 import {match, MemoryRouter} from "react-router";
 import {Provider} from "react-redux";
-import {IStoreState} from "../../../reducers/rootReducer";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
 import configureStore from 'redux-mock-store';
 import {fakeHistory, fakeInitialState, fakeLocation} from "../../fakes/fakes";
 import {ViewSpecification, ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
 import {FundingStructureType} from "../../../types/FundingStructureItem";
+import {createStore, Store} from "redux";
+
+const store: Store<IStoreState> = createStore(
+    rootReducer
+);
+
+store.dispatch = jest.fn();
 
 describe("Provider Funding Overview ", () => {
     const Adapter = require('enzyme-adapter-react-16');
@@ -151,13 +158,13 @@ describe("Provider Funding Overview ", () => {
     store.dispatch = jest.fn();
 
     it("renders the page with the expected number of tabs", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
         expect(wrapper.find('.govuk-tabs__list').children().length).toBe(4);
     });
 
     it("shows approve status in funding line structure tab", () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
         let actual = wrapper.find("ApproveStatusButton");
 
         expect(actual.length).toBe(1);
@@ -165,20 +172,20 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders collapsible steps", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
         expect(wrapper.find('.collapsible-steps').length).toBe(1);
     });
 
     it("renders back to top link within funding line structure tab", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
         expect(wrapper.find('#fundingline-structure .app-back-to-top__link').prop("href"))
             .toBe("#fundingline-structure");
     });
 
     it("renders open all button within funding line structure tab with correct values on initial load", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
 
         expect(openAllButton.prop("hidden")).toBe(false);
@@ -186,7 +193,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders close all button within funding line structure tab with correct values on initial load", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
         const closeAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(1);
 
         expect(closeAllButton.prop("hidden")).toBe(true);
@@ -194,7 +201,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("display close all button within funding line structure tab given open all button is clicked", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
 
         openAllButton.simulate('click');
@@ -206,7 +213,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("display open all button within funding line structure tab given close all button is clicked", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
         const openAllButton = wrapper.find('#fundingline-structure .govuk-accordion__open-all').at(0);
         openAllButton.simulate('click');
@@ -220,7 +227,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("renders search box with an autocomplete input in funding line structure tab", async () => {
-        const wrapper = mount(<MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter>);
+        const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
         expect(wrapper.find('#fundingline-structure .search-container').length).toBe(1);
         expect(wrapper.find('#fundingline-structure .search-container AutoComplete').length).toBe(1);

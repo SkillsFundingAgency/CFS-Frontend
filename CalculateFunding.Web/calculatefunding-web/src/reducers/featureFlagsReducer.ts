@@ -4,7 +4,8 @@ import { FeatureFlagKey, FeatureFlag } from "../types/FeatureFlag";
 import { Reducer } from "redux";
 
 const initialState: FeatureFlagsState = {
-    templateBuilderVisible: false
+    templateBuilderVisible: false,
+    releaseTimetableVisible: false
 };
 
 function isFeatureEnabled(featureFlags: FeatureFlag[], targetFeature: FeatureFlagKey): boolean {
@@ -15,7 +16,11 @@ function isFeatureEnabled(featureFlags: FeatureFlag[], targetFeature: FeatureFla
 export const reduceFeatureFlagsState: Reducer<FeatureFlagsState, GetFeatureFlagsAction> = (state: FeatureFlagsState = initialState, action: GetFeatureFlagsAction): FeatureFlagsState => {
     switch (action.type) {
         case FeatureFlagsActionTypes.GET_FEATUREFLAGS:
-            return {...state, templateBuilderVisible: isFeatureEnabled(action.payload, FeatureFlagKey.TemplateBuilderVisible) };
+            return {
+                ...state,
+                templateBuilderVisible: isFeatureEnabled(action.payload, FeatureFlagKey.TemplateBuilderVisible),
+                releaseTimetableVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ReleaseTimetableVisible)
+            };
         default:
             return state;
     }

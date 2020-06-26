@@ -33,12 +33,16 @@ import {getCalculationsService} from "../../services/calculationService";
 import {getFundingLineStructureService} from "../../services/fundingStructuresService";
 import {CalculationSummary} from "../../types/CalculationSummary";
 import {PublishStatus} from "../../types/PublishStatusModel";
+import {FeatureFlagsState} from "../../states/FeatureFlagsState";
+import {IStoreState} from "../../reducers/rootReducer";
+import {useSelector} from "react-redux";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
 }
 
 export function ViewSpecification({match}: RouteComponentProps<ViewSpecificationRoute>) {
+    const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [additionalCalculationsSearchTerm,] = useState('');
     const [statusFilter] = useState("");
     const [navisionDate, setNavisionDate] = useState();
@@ -47,6 +51,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [releaseTime, setReleaseTime] = useState();
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
+    const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
         name: "",
         approvalStatus: "",
@@ -179,6 +184,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             });
         }
     }, [fundingLines]);
+
+    useEffect(() => {
+        setReleaseTimetableIsEnabled(featureFlagsState.releaseTimetableVisible);
+    }, [featureFlagsState.releaseTimetableVisible]);
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
@@ -389,7 +398,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
-                            <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
+                            <Tabs.Tab hidden={!releaseTimetableIsEnabled} label="release-timetable">Release timetable</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
@@ -586,7 +595,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                 </table>
                             </section>
                         </Tabs.Panel>
-                        <Tabs.Panel label="release-timetable">
+                        <Tabs.Panel hidden={!releaseTimetableIsEnabled} label="release-timetable">
                             <section className="govuk-tabs__panel">
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-full">
