@@ -8,7 +8,6 @@ export class LoginService {
     private baseUrl:string;
     private userIdentity: IdentityTokenInfo | null;
     private logger: LoggerService;
-    private loggedIn: boolean = false;
 
     private storageTokenKey: string = 'identity_token_info';
 
@@ -58,19 +57,22 @@ export class LoginService {
 
     refresh = (loginType: string): Promise<string> => {
       return new Promise((resolve, reject) => {
-          if(this.userTokenInfo)
+          if (this.userTokenInfo)
           {
-            axios.get<IdentityTokenInfo[]>(
+            fetch(
                 `${this.baseUrl}/.auth/refresh`, 
                 {
                     method: 'GET',
                     headers: {
-                        'X-ZUMO-AUTH': this.userTokenInfo.access_token
+                        'X-ZUMO-AUTH': this.userTokenInfo.auth_token
                     }
                 }
-            ).then(response => {
-                this.userIdentity = response.data[0];
-                this.loggedIn = true;
+            )
+            .then(response => {
+              return response.json() as Promise<IdentityTokenInfo[]>;
+            })
+            .then(identitities => {
+                this.userIdentity = identitities[0];
 
                 // Write out userIdentity to local storage
                 localStorage.setItem(this.storageTokenKey, JSON.stringify(this.userIdentity));
@@ -169,7 +171,7 @@ export class LoginService {
                 (results: { userId: string | PromiseLike<string> | undefined; }) => {
                 resolve(results.userId);
 
-                axios.get<IdentityTokenInfo[]>(
+                fetch(
                     `${this.baseUrl}/.auth/me`, 
                     {
                         method: 'GET',
@@ -177,10 +179,16 @@ export class LoginService {
                             'X-ZUMO-AUTH': this.azureServiceClient.currentUser.mobileServiceAuthenticationToken
                         }
                     }
-                ).then(response => {
-                    this.userIdentity = response.data[0];
-                    this.loggedIn = true;
+                )
+                .then(response => {
+                  return response.json() as Promise<IdentityTokenInfo[]>
+                })
+                .then(identities => {
+                    this.userIdentity = identities[0];
 
+                    // Set the auth token here so we can refresh the token if required
+                    this.userIdentity.auth_token = this.azureServiceClient.currentUser.mobileServiceAuthenticationToken;
+                    
                      // Write out userIdentity to local storage
                      localStorage.setItem( this.storageTokenKey, JSON.stringify(this.userIdentity));
                 })
@@ -204,7 +212,6 @@ export class LoginService {
     }
 
     private clearAuth(): void {
-      this.loggedIn = false; 
       this.userIdentity = null;
       localStorage.removeItem(this.storageTokenKey);
     }
