@@ -8,6 +8,7 @@ export class LoginService {
     private baseUrl:string;
     private userIdentity: IdentityTokenInfo | null;
     private logger: LoggerService;
+    private loggedIn: boolean = false;
 
     private storageTokenKey: string = 'identity_token_info';
 
@@ -25,12 +26,6 @@ export class LoginService {
 
       if (this.userIdentity) 
       {
-        if (this.isTokenExpired(this.userIdentity.expires_on))
-        {
-          this.logout();             
-          return null;
-        }
-
         // If its a valid token, just return it and move on.
         token = this.userIdentity;
       }
@@ -40,15 +35,6 @@ export class LoginService {
         try
         {
           token = JSON.parse(localStorage.getItem(this.storageTokenKey) || '');
-
-          if (token)
-          {
-            if (this.isTokenExpired(token.expires_on))
-            {
-              this.logout();             
-              token = null;
-            }
-          }
         }
         catch(e)
         {
@@ -58,6 +44,48 @@ export class LoginService {
         }
       }
       return token;
+    }
+
+    public isTokenExpired(expires_on:Date): boolean
+    {
+      let date:Date = new Date(expires_on);
+      if (date === null)
+      {
+        return true;
+      }
+      return !(date.valueOf() > Date.now() );
+    }
+
+    refresh = (loginType: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+            axios.get<IdentityTokenInfo[]>(
+                `${this.baseUrl}/.auth/refresh`, 
+                {
+                    method: 'GET',
+                    headers: {
+                        'X-ZUMO-AUTH': this.azureServiceClient.currentUser.mobileServiceAuthenticationToken
+                    }
+                }
+            ).then(response => {
+                this.userIdentity = response.data[0];
+                this.loggedIn = true;
+
+                // Write out userIdentity to local storage
+                localStorage.setItem(this.storageTokenKey, JSON.stringify(this.userIdentity));
+
+                resolve(this.userIdentity.user_id);
+            })
+            .catch(error => {
+                this.clearAuth();
+                // Fall back to login
+                this.login(loginType).then((user:string) => {
+                  resolve(user);
+                })
+                .catch(error => {
+                  reject("Refresh failed.");
+                });
+            });
+      });
     }
 
     public isLoggedIn(): boolean {
@@ -139,6 +167,8 @@ export class LoginService {
                     }
                 ).then(response => {
                     this.userIdentity = response.data[0];
+                    this.loggedIn = true;
+
                      // Write out userIdentity to local storage
                      localStorage.setItem( this.storageTokenKey, JSON.stringify(this.userIdentity));
                 })
@@ -162,6 +192,7 @@ export class LoginService {
     }
 
     private clearAuth(): void {
+      this.loggedIn = false; 
       this.userIdentity = null;
       localStorage.removeItem(this.storageTokenKey);
     }
@@ -172,15 +203,5 @@ export class LoginService {
       this.azureServiceClient.logout();
       this.logger.trace("<-- LoginService.logout()");
       return true;
-    }
-
-    private isTokenExpired(expires_on:Date): boolean
-    {
-      let date:Date = new Date(expires_on);
-      if (date === null)
-      {
-        return true;
-      }
-      return !(date.valueOf() > Date.now() );
     }
 }

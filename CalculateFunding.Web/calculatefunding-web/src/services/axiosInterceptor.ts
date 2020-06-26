@@ -20,7 +20,22 @@ export function initialiseAxios() {
       {
         if (loginService.userTokenInfo)
         {
-          config.headers.Authorization = `Bearer ${loginService.userTokenInfo.access_token}`;
+          if (!loginService.isTokenExpired(loginService.userTokenInfo.expires_on))
+          {
+            config.headers.Authorization = `Bearer ${loginService.userTokenInfo.access_token}`;
+          }
+          else
+          {
+            return loginService.refresh(configuration.loginType).then(() =>
+            {
+              if (loginService && loginService.userTokenInfo)
+              {
+                config.headers.Authorzation = `Bearer ${loginService.userTokenInfo.access_token}`;
+              }
+
+              return Promise.resolve(config);
+            })
+          }
         }
         else
         {
