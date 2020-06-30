@@ -23,9 +23,13 @@ export function EditDescriptionModal({ originalDescription, showModal, toggleMod
 
     const handleSave = async () => {
         setIsSaving(true);
-        await saveDescription(description);
-        setIsSaving(false);
-        toggleModal(false);
+        try {
+            await saveDescription(description);
+        }
+        finally {
+            setIsSaving(false);
+            toggleModal(false);
+        }
     }
 
     const modalDisplayStyle = {

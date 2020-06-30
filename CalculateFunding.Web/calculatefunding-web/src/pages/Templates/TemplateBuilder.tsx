@@ -281,12 +281,17 @@ export function TemplateBuilder() {
 
     const saveDescription = async (description: string) => {
         if (!template) return;
-        const saveResponse = await updateTemplateDescription(template.templateId, description);
-        if (saveResponse.status !== 200) {
-            addErrorMessage("Description changes could not be saved", "description");
-        } else {
-            const updatedTemplate: TemplateResponse = Object.assign({}, template, { description: description });
-            setTemplate(updatedTemplate);
+        try {
+            const saveResponse = await updateTemplateDescription(template.templateId, description);
+            if (saveResponse.status !== 200) {
+                addErrorMessage("Description changes could not be saved", "description");
+            } else {
+                const updatedTemplate: TemplateResponse = Object.assign({}, template, { description: description });
+                setTemplate(updatedTemplate);
+            }
+        }
+        catch (err) {
+            addErrorMessage(`Description changes could not be saved: ${err.message}.`, "description");
         }
     }
 
@@ -364,14 +369,14 @@ export function TemplateBuilder() {
                                         checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit' />
                                     <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
                                         Edit
-                                                </label>
+                                    </label>
                                 </div>
                                 <div className="govuk-radios__item">
                                     <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view"
                                         checked={mode === Mode.View} onChange={handleModeChange} data-testid='view' />
                                     <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
                                         View
-                                                    </label>
+                                    </label>
                                 </div>
                             </div>
                         </div>}
