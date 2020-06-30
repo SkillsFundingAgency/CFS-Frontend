@@ -90,11 +90,11 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPutAsync<string, TemplateContentUpdateCommand>(url, command);
         }
 
-        public async Task<ValidatedApiResponse<string>> UpdateTemplateMetadata(TemplateMetadataUpdateCommand command)
+        public async Task<ValidatedApiResponse<string>> UpdateTemplateDescription(TemplateDescriptionUpdateCommand command)
         {
             string url = "templates/build/metadata";
 
-            return await ValidatedPutAsync<string, TemplateMetadataUpdateCommand>(url, command);
+            return await ValidatedPutAsync<string, TemplateDescriptionUpdateCommand>(url, command);
         }
 
         public async Task<ValidatedApiResponse<SearchResults<TemplateIndex>>> SearchTemplates(SearchModel request)

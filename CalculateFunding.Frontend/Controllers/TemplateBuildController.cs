@@ -194,8 +194,8 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPut]
-        [Route("api/templates/build/metadata")]
-        public async Task<IActionResult> UpdateTemplateMetadata([FromBody] TemplateMetadataUpdateModel model)
+        [Route("api/templates/build/description")]
+        public async Task<IActionResult> UpdateDescription([FromBody] TemplateDescriptionUpdateModel model)
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
@@ -204,10 +204,9 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<string> result = await _client.UpdateTemplateMetadata(new TemplateMetadataUpdateCommand
+            ValidatedApiResponse<string> result = await _client.UpdateTemplateDescription(new TemplateDescriptionUpdateCommand
             {
                 TemplateId = model.TemplateId,
-                Name = model.Name,
                 Description = model.Description
             });
 

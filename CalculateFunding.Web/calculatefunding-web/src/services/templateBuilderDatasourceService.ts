@@ -540,3 +540,11 @@ export async function publishTemplate(templateId: string, note: string): Promise
         data: { templateId, note }
     })
 }
+
+export async function updateTemplateDescription(templateId: string, description: string): Promise<AxiosResponse<string>> {
+    return await axios(`/api/templates/build/description`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: { templateId, description }
+    })
+}
