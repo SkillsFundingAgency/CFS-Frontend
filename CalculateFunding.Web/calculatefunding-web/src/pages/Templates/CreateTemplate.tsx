@@ -27,7 +27,6 @@ export const CreateTemplate = () => {
     const [saveMessage, setSaveMessage] = useState<string>('');
     const [enableSaveButton, setEnableSaveButton] = useState<boolean>(false);
     const { canCreateTemplate, missingPermissions, fundingStreamPermissions } = useTemplatePermissions([TemplatePermissions.Create]);
-    let errorCount = 0;
     const history = useHistory();
 
     const fetchData = async () => {
@@ -84,12 +83,12 @@ export const CreateTemplate = () => {
     }, [selectedFundingStreamId]);
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
-        const error: ErrorMessage = { id: ++errorCount, fieldName: fieldName, message: errorMessage };
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = { id: errorCount + 1, fieldName: fieldName, message: errorMessage };
         setErrors(errors => [...errors, error]);
     }
 
     function clearErrorMessages() {
-        errorCount = 0;
         setErrors([]);
     }
 

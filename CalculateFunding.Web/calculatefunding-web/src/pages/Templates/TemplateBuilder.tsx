@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, RefObject } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import { useTemplatePermissions } from '../../hooks/useTemplatePermissions';
@@ -54,10 +54,8 @@ enum Mode {
     Edit = 'edit'
 }
 
-const scrollToRef = (ref: React.MutableRefObject<HTMLSpanElement>) => window.scrollTo(0, ref.current.offsetTop);
-
 export function TemplateBuilder() {
-    const orgchart = useRef();
+    const orgchart = useRef<HTMLDivElement>(null);
     const descriptionRef = useRef<HTMLSpanElement>(null);
     let { templateId } = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -110,7 +108,7 @@ export function TemplateBuilder() {
     }, [canEditTemplate]);
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
-        const errorCount = errors.length;
+        const errorCount: number = errors.length;
         const error: ErrorMessage = { id: errorCount + 1, fieldName: fieldName, message: errorMessage };
         setErrors(errors => [...errors, error]);
     }
@@ -215,6 +213,7 @@ export function TemplateBuilder() {
     const handleSaveContentClick = async () => {
         clearUndoState();
         clearRedoState();
+        clearErrorMessages();
 
         try {
             if (template === undefined) {
@@ -238,7 +237,23 @@ export function TemplateBuilder() {
             showSaveMessageOnce("Template saved successfully.");
         }
         catch (err) {
-            setSaveMessage(`Template could not be saved: ${err.message}.`);
+            const errStatus = err.response.status;
+            if (errStatus === 400) {
+                const errResponse = err.response.data;
+                if (errResponse.hasOwnProperty("FundingLine")) {
+                    errResponse["FundingLine"].forEach((error: string) => {
+                        addErrorMessage(error, "template");
+                    });
+                }
+                if (errResponse.hasOwnProperty("Calculation")) {
+                    errResponse["Calculation"].forEach((error: string) => {
+                        addErrorMessage(error, "template");
+                    });
+                }
+            } else {
+                addErrorMessage(`Template could not be saved: ${err.message}.`, "template");
+            }
+            setSaveMessage("Template failed to save due to errors.");
         }
     };
 
@@ -276,6 +291,7 @@ export function TemplateBuilder() {
     }
 
     const toggleEditDescription = () => {
+        clearErrorMessages();
         setShowModal(!showModal);
     }
 
@@ -295,10 +311,20 @@ export function TemplateBuilder() {
         }
     }
 
-    const handleScroll = () => {
-        descriptionRef &&
-            descriptionRef.current &&
-            descriptionRef.current.scrollIntoView();
+    const handleScroll = (fieldName: string | undefined) => {
+        if (!fieldName) return;
+        let ref: React.RefObject<HTMLElement> | null = null;
+
+        switch (fieldName) {
+            case "description":
+                ref = descriptionRef;
+            case "template":
+                ref = orgchart;
+            default:
+                break;
+        }
+
+        ref && ref.current && ref.current.scrollIntoView();
     }
 
     return (
@@ -325,7 +351,7 @@ export function TemplateBuilder() {
                                         <ul className="govuk-list govuk-error-summary__list">
                                             {errors.map(error =>
                                                 <li key={error.id}>
-                                                    {error.fieldName && <a href={"#" + error.fieldName} onClick={handleScroll}>{error.message}</a>}
+                                                    {error.fieldName && <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
                                                     {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
                                                 </li>
                                             )}
@@ -340,7 +366,7 @@ export function TemplateBuilder() {
                     <h3 className="govuk-heading-m">{template && template.fundingStreamId}</h3>
                     <span className="govuk-caption-m">Funding period</span>
                     <h3 className="govuk-heading-m">{template && template.fundingPeriodId}</h3>
-                    <div className={`govuk-form-group ${errors.map(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                    <div className={`govuk-form-group ${errors.filter(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <span className="govuk-caption-m" id="description" ref={descriptionRef}>Description</span>
                         {errors.map(error => error.fieldName === "description" &&
                             <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
@@ -397,25 +423,32 @@ export function TemplateBuilder() {
                         </>}
                 </div>
                 <div className="gov-org-chart-container">
-                    <OrganisationChart
-                        ref={orgchart}
-                        NodeTemplate={TemplateBuilderNode}
-                        datasource={ds}
-                        chartClass="myChart"
-                        collapsible={true}
-                        draggable={true}
-                        pan={true}
-                        zoom={true}
-                        multipleSelect={false}
-                        onClickNode={readSelectedNode}
-                        onClickChart={clearSelectedNode}
-                        openSideBar={openSideBar}
-                        editMode={mode === Mode.Edit}
-                        onClickAdd={onClickAdd}
-                        changeHierarchy={changeHierarchy}
-                        cloneNode={cloneNode}
-                        nextId={nextId}
-                    />
+                    <div id="template" className={`govuk-form-group ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        {errors.map(error => error.fieldName === "template" &&
+                            <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                <span className="govuk-visually-hidden">Error:</span> {error.message}
+                            </span>
+                        )}
+                        <OrganisationChart
+                            ref={orgchart}
+                            NodeTemplate={TemplateBuilderNode}
+                            datasource={ds}
+                            chartClass="myChart"
+                            collapsible={true}
+                            draggable={true}
+                            pan={true}
+                            zoom={true}
+                            multipleSelect={false}
+                            onClickNode={readSelectedNode}
+                            onClickChart={clearSelectedNode}
+                            openSideBar={openSideBar}
+                            editMode={mode === Mode.Edit}
+                            onClickAdd={onClickAdd}
+                            changeHierarchy={changeHierarchy}
+                            cloneNode={cloneNode}
+                            nextId={nextId}
+                        />
+                    </div>
                     {mode === Mode.Edit && (template == undefined && canCreateTemplate || template !== undefined && canEditTemplate) &&
                         <button className="govuk-button govuk-!-margin-right-1" data-testid='save'
                             onClick={handleSaveContentClick}>Save and continue
