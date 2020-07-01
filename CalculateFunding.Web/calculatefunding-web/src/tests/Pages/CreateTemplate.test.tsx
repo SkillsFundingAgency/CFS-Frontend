@@ -91,6 +91,7 @@ describe("Create Template page when I have create permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
+
         fetchMock.onGet("/api/templates/build/available-stream-periods").reply(200, [{
             "fundingStream": {
                 "id": "DSG",

@@ -92,9 +92,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             string templateId = Guid.NewGuid().ToString();
             List<TemplateStatus> statuses = new List<TemplateStatus>();
-            List<TemplateResource> returnedContent = new List<TemplateResource>
+            List<TemplateSummaryResource> returnedContent = new List<TemplateSummaryResource>
             {
-                new TemplateResource
+                new TemplateSummaryResource
                 {
                     TemplateId = "123",
                     FundingPeriodId = "ABC",
@@ -113,20 +113,20 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 }
             };
             apiClient
-                .GetTemplateVersions(templateId, statuses)
-                .Returns(new ApiResponse<List<TemplateResource>>(HttpStatusCode.OK, returnedContent));
+                .GetTemplateVersions(templateId, statuses, Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ApiResponse<TemplateVersionListResponse>(HttpStatusCode.OK, new TemplateVersionListResponse { PageResults = returnedContent }));
 
             var authHelper = Substitute.For<IAuthorizationHelper>();
             TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
 
-            IActionResult result = await controller.GetTemplateVersions(templateId, statuses);
+            IActionResult result = await controller.GetTemplateVersions(templateId, statuses, 1, 20);
 
             result
                 .Should()
                 .BeAssignableTo<OkObjectResult>();
 
-            List<TemplateResource> results = (result as OkObjectResult).Value as List<TemplateResource>;
-            results
+            TemplateVersionListResponse results = (result as OkObjectResult).Value as TemplateVersionListResponse;
+            results.PageResults
                 .Should()
                 .Equal(returnedContent);
         }
@@ -137,9 +137,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             ITemplateBuilderApiClient apiClient = Substitute.For<ITemplateBuilderApiClient>();
             string templateId = Guid.NewGuid().ToString();
             List<TemplateStatus> statuses = new List<TemplateStatus> {TemplateStatus.Draft, TemplateStatus.Published};
-            List<TemplateResource> returnedContent = new List<TemplateResource>
+            List<TemplateSummaryResource> returnedContent = new List<TemplateSummaryResource>
             {
-                new TemplateResource
+                new TemplateSummaryResource
                 {
                     TemplateId = "123",
                     FundingPeriodId = "ABC",
@@ -156,7 +156,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     MinorVersion = 1,
                     MajorVersion = 0
                 },
-                new TemplateResource
+                new TemplateSummaryResource
                 {
                     TemplateId = "123",
                     FundingPeriodId = "ABC",
@@ -175,19 +175,19 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 }
             };
             apiClient
-                .GetTemplateVersions(templateId, statuses)
-                .Returns(new ApiResponse<List<TemplateResource>>(HttpStatusCode.OK, returnedContent));
+                .GetTemplateVersions(templateId, statuses, Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ApiResponse<TemplateVersionListResponse>(HttpStatusCode.OK, new TemplateVersionListResponse { PageResults = returnedContent }));
             var authHelper = Substitute.For<IAuthorizationHelper>();
             TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
 
-            IActionResult result = await controller.GetTemplateVersions(templateId, statuses);
+            IActionResult result = await controller.GetTemplateVersions(templateId, statuses, 1, 20);
 
             result
                 .Should()
                 .BeAssignableTo<OkObjectResult>();
 
-            List<TemplateResource> results = (result as OkObjectResult).Value as List<TemplateResource>;
-            results
+            TemplateVersionListResponse results = (result as OkObjectResult).Value as TemplateVersionListResponse;
+            results.PageResults
                 .Should()
                 .Equal(returnedContent);
         }

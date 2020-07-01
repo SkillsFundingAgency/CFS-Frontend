@@ -56,17 +56,20 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPostAsync(url, model);
         }
 
-        public async Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses)
+        public async Task<ApiResponse<TemplateVersionListResponse>> GetTemplateVersions(string templateId, 
+            List<TemplateStatus> statuses,
+            int page,
+            int itemsPerPage)
         {
             Guard.ArgumentNotNull(templateId, nameof(templateId));
             string templateStatusesParam = string.Join(",", statuses);
-            string url = $"templates/build/{templateId}/versions";
+            string url = $"templates/build/{templateId}/versions?page={page}&itemsPerPage={itemsPerPage}";
             if (!string.IsNullOrWhiteSpace(templateStatusesParam))
             {
-                url += $"?statuses={templateStatusesParam}";
+                url += $"&statuses={templateStatusesParam}";
             }
 
-            return await GetAsync<List<TemplateResource>>(url);
+            return await GetAsync<TemplateVersionListResponse>(url);
         }
 
         public async Task<ValidatedApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command)

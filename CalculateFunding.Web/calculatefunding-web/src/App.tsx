@@ -14,6 +14,8 @@ import { EditSpecification } from "./pages/Specifications/EditSpecification";
 import { ViewTemplates } from "./pages/Templates/ViewTemplates";
 import { PublishTemplate } from "./pages/Templates/PublishTemplate";
 import { TemplateBuilder } from "./pages/Templates/TemplateBuilder";
+import {CreateTemplate} from "./pages/Templates/CreateTemplate";
+import {ViewTemplateVersions} from "./pages/Templates/ViewTemplateVersions";
 import { Section } from "./types/Sections";
 import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
 import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
@@ -36,7 +38,6 @@ import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
-import {CreateTemplate} from "./pages/Templates/CreateTemplate";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 import { initialiseAxios } from './services/axiosInterceptor';
@@ -84,6 +85,7 @@ const App: React.FunctionComponent = () => {
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Build/:templateId" component={TemplateBuilder} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ViewTemplateVersions} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />

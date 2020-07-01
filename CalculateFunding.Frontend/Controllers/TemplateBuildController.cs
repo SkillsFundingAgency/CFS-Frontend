@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
@@ -74,9 +75,14 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/templates/build/{templateId}/versions")]
-        public async Task<IActionResult> GetTemplateVersions([FromRoute] string templateId, [FromQuery] List<TemplateStatus> statuses)
+        public async Task<IActionResult> GetTemplateVersions(
+            [FromRoute] string templateId, 
+            [FromQuery] List<TemplateStatus> statuses, 
+            [FromQuery] int page, 
+            [FromQuery] int itemsPerPage)
         {
-            ApiResponse<List<TemplateResource>> result = await _client.GetTemplateVersions(templateId, statuses);
+            ApiResponse<TemplateVersionListResponse> result = 
+                await _client.GetTemplateVersions(templateId, statuses, page, itemsPerPage);
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);

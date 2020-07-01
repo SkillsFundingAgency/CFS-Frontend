@@ -12,7 +12,11 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ValidatedApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateDescription(TemplateDescriptionUpdateCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command);
-        Task<ApiResponse<List<TemplateResource>>> GetTemplateVersions(string templateId, List<TemplateStatus> statuses);
+        Task<ApiResponse<TemplateVersionListResponse>> GetTemplateVersions(
+            string templateId, 
+            List<TemplateStatus> statuses, 
+            int page,
+            int itemsPerPage);
         Task<ApiResponse<TemplateResource>> GetTemplate(string templateId);
         Task<ApiResponse<TemplateResource>> GetTemplateVersion(string templateId, string version);
         Task<ApiResponse<IEnumerable<TemplateResource>>> GetPublishedTemplatesByFundingStreamAndPeriod(string fundingStreamId, string fundingPeriodId);

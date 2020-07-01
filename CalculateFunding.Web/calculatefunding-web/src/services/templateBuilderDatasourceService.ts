@@ -17,7 +17,7 @@ import {
     TemplateResponse,
     TemplateContentUpdateCommand,
     CalculationDictionaryItem,
-    FundingStreamWithPeriodsResponse
+    FundingStreamWithPeriodsResponse, GetTemplateVersionsResponse, TemplateStatus
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/searchRequestViewModel";
 import axios from "axios";
@@ -508,7 +508,8 @@ export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
 }
 
 export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
-    return axios.get(`/api/templates/build/${templateId}`, {
+    const url = `/api/templates/build/${templateId}`;
+    return axios.get(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -539,6 +540,20 @@ export async function publishTemplate(templateId: string, note: string): Promise
         headers: { 'Content-Type': 'application/json' },
         data: { templateId, note }
     })
+}
+
+export async function getVersionsOfTemplate(templateId: string, page: number, itemsPerPage: number, statuses?: TemplateStatus[]): 
+    Promise<AxiosResponse<GetTemplateVersionsResponse>> {
+    let uri = `/api/templates/build/${templateId}/versions?page=${page}&itemsPerPage=${itemsPerPage}`;
+    if (statuses) {
+        uri += statuses.map(x => `&statuses=${x}`).join(``);
+    }
+    return await axios(uri, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
 }
 
 export async function updateTemplateDescription(templateId: string, description: string): Promise<AxiosResponse<string>> {
