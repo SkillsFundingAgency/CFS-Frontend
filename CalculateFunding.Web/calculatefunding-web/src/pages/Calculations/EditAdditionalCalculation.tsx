@@ -8,7 +8,7 @@ import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecifi
 import {CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {approveCalculationService, compileCalculationPreviewService, getCalculationByIdService, getIsUserAllowedToApproveCalculationService, updateAdditionalCalculationService} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
-import {CompilerMessage, CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
+import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
@@ -278,12 +278,12 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     <select className="govuk-select" id="sort" name="sort"
                             onChange={(e) => setAdditionalCalculationType(e.target.value as CalculationTypes)}>
                         <option value="Percentage"
-                                selected={additionalCalculationType == CalculationTypes.Percentage}>Percentage
+                                selected={additionalCalculationType === CalculationTypes.Percentage}>Percentage
                         </option>
-                        <option value="Number" selected={additionalCalculationType == CalculationTypes.Number}>Number
+                        <option value="Number" selected={additionalCalculationType === CalculationTypes.Number}>Number
                         </option>
                         <option value="Currency"
-                                selected={additionalCalculationType == CalculationTypes.Currency}>Currency
+                                selected={additionalCalculationType === CalculationTypes.Currency}>Currency
                         </option>
                     </select>
                 </div>

@@ -42,13 +42,6 @@ interface EditSpecificationCoreProvider {
     selected: boolean
 }
 
-interface EditSpecificationSelection {
-    fundingStreams: [{
-        name: string,
-        selected: boolean
-    }]
-}
-
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
 
     const specificationId = match.params.specificationId;

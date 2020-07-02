@@ -1,9 +1,5 @@
 import axios from "axios"
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
-import {ActionCreator, Dispatch} from "redux";
-import {ThunkAction} from "redux-thunk";
-import {IViewFundingState} from "../states/IViewFundingState";
-import {ViewFundingAction, ViewFundingActionTypes} from "../actions/viewFundingAction";
 
 const baseUrl = "/api/publish";
 

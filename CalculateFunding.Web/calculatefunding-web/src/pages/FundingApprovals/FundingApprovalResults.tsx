@@ -307,17 +307,17 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             const specificationPermissions = result.data as EffectiveSpecificationPermission;
             setUserPermissions(specificationPermissions);
             if (!specificationPermissions.canApproveFunding) {
-                if (!missingPermissions.find(x => x == "approve")) {
+                if (!missingPermissions.find(x => x === "approve")) {
                     setMissingPermissions(prevState => [...prevState, "approve"]);
                 }
             }
             if (!specificationPermissions.canReleaseFunding) {
-                if (!missingPermissions.find(x => x == "release")) {
+                if (!missingPermissions.find(x => x === "release")) {
                     setMissingPermissions(prevState => [...prevState, "release"]);
                 }
             }
             if (!specificationPermissions.canRefreshFunding) {
-                if (!missingPermissions.find(x => x == "refresh")) {
+                if (!missingPermissions.find(x => x === "refresh")) {
                     setMissingPermissions(prevState => [...prevState, "refresh"]);
                 }
             }

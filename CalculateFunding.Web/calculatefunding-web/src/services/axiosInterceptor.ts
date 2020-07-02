@@ -1,7 +1,6 @@
 import axios from "axios";
 import { LoginService } from '../auth/authProvider';
 import { Config } from '../types/Config';
-import { AuthenticationParameters } from "msal";
 const configurationPromise:Promise<Config> = (window as any)['configuration'];
 
 export function initialiseAxios() {

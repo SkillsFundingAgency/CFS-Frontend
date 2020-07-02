@@ -1,4 +1,3 @@
-import axios from "axios";
 import { IdentityTokenInfo } from '../types/IdentityTokenInfo';
 import { LoggerService } from '../services/loggerService'
 var WindowsAzure = require('azure-mobile-apps-client');

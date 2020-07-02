@@ -1,7 +1,6 @@
 ﻿import { ErrorMessage } from "../../types/ErrorMessage";
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import { useHistory } from 'react-router-dom';
 import { Header } from "../../components/Header";
 import { Footer } from "../../components/Footer";
 import { Section } from "../../types/Sections";
@@ -13,6 +12,7 @@ import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { createNewDraftTemplate, getAllFundingStreamsWithAvailablePeriods } from "../../services/templateBuilderDatasourceService";
 import { useTemplatePermissions } from "../../hooks/useTemplatePermissions";
+import {useHistory} from "react-router";
 
 export const CreateTemplate = () => {
     const [permittedFundingStreamsWithPeriods, setPermittedFundingStreamsWithPeriods] = useState<FundingStreamWithPeriodsResponse[]>([]);

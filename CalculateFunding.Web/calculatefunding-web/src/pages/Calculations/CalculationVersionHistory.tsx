@@ -10,7 +10,6 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {CalculationVersionHistorySummary} from "../../types/Calculations/CalculationVersionHistorySummary";
 import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 
 export interface CalculationVersionHistoryRoute {

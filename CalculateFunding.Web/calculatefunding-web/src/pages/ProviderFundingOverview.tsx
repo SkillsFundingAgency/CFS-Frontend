@@ -13,8 +13,6 @@ import {useEffectOnce} from "../hooks/useEffectOnce";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
-import {BackButton} from "../components/BackButton";
-import {Link} from "react-router-dom";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string

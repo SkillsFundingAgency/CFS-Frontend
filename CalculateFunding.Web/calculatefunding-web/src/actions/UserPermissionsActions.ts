@@ -1,4 +1,4 @@
-﻿import {ActionCreator, Dispatch} from "redux";
+﻿import {ActionCreator} from "redux";
 import {ThunkAction} from "redux-thunk";
 import axios from "axios"
 import {IUserPermissionsState} from "../states/IUserPermissionsState";
