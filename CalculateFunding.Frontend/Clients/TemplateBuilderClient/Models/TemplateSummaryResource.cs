@@ -77,5 +77,10 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models
         /// Last modification date
         /// </summary>
         public DateTime LastModificationDate { get; set; }
+
+        /// <summary>
+        /// whether this template version is the latest most current
+        /// </summary>
+        public bool IsCurrentVersion { get; set; }
     }
 }

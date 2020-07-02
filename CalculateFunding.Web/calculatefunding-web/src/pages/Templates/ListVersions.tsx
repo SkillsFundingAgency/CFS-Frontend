@@ -13,7 +13,7 @@ import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {Footer} from "../../components/Footer";
 import {AxiosError} from "axios";
 
-export const ViewTemplateVersions = () => {
+export const ListVersions = () => {
     let {templateId} = useParams();
     const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
     const [isLoadingTemplate, setIsLoadingTemplate] = useState<boolean>(true);
@@ -43,41 +43,42 @@ export const ViewTemplateVersions = () => {
         }).finally(() => setIsLoadingTemplate(false));
     }
 
-    function loadTemplateVersions() {
-        const getVersions = async () => {
-            const statuses: TemplateStatus[] = [
-                ...includeDrafts ? [TemplateStatus.Draft] : [],
-                ...includePublished ? [TemplateStatus.Published] : [],
-            ]
-            const result = await getVersionsOfTemplate(templateId, page, itemsPerPage, statuses);
-            return result.data as GetTemplateVersionsResponse;
-        };
-        setIsLoadingVersions(true);
-        if (!includeDrafts && !includePublished) {
-            setResults([]);
-            setTotalResults(0);
-            setIsLoadingVersions(false);
-        } else {
-            getVersions().then((result) => {
-                setResults(result.pageResults);
-                setTotalResults(result.totalCount);
-                setIsLoadingVersions(false);
-            }).catch((error: AxiosError) => {
-                const response = error.response;
-                if (!response) {
-                    setErrors(errors => [...errors, `Error whilst fetching versions: ${response.statusText}`]);
-                }
-            }).finally(() => setIsLoadingVersions(false));
-        }
-    }
+
 
     useEffectOnce(() => {
         loadTemplate();
     });
 
     useEffect(() => {
+        function loadTemplateVersions() {
+            const getVersions = async () => {
+                const statuses: TemplateStatus[] = [
+                    ...includeDrafts ? [TemplateStatus.Draft] : [],
+                    ...includePublished ? [TemplateStatus.Published] : [],
+                ]
+                const result = await getVersionsOfTemplate(templateId, page, itemsPerPage, statuses);
+                return result.data as GetTemplateVersionsResponse;
+            };
+            setIsLoadingVersions(true);
+            if (!includeDrafts && !includePublished) {
+                setResults([]);
+                setTotalResults(0);
+                setIsLoadingVersions(false);
+            } else {
+                getVersions().then((result) => {
+                    setResults(result.pageResults);
+                    setTotalResults(result.totalCount);
+                    setIsLoadingVersions(false);
+                }).catch((error: AxiosError) => {
+                    const response = error.response;
+                    if (!response) {
+                        setErrors(errors => [...errors, `Error whilst fetching versions: ${response.statusText}`]);
+                    }
+                }).finally(() => setIsLoadingVersions(false));
+            }
+        }
         loadTemplateVersions();
-    }, [includeDrafts, includePublished]);
+    }, [page, includeDrafts, includePublished, templateId]);
 
     function onStatusFilterChanged(e: React.ChangeEvent<HTMLInputElement>) {
         setPage(1);
@@ -92,19 +93,15 @@ export const ViewTemplateVersions = () => {
     const onChangePage = async (newPage: number) => {
         setPage(newPage);
     }
-
-    useEffect(() => {
-        loadTemplateVersions();
-    }, [page]);
-
+    
     return (
         <div>
             <Header location={Section.Templates}/>
             <div className="govuk-width-container">
                 <Breadcrumbs>
                     <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/View"}/>
-                    <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/Build/${templateId}`}/>
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
+                    <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`}/>
                     <Breadcrumb name={"Template Versions"}/>
                 </Breadcrumbs>
                 <div className="govuk-main-wrapper">
@@ -194,16 +191,16 @@ export const ViewTemplateVersions = () => {
                                     {results.map(item =>
                                         <tr key={item.version} className="govuk-table__row">
                                             <th scope="row" className="govuk-table__header">
-                                                <Link to={`/Templates/Build/${template.templateId}/version/${item.version}`}
+                                                <Link to={`/Templates/${template.templateId}/Versions/${item.version}`}
                                                       data-testid={"version-" + item.version}
                                                 >Version {item.majorVersion}.{item.minorVersion}</Link>
                                             </th>
                                             <td className="govuk-table__cell" data-testid={"status-" + item.version}>
-                                                {item.status == "Draft" && item.version === template.version &&
+                                                {item.status === "Draft" && item.version === template.version &&
                                                 <span><strong className="govuk-tag govuk-tag--blue">In Progress</strong></span>}
-                                                {item.status == "Draft" && item.version !== template.version &&
+                                                {item.status === "Draft" && item.version !== template.version &&
                                                 <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
-                                                {item.status == "Published" &&
+                                                {item.status === "Published" &&
                                                 <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
                                             </td>
                                             <td className="govuk-table__cell">

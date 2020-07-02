@@ -67,6 +67,11 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models
         /// Version of VersionedItem
         /// </summary>
         public int Version { get; set; }
+
+        /// <summary>
+        /// whether this template version is the latest most current
+        /// </summary>
+        public bool IsCurrentVersion { get; set; }
         
         /// <summary>
         /// Author id

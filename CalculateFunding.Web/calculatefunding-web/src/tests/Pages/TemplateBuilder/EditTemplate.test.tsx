@@ -1,6 +1,6 @@
 import React from "react";
 import { mount } from "enzyme";
-import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
+import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
 import { waitFor } from "@testing-library/react"
@@ -57,7 +57,7 @@ export const permissionsState: FundingStreamPermissions[] = [{
 
 beforeAll(() => {
     function mockFunctions() {
-        const originalService = require.requireActual('../../services/templateBuilderDatasourceService');
+        const originalService = require.requireActual('../../../services/templateBuilderDatasourceService');
         return {
             ...originalService,
             getTemplateById: jest.fn(() => Promise.resolve({
@@ -70,6 +70,7 @@ beforeAll(() => {
                     majorVersion: 0,
                     minorVersion: 1,
                     version: 2,
+                    isCurrentVersion: true,
                     status: "Draft",
                     schemaVersion: "1.1",
                     templateJson: "",
@@ -82,7 +83,7 @@ beforeAll(() => {
             }))
         }
     }
-    jest.mock('../../services/templateBuilderDatasourceService', () => mockFunctions());
+    jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions());
 });
 
 describe("Template Builder when I have no permissions ", () => {
@@ -92,16 +93,16 @@ describe("Template Builder when I have no permissions ", () => {
     });
 
     it("fetches template data getTemplateById", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const { getTemplateById } = require('../../services/templateBuilderDatasourceService');
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const { getTemplateById } = require('../../../services/templateBuilderDatasourceService');
 
-        mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(getTemplateById).toBeCalled());
     });
 
     it("renders a permission status warning", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
     });
 });
@@ -113,29 +114,29 @@ describe("Template Builder when I have edit permissions ", () => {
     });
 
     it("fetches template data getTemplateById", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const { getTemplateById } = require('../../services/templateBuilderDatasourceService');
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const { getTemplateById } = require('../../../services/templateBuilderDatasourceService');
 
-        mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(getTemplateById).toBeCalled());
     });
 
     it("does not render a permission status warning", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
     });
 
     it("shows add funding line button when edit mode selected", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         wrapper.find("[data-testid='edit']").simulate('change');
         await waitFor(() => expect(wrapper.find("[data-testid='add']")).toHaveLength(1));
     });
 
     it("adds new funding line to page when button clicked", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         expect(wrapper.find('OrganisationChartNode')).toHaveLength(0);
         wrapper.find("[data-testid='edit']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
@@ -143,8 +144,8 @@ describe("Template Builder when I have edit permissions ", () => {
     });
 
     it("funding line displays add buttons in edit mode", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         wrapper.find("[data-testid='edit']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         await waitFor(() => {
@@ -154,8 +155,8 @@ describe("Template Builder when I have edit permissions ", () => {
     });
 
     it("funding line hides add buttons in view mode", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         wrapper.find("[data-testid='edit']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         wrapper.find("[data-testid='view']").simulate('change');
@@ -166,8 +167,8 @@ describe("Template Builder when I have edit permissions ", () => {
     });
 
     it("displays edit window when clicking on funding line", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        const wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         wrapper.find("[data-testid='edit']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         await waitFor(() => {
@@ -178,8 +179,8 @@ describe("Template Builder when I have edit permissions ", () => {
     });
 
     it("displays confirmation when deleting a funding line", async () => {
-        const { TemplateBuilder } = require('../../pages/Templates/TemplateBuilder');
-        let wrapper = mount(<MemoryRouter><TemplateBuilder /></MemoryRouter>);
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        let wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         wrapper.find("[data-testid='edit']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');

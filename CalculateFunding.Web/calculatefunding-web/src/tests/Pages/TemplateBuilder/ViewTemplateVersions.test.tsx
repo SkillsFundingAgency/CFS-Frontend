@@ -5,7 +5,7 @@ import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions"
 import {render, screen, waitFor} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import React from "react";
-import {ViewTemplateVersions} from "../../../pages/Templates/ViewTemplateVersions";
+import {ListVersions} from "../../../pages/Templates/ListVersions";
 import '@testing-library/jest-dom/extend-expect';
 
 const templateId = "xxxx-xxxx-xxxx-xxxx";
@@ -120,14 +120,14 @@ describe("Template Versions page when there are two versions and I have no permi
     });
 
     it("does not render a permission status warning", async () => {
-        render(<MemoryRouter><ViewTemplateVersions/></MemoryRouter>)
+        render(<MemoryRouter><ListVersions/></MemoryRouter>)
         await waitFor(() => {
             expect(screen.queryByText("You do not have permissions to perform the following actions")).not.toBeInTheDocument();
         });
     });
 
     it("does render versions list correctly", async () => {
-        const {getByTestId} = render(<MemoryRouter><ViewTemplateVersions/></MemoryRouter>)
+        const {getByTestId} = render(<MemoryRouter><ListVersions/></MemoryRouter>)
         await waitFor(() => {
             expect(getByTestId("version-1")).toBeInTheDocument();
             expect(getByTestId("version-2")).toBeInTheDocument();
@@ -185,7 +185,7 @@ describe("Template Versions page displays no results when filtered search return
     });
 
     it("does render no results correctly", async () => {
-        const {getByTestId} = render(<MemoryRouter><ViewTemplateVersions/></MemoryRouter>);
+        const {getByTestId} = render(<MemoryRouter><ListVersions/></MemoryRouter>);
         await waitFor(() => {
             expect(getByTestId( "no-results")).toBeVisible();
             expect(screen.queryByText("There are no records to match your search")).toBeInTheDocument();

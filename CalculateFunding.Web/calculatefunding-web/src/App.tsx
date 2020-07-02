@@ -11,11 +11,11 @@ import { ProviderFundingOverview } from "./pages/ProviderFundingOverview";
 import { CreateSpecification } from "./pages/Specifications/CreateSpecification";
 import { CreateDatasetPage } from "./pages/CreateDatasetPage";
 import { EditSpecification } from "./pages/Specifications/EditSpecification";
-import { ViewTemplates } from "./pages/Templates/ViewTemplates";
+import { ListTemplates } from "./pages/Templates/ListTemplates";
 import { PublishTemplate } from "./pages/Templates/PublishTemplate";
-import { TemplateBuilder } from "./pages/Templates/TemplateBuilder";
+import { EditTemplate } from "./pages/Templates/EditTemplate";
 import {CreateTemplate} from "./pages/Templates/CreateTemplate";
-import {ViewTemplateVersions} from "./pages/Templates/ViewTemplateVersions";
+import {ListVersions} from "./pages/Templates/ListVersions";
 import { Section } from "./types/Sections";
 import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
 import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
@@ -51,7 +51,6 @@ const App: React.FunctionComponent = () => {
         dispatch(getUserFundingStreamPermissions());
     }
 
-    
     initialiseAxios();
 
     useEffect(() => {
@@ -81,11 +80,12 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
-                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/View" component={ViewTemplates} />}
-                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Build/:templateId" component={TemplateBuilder} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />}
-                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ViewTemplateVersions} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />
                 <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation} />
                 <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation} />

@@ -15,7 +15,7 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 
-export const ViewTemplates = () => {
+export const ListTemplates = () => {
     const [canCreateTemplate, setCanCreateTemplate] = useState<boolean>(false);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [haveResults, setHaveResults] = useState<boolean>(false);
@@ -109,7 +109,7 @@ export const ViewTemplates = () => {
                             {templateListResults.results.map(template =>
                                 <tr key={template.id} className="govuk-table__row">
                                     <th scope="row" className="govuk-table__header"><Link
-                                        to={`/Templates/Build/${template.id}`}>{template.name}</Link></th>
+                                        to={`/Templates/${template.id}/Edit`}>{template.name}</Link></th>
                                     <td className="govuk-table__cell">{template.fundingStreamId}</td>
                                     <td className="govuk-table__cell">{template.fundingPeriodId}</td>
                                     <td className="govuk-table__cell"><DateFormatter date={template.lastUpdatedDate} utc={false}/></td>

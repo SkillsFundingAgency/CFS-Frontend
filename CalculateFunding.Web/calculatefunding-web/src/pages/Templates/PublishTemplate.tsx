@@ -88,7 +88,7 @@ export const PublishTemplate = () => {
                 isValid = false;
                 addErrorMessage("You can't publish an empty template. Go back to edit the contents.", "content");
             }
-            if (template.status != 'Draft') {
+            if (template.status !== 'Draft') {
                 isValid = false;
                 addErrorMessage("This template version has already been published.", "status");
             }
@@ -138,7 +138,7 @@ export const PublishTemplate = () => {
             <div className="govuk-width-container">
                 <Breadcrumbs>
                     <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/View"}/>
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
                     <Breadcrumb name={"Publish a template"}/>
                 </Breadcrumbs>
 
@@ -240,11 +240,11 @@ export const PublishTemplate = () => {
                                 </button>}
                                 &nbsp;
                                 {template && template.status !== "Published" && 
-                                <Link id="cancel" to="/Templates/View" className="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                <Link id="cancel" to="/Templates/List" className="govuk-button govuk-button--secondary" data-module="govuk-button">
                                     Back
                                 </Link>}
                                 {template && template.status === "Published" &&
-                                <Link id="continue" to="/Templates/View" className="govuk-button govuk-button--primary" data-module="govuk-button">
+                                <Link id="continue" to="/Templates/List" className="govuk-button govuk-button--primary" data-module="govuk-button">
                                     Continue
                                 </Link>}
                             </form>

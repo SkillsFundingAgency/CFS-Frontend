@@ -123,6 +123,7 @@ export interface TemplateResponse {
     minorVersion: number,
     majorVersion: number,
     version: number,
+    isCurrentVersion: boolean,
     authorId: string,
     authorName: string,
     comments: string,
@@ -161,6 +162,7 @@ export interface TemplateVersionSummary {
     lastModificationDate: Date,
     status: string,
     version: number,
+    isCurrentVersion: boolean,
     majorVersion: number,
     minorVersion: number
 }

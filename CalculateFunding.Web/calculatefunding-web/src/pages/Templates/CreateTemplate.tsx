@@ -115,11 +115,11 @@ export const CreateTemplate = () => {
         }
         setEnableSaveButton(false);
         try {
-            if (selectedFundingStreamId == undefined) {
+            if (selectedFundingStreamId === undefined) {
                 addErrorMessage("Funding stream is not defined", "fundingStreamId");
                 return;
             }
-            if (selectedFundingPeriodId == undefined) {
+            if (selectedFundingPeriodId === undefined) {
                 addErrorMessage("Funding period is not defined", "fundingPeriodId");
                 return;
             }
@@ -128,7 +128,7 @@ export const CreateTemplate = () => {
 
             const result = await createNewDraftTemplate(selectedFundingStreamId, selectedFundingPeriodId, description);
             if (result.status === 201) {
-                history.push("/Templates/Build/" + result.data);
+                history.push(`/Templates/${result.data}/Edit`);
             } else {
                 addErrorMessage(`Template creation failed: ` + result.status + ` ` + result.statusText + ` ` + result.data);
             }
@@ -145,7 +145,7 @@ export const CreateTemplate = () => {
             <div className="govuk-width-container">
                 <Breadcrumbs>
                     <Breadcrumb name={"Calculate Funding"} url={"/"} />
-                    <Breadcrumb name={"Templates"} url={"/Templates/View"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
                     <Breadcrumb name={"Create a new template"} />
                 </Breadcrumbs>
                 <PermissionStatus requiredPermissions={missingPermissions} />
@@ -229,7 +229,7 @@ export const CreateTemplate = () => {
                                     <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
                                 Template</button>}
                             &nbsp;
-                            <Link id="cancel-create-template" to="/Templates/View" className="govuk-button govuk-button--secondary"
+                            <Link id="cancel-create-template" to="/Templates/List" className="govuk-button govuk-button--secondary"
                                     data-module="govuk-button">
                                     Back
                             </Link>

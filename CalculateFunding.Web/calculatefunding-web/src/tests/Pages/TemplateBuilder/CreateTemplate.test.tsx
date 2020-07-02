@@ -1,12 +1,12 @@
-﻿import React from 'react';
-import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
+﻿﻿import React from 'react';
+import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import { waitFor, screen, render } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import { MemoryRouter } from 'react-router-dom';
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { CreateTemplate } from '../../pages/Templates/CreateTemplate';
+import { CreateTemplate } from '../../../pages/Templates/CreateTemplate';
 
 const fetchMock = new MockAdapter(axios);
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');

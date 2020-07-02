@@ -563,3 +563,10 @@ export async function updateTemplateDescription(templateId: string, description:
         data: { templateId, description }
     })
 }
+
+export async function getTemplateVersion(templateId: string, version: number): Promise<AxiosResponse<TemplateResponse>> {
+    return await axios(`/api/templates/build/${templateId}/versions/${version}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+}
