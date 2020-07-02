@@ -39,6 +39,7 @@ export const PublishTemplate = () => {
     let {templateId} = useParams();
 
     useEffectOnce(() => {
+        window.scrollTo(0, 0);
         fetchData();
     });
 

@@ -37,7 +37,7 @@ import {
     FundingLineOrCalculation,
     TemplateFundingLine,
     Template,
-    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem
+    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, TemplateStatus
 } from '../../types/TemplateBuilderDefinitions';
 import "../../styles/TemplateBuilder.scss";
 import {useEffectOnce} from '../../hooks/useEffectOnce';
@@ -49,6 +49,7 @@ import deepClone from 'lodash/cloneDeep';
 import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
 import {ErrorMessage} from '../../types/ErrorMessage';
+import {useHistory} from "react-router";
 
 enum Mode {
     View = 'view',
@@ -60,6 +61,7 @@ export function EditTemplate() {
     const descriptionRef = useRef<HTMLSpanElement>(null);
     let {templateId, version} = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDirty, setIsDirty] = useState<boolean>(false);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [saveMessage, setSaveMessage] = useState<string>('');
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
@@ -69,7 +71,7 @@ export function EditTemplate() {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [showModal, setShowModal] = useState<boolean>(false);
-    const {canEditTemplate, missingPermissions} = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
+    const {canEditTemplate, canApproveTemplate, missingPermissions} = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     const {
         initialiseState,
         updatePresentState,
@@ -81,6 +83,7 @@ export function EditTemplate() {
         canUndo,
         canRedo
     } = useTemplateUndo(setDS);
+    const history = useHistory();
 
     const keyPressHandler = (e: React.KeyboardEvent) => {
         if (e.keyCode === 90 && e.ctrlKey) {
@@ -93,6 +96,7 @@ export function EditTemplate() {
     useEventListener('keydown', keyPressHandler);
 
     useEffectOnce(() => {
+        window.scrollTo(0, 0);
         clearErrorMessages();
         fetchData();
         clearPresentState();
@@ -151,6 +155,7 @@ export function EditTemplate() {
 
     const update = (ds: FundingLineDictionaryEntry[]) => {
         updatePresentState(ds);
+        setIsDirty(true);
     }
 
     const openSideBar = (open: boolean) => {
@@ -238,6 +243,7 @@ export function EditTemplate() {
 
             await saveTemplateContent(templateContentUpdateCommand);
             await fetchData();
+            setIsDirty(false);
             showSaveMessageOnce("Template saved successfully.");
         } catch (err) {
             const errStatus = err.response.status;
@@ -259,6 +265,11 @@ export function EditTemplate() {
             setSaveMessage("Template failed to save due to errors.");
         }
     };
+
+    const handlePublishClick = () => {
+        if (!template) return;
+        history.push(`/Templates/Publish/${template.templateId}`);
+    }
 
     const handleAddFundingLineClick = () => {
         const keyCount = ds.length > 0 ? ds.reduce((prev, current) => {
@@ -391,11 +402,11 @@ export function EditTemplate() {
                     </div>
                     <span className="govuk-caption-m">Version</span>
                     <div className="govuk-body">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;
-                        {template && template.status === "Draft" && template.isCurrentVersion &&
+                        {template && template.status === TemplateStatus.Draft && template.isCurrentVersion &&
                         <span><strong className="govuk-tag govuk-tag--blue">In Progress</strong></span>}
-                        {template && template.status === "Draft" && !template.isCurrentVersion &&
+                        {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
                         <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
-                        {template && template.status === "Published" &&
+                        {template && template.status === TemplateStatus.Published &&
                         <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
                         <div>
                             <Link id="versions-link"
@@ -471,8 +482,12 @@ export function EditTemplate() {
                         />
                     </div>
                     {mode === Mode.Edit && template !== undefined && canEditTemplate &&
-                    <button className="govuk-button govuk-!-margin-right-1" data-testid='save'
-                            onClick={handleSaveContentClick}>Save and continue
+                    <button className="govuk-button" data-testid='save'
+                            disabled={!isDirty} onClick={handleSaveContentClick}>Save
+                    </button>}
+                    {template !== undefined && canApproveTemplate &&
+                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" data-testid='publish'
+                            disabled={isDirty} onClick={handlePublishClick}>Continue to publish
                     </button>}
                     {version && canEditTemplate && template && !template.isCurrentVersion &&
                     <button className="govuk-button govuk-!-margin-right-1" data-testid='save'

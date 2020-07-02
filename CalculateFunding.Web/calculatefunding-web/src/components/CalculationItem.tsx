@@ -228,7 +228,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                 }
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-formula-text">Formula Text</label>
-                    <input className="govuk-input govuk-!-width-two-thirds" id="calc-formula-text" name="calc-formula-text" type="text" value={formulaText} onChange={handleFormulaTextChange} />
+                    <input className="govuk-input govuk-!-width-two-thirds" id="calc-formula-text" name="calc-formula-text" type="text" value={formulaText} placeholder="Enter formula text" onChange={handleFormulaTextChange} />
                 </div>
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-value-format">Value Format</label>

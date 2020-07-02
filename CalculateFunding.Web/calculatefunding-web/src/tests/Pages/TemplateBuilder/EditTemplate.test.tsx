@@ -3,7 +3,8 @@ import { mount } from "enzyme";
 import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
-import { waitFor } from "@testing-library/react"
+import { waitFor, screen, render } from "@testing-library/react";
+import '@testing-library/jest-dom/extend-expect';
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
@@ -105,6 +106,12 @@ describe("Template Builder when I have no permissions ", () => {
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
     });
+
+    it("does not render a publish button", async () => {
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
+        await waitFor(() => expect(wrapper.find("[data-testid='publish']")).toHaveLength(0));
+    });
 });
 
 describe("Template Builder when I have edit permissions ", () => {
@@ -188,6 +195,14 @@ describe("Template Builder when I have edit permissions ", () => {
             expect(wrapper.find('FundingLineItem').find("[data-testid='node-n0-confirm-delete']")).toHaveLength(0);
             wrapper.find('FundingLineItem').find("[data-testid='node-n0-delete']").simulate('click');
             expect(wrapper.find('FundingLineItem').find("[data-testid='node-n0-confirm-delete']")).toHaveLength(1);
+        });
+    });
+
+    it("renders a publish button", async () => {
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const { getByTestId } = render(<MemoryRouter><EditTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByTestId("publish")).toBeInTheDocument();
         });
     });
 });

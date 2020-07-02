@@ -5,6 +5,7 @@ import 'jest-canvas-mock';
 import MutationObserver from '@sheerun/mutationobserver-shim';
 require('jest-localstorage-mock');
 
+window.scrollTo = jest.fn();
 window.MutationObserver = MutationObserver;
 
 configure({ adapter: new Adapter() });
