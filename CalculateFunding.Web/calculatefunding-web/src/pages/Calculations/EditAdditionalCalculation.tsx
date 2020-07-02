@@ -337,6 +337,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                                     <th className="govuk-table__header">End char</th>
                                 </tr>
                                 </thead>
+                                <tbody>
                                 {additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
                                     <tr key={index} className={"govuk-table__row"}>
                                         <td className="govuk-table__cell">{cm.message}</td>
@@ -346,6 +347,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                                         <td className="govuk-table__cell">{cm.location.endChar}</td>
                                     </tr>
                                 )}
+                                </tbody>
                             </table>
                             <ul className="govuk-error-summary__list">
                                 <li hidden={errorMessage.length === 0}>{errorMessage}</li>

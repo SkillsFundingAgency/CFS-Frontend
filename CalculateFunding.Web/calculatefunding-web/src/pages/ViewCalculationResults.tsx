@@ -24,6 +24,7 @@ import {JobSummary} from "../types/jobSummary";
 import {HubConnectionBuilder} from "@aspnet/signalr";
 import {JobMessage} from "../types/jobMessage";
 import {JobSummaryDetails} from "../components/JobSummaryDetails";
+import {Link} from "react-router-dom";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -275,10 +276,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         <h1 className="govuk-heading-xl">{calculationSummary.calculation.name}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
                         <JobSummaryDetails jobSummary={jobSummary} hidden={jobSummary.jobId === ""} />
-                        <a href={`/calcs/edit${calculationSummary.calculation.calculationType}calculation/${calculationSummary.calculation.id}`}
-                           role="button" className="govuk-button">
-                            View calculation
-                        </a>
+                        <Link to={`/Specifications/Edit${calculationSummary.calculation.calculationType}Calculation/${calculationSummary.calculation.id}`} className="govuk-button" role="button">View calculation</Link>
                     </div>
                 </div>
                 <div className="govuk-grid-row">
