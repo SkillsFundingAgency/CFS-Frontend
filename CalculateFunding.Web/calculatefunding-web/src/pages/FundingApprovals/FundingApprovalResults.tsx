@@ -325,7 +325,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     }
 
     return <div>
-        <Header location={Section.Datasets}/>
+        <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>

@@ -2,40 +2,57 @@ import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {
-    getFundingPeriodsByFundingStreamIdService,
-    getFundingStreamsService,
+    getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications,
     getSpecificationsByFundingPeriodAndStreamIdService
 } from "../../services/specificationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {FundingPeriod} from "../../types/viewFundingTypes";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export function FundingApprovalSelection() {
 
-    const [fundingStreams, setFundingStreams] = useState<string[]>([]);
+    const initialSpecificationState = {
+        isSelectedForFunding: false,
+        fundingStreams: [],
+        id: "",
+        providerVersionId: "",
+        description: "",
+        name: "",
+        approvalStatus: "",
+        fundingPeriod: {
+            id: "",
+            name: ""
+        }
+    };
+
+    const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("");
-    const [selectedSpecification, setSelectedSpecification] = useState<string>("");
+    const [selectedSpecification, setSelectedSpecification] = useState<SpecificationSummary>(initialSpecificationState);
     const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
-    const [isLoading, setIsLoading] = useState({
-        fundingStreams: false,
-        fundingPeriods: false,
-        specification: false
+
+    const [loadingState, setLoadingState] = useState({
+        specification: {
+            loading: false,
+            loaded: false,
+            data: false
+        }
     });
 
 
     useEffectOnce(() => {
-        getFundingStreamsService().then((result) => {
-            setFundingStreams(result.data);
+        getFundingStreamsForSelectedSpecifications().then((result) => {
+            setFundingStreams(result.data as FundingStream[]);
         })
     });
 
     function populateFundingPeriod(fundingStream: string) {
         if (fundingStream === "") {
             setFundingPeriods([]);
-            setSelectedSpecification("");
+            setSelectedSpecification(initialSpecificationState)
         } else {
             getFundingPeriodsByFundingStreamIdService(fundingStream).then((result) => {
                 setFundingPeriods(result.data as FundingPeriod[])
@@ -44,13 +61,31 @@ export function FundingApprovalSelection() {
     }
 
     function populateSpecification(fundingPeriod: string) {
-        if (fundingPeriod === "") {
-            setSelectedSpecification("")
-        } else {
+        if (fundingPeriod !== "") {
+            setLoadingState(prevState => {
+                return {
+                    ...prevState,
+                    specification: {
+                        loading: true,
+                        loaded: false,
+                        data: false
+                    }
+                }
+            });
             getSpecificationsByFundingPeriodAndStreamIdService(selectedFundingStream, fundingPeriod).then((result) => {
                 if (result.data.length > 0) {
-                    setSelectedSpecification((result.data[0] as SpecificationSummary).id)
+                    setSelectedSpecification(result.data[0] as SpecificationSummary)
                 }
+                setLoadingState(prevState => {
+                    return {
+                        ...prevState,
+                        specification: {
+                            loading: false,
+                            loaded: true,
+                            data: result.data.length > 0
+                        }
+                    }
+                })
             });
         }
     }
@@ -69,13 +104,13 @@ export function FundingApprovalSelection() {
     }
 
     return <div>
-        <Header location={Section.Datasets}/>
+        <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
-          <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Funding approvals"} url={"/Approvals"} />
-              <Breadcrumb name={"Select specification"} />
-          </Breadcrumbs>
+            <Breadcrumbs>
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Funding approvals"} url={"/Approvals"}/>
+                <Breadcrumb name={"Select specification"}/>
+            </Breadcrumbs>
 
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row  govuk-!-margin-bottom-9">
@@ -91,7 +126,7 @@ export function FundingApprovalSelection() {
                     <select className="govuk-select" id="funding-streams" name="sort"
                             onChange={(e) => changeFundingStream(e)}>
                         <option></option>
-                        {fundingStreams.map((fs, index) => <option key={index} value={fs}>{fs}</option>)}
+                        {fundingStreams.map((fs, index) => <option key={index} value={fs.id}>{fs.name}</option>)}
                     </select>
                 </div>
                 <div className="govuk-form-group" hidden={fundingPeriods.length === 0}>
@@ -104,14 +139,24 @@ export function FundingApprovalSelection() {
                         {fundingPeriods.map((fp, index) => <option key={index} value={fp.id}>{fp.name}</option>)}
                     </select>
                 </div>
-                <div className="govuk-form-group" hidden={selectedSpecification === ""}>
-                    <label className="govuk-label" >
+                <LoadingFieldStatus title="Loading specifications" hidden={!loadingState.specification.loading}/>
+                <div className="govuk-form-group" hidden={!(loadingState.specification.loaded && !loadingState.specification.data) || loadingState.specification.loading}>
+                    <label className="govuk-label">
                         Specification
                     </label>
-                    <h3 className="govuk-heading-m">{selectedSpecification}</h3>
+                    <div className="govuk-error-summary">
+                        <span className="govuk-body-m">There are no specifications available for the selection</span>
+                    </div>
+                </div>
+                <div className="govuk-form-group" hidden={!(loadingState.specification.loaded && loadingState.specification.data) || loadingState.specification.loading}>
 
-                    <Link to={`/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification}`}
-                       className="govuk-button" data-module="govuk-button">
+                    <label className="govuk-label">
+                        Specification
+                    </label>
+                    <h3 className="govuk-heading-m">{selectedSpecification.name}</h3>
+
+                    <Link to={`/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification.id}`}
+                          className="govuk-button" data-module="govuk-button">
                         View funding
                     </Link>
 
