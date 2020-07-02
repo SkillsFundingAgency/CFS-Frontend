@@ -1,48 +1,81 @@
 import {Header} from "../../components/Header";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Footer} from "../../components/Footer";
-import {useDispatch, useSelector} from "react-redux";
-import {AppState} from "../../states/AppState";
-import {SelectSpecificationState} from "../../states/SelectSpecificationState";
-import {
-    getFundingPeriodsByFundingStreamId,
-    getFundingStreams,
-    getSpecificationsByFundingPeriodAndStreamId
-} from "../../actions/SelectSpecificationActions";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {useEffectOnce} from "../../hooks/useEffectOnce";
+import {getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications, getSpecificationsByFundingPeriodAndStreamIdService} from "../../services/specificationService";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
-export interface SelectSpecificationProps {
-    fundingStreams: string[];
-}
-
-export function SelectSpecification(props: SelectSpecificationProps) {
-    const dispatch = useDispatch();
+export function SelectSpecification() {
     const [selectedFundingStreamId, setSelectedFundingStreamId] = useState('');
     const [selectedSpecificationId, setSpecificationId] = useState('');
 
-    let selectSpecification: SelectSpecificationState = useSelector((state: AppState) => state.selectSpecification);
+    const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
+    const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
+    const [specifications, setSpecifications] = useState<SpecificationSummary[]>([]);
 
-    document.title = "Select Specification - Calculate funding";
+    const [loadingState, setLoadingState] = useState({
+        specification: {
+            loading: false,
+            loaded: false,
+            data: false}
+    });
 
-    if (selectSpecification.fundingStreams.length === 0)
-        dispatch(getFundingStreams());
 
-    useEffect(() => {
-        dispatch(getFundingPeriodsByFundingStreamId(selectedFundingStreamId));
-    }, [selectedFundingStreamId]);
+    document.title = "Select specification - Calculate funding";
+
+    useEffectOnce(() => {
+        getFundingStreamsForSelectedSpecifications().then((response) => {
+            setFundingStreams(response.data as FundingStream[])
+        })
+    })
 
     function updateFundingPeriods(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
         setSelectedFundingStreamId(filter);
-        dispatch(getFundingPeriodsByFundingStreamId(filter));
+        setLoadingState({
+                specification: {
+                    data: false,
+                    loaded: false,
+                    loading: false
+                }
+            }
+        );
+        setSpecificationId("");
+
+        getFundingPeriodsByFundingStreamIdService(filter).then((response) => {
+            setFundingPeriods(response.data as FundingPeriod[])
+        })
+
+
     }
 
     function updateSpecifications(event: React.ChangeEvent<HTMLSelectElement>) {
         const selectedFundingPeriodId = event.target.value;
-        dispatch(getSpecificationsByFundingPeriodAndStreamId(selectedFundingStreamId, selectedFundingPeriodId));
+        setLoadingState({
+                specification: {
+                    data: false,
+                    loaded: false,
+                    loading: true
+                }
+            });
+        setSpecificationId("");
+        getSpecificationsByFundingPeriodAndStreamIdService(selectedFundingStreamId, selectedFundingPeriodId).then((response) => {
+            setSpecifications(response.data as SpecificationSummary[]);
+            setLoadingState({
+                    specification: {
+                        data: response.data.length > 0,
+                        loaded: true,
+                        loading: false
+                    }
+
+            })
+        });
     }
 
     function setSpecification(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -54,8 +87,8 @@ export function SelectSpecification(props: SelectSpecificationProps) {
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View results"} url={"/results"} />
-                <Breadcrumb name={"Select specification"} />
+                <Breadcrumb name={"View results"} url={"/results"}/>
+                <Breadcrumb name={"Select specification"}/>
             </Breadcrumbs>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
@@ -68,13 +101,13 @@ export function SelectSpecification(props: SelectSpecificationProps) {
                     <div className="govuk-form-group">
                         <label htmlFor="select-funding-stream" className="govuk-label">Select funding stream:</label>
                         <select id="select-funding-stream" className="govuk-select"
-                                disabled={selectSpecification.fundingStreams.length === 0}
+                                disabled={fundingStreams.length === 0}
                                 onChange={(e) => {
-                            updateFundingPeriods(e)
-                        }}>
+                                    updateFundingPeriods(e)
+                                }}>
                             <option>Please select a funding stream</option>
-                            {selectSpecification.fundingStreams.map(fs =>
-                                <option key={fs} value={fs}>{fs}</option>
+                            {fundingStreams.map(fs =>
+                                <option key={fs.id} value={fs.id}>{fs.name}</option>
                             )}
                         </select>
                     </div>
@@ -84,37 +117,46 @@ export function SelectSpecification(props: SelectSpecificationProps) {
                         <label htmlFor="select-provider" className="govuk-label">Select funding
                             period:</label>
                         <select id="select-provider" className="govuk-select" placeholder="Please select"
-                                disabled={selectSpecification.fundingPeriods.length === 0}
+                                disabled={fundingPeriods.length === 0}
                                 onChange={(e) => {
                                     updateSpecifications(e)
                                 }}>
                             <option>Please select a funding period</option>
-                            {selectSpecification.fundingPeriods.map(fp =>
+                            {fundingPeriods.map(fp =>
                                 <option key={fp.id} value={fp.id}>{fp.name}</option>
                             )}
                         </select>
                     </div>
                 </fieldset>
-                <fieldset className="govuk-fieldset">
+                <LoadingFieldStatus title="Loading specifications" hidden={!loadingState.specification.loading}/>
+                <div className="govuk-form-group" hidden={!(loadingState.specification.loaded && !loadingState.specification.data) || loadingState.specification.loading}>
+                    <label className="govuk-label">
+                        Specification
+                    </label>
+                    <div className="govuk-error-summary">
+                        <span className="govuk-body-m">There are no specifications available for the selection</span>
+                    </div>
+                </div>
+                <fieldset className="govuk-fieldset" hidden={!(loadingState.specification.loaded && loadingState.specification.data) || loadingState.specification.loading}>
                     <div className="govuk-form-group">
                         <label htmlFor="select-provider" className="govuk-label">Select specification:</label>
                         <select id="select-provider" className="govuk-select" placeholder="Please select"
-                                disabled={selectSpecification.specifications.length === 0}
+                                disabled={specifications.length === 0}
                                 onChange={(e) => {
                                     setSpecification(e)
                                 }}>
                             <option key={''} value={''}>Please select a specification</option>
-                            {selectSpecification.specifications.map(fp =>
-                                <option key={fp.id} value={fp.id}>{fp.name}</option>
+                            {specifications.map(s =>
+                                <option key={s.id} value={s.id}>{s.name}</option>
                             )}
                         </select>
                     </div>
                 </fieldset>
-                <div className="govuk-grid-row">
+                <div className="govuk-grid-row" hidden={!(loadingState.specification.loaded && loadingState.specification.data) || loadingState.specification.loading}>
                     <div className="govuk-grid-column-full">
-                        <Link to={selectedSpecificationId === ''? `#` : `/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
-                           className={`govuk-button govuk-button ${selectedSpecificationId === ''? "govuk-button--disabled":"govuk-button govuk-button"}`}
-                           data-module="govuk-button">
+                        <Link to={selectedSpecificationId === '' ? `#` : `/ViewSpecificationResults/${selectedSpecificationId}`} role="button"
+                              className={`govuk-button govuk-button ${selectedSpecificationId === '' ? "govuk-button--disabled" : "govuk-button govuk-button"}`}
+                              data-module="govuk-button">
                             Continue
                         </Link>
                     </div>
