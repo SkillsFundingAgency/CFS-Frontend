@@ -304,7 +304,8 @@ export function EditTemplate() {
         redo();
     }
 
-    const toggleEditDescription = () => {
+    const toggleEditDescription = (event: React.ChangeEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
         clearErrorMessages();
         setShowModal(!showModal);
     }
@@ -396,9 +397,25 @@ export function EditTemplate() {
                                 <span className="govuk-visually-hidden">Error:</span> {error.message}
                             </span>
                         )}
-                        <p className="govuk-body">{template && template.description}
+                        <p className="govuk-body">
+                            {template && template.description.trim()}
                             {template && template.isCurrentVersion &&
-                            <button className="govuk-link" onClick={toggleEditDescription}>Edit</button>}</p>
+                            <>
+                                {template.description.trim().length > 0 &&
+                                <a id="edit-description-link" href={"#"}
+                                   onClick={toggleEditDescription}
+                                   className="govuk-link--no-visited-state">
+                                    Edit
+                                </a>}
+                                {template.description.trim().length === 0 &&
+                                <a id="add-description-link" href={"#"}
+                                   onClick={toggleEditDescription}
+                                   className="govuk-link--no-visited-state">
+                                    Add
+                                </a>}
+                            </>
+                            }
+                        </p>
                     </div>
                     <span className="govuk-caption-m">Version</span>
                     <div className="govuk-body">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;
@@ -407,12 +424,25 @@ export function EditTemplate() {
                         {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
                         <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
                         {template && template.status === TemplateStatus.Published &&
-                        <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
+                        <span><strong className="govuk-tag govuk-tag--green">Published</strong><br/>
+                            
+                        </span>}
+                        {template && template.version > 1 &&
                         <div>
                             <Link id="versions-link"
                                   to={`/Templates/${templateId}/Versions`}
-                                  className="govuk-link--no-visited-state">View all versions</Link></div>
+                                  className="govuk-link--no-visited-state">
+                                View all versions
+                            </Link>
+                        </div>}
                     </div>
+                    {template && template.status === TemplateStatus.Published &&
+                    <>
+                        <span className="govuk-caption-m">Publish Notes</span>
+                        <p className="govuk-body">
+                            {template && template.comments}
+                        </p>
+                    </>}
                     <span className="govuk-caption-m">Last Update</span>
                     <p className="govuk-body">
                         <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false}/> by
@@ -423,14 +453,14 @@ export function EditTemplate() {
                         <div className="govuk-radios govuk-radios--inline">
                             <div className="govuk-radios__item">
                                 <input className="govuk-radios__input" id="edit-mode" name="edit-mode" type="radio" value="edit"
-                                       checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit'/>
+                                       checked={mode === Mode.Edit} onChange={handleModeChange} data-testid='edit-option'/>
                                 <label className="govuk-label govuk-radios__label" htmlFor="edit-mode">
                                     Edit
                                 </label>
                             </div>
                             <div className="govuk-radios__item">
                                 <input className="govuk-radios__input" id="edit-mode-2" name="edit-mode" type="radio" value="view"
-                                       checked={mode === Mode.View} onChange={handleModeChange} data-testid='view'/>
+                                       checked={mode === Mode.View} onChange={handleModeChange} data-testid='view-option'/>
                                 <label className="govuk-label govuk-radios__label" htmlFor="edit-mode-2">
                                     View
                                 </label>
@@ -482,19 +512,19 @@ export function EditTemplate() {
                         />
                     </div>
                     {mode === Mode.Edit && template !== undefined && canEditTemplate &&
-                    <button className="govuk-button" data-testid='save'
+                    <button className="govuk-button" data-testid='save-button'
                             disabled={!isDirty} onClick={handleSaveContentClick}>Save
                     </button>}
-                    {template !== undefined && canApproveTemplate &&
-                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" data-testid='publish'
+                    {template !== undefined && canApproveTemplate && template.status !== TemplateStatus.Published &&
+                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" data-testid='publish-button'
                             disabled={isDirty} onClick={handlePublishClick}>Continue to publish
                     </button>}
                     {version && canEditTemplate && template && !template.isCurrentVersion &&
-                    <button className="govuk-button govuk-!-margin-right-1" data-testid='save'
+                    <button className="govuk-button govuk-!-margin-right-1" data-testid='restore-button'
                             onClick={() => alert("Coming soon...")}>Restore as current version
                     </button>}
                     {version &&
-                    <Link to={`/Templates/${templateId}/Versions`} id="versions-link"
+                    <Link to={`/Templates/${templateId}/Versions`} id="back-button"
                           className="govuk-button govuk-button--secondary"
                           data-module="govuk-button">
                         Back
