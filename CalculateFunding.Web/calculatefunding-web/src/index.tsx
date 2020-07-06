@@ -3,12 +3,16 @@ import * as ReactDOM from 'react-dom';
 import { Store, createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import AppContainer from './containers/AppContainer';
-import {IStoreState, rootReducer} from "./reducers/rootReducer";
-import {composeWithDevTools} from "redux-devtools-extension";
+import { IStoreState, rootReducer } from "./reducers/rootReducer";
+import { composeWithDevTools } from "redux-devtools-extension";
 import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
 
-const middleware = [logger, thunk as ThunkMiddleware<IStoreState>];
+let middleware = [thunk as ThunkMiddleware<IStoreState>];
+
+if (process.env.NODE_ENV === 'development') {
+    middleware = [...middleware, logger];
+}
 
 const store: Store<IStoreState> = createStore(
     rootReducer,
@@ -17,7 +21,7 @@ const store: Store<IStoreState> = createStore(
 
 ReactDOM.render(
     <Provider store={store}>
-        <AppContainer  />
+        <AppContainer />
     </Provider>,
     document.getElementById('main-content') as HTMLElement
 );
