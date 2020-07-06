@@ -39,7 +39,7 @@ import {
     Template,
     TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, TemplateStatus
 } from '../../types/TemplateBuilderDefinitions';
-import "../../styles/TemplateBuilder.scss";
+import "../../styles/EditTemplate.scss";
 import {useEffectOnce} from '../../hooks/useEffectOnce';
 import {DateFormatter} from '../../components/DateFormatter';
 import {Breadcrumbs, Breadcrumb} from '../../components/Breadcrumbs';
@@ -304,7 +304,7 @@ export function EditTemplate() {
         redo();
     }
 
-    const toggleEditDescription = (event: React.ChangeEvent<HTMLAnchorElement>) => {
+    const toggleEditDescription = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         clearErrorMessages();
         setShowModal(!showModal);
@@ -398,21 +398,21 @@ export function EditTemplate() {
                             </span>
                         )}
                         <p className="govuk-body">
-                            {template && template.description.trim()}
+                            {`${(template && template.description && template.description.trim()) || ''} `}
                             {template && template.isCurrentVersion &&
                             <>
-                                {template.description.trim().length > 0 &&
-                                <a id="edit-description-link" href={"#"}
+                                {template.description && template.description.trim().length > 0 &&
+                                <button id="edit-description-link"
                                    onClick={toggleEditDescription}
-                                   className="govuk-link--no-visited-state">
+                                   className="govuk-link govuk-link--no-visited-state">
                                     Edit
-                                </a>}
-                                {template.description.trim().length === 0 &&
-                                <a id="add-description-link" href={"#"}
+                                </button>}
+                                {(template.description === null || template.description.trim().length === 0) &&
+                                <button id="add-description-link"
                                    onClick={toggleEditDescription}
-                                   className="govuk-link--no-visited-state">
+                                   className="govuk-link govuk-link--no-visited-state">
                                     Add
-                                </a>}
+                                </button>}
                             </>
                             }
                         </p>
@@ -445,8 +445,8 @@ export function EditTemplate() {
                     </>}
                     <span className="govuk-caption-m">Last Update</span>
                     <p className="govuk-body">
-                        <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false}/> by
-                        {template && template.authorName}
+                        <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false}/>
+                        {` by ${template && template.authorName}`}
                     </p>
                     {canEditTemplate && (!version || (template && template.isCurrentVersion)) &&
                     <div className="govuk-form-group">
@@ -571,7 +571,7 @@ export function EditTemplate() {
             {
                 mode === Mode.Edit && canEditTemplate && !isLoading &&
                 <EditDescriptionModal
-                    originalDescription={template ? template.description : ""}
+                    originalDescription={template && template.description ? template.description : ""}
                     showModal={showModal}
                     toggleModal={setShowModal}
                     saveDescription={saveDescription}/>
