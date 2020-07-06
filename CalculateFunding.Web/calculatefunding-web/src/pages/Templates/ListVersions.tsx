@@ -12,6 +12,7 @@ import {GetTemplateVersionsResponse, TemplateResponse, TemplateStatus, TemplateV
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {Footer} from "../../components/Footer";
 import {AxiosError} from "axios";
+import { PublishStatus } from "../../types/PublishStatusModel";
 
 export const ListVersions = () => {
     let {templateId} = useParams();
@@ -43,14 +44,13 @@ export const ListVersions = () => {
         }).finally(() => setIsLoadingTemplate(false));
     }
 
-
-
     useEffectOnce(() => {
         loadTemplate();
     });
 
     useEffect(() => {
         function loadTemplateVersions() {
+            setIsLoadingVersions(true);
             const getVersions = async () => {
                 const statuses: TemplateStatus[] = [
                     ...includeDrafts ? [TemplateStatus.Draft] : [],
@@ -59,7 +59,6 @@ export const ListVersions = () => {
                 const result = await getVersionsOfTemplate(templateId, page, itemsPerPage, statuses);
                 return result.data as GetTemplateVersionsResponse;
             };
-            setIsLoadingVersions(true);
             if (!includeDrafts && !includePublished) {
                 setResults([]);
                 setTotalResults(0);
@@ -68,7 +67,6 @@ export const ListVersions = () => {
                 getVersions().then((result) => {
                     setResults(result.pageResults);
                     setTotalResults(result.totalCount);
-                    setIsLoadingVersions(false);
                 }).catch((error: AxiosError) => {
                     const response = error.response;
                     if (!response) {
@@ -83,9 +81,9 @@ export const ListVersions = () => {
     function onStatusFilterChanged(e: React.ChangeEvent<HTMLInputElement>) {
         setPage(1);
         const status = e.target.value as TemplateStatus;
-        if (status === "Draft") {
+        if (status === TemplateStatus.Draft) {
             setIncludeDrafts(e.target.checked);
-        } else if (status === "Published") {
+        } else if (status === TemplateStatus.Published) {
             setIncludePublished(e.target.checked);
         }
     }
@@ -196,11 +194,11 @@ export const ListVersions = () => {
                                                 >Version {item.majorVersion}.{item.minorVersion}</Link>
                                             </th>
                                             <td className="govuk-table__cell" data-testid={"status-" + item.version}>
-                                                {item.status === "Draft" && item.version === template.version &&
+                                                {item.status === TemplateStatus.Draft && item.version === template.version &&
                                                 <span><strong className="govuk-tag govuk-tag--blue">In Progress</strong></span>}
-                                                {item.status === "Draft" && item.version !== template.version &&
+                                                {item.status === TemplateStatus.Draft && item.version !== template.version &&
                                                 <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
-                                                {item.status === "Published" &&
+                                                {item.status === TemplateStatus.Published &&
                                                 <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
                                             </td>
                                             <td className="govuk-table__cell">

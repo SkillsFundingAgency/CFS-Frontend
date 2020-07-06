@@ -43,6 +43,7 @@ export const ListTemplates = () => {
         }
         setMissingPermissions(missingPermissions);
     }, [canCreateTemplate]);
+
     useEffect(() => {
         const permissionsToApply = permissions ? permissions : [];
         setCanCreateTemplate(getEffectiveCanCreateTemplate(permissionsToApply));
@@ -61,6 +62,7 @@ export const ListTemplates = () => {
     }
 
     useEffectOnce(() => {
+        window.scrollTo(0, 0);
         populateTemplates(searchCriteria);
     });
 

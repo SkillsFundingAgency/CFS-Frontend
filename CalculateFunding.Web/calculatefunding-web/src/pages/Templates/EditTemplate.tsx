@@ -8,6 +8,7 @@ import {Header} from '../../components/Header';
 import {Footer} from '../../components/Footer';
 import OrganisationChart from "../../components/OrganisationChart";
 import TemplateBuilderNode from "../../components/TemplateBuilderNode";
+import {TemplateButtons} from "../../components/TemplateButtons";
 import {
     addNode,
     removeNode,
@@ -418,14 +419,14 @@ export function EditTemplate() {
                         </p>
                     </div>
                     <span className="govuk-caption-m">Version</span>
-                    <div className="govuk-body">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;
+                    <div className="govuk-body">
+                        <span className="govuk-heading-m">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;</span>
                         {template && template.status === TemplateStatus.Draft && template.isCurrentVersion &&
                         <span><strong className="govuk-tag govuk-tag--blue">In Progress</strong></span>}
                         {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
                         <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
                         {template && template.status === TemplateStatus.Published &&
                         <span><strong className="govuk-tag govuk-tag--green">Published</strong><br/>
-                            
                         </span>}
                         {template && template.version > 1 &&
                         <div>
@@ -511,32 +512,18 @@ export function EditTemplate() {
                             nextId={nextId}
                         />
                     </div>
-                    {mode === Mode.Edit && template !== undefined && canEditTemplate &&
-                    <button className="govuk-button" data-testid='save-button'
-                            disabled={!isDirty} onClick={handleSaveContentClick}>Save
-                    </button>}
-                    {template !== undefined && canApproveTemplate && template.status !== TemplateStatus.Published &&
-                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" data-testid='publish-button'
-                            disabled={isDirty} onClick={handlePublishClick}>Continue to publish
-                    </button>}
-                    {version && canEditTemplate && template && !template.isCurrentVersion &&
-                    <button className="govuk-button govuk-!-margin-right-1" data-testid='restore-button'
-                            onClick={() => alert("Coming soon...")}>Restore as current version
-                    </button>}
-                    {version &&
-                    <Link to={`/Templates/${templateId}/Versions`} id="back-button"
-                          className="govuk-button govuk-button--secondary"
-                          data-module="govuk-button">
-                        Back
-                    </Link>
-                    }
-                    {!version &&
-                    <Link id="cancel-create-template" to="/Templates/List"
-                          className="govuk-button govuk-button--secondary"
-                          data-module="govuk-button">
-                        Back
-                    </Link>
-                    }
+                    {template && <TemplateButtons
+                        isEditMode={mode === Mode.Edit}
+                        canEditTemplate={canEditTemplate}
+                        canApproveTemplate={canApproveTemplate}
+                        templateId={templateId}
+                        templateStatus={template.status}
+                        templateVersion={version}
+                        unsavedChanges={isDirty}
+                        isCurrentVersion={template.isCurrentVersion}
+                        handleSave={handleSaveContentClick}
+                        handlePublish={handlePublishClick}
+                    />}
                     {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                     {mode === Mode.Edit &&
                     <Sidebar
