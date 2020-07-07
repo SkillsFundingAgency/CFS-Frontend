@@ -6,7 +6,6 @@ import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {DateFormatter} from "../../components/DateFormatter";
 import Pagination from "../../components/Pagination";
-import {FacetValue} from "../../types/CalculationProviderResult";
 import {SpecificationSearchRequestViewModel} from "../../types/SpecificationSearchRequestViewModel";
 import {Section} from "../../types/Sections";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -14,6 +13,7 @@ import {getAllSpecificationsService} from "../../services/specificationService";
 import {SpecificationListResults} from "../../types/SpecificationListResults";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {FacetValue} from "../../types/Facet";
 
 export function SpecificationsList() {
     const [specificationListResults, setSpecificationListResults] = useState<SpecificationListResults>({

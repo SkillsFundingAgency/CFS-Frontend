@@ -41,6 +41,7 @@ import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 import { initialiseAxios } from './services/axiosInterceptor';
+import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -65,6 +66,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection} />
                 <Route path="/Approvals/FundingApprovalResults/:fundingStreamId/:fundingPeriodId/:specificationId" component={FundingApprovalResults} />
                 <Route path="/results" component={ViewResults} />
+                <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream} />
                 <Route path="/SelectSpecification" component={SelectSpecification} />
                 <Route path="/SpecificationsList" component={SpecificationsList} />
                 <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />

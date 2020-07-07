@@ -12,7 +12,6 @@ import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsS
 import {getCalculationById, getCalculationResults} from "../actions/ViewCalculationResultsActions";
 import {FundingStream} from "../types/viewFundingTypes";
 import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
-import {FacetValue} from "../types/CalculationProviderResult";
 import {getSpecificationSummary} from "../actions/ViewSpecificationResultsActions";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
@@ -24,6 +23,7 @@ import {JobSummary} from "../types/jobSummary";
 import {HubConnectionBuilder} from "@aspnet/signalr";
 import {JobMessage} from "../types/jobMessage";
 import {JobSummaryDetails} from "../components/JobSummaryDetails";
+import {FacetValue} from "../types/Facet";
 import {Link} from "react-router-dom";
 
 export interface ViewCalculationResultsProps {

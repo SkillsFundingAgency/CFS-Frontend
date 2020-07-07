@@ -1,4 +1,4 @@
-import {Facet} from "./CalculationProviderResult";
+import {Facet} from "./Facet";
 
 export interface SpecificationListResultsItem {
     fundingPeriodName: string;

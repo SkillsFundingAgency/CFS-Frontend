@@ -1,4 +1,8 @@
 import axios from "axios"
+import {TemplateSearchRequest} from "../types/searchRequestViewModel";
+import {SearchMode} from "../types/SearchMode";
+import {useState} from "react";
+import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
 
 let baseURL = "/api/provider";
 
@@ -33,5 +37,15 @@ export async function getLocalAuthoritiesService(fundingStreamId: string, fundin
         headers: {
             'Content-Type': 'application/json'
         }
+    });
+}
+
+export async function GetProvidersByFundingStreamService(fundingStreamId: string, search: ProviderVersionSearchModel) {
+    return axios(`${baseURL}/fundingstreams/${fundingStreamId}/current/search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: search
     });
 }

@@ -1,4 +1,6 @@
-    export interface Provider {
+import {Facet} from "../Facet";
+
+export interface Provider {
         id: string;
         providerType: string;
         localAuthority: string;
@@ -18,16 +20,6 @@
         lastPage: number;
         pages: number[];
         currentPage: number;
-    }
-
-    export interface FacetValue {
-        name: string;
-        count: number;
-    }
-
-    export interface Facet {
-        name: string;
-        facetValues: FacetValue[];
     }
 
     export interface PublishProviderSearchResultViewModel {

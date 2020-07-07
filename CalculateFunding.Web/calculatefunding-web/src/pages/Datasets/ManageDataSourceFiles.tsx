@@ -11,8 +11,8 @@ import {DateFormatter} from "../../components/DateFormatter";
 import Pagination from "../../components/Pagination";
 import {DatasetSearchRequestViewModel} from "../../types/Datasets/DatasetSearchRequestViewModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {FacetValue} from "../../types/CalculationProviderResult";
 import {Link} from "react-router-dom";
+import {FacetValue} from "../../types/Facet";
 
 export function ManageDataSourceFiles() {
     const initialSearch: DatasetSearchRequestViewModel = {

@@ -1,4 +1,5 @@
 import {PagerState} from "./publishedProvider";
+import {Facet} from "./Facet";
 
 export interface CalculationProviderResultList {
     calculationProviderResults: CalculationProviderResult[];
@@ -34,14 +35,4 @@ export interface CalculationProviderResult {
     lastUpdatedDateDisplay: string;
     dateOpenedDisplay: string;
     calculationResultDisplay: string;
-}
-
-export interface FacetValue {
-    name: string;
-    count: number;
-}
-
-export interface Facet {
-    name: string;
-    facetValues: FacetValue[];
 }
