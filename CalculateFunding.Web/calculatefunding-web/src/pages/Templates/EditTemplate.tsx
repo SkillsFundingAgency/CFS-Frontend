@@ -428,7 +428,7 @@ export function EditTemplate() {
                         {template && template.status === TemplateStatus.Published &&
                         <span><strong className="govuk-tag govuk-tag--green">Published</strong><br/>
                         </span>}
-                        {template && template.version > 1 &&
+                        {template && 
                         <div>
                             <Link id="versions-link"
                                   to={`/Templates/${templateId}/Versions`}
@@ -516,9 +516,11 @@ export function EditTemplate() {
                         isEditMode={mode === Mode.Edit}
                         canEditTemplate={canEditTemplate}
                         canApproveTemplate={canApproveTemplate}
-                        templateId={templateId}
+                        templateId={template.templateId}
                         templateStatus={template.status}
-                        templateVersion={version}
+                        hasTemplateContent={template.templateJson !== null && template.templateJson.trim().length > 0}
+                        templateVersion={template.version}
+                        cameFromVersionList={version !== undefined}
                         unsavedChanges={isDirty}
                         isCurrentVersion={template.isCurrentVersion}
                         handleSave={handleSaveContentClick}

@@ -59,30 +59,9 @@ export const permissionsState: FundingStreamPermissions[] = [{
 
 beforeAll(() => {
     function mockFunctions() {
-        const originalService = require.requireActual('../../../services/templateBuilderDatasourceService');
+        const originalService = jest.requireActual('../../../services/templateBuilderDatasourceService');
         return {
             ...originalService,
-            getTemplateById: jest.fn(() => Promise.resolve({
-                data: {
-                    templateId: "12352346",
-                    name: "template name",
-                    description: "lorem ipsum",
-                    fundingStreamId: "DSG",
-                    fundingPeriodId: "2021",
-                    majorVersion: 0,
-                    minorVersion: 2,
-                    version: 2,
-                    isCurrentVersion: true,
-                    status: "Draft",
-                    schemaVersion: "1.1",
-                    templateJson: "",
-                    authorId: "",
-                    authorName: "",
-                    lastModificationDate: new Date(),
-                    publishStatus: "",
-                    publishNote: ""
-                }
-            })),
             getTemplateVersion: jest.fn(() => Promise.resolve({
                 data: {
                     templateId: "12352346",
@@ -108,16 +87,6 @@ beforeAll(() => {
     }
     jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions());
 });
-
-const mountTemplateVersionPage = () =>
-{
-    const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
-    return mount(<MemoryRouter initialEntries={[`/Templates/12352346/Versions/1`]}>
-        <Switch>
-            <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>
-        </Switch>
-    </MemoryRouter>);
-}
 const renderTemplateVersionPage = () =>
 {
     const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
@@ -135,19 +104,19 @@ describe("Template Builder when I request previous version", () => {
     });
 
     it("does not render a permission status warning", async () => {
-        const wrapper = mountTemplateVersionPage();
-        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
+        const {queryByTestId} = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("permission-alert-message")).not.toBeInTheDocument());
     });
 
     it("fetches template data getTemplateVersion", async () => {
         const { getTemplateVersion } = require('../../../services/templateBuilderDatasourceService');
-        mountTemplateVersionPage();
+        renderTemplateVersionPage();
         await waitFor(() => expect(getTemplateVersion).toBeCalled());
     });
 
     it("hides edit option when not viewing current version but have edit permissions", async () => {
-        const wrapper = mountTemplateVersionPage();
-        await waitFor(() => expect(wrapper.find("[data-testid='edit-option']")).toHaveLength(0));
+        const {queryByTestId} = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("edit-option")).not.toBeInTheDocument());
     });
 
     it("does render a publish button", async () => {
@@ -156,17 +125,17 @@ describe("Template Builder when I request previous version", () => {
     });
 
     it("does not render the add or edit description link", async () => {
-        const wrapper = mountTemplateVersionPage();
+        const {container} = renderTemplateVersionPage();
         await waitFor(() => {
-            expect(wrapper.find("#add-description-link")).toHaveLength(0);
-            expect(wrapper.find("#edit-description-link")).toHaveLength(0);
+            expect(container.querySelector("#add-description-link")).not.toBeInTheDocument();
+            expect(container.querySelector("#edit-description-link")).not.toBeInTheDocument();
         });
     });
 
     it("does not render a save button", async () => {
-        const wrapper = mountTemplateVersionPage();
+        const {queryByTestId} = renderTemplateVersionPage();
 
-        await waitFor(() => expect(wrapper.find("[data-testid='save-button']")).toHaveLength(0));
+        await waitFor(() => expect(queryByTestId("save-button")).not.toBeInTheDocument());
     });
 
     it("does render a restore button", async () => {
@@ -189,30 +158,30 @@ describe("Template Builder when I request previous version and have no permissio
 
     it("fetches template data getTemplateVersion", async () => {
         const { getTemplateVersion } = require('../../../services/templateBuilderDatasourceService');
-        mountTemplateVersionPage();
+        renderTemplateVersionPage();
         await waitFor(() => expect(getTemplateVersion).toBeCalled());
     });
 
     it("does not render a restore button", async () => {
-        const wrapper = mountTemplateVersionPage();
-        await waitFor(() => expect(wrapper.find("[data-testid='restore-button']")).toHaveLength(0));
+        const { queryByTestId } = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("restore-button")).not.toBeInTheDocument());
     });
 
     it("does not render a publish button", async () => {
-        const wrapper = mountTemplateVersionPage();
-        await waitFor(() => expect(wrapper.find("[data-testid='publish-button']")).toHaveLength(0));
+        const { queryByTestId } = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("publish-button")).not.toBeInTheDocument());
     });
 
     it("does not render the add or edit description link", async () => {
-        const wrapper = mountTemplateVersionPage();
+        const {container} = renderTemplateVersionPage();
         await waitFor(() => {
-            expect(wrapper.find("#add-description-link")).toHaveLength(0);
-            expect(wrapper.find("#edit-description-link")).toHaveLength(0);
+            expect(container.querySelector("#add-description-link")).not.toBeInTheDocument();
+            expect(container.querySelector("#edit-description-link")).not.toBeInTheDocument();
         });
     });
 
     it("does not render a save button", async () => {
-        const wrapper = mountTemplateVersionPage();
-        await waitFor(() => expect(wrapper.find("[data-testid='save-button']")).toHaveLength(0));
+        const { queryByTestId } = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("save-button")).not.toBeInTheDocument());
     });
 });

@@ -1,12 +1,68 @@
 ﻿﻿import React from "react";
 import {ListTemplates} from "../../../pages/Templates/ListTemplates";
-import { mount } from "enzyme";
-import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
+import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
-import {Link} from "react-router-dom";
+import {TemplateSearchResponse} from "../../../types/TemplateBuilderDefinitions";
+import {render, waitFor} from "@testing-library/react";
+import '@testing-library/jest-dom/extend-expect';
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+
+export const mockTemplateResults: TemplateSearchResponse = {
+    totalCount: 2,
+    totalErrorCount: 0,
+    facets: [],
+    results: [
+        {
+            id: "1111111",
+            name: "template name",
+            fundingStreamId: "DSG",
+            fundingPeriodId: "1920",
+            currentMajorVersion: 0,
+            currentMinorVersion: 1,
+            version: 1,
+            lastUpdatedAuthorName: "testUser",
+            lastUpdatedDate: new Date(),
+            fundingStreamName: "Magical Arts Grant",
+            fundingPeriodName: "2019-2020",
+            hasReleasedVersion: false,
+            publishedMajorVersion: 0,
+            publishedMinorVersion: 0
+        },
+        {
+            id: "2222222",
+            name: "template name",
+            fundingStreamId: "PSG",
+            fundingPeriodId: "2021",
+            currentMajorVersion: 0,
+            currentMinorVersion: 1,
+            version: 1,
+            lastUpdatedAuthorName: "testUser",
+            lastUpdatedDate: new Date(),
+            fundingStreamName: "Potions and Spells Grant",
+            fundingPeriodName: "2019-2020",
+            hasReleasedVersion: false,
+            publishedMajorVersion: 0,
+            publishedMinorVersion: 0
+        }]
+};
+export const mockNoTemplateResults: TemplateSearchResponse = {
+    totalCount: 0,
+    totalErrorCount: 0,
+    facets: [],
+    results: []
+};
+
+function mockSearchForTemplates(response: TemplateSearchResponse) {
+    const originalService = jest.requireActual('../../../services/templateBuilderDatasourceService');
+    return {
+        ...originalService,
+        searchForTemplates: jest.fn(() => Promise.resolve({
+            data: response
+        }))
+    }
+}
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
@@ -56,65 +112,103 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true
 }];
 
-describe("Templates homepage when I don't have permissions to create templates", () => {
+const renderListTemplatesPage = () => {
+    const {ListTemplates} = require('../../../pages/Templates/ListTemplates');
+    return render(<MemoryRouter><ListTemplates/></MemoryRouter>);
+}
+
+beforeAll(() => {
+    jest.mock('../../../services/templateBuilderDatasourceService', () => mockSearchForTemplates(mockTemplateResults));
+})
+
+describe("List Templates when I don't have permissions to create templates", () => {
     beforeEach(() => {
+        jest.clearAllMocks();
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(noPermissionsState);
     });
 
-    it("does not render a create template link", () => {
-        const wrapper = mount(<MemoryRouter><ListTemplates /></MemoryRouter>);
-        expect(wrapper.find("[href='/app/templatebuilder']")).toHaveLength(0);
+    it("does not render a create template link", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(queryByTestId("create-template-link")).not.toBeInTheDocument();
+        });
     });
 
-    it("renders a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><ListTemplates /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1);
-        expect(wrapper.find("[data-testid='permission-alert-message']").text()).toBe("You do not have permissions to perform the following actions: create");
+    it("does not render a permission status warning", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => expect(queryByTestId("permission-alert-message")).toBeInTheDocument());
     });
 });
 
-describe("Templates homepage when I have permissions to create templates", () => {
+describe("List Templates when I have permissions to create templates", () => {
     beforeEach(() => {
-        useSelectorSpy.mockClear();
-        useSelectorSpy.mockReturnValue(permissionsState);
-    });
-    
-    it("renders a create template link", () => {
-        const wrapper = mount(<MemoryRouter><ListTemplates /></MemoryRouter>);
-        expect(wrapper.find("#create-template-link").find(Link).prop('to')).toBe('/Templates/Create');
-    });
-
-    it("does not render a permission status warning", () => {
-        const wrapper = mount(<MemoryRouter><ListTemplates /></MemoryRouter>);
-        expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0);
-    });
-});
-
-describe("Templates homepage when there are NO templates to list", () => {
-    beforeEach(() => {
+        jest.clearAllMocks();
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
     });
 
-    it("does not renders the template listing table", () => {
-        const wrapper = mount(<MemoryRouter><ListTemplates /></MemoryRouter>);
-        expect(wrapper.find("#templates-table")).toHaveLength(0);
+    it("renders a create template link", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(queryByTestId("create-template-link")).toBeInTheDocument();
+            expect(queryByTestId("create-template-link")).toHaveAttribute('href', expect.stringMatching('/Templates/Create'));
+        });
+    });
+
+    it("does not render a permission status warning", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => expect(queryByTestId("permission-alert-message")).not.toBeInTheDocument());
     });
 });
 
-describe("Templates homepage when there are templates to list", () => {
+describe("List Templates when there are NO templates to list", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        useSelectorSpy.mockClear();
+        useSelectorSpy.mockReturnValue(permissionsState);
+        jest.mock('../../../services/templateBuilderDatasourceService', () => mockSearchForTemplates(mockNoTemplateResults));
+    });
+
+    it("does not render the table of results", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(queryByTestId("template-results")).not.toBeInTheDocument();
+        });
+    });
+
+    it("renders the no results message", async () => {
+        const {queryAllByText} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(queryAllByText(`There are no records to match your search`)).toHaveLength(1);
+        });
+    });
+});
+
+describe("List Templates when there are templates to list", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();
         useSelectorSpy.mockReturnValue(permissionsState);
     });
-    
-    /* TODO:
-    it("renders the template", () => {
-        const wrapper = mount(<MemoryRouter><Templates /></MemoryRouter>);
-        expect(wrapper.find("#templates-table")).toHaveLength(1);
-        expect(wrapper.find("#templates-table").find(Link)).toHaveLength(1);
-        expect(wrapper.find("#templates-table").find(Link).prop('to')).toBe('/templatebuilder/' + template.Id);
-        expect(wrapper.find("#templates-table").find(Link).text()).toBe(template.Name);
-    });*/
+
+    it("does not render a permission status warning", async () => {
+        const {queryByTestId} = renderListTemplatesPage();
+        await waitFor(() => expect(queryByTestId("permission-alert-message")).not.toBeInTheDocument());
+    });
+
+    it("fetches template data using searchForTemplates", async () => {
+        const {searchForTemplates} = require('../../../services/templateBuilderDatasourceService');
+        renderListTemplatesPage();
+        await waitFor(() => expect(searchForTemplates).toBeCalled());
+    });
+
+    it("renders the template results", async () => {
+        const {getByTestId} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(getByTestId(`template-${mockTemplateResults.results[0].id}`)).toBeInTheDocument();
+            expect(getByTestId(`template-${mockTemplateResults.results[1].id}`)).toBeInTheDocument();
+        });
+    });
 });
+
+

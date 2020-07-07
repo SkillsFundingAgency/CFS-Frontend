@@ -80,7 +80,9 @@ export const ListTemplates = () => {
                     {canCreateTemplate &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-third">
-                            <Link to="/Templates/Create" id="create-template-link"
+                            <Link to="/Templates/Create" 
+                                  id="create-template-link"
+                                  data-testid={"create-template-link"}
                                   className="govuk-button govuk-button--primary"
                                   data-module="govuk-button">
                                 Create a new template
@@ -97,7 +99,7 @@ export const ListTemplates = () => {
                 <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-full">
                         {haveResults &&
-                        <table className="govuk-table" id="templates-table">
+                        <table className="govuk-table" id="templates-table" data-testid={"template-results"}>
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
                                 <th scope="col" className="govuk-table__header">Template</th>
@@ -109,9 +111,9 @@ export const ListTemplates = () => {
                             </thead>
                             <tbody className="govuk-table__body" id="mainContentResults">
                             {templateListResults.results.map(template =>
-                                <tr key={template.id} className="govuk-table__row">
-                                    <th scope="row" className="govuk-table__header"><Link
-                                        to={`/Templates/${template.id}/Edit`}>{template.name}</Link></th>
+                                <tr key={template.id} className="govuk-table__row" data-testid={`template-${template.id}`}>
+                                    <th scope="row" className="govuk-table__header">
+                                        <Link to={`/Templates/${template.id}/Edit`}>{template.name}</Link></th>
                                     <td className="govuk-table__cell">{template.fundingStreamId}</td>
                                     <td className="govuk-table__cell">{template.fundingPeriodId}</td>
                                     <td className="govuk-table__cell"><DateFormatter date={template.lastUpdatedDate} utc={false}/></td>

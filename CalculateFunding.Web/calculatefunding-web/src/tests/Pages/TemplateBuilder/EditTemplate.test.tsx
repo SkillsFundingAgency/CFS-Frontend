@@ -5,6 +5,7 @@ import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
 import { waitFor, screen, render } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
+import {TemplateResponse, TemplateSearchResponse} from "../../../types/TemplateBuilderDefinitions";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
@@ -56,35 +57,37 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true
 }];
 
+export const mockTemplate: TemplateResponse = {
+    templateId: "12352346",
+    name: "template name",
+    description: "lorem ipsum",
+    fundingStreamId: "DSG",
+    fundingPeriodId: "2021",
+    majorVersion: 0,
+    minorVersion: 2,
+    version: 2,
+    isCurrentVersion: true,
+    status: "Draft",
+    schemaVersion: "1.1",
+    templateJson: "{}",
+    authorId: "",
+    authorName: "",
+    lastModificationDate: new Date(),
+    publishStatus: "",
+    comments: ""
+};
+
 beforeAll(() => {
-    function mockFunctions() {
-        const originalService = require.requireActual('../../../services/templateBuilderDatasourceService');
+    function mockFunctions(mockData: TemplateResponse) {
+        const originalService = jest.requireActual('../../../services/templateBuilderDatasourceService');
         return {
             ...originalService,
             getTemplateById: jest.fn(() => Promise.resolve({
-                data: {
-                    templateId: "12352346",
-                    name: "template name",
-                    description: "lorem ipsum",
-                    fundingStreamId: "DSG",
-                    fundingPeriodId: "2021",
-                    majorVersion: 0,
-                    minorVersion: 2,
-                    version: 2,
-                    isCurrentVersion: true,
-                    status: "Draft",
-                    schemaVersion: "1.1",
-                    templateJson: "",
-                    authorId: "",
-                    authorName: "",
-                    lastModificationDate: new Date(),
-                    publishStatus: "",
-                    publishNote: ""
-                }
+                data: mockData
             }))
         }
     }
-    jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions());
+    jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions(mockTemplate));
 });
 
 describe("Template Builder when I have no permissions ", () => {
@@ -203,6 +206,20 @@ describe("Template Builder when I request current version and have edit permissi
         const { getByTestId } = render(<MemoryRouter><EditTemplate /></MemoryRouter>)
         await waitFor(() => {
             expect(getByTestId("publish-button")).toBeInTheDocument();
+        });
+    });
+
+    it("renders an export button", async () => {
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const { getByTestId } = render(<MemoryRouter><EditTemplate /></MemoryRouter>)
+        await waitFor(() => {
+            expect(getByTestId("export-button")).toBeInTheDocument();
+            expect(getByTestId("export-button"))
+                .toHaveAttribute('href', expect
+                    .stringContaining("/api/templates/build/" + 
+                        mockTemplate.templateId +
+                        "/export?version=" +
+                        mockTemplate.version));
         });
     });
 });
