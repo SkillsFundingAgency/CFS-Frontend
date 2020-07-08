@@ -159,25 +159,25 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
         getIsUserAllowedToApproveCalculationService(calculationId)
             .then((userPermissionResult) => {
-            if (userPermissionResult.status === 200) {
-                let userCanApprove = userPermissionResult.data as boolean;
-                if (userCanApprove) {
-                    const publishStatusModel: PublishStatusModel = {
-                        publishStatus: PublishStatus.Approved
-                    };
-                    approveCalculationService(publishStatusModel, specificationId, calculationId)
-                        .then((result) => {
-                            if (result.status === 200) {
-                                const response: PublishStatusModel = result.data as PublishStatusModel;
-                                setTemplateCalculationStatus(response.publishStatus);
-                            }
-                        });
+                if (userPermissionResult.status === 200) {
+                    const userCanApprove = userPermissionResult.data as boolean;
+                    if (userCanApprove) {
+                        const publishStatusModel: PublishStatusModel = {
+                            publishStatus: PublishStatus.Approved
+                        };
+                        approveCalculationService(publishStatusModel, specificationId, calculationId)
+                            .then((result) => {
+                                if (result.status === 200) {
+                                    const response: PublishStatusModel = result.data as PublishStatusModel;
+                                    setTemplateCalculationStatus(response.publishStatus);
+                                }
+                            });
+                    } else {
+                        setCalculationApproveError("Calculation can not be approved by calculation writer");
+                    }
                 }
-                else
-                {
-                    setCalculationApproveError("Calculation can not be approved by calculation writer");
-                }
-            }
+            }).catch(() => {
+            setCalculationApproveError("Calculation can not be approved by calculation writer");
         }).finally(() => {
             setIsLoading(false);
         });
