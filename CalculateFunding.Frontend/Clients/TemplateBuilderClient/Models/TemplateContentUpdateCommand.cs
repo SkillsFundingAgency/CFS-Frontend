@@ -5,5 +5,7 @@
         public string TemplateId { get; set; }
 
         public string TemplateFundingLinesJson { get; set; }
+
+        public int Version { get; set; }
     }
 }

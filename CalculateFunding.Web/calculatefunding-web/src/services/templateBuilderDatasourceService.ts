@@ -499,6 +499,14 @@ export async function saveTemplateContent(command: TemplateContentUpdateCommand)
     })
 }
 
+export async function restoreTemplateContent(command: TemplateContentUpdateCommand, templateId: string, version: number): Promise<AxiosResponse<number>> {
+    return await axios(`/api/templates/build/${templateId}/restore/${version}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: command
+    })
+}
+
 export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
     return await axios(`/api/templates/build/search`, {
         method: 'POST',

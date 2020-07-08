@@ -200,6 +200,42 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPut]
+        [Route("api/templates/build/{templateId}/restore/{version}")]
+        public async Task<IActionResult> RestoreTemplate([FromBody] TemplateContentUpdateModel model,
+            [FromRoute] string templateId, [FromRoute] int version)
+        {
+            Guard.ArgumentNotNull(model, nameof(model));
+
+            if (model.TemplateId != templateId)
+            {
+                ModelState.AddModelError("TemplateId", "TemplateId in payload doesn't match route parameter.");
+                return BadRequest(ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ValidatedApiResponse<int> result = await _client.RestoreContent(new TemplateContentUpdateCommand
+            {
+                TemplateId = model.TemplateId,
+                TemplateFundingLinesJson = model.TemplateFundingLinesJson,
+                Version = version
+            });
+
+            switch (result.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return Ok(result.Content);
+                case HttpStatusCode.BadRequest:
+                    return BadRequest(result.ModelState);
+                default:
+                    return StatusCode((int)result.StatusCode);
+            }
+        }
+
+        [HttpPut]
         [Route("api/templates/build/description")]
         public async Task<IActionResult> UpdateDescription([FromBody] TemplateDescriptionUpdateModel model)
         {

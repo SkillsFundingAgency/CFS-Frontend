@@ -93,6 +93,13 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient
             return await ValidatedPutAsync<string, TemplateContentUpdateCommand>(url, command);
         }
 
+        public async Task<ValidatedApiResponse<int>> RestoreContent(TemplateContentUpdateCommand command)
+        {
+            string url = $"templates/build/{command.TemplateId}/restore/{command.Version}";
+
+            return await ValidatedPutAsync<int, TemplateContentUpdateCommand>(url, command);
+        }
+
         public async Task<ValidatedApiResponse<string>> UpdateTemplateDescription(TemplateDescriptionUpdateCommand command)
         {
             string url = "templates/build/metadata";
