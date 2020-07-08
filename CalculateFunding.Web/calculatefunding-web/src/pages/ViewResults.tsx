@@ -22,8 +22,9 @@ export function ViewResults() {
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-one-third">
                                 <div className="govuk-heading-m">
-                                    <a href="/results/viewproviderresults" className="govuk-link">View provider
-                                        results</a>
+                                    <Link to={"/viewresults/viewprovidersfundingstreamselection"}>
+                                        View provider results
+                                    </Link>
                                 </div>
                                 <p className="govuk-body">Select a provider to view its calculation and quality
                                     assurance test results.</p>
