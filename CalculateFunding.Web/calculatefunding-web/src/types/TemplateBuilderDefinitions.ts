@@ -176,6 +176,7 @@ export interface TemplateSearchResult {
     fundingPeriodName: string,
     lastUpdatedAuthorName: string,
     lastUpdatedDate: Date,
+    status: TemplateStatus,
     version: number,
     currentMajorVersion: number,
     currentMinorVersion: number,

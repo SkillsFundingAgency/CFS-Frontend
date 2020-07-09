@@ -10,7 +10,7 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {TemplateSearchRequest} from "../../types/searchRequestViewModel";
 import {DateFormatter} from "../../components/DateFormatter";
-import {TemplateSearchResponse} from "../../types/TemplateBuilderDefinitions";
+import {TemplateSearchResponse, TemplateStatus} from "../../types/TemplateBuilderDefinitions";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -77,6 +77,7 @@ export const ListTemplates = () => {
                 <PermissionStatus requiredPermissions={missingPermissions}/>
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Templates</h1>
+                    <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">View and edit existing templates</h3>
                     {canCreateTemplate &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-third">
@@ -103,21 +104,43 @@ export const ListTemplates = () => {
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
                                 <th scope="col" className="govuk-table__header">Template</th>
-                                <th scope="col" className="govuk-table__header govuk-!-width-one-half">Funding Stream</th>
-                                <th scope="col" className="govuk-table__header govuk-!-width-one-half">Funding Period</th>
-                                <th scope="col" className="govuk-table__header govuk-!-width-one-half">Last Amend</th>
-                                <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">Status</th>
+                                <th scope="col" className="govuk-table__header">Last Updated</th>
                             </tr>
                             </thead>
                             <tbody className="govuk-table__body" id="mainContentResults">
                             {templateListResults.results.map(template =>
-                                <tr key={template.id} className="govuk-table__row" data-testid={`template-${template.id}`}>
+                                <tr className="govuk-table__row" key={template.id} data-testid={`template-result-${template.id}`}>
                                     <th scope="row" className="govuk-table__header">
-                                        <Link to={`/Templates/${template.id}/Edit`}>{template.name}</Link></th>
-                                    <td className="govuk-table__cell">{template.fundingStreamId}</td>
-                                    <td className="govuk-table__cell">{template.fundingPeriodId}</td>
+                                        <Link to={`/Templates/${template.id}/Edit`}>{template.name}</Link>
+                                        <div className="govuk-!-margin-top-3">
+                                            <details className="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                                <summary className="govuk-details__summary">
+                                                    <span className="govuk-details__summary-text">
+                                                        Template details
+                                                    </span>
+                                                </summary>
+                                                <div className="govuk-details__text">
+                                                    <p className="govuk-body"><strong>Funding stream:</strong> &nbsp; {template.fundingStreamName}</p>
+                                                    <p className="govuk-body"><strong>Funding period:</strong> &nbsp; {template.fundingPeriodName}</p>
+                                                    <p className="govuk-body"><strong>Current version:</strong> &nbsp;
+                                                        <Link to={`/Templates/${template.id}/Edit`} className="govuk-link" data-testid={`template-link-${template.id}`}>
+                                                            {template.currentMajorVersion}.{template.currentMinorVersion}
+                                                        </Link> &nbsp;
+                                                            {template.status === TemplateStatus.Draft &&
+                                                        <span><strong className="govuk-tag govuk-tag--blue govuk-!-margin-left-2">In Progress</strong></span>}
+                                                            {template.status === TemplateStatus.Published &&
+                                                        <span><strong className="govuk-tag govuk-tag--green govuk-!-margin-left-2">Published</strong></span>}
+                                                    </p>
+                                                    <p className="govuk-body">
+                                                        <Link to={`/Templates/${template.id}/Versions`} className="govuk-link" data-testid={`versions-link-${template.id}`}>
+                                                            View all versions
+                                                        </Link>
+                                                    </p>
+                                                </div>
+                                            </details>
+                                        </div>
+                                    </th>
                                     <td className="govuk-table__cell"><DateFormatter date={template.lastUpdatedDate} utc={false}/></td>
-                                    <td className="govuk-table__cell">{"Draft"}</td>
                                 </tr>)
                             }
                             </tbody>

@@ -3,7 +3,7 @@ import {ListTemplates} from "../../../pages/Templates/ListTemplates";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
-import {TemplateSearchResponse} from "../../../types/TemplateBuilderDefinitions";
+import {TemplateSearchResponse, TemplateStatus} from "../../../types/TemplateBuilderDefinitions";
 import {render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 
@@ -21,6 +21,7 @@ export const mockTemplateResults: TemplateSearchResponse = {
             fundingPeriodId: "1920",
             currentMajorVersion: 0,
             currentMinorVersion: 1,
+            status: TemplateStatus.Draft,
             version: 1,
             lastUpdatedAuthorName: "testUser",
             lastUpdatedDate: new Date(),
@@ -37,6 +38,7 @@ export const mockTemplateResults: TemplateSearchResponse = {
             fundingPeriodId: "2021",
             currentMajorVersion: 0,
             currentMinorVersion: 1,
+            status: TemplateStatus.Published,
             version: 1,
             lastUpdatedAuthorName: "testUser",
             lastUpdatedDate: new Date(),
@@ -202,11 +204,39 @@ describe("List Templates when there are templates to list", () => {
         await waitFor(() => expect(searchForTemplates).toBeCalled());
     });
 
-    it("renders the template results", async () => {
+    it("renders the two template results", async () => {
+        const {getByTestId, container} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(container.querySelectorAll("[data-testid^='template-result-']")).toHaveLength(2);
+            expect(getByTestId(`template-result-${mockTemplateResults.results[0].id}`)).toBeInTheDocument();
+            expect(getByTestId(`template-result-${mockTemplateResults.results[1].id}`)).toBeInTheDocument();
+        });
+    });
+
+    it("renders the template status as 'In Progress' when Draft and current", async () => {
+        const {container} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(container.querySelectorAll("[data-testid^='template-result-']")[0]).toHaveTextContent("In Progress");
+        });
+    });
+
+    it("renders link to edit template", async () => {
         const {getByTestId} = renderListTemplatesPage();
         await waitFor(() => {
-            expect(getByTestId(`template-${mockTemplateResults.results[0].id}`)).toBeInTheDocument();
-            expect(getByTestId(`template-${mockTemplateResults.results[1].id}`)).toBeInTheDocument();
+            expect(getByTestId(`template-link-${mockTemplateResults.results[0].id}`))
+                .toHaveAttribute("href", `/Templates/${mockTemplateResults.results[0].id}/Edit`);
+            expect(getByTestId(`template-link-${mockTemplateResults.results[1].id}`))
+                .toHaveAttribute("href", `/Templates/${mockTemplateResults.results[1].id}/Edit`);
+        });
+    });
+
+    it("renders link to template versions", async () => {
+        const {getByTestId} = renderListTemplatesPage();
+        await waitFor(() => {
+            expect(getByTestId(`versions-link-${mockTemplateResults.results[0].id}`))
+                .toHaveAttribute("href", `/Templates/${mockTemplateResults.results[0].id}/Versions`);
+            expect(getByTestId(`versions-link-${mockTemplateResults.results[1].id}`))
+                .toHaveAttribute("href", `/Templates/${mockTemplateResults.results[1].id}/Versions`);
         });
     });
 });

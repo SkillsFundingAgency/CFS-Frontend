@@ -13,6 +13,7 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models
 	    public DateTime LastUpdatedDate { get; set; }
 	    public string LastUpdatedAuthorId { get; set; }
 	    public string LastUpdatedAuthorName { get; set; }
+	    public string Status { get; set; }
 	    public int Version { get; set; }
 	    public int CurrentMajorVersion { get; set; }
 	    public int CurrentMinorVersion { get; set; }
