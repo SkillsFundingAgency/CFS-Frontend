@@ -337,5 +337,22 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new StatusCodeResult(500);
         }
+
+        [HttpGet]
+        [Route("api/datasets/get-datasets-for-fundingstream/{fundingStreamId}")]
+        public async Task<IActionResult> GetDatasetsForFundingStream(string fundingStreamId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            
+            ApiResponse<IEnumerable<DatasetDefinationByFundingStream>> result =
+                await _datasetApiClient.GetDatasetDefinitionsByFundingStreamId(fundingStreamId);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(result.Content);
+            }
+
+            return result.StatusCode == HttpStatusCode.BadRequest ? new BadRequestResult() : new StatusCodeResult(500);
+        }
     }
 }

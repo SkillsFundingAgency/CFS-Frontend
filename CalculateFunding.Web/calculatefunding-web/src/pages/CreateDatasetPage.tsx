@@ -1,18 +1,15 @@
 import React, {useEffect, useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Header} from "../components/Header";
-import {getSpecification} from "../actions/ViewSpecificationsActions";
-import {useDispatch, useSelector} from "react-redux";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
-import {AppState} from "../states/AppState";
-import {DatasetState} from "../states/DatasetState";
-import {getDatasetSchema} from "../actions/DatasetActions";
-import {assignDatasetSchemaUpdateService} from "../services/datasetService";
+import {assignDatasetSchemaUpdateService, getDatasetsForFundingStreamService} from "../services/datasetService";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {ConfirmationPanel} from "../components/ConfirmationPanel";
 import {Section} from "../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
+import {getSpecificationSummaryService} from "../services/specificationService";
+import {SpecificationSummary} from "../types/SpecificationSummary";
+import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsViewModel";
 
 interface CreateDatasetPageRoute {
     specificationId: string
@@ -20,11 +17,26 @@ interface CreateDatasetPageRoute {
 
 export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPageRoute>) {
     const specificationId = match.params.specificationId;
-    const dispatch = useDispatch();
-
     let history = useHistory();
-    let viewSpecification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
-    let datasets: DatasetState = useSelector((state: AppState) => state.datasets);
+
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
+        approvalStatus: "",
+        description: "",
+        fundingPeriod: {
+            name: "",
+            id: ""
+        },
+        fundingStreams: [],
+        id: "",
+        isSelectedForFunding: false,
+        name: "",
+        providerVersionId: ""
+    })
+    const [dataSchemas, setDataSchemas] = useState<DataschemaDetailsViewModel[]>([{
+        id: "",
+        name: "",
+        description: ""
+    }]);
 
     const [datasetAsDataProvider, setDatasetAsDataProvider] = useState<boolean>(false);
     const [datasetName, setDatasetName] = useState({
@@ -50,11 +62,19 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
-        dispatch(getSpecification(specificationId));
-        dispatch(getDatasetSchema());
+
+        getSpecificationSummaryService(match.params.specificationId).then((response) => {
+            if (response.status === 200) {
+                let result = response.data as SpecificationSummary
+                setSpecificationSummary(result);
+                getDatasetsForFundingStreamService(result.fundingStreams[0].id).then((response) => {
+                    if (response.status === 200) {
+                        setDataSchemas(response.data as DataschemaDetailsViewModel[]);
+                    }
+                })
+            }
+        })
     }, [specificationId]);
-
-
 
     function setAsDataProvider(e: React.ChangeEvent<HTMLInputElement>) {
         setDatasetAsDataProvider(Boolean(JSON.parse(e.target.value)));
@@ -191,8 +211,8 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={viewSpecification.specification.name} url={`/ViewSpecification/${specificationId}`}/>
-                <Breadcrumb name={"Create dataset"} />
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationId}`}/>
+                <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
             <ConfirmationPanel title={"Dataset created"} body={"Your dataset has been created."} hidden={!addAnother}/>
             <LoadingStatus title={"Creating Dataset"} hidden={!isLoading} id={"create-dataset-loader"}
@@ -203,7 +223,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                     <fieldset className="govuk-fieldset">
                         <form id={"save-dataset-form"}>
                             <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                <span className="govuk-caption-xl">{viewSpecification.specification.name}</span>
+                                <span className="govuk-caption-xl">{specificationSummary.name}</span>
                                 <h1 className="govuk-heading-xl">Create dataset</h1>
                             </legend>
 
@@ -215,7 +235,7 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                                         onChange={(e) => changeDataschema(e)}>
                                     <option key={-1} value="">Please select</option>
                                     )
-                                    {datasets.dataSchemas.map((d, index) =>
+                                    {dataSchemas.map((d, index) =>
                                         <option key={index} value={d.id}>{d.name}</option>)
                                     }
                                 </select>
@@ -296,8 +316,8 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                             onClick={() => saveDataset(true)}>Save and add another
                     </button>
                     <Link to={`/ViewSpecification/${specificationId}`}
-                       className="govuk-button govuk-button--warning govuk-!-margin-left-1"
-                       data-module="govuk-button">Cancel</Link>
+                          className="govuk-button govuk-button--warning govuk-!-margin-left-1"
+                          data-module="govuk-button">Cancel</Link>
                 </div>
             </div>
         </div>

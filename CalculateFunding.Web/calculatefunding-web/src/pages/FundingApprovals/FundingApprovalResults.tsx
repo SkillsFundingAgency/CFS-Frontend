@@ -6,7 +6,7 @@ import {getPublishedProviderResultsService} from "../../services/publishedProvid
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
-import {FacetValue, PublishProviderSearchResultViewModel} from "../../types/PublishedProvider/PublishProviderSearchResultViewModel";
+import {PublishProviderSearchResultViewModel} from "../../types/PublishedProvider/PublishProviderSearchResultViewModel";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {BackToTop} from "../../components/BackToTop";
 import Pagination from "../../components/Pagination";
@@ -25,6 +25,7 @@ import {BackButton} from "../../components/BackButton";
 import {NotificationSignal} from "../../signals/NotificationSignal";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {NoData} from "../../components/NoData";
+import {FacetValue} from "../../types/Facet";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;

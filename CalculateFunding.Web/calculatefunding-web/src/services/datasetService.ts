@@ -174,3 +174,12 @@ export async function searchDatasetService(request: DatasetSearchRequestViewMode
         }
     })
 }
+
+export async function getDatasetsForFundingStreamService(fundingStreamId: string) {
+    return axios(`/api/datasets/get-datasets-for-fundingstream/${fundingStreamId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
