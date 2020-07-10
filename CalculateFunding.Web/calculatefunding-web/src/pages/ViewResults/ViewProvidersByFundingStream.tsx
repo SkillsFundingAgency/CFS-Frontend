@@ -16,6 +16,7 @@ import Pagination from "../../components/Pagination";
 import {FacetValue} from "../../types/Facet";
 import {BackToTop} from "../../components/BackToTop";
 import {DateFormatter} from "../../components/DateFormatter";
+import {NoData} from "../../components/NoData";
 export interface ViewProvidersByFundingStreamRouteProps {
     fundingStreamId: string;
 }
@@ -289,6 +290,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
             </div>
             <div className="govuk-grid-column-two-thirds">
                 <LoadingStatus title={"Loading providers"} hidden={!isLoading}/>
+                <NoData hidden={providerVersionSearchResults.items.length === 0 || isLoading} />
                 {
                     providerVersionSearchResults.items.map(providerVersionSearchResult =>
                         <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">

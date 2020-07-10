@@ -13,6 +13,7 @@ import {DatasetSearchRequestViewModel} from "../../types/Datasets/DatasetSearchR
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {FacetValue} from "../../types/Facet";
+import {NoData} from "../../components/NoData";
 
 export function ManageDataSourceFiles() {
     const initialSearch: DatasetSearchRequestViewModel = {
@@ -70,13 +71,13 @@ export function ManageDataSourceFiles() {
             setDatasetSearchData(response);
 
             if (filterFundingStreams.length === 0) {
-                if(response.facets !== undefined && response.facets.length > 5) {
+                if (response.facets !== undefined && response.facets.length > 5) {
                     setFundingStreams(response.facets[5].facetValues)
                 }
             }
 
             if (filterDataSchemas.length === 0) {
-                if(response.facets !== undefined && response.facets.length > 2) {
+                if (response.facets !== undefined && response.facets.length > 2) {
                     setDataSchema(response.facets[2].facetValues)
                 }
             }
@@ -88,7 +89,7 @@ export function ManageDataSourceFiles() {
     function searchText(e: React.ChangeEvent<HTMLInputElement>) {
         const term = e.target.value;
 
-        if((term.length === 0 && searchRequest.searchTerm.length !== 0) || term.length > 2) {
+        if ((term.length === 0 && searchRequest.searchTerm.length !== 0) || term.length > 2) {
             let request = searchRequest;
             request.searchTerm = term;
             request.pageNumber = 1;
@@ -264,8 +265,7 @@ export function ManageDataSourceFiles() {
                             )}
                             </tbody>
                         </table>
-                        <p className="govuk-body govuk-body-m center-align" hidden={datasetSearchData.datasets.length > 0 || isLoading}>There are no records to match your search</p>
-
+                        <NoData hidden={datasetSearchData.datasets.length > 0 || isLoading}/>
                         <div className="app-back-to-top app-back-to-top--fixed govuk-!-margin-top-9" data-module="app-back-to-top">
                             <a className="govuk-link govuk-link--no-visited-state app-back-to-top__link" href="#top">
                                 <svg role="presentation" focusable="false" className="app-back-to-top__icon" xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17">

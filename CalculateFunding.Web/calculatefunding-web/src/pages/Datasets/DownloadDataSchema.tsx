@@ -13,6 +13,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {WarningText} from "../../components/WarningText";
 import {BackToTop} from "../../components/BackToTop";
 import {SearchMode} from "../../types/SearchMode";
+import {NoData} from "../../components/NoData";
 
 export function DownloadDataSchema() {
 
@@ -110,7 +111,7 @@ export function DownloadDataSchema() {
             <LoadingStatus title={"Loading data schema"} hidden={!isLoading}/>
             <div className="govuk-grid-row" hidden={isLoading}>
                 <div className="govuk-grid-column-full">
-                    <WarningText hidden={datasetDefinitions.totalResults > 0} text={"There are no results available"} />
+                    <NoData hidden={datasetDefinitions.totalResults > 0} />
                     <table className="govuk-table" hidden={datasetDefinitions.totalResults === 0}>
                         <thead className="govuk-table__head">
                         <tr className="govuk-table__row">
@@ -123,7 +124,6 @@ export function DownloadDataSchema() {
                         {datasetDefinitions.datasetDefinitions.map((d, index) =>
                             <tr className="govuk-table__row" key={index}>
                                 <th scope="row" className="govuk-table__header"><p>{d.name}</p>
-
                                     <div className="govuk-!-margin-top-2">
 
                                         <details className="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">

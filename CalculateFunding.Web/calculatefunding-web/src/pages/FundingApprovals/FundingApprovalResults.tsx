@@ -24,6 +24,7 @@ import {JobMessage} from "../../types/jobMessage";
 import {BackButton} from "../../components/BackButton";
 import {NotificationSignal} from "../../signals/NotificationSignal";
 import {PermissionStatus} from "../../components/PermissionStatus";
+import {NoData} from "../../components/NoData";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;
@@ -421,6 +422,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 </div>
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatus title={"Loading published provider data"} hidden={!tableIsLoading}/>
+                    <NoData hidden={publishedProviderResults.providers.length > 0 && !tableIsLoading} />
                     <table className="govuk-table" hidden={tableIsLoading}>
                         <thead>
                         <tr>

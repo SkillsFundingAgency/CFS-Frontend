@@ -14,6 +14,7 @@ import {SpecificationListResults} from "../../types/SpecificationListResults";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {FacetValue} from "../../types/Facet";
+import {NoData} from "../../components/NoData";
 
 export function SpecificationsList() {
     const [specificationListResults, setSpecificationListResults] = useState<SpecificationListResults>({
@@ -324,7 +325,7 @@ export function SpecificationsList() {
 
                             </tbody>
                         </table>
-                        <p className="govuk-body" hidden={specificationListResults.items.length > 0}>There are no records to match your search</p>
+                        <NoData hidden={specificationListResults.items.length > 0}/>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
                                 <Pagination callback={movePage}
