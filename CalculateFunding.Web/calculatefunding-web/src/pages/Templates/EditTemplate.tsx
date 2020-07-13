@@ -83,7 +83,9 @@ export function EditTemplate() {
         clearRedoState,
         clearUndoState,
         canUndo,
-        canRedo
+        canRedo,
+        undoCount,
+        redoCount
     } = useTemplateUndo(setDS);
     const history = useHistory();
 
@@ -325,7 +327,8 @@ export function EditTemplate() {
         history.push(`/Templates/Publish/${template.templateId}`);
     }
 
-    const handleAddFundingLineClick = () => {
+    const handleAddFundingLineClick = (event: MouseEvent) => {
+        event.preventDefault();
         const keyCount = ds.length > 0 ? ds.reduce((prev, current) => {
             return (prev.key > current.key ? prev : current)
         }).key : 0;
@@ -350,11 +353,13 @@ export function EditTemplate() {
         update((deepClone(ds)));
     }
 
-    const handleUndo = () => {
+    const handleUndo = (event: MouseEvent) => {
+        event.preventDefault();
         undo();
     }
 
-    const handleRedo = () => {
+    const handleRedo = (event: MouseEvent) => {
+        event.preventDefault();
         redo();
     }
 
@@ -487,11 +492,11 @@ export function EditTemplate() {
                             <span
                                 className="govuk-heading-m govuk-!-margin-bottom-2">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;</span>
                             {template && template.status === TemplateStatus.Draft && template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--blue">In Progress</strong></span>}
+                            <span><strong className="govuk-tag govuk-tag--blue">IN PROGRESS</strong></span>}
                             {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--grey">Draft</strong></span>}
+                            <span><strong className="govuk-tag govuk-tag--grey">DRAFT</strong></span>}
                             {template && template.status === TemplateStatus.Published &&
-                            <span><strong className="govuk-tag govuk-tag--green">Published</strong><br/>
+                            <span><strong className="govuk-tag govuk-tag--green">PUBLISHED</strong><br/>
                             </span>}
                             {template &&
                             <div className="govuk-body">
@@ -522,22 +527,33 @@ export function EditTemplate() {
                                 </div>
                             </div>
                             <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
-                                <div className="search-container right-align govuk-!-padding-right-0">
-                                    <button className="govuk-button govuk-!-margin-right-1 govuk-!-margin-bottom-0" data-testid='add'
-                                            onClick={handleAddFundingLineClick}>
-                                        <span>+</span> Add new funding line
-                                    </button>
-                                    <button className="govuk-button govuk-button--secondary govuk-!-margin-right-1 govuk-!-margin-bottom-0"
-                                            data-testid='undo'
-                                            onClick={handleUndo} disabled={!canUndo}>
-                                        <span>↩</span> Undo
-                                    </button>
-                                    <button className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-0"
-                                            data-testid='redo'
-                                            onClick={handleRedo} disabled={!canRedo}>
-                                        <span>↪</span> Redo
-                                    </button>
-                                </div>
+                                <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
+                                <ul className="govuk-list inline-block-list">
+                                    <li>
+                                        <a href="#"
+                                           data-testid='redo'
+                                           onClick={handleRedo}
+                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
+                                            <span>↪</span> Redo ({redoCount()})
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"
+                                           data-testid='undo'
+                                           onClick={handleUndo}
+                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                            <span>↩</span> Undo ({undoCount()})
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"
+                                           data-testid='add-funding-line'
+                                           onClick={handleAddFundingLineClick}
+                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                            <span>+</span> Add a new funding line
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>}

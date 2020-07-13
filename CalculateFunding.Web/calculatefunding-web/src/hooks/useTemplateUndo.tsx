@@ -69,6 +69,14 @@ export const useTemplateUndo = (updateFunction: Function) => {
         window.localStorage.removeItem(templateBuilderFutureStateKey);
     }
 
+    const undoCount = () => {
+        return getTimeItems(templateBuilderPastStateKey).length;
+    }
+
+    const redoCount = () => {
+        return getTimeItems(templateBuilderFutureStateKey).length;
+    }
+
     const canUndo = () => {
         return getTimeItems(templateBuilderPastStateKey).length > 0;
     }
@@ -106,6 +114,8 @@ export const useTemplateUndo = (updateFunction: Function) => {
         clearPresentState,
         clearUndoState,
         clearRedoState,
+        undoCount,
+        redoCount,
         canUndo: canUndo(),
         canRedo: canRedo()
     }

@@ -147,14 +147,14 @@ describe("Template Builder when I request current version and have edit permissi
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         expect(wrapper.find('OrganisationChartNode')).toHaveLength(0);
-        wrapper.find("[data-testid='add']").simulate('click');
+        wrapper.find("[data-testid='add-funding-line']").simulate('click');
         await waitFor(() => expect(wrapper.find('OrganisationChartNode')).toHaveLength(1));
     });
 
     it("funding line displays add buttons", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='add']").simulate('click');
+        wrapper.find("[data-testid='add-funding-line']").simulate('click');
         await waitFor(() => {
             expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(1);
             expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-calc']")).toHaveLength(1);
@@ -164,7 +164,7 @@ describe("Template Builder when I request current version and have edit permissi
     it("displays edit window when clicking on funding line", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='add']").simulate('click');
+        wrapper.find("[data-testid='add-funding-line']").simulate('click');
         await waitFor(() => {
             expect(wrapper.find('Sidebar').prop('open')).toBe(false);
             wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');
@@ -175,7 +175,7 @@ describe("Template Builder when I request current version and have edit permissi
     it("displays confirmation when deleting a funding line", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         let wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='add']").simulate('click');
+        wrapper.find("[data-testid='add-funding-line']").simulate('click');
         wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');
         await waitFor(() => {
             expect(wrapper.find('FundingLineItem').find("[data-testid='node-n0-confirm-delete']")).toHaveLength(0);
