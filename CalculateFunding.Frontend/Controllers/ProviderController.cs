@@ -49,19 +49,6 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<ProviderVersionSearchResults> result =
                 await _providersApiClient.SearchCurrentProviderVersionForFundingStream(fundingStreamId, search);
 
-            SearchFilterRequest filterOptions = new SearchFilterRequest
-            {
-                ErrorToggle = search.ErrorToggle,
-                FacetCount = search.FacetCount,
-                Filters = search.Filters,
-                IncludeFacets = search.IncludeFacets,
-                Page = search.PageNumber,
-                PageSize = search.Top,
-                SearchFields = search.SearchFields,
-                SearchMode = (Common.ApiClient.Models.SearchMode)search.SearchMode,
-                SearchTerm = search.SearchTerm
-            };
-
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 int totalPages = result.Content.TotalCount / search.Top;

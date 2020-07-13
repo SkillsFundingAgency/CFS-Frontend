@@ -26,15 +26,15 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
         pageNumber: 1,
         top: 100,
         searchTerm: "",
-        errorToggle: null,
-        orderBy: null,
+        errorToggle: false,
+        orderBy: [],
         filters: {"": [""]},
         includeFacets: true,
         facetCount: 100,
         countOnly: false,
         searchMode: SearchMode.All,
-        searchFields: null,
-        overrideFacetFields: null
+        searchFields: [],
+        overrideFacetFields: []
     };
     const initialProviderVersionSearchResults: PagedProviderVersionSearchResults = {
         facets: [],
@@ -290,7 +290,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                 </div>
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatus title={"Loading providers"} hidden={!isLoading}/>
-                    <NoData hidden={providerVersionSearchResults.items.length === 0 || isLoading} />
+                    <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
                     {
                         providerVersionSearchResults.items.map(providerVersionSearchResult =>
                             <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
