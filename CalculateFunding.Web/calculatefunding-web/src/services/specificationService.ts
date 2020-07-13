@@ -139,12 +139,3 @@ export async function getFundingStreamsForSelectedSpecifications() {
     });
 }
 
-export async function getFundingPeriodsService() {
-    return axios(`/api/policy/fundingperiods`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-}
-

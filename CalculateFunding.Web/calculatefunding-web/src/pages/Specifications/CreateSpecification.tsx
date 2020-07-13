@@ -4,10 +4,12 @@ import {Header} from "../../components/Header";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {
     createSpecificationService,
-    getFundingPeriodsByFundingStreamIdService,
-    getFundingStreamsService
+    getFundingPeriodsByFundingStreamIdService
 } from "../../services/specificationService";
-import {FundingPeriod} from "../../types/viewFundingTypes";
+import {
+    getFundingStreamsService
+} from "../../services/policyService";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
 import {CoreProviderSummary} from "../../types/CoreProviderSummary";
 import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";
@@ -23,7 +25,7 @@ import {HubConnectionBuilder} from "@aspnet/signalr";
 import {JobMessage} from "../../types/jobMessage";
 
 export function CreateSpecification() {
-    const [fundingStreamData, setFundingStreamData] = useState<string[]>([]);
+    const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<CoreProviderSummary[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
@@ -47,7 +49,7 @@ export function CreateSpecification() {
 
         const getStreams = async () => {
             const streamResult = await getFundingStreamsService();
-            setFundingStreamData(streamResult.data);
+            setFundingStreamData(streamResult.data as FundingStream[]);
         };
         getStreams().then(result => {
             return true;
@@ -220,7 +222,7 @@ export function CreateSpecification() {
                         </label>
                         <select className="govuk-select" id="sort" name="sort" onChange={(e) => selectFundingStream(e)}>
                             <option value="-1">Select funding Stream</option>
-                            {fundingStreamData.map((fs, index) => <option key={index} value={fs}>{fs}</option>)}
+                            {fundingStreamData.map((fs, index) => <option key={index} value={fs.id}>{fs.name}</option>)}
                         </select>
                     </div>
 
