@@ -5,8 +5,9 @@ export interface DatasetDefinitionRequestViewModel {
     searchTerm: string;
     errorToggle: string;
     includeFacets: boolean;
-    filters: []
-    pageSize: number;
+    filters: { [key: string]: string[] };
+    pageSize?: number;
     facetCount: number;
     searchMode: SearchMode
 }
+

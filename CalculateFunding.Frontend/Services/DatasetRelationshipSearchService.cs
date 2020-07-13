@@ -1,4 +1,7 @@
-﻿namespace CalculateFunding.Frontend.Services
+﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace CalculateFunding.Frontend.Services
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -30,13 +33,21 @@
 
         public async Task<SpecificationDatasourceRelationshipSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+	        var filters = request.Filters.IsNullOrEmpty()
+		        ? new ConcurrentDictionary<string, string[]>()
+		        : request.Filters;
+	        if (filters.ContainsKey(""))
+	        {
+		        filters.Remove("");
+	        }
+
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
                 PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
                 SearchTerm = request.SearchTerm,
-                IncludeFacets = false,
-                Filters = request.Filters,
+                IncludeFacets = request.IncludeFacets,
+                Filters = filters
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
@@ -51,44 +62,28 @@
                 _logger.Error("Find specification data source relationships HTTP request failed");
             }
 
-            SpecificationDatasourceRelationshipSearchResultViewModel viewModel = new SpecificationDatasourceRelationshipSearchResultViewModel();
-
-            viewModel.TotalResults = pagedResult.TotalItems;
-            viewModel.CurrentPage = pagedResult.PageNumber;
-
-            IList<SpecificationDatasourceRelationshipSearchResultItemViewModel> itemResults = new List<SpecificationDatasourceRelationshipSearchResultItemViewModel>();
-
-            foreach (SpecificationDatasourceRelationshipSearchResultItem item in pagedResult.Items)
+            int totalPages = pagedResult.TotalItems / pagedResult.PageSize;
+            if (pagedResult.TotalItems % pagedResult.PageSize > 0)
             {
-                itemResults.Add(new SpecificationDatasourceRelationshipSearchResultItemViewModel
+                totalPages++;
+            }
+
+            int startNumber = ((pagedResult.PageSize * pagedResult.PageNumber) - pagedResult.PageSize) + 1;
+            int endNumber = (pagedResult.PageSize * pagedResult.PageNumber);
+            if (endNumber > pagedResult.TotalItems)
+            {
+                endNumber = pagedResult.TotalItems;
+            }
+
+            SpecificationDatasourceRelationshipSearchResultViewModel viewModel =
+                new SpecificationDatasourceRelationshipSearchResultViewModel
                 {
-                    SpecificationId = item.Id,
-                    SpecificationName = item.Name,
-                    CountPhrase = BuildCountPhrase(item.RelationshipCount)
-                });
-            }
-
-            IEnumerable<SpecificationDatasourceRelationshipSearchResultItemViewModel> sortedResults = itemResults.OrderBy(f => f.SpecificationName);
-
-            viewModel.SpecRelationships = sortedResults.ToList();
-
-            if (viewModel.TotalResults == 0)
-            {
-                viewModel.StartItemNumber = 0;
-                viewModel.EndItemNumber = 0;
-            }
-            else
-            {
-                viewModel.StartItemNumber = ((requestOptions.Page - 1) * requestOptions.PageSize) + 1;
-                viewModel.EndItemNumber = viewModel.StartItemNumber + requestOptions.PageSize - 1;
-            }
-
-            if (viewModel.EndItemNumber > pagedResult.TotalItems)
-            {
-                viewModel.EndItemNumber = pagedResult.TotalItems;
-            }
-
-            viewModel.PagerState = new PagerState(requestOptions.Page, pagedResult.TotalPages, 4);
+                    Items = pagedResult.Items,
+                    PagerState = new PagerState(pagedResult.PageNumber, pagedResult.TotalPages),
+                    TotalCount = pagedResult.TotalItems,
+                    StartItemNumber = startNumber,
+                    EndItemNumber = endNumber
+                };
 
             return viewModel;
         }

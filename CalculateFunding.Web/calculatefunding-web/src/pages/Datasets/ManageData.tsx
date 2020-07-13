@@ -29,7 +29,7 @@ export function ManageData() {
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"map-data-source-files-title"} className="govuk-heading-m">
-                            <a href="/datasets/datasetRelationships">Map data source files to datasets for a specification</a>
+                            <a href="/Datasets/MapDataSourceFiles">Map data source files to datasets for a specification</a>
                         </h3>
                         <p className="govuk-body">Select the data source file a dataset uses.</p>
                     </div>

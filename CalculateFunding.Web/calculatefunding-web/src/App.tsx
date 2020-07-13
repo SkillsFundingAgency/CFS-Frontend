@@ -40,6 +40,7 @@ import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
+import {MapDataSourceFiles} from "./pages/Datasets/MapDataSourceFiles";
 import { initialiseAxios } from './services/axiosInterceptor';
 import {
     ViewProvidersFundingStreamSelection
@@ -84,6 +85,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile} />
                 <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
+                <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates} />}

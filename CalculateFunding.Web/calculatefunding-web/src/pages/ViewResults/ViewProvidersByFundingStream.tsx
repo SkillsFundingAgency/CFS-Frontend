@@ -184,120 +184,120 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
         <div className="govuk-width-container">
             <div className={"govuk-grid-row  govuk-!-margin-bottom-9"}>
                 <div className={"govuk-grid-column-full"}>
-                <Breadcrumbs>
-                    <Breadcrumb name={"Calculate funding"} url={"/"} />
-                    <Breadcrumb name={"View results"} url={"/results"} />
-                    <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
-                    <Breadcrumb name={"View provider results"} />
-                </Breadcrumbs>
-                <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">View provider results</h1>
-                <span className="govuk-caption-m">Funding stream</span>
-                <h3 className="govuk-heading-m">General annual grant</h3>
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate funding"} url={"/"} />
+                        <Breadcrumb name={"View results"} url={"/results"} />
+                        <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
+                        <Breadcrumb name={"View provider results"} />
+                    </Breadcrumbs>
+                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">View provider results</h1>
+                    <span className="govuk-caption-m">Funding stream</span>
+                    <h3 className="govuk-heading-m">General annual grant</h3>
                 </div>
             </div>
-        <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third">
-                <form id="searchProviders">
-                    <CollapsiblePanel title={"Search"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                                    Search
-                                </label>
-                                <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)}/>
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by provider type"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Search</label>
-                                <input className="govuk-input" type="text"
-                                       onChange={(e) => searchProviderTypeFilters(e)}/>
-                            </div>
-                            <div className="govuk-checkboxes">
-                                {filterProviderType.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               key={`providerType-${s.name}`}
-                                               id={`providerType-${s.name}`}
-                                               name={`providerType-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByProviderType(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`providerType-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by provider sub type"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Search</label>
-                                <input className="govuk-input" type="text"
-                                       onChange={(e) => searchProviderSubTypeFilters(e)}/>
-                            </div>
-                            <div className="govuk-checkboxes">
-                                {filterProviderSubType.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               key={`providerSubType-${s.name}`}
-                                               id={`providerSubType-${s.name}`}
-                                               name={`providerSubType-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByProviderSubType(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`providerType-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by local authority (LA)"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Search</label>
-                                <input className="govuk-input" type="text"
-                                       onChange={(e) => searchLocalAuthorityFilters(e)}/>
-                            </div>
-                            <div className="govuk-checkboxes">
-                                {filterLocalAuthority.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               key={`authority-${s.name}`}
-                                               id={`authority-${s.name}`}
-                                               name={`authority-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByLocalAuthority(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`providerType-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <button type="button" className="govuk-button"
-                            onClick={() => clearFilters()}>Clear filters
-                    </button>
-                </form>
-            </div>
-            <div className="govuk-grid-column-two-thirds">
-                <LoadingStatus title={"Loading providers"} hidden={!isLoading}/>
-                <NoData hidden={providerVersionSearchResults.items.length === 0 || isLoading} />
-                {
-                    providerVersionSearchResults.items.map(providerVersionSearchResult =>
-                        <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
-                            <h3 className="govuk-heading-m">
-                                <Link to={`/results/${providerVersionSearchResult.id}`}>{providerVersionSearchResult.name}</Link>
-                            </h3>
-                            <p className="govuk-body-s govuk-!-margin-bottom-3">
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-third">
+                    <form id="searchProviders">
+                        <CollapsiblePanel title={"Search"} expanded={true}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+                                        Search
+                                    </label>
+                                    <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)}/>
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by provider type"} expanded={true}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label">Search</label>
+                                    <input className="govuk-input" type="text"
+                                           onChange={(e) => searchProviderTypeFilters(e)}/>
+                                </div>
+                                <div className="govuk-checkboxes">
+                                    {filterProviderType.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   key={`providerType-${s.name}`}
+                                                   id={`providerType-${s.name}`}
+                                                   name={`providerType-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={(e) => filterByProviderType(e)}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`providerType-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by provider sub type"} expanded={true}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label">Search</label>
+                                    <input className="govuk-input" type="text"
+                                           onChange={(e) => searchProviderSubTypeFilters(e)}/>
+                                </div>
+                                <div className="govuk-checkboxes">
+                                    {filterProviderSubType.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   key={`providerSubType-${s.name}`}
+                                                   id={`providerSubType-${s.name}`}
+                                                   name={`providerSubType-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={(e) => filterByProviderSubType(e)}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`providerType-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by local authority (LA)"} expanded={true}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label">Search</label>
+                                    <input className="govuk-input" type="text"
+                                           onChange={(e) => searchLocalAuthorityFilters(e)}/>
+                                </div>
+                                <div className="govuk-checkboxes">
+                                    {filterLocalAuthority.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   key={`authority-${s.name}`}
+                                                   id={`authority-${s.name}`}
+                                                   name={`authority-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={(e) => filterByLocalAuthority(e)}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`providerType-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <button type="button" className="govuk-button"
+                                onClick={() => clearFilters()}>Clear filters
+                        </button>
+                    </form>
+                </div>
+                <div className="govuk-grid-column-two-thirds">
+                    <LoadingStatus title={"Loading providers"} hidden={!isLoading}/>
+                    <NoData hidden={providerVersionSearchResults.items.length === 0 || isLoading} />
+                    {
+                        providerVersionSearchResults.items.map(providerVersionSearchResult =>
+                            <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
+                                <h3 className="govuk-heading-m">
+                                    <Link to={`/results/${providerVersionSearchResult.id}`}>{providerVersionSearchResult.name}</Link>
+                                </h3>
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">
                                 <span>UKPRN: <strong>
                                     {
                                         (providerVersionSearchResult.ukprn !== "") ?
@@ -305,56 +305,56 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                             : "No data found"
                                     }
                                 </strong></span>
-                                <span>UPIN: <strong>
+                                    <span>UPIN: <strong>
                                     {
                                         (providerVersionSearchResult.upin !== "") ?
                                             providerVersionSearchResult.upin
                                             : "No data found"
                                     }
                                 </strong></span>
-                                <span>URN: <strong>
+                                    <span>URN: <strong>
                                     {
                                         (providerVersionSearchResult.urn !== "") ?
                                             providerVersionSearchResult.urn
                                             : "No data found"
                                     }
                                 </strong></span>
-                                <span>Establishment number: <strong>
+                                    <span>Establishment number: <strong>
                                     {
                                         (providerVersionSearchResult.establishmentNumber !== "") ?
                                             providerVersionSearchResult.establishmentNumber
                                             : "No data found"
                                     }
                                 </strong></span>
-                            </p>
-                            <p className="govuk-body-s govuk-!-margin-bottom-3">Provider type: <strong>{providerVersionSearchResult.providerType}</strong>
-                            </p>
-                            <p className="govuk-body-s govuk-!-margin-bottom-3">Provider subtype: <strong>{providerVersionSearchResult.providerSubType}</strong></p>
+                                </p>
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider type: <strong>{providerVersionSearchResult.providerType}</strong>
+                                </p>
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider subtype: <strong>{providerVersionSearchResult.providerSubType}</strong></p>
 
-                            <p className="govuk-body-s govuk-!-margin-bottom-3">
-                                <span>Local authority: <strong>{providerVersionSearchResult.authority}</strong></span>
-                                <span>Date opened:
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">
+                                    <span>Local authority: <strong>{providerVersionSearchResult.authority}</strong></span>
+                                    <span>Date opened:
                                     <strong>
                                         {
                                             ((providerVersionSearchResult.dateOpened == null)?
-                                            " Unknown"
-                                            : <DateFormatter date={providerVersionSearchResult.dateOpened} utc={true}/>
-                                        )}
+                                                    " Unknown"
+                                                    : <DateFormatter date={providerVersionSearchResult.dateOpened} utc={true}/>
+                                            )}
                                     </strong>
                                 </span>
-                            </p>
-                            <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
-                        </div>
-                    )
-                }
-                <BackToTop id="top" />
-                <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
-                     aria-label="Pagination">
-                    <div className="pagination__summary">Showing {providerVersionSearchResults.startItemNumber} - {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount} results</div>
-                    <Pagination currentPage={providerVersionSearchResults.pagerState.currentPage} lastPage={providerVersionSearchResults.pagerState.lastPage} callback={pageChange}/>
-                </nav>
+                                </p>
+                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                            </div>
+                        )
+                    }
+                    <BackToTop id="top" />
+                    <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                         aria-label="Pagination">
+                        <div className="pagination__summary">Showing {providerVersionSearchResults.startItemNumber} - {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount} results</div>
+                        <Pagination currentPage={providerVersionSearchResults.pagerState.currentPage} lastPage={providerVersionSearchResults.pagerState.lastPage} callback={pageChange}/>
+                    </nav>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 }

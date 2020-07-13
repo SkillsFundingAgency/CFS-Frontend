@@ -54,7 +54,7 @@
     <partial name="_SearchErrorPartial" />
     <div class="col-xs-12">
         <div data-bind="visible: isResultsVisible">
-            <partial name="_SearchPagerPartial_SpecRelationships" model='new PagerPartialViewModel(Model.SearchResults, "specifications", Model.SearchTerm)' />
+            <partial name="_SearchPagerPartial_SpecRelationships" model='new PagerPartialViewModel(new SearchResultViewModel(Model.SearchResults.TotalCount, Model.SearchResults.PagerState.CurrentPage), "specifications", Model.SearchTerm)' />
         </div>
         @*end of row*@
         <div class="row">
@@ -62,13 +62,13 @@
                 <div>
                     <div data-bind="visible: !searchPerformed()" id="static-results-container">
 
-                        @foreach (var specification in Model.SearchResults.SpecRelationships)
+                        @foreach (var specification in Model.SearchResults.Items)
                         {
                             <div class="specs-relationship-searchresult-container-item">
                                 <h2 class="description-text-link stream-title">
-                                    <a href="/datasets/specificationrelationships?specificationId=@specification.SpecificationId" id="specification-link-@specification.SpecificationId"> @specification.SpecificationName</a>
+                                    <a href="/datasets/specificationrelationships?specificationId=@specification.Id" id="specification-link-@specification.Id"> @specification.Name</a>
                                 </h2>
-                                <p>@specification.CountPhrase</p>
+                                <p>@specification.RelationshipCount</p>
                             </div>
                         }
 

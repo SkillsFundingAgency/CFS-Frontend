@@ -1,16 +1,15 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿using System.Collections.Generic;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Frontend.ViewModels.Common;
+
+namespace CalculateFunding.Frontend.ViewModels.Specs
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using CalculateFunding.Frontend.ViewModels.Common;
-
-    public class SpecificationDatasourceRelationshipSearchResultViewModel : SearchResultViewModel
+	public class SpecificationDatasourceRelationshipSearchResultViewModel
     {
-        public SpecificationDatasourceRelationshipSearchResultViewModel()
-        {
-            SpecRelationships = Enumerable.Empty<SpecificationDatasourceRelationshipSearchResultItemViewModel>();
-        }
-
-        public IEnumerable<SpecificationDatasourceRelationshipSearchResultItemViewModel> SpecRelationships { get; set; }
+		public IEnumerable<SpecificationDatasourceRelationshipSearchResultItem> Items { get; set; }
+        public PagerState PagerState { get; set; }
+		public int TotalCount { get; set; }
+		public int StartItemNumber { get; set; }
+		public int EndItemNumber { get; set; }
     }
 }

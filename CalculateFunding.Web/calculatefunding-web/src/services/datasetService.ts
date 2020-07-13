@@ -183,3 +183,13 @@ export async function getDatasetsForFundingStreamService(fundingStreamId: string
         }
     })
 }
+
+export async function searchDatasetRelationshipsService(request: DatasetDefinitionRequestViewModel) {
+    return axios(`/api/datasetrelationships/search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: request
+    })
+}
