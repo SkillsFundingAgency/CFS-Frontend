@@ -42,11 +42,13 @@
             {
                 if (string.IsNullOrWhiteSpace(DatasetName))
                 {
-                    return "Map data source file";
+                    return "Map";
                 }
 
-                return "Change data source file";
+                return "Change";
             }
         }
+
+        public bool IsLatestVersion { get; set; }
     }
 }

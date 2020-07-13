@@ -175,7 +175,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 		        {
 			        Id = "ds-id",
 			        Name = "ds name",
-                    Versions = Builder<DatasetVersionModel>.CreateListOfSize(10).Build()
+			        Versions = Builder<DatasetVersionModel>.CreateListOfSize(10).Build()
 		        }
 	        };
 

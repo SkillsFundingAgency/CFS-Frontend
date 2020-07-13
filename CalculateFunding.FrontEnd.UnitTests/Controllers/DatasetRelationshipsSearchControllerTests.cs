@@ -1,6 +1,12 @@
 ﻿// <copyright file="DatasetRelationshipsSearchControllerTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
+
+using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Frontend.Helpers;
+
 namespace CalculateFunding.Frontend.Controllers
 {
     using System;
@@ -88,7 +94,11 @@ namespace CalculateFunding.Frontend.Controllers
 
         private static DatasetRelationshipsSearchController CreateController(IDatasetRelationshipsSearchService searchService = null)
         {
-            return new DatasetRelationshipsSearchController(searchService ?? CreateSearchService());
+            return new DatasetRelationshipsSearchController(searchService ?? CreateSearchService(), 
+                Substitute.For<ISpecificationsApiClient>(), 
+                Substitute.For<IAuthorizationHelper>(), 
+                Substitute.For<IMapper>(), 
+                Substitute.For<IDatasetsApiClient>());
         }
 
         private static IDatasetRelationshipsSearchService CreateSearchService()

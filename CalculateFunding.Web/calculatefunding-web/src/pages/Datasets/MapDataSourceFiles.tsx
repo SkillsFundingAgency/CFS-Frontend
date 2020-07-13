@@ -12,6 +12,7 @@ import {DatasetDefinitionRequestViewModel} from "../../types/Datasets/DatasetDef
 import {Link} from "react-router-dom";
 import {SpecificationDatasourceRelationshipViewModel} from "../../types/Datasets/SpecificationDatasourceRelationshipViewModel";
 import {BackToTop} from "../../components/BackToTop";
+import {NoData} from "../../components/NoData";
 
 export function MapDataSourceFiles() {
     const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -278,7 +279,8 @@ export function MapDataSourceFiles() {
 
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatus title={"Loading data source file results"} hidden={!isLoading}/>
-                    <table className="govuk-table" hidden={isLoading}>
+                    <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading} />
+                    <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
                         <thead className="govuk-table__head">
                         <tr className="govuk-table__row">
                             <th scope="col"
@@ -291,7 +293,7 @@ export function MapDataSourceFiles() {
                         {datasetRelationships.items.map((dr, index) =>
                             <tr className="govuk-table__row" key={index}>
                                 <th scope="row" className="govuk-table__header">
-                                    <Link to={`/datasets/datarelationships/${dr.specificationId}`}>
+                                    <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
                                         {dr.specificationName}
                                     </Link>
                                     <p className="govuk-body">{dr.definitionRelationshipCount > 0? dr.definitionRelationshipCount : "no" } datasets exist for specification</p>
@@ -302,10 +304,6 @@ export function MapDataSourceFiles() {
                         )}
                         </tbody>
                     </table>
-                    <p className="govuk-body govuk-body-m center-align"
-                       hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading}>
-                        There are no records to match your search
-                    </p>
                     <BackToTop id={"top"} />
                     <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">

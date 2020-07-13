@@ -554,7 +554,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
-                                        <Link to={`/datasets/specificationrelationships?specificationId=${specificationId}`}
+                                        <Link to={`/Datasets/DataRelationships/${specificationId}`}
                                               id={"dataset-specification-relationship-button"}
                                               className="govuk-link govuk-button" data-module="govuk-button">
                                             Map data source file to data set</Link>

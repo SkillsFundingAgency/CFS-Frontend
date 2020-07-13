@@ -1,6 +1,6 @@
 import {SearchMode} from "../SearchMode";
 
-export interface DatasetSearchRequestViewModel {
+export interface DatasetRelationshipSearchRequestViewModel {
     pageNumber: number;
     searchTerm: string;
     errorToggle: string;
@@ -9,6 +9,4 @@ export interface DatasetSearchRequestViewModel {
     pageSize: number;
     facetCount: number;
     searchMode: SearchMode;
-    fundingStreams: string[];
-    dataSchemas: string[];
 }

@@ -46,6 +46,7 @@ import {
     ViewProvidersFundingStreamSelection
 } from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
+import {DataRelationships} from "./pages/Datasets/DataRelationships";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -85,6 +86,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile} />
                 <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
+                <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships} />
                 <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />

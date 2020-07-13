@@ -104,7 +104,7 @@
                         <tr>
                             <td>@result.Name</td>
                             <td>@result.ValueType</td>
-                            <td>@(!result.HasException ? result.Value.AsFormatCalculationTypeText(result.ValueType) : result.ExceptionType)</td>
+                            <td>@(!result.HasException ? result.Value : result.ExceptionType)</td>
                         </tr>
                         @if (result.HasException)
                         {

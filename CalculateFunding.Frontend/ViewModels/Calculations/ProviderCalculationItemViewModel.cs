@@ -7,6 +7,6 @@
         public string ExceptionMessage { get; set; }
         public bool HasException => !string.IsNullOrWhiteSpace(ExceptionType);
         public string ValueType { get; set; }
-		public decimal? Value { get; set; }
+		public object Value { get; set; }
 	}
 }
