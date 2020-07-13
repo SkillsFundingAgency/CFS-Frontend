@@ -245,20 +245,20 @@ function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Ar
     return children;
 }
 
-export function getStringArray(options: string | undefined): string[] | undefined {
+export function getStringArray(options: string | undefined, delimiter: string = ","): string[] | undefined {
     if (!options || options.length === 0) {
         return undefined;
     }
 
-    return options.split(",").map(s => s.trim());
+    return options.split(`${delimiter}`).map(s => s.trim());
 }
 
-export function stringArrayToString(options: string[] | undefined): string | undefined {
+export function stringArrayToString(options: string[] | undefined, delimiter: string = ","): string | undefined {
     if (!options || options.length === 0) {
         return undefined;
     }
 
-    return options.join(", ").trimEnd();
+    return options.join(`${delimiter}`).trimEnd();
 }
 
 function getCalculation(templateCalculation: TemplateCalculation, id: number, key: number): Calculation {

@@ -113,7 +113,7 @@ export const withChildFundingLineAndCalculationDs: Array<FundingLineDictionaryEn
                     "aggregationType": AggregrationType.None,
                     "formulaText": "",
                     "valueFormat": ValueFormatType.Currency,
-                    "allowedEnumTypeValues": "Option1, Option2, Option3",
+                    "allowedEnumTypeValues": "Option1,Option2,Option3",
                     "groupRate": undefined,
                     "percentageChangeBetweenAandB": undefined,
                     "children": []

@@ -2,6 +2,7 @@ import React from "react";
 import { CalculationItem } from "../../components/CalculationItem";
 import { mount } from "enzyme";
 import { Calculation, NodeType, CalculationType, AggregrationType, ValueFormatType, CalculationDictionaryItem } from "../../types/TemplateBuilderDefinitions";
+import { waitFor, screen, render } from "@testing-library/react";
 
 const calc: Calculation = {
     id: "n1",
@@ -41,7 +42,7 @@ describe('<CalculationItem />', () => {
         expect(wrapper.find('#calc-aggregation-type').children().length).toBe(1)
         expect(wrapper.find('#calc-value-format').props().value).toBe("String");
         expect(wrapper.find('#calc-value-format').children().length).toBe(1);
-        expect(wrapper.find('#calc-enum-values')).toHaveLength(1);
+        expect(wrapper.find('#add-tag')).toHaveLength(1);
     });
 
     it('renders allowedEnumTypeValues field when type Enum selected', () => {
@@ -54,14 +55,14 @@ describe('<CalculationItem />', () => {
             cloneCalculation={jest.fn()}
         />);
 
-        expect(wrapper.find('#calc-enum-values')).toHaveLength(0);
+        expect(wrapper.find('#add-tag')).toHaveLength(0);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
 
-        expect(wrapper.find('#calc-enum-values')).toHaveLength(1);
+        expect(wrapper.find('#add-tag')).toHaveLength(1);
     });
 
-    it('disables save button when allowedEnumTypeValues field is empty', () => {
+    it('shows error when click save and allowedEnumTypeValues field is empty', async () => {
         const wrapper = mount(<CalculationItem
             node={calc}
             calcs={allCalcs}
@@ -72,13 +73,14 @@ describe('<CalculationItem />', () => {
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
+        wrapper.find('#save-button').simulate("click");
 
-        wrapper.find('#calc-enum-values').simulate("change", { target: { value: "" } });
-
-        expect(wrapper.find('#save-button').props().disabled).toBeTruthy();
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(1);
+        });
     });
 
-    it('disables save button when allowedEnumTypeValues field contains non-unique options', () => {
+    it('shows error when allowedEnumTypeValues field contains non-unique options', async () => {
         const wrapper = mount(<CalculationItem
             node={calc}
             calcs={allCalcs}
@@ -89,13 +91,17 @@ describe('<CalculationItem />', () => {
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
+        wrapper.find('#add-tag').simulate("change", { target: { value: "Option1" } });
+        wrapper.find("[data-testid='add-tag-button']").simulate("click");
+        wrapper.find('#add-tag').simulate("change", { target: { value: "Option1" } });
+        wrapper.find("[data-testid='add-tag-button']").simulate("click");
 
-        wrapper.find('#calc-enum-values').simulate("change", { target: { value: "Option1, Option2, Option2" } });
-
-        expect(wrapper.find('#save-button').props().disabled).toBeTruthy();
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(1);
+        });
     });
 
-    it('does not disable save button when allowedEnumTypeValues field contains valid options', () => {
+    it('does not show error when allowedEnumTypeValues field contains valid options', async () => {
         const wrapper = mount(<CalculationItem
             node={calc}
             calcs={allCalcs}
@@ -106,10 +112,13 @@ describe('<CalculationItem />', () => {
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
+        wrapper.find('#add-tag').simulate("change", { target: { value: "Option1" } });
+        wrapper.find("[data-testid='add-tag-button']").simulate("click");
+        wrapper.find('#save-button').simulate("click");
 
-        wrapper.find('#calc-enum-values').simulate("change", { target: { value: "Option1, Option2, Option3" } });
-
-        expect(wrapper.find('#save-button').props().disabled).toBeFalsy();
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(0);
+        });
     });
 
     it('renders valueFormat of Boolean when type Boolean selected', () => {

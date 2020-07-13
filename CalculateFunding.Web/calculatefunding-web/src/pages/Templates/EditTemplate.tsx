@@ -42,7 +42,6 @@ import {
     TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, TemplateStatus
 } from '../../types/TemplateBuilderDefinitions';
 import "../../styles/EditTemplate.scss";
-import { useEffectOnce } from '../../hooks/useEffectOnce';
 import { DateFormatter } from '../../components/DateFormatter';
 import { Breadcrumbs, Breadcrumb } from '../../components/Breadcrumbs';
 import { LoadingStatus } from '../../components/LoadingStatus';

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
+import { TagEditor } from "./TagEditor";
 import "../styles/CalculationItem.scss";
-import { getStringArray } from "../services/templateBuilderDatasourceService";
+import { getStringArray, stringArrayToString } from "../services/templateBuilderDatasourceService";
 
 export interface CalculationItemProps {
     node: Calculation,
@@ -26,6 +27,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     const [aggregationType, setAggregationType] = useState<AggregrationType>(node.aggregationType);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [cloneId, setCloneId] = useState<string>('');
+    const [saved, setSaved] = useState<boolean>(false);
 
     const isClone = node.id.includes(":");
 
@@ -84,8 +86,19 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         setcalculationAggregationType(CalculationAggregationType[e.target.value as keyof typeof CalculationAggregationType]);
     }
 
-    const handleAllowedEnumTypeValuesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAllowedEnumTypeValues(e.target.value);
+    const handleAddAllowedEnumTypeValue = (newValue: string) => {
+        isAllowedEnumTypeValuesEmpty ?
+            setAllowedEnumTypeValues(newValue) :
+            setAllowedEnumTypeValues(allowedEnumTypeValues.concat(",", newValue));
+    }
+
+    const handleRemoveAllowedEnumTypeValue = (valueToRemove: string) => {
+        const values: string[] | undefined = getStringArray(allowedEnumTypeValues);
+        if (!values || values.length === 0) return;
+        const indexOfValueToRemove = values.findIndex(s => s === valueToRemove);
+        values.splice(indexOfValueToRemove, 1);
+        const newValue = stringArrayToString(values);
+        newValue ? setAllowedEnumTypeValues(newValue) : setAllowedEnumTypeValues("");
     }
 
     const handleCloneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -114,6 +127,9 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     }
 
     const handleSubmit = () => {
+        setSaved(true);
+        if (!isFormValid()) return;
+
         const groupRate: GroupRate = {
             numerator: numerator,
             denominator: denominator
@@ -142,6 +158,10 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         openSideBar(false);
     }
 
+    const handleCancel = () => {
+        openSideBar(false);
+    }
+
     const renderValueFormatOptions = (): JSX.Element => {
         if (type === CalculationType.Boolean) {
             return <option value={ValueFormatType.Boolean}>Boolean</option>
@@ -162,18 +182,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         );
     }
 
-    const allowedEnumTypeValuesValid = () => {
-        if (type !== CalculationType.Enum) {
-            return true;
-        }
-        const values = getStringArray(allowedEnumTypeValues);
-        if (!values) {
-            return true; // Empty case handled by isFormValid to prevent error being displayed on render
-        }
-        return new Set(values.map(v => v.toLowerCase())).size === values.map(v => v.toLowerCase()).length
-    }
-
-    const isAllowedEnumTypeValuesValid = allowedEnumTypeValuesValid();
+    const isAllowedEnumTypeValuesEmpty = allowedEnumTypeValues.trim().length === 0;
     const isNameValid = name.length > 0;
     const isGroupRateValid = aggregationType !== AggregrationType.GroupRate ||
         (aggregationType === AggregrationType.GroupRate && numerator !== 0 && denominator !== 0);
@@ -181,11 +190,10 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         (aggregationType === AggregrationType.PercentageChangeBetweenAandB && calculationA !== 0 && calculationB !== 0);
 
     const isFormValid = () => {
-        const hasAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
+        const hasValidAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
         return (
             isNameValid &&
-            !hasAllowedEnumTypes &&
-            isAllowedEnumTypeValuesValid &&
+            !hasValidAllowedEnumTypes &&
             isGroupRateValid &&
             isPecentageChangeBetweenAandBValid
         );
@@ -195,10 +203,10 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         <>
             <h2 className="govuk-heading-l">Edit Calculation</h2>
             <fieldset className="govuk-fieldset" key={node.id}>
-                <div className={`govuk-form-group ${isNameValid ? "" : "govuk-form-group--error"}`}>
+                <div className={`govuk-form-group ${saved && !isNameValid ? "govuk-form-group--error" : ""}`}>
                     <label className="govuk-label" htmlFor="calc-name">Name</label>
                     <span id="calculation-name-hint" className="govuk-hint">The name of the calculation</span>
-                    {!isNameValid && <span id="name-error" className="govuk-error-message">
+                    {saved && !isNameValid && <span id="name-error" className="govuk-error-message">
                         <span className="govuk-visually-hidden">Error:</span> Name must be not be blank
                     </span>}
                     <input className="govuk-input" id="calc-name" name="calc-name" type="text" value={name} onChange={handleNameChange} />
@@ -216,15 +224,14 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                     </select>
                 </div>
                 {type === CalculationType.Enum &&
-                    <div className={`govuk-form-group ${isAllowedEnumTypeValuesValid ? "" : "govuk-form-group--error"}`}>
-                        <label className="govuk-label" htmlFor="calc-enum-values">Allowed Enum Values</label>
-                        <span id="calculation-enum-values-hint" className="govuk-hint">E.g. Option 1, Option2, Option3</span>
-                        {!isAllowedEnumTypeValuesValid &&
-                            <span id="name-error" className="govuk-error-message">
-                                <span className="govuk-visually-hidden">Error:</span>Allowed Enum Values must contain unique values
-                            </span>}
-                        <input className="govuk-input" id="calc-enum-values" name="calc-enum-values" type="text" placeholder="Please enter options..." value={allowedEnumTypeValues} onChange={handleAllowedEnumTypeValuesChange} />
-                    </div>
+                    <TagEditor
+                        allowDuplicates={false}
+                        tagValuesCsv={allowedEnumTypeValues}
+                        showErrorMessageOnRender={saved && isAllowedEnumTypeValuesEmpty ? "You must add an enum value" : undefined}
+                        duplicateErrorMessage={"You cannot add the same enum value twice"}
+                        onAddNewValue={handleAddAllowedEnumTypeValue}
+                        onRemoveValue={handleRemoveAllowedEnumTypeValue}
+                    />
                 }
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-formula-text">Formula Text</label>
@@ -308,7 +315,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                         </div>
                     </>
                 }
-                <button className="govuk-button" id="save-button" data-module="govuk-button" onClick={handleSubmit} disabled={!isFormValid()}>
+                <button className="govuk-button" id="save-button" data-module="govuk-button" onClick={handleSubmit}>
                     Save and continue
                 </button>
                 {
