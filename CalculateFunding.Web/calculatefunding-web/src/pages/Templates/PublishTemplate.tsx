@@ -178,9 +178,9 @@ export const PublishTemplate = () => {
                                 <span className="govuk-caption-m">Template Name</span>
                                 <h3 className="govuk-heading-m" data-testid="template-name">{template && template.name}</h3>
                                 <span className="govuk-caption-m">Funding stream</span>
-                                <h3 className="govuk-heading-m">{template && template.fundingStreamId}</h3>
+                                <h3 className="govuk-heading-m">{template && template.fundingStreamName}</h3>
                                 <span className="govuk-caption-m">Funding period</span>
-                                <h3 className="govuk-heading-m">{template && template.fundingPeriodId}</h3>
+                                <h3 className="govuk-heading-m">{template && template.fundingPeriodName}</h3>
                                 <span className="govuk-caption-m">Description</span>
                                 <h3 className="govuk-heading-m">{template && template.description}</h3>
                                 <span className="govuk-caption-m">Version</span>

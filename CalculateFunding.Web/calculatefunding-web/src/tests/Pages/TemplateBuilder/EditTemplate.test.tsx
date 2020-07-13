@@ -115,6 +115,12 @@ describe("Template Builder when I have no permissions ", () => {
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         await waitFor(() => expect(wrapper.find("[data-testid='publish-button']")).toHaveLength(0));
     });
+
+    it("does not render add button", async () => {
+        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
+        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
+        await waitFor(() => expect(wrapper.find("[data-testid='add']")).toHaveLength(0));
+    });
 });
 
 describe("Template Builder when I request current version and have edit permissions ", () => {
@@ -137,26 +143,17 @@ describe("Template Builder when I request current version and have edit permissi
         await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
     });
 
-    it("shows add funding line button when edit mode selected", async () => {
-        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
-        await waitFor(() => expect(wrapper.find("[data-testid='add']")).toHaveLength(1));
-    });
-
     it("adds new funding line to page when button clicked", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
         expect(wrapper.find('OrganisationChartNode')).toHaveLength(0);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         await waitFor(() => expect(wrapper.find('OrganisationChartNode')).toHaveLength(1));
     });
 
-    it("funding line displays add buttons in edit mode", async () => {
+    it("funding line displays add buttons", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         await waitFor(() => {
             expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(1);
@@ -164,22 +161,9 @@ describe("Template Builder when I request current version and have edit permissi
         });
     });
 
-    it("funding line hides add buttons in view mode", async () => {
-        const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
-        wrapper.find("[data-testid='add']").simulate('click');
-        wrapper.find("[data-testid='view-option']").simulate('change');
-        await waitFor(() => {
-            expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(0);
-            expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-calc']")).toHaveLength(0);
-        });
-    });
-
     it("displays edit window when clicking on funding line", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         const wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         await waitFor(() => {
             expect(wrapper.find('Sidebar').prop('open')).toBe(false);
@@ -191,7 +175,6 @@ describe("Template Builder when I request current version and have edit permissi
     it("displays confirmation when deleting a funding line", async () => {
         const { EditTemplate } = require('../../../pages/Templates/EditTemplate');
         let wrapper = mount(<MemoryRouter><EditTemplate /></MemoryRouter>);
-        wrapper.find("[data-testid='edit-option']").simulate('change');
         wrapper.find("[data-testid='add']").simulate('click');
         wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');
         await waitFor(() => {

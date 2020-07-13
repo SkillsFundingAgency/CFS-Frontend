@@ -114,14 +114,9 @@ describe("Template Builder when I request previous version", () => {
         await waitFor(() => expect(getTemplateVersion).toBeCalled());
     });
 
-    it("hides edit option when not viewing current version but have edit permissions", async () => {
-        const {queryByTestId} = renderTemplateVersionPage();
-        await waitFor(() => expect(queryByTestId("edit-option")).not.toBeInTheDocument());
-    });
-
-    it("does render a publish button", async () => {
-        const { getByTestId } = renderTemplateVersionPage();
-        await waitFor(() => expect(getByTestId("publish-button")).toBeEnabled());
+    it("does not render a publish button", async () => {
+        const { queryByTestId } = renderTemplateVersionPage();
+        await waitFor(() => expect(queryByTestId("publish-button")).not.toBeInTheDocument());
     });
 
     it("does not render the add or edit description link", async () => {

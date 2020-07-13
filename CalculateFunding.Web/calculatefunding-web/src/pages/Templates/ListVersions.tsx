@@ -130,9 +130,9 @@ export const ListVersions = () => {
                             <h1 className="govuk-heading-xl">{template && template.name}</h1>
                             <h3 className="govuk-caption-l govuk-!-padding-bottom-5">View or restore previous versions of the template.</h3>
                             <span className="govuk-caption-m">Funding stream</span>
-                            <h3 className="govuk-heading-m">{template && template.fundingStreamId}</h3>
+                            <h3 className="govuk-heading-m">{template && template.fundingStreamName}</h3>
                             <span className="govuk-caption-m">Funding period</span>
-                            <h3 className="govuk-heading-m">{template && template.fundingPeriodId}</h3>
+                            <h3 className="govuk-heading-m">{template && template.fundingPeriodName}</h3>
                         </div>
                     </div>
                     }
