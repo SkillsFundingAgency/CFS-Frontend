@@ -157,7 +157,7 @@ export const CreateTemplate = () => {
                         </h2>
                         <div className="govuk-error-summary__body">
                             <ul className="govuk-list govuk-error-summary__list">
-                                {errors.map((error, index) =>
+                                {errors.map((error) =>
                                     <li key={error.id}>
                                         {error.fieldName && <a href={"#" + error.fieldName}>{error.message}</a>}
                                         {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
@@ -190,8 +190,8 @@ export const CreateTemplate = () => {
                                                     <option key={stream.id} value={stream.id}>{stream.name}</option>)
                                                 }
                                             </select>}
-                                        {errors.map((error, index) => error.fieldName === "fundingStreamId" &&
-                                            <span key={`error-${index}`} className="govuk-error-message">
+                                        {errors.map(error => error.fieldName === "fundingStreamId" &&
+                                            <span key={error.id} className="govuk-error-message">
                                                 <span className="govuk-visually-hidden">Error:</span> {error.message}
                                             </span>
                                         )}
@@ -210,7 +210,7 @@ export const CreateTemplate = () => {
                                                     }
                                                 </select>}
                                             {errors.map(error => error.fieldName === "fundingPeriodId" &&
-                                                <span className="govuk-error-message">
+                                                <span key={error.id} className="govuk-error-message">
                                                     <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
                                             )}
                                         </div>

@@ -103,6 +103,9 @@ export function EditTemplate() {
         const initialisePage = () => {
             window.scrollTo(0, 0);
             clearErrorMessages();
+            setSaveMessage("");
+            setIsSaving(false);
+            setIsDirty(false);
             fetchData();
             clearPresentState();
             clearUndoState();
@@ -152,11 +155,13 @@ export function EditTemplate() {
             }
             if (!templateResponse.isCurrentVersion) {
                 setMode(Mode.View);
+            } else {
+                setMode(Mode.Edit);
             }
-            setIsLoading(false);
         } catch (err) {
-            setIsLoading(false);
             addErrorMessage(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -183,11 +188,6 @@ export function EditTemplate() {
     const updateNode = async (node: FundingLineUpdateModel | CalculationUpdateModel) => {
         await updateDatasource(ds, node);
         update((deepClone(ds)));
-    }
-
-    const handleModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMode(e.target.value);
-        setOpenSidebar(false);
     }
 
     const incrementNextId = () => {
@@ -228,12 +228,16 @@ export function EditTemplate() {
 
     const handleRestoreTemplateClick = async (templateVersion: number) => {
         try {
+            clearErrorMessages();
+
             if (template === undefined) {
                 addErrorMessage("Can't find template data to update");
                 return;
             }
+
             setIsSaving(true);
             setSaveMessage("Restoring template...");
+
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
 
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
@@ -249,6 +253,7 @@ export function EditTemplate() {
                 history.push(`/Templates/${template.templateId}/Versions/${restoreResult.data}`);
             } else {
                 addErrorMessage(`Template restore failed: ${restoreResult.status} ${restoreResult.statusText}`);
+                showSaveMessageOnce("Template failed to be restored due to errors.");
             }
         } catch (err) {
             const errStatus = err.response.status;
@@ -267,38 +272,50 @@ export function EditTemplate() {
             } else {
                 addErrorMessage(`Template could not be restored: ${err.message}.`, "template");
             }
-            setSaveMessage("Template failed to be restored due to errors.");
+            showSaveMessageOnce("Template failed to be restored due to errors.");
         } finally {
             setIsSaving(false);
         }
     }
 
     const handleSaveContentClick = async () => {
-        clearUndoState();
-        clearRedoState();
-        clearErrorMessages();
-
         try {
+            clearErrorMessages();
+
             if (template === undefined) {
                 addErrorMessage("Can't find template data to update");
                 return;
             }
+
             setIsSaving(true);
             setSaveMessage("Saving template...");
+
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
             if (!fundingLines || fundingLines.length === 0) {
                 showSaveMessageOnce("You can't save an empty template. Add one or more funding lines and try again.");
                 return;
             }
+
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
                 templateId: template.templateId,
                 templateFundingLinesJson: JSON.stringify(fundingLines)
             }
 
-            await saveTemplateContent(templateContentUpdateCommand);
-            await fetchData();
-            setIsDirty(false);
-            showSaveMessageOnce("Template saved successfully.");
+            const saveResponse = await saveTemplateContent(templateContentUpdateCommand);
+            if (!version) {
+                clearUndoState();
+                clearRedoState();
+                await fetchData();
+                setIsDirty(false);
+                showSaveMessageOnce("Template saved successfully.");
+            } else {
+                if (saveResponse.status === 200) {
+                    history.push(`/Templates/${template.templateId}/Versions/${saveResponse.data}`);
+                } else {
+                    addErrorMessage(`Template save failed: ${saveResponse.status} ${saveResponse.statusText}`);
+                    showSaveMessageOnce("Template failed to save due to errors.");
+                }
+            }
         } catch (err) {
             const errStatus = err.response.status;
             if (errStatus === 400) {
@@ -316,7 +333,7 @@ export function EditTemplate() {
             } else {
                 addErrorMessage(`Template could not be saved: ${err.message}.`, "template");
             }
-            setSaveMessage("Template failed to save due to errors.");
+            showSaveMessageOnce("Template failed to save due to errors.");
         } finally {
             setIsSaving(false);
         }
@@ -327,7 +344,7 @@ export function EditTemplate() {
         history.push(`/Templates/Publish/${template.templateId}`);
     }
 
-    const handleAddFundingLineClick = (event: MouseEvent) => {
+    const handleAddFundingLineClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         const keyCount = ds.length > 0 ? ds.reduce((prev, current) => {
             return (prev.key > current.key ? prev : current)
@@ -353,12 +370,12 @@ export function EditTemplate() {
         update((deepClone(ds)));
     }
 
-    const handleUndo = (event: MouseEvent) => {
+    const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         undo();
     }
 
-    const handleRedo = (event: MouseEvent) => {
+    const handleRedo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         redo();
     }
@@ -399,92 +416,92 @@ export function EditTemplate() {
 
     return (
         <div>
-            <Header location={Section.Templates}/>
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
-                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []}/>
+                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
                 <LoadingStatus title={"Loading Template"} hidden={!isLoading} id={"template-builder-loader"}
-                               subTitle={"Please wait while the template loads."}/>
+                    subTitle={"Please wait while the template loads."} />
                 {!version && <Breadcrumbs>
-                    <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
-                    <Breadcrumb name={template ? template.name : ""}/>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+                    <Breadcrumb name={template ? template.name : ""} />
                 </Breadcrumbs>}
                 {version && <Breadcrumbs>
-                    <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
                     {template &&
-                    <Breadcrumb name={template.name} url={`/Templates/${templateId}/Edit`}/>
+                        <Breadcrumb name={template.name} url={`/Templates/${templateId}/Edit`} />
                     }
-                    <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`}/>
+                    <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`} />
                     {template &&
-                    <Breadcrumb name={`${template.majorVersion}.${template.minorVersion}`}/>
+                        <Breadcrumb name={`${template.majorVersion}.${template.minorVersion}`} />
                     }
                 </Breadcrumbs>}
                 <div className="govuk-main-wrapper">
                     {errors.length > 0 &&
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-two-thirds">
-                            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
-                                <h2 className="govuk-error-summary__title" id="error-summary-title">
-                                    There is a problem
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-two-thirds">
+                                <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
+                                    <h2 className="govuk-error-summary__title" id="error-summary-title">
+                                        There is a problem
                                 </h2>
-                                <div className="govuk-error-summary__body">
-                                    <ul className="govuk-list govuk-error-summary__list">
-                                        {errors.map(error =>
-                                            <li key={error.id}>
-                                                {error.fieldName &&
-                                                <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
-                                                {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
-                                            </li>
-                                        )}
-                                    </ul>
+                                    <div className="govuk-error-summary__body">
+                                        <ul className="govuk-list govuk-error-summary__list">
+                                            {errors.map(error =>
+                                                <li key={error.id}>
+                                                    {error.fieldName &&
+                                                        <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
+                                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     }
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-0" data-testid="template-name">{template && template.name}</h1>
                     <h3 className="govuk-caption-l govuk-!-padding-top-0">{template &&
-                    <span>{template.fundingStreamName} for {template.fundingPeriodName}</span>
+                        <span>{template.fundingStreamName} for {template.fundingPeriodName}</span>
                     }
                     </h3>
 
                     {template && ((template.isCurrentVersion && canEditTemplate) || (template.description && template.description.trim().length > 0)) &&
-                    <details className="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-3" data-module="govuk-details">
-                        <summary className="govuk-details__summary">
-                            <span className="govuk-details__summary-text">
-                                What is {template.fundingStreamId} {template.fundingPeriodId}?
+                        <details className="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-3" data-module="govuk-details">
+                            <summary className="govuk-details__summary">
+                                <span className="govuk-details__summary-text">
+                                    What is {template.fundingStreamId} {template.fundingPeriodId}?
                             </span>
-                        </summary>
-                        <div
-                            className={`govuk-details__text ${errors.filter(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                            <span className="govuk-caption-m" id="description" ref={descriptionRef}>Description</span>
-                            {errors.map(error => error.fieldName === "description" &&
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                <span className="govuk-visually-hidden">Error:</span> {error.message}
-                            </span>
-                            )}
-                            <p className="govuk-body">
-                                {`${(template.description && template.description.trim()) || ''} `}
-                                {template.isCurrentVersion && canEditTemplate &&
-                                <>
-                                    {template.description && template.description.trim().length > 0 &&
-                                    <button id="edit-description-link"
-                                            onClick={toggleEditDescription}
-                                            className="govuk-link govuk-link--no-visited-state">
-                                        Edit
+                            </summary>
+                            <div
+                                className={`govuk-details__text ${errors.filter(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                                <span className="govuk-caption-m" id="description" ref={descriptionRef}>Description</span>
+                                {errors.map(error => error.fieldName === "description" &&
+                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                    </span>
+                                )}
+                                <p className="govuk-body">
+                                    {`${(template.description && template.description.trim()) || ''} `}
+                                    {template.isCurrentVersion && canEditTemplate &&
+                                        <>
+                                            {template.description && template.description.trim().length > 0 &&
+                                                <button id="edit-description-link"
+                                                    onClick={toggleEditDescription}
+                                                    className="govuk-link govuk-link--no-visited-state">
+                                                    Edit
                                     </button>}
-                                    {(template.description.trim().length === 0) &&
-                                    <button id="add-description-link"
-                                            onClick={toggleEditDescription}
-                                            className="govuk-link govuk-link--no-visited-state">
-                                        Add
+                                            {(template.description.trim().length === 0) &&
+                                                <button id="add-description-link"
+                                                    onClick={toggleEditDescription}
+                                                    className="govuk-link govuk-link--no-visited-state">
+                                                    Add
                                     </button>}
-                                </>
-                                }
-                            </p>
-                        </div>
-                    </details>}
+                                        </>
+                                    }
+                                </p>
+                            </div>
+                        </details>}
 
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
@@ -492,78 +509,78 @@ export function EditTemplate() {
                             <span
                                 className="govuk-heading-m govuk-!-margin-bottom-2">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;</span>
                             {template && template.status === TemplateStatus.Draft && template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--blue">IN PROGRESS</strong></span>}
+                                <span><strong className="govuk-tag govuk-tag--blue">IN PROGRESS</strong></span>}
                             {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--grey">DRAFT</strong></span>}
+                                <span><strong className="govuk-tag govuk-tag--grey">DRAFT</strong></span>}
                             {template && template.status === TemplateStatus.Published &&
-                            <span><strong className="govuk-tag govuk-tag--green">PUBLISHED</strong><br/>
-                            </span>}
+                                <span><strong className="govuk-tag govuk-tag--green">PUBLISHED</strong><br />
+                                </span>}
                             {template &&
-                            <div className="govuk-body">
-                                <Link id="versions-link"
-                                      to={`/Templates/${templateId}/Versions`}
-                                      className="govuk-link--no-visited-state">
-                                    View all versions
+                                <div className="govuk-body">
+                                    <Link id="versions-link"
+                                        to={`/Templates/${templateId}/Versions`}
+                                        className="govuk-link--no-visited-state">
+                                        View all versions
                                 </Link>
-                            </div>}
+                                </div>}
                         </div>
                     </div>
                     {template && template.status === TemplateStatus.Published &&
-                    <>
-                        <span className="govuk-caption-m">Publish Notes</span>
-                        <p className="govuk-body">
-                            {template && template.comments}
-                        </p>
-                    </>}
+                        <>
+                            <span className="govuk-caption-m">Publish Notes</span>
+                            <p className="govuk-body">
+                                {template && template.comments}
+                            </p>
+                        </>}
                     {mode === Mode.Edit && canEditTemplate &&
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-full">
-                            <label className="govuk-label" htmlFor="textarea">
-                                Search </label>
-                            <div className="govuk-grid-column-one-third govuk-!-padding-left-0">
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <label className="govuk-label" htmlFor="textarea">
+                                    Search </label>
+                                <div className="govuk-grid-column-one-third govuk-!-padding-left-0">
 
-                                <div className="search-container">
-                                    <input className="govuk-input input-search" id="event-name" name="event-name" type="text"/>
+                                    <div className="search-container">
+                                        <input className="govuk-input input-search" id="event-name" name="event-name" type="text" />
+                                    </div>
+                                </div>
+                                <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
+                                    <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
+                                    <ul className="govuk-list inline-block-list">
+                                        <li>
+                                            <a href="#"
+                                                data-testid='redo'
+                                                onClick={handleRedo}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
+                                                <span>↪</span> Redo ({redoCount()})
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <a href="#"
+                                                data-testid='undo'
+                                                onClick={handleUndo}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                                <span>↩</span> Undo ({undoCount()})
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <a href="#"
+                                                data-testid='add-funding-line'
+                                                onClick={handleAddFundingLineClick}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                                <span>+</span> Add a new funding line
+                                        </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
-                            <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
-                                <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
-                                <ul className="govuk-list inline-block-list">
-                                    <li>
-                                        <a href="#"
-                                           data-testid='redo'
-                                           onClick={handleRedo}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
-                                            <span>↪</span> Redo ({redoCount()})
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           data-testid='undo'
-                                           onClick={handleUndo}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-                                            <span>↩</span> Undo ({undoCount()})
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           data-testid='add-funding-line'
-                                           onClick={handleAddFundingLineClick}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-                                            <span>+</span> Add a new funding line
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>}
+                        </div>}
                     <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
                         <div id="template"
-                             className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map(error => error.fieldName === "template" &&
                                 <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                <span className="govuk-visually-hidden">Error:</span> {error.message}
-                            </span>
+                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                </span>
                             )}
                             <OrganisationChart
                                 ref={orgchart}
@@ -602,53 +619,53 @@ export function EditTemplate() {
                         handlePublish={handlePublishClick}
                     />}
                     <p className="govuk-body">
-                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false}/>
+                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false} />
                         {` by ${template && template.authorName}`}
                     </p>
                     {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                     <Link to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"}
-                          id="back-button"
-                          className="govuk-link govuk-back-link govuk-link--no-visited-state">
+                        id="back-button"
+                        className="govuk-link govuk-back-link govuk-link--no-visited-state">
                         Back
                     </Link>
                     {mode === Mode.Edit &&
-                    <Sidebar
-                        sidebar={<SidebarContent
-                            data={selectedNodes}
-                            calcs={getCalculations()}
-                            updateNode={updateNode}
-                            openSideBar={openSideBar}
-                            deleteNode={onClickDelete}
-                            cloneCalculation={onCloneCalculation}
-                        />}
-                        open={openSidebar}
-                        onSetOpen={openSideBar}
-                        pullRight={true}
-                        styles={{
-                            sidebar: {
-                                background: "white",
-                                position: "fixed",
-                                padding: "20px 20px",
-                                width: "500px"
-                            }, root: {position: "undefined"}, content: {
-                                position: "undefined",
-                                top: "undefined",
-                                left: "undefined",
-                                right: "undefined",
-                                bottom: "undefined"
-                            }
-                        }}
-                    ><span></span></Sidebar>}
+                        <Sidebar
+                            sidebar={<SidebarContent
+                                data={selectedNodes}
+                                calcs={getCalculations()}
+                                updateNode={updateNode}
+                                openSideBar={openSideBar}
+                                deleteNode={onClickDelete}
+                                cloneCalculation={onCloneCalculation}
+                            />}
+                            open={openSidebar}
+                            onSetOpen={openSideBar}
+                            pullRight={true}
+                            styles={{
+                                sidebar: {
+                                    background: "white",
+                                    position: "fixed",
+                                    padding: "20px 20px",
+                                    width: "500px"
+                                }, root: {position: "undefined"}, content: {
+                                    position: "undefined",
+                                    top: "undefined",
+                                    left: "undefined",
+                                    right: "undefined",
+                                    bottom: "undefined"
+                                }
+                            }}
+                        ><span></span></Sidebar>}
                 </div>
             </div>
             {mode === Mode.Edit && canEditTemplate && !isLoading &&
-            <EditDescriptionModal
-                originalDescription={template && template.description ? template.description : ""}
-                showModal={showModal}
-                toggleModal={setShowModal}
-                saveDescription={saveDescription}/>
+                <EditDescriptionModal
+                    originalDescription={template && template.description ? template.description : ""}
+                    showModal={showModal}
+                    toggleModal={setShowModal}
+                    saveDescription={saveDescription} />
             }
-            <Footer/>
+            <Footer />
         </div>
     )
 }

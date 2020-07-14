@@ -491,7 +491,7 @@ function childMatches(children: FundingLineOrCalculation[] | undefined, childId:
     return false;
 }
 
-export async function saveTemplateContent(command: TemplateContentUpdateCommand) {
+export async function saveTemplateContent(command: TemplateContentUpdateCommand): Promise<AxiosResponse<number>> {
     return await axios(`/api/templates/build/content`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

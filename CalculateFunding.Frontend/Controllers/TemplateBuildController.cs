@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Utility;
@@ -13,7 +11,6 @@ using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -181,7 +178,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<string> result = await _client.UpdateTemplateContent(new TemplateContentUpdateCommand
+            ValidatedApiResponse<int> result = await _client.UpdateTemplateContent(new TemplateContentUpdateCommand
             {
                 TemplateId = model.TemplateId,
                 TemplateFundingLinesJson = model.TemplateFundingLinesJson
@@ -190,12 +187,11 @@ namespace CalculateFunding.Frontend.Controllers
             switch (result.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    return Ok();
+                    return Ok(result.Content);
                 case HttpStatusCode.BadRequest:
                     return BadRequest(result.ModelState);
                 default:
-                    return StatusCode((int) result.StatusCode,
-                        result.Content.IsNullOrEmpty() ? "There was an error processing your request. Please try again." : result.Content);
+                    return StatusCode((int) result.StatusCode, "There was an error processing your request. Please try again.");
             }
         }
 

@@ -11,7 +11,7 @@ namespace CalculateFunding.Frontend.Interfaces
         Task<ValidatedApiResponse<string>> CreateDraftTemplate(TemplateCreateCommand command);
         Task<ValidatedApiResponse<string>> CreateTemplateAsClone(TemplateCreateAsCloneCommand command);
         Task<ValidatedApiResponse<string>> UpdateTemplateDescription(TemplateDescriptionUpdateCommand command);
-        Task<ValidatedApiResponse<string>> UpdateTemplateContent(TemplateContentUpdateCommand command);
+        Task<ValidatedApiResponse<int>> UpdateTemplateContent(TemplateContentUpdateCommand command);
         Task<ValidatedApiResponse<int>> RestoreContent(TemplateContentUpdateCommand command);
         Task<ApiResponse<TemplateVersionListResponse>> GetTemplateVersions(
             string templateId, 
