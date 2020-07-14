@@ -379,6 +379,7 @@ export function EditTemplate() {
     const handleRedo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         redo();
+        setIsDirty(true);
     }
 
     const toggleEditDescription = (event: React.MouseEvent<HTMLButtonElement>) => {
