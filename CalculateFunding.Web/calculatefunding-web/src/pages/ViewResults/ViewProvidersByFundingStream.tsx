@@ -61,17 +61,13 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([]);
     const [resultsLocalAuthority, setResultsLocalAuthority] = useState<FacetValue[]>([]);
 
-    useEffectOnce(() => {
-        setIsLoading(true);
-        GetProvidersByFundingStream(initialSearchRequest);
-    });
-
     useEffect(()=>{
         GetProvidersByFundingStream(searchRequest);
     }, [searchRequest]);
 
     function GetProvidersByFundingStream(searchModel: ProviderVersionSearchModel)
     {
+        setIsLoading(true);
         GetProvidersByFundingStreamService(match.params.fundingStreamId, searchModel).then( (response)=>{
             if (response.status === 200 || response.status === 201) {
                 const result = response.data as PagedProviderVersionSearchResults;

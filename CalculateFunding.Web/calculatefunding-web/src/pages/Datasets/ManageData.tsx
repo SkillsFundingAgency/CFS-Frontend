@@ -29,13 +29,13 @@ export function ManageData() {
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"map-data-source-files-title"} className="govuk-heading-m">
-                            <a href="/Datasets/MapDataSourceFiles">Map data source files to datasets for a specification</a>
+                            <Link to={"/Datasets/MapDataSourceFiles"}>Map data source files to datasets for a specification</Link>
                         </h3>
                         <p className="govuk-body">Select the data source file a dataset uses.</p>
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"download-data-schemas-title"} className="govuk-heading-m">
-                            <Link to="/datasets/DownloadDataSchema">Download data schemas</Link>
+                            <Link to="/Datasets/DownloadDataSchema">Download data schemas</Link>
                         </h3>
                         <p className="govuk-body">Download the data schema for data source.</p>
                     </div>

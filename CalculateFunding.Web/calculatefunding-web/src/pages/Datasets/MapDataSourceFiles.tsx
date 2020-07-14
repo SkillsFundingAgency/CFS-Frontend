@@ -55,10 +55,6 @@ export function MapDataSourceFiles() {
     const [filterFundingPeriodsInitialResult, setFilterFundingPeriodsInitialResult] = useState<string[]>(initialFacets);
     const [datasetRelationships, setDatasetRelationships] = useState<SpecificationDatasourceRelationshipViewModel>(initialDatasetRelationships);
 
-    useEffectOnce(() => {
-        searchDatasetRelationships(searchRequest);
-    });
-
     useEffect(()=>{
         searchDatasetRelationships(searchRequest);
     }, [searchRequest]);

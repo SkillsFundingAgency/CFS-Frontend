@@ -33,7 +33,7 @@ describe("<ManageData />", () => {
 
     it('will have the correct <H3 /> title for Map data source files to datasets for a specification', () => {
         const wrapper = mount(<MemoryRouter><Provider store={store}><ManageData/>></Provider></MemoryRouter>);
-        expect(wrapper.find("h3#map-data-source-files-title>a").text()).toBe("Map data source files to datasets for a specification");
+        expect(wrapper.find("h3#map-data-source-files-title>Link").text()).toBe("Map data source files to datasets for a specification");
     });
 
     it('will have the correct <H3 /> title for Download data schemas', () => {
