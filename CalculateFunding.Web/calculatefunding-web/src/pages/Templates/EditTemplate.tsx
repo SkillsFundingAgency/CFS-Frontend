@@ -82,8 +82,6 @@ export function EditTemplate() {
         clearPresentState,
         clearRedoState,
         clearUndoState,
-        canUndo,
-        canRedo,
         undoCount,
         redoCount
     } = useTemplateUndo(setDS);
@@ -373,6 +371,9 @@ export function EditTemplate() {
     const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         undo();
+        if (undoCount() === 0) {
+            setIsDirty(false);
+        }
     }
 
     const handleRedo = (event: React.MouseEvent<HTMLAnchorElement>) => {
