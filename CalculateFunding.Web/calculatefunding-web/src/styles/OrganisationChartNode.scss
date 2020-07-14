@@ -20,7 +20,7 @@
     top: -11px;
     left: 0;
     width: 100%;
-    border-top: 2px solid rgba(217, 83, 79, 0.8);
+    border-top: 2px solid #215a88;
     box-sizing: border-box;
   }
   
@@ -68,8 +68,8 @@
     top: -11px;
     left: calc(50% - 1px);
     width: 2px;
-    height: 9px;
-    background-color: rgba(217, 83, 79, 0.8);
+    height: 14px;
+    background-color: #215a88;
   }
   
   .orgchart > div > ul > li > ul li.isSiblingsCollapsed > .oc-node::before {
@@ -88,8 +88,8 @@
     bottom: -11px;
     left: calc(50% - 1px);
     width: 2px;
-    height: 9px;
-    background-color: rgba(217, 83, 79, 0.8);
+    height: 19px;
+    background-color: #215a88;
   }
   
   .orgchart ul li .oc-node.isChildrenCollapsed:not(:only-child)::after {
@@ -108,7 +108,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    background-color: rgba(217, 83, 79, 0.8);
+    background-color: #215a88;
     color: #fff;
     border-radius: 4px 4px 0 0;
   }
@@ -121,7 +121,7 @@
   
   .orgchart ul li .oc-node .oc-heading .oc-symbol::before {
     background-color: #fff;
-    border-color: rgba(217, 83, 79, 0.8);
+    border-color: #215a88;
   }
   
   .orgchart ul li .oc-node .oc-heading .oc-symbol::after {
@@ -134,7 +134,7 @@
     width: 130px;
     height: 20px;
     font-size: 0.625rem;
-    border: 1px solid rgba(217, 83, 79, 0.8);
+    border: 1px solid #215a88;
     border-radius: 0 0 4px 4px;
     text-align: center;
     background-color: #fff;
