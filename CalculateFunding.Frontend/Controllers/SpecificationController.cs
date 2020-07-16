@@ -147,7 +147,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetApprovedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSelectedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -169,7 +169,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetApprovedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId);
+            ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {

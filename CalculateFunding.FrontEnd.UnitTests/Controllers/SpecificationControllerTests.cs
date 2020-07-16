@@ -66,7 +66,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             const string fundingStreamId = "fundingStreamId";
 
             _specificationsApiClient
-                .GetApprovedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
+	            .GetSelectedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.ServiceUnavailable, null)));
 
             // Act
@@ -84,7 +84,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             const string fundingStreamId = "fundingStreamId";
 
             _specificationsApiClient
-                .GetApprovedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
+                .GetSelectedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.BadRequest, null)));
 
             // Act
@@ -126,7 +126,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             };
 
             _specificationsApiClient
-                .GetApprovedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
+                .GetSelectedSpecificationsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId)
                 .Returns(Task.FromResult(new ApiResponse<IEnumerable<SpecificationSummary>>(HttpStatusCode.OK, specificationSummaries)));
 
             // Act
