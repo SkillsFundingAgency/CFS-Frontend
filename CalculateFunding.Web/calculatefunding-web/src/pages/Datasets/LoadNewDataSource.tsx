@@ -5,11 +5,11 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {AutoComplete} from "../../components/AutoComplete";
 import {
-    createDatasetService, 
-    getDatasetDefinitionsService, 
-    uploadDataSourceService, 
+    createDatasetService,
+    getDatasetDefinitionsService,
+    uploadDataSourceService,
     getDatasetValidateStatusService,
-    validateDatasetService
+    validateDatasetService, getDatasetsForFundingStreamService
 } from "../../services/datasetService";
 import {DatasetDefinition} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
 import {CreateDatasetRequestViewModel} from "../../types/Datasets/CreateDatasetRequestViewModel";
@@ -105,8 +105,10 @@ export function LoadNewDataSource() {
         const result = fundingStreamSuggestions.filter(x => x.name === e)[0];
         if (result != null) {
             setSelectedFundingStream(result.id);
+            populateDataSchemaSuggestions(result.id);
         } else {
             setSelectedFundingStream("");
+            populateDataSchemaSuggestions();
         }
     }
 
@@ -120,12 +122,30 @@ export function LoadNewDataSource() {
         }
     }
 
-    function populateDataSchemaSuggestions() {
+    function populateDataSchemaSuggestions(fundingStreamId?: string) {
         setDataSchemaIsLoading(true);
-        getDatasetDefinitionsService().then((result) => {
-            setDataSchemaSuggestions(result.data as DatasetDefinition[])
-            setDataSchemaIsLoading(false);
-        })
+        if (fundingStreamId != null)
+        {
+            getDatasetsForFundingStreamService(fundingStreamId).then((datasetsResponse)=>{
+                if (datasetsResponse.status === 200 || datasetsResponse.status === 201) {
+                    setDataSchemaSuggestions(datasetsResponse.data as DatasetDefinition[])
+                }
+                setDataSchemaIsLoading(false);
+            }).catch(() => {
+                setDataSchemaIsLoading(false);
+            })
+        }
+        else
+        {
+            getDatasetDefinitionsService().then((result) => {
+                if (result.status === 200 || result.status === 201) {
+                    setDataSchemaSuggestions(result.data as DatasetDefinition[])
+                }
+                setDataSchemaIsLoading(false);
+            }).catch(() => {
+                setDataSchemaIsLoading(false);
+            })
+        }
     }
 
     function populateFundingStreamSuggestions() {
