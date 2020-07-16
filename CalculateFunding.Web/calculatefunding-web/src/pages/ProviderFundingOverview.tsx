@@ -168,6 +168,10 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                     </tr>
                                     </tbody>
                                 </table>
+<h3 className="govuk-heading-m">Previous profiles</h3>
+                                    <p className="govuk-body">History of previous <a className="govuk-link"
+                                     href={`/app/FundingApprovals/ProfilingArchive/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}`}>profiles</a>
+                                    </p>
                             </section>
                         </Tabs.Panel>
                     </Tabs>

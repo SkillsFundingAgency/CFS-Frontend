@@ -51,3 +51,21 @@ export async function releaseFundingService(specificationId: string){
             }
         });
 };
+
+export async function getProfileHistoryService(fundingStreamId:string, fundingPeriodId:string, providerId:string) {
+    return axios(`/api/publish/get-profile-history/${fundingStreamId}/${fundingPeriodId}/${providerId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+export async function getProfileArchiveService(fundingStreamId:string, fundingPeriodId:string, providerId:string) {
+    return axios(`/api/provider/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileArchive`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}

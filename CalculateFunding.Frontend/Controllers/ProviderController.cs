@@ -37,6 +37,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(result.Content);
             }
 
+            if (result.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new NotFoundObjectResult("Provider was not found");
+            }
+
             return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 

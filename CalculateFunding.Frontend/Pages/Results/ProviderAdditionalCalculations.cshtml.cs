@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.Pages.Results
+﻿using System;
+
+namespace CalculateFunding.Frontend.Pages.Results
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;

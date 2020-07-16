@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Common.ApiClient.Calcs;
+﻿using System;
+using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
@@ -49,7 +50,7 @@ namespace CalculateFunding.Frontend.Pages.Results
                     ExceptionMessage = calculationResultItem.ExceptionMessage,
                     ExceptionType = calculationResultItem.ExceptionType,
                     ValueType = calculation.Content.ValueType.ToString(),
-                    Value = calculationResultItem.Value
+                    Value = calculationResultItem.Value as Nullable<Decimal>
                 });
             }
 

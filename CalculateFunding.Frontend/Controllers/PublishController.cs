@@ -295,6 +295,59 @@ namespace CalculateFunding.Frontend.Controllers
                 "There was an error retrieving latest profile totals.");
         }
 
+        [HttpGet]
+        [Route("api/publish/get-profile-history/{fundingStreamId}/{fundingPeriodId}/{providerId}")]
+        public async Task<IActionResult> GetProfileHistory(string fundingStreamId, string fundingPeriodId, string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            ApiResponse<IEnumerable<ProfileTotal>> response = await _publishingApiClient.GetProfileHistory(fundingStreamId, fundingPeriodId, providerId);
+
+            if(response.StatusCode == HttpStatusCode.OK)
+            {
+	            return new OkObjectResult(response.Content);
+            }
+
+            return new BadRequestResult();
+
+        }
+
+        [HttpGet]
+        [Route("api/provider/{fundingStreamId}/{fundingPeriodId}/{providerId}/profileArchive")]
+        public async Task<IActionResult> GetProfileArchive(
+            string fundingStreamId,
+            string fundingPeriodId,
+            string providerId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.ArgumentNotNull(providerId, nameof(providerId));
+
+            ApiResponse<IDictionary<int, ProfilingVersion>> apiResponse =
+                await _publishingApiClient.GetAllReleasedProfileTotals(
+                    fundingStreamId,
+                    fundingPeriodId,
+                    providerId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                if (apiResponse.Content != null && apiResponse.Content.Any())
+                {
+                    return Ok(MapToArchiveViewModel(apiResponse.Content));
+                }
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(apiResponse.Content);
+            }
+
+            return new InternalServerErrorResult(
+                "There was an error retrieving profile archive details.");
+        }
+        
         private static ProfilingViewModel MapToProfilingViewModel(
             IDictionary<int, ProfilingVersion> profilingVersions)
         {
@@ -314,6 +367,22 @@ namespace CalculateFunding.Frontend.Controllers
                 .ToList();
 
             return new ProfilingViewModel(profilingInstallments, previousAllocation);
+        }
+
+        private static List<ProfilingArchiveViewModel> MapToArchiveViewModel(IDictionary<int, ProfilingVersion> profilingVersions)
+        {
+            var output = new List<ProfilingArchiveViewModel>();
+
+            foreach (var item in profilingVersions.Values)
+            {
+                output.Add(new ProfilingArchiveViewModel
+                {
+                    Name = $"Profile change {item.Date:d MMMM yyyy}",
+                    Version = item
+                });
+            }
+
+            return output;
         }
 
         private static decimal CalculatePreviousAllocation(

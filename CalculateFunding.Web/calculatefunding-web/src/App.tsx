@@ -47,6 +47,7 @@ import {
 } from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 import {DataRelationships} from "./pages/Datasets/DataRelationships";
+import {ProfilingArchive} from "./pages/FundingApprovals/ProfilingArchive";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -79,7 +80,8 @@ const App: React.FunctionComponent = () => {
                 <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
                 <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
                 <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId" component={ProviderFundingOverview} />
-                <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
+                <Route path="/FundingApprovals/ProfilingArchive/:specificationId/:providerId/:providerVersionId" component={ProfilingArchive} />  
+				<Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage} />
                 <Route path="/Datasets/ManageData" component={ManageData} />
                 <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
                 <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
