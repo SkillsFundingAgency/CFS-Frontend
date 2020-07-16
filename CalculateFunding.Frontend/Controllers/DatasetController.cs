@@ -18,6 +18,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
+using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
@@ -343,7 +344,7 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GetDatasetsForFundingStream(string fundingStreamId)
         {
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
-            
+
             ApiResponse<IEnumerable<DatasetDefinationByFundingStream>> result =
                 await _datasetApiClient.GetDatasetDefinitionsByFundingStreamId(fundingStreamId);
 
@@ -353,6 +354,165 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return result.StatusCode == HttpStatusCode.BadRequest ? new BadRequestResult() : new StatusCodeResult(500);
+        }
+
+        [HttpGet]
+        [Route("api/datasets/get-datasources-by-relationship-id/{relationshipId}")]
+        public async Task<IActionResult> GetPreviousVersions(string relationshipId)
+        {
+            ApiResponse<SelectDatasourceModel> result =
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(result.Content);
+            }
+
+            return new StatusCodeResult(Convert.ToInt32(result.StatusCode));
+        }
+
+        [HttpPost]
+        [Route("api/datasets/assign-datasource-version-to-relationship/{specificationId}/{relationshipId}/{datasetVersionId}")]
+        public async Task<IActionResult> AssignDatasourceVersionToRelationship([FromRoute]string relationshipId, [FromRoute]string specificationId,
+            [FromRoute]string datasetVersionId)
+        {
+            Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(datasetVersionId, nameof(datasetVersionId));
+
+            ApiResponse<SelectDatasourceModel> sourcesResponse =
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+
+            if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
+            {
+                _logger.Error($"Failed to fetch data sources with status code {sourcesResponse.StatusCode.ToString()}");
+                return NotFound();
+            }
+
+            bool isAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User,
+                sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
+            if (!isAuthorizedToMap)
+            {
+                return new ForbidResult();
+            }
+
+            if (string.IsNullOrWhiteSpace(datasetVersionId))
+            {
+                SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
+                this.ModelState.AddModelError($"{nameof(SelectDataSourceViewModel)}.{nameof(datasetVersionId)}", "");
+                if (viewModel == null)
+                {
+                    return new StatusCodeResult(500);
+                }
+            }
+
+            string[] datasetVersionArray = datasetVersionId.Split("_");
+            if (datasetVersionArray.Length != 2)
+            {
+                _logger.Error($"Dataset version: {datasetVersionId} is invalid");
+                return new StatusCodeResult(500);
+            }
+
+            AssignDatasourceModel assignDatasetVersion = new AssignDatasourceModel
+            {
+                RelationshipId = relationshipId,
+                DatasetId = datasetVersionArray[0],
+                Version = Convert.ToInt32(datasetVersionArray[1])
+            };
+
+            HttpStatusCode httpStatusCode =
+                await _datasetApiClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
+
+            if (httpStatusCode.IsSuccess())
+            {
+                return new OkObjectResult(true);
+            }
+
+            _logger.Error($"Failed to assign dataset version with status code: {httpStatusCode.ToString()}");
+
+            return new StatusCodeResult(500);
+        }
+
+        [HttpPost]
+        [Route("api/datasets/expanded-datasources/{relationshipId}")]
+        public async Task<IActionResult> GetExpandedDataSourcesSearch(
+            [FromRoute]string relationshipId,
+            [FromBody]SearchModel search)
+        {
+            ApiResponse<SelectDatasourceModel> result =
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                int totalPages = result.Content.Datasets.Count() / search.Top;
+                if (result.Content.Datasets.Count() % search.Top > 0)
+                {
+                    totalPages++;
+                }
+
+                int startNumber = ((search.Top * search.PageNumber) - search.Top) + 1;
+                int endNumber = (search.Top * search.PageNumber);
+                if (endNumber > result.Content.Datasets.Count())
+                {
+                    endNumber = result.Content.Datasets.Count();
+                }
+                
+                PagedDatasetSearchResults searchPagedResult = new PagedDatasetSearchResults
+                {
+                    Items = result.Content.Datasets,
+                    TotalCount = result.Content.Datasets.Count(),
+                    PagerState = new PagerState(search.PageNumber, totalPages),
+                    StartItemNumber = startNumber,
+                    EndItemNumber = endNumber
+                };
+
+                return Ok(searchPagedResult);
+            }
+
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(result.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+        }
+        
+        private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
+        {
+            SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel
+            {
+                SpecificationId = selectDatasourceModel.SpecificationId,
+                SpecificationName = selectDatasourceModel.SpecificationName,
+                RelationshipId = selectDatasourceModel.RelationshipId,
+                DefinitionId = selectDatasourceModel.DefinitionId,
+                DefinitionName = selectDatasourceModel.DefinitionName,
+                RelationshipName = selectDatasourceModel.RelationshipName
+            };
+
+            List<DatasetVersionsViewModel> datasets = new List<DatasetVersionsViewModel>();
+
+            if (!selectDatasourceModel.Datasets.IsNullOrEmpty())
+            {
+                foreach (DatasetVersions datasetVersionModel in selectDatasourceModel.Datasets)
+                {
+                    datasets.Add(new DatasetVersionsViewModel
+                    {
+                        Id = datasetVersionModel.Id,
+                        Name = datasetVersionModel.Name,
+                        IsSelected = datasetVersionModel.SelectedVersion.HasValue,
+                        Versions = datasetVersionModel.Versions.Select(m =>
+                            new DatasetVersionItemViewModel(datasetVersionModel.Id, datasetVersionModel.Name, m.Version)
+                            {
+                                IsSelected = datasetVersionModel.SelectedVersion.HasValue &&
+                                             datasetVersionModel.SelectedVersion.Value == m.Version
+                            }).ToArraySafe()
+                    });
+                }
+            }
+
+            viewModel.Datasets = datasets;
+
+            return viewModel;
         }
     }
 }

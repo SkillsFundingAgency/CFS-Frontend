@@ -1,5 +1,5 @@
-import {Author} from "../Calculations/CalculationVersionHistorySummary";
 import { FundingLineUpdateModel } from "../TemplateBuilderDefinitions";
+import {Author} from "../Calculations/Author";
 
 export interface NewDatasetVersionResponseViewModel {
     blobUrl: string;

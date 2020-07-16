@@ -3,6 +3,7 @@ import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefini
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 import axios from "axios"
+import {DatasourceVersionSearchModel} from "../types/Datasets/DatasourceVersionSearchModel";
 
 const baseUrl = "/api/datasets";
 
@@ -114,7 +115,7 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
     })
 }
 
-export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, fundingStreamId:string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
+export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, fundingStreamId: string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
     return axios(`${blobUrl}`, {
         method: 'PUT',
         headers: {
@@ -176,7 +177,16 @@ export async function searchDatasetService(request: DatasetSearchRequestViewMode
 }
 
 export async function getDatasetsForFundingStreamService(fundingStreamId: string) {
-    return axios(`/api/datasets/get-datasets-for-fundingstream/${fundingStreamId}`, {
+    return axios(`${baseUrl}/get-datasets-for-fundingstream/${fundingStreamId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export async function getDatasourcesByRelationshipIdService(relationshipId: string) {
+    return axios(`${baseUrl}/get-datasources-by-relationship-id/${relationshipId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -191,5 +201,25 @@ export async function searchDatasetRelationshipsService(request: DatasetDefiniti
             'Content-Type': 'application/json'
         },
         data: request
+    })
+}
+
+
+export async function assignDataSourceService(relationshipId: string, specificationId: string, datasetVersionId: string) {
+    return axios(`${baseUrl}/assign-datasource-version-to-relationship/${specificationId}/${relationshipId}/${datasetVersionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export async function getExpandedDataSources(relationshipId:string, searchRequest: DatasourceVersionSearchModel) {
+    return axios(`${baseUrl}/expanded-datasources/${relationshipId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: searchRequest
     })
 }

@@ -1,7 +1,6 @@
 import {SearchMode} from "../SearchMode";
 import {Facet} from "../Facet";
-import {PagerState} from "../Datasets/DatasetDefinitionResponseViewModel";
-import {Dataset} from "../Datasets/DatasetSearchResponseViewModel";
+import {PagerState} from "../PublishedProvider/PagerState";
 
 export interface PagedProviderVersionSearchResults {
     facets: Facet[];

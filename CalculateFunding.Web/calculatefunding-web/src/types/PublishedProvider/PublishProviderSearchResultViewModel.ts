@@ -1,4 +1,5 @@
 import {Facet} from "../Facet";
+import {PagerState} from "./PagerState";
 
 export interface Provider {
         id: string;
@@ -11,15 +12,6 @@ export interface Provider {
         specificationId: string;
         fundingStreamId: string;
         fundingPeriodId: string;
-    }
-
-    export interface PagerState {
-        displayNumberOfPages: number;
-        previousPage?: any;
-        nextPage?: any;
-        lastPage: number;
-        pages: number[];
-        currentPage: number;
     }
 
     export interface PublishProviderSearchResultViewModel {

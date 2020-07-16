@@ -1,7 +1,4 @@
-export interface Author {
-    id: string;
-    name: string;
-}
+import {Author} from "./Author";
 
 export interface CalculationVersionHistorySummary {
     calculationId: string;

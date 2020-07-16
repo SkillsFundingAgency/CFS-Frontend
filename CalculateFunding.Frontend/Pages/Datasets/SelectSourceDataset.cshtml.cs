@@ -23,7 +23,8 @@ namespace CalculateFunding.Frontend.Pages.Datasets
         private readonly ILogger _logger;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public SelectSourceDatasetPageModel(IDatasetsApiClient datasetClient, ILogger logger, IAuthorizationHelper authorizationHelper)
+        public SelectSourceDatasetPageModel(IDatasetsApiClient datasetClient, ILogger logger,
+            IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(datasetClient, nameof(datasetClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
@@ -36,13 +37,14 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 
         public SelectDataSourceViewModel ViewModel { get; set; }
 
-	    public bool IsAuthorizedToMap { get; set; }
+        public bool IsAuthorizedToMap { get; set; }
 
-		public async Task<IActionResult> OnGetAsync(string relationshipId)
+        public async Task<IActionResult> OnGetAsync(string relationshipId)
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            ApiResponse<SelectDatasourceModel> sourcesResponse = await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
+            ApiResponse<SelectDatasourceModel> sourcesResponse =
+                await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
 
             if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
             {
@@ -50,7 +52,8 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                 return NotFound();
             }
 
-            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
+            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User,
+                sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
 
             SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
 
@@ -64,11 +67,13 @@ namespace CalculateFunding.Frontend.Pages.Datasets
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string relationshipId, string specificationId, string datasetVersion = null)
+        public async Task<IActionResult> OnPostAsync(string relationshipId, string specificationId,
+            string datasetVersion = null)
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            ApiResponse<SelectDatasourceModel> sourcesResponse = await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
+            ApiResponse<SelectDatasourceModel> sourcesResponse =
+                await _datasetClient.GetDataSourcesByRelationshipId(relationshipId);
 
             if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
             {
@@ -76,8 +81,9 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                 return NotFound();
             }
 
-	        IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
-	        if (!IsAuthorizedToMap)
+            IsAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User,
+                sourcesResponse.Content.SpecificationId, SpecificationActionTypes.CanMapDatasets);
+            if (!IsAuthorizedToMap)
             {
                 return new ForbidResult();
             }
@@ -112,11 +118,13 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                 Version = Convert.ToInt32(datasetVersionArray[1])
             };
 
-            HttpStatusCode httpStatusCode = await _datasetClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
+            HttpStatusCode httpStatusCode =
+                await _datasetClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
 
             if (httpStatusCode.IsSuccess())
             {
-                return Redirect($"/datasets/specificationrelationships?specificationId={specificationId}&wasSuccess=true");
+                return Redirect(
+                    $"/datasets/specificationrelationships?specificationId={specificationId}&wasSuccess=true");
             }
 
             _logger.Error($"Failed to assign dataset version with status code: {httpStatusCode.ToString()}");
@@ -128,12 +136,12 @@ namespace CalculateFunding.Frontend.Pages.Datasets
         {
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel
             {
-	            SpecificationId = selectDatasourceModel.SpecificationId,
-	            SpecificationName = selectDatasourceModel.SpecificationName,
-	            RelationshipId = selectDatasourceModel.RelationshipId,
-	            DefinitionId = selectDatasourceModel.DefinitionId,
-	            DefinitionName = selectDatasourceModel.DefinitionName,
-	            RelationshipName = selectDatasourceModel.RelationshipName
+                SpecificationId = selectDatasourceModel.SpecificationId,
+                SpecificationName = selectDatasourceModel.SpecificationName,
+                RelationshipId = selectDatasourceModel.RelationshipId,
+                DefinitionId = selectDatasourceModel.DefinitionId,
+                DefinitionName = selectDatasourceModel.DefinitionName,
+                RelationshipName = selectDatasourceModel.RelationshipName
             };
 
             List<DatasetVersionsViewModel> datasets = new List<DatasetVersionsViewModel>();
@@ -150,10 +158,10 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                         Versions = datasetVersionModel.Versions.Select(m =>
                             new DatasetVersionItemViewModel(datasetVersionModel.Id, datasetVersionModel.Name, m.Version)
                             {
-                                IsSelected = datasetVersionModel.SelectedVersion.HasValue && datasetVersionModel.SelectedVersion.Value == m.Version
+                                IsSelected = datasetVersionModel.SelectedVersion.HasValue &&
+                                             datasetVersionModel.SelectedVersion.Value == m.Version
                             }).ToArraySafe()
                     });
-
                 }
             }
 

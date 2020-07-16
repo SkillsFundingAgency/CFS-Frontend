@@ -1,4 +1,4 @@
-import {Author} from "../Calculations/CalculationVersionHistorySummary";
+import {Author} from "../Calculations/Author";
 
 export interface UpdateNewDatasetVersionResponseViewModel {
     blobUrl: string;

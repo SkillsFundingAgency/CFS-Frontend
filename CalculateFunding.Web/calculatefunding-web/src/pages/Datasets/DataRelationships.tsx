@@ -133,7 +133,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                         </th>
                                         <td className="govuk-table__cell">{sdr.datasetPhrase}</td>
                                         <td className="govuk-table__cell">
-                                                <Link to={`/Datasets/SelectDataSource/${sdr.datasetId}`} className="govuk-link">{sdr.linkPhrase}</Link>
+                                                <Link to={`/Datasets/SelectDataSource/${datasetRelationships.specification.id}`} className="govuk-link">{sdr.linkPhrase}</Link>
                                         </td>
                                     </tr>
                             )}

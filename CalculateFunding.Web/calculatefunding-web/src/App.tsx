@@ -48,6 +48,8 @@ import {
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 import {DataRelationships} from "./pages/Datasets/DataRelationships";
 import {ProfilingArchive} from "./pages/FundingApprovals/ProfilingArchive";
+import {SelectDataSource} from "./pages/Datasets/SelectDataSource";
+import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpanded";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -90,6 +92,8 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
                 <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships} />
                 <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
+                <Route path="/Datasets/SelectDataSource/:specificationId" component={SelectDataSource} />
+                <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId" component={SelectDataSourceExpanded} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates} />}
