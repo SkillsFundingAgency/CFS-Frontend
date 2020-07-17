@@ -349,7 +349,9 @@
                 "providerProfilingAzureBearerTokenOptions:ClientId": "[parameters('providerProfilingAzureBearerTokenClientId')]",
                 "providerProfilingAzureBearerTokenOptions:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'providerProfilingAzureBearerTokenClientSecret'),'2018-02-14').secretUriWithVersion, ')')]",
                 "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]"
+                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
+                "HandlerEnabled": "true",
+                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]"
             }
         },
         {
@@ -416,7 +418,9 @@
                 "providerProfilingAzureBearerTokenOptions:ClientId": "[parameters('providerProfilingAzureBearerTokenClientId')]",
                 "providerProfilingAzureBearerTokenOptions:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'providerProfilingAzureBearerTokenClientSecret'),'2018-02-14').secretUriWithVersion, ')')]",
                 "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]"
+                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
+                "HandlerEnabled": "true",
+                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]"
             }
         },
         {
@@ -429,7 +433,7 @@
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
-                "unauthenticatedClientAction": "AllowAnonymous",
+                "unauthenticatedClientAction": "RedirectToLoginPage",
                 "tokenStoreEnabled": true,
                 "defaultProvider": "AzureActiveDirectory",
                 "clientId": "[parameters('aadClientId')]",
@@ -439,7 +443,7 @@
                 "isAadAutoProvisioned": false,
                 "additionalLoginParams": [
                     "response_type=code id_token",
-                    "resource=https://graph.microsoft.com"
+                    "[concat('resource=', parameters('aadClientId'))]"
                 ]
             }
         },
@@ -453,7 +457,7 @@
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
-                "unauthenticatedClientAction": "AllowAnonymous",
+                "unauthenticatedClientAction": "RedirectToLoginPage",
                 "tokenStoreEnabled": true,
                 "defaultProvider": "AzureActiveDirectory",
                 "clientId": "[parameters('aadClientId')]",
@@ -463,7 +467,7 @@
                 "isAadAutoProvisioned": false,
                 "additionalLoginParams": [
                     "response_type=code id_token",
-                    "resource=https://graph.microsoft.com"
+                    "[concat('resource=', parameters('aadClientId'))]"
                 ]
             }
         },
