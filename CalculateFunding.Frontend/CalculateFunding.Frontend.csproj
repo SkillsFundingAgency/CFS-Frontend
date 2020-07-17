@@ -79,10 +79,10 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="3.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="3.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="2.2.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="5.0.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="2.3.0" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.1.0" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.1.0" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.2.0" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="2.1.0" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />

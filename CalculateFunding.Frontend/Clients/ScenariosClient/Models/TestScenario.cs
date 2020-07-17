@@ -1,10 +1,9 @@
 ﻿namespace CalculateFunding.Frontend.Clients.ScenariosClient.Models
 {
     using System;
-    using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Models;
 
-    public class TestScenario : Reference, ISpecificationAuthorizationEntity
+    public class TestScenario : Reference
     {
         public string Description { get; set; }
 

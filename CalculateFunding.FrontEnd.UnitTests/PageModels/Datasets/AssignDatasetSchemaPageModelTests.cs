@@ -433,7 +433,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: specsClient, authorizationHelper: authorizationHelper, datasetsClient: mockDatasetsApiClient);
@@ -480,7 +480,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -528,7 +528,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -571,7 +571,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -623,7 +623,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -672,7 +672,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -727,7 +727,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -802,7 +802,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,
@@ -848,7 +848,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
             mockAuthorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             AssignDatasetSchemaPageModel datasetSchemaPageModel = CreatePageModel(specsClient: mockSpecsClient,

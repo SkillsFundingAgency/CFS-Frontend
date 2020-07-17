@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using CalculateFunding.Common.Identity.Authentication;
+﻿using CalculateFunding.Common.Identity.Authentication;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Helpers;
@@ -56,7 +55,7 @@ namespace CalculateFunding.Frontend.Modules
                 {
                     AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
-                                     .RequireClaim(ClaimTypes.Role, azureAdOptions.Groups?.Split(","))
+                                     .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
                                      .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
                 });

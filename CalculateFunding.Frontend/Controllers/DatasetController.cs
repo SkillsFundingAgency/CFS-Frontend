@@ -11,18 +11,16 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
-using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
-using SearchMode = CalculateFunding.Common.Models.Search.SearchMode;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -266,7 +264,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             bool isAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
-                specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+                specificationResponse.Content.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 
             if (!isAuthorizedToEdit)
             {

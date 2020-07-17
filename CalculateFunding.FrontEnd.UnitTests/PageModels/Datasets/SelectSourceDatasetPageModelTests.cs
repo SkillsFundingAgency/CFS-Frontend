@@ -7,9 +7,7 @@ using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Pages.Datasets;
 using CalculateFunding.Frontend.UnitTests.Helpers;
 using FizzWare.NBuilder;
@@ -449,7 +447,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
                 .Returns(false);
 
             SelectSourceDatasetPageModel pageModel = CreatePageModel(datasetsApiClient, logger, authorizationHelper);

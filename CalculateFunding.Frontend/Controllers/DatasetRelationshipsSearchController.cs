@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult((int)specificationResponse.StatusCode);
             }
 
-            bool isAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content,
+            bool isAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content.GetSpecificationId(),
                 SpecificationActionTypes.CanMapDatasets);
 
             SpecificationDatasetRelationshipsViewModel viewModel = await PopulateViewModel(specificationResponse.Content);

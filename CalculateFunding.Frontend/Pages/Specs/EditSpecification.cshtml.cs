@@ -69,7 +69,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
             EditSpecificationViewModel = _mapper.Map<EditSpecificationViewModel>(specificationResponse.Content);
 
             IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
-                specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+                specificationResponse.Content.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 
             EditSpecificationViewModel.OriginalSpecificationName = specificationResponse.Content.Name;
             EditSpecificationViewModel.OriginalFundingStreamId = string.Join(",", EditSpecificationViewModel.FundingStreamId);
@@ -85,7 +85,7 @@ namespace CalculateFunding.Frontend.Pages.Specs
 	        [FromQuery] EditSpecificationRedirectAction returnPage = EditSpecificationRedirectAction.ManagePolicies)
         {
             IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(
-	            User, EditSpecificationViewModel, SpecificationActionTypes.CanEditSpecification);
+	            User, EditSpecificationViewModel?.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 
             if (!IsAuthorizedToEdit)
             {

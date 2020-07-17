@@ -409,7 +409,7 @@ namespace CalculateFunding.Frontend.PageModels.Datasets
 	    {
 		    IAuthorizationHelper mockAuthorizationHelper = Substitute.For<IAuthorizationHelper>();
 			mockAuthorizationHelper
-				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
+				.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanMapDatasets))
 			    .Returns(authUser);
 
 		    return mockAuthorizationHelper;

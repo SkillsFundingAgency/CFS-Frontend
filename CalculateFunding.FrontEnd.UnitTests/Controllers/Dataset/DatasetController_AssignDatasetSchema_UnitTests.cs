@@ -63,7 +63,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
                 .ReturnsAsync(() => new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, Builder<SpecificationSummary>.CreateNew().Build())
                     );
             _mockAuthorisationHelper.Setup(x => x.DoesUserHavePermission(It.IsAny<ClaimsPrincipal>(),
-                It.IsAny<SpecificationSummary>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(true);
+                It.IsAny<string>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(true);
             ; _sut = new DatasetController(_mockDatasetApiClient.Object, _mockLogger.Object, _mockMapper.Object, _mockSpecificationApiClient.Object, _mockAuthorisationHelper.Object);
             _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
                 .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());
@@ -96,7 +96,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
                 .ReturnsAsync(() => new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, Builder<SpecificationSummary>.CreateNew().Build())
                     );
             _mockAuthorisationHelper.Setup(x => x.DoesUserHavePermission(It.IsAny<ClaimsPrincipal>(),
-                It.IsAny<SpecificationSummary>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(false);
+                It.IsAny<string>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(false);
             ; _sut = new DatasetController(_mockDatasetApiClient.Object, _mockLogger.Object, _mockMapper.Object, _mockSpecificationApiClient.Object, _mockAuthorisationHelper.Object);
             _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
                 .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());

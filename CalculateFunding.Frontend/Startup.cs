@@ -58,16 +58,16 @@
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
             });
 
+            AzureAdOptions azureAdOptions = new AzureAdOptions();
+            Configuration.Bind("AzureAd", azureAdOptions);
+            _authenticationEnabled = azureAdOptions.IsEnabled;
+
             if (enablePlatformAuth)
             {
                 services.AddModule<AuthModule>(Configuration, _hostingEnvironment);
             }
             else
             {
-                AzureAdOptions azureAdOptions = new AzureAdOptions();
-                Configuration.Bind("AzureAd", azureAdOptions);
-                _authenticationEnabled = azureAdOptions.IsEnabled;
-                
                 if (_authenticationEnabled)
                 {
                     services.AddAuthentication(adOptions =>

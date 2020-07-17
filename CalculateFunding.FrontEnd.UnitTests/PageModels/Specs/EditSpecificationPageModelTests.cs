@@ -356,7 +356,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
 
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
@@ -416,7 +416,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(fundingStreamsResponse);
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
@@ -471,7 +471,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(fundingStreamsResponse);
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
 
             _authorizationHelper
@@ -537,7 +537,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Any<IEnumerable<FundingStream>>(), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
@@ -593,7 +593,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<IEnumerable<FundingStream>>(HttpStatusCode.OK, fundingStreams));
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
 
             _authorizationHelper
@@ -710,7 +710,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(fundingStreamsResponse);
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))
@@ -847,8 +847,12 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary { Id = specificationId }));
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(false);
+
+            EditSpecificationViewModel viewModel = CreateEditSpecificationViewModel();
+
+            _pageModel.EditSpecificationViewModel = viewModel;
 
             // Act
             IActionResult result = await _pageModel.OnPostAsync(specificationId);
@@ -909,7 +913,7 @@ namespace CalculateFunding.Frontend.UnitTests.PageModels.Specs
             };
 
             _authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditSpecification))
                 .Returns(true);
             _authorizationHelper
                 .SecurityTrimList(Arg.Any<ClaimsPrincipal>(), Arg.Is(fundingStreams), Arg.Is(FundingStreamActionTypes.CanCreateSpecification))

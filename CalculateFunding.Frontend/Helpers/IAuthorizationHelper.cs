@@ -10,8 +10,6 @@ namespace CalculateFunding.Frontend.Helpers
 {
     public interface IAuthorizationHelper
     {
-        Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired);
-
         Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired);
 
         Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId);

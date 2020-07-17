@@ -1,60 +1,55 @@
 import axios from "axios";
-import { LoginService } from '../auth/authProvider';
 import { Config } from '../types/Config';
 const configurationPromise:Promise<Config> = (window as any)['configuration'];
 
 export function initialiseAxios() {
   configurationPromise.then(response => {
     let configuration = response;
-    let loginService:LoginService | null;
 
-    if (configuration.handlerEnabled)
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.interceptors.response.use(async function (config) 
     {
-      loginService = new LoginService(configuration.baseUrl);       
-    }
-                        
-    axios.interceptors.request.use(async function (config) 
-    {
-      if (loginService) 
+      return config;
+    },
+    error => {
+      if (!configuration.handlerEnabled)
       {
-        if (loginService.userTokenInfo)
-        {
-          if (!loginService.isTokenExpired(loginService.userTokenInfo.expires_on))
-          {
-            config.headers.Authorization = `Bearer ${loginService.userTokenInfo.access_token}`;
-          }
-          else
-          {
-            return loginService.refresh(configuration.loginType).then(() =>
-            {
-              if (loginService && loginService.userTokenInfo)
-              {
-                config.headers.Authorzation = `Bearer ${loginService.userTokenInfo.access_token}`;
-              }
-
-              return Promise.resolve(config);
-            })
-          }
-        }
-        else
-        {
-          return loginService.login(configuration.loginType).then(() => 
-          {
-            if (loginService && loginService.userTokenInfo)
-            {
-              config.headers.Authorzation = `Bearer ${loginService.userTokenInfo.access_token}`;
-            }
-
-            return Promise.resolve(config);
-          });
-        }
+        return Promise.reject(error);
       }
 
-      return config;
-    }, 
-    error => {
+      const originalRequest = error.config;
+
+      // no authentication provided so need to login
+      if (error.response.status === 403)
+      {
+        window.location.href = `${configuration.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
+      }
+
       // Do something with request error
-      return Promise.reject(error);
+      if (error.response.status === 401 && !originalRequest._retry) 
+      {
+        originalRequest._retry = true;
+        fetch(
+          `${configuration.baseUrl}/.auth/refresh`, 
+          {
+              method: 'GET'
+          }
+        )
+        .then(response => {
+          return response.json();
+        })
+        .then(() => {
+            axios(originalRequest);
+        })
+        .catch(error => {
+            // do login redirect
+            window.location.href = `${configuration.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
+        });
+      }
+      else
+      {
+        return Promise.reject(error);
+      }
     });
   });
 } 

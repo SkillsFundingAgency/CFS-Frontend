@@ -64,7 +64,7 @@ namespace CalculateFunding.Frontend.Pages.Scenarios
                 return new NotFoundObjectResult("Test Scenario not found");
             }
 
-            DoesUserHavePermissionToSave = (await _authorizationHelper.DoesUserHavePermission(User, scenario, SpecificationActionTypes.CanEditQaTests)).ToString().ToLowerInvariant();
+            DoesUserHavePermissionToSave = (await _authorizationHelper.DoesUserHavePermission(User, scenario.GetSpecificationId(), SpecificationActionTypes.CanEditQaTests)).ToString().ToLowerInvariant();
 
             SpecificationSummary specResponse = await GetSpecification(scenario.SpecificationId);
             if (specResponse == null)

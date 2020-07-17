@@ -83,7 +83,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
                     throw new InvalidOperationException(message: $"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
                 }
 
-	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specContent, SpecificationActionTypes.CanEditSpecification);
+	            IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specContent.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 				
                 SpecificationName = specContent.Name;
                 SpecificationDescription = specContent.Description;
@@ -140,7 +140,7 @@ namespace CalculateFunding.Frontend.Pages.Datasets
 		        throw new InvalidOperationException($"Unable to retrieve specification model from the response. Specification Id value = {SpecificationId}");
 	        }
 
-	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content, SpecificationActionTypes.CanEditSpecification);
+	        IsAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 	        if (!IsAuthorizedToEdit)
 	        {
 		        return new ForbidResult();

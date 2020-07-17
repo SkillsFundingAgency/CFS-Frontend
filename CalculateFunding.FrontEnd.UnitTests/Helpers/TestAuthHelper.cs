@@ -41,7 +41,6 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         internal static IAuthorizationHelper CreateAuthorizationHelperSubstitute(SpecificationActionTypes permissionRequired, bool returns = true)
         {
             IAuthorizationHelper authHelper = Substitute.For<IAuthorizationHelper>();
-            authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(permissionRequired)).Returns(returns);
             authHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(permissionRequired)).Returns(returns);
             return authHelper;
         }

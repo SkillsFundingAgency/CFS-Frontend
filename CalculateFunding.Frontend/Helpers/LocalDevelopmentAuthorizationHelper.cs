@@ -23,15 +23,10 @@ namespace CalculateFunding.Frontend.Helpers
             _authorizationService = authorizationService;
         }
 
-        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired)
-        {
-            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specification, new SpecificationRequirement(permissionRequired));
-            return authorizationResult.Succeeded;
-        }
-
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
         {
-            return await Task.FromResult(true);
+            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specificationId, new SpecificationRequirement(permissionRequired));
+            return authorizationResult.Succeeded;
         }
 
         public Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId)

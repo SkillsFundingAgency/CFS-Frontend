@@ -21,22 +21,6 @@ namespace CalculateFunding.Frontend.Helpers
 {
     public class AuthorizationHelper : IAuthorizationHelper
     {
-        private class SpecificationAuthorizationEntity : ISpecificationAuthorizationEntity
-        {
-            private readonly string _specificationId;
-
-            public SpecificationAuthorizationEntity(string specificationId)
-            {
-                Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-                _specificationId = specificationId;
-            }
-
-            public string GetSpecificationId()
-            {
-                return _specificationId;
-            }
-        }
-
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
         private readonly ILogger _logger;
@@ -55,16 +39,10 @@ namespace CalculateFunding.Frontend.Helpers
             _permissionOptions = permissionOptions.Value;
         }
 
-        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, ISpecificationAuthorizationEntity specification, SpecificationActionTypes permissionRequired)
-        {
-            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specification, new SpecificationRequirement(permissionRequired));
-            return authorizationResult.Succeeded;
-        }
-
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
         {
-            SpecificationAuthorizationEntity entity = new SpecificationAuthorizationEntity(specificationId);
-            return await DoesUserHavePermission(user, entity, permissionRequired);
+            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specificationId, new SpecificationRequirement(permissionRequired));
+            return authorizationResult.Succeeded;
         }
 
         public async Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId)

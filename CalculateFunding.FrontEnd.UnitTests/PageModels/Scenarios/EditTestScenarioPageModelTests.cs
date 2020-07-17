@@ -242,7 +242,7 @@
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditQaTests))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditQaTests))
                 .Returns(true);
 
             EditTestScenarioPageModel pageModel = CreatePageModel(specsClient, scenarioClient, authorizationHelper: authorizationHelper);
@@ -301,7 +301,7 @@
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
             authorizationHelper
-                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<ISpecificationAuthorizationEntity>(), Arg.Is(SpecificationActionTypes.CanEditQaTests))
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>(), Arg.Is(SpecificationActionTypes.CanEditQaTests))
                 .Returns(false);
 
             EditTestScenarioPageModel pageModel = CreatePageModel(specsClient, scenarioClient, authorizationHelper: authorizationHelper);
