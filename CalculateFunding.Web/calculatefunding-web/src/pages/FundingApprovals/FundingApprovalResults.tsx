@@ -26,6 +26,7 @@ import {NotificationSignal} from "../../signals/NotificationSignal";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {NoData} from "../../components/NoData";
 import {FacetValue} from "../../types/Facet";
+import {CollapsibleSearchBox} from "../../components/CollapsibleSearchBox";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;
@@ -152,7 +153,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
 
     useEffectOnce(() => {
         getUserPermissions();
-        getPublishedProviderResults(initialSearch);
 
         getSpecificationSummaryService(specificationId).then((result) => {
             setSpecificationSummary(result.data as SpecificationSummary);
@@ -172,6 +172,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     });
 
     function getPublishedProviderResults(searchRequestViewModel: SearchRequestViewModel) {
+        setTableIsLoading(true);
         getPublishedProviderResultsService(searchRequestViewModel).then((result) => {
             const response = result.data as PublishProviderSearchResultViewModel;
             setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
@@ -193,6 +194,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         getPublishedProviderResultsService(criteria).then((result) => {
             setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
             setTableIsLoading(false);
+        }).catch(()=>{
+            setTableIsLoading(false)
         })
     }
 
@@ -256,9 +259,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         populatePublishedProviderResultsService(searchCriteria);
     }
 
-    function filterByText(e: React.ChangeEvent<HTMLInputElement>) {
-        const term = e.target.value;
-
+    function filterByText(term: string) {
         if ((term.length === 0 && searchCriteria.searchTerm.length !== 0) || term.length > 2) {
             let request = searchCriteria;
             request.searchTerm = term;
@@ -266,7 +267,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             setSearchCriteria(prevState => {
                 return {...prevState, searchTerm: term, pageNumber: 1}
             })
-            populatePublishedProviderResultsService(request);
         }
     }
 
@@ -326,6 +326,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         });
     }
 
+
     return <div>
         <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
@@ -355,8 +356,15 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                  (publishedProviderResults.providers == null || publishedProviderResults.providers.length === 0)}>
                 <div className="govuk-grid-column-one-third">
                     <CollapsiblePanel title={"Search"} expanded={true}>
-                        <span className="govuk-body-s">Search by provider name, UPIN, UKPRN, URN, or establishment number</span>
-                        <input id="searchByText" className="govuk-input" type="text" onChange={(e) => filterByText(e)}/>
+                        <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
+                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading">
+                                <h4 className="govuk-heading-s">Search</h4>
+                            </legend>
+                            <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span">
+                                Select one option.
+                            </span>
+                            <CollapsibleSearchBox searchTerm={""} callback={filterByText} />
+                        </fieldset>
                     </CollapsiblePanel>
                     <CollapsiblePanel title={"Filter by provider type"} expanded={true}>
                         <fieldset className="govuk-fieldset">
@@ -423,7 +431,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 </div>
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatus title={"Loading published provider data"} hidden={!tableIsLoading}/>
-                    <NoData hidden={publishedProviderResults.providers.length > 0 && !tableIsLoading} />
+                    <NoData hidden={publishedProviderResults.providers.length > 0 || tableIsLoading} />
                     <table className="govuk-table" hidden={tableIsLoading}>
                         <thead>
                         <tr>
