@@ -15,16 +15,19 @@ export interface PublishedProviderItems {
     totalProvidersToPublish: number;
 }
 export interface ProvidersEntity {
-    fundingPeriodId: string;
-    fundingStatus: string;
-    fundingStreamId: string;
-    fundingValue: number;
     id: string;
-    localAuthority: string;
-    providerName: string;
     providerType: string;
-    specificationId: string;
+    providerSubType: string;
+    localAuthority: string;
+    fundingStatus: string;
+    providerName: string;
     ukprn: string;
+    upin: string;
+    urn: string;
+    fundingValue: number;
+    specificationId: string;
+    fundingStreamId: string;
+    fundingPeriodId: string;
 }
 export interface PagerState {
     currentPage: number;

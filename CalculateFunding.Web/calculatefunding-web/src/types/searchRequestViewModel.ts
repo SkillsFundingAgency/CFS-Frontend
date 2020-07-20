@@ -10,6 +10,7 @@ export interface SearchRequestViewModel {
     localAuthority: string[],
     status: string[],
     providerType: string[],
+    providerSubType: string[],
     pageSize: number
     facetCount: number,
     searchMode: SearchMode

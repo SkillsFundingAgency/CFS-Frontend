@@ -67,6 +67,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         searchTerm: "",
         status: [],
         providerType: [],
+        providerSubType: [],
         localAuthority: [],
         fundingStreamId: fundingStreamId,
         searchMode: SearchMode.All,
@@ -118,6 +119,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     const [searchCriteria, setSearchCriteria] = useState<SearchRequestViewModel>(initialSearch);
     const [filterStatus, setFilterStatus] = useState<FacetValue[]>([])
     const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([])
+    const [filterProviderSubType, setFilterProviderSubType] = useState<FacetValue[]>([])
     const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([])
 
     const [pageState, setPageState] = useState<string>("IDLE");
@@ -177,8 +179,9 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             const response = result.data as PublishProviderSearchResultViewModel;
             setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
             setFilterProviderType(response.facets[0].facetValues);
-            setFilterLocalAuthority(response.facets[1].facetValues)
-            setFilterStatus(response.facets[2].facetValues)
+            setFilterProviderSubType(response.facets[1].facetValues);
+            setFilterLocalAuthority(response.facets[2].facetValues)
+            setFilterStatus(response.facets[3].facetValues)
             setTableIsLoading(false);
         });
     }
@@ -255,6 +258,26 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
 
         let request = searchCriteria;
         request.providerType = filterUpdate;
+
+        populatePublishedProviderResultsService(searchCriteria);
+    }
+
+    function filterByProviderSubType(e: React.ChangeEvent<HTMLInputElement>) {
+        let filterUpdate = searchCriteria.providerSubType;
+
+        if (e.target.checked) {
+
+            filterUpdate.push(e.target.value);
+        } else {
+            const position = filterUpdate.indexOf(e.target.value);
+            filterUpdate.splice(position, 1);
+        }
+        setSearchCriteria(prevState => {
+            return {...prevState, providerSubType: filterUpdate}
+        });
+
+        let request = searchCriteria;
+        request.providerSubType = filterUpdate;
 
         populatePublishedProviderResultsService(searchCriteria);
     }
@@ -381,6 +404,30 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                                name={`providerType-${s.name}`}
                                                type="checkbox" value={s.name}
                                                onChange={(e) => filterByProviderType(e)}/>
+                                        <label className="govuk-label govuk-checkboxes__label"
+                                               htmlFor={`providerType-${s.name}`}>
+                                            {s.name}
+                                        </label>
+                                    </div>)
+                                }
+                            </div>
+                        </fieldset>
+                    </CollapsiblePanel>
+                    <CollapsiblePanel title={"Filter by provider sub type"} expanded={true}>
+                        <fieldset className="govuk-fieldset">
+                            <div className="govuk-form-group">
+                                <label className="govuk-label">Search</label>
+                                {/*<input className="govuk-input" type="text"*/}
+                                {/*       onChange={(e) => searchStatus(e)}/>*/}
+                            </div>
+                            <div className="govuk-checkboxes">
+                                {filterProviderSubType.map((s, index) =>
+                                    <div key={index} className="govuk-checkboxes__item">
+                                        <input className="govuk-checkboxes__input"
+                                               id={`providerType-${s.name}`}
+                                               name={`providerType-${s.name}`}
+                                               type="checkbox" value={s.name}
+                                               onChange={(e) => filterByProviderSubType(e)}/>
                                         <label className="govuk-label govuk-checkboxes__label"
                                                htmlFor={`providerType-${s.name}`}>
                                             {s.name}

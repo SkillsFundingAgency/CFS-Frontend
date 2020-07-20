@@ -55,6 +55,11 @@ namespace CalculateFunding.Frontend.Controllers
                 filters.Add("fundingStatus", viewModel.Status);
             }
 
+            if (viewModel.ProviderSubType != null && viewModel.ProviderSubType.Length > 0)
+            {
+                filters.Add("providerSubType", viewModel.ProviderSubType);
+            }
+
 
             SearchRequestViewModel request = new SearchRequestViewModel
             {
