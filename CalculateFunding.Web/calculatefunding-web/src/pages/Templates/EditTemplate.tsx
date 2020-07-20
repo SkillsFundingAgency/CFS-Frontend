@@ -493,7 +493,7 @@ export function EditTemplate() {
                                                     className="govuk-link govuk-link--no-visited-state">
                                                     Edit
                                     </button>}
-                                            {(template.description.trim().length === 0) &&
+                                            {(!template.description || (template.description.trim().length === 0)) &&
                                                 <button id="add-description-link"
                                                     onClick={toggleEditDescription}
                                                     className="govuk-link govuk-link--no-visited-state">
