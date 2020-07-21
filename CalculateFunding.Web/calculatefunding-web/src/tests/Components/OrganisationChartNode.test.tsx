@@ -10,6 +10,7 @@ let cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: num
 let onClickNode: (node: FundingLineOrCalculationSelectedItem) => void;
 let addNode: (id: string, newChild: FundingLine | Calculation) => Promise<void>;
 let openSideBar: (open: boolean) => void;
+let addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void;
 
 beforeEach(() => {
     changeHierarchy = jest.fn();
@@ -17,6 +18,7 @@ beforeEach(() => {
     onClickNode = jest.fn();
     addNode = jest.fn();
     openSideBar = jest.fn();
+    addNodeToRefs = jest.fn();
     jest.clearAllMocks();
 });
 
@@ -44,6 +46,7 @@ it("sends drag event info to component", () => {
             editMode={true}
             nextId={1}
             dsKey={0}
+            addNodeToRefs={addNodeToRefs}
         />);
 
     const node = wrapper.find("div#n0");
@@ -77,6 +80,7 @@ it("does not collapse a non-cloned node on initial render", () => {
             editMode={true}
             nextId={1}
             dsKey={0}
+            addNodeToRefs={addNodeToRefs}
         />);
 
     expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(0);
@@ -106,6 +110,7 @@ it("collapses a cloned node on initial render", () => {
             editMode={true}
             nextId={1}
             dsKey={0}
+            addNodeToRefs={addNodeToRefs}
         />);
 
     expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);

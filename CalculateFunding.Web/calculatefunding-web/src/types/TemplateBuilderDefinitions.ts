@@ -259,6 +259,14 @@ export interface CalculationDictionaryItem {
     name: string
 }
 
+export interface FundingLineDictionaryItem {
+    id: string,
+    templateLineId: number,
+    name: string
+}
+
+export type NodeDictionaryItem = CalculationDictionaryItem | FundingLineDictionaryItem;
+
 export type FundingLineOrCalculation = FundingLine | Calculation;
 
 export type FundingLineDictionaryEntry = {

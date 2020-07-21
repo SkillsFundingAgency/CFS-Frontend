@@ -20,7 +20,11 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
     }
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setType(FundingLineType[e.target.value as keyof typeof FundingLineType]);
+        const newType = FundingLineType[e.target.value as keyof typeof FundingLineType];
+        if (newType === FundingLineType.Payment && code === null) {
+            setCode('');
+        }
+        setType(newType);
     }
 
     const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {

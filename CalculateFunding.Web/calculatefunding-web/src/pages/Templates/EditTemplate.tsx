@@ -21,10 +21,12 @@ import {
     saveTemplateContent,
     getLastUsedId,
     getAllCalculations,
+    getAllFundingLines,
     cloneCalculation,
     updateTemplateDescription,
     getTemplateVersion,
-    restoreTemplateContent
+    restoreTemplateContent,
+    findNodeById
 } from "../../services/templateBuilderDatasourceService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {
@@ -39,7 +41,11 @@ import {
     FundingLineOrCalculation,
     TemplateFundingLine,
     Template,
-    TemplateResponse, TemplateContentUpdateCommand, CalculationDictionaryItem, TemplateStatus
+    TemplateResponse,
+    TemplateContentUpdateCommand,
+    CalculationDictionaryItem,
+    TemplateStatus,
+    FundingLineDictionaryItem
 } from '../../types/TemplateBuilderDefinitions';
 import "../../styles/EditTemplate.scss";
 import {DateFormatter} from '../../components/DateFormatter';
@@ -51,6 +57,7 @@ import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
 import {ErrorMessage} from '../../types/ErrorMessage';
 import {useHistory} from "react-router";
+import {AutoComplete} from '../../components/AutoComplete';
 
 enum Mode {
     View = 'view',
@@ -60,6 +67,7 @@ enum Mode {
 export function EditTemplate() {
     const orgchart = useRef<HTMLDivElement>(null);
     const descriptionRef = useRef<HTMLSpanElement>(null);
+    const itemRefs = useRef({});
     let {templateId, version} = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -73,6 +81,8 @@ export function EditTemplate() {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [allFundingLinesAndCalculations, setAllFundingLinesAndCalculations] = useState<string[]>([]);
+    const [focusNodeId, setFocusNodeId] = useState<string>('');
     const {canEditTemplate, canApproveTemplate, missingPermissions} = useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     const {
         initialiseState,
@@ -120,6 +130,16 @@ export function EditTemplate() {
         }
     }, [canEditTemplate]);
 
+    useEffect(() => {
+        const allCalcs = getCalculations().map(c => `CAL: ${c.name} (${c.templateCalculationId})`);
+        const allFundingLines = getFundingLines().map(fl => `FUN: ${fl.name} (${fl.templateLineId})`);
+        setAllFundingLinesAndCalculations(allCalcs.concat(allFundingLines));
+    }, [ds]);
+
+    const addNodeToRefs = (id: string, ref: React.MutableRefObject<any>) => {
+        (itemRefs.current as any)[id] = ref;
+    }
+
     function addErrorMessage(errorMessage: string, fieldName?: string) {
         const errorCount: number = errors.length;
         const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
@@ -133,6 +153,11 @@ export function EditTemplate() {
     function getCalculations(): CalculationDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
         return getAllCalculations(fundingLines);
+    }
+
+    function getFundingLines(): FundingLineDictionaryItem[] {
+        const fundingLines: FundingLine[] = ds.map(fl => fl.value);
+        return getAllFundingLines(fundingLines);
     }
 
     const fetchData = async () => {
@@ -413,7 +438,43 @@ export function EditTemplate() {
             ref = orgchart;
         }
 
-        ref && ref.current && ref.current.scrollIntoView();
+        ref && ref.current && ref.current.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    const search = async (result: string) => {
+        if (!result || result.trim().length === 0) return;
+        if (result.startsWith("CAL")) {
+            const allCalculations: CalculationDictionaryItem[] = getCalculations();
+            const matches = result.match(/\((.*?)\)/);
+            if (matches) {
+                const templateCalculationId: number = parseInt(matches[1], 10);
+                const id = allCalculations.filter(c => c.templateCalculationId === templateCalculationId)[0].id;
+                setFocusNodeId(id);
+                const dataNode = await findNodeById(ds, id);
+                const node: FundingLineOrCalculationSelectedItem = {
+                    key: dataNode.dsKey,
+                    value: dataNode as Calculation
+                };
+                readSelectedNode(node);
+                setOpenSidebar(true);
+            }
+        }
+        if (result.startsWith("FUN")) {
+            const allFundingLines: FundingLineDictionaryItem[] = getFundingLines();
+            const matches = result.match(/\((.*?)\)/);
+            if (matches) {
+                const templateLineId: number = parseInt(matches[1], 10);
+                const id = allFundingLines.filter(c => c.templateLineId === templateLineId)[0].id;
+                setFocusNodeId(id);
+                const dataNode = await findNodeById(ds, id);
+                const node: FundingLineOrCalculationSelectedItem = {
+                    key: dataNode.dsKey,
+                    value: dataNode as FundingLine
+                };
+                readSelectedNode(node);
+                setOpenSidebar(true);
+            }
+        }
     }
 
     return (
@@ -538,12 +599,10 @@ export function EditTemplate() {
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
                                 <label className="govuk-label" htmlFor="textarea">
-                                    Search </label>
-                                <div className="govuk-grid-column-one-third govuk-!-padding-left-0">
-
-                                    <div className="search-container">
-                                        <input className="govuk-input input-search" id="event-name" name="event-name" type="text" />
-                                    </div>
+                                    Search
+                                </label>
+                                <div className="govuk-grid-column-one-third govuk-!-padding-left-0 search-container">
+                                    <AutoComplete suggestions={allFundingLinesAndCalculations} callback={search} />
                                 </div>
                                 <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
                                     <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
@@ -586,6 +645,7 @@ export function EditTemplate() {
                             )}
                             <OrganisationChart
                                 ref={orgchart}
+                                itemRefs={itemRefs}
                                 NodeTemplate={TemplateBuilderNode}
                                 datasource={ds}
                                 chartClass="myChart"
@@ -602,6 +662,8 @@ export function EditTemplate() {
                                 changeHierarchy={changeHierarchy}
                                 cloneNode={cloneNode}
                                 nextId={nextId}
+                                addNodeToRefs={addNodeToRefs}
+                                focusNodeId={focusNodeId}
                             />
                         </div>
                     </div>

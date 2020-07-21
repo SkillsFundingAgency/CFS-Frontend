@@ -1,6 +1,6 @@
-import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, cloneCalculation, isChildOf } from "../../services/templateBuilderDatasourceService";
-import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationType, AggregrationType, ValueFormatType } from "../../types/TemplateBuilderDefinitions";
+import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs } from "./templateBuilderTestData";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf } from "../../services/templateBuilderDatasourceService";
+import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel } from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
 import { v4 as uuidv4 } from 'uuid';
 jest.mock('uuid');
@@ -380,6 +380,43 @@ it("calculates getAllCalculations correctly", () => {
         {"id": "n3", "name": "Calculation 3", "templateCalculationId": 3, "aggregationType": "Sum"},
         {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
         {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6, "aggregationType": "Sum"}
+    ]);
+});
+
+it("calculates getAllFundingLines correctly", () => {
+    expect(getAllFundingLines(singleNodeDs.map(d => d.value))).toEqual([
+        {"id": "n0", "name": "Funding Line 0", "templateLineId": 0}
+    ]);
+    expect(getAllFundingLines(withChildFundingLineDs.map(d => d.value))).toEqual([
+        {"id": "n1", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n0", "name": "Funding Line 1", "templateLineId": 1}
+    ]);
+    expect(getAllFundingLines(withChildFundingLineAndCalculationDs.map(d => d.value))).toEqual([
+        {"id": "n3", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n1", "name": "Funding Line 1", "templateLineId": 1},
+        {"id": "n0", "name": "Funding Line 2", "templateLineId": 2}
+    ]);
+    expect(getAllFundingLines(multipleFundingLinesDs.map(d => d.value))).toEqual([
+        {"id": "n0", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n3", "name": "Funding Line 1", "templateLineId": 1},
+        {"id": "n4", "name": "Funding Line 2", "templateLineId": 2},
+        {"id": "n1", "name": "Funding Line 3", "templateLineId": 3}
+    ]);
+    expect(getAllFundingLines(clonedNodeDs.map(d => d.value))).toEqual([
+        {"id": "n1", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n3", "name": "Funding Line 1", "templateLineId": 1},
+        {"id": "n4", "name": "Funding Line 2", "templateLineId": 2},
+        {"id": "n2", "name": "Funding Line 3", "templateLineId": 3}
+    ]);
+    expect(getAllFundingLines(multipleCalculationsDs.map(d => d.value))).toEqual([
+        {"id": "n0", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n1", "name": "Funding Line 1", "templateLineId": 1},
+        {"id": "n5", "name": "Funding Line 5", "templateLineId": 5},
+        {"id": "n7", "name": "Funding Line 7", "templateLineId": 7}
+    ]);
+    expect(getAllFundingLines(clonedFundingLinesDs.map(d => d.value))).toEqual([
+        {"id": "n0", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n1", "name": "Funding Line 1", "templateLineId": 1}
     ]);
 });
 

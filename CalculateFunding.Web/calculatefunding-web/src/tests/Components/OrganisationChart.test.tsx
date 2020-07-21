@@ -50,6 +50,7 @@ let onClickAdd: (id: string, newChild: FundingLine | Calculation) => Promise<voi
 let changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
 let cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
 let openSideBar: (open: boolean) => void;
+let addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void;
 
 beforeEach(() => {
     onClickNode = jest.fn();
@@ -57,6 +58,7 @@ beforeEach(() => {
     changeHierarchy = jest.fn();
     cloneNode = jest.fn();
     openSideBar = jest.fn();
+    addNodeToRefs = jest.fn();
     jest.clearAllMocks();
 });
 
@@ -76,6 +78,8 @@ it("renders all nodes in datasource", () => {
         draggable={true}
         collapsible={true}
         multipleSelect={false}
+        addNodeToRefs={addNodeToRefs}
+        itemRefs={{ current: {} }}
     />);
 
     expect(wrapper.find('OrganisationChartNode')).toHaveLength(8);
@@ -97,6 +101,8 @@ it("adds new lines", () => {
         draggable={true}
         collapsible={true}
         multipleSelect={false}
+        addNodeToRefs={addNodeToRefs}
+        itemRefs={{ current: {} }}
     />);
 
     const button = wrapper.find("[data-testid='n1-add-line']");
@@ -122,6 +128,8 @@ it("handles drag and drop of a Funding Line (clone)", () => {
         draggable={true}
         collapsible={true}
         multipleSelect={false}
+        addNodeToRefs={addNodeToRefs}
+        itemRefs={{ current: {} }}
     />);
 
     const sourceNode = wrapper.find("div#n2");
@@ -154,6 +162,8 @@ it("handles drag and drop of a Funding Line (copy)", () => {
         draggable={true}
         collapsible={true}
         multipleSelect={false}
+        addNodeToRefs={addNodeToRefs}
+        itemRefs={{ current: {} }}
     />);
 
     const sourceNode = wrapper.find("div#n2");
@@ -186,6 +196,8 @@ it("handles drag and drop of a Calculation", () => {
         draggable={true}
         collapsible={true}
         multipleSelect={false}
+        addNodeToRefs={addNodeToRefs}
+        itemRefs={{ current: {} }}
     />);
 
     const node = wrapper.find("div#n4");

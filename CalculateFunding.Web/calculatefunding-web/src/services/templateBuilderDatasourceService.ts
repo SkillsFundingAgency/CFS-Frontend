@@ -1,5 +1,5 @@
 import JSONDigger from "json-digger";
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {
     AggregrationType,
     Calculation,
@@ -17,9 +17,9 @@ import {
     TemplateResponse,
     TemplateContentUpdateCommand,
     CalculationDictionaryItem,
-    FundingStreamWithPeriodsResponse, GetTemplateVersionsResponse, TemplateStatus
+    FundingStreamWithPeriodsResponse, GetTemplateVersionsResponse, TemplateStatus, FundingLineDictionaryItem, NodeDictionaryItem
 } from "../types/TemplateBuilderDefinitions";
-import { TemplateSearchRequest } from "../types/searchRequestViewModel";
+import {TemplateSearchRequest} from "../types/searchRequestViewModel";
 import axios from "axios";
 import {AxiosResponse} from "axios";
 import cloneDeep from 'lodash/cloneDeep';
@@ -37,7 +37,7 @@ export const addNode = async (ds: Array<FundingLineDictionaryEntry>, id: string,
             try {
                 const clonedNodeId = clonedNodeIds[j];
                 if (clonedNodeId !== id) {
-                    const childToAdd = { ...newChild };
+                    const childToAdd = {...newChild};
                     childToAdd.id = `${newChild.id.split(":")[0]}:${uuidv4()}`.replace(/-/gi, "");
                     await digger.addChildren(clonedNodeId, [childToAdd]);
                 } else {
@@ -177,7 +177,7 @@ export async function findAllClonedNodeIds(fundingLine: FundingLine, id: string)
     const originalId = id.split(":")[0];
     const findClonedNodesCondition = new RegExp(`${originalId}:|^${originalId}$`, 'i')
     try {
-        const clonedNodes: Array<FundingLineOrCalculation> = await digger.findNodes({ 'id': findClonedNodesCondition });
+        const clonedNodes: Array<FundingLineOrCalculation> = await digger.findNodes({'id': findClonedNodesCondition});
         return clonedNodes ? clonedNodes.map((n: FundingLineOrCalculation) => n.id) : [];
     }
     catch (err) {
@@ -193,7 +193,7 @@ export const updateNode = async (ds: Array<FundingLineDictionaryEntry>, updateMo
             const digger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
             const clonedNodeIds = await findAllClonedNodeIds(fundingLine.value, updateModel.id);
             clonedNodeIds.forEach(async c => {
-                const cloneUpdateModel = { ...updateModel };
+                const cloneUpdateModel = {...updateModel};
                 cloneUpdateModel.id = c;
                 try {
                     await digger.updateNode(cloneUpdateModel);
@@ -305,7 +305,7 @@ export const templateFundingLinesToDatasource = (templateFundingLines: Array<Tem
     for (let i = 0; i < templateFundingLines.length; i++) {
         const key: number = i + 1;
         const fundingLine: FundingLine = getFundingLine(templateFundingLines[i], id, key);
-        datasource.push({ key, value: fundingLine })
+        datasource.push({key, value: fundingLine})
     }
     return datasource;
 }
@@ -442,10 +442,42 @@ export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDict
         result.push(...array);
     }
 
-    return result.sort(compare);
+    return result.sort(compareNode);
 }
 
-function compare(a: CalculationDictionaryItem, b: CalculationDictionaryItem) {
+export const getAllFundingLines = (fundingLines: FundingLine[]): FundingLineDictionaryItem[] => {
+    const result: FundingLineDictionaryItem[] = [];
+
+    for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
+        let stack: FundingLineOrCalculation[] = [];
+        let array: FundingLineDictionaryItem[] = [];
+        let hashMap: any = {};
+
+        stack.push(fundingLines[fundingLine]);
+
+        while (stack.length !== 0) {
+            const node = stack.pop();
+            if (node && (node.children === undefined || node.children.length === 0)) {
+                node.kind === NodeType.FundingLine && visitNode(node as FundingLine, hashMap, array);
+            } else {
+                if (node && node.children && node.children.length > 0) {
+                    for (let i: number = node.children.length - 1; i >= 0; i--) {
+                        stack.push(node.children[i]);
+                    }
+                }
+            }
+
+            if (node && node.kind === NodeType.FundingLine) {
+                visitNode(node as FundingLine, hashMap, array);
+            }
+        }
+        result.push(...array);
+    }
+
+    return result.sort(compareNode);
+}
+
+function compareNode(a: NodeDictionaryItem, b: NodeDictionaryItem) {
     const nameA = a.name.toUpperCase();
     const nameB = b.name.toUpperCase();
 
@@ -458,15 +490,26 @@ function compare(a: CalculationDictionaryItem, b: CalculationDictionaryItem) {
     return comparison;
 }
 
-function visitNode(node: Calculation, hashMap: any, array: CalculationDictionaryItem[]) {
+function visitNode(node: FundingLineOrCalculation, hashMap: any, array: NodeDictionaryItem[]) {
     if (!node.id.includes(":") && !hashMap[node.id]) {
         hashMap[node.id] = true;
-        array.push({
-            id: node.id,
-            templateCalculationId: node.templateCalculationId,
-            aggregationType: node.aggregationType,
-            name: node.name
-        });
+        if (node.kind === NodeType.Calculation) {
+            const item: Calculation = node as Calculation;
+            array.push({
+                id: item.id,
+                templateCalculationId: item.templateCalculationId,
+                aggregationType: item.aggregationType,
+                name: node.name
+            });
+        }
+        if (node.kind === NodeType.FundingLine) {
+            const item: FundingLine = node as FundingLine;
+            array.push({
+                id: item.id,
+                templateLineId: item.templateLineId,
+                name: item.name
+            });
+        }
     }
 }
 
@@ -494,7 +537,7 @@ function childMatches(children: FundingLineOrCalculation[] | undefined, childId:
 export async function saveTemplateContent(command: TemplateContentUpdateCommand): Promise<AxiosResponse<number>> {
     return await axios(`/api/templates/build/content`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         data: command
     })
 }
@@ -502,7 +545,7 @@ export async function saveTemplateContent(command: TemplateContentUpdateCommand)
 export async function restoreTemplateContent(command: TemplateContentUpdateCommand, templateId: string, version: number): Promise<AxiosResponse<number>> {
     return await axios(`/api/templates/build/${templateId}/restore/${version}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         data: command
     })
 }
@@ -510,7 +553,7 @@ export async function restoreTemplateContent(command: TemplateContentUpdateComma
 export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
     return await axios(`/api/templates/build/search`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         data: searchRequest
     })
 }
@@ -537,20 +580,20 @@ export async function getAllFundingStreamsWithAvailablePeriods(): Promise<AxiosR
 export async function createNewDraftTemplate(fundingStreamId: string, fundingPeriodId: string, description: string): Promise<AxiosResponse<string>> {
     return await axios(`/api/templates/build`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: { fundingStreamId, fundingPeriodId, description }
+        headers: {'Content-Type': 'application/json'},
+        data: {fundingStreamId, fundingPeriodId, description}
     })
 }
 
 export async function publishTemplate(templateId: string, note: string): Promise<AxiosResponse<string>> {
     return await axios(`/api/templates/build/${templateId}/publish`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: { templateId, note }
+        headers: {'Content-Type': 'application/json'},
+        data: {templateId, note}
     })
 }
 
-export async function getVersionsOfTemplate(templateId: string, page: number, itemsPerPage: number, statuses?: TemplateStatus[]): 
+export async function getVersionsOfTemplate(templateId: string, page: number, itemsPerPage: number, statuses?: TemplateStatus[]):
     Promise<AxiosResponse<GetTemplateVersionsResponse>> {
     let uri = `/api/templates/build/${templateId}/versions?page=${page}&itemsPerPage=${itemsPerPage}`;
     if (statuses) {
@@ -567,14 +610,14 @@ export async function getVersionsOfTemplate(templateId: string, page: number, it
 export async function updateTemplateDescription(templateId: string, description: string): Promise<AxiosResponse<string>> {
     return await axios(`/api/templates/build/description`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        data: { templateId, description }
+        headers: {'Content-Type': 'application/json'},
+        data: {templateId, description}
     })
 }
 
 export async function getTemplateVersion(templateId: string, version: number): Promise<AxiosResponse<TemplateResponse>> {
     return await axios(`/api/templates/build/${templateId}/versions/${version}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: {'Content-Type': 'application/json'}
     })
 }

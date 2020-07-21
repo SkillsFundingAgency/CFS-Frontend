@@ -538,3 +538,41 @@ export const multipleCalculationsDs: Array<FundingLineDictionaryEntry> = [
         }
     }
 ];
+
+export const clonedFundingLinesDs: Array<FundingLineDictionaryEntry> = [
+    {
+        "key": 1,
+        "value": {
+            "id": "n0",
+            "templateLineId": 0,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 0",
+            "fundingLineCode": "Code 0",
+            "dsKey": 1,
+            "children": []
+        }
+    },
+    {
+        "key": 2,
+        "value": {
+            "id": "n1",
+            "templateLineId": 1,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 1",
+            "fundingLineCode": "Code 1",
+            "dsKey": 2,
+            "children": [{
+                "id": "n0:12345",
+                "templateLineId": 0,
+                "kind": NodeType.FundingLine,
+                "type": FundingLineType.Information,
+                "name": "Funding Line 0",
+                "fundingLineCode": "Code 0",
+                "dsKey": 2,
+                "children": []
+            }]
+        }
+    }
+];

@@ -2,11 +2,12 @@ import React, {
   useState,
   useRef,
   forwardRef,
+  useEffect,
 } from "react";
-import { clearSelectedNodeInfo } from "../services/templateBuilderService";
+import {clearSelectedNodeInfo, sendSelectedNodeInfo} from "../services/templateBuilderService";
 import OrganisationChartNode from "./OrganisationChartNode";
 import "../styles/OrganisationChart.scss";
-import { FundingLineOrCalculation, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem } from "../types/TemplateBuilderDefinitions";
+import {FundingLineOrCalculation, FundingLineDictionaryEntry, FundingLine, Calculation, FundingLineOrCalculationSelectedItem} from "../types/TemplateBuilderDefinitions";
 
 interface OrganisationChartProps {
   datasource: Array<FundingLineDictionaryEntry>,
@@ -28,6 +29,9 @@ interface OrganisationChartProps {
   openSideBar: (open: boolean) => void,
   editMode: boolean,
   nextId: number,
+  addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
+  focusNodeId?: string | undefined,
+  itemRefs: React.MutableRefObject<{}>,
 };
 
 const defaultProps = {
@@ -64,6 +68,9 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
       openSideBar,
       editMode,
       nextId,
+      addNodeToRefs,
+      focusNodeId,
+      itemRefs,
     }, ref
   ) => {
     const container = useRef<HTMLDivElement>(null);
@@ -74,6 +81,15 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
     const [transform, setTransform] = useState("");
     const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState("grab");
+
+    useEffect(() => {
+      if (!itemRefs || !itemRefs.current || !focusNodeId || focusNodeId.length === 0) return;
+      setTransform("");
+      sendSelectedNodeInfo(focusNodeId);
+      setTimeout(() => {
+        (itemRefs.current as any)[focusNodeId].current.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+      }, 500);
+    }, [focusNodeId]);
 
     const attachRel = (data: FundingLineOrCalculation, flags: string) => {
       data.relationship =
@@ -193,51 +209,55 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
           }
         }
       }
-      chart && chart.current && chart.current.scrollIntoView({ block: "center", inline: "center" });
+      chart && chart.current && chart.current.scrollIntoView({block: "center", inline: "center"});
     };
 
-    const zoomHandler = (e: { deltaY: number; }) => {
+    const zoomHandler = (e: {deltaY: number;}) => {
       let newScale = 1 + (e.deltaY > 0 ? -0.2 : 0.2);
       updateChartScale(newScale);
     };
 
     return (
       <div
+        id="org-container"
         ref={container}
         className={"orgchart-container " + containerClass}
-        style={{ cursor: cursor }}
+        style={{cursor: cursor}}
         onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >
-        <div
-          ref={chart}
-          className={"orgchart " + chartClass}
-          style={{ transform: transform, cursor: cursor }}
-          onClick={clickChartHandler}
-          onMouseDown={pan ? panStartHandler : undefined}
-          onMouseMove={pan && panning ? panHandler : undefined}
-        >
-          {datasource.map(ds =>
-            <div className="chart-cell" key={ds.key}>
-              <ul>
-                <OrganisationChartNode
-                  datasource={attachRel(ds.value, "00")}
-                  NodeTemplate={NodeTemplate}
-                  draggable={draggable && editMode}
-                  collapsible={collapsible}
-                  multipleSelect={multipleSelect && editMode}
-                  changeHierarchy={changeHierarchy}
-                  cloneNode={cloneNode}
-                  onClickNode={onClickNode}
-                  addNode={onClickAdd}
-                  openSideBar={openSideBar}
-                  editMode={editMode}
-                  nextId={nextId}
-                  dsKey={ds.key}
-                />
-              </ul>
-            </div>
-          )}
+        <div>
+          <div
+            ref={chart}
+            className={"orgchart " + chartClass}
+            style={{transform: transform, cursor: cursor}}
+            onClick={clickChartHandler}
+            onMouseDown={pan ? panStartHandler : undefined}
+            onMouseMove={pan && panning ? panHandler : undefined}
+          >
+            {datasource.map(ds =>
+              <div className="chart-cell" key={ds.key}>
+                <ul>
+                  <OrganisationChartNode
+                    datasource={attachRel(ds.value, "00")}
+                    NodeTemplate={NodeTemplate}
+                    draggable={draggable && editMode}
+                    collapsible={collapsible}
+                    multipleSelect={multipleSelect && editMode}
+                    changeHierarchy={changeHierarchy}
+                    cloneNode={cloneNode}
+                    onClickNode={onClickNode}
+                    addNode={onClickAdd}
+                    openSideBar={openSideBar}
+                    editMode={editMode}
+                    nextId={nextId}
+                    dsKey={ds.key}
+                    addNodeToRefs={addNodeToRefs}
+                  />
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );

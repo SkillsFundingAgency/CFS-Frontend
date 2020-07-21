@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { getDragInfo, sendDragInfo, clearDragInfo, sendSelectedNodeInfo, getSelectedNodeInfo } from "../services/templateBuilderService";
+import React, {useState, useRef, useEffect} from "react";
+import {getDragInfo, sendDragInfo, clearDragInfo, sendSelectedNodeInfo, getSelectedNodeInfo} from "../services/templateBuilderService";
 import "../styles/OrganisationChartNode.scss";
-import { FundingLineOrCalculation, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, NodeType } from "../types/TemplateBuilderDefinitions";
+import {FundingLineOrCalculation, FundingLine, Calculation, FundingLineOrCalculationSelectedItem, NodeType} from "../types/TemplateBuilderDefinitions";
 
 interface OrganisationChartNodeProps {
   id?: string,
@@ -18,6 +18,7 @@ interface OrganisationChartNodeProps {
   editMode: boolean,
   nextId: number,
   dsKey: number,
+  addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
 };
 
 const defaultProps = {
@@ -40,6 +41,7 @@ function OrganisationChartNode({
   editMode,
   nextId,
   dsKey,
+  addNodeToRefs,
 }: OrganisationChartNodeProps) {
   const node = useRef<HTMLDivElement>(null);
 
@@ -47,6 +49,10 @@ function OrganisationChartNode({
   const [bottomEdgeExpanded, setBottomEdgeExpanded] = useState<boolean>();
   const [allowedDrop, setAllowedDrop] = useState<boolean>(false);
   const [selected, setSelected] = useState<boolean>(false);
+
+  useEffect(() => {
+    addNodeToRefs(datasource.id, node);
+  }, []);
 
   const nodeClass = [
     "oc-node",
@@ -116,7 +122,7 @@ function OrganisationChartNode({
     setBottomEdgeExpanded(undefined);
   };
 
-  const bottomEdgeClickHandler = (e: { stopPropagation: () => void; }) => {
+  const bottomEdgeClickHandler = (e: {stopPropagation: () => void;}) => {
     e.stopPropagation();
     setIsChildrenCollapsed(!isChildrenCollapsed);
     setBottomEdgeExpanded(!bottomEdgeExpanded);
@@ -128,14 +134,14 @@ function OrganisationChartNode({
 
   const clickNodeHandler = () => {
     if (onClickNode) {
-      onClickNode({ key: dsKey, value: datasource });
+      onClickNode({key: dsKey, value: datasource});
     }
 
     sendSelectedNodeInfo(datasource.id);
   };
 
   const dragstartHandler = (event: React.DragEvent<HTMLDivElement>) => {
-    const copyDS = { ...datasource };
+    const copyDS = {...datasource};
     delete copyDS.relationship;
     copyDS.dsKey = dsKey;
     event.dataTransfer.setData("text/plain", JSON.stringify(copyDS));
@@ -242,6 +248,7 @@ function OrganisationChartNode({
               editMode={editMode}
               nextId={nextId}
               dsKey={dsKey}
+              addNodeToRefs={addNodeToRefs}
             />
           ))}
         </ul>
