@@ -12,7 +12,6 @@ import {GetTemplateVersionsResponse, TemplateResponse, TemplateStatus, TemplateV
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {Footer} from "../../components/Footer";
 import {AxiosError} from "axios";
-import { PublishStatus } from "../../types/PublishStatusModel";
 
 export const ListVersions = () => {
     let {templateId} = useParams();

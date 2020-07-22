@@ -77,14 +77,6 @@ export const useTemplateUndo = (updateFunction: Function) => {
         return getTimeItems(templateBuilderFutureStateKey).length;
     }
 
-    const canUndo = () => {
-        return getTimeItems(templateBuilderPastStateKey).length > 0;
-    }
-
-    const canRedo = () => {
-        return getTimeItems(templateBuilderFutureStateKey).length > 0;
-    }
-
     function getPresentState(): FundingLineDictionaryEntry[] {
         const presentStateString = window.localStorage.getItem(templateBuilderStateKey);
         if (presentStateString) {
@@ -115,8 +107,6 @@ export const useTemplateUndo = (updateFunction: Function) => {
         clearUndoState,
         clearRedoState,
         undoCount,
-        redoCount,
-        canUndo: canUndo(),
-        canRedo: canRedo()
+        redoCount
     }
 }

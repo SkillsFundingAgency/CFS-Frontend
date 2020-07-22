@@ -57,12 +57,14 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true
 }];
 
-export const mockTemplate: TemplateResponse = {
+const mockTemplate: TemplateResponse = {
     templateId: "12352346",
     name: "template name",
     description: "lorem ipsum",
     fundingStreamId: "DSG",
+    fundingStreamName: "DSG",
     fundingPeriodId: "2021",
+    fundingPeriodName: "2021",
     majorVersion: 0,
     minorVersion: 2,
     version: 2,

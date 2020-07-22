@@ -15,6 +15,7 @@ import { ListTemplates } from "./pages/Templates/ListTemplates";
 import { PublishTemplate } from "./pages/Templates/PublishTemplate";
 import { EditTemplate } from "./pages/Templates/EditTemplate";
 import {CreateTemplate} from "./pages/Templates/CreateTemplate";
+import {CloneTemplate} from "./pages/Templates/CloneTemplate";
 import {ListVersions} from "./pages/Templates/ListVersions";
 import { Section } from "./types/Sections";
 import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
@@ -42,9 +43,7 @@ import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 import {MapDataSourceFiles} from "./pages/Datasets/MapDataSourceFiles";
 import { initialiseAxios } from './services/axiosInterceptor';
-import {
-    ViewProvidersFundingStreamSelection
-} from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
+import {ViewProvidersFundingStreamSelection} from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 import {DataRelationships} from "./pages/Datasets/DataRelationships";
 import {ProfilingArchive} from "./pages/FundingApprovals/ProfilingArchive";
@@ -100,6 +99,7 @@ const App: React.FunctionComponent = () => {
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate} />}
+                {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />}
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions} />}
                 <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation} />

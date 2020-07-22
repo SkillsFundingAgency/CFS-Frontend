@@ -289,7 +289,7 @@ function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, ke
     return {
         id: `n${getId(templateFundingLine.templateLineId)}`,
         templateLineId: templateFundingLine.templateLineId,
-        type: <FundingLineType>templateFundingLine.type,
+        type: templateFundingLine.type as FundingLineType,
         fundingLineCode: templateFundingLine.fundingLineCode,
         name: templateFundingLine.name,
         kind: NodeType.FundingLine,
@@ -582,6 +582,16 @@ export async function createNewDraftTemplate(fundingStreamId: string, fundingPer
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         data: {fundingStreamId, fundingPeriodId, description}
+    })
+}
+
+export async function cloneNewTemplateFromExisting(
+    fromTemplateId: string, fromTemplateVersion: number, fundingStreamId: string, fundingPeriodId: string, description: string): 
+    Promise<AxiosResponse<string>> {
+    return await axios(`/api/templates/build/clone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: { cloneFromTemplateId: fromTemplateId, version: fromTemplateVersion, fundingStreamId, fundingPeriodId, description }
     })
 }
 
