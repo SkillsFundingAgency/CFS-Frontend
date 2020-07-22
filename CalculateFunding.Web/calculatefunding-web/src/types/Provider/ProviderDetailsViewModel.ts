@@ -1,0 +1,37 @@
+export interface ProviderDetailsViewModel {
+    id: string;
+    providerVersionId: string;
+    providerId: string;
+    name: string;
+    urn: string;
+    ukprn: string;
+    upin: string;
+    establishmentNumber: string;
+    dfeEstablishmentNumber: string;
+    authority: string;
+    providerType: string;
+    providerSubType: string;
+    dateOpened: Date;
+    dateClosed: Date;
+    providerProfileIdType: string;
+    laCode: string;
+    navVendorNo: string;
+    crmAccountId: string;
+    legalName: string;
+    status: string;
+    phaseOfEducation: string;
+    reasonEstablishmentOpened: string;
+    reasonEstablishmentClosed: string;
+    successor: string;
+    trustStatus: string;
+    trustName: string;
+    trustCode: string;
+    town: string;
+    postcode: string;
+    rscRegionName: string;
+    rscRegionCode: string;
+    localGovernmentGroupTypeName: string;
+    localGovernmentGroupTypeCode: string;
+    countryName: string;
+    countryCode: string;
+}

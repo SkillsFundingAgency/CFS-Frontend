@@ -2,6 +2,7 @@
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.ViewModels.Results;
 using FizzWare.NBuilder;
@@ -17,12 +18,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     {
         private ProviderController _sut;
         private Mock<IProvidersApiClient> _mockProvidersApiClient;
+        private Mock<IResultsApiClient> _mockResultsApiClient;
 
 
         [TestInitialize]
         public void Initialize()
         {
             _mockProvidersApiClient = new Mock<IProvidersApiClient>();
+_mockResultsApiClient = new Mock<IResultsApiClient>();
 
             ApiResponse<ProviderVersionSearchResult> data = new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, Builder<ProviderVersionSearchResult>.CreateNew().Build());
 
@@ -30,7 +33,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _mockProvidersApiClient.Setup(x => x.GetProviderByIdFromProviderVersion("providerVersionId", "providerId"))
                 .ReturnsAsync(data);
 
-            _sut = new ProviderController(_mockProvidersApiClient.Object);
+            _sut = new ProviderController(_mockProvidersApiClient.Object, _mockResultsApiClient.Object);
         }
 
         [TestMethod]
