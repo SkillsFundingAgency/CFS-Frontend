@@ -51,7 +51,7 @@ function OrganisationChartNode({
   const [selected, setSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    addNodeToRefs(datasource.id, node);
+    addNodeToRefs && addNodeToRefs(datasource.id, node);
   }, []);
 
   const nodeClass = [

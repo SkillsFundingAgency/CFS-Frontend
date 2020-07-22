@@ -29,9 +29,9 @@ interface OrganisationChartProps {
   openSideBar: (open: boolean) => void,
   editMode: boolean,
   nextId: number,
-  addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
+  addNodeToRefs?: (id: string, ref: React.MutableRefObject<any>) => void | undefined,
   focusNodeId?: string | undefined,
-  itemRefs: React.MutableRefObject<{}>,
+  itemRefs?: React.MutableRefObject<{}> | undefined,
 };
 
 const defaultProps = {

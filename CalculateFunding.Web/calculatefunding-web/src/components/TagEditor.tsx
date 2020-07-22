@@ -77,7 +77,7 @@ export function TagEditor({
                     <strong
                         key={`tag-${i}`}
                         data-testid="tag"
-                        className="govuk-tag govuk-tag--grey govuk-!-margin-bottom-1"
+                        className="govuk-tag govuk-tag--grey govuk-!-margin-bottom-1 enum-tag"
                         onClick={() => handleRemoveTagValueClick(t)}>✕ {t}
                     </strong>)
                 }
