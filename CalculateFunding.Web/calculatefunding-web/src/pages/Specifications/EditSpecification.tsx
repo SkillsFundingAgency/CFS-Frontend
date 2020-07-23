@@ -19,6 +19,8 @@ import {CoreProviderSummary} from "../../types/CoreProviderSummary";
 import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpecificationViewModel";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
+import {getDefaultTemplateVersionService, getTemplatesService} from "../../services/policyService";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -42,6 +44,12 @@ interface EditSpecificationCoreProvider {
     selected: boolean
 }
 
+interface EditSpecificationTemplateVersion {
+    name: string,
+    value: string
+    selected: boolean
+}
+
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
 
     const specificationId = match.params.specificationId;
@@ -58,17 +66,17 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         isSelectedForFunding: false,
         fundingStreams: [],
         dataDefinitionRelationshipIds: [],
-        templateIds: {
-            PSG: ""
-        }
+        templateIds: {"": [""]}
     });
     const [fundingStreamData, setFundingStreamData] = useState<EditSpecificationFundingStream[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<EditSpecificationFundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<EditSpecificationCoreProvider[]>([]);
+    const [templateVersionData, setTemplateVersionData] = useState<EditSpecificationTemplateVersion[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("fundingStreamDefault");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("fundingPeriodDefault");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [formValid, setFormValid] = useState({
         formSubmitted: false,
@@ -155,6 +163,28 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             });
                         });
 
+                        getTemplatesService(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id).then(templatesResult =>{
+                            if (templatesResult.status === 200 || templatesResult.status === 201) {
+                                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
+                                const fundingStreamKey = specificationSummary.fundingStreams[0].id.toString().toLowerCase();
+                                publishedFundingTemplates.forEach(publishedFundingTemplate => {
+                                    let item: EditSpecificationTemplateVersion = {
+                                        name: publishedFundingTemplate.templateVersion,
+                                        value: publishedFundingTemplate.templateVersion,
+                                        selected: fundingStreamKey!= null
+                                            && (parseFloat(specificationSummary.templateIds[fundingStreamKey][0])===parseFloat(publishedFundingTemplate.templateVersion))
+                                    };
+
+                                    setTemplateVersionData(prevState => [...prevState, item]);
+
+                                    if (item.selected) {
+                                        setSelectedTemplateVersion(publishedFundingTemplate.templateVersion);
+                                    }
+                                });
+
+                            }
+                        })
+
                         setSelectedDescription(specificationSummary.description);
                     }
                 });
@@ -210,6 +240,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         setSelectedProviderVersionId(coreProviderId);
     }
 
+    function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
+        const templateVersionId = e.target.value;
+        setSelectedTemplateVersion(templateVersionId);
+    }
+
     function saveDescriptionName(e: React.ChangeEvent<HTMLTextAreaElement>) {
         const specificationDescription = e.target.value;
         setSelectedDescription(specificationDescription);
@@ -219,12 +254,15 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         if (selectedName !== "" && selectedFundingStream !== "" && selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
+            let assignedTemplateIdsValue: any = {};
+            assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
             let updateSpecificationViewModel: UpdateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriod,
                 fundingStreamId: selectedFundingStream,
                 name: selectedName,
-                providerVersionId: selectedProviderVersionId
+                providerVersionId: selectedProviderVersionId,
+                assignedTemplateIds: assignedTemplateIdsValue,
             };
 
             const updateSpecification = async () => {
@@ -302,6 +340,18 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 onChange={(e) => selectCoreProvider(e)}>
                             <option value="-1">Select core provider</option>
                             {coreProviderData.map((cp, index) => <option key={index}
+                                                                         value={cp.value} selected={cp.selected}>{cp.name}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="govuk-form-group">
+                        <label className="govuk-label" htmlFor="sort">
+                            Template version
+                        </label>
+                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0}
+                                onChange={(e) => selectTemplateVersion(e)}>
+                            <option value="-1">Select template version</option>
+                            {templateVersionData.map((cp, index) => <option key={index}
                                                                          value={cp.value} selected={cp.selected}>{cp.name}</option>)}
                         </select>
                     </div>

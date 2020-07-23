@@ -150,7 +150,8 @@ namespace CalculateFunding.Frontend.ViewModels
                     destination.FundingStreamIds = new List<string> { source.FundingStreamId };
                 });
 
-            CreateMap<EditSpecificationViewModel, EditSpecificationModel>();
+            CreateMap<EditSpecificationViewModel, EditSpecificationModel>()
+	            .ForMember(m => m.AssignedTemplateIds, opt => opt.Ignore());
 
             CreateMap<EditSpecificationModel, EditSpecificationViewModel>()
                 .ForMember(m => m.Id, opt => opt.Ignore())

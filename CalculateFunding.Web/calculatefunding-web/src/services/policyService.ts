@@ -10,3 +10,21 @@ export async function getFundingStreamsService() {
         },
     });
 }
+
+export async function getDefaultTemplateVersionService(fundingStreamId: string, fundingPeriodId: string) {
+    return axios(`${baseURL}/configuration/${fundingStreamId}/${fundingPeriodId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}
+
+export async function getTemplatesService(fundingStreamId: string, fundingPeriodId: string) {
+    return axios(`${baseURL}/templates/${fundingStreamId}/${fundingPeriodId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}

@@ -278,3 +278,12 @@ export type FundingLineOrCalculationSelectedItem = {
     key: number,
     value: FundingLineOrCalculation
 }
+
+export interface PublishedFundingTemplate {
+    templateVersion: string,
+    publishNote: string,
+    authorId: string,
+    authorName: string,
+    publishDate: Date,
+    schemaVersion: string
+}

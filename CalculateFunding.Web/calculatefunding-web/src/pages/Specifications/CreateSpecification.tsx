@@ -7,7 +7,8 @@ import {
     getFundingPeriodsByFundingStreamIdService
 } from "../../services/specificationService";
 import {
-    getFundingStreamsService
+    getDefaultTemplateVersionService,
+    getFundingStreamsService, getTemplatesService
 } from "../../services/policyService";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
@@ -23,11 +24,14 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {HubConnectionBuilder} from "@aspnet/signalr";
 import {JobMessage} from "../../types/jobMessage";
+import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<CoreProviderSummary[]>([]);
+    const [templateVersionData, setTemplateVersionData] = useState<PublishedFundingTemplate[]>([]);
+    const [defaultTemplateVersionId, setDefaultTemplateVersionId] = useState<string>("");
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("");
@@ -82,6 +86,32 @@ export function CreateSpecification() {
         }
     }
 
+    function populateTemplateVersion(fundingStreamId: string, fundingPeriodId: string) {
+        if (fundingPeriodId !== "" && fundingStreamId !== "") {
+            getTemplatesService(fundingStreamId, fundingPeriodId).then(templatesResult =>{
+                if (templatesResult.status === 200 || templatesResult.status === 201) {
+                    const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
+                    getDefaultTemplateVersionService(fundingStreamId, fundingPeriodId).then(result => {
+                        const defaultTemplateVersionId = result.data as string;
+                        if (defaultTemplateVersionId != null && defaultTemplateVersionId !== "")
+                        {
+                            setDefaultTemplateVersionId(defaultTemplateVersionId);
+                            setTemplateVersionData(publishedFundingTemplates);
+                        }
+                        else
+                        {
+                            setTemplateVersionData(publishedFundingTemplates);
+                        }
+
+                    }).catch(()=>{
+                        setTemplateVersionData(publishedFundingTemplates);
+                    });
+                }
+            })
+
+        }
+    }
+
     function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
         setSelectedName(specificationName);
@@ -92,16 +122,22 @@ export function CreateSpecification() {
         setSelectedFundingStream(fundingStreamId);
         populateFundingPeriods(fundingStreamId);
         populateCoreProviders(fundingStreamId);
+
     }
 
     function selectFundingPeriod(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingPeriodId = e.target.value;
         setSelectedFundingPeriod(fundingPeriodId);
+        //populateTemplateVersion(selectedFundingStream, fundingPeriodId);
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
         setSelectedProviderVersionId(coreProviderId);
+    }
+
+    function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
+        const templateVersionId = e.target.value;
     }
 
     function saveDescriptionName(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -247,7 +283,20 @@ export function CreateSpecification() {
                                                                          value={cp.providerVersionId}>{cp.name}</option>)}
                         </select>
                     </div>
-
+                    {/*
+                    <div className="govuk-form-group">
+                        <label className="govuk-label" htmlFor="sort">
+                            Template version
+                        </label>
+                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0} onChange={(e) => selectTemplateVersion(e)}>
+                            <option value="-1">Select template version</option>
+                            {templateVersionData.map((publishedFundingTemplate, index) => <option key={index}
+                                                                          value={publishedFundingTemplate.templateVersion}
+                                                                          selected={parseFloat(defaultTemplateVersionId)===parseFloat(publishedFundingTemplate.templateVersion)}
+                            >{publishedFundingTemplate.templateVersion}</option>)}
+                        </select>
+                    </div>
+                    */}
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
                             Can you provide more detail?

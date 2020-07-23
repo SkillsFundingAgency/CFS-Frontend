@@ -362,6 +362,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestResult();
         }
 
+
         [Route("api/specs/{specificationId}/get-report-metadata/")]
         [HttpGet]
         public async Task<IActionResult> GetReportMetadata(string specificationId)

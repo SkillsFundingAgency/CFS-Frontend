@@ -4,4 +4,5 @@ export interface UpdateSpecificationViewModel {
     providerVersionId: string;
     description: string;
     fundingPeriodId: string;
+    assignedTemplateIds: { [key: string]: string[] };
 }

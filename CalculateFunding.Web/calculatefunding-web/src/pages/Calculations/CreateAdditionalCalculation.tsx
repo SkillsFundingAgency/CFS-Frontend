@@ -34,9 +34,7 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
         isSelectedForFunding: false,
         fundingStreams: [],
         dataDefinitionRelationshipIds: [],
-        templateIds: {
-            PSG: ""
-        }
+        templateIds: {"": [""]}
     });
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);

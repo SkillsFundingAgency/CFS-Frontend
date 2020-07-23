@@ -7,7 +7,7 @@ export interface Specification {
     approvalStatus: string;
     publishedResultsRefreshedAt?: null;
     lastCalculationUpdatedAt?: string | null;
-    templateIds: TemplateIds;
+    templateIds: { [key: string]: string[] };
     id: string;
     name: string;
 }
