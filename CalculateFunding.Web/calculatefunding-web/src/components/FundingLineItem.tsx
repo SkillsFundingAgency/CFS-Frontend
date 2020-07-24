@@ -6,14 +6,16 @@ export interface FundingLineItemProps {
     node: FundingLine,
     updateNode: (p: FundingLineUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string) => Promise<void>
+    deleteNode: (id: string) => Promise<void>,
+    checkIfTemplateLineIdInUse: (templateLineId: number) => boolean,
 }
 
-export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: FundingLineItemProps) {
+export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, checkIfTemplateLineIdInUse }: FundingLineItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<FundingLineType>(node.type);
     const [code, setCode] = useState<string | undefined>(node.fundingLineCode);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [templateLineId, setTemplateLineId] = useState<string>(node.templateLineId.toString());
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -29,6 +31,13 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
 
     const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCode(e.target.value);
+    }
+
+    const handleTemplateLineIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const re = /^[0-9\b]+$/;
+        if (e.target.value === '' || re.test(e.target.value)) {
+            setTemplateLineId(e.target.value);
+        }
     }
 
     const handleDelete = () => {
@@ -49,6 +58,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
             id: node.id,
             kind: node.kind,
             name: name,
+            templateLineId: parseInt(templateLineId, 10),
             type: type,
             fundingLineCode: type === FundingLineType.Payment ? code : undefined
         };
@@ -59,6 +69,10 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
 
     const isNameValid = name.length > 0;
     const isFormValid = isNameValid;
+
+    const newTemplateLineId = parseInt(templateLineId, 10);
+    const isTemplateLineIdValid = node.templateLineId === newTemplateLineId ||
+        (templateLineId.trim().length !== 0 && !checkIfTemplateLineIdInUse(newTemplateLineId));
 
     return (
         <div>
@@ -71,6 +85,13 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode }: F
                         <span className="govuk-visually-hidden">Error:</span> Name must be not be blank
                     </span>}
                     <input className="govuk-input" id="fl-name" name="fl-name" type="text" value={name} onChange={handleNameChange} />
+                </div>
+                <div className={`govuk-form-group ${!isTemplateLineIdValid ? "govuk-form-group--error" : ""}`}>
+                    <label className="govuk-label" htmlFor="template-line-id">Funding Line ID</label>
+                    {!isTemplateLineIdValid && <span id="template-line-id-error" className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> {templateLineId.length > 0 ? 'This funding line ID is already in use.' : 'Funding line ID is required.'}
+                    </span>}
+                    <input className="govuk-input" id="fl-template-line-id" name="fl-template-line-id" type="text" value={templateLineId} onChange={handleTemplateLineIdChange} />
                 </div>
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="fl-type">Type</label>

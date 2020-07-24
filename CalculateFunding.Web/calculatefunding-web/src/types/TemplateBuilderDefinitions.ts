@@ -237,6 +237,7 @@ export interface FundingLineUpdateModel extends UpdateModel {
     id: string,
     type: FundingLineType,
     name: string,
+    templateLineId: number,
     fundingLineCode?: string
 }
 
@@ -244,6 +245,7 @@ export interface CalculationUpdateModel extends UpdateModel {
     id: string,
     type: CalculationType,
     name: string,
+    templateCalculationId: number,
     aggregationType: AggregrationType,
     formulaText: string,
     valueFormat: ValueFormatType,

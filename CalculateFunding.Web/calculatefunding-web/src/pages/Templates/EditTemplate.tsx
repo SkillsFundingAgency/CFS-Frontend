@@ -26,7 +26,9 @@ import {
     updateTemplateDescription,
     getTemplateVersion,
     restoreTemplateContent,
-    findNodeById
+    findNodeById,
+    getAllTemplateCalculationIds,
+    getAllTemplateLineIds
 } from "../../services/templateBuilderDatasourceService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {
@@ -192,6 +194,7 @@ export function EditTemplate() {
     const update = (ds: FundingLineDictionaryEntry[]) => {
         updatePresentState(ds);
         setIsDirty(true);
+        showSaveMessage("");
     }
 
     const openSideBar = (open: boolean) => {
@@ -243,11 +246,8 @@ export function EditTemplate() {
         update((deepClone(ds)));
     }
 
-    function showSaveMessageOnce(message: string) {
+    function showSaveMessage(message: string) {
         setSaveMessage(message);
-        setTimeout(function () {
-            setSaveMessage("");
-        }, 5000);
     }
     
     const handleRestoreTemplateClick = async (templateVersion: number) => {
@@ -277,7 +277,7 @@ export function EditTemplate() {
                 history.push(`/Templates/${template.templateId}/Versions/${restoreResult.data}`);
             } else {
                 addErrorMessage(`Template restore failed: ${restoreResult.status} ${restoreResult.statusText}`);
-                showSaveMessageOnce("Template failed to be restored due to errors.");
+                showSaveMessage("Template failed to be restored due to errors.");
             }
         } catch (err) {
             const errStatus = err.response.status;
@@ -296,7 +296,7 @@ export function EditTemplate() {
             } else {
                 addErrorMessage(`Template could not be restored: ${err.message}.`, "template");
             }
-            showSaveMessageOnce("Template failed to be restored due to errors.");
+            showSaveMessage("Template failed to be restored due to errors.");
         } finally {
             setIsSaving(false);
         }
@@ -316,7 +316,7 @@ export function EditTemplate() {
 
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
             if (!fundingLines || fundingLines.length === 0) {
-                showSaveMessageOnce("You can't save an empty template. Add one or more funding lines and try again.");
+                showSaveMessage("You can't save an empty template. Add one or more funding lines and try again.");
                 return;
             }
 
@@ -331,13 +331,13 @@ export function EditTemplate() {
                 clearRedoState();
                 await fetchData();
                 setIsDirty(false);
-                showSaveMessageOnce("Template saved successfully.");
+                showSaveMessage("Template saved successfully.");
             } else {
                 if (saveResponse.status === 200) {
                     history.push(`/Templates/${template.templateId}/Versions/${saveResponse.data}`);
                 } else {
                     addErrorMessage(`Template save failed: ${saveResponse.status} ${saveResponse.statusText}`);
-                    showSaveMessageOnce("Template failed to save due to errors.");
+                    showSaveMessage("Template failed to save due to errors.");
                 }
             }
         } catch (err) {
@@ -357,7 +357,7 @@ export function EditTemplate() {
             } else {
                 addErrorMessage(`Template could not be saved: ${err.message}.`, "template");
             }
-            showSaveMessageOnce("Template failed to save due to errors.");
+            showSaveMessage("Template failed to save due to errors.");
         } finally {
             setIsSaving(false);
         }
@@ -478,6 +478,16 @@ export function EditTemplate() {
         }
     }
 
+    const checkIfTemplateCalculationIdInUse = (templateCalculationId: number) => {
+        const allTemplateCalculationIds: number[] = getAllTemplateCalculationIds(ds);
+        return allTemplateCalculationIds.includes(templateCalculationId);
+    }
+
+    const checkIfTemplateLineIdInUse = (templateLineId: number) => {
+        const allTemplateLineIds: number[] = getAllTemplateLineIds(ds);
+        return allTemplateLineIds.includes(templateLineId);
+    }
+
     return (
         <div>
             <Header location={Section.Templates}/>
@@ -507,8 +517,8 @@ export function EditTemplate() {
                                 </h2>
                                 <div className="govuk-error-summary__body">
                                     <ul className="govuk-list govuk-error-summary__list">
-                                        {errors.map(error =>
-                                            <li key={error.id}>
+                                        {errors.map((error, i) =>
+                                            <li key={i}>
                                                 {error.fieldName &&
                                                 <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
                                                 {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
@@ -635,8 +645,8 @@ export function EditTemplate() {
                     <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
                         <div id="template"
                              className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                            {errors.map(error => error.fieldName === "template" &&
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                            {errors.map((error, i) => error.fieldName === "template" &&
+                                <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1">
                                     <span className="govuk-visually-hidden">Error:</span> {error.message}
                                 </span>
                             )}
@@ -699,6 +709,8 @@ export function EditTemplate() {
                             openSideBar={openSideBar}
                             deleteNode={onClickDelete}
                             cloneCalculation={onCloneCalculation}
+                            checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUse}
+                            checkIfTemplateLineIdInUse={checkIfTemplateLineIdInUse}
                         />}
                              open={openSidebar}
                              onSetOpen={openSideBar}

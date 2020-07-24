@@ -32,6 +32,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-enum-values')).toHaveLength(0);
@@ -53,6 +54,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         expect(wrapper.find('#add-tag')).toHaveLength(0);
@@ -70,6 +72,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -88,6 +91,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -109,6 +113,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -129,6 +134,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Boolean" } });
@@ -145,6 +151,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-numerator')).toHaveLength(0);
@@ -164,6 +171,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-aggregation-type').simulate("change", { target: { value: "GroupRate" } });
@@ -187,6 +195,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-calculation-a')).toHaveLength(0);
@@ -206,6 +215,7 @@ describe('<CalculationItem />', () => {
             openSideBar={jest.fn()}
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={jest.fn()}
         />);
 
         wrapper.find('#calc-aggregation-type').simulate("change", { target: { value: "PercentageChangeBetweenAandB" } });
@@ -219,5 +229,68 @@ describe('<CalculationItem />', () => {
 
         // Now calculationB has 0, 3, 4 and 5
         expect(wrapper.find('#calc-calculation-b').children()).toHaveLength(4);
+    });
+
+    it("shows error if editing template calculation id and already in use", async () => {
+        const checkIfTemplateCalculationIdInUseMock = jest.fn().mockReturnValue(true);
+
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+        />);
+
+        wrapper.find('#template-calculation-id').simulate("change", { target: { value: "2" } });
+        wrapper.find('#save-button').simulate("click");
+
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(1);
+        });
+    });
+
+    it("shows error if saving empty template calculation id", async () => {
+        const checkIfTemplateCalculationIdInUseMock = jest.fn().mockReturnValue(false);
+
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+        />);
+
+        wrapper.find('#template-calculation-id').simulate("change", { target: { value: "" } });
+        wrapper.find('#save-button').simulate("click");
+
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(1);
+        });
+    });
+
+    it("does not show error if editing template calculation id and value is valid", async () => {
+        const checkIfTemplateCalculationIdInUseMock = jest.fn().mockReturnValue(false);
+
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+        />);
+
+        wrapper.find('#template-calculation-id').simulate("change", { target: { value: "2" } });
+        wrapper.find('#save-button').simulate("click");
+
+        await waitFor(() => {
+            expect(wrapper.find('.govuk-error-message')).toHaveLength(0);
+        });
     });
 });

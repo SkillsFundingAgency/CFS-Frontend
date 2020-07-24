@@ -17,7 +17,11 @@ import {
     TemplateResponse,
     TemplateContentUpdateCommand,
     CalculationDictionaryItem,
-    FundingStreamWithPeriodsResponse, GetTemplateVersionsResponse, TemplateStatus, FundingLineDictionaryItem, NodeDictionaryItem
+    FundingStreamWithPeriodsResponse,
+    GetTemplateVersionsResponse,
+    TemplateStatus,
+    FundingLineDictionaryItem,
+    NodeDictionaryItem
 } from "../types/TemplateBuilderDefinitions";
 import {TemplateSearchRequest} from "../types/searchRequestViewModel";
 import axios from "axios";
@@ -413,6 +417,26 @@ export function getLastUsedId(fundingLines: TemplateFundingLine[]): number {
     return Math.max(...ids);
 }
 
+export function getAllTemplateCalculationIds(fundingLines: FundingLineDictionaryEntry[]): number[] {
+    let ids = [];
+    const flString = JSON.stringify(fundingLines);
+    const calcMatches = flString.matchAll(/"templateCalculationId":(.*?)"/g);
+    for (const match of calcMatches) {
+        ids.push(parseInt(match[1].replace(',', ''), 10));
+    }
+    return [...new Set(ids)].sort();
+}
+
+export function getAllTemplateLineIds(fundingLines: FundingLineDictionaryEntry[]): number[] {
+    let ids = [];
+    const flString = JSON.stringify(fundingLines);
+    const calcMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
+    for (const match of calcMatches) {
+        ids.push(parseInt(match[1].replace(',', ''), 10));
+    }
+    return [...new Set(ids)].sort();
+}
+
 export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDictionaryItem[] => {
     const result: CalculationDictionaryItem[] = [];
 
@@ -586,12 +610,12 @@ export async function createNewDraftTemplate(fundingStreamId: string, fundingPer
 }
 
 export async function cloneNewTemplateFromExisting(
-    fromTemplateId: string, fromTemplateVersion: number, fundingStreamId: string, fundingPeriodId: string, description: string): 
+    fromTemplateId: string, fromTemplateVersion: number, fundingStreamId: string, fundingPeriodId: string, description: string):
     Promise<AxiosResponse<string>> {
     return await axios(`/api/templates/build/clone`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: { cloneFromTemplateId: fromTemplateId, version: fromTemplateVersion, fundingStreamId, fundingPeriodId, description }
+        headers: {'Content-Type': 'application/json'},
+        data: {cloneFromTemplateId: fromTemplateId, version: fromTemplateVersion, fundingStreamId, fundingPeriodId, description}
     })
 }
 

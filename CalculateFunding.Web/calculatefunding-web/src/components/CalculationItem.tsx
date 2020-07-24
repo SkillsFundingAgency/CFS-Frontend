@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
-import { TagEditor } from "./TagEditor";
+import React, {useState} from "react";
+import {Calculation, CalculationType, ValueFormatType, CalculationUpdateModel, AggregrationType, GroupRate, PercentageChangeBetweenAandB, CalculationAggregationType, CalculationDictionaryItem} from '../types/TemplateBuilderDefinitions';
+import {TagEditor} from "./TagEditor";
 import "../styles/CalculationItem.scss";
-import { getStringArray, stringArrayToString } from "../services/templateBuilderDatasourceService";
+import {getStringArray, stringArrayToString} from "../services/templateBuilderDatasourceService";
 
 export interface CalculationItemProps {
     node: Calculation,
@@ -11,9 +11,10 @@ export interface CalculationItemProps {
     openSideBar: (open: boolean) => void,
     deleteNode: (id: string) => Promise<void>,
     cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
+    checkIfTemplateCalculationIdInUse: (templateCalculationId: number) => boolean,
 }
 
-export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNode, cloneCalculation }: CalculationItemProps) {
+export function CalculationItem({node, calcs, updateNode, openSideBar, deleteNode, cloneCalculation, checkIfTemplateCalculationIdInUse}: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string>(node.allowedEnumTypeValues || "");
@@ -28,6 +29,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [cloneId, setCloneId] = useState<string>('');
     const [saved, setSaved] = useState<boolean>(false);
+    const [templateCalculationId, setTemplateCalculationId] = useState<string>(node.templateCalculationId.toString());
 
     const isClone = node.id.includes(":");
 
@@ -105,6 +107,13 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
         setCloneId(e.target.value);
     }
 
+    const handleTemplateCalculationIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const re = /^[0-9\b]+$/;
+        if (e.target.value === '' || re.test(e.target.value)) {
+            setTemplateCalculationId(e.target.value);
+        }
+    }
+
     const handleDelete = () => {
         setConfirmDelete(true);
     }
@@ -145,6 +154,7 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
             id: node.id,
             kind: node.kind,
             name: name,
+            templateCalculationId: parseInt(templateCalculationId, 10),
             type: type,
             formulaText: formulaText,
             valueFormat: valueFormat,
@@ -189,13 +199,18 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
     const isPecentageChangeBetweenAandBValid = aggregationType !== AggregrationType.PercentageChangeBetweenAandB ||
         (aggregationType === AggregrationType.PercentageChangeBetweenAandB && calculationA !== 0 && calculationB !== 0);
 
+    const newTemplateCalculationId = parseInt(templateCalculationId, 10);
+    const isTemplateCalculationIdValid = node.templateCalculationId === newTemplateCalculationId ||
+        (templateCalculationId.trim().length !== 0 && !checkIfTemplateCalculationIdInUse(newTemplateCalculationId));
+
     const isFormValid = () => {
         const hasValidAllowedEnumTypes = type === CalculationType.Enum && allowedEnumTypeValues.trim().length === 0;
         return (
             isNameValid &&
             !hasValidAllowedEnumTypes &&
             isGroupRateValid &&
-            isPecentageChangeBetweenAandBValid
+            isPecentageChangeBetweenAandBValid &&
+            isTemplateCalculationIdValid
         );
     }
 
@@ -210,6 +225,13 @@ export function CalculationItem({ node, calcs, updateNode, openSideBar, deleteNo
                         <span className="govuk-visually-hidden">Error:</span> Name must be not be blank
                     </span>}
                     <input className="govuk-input" id="calc-name" name="calc-name" type="text" value={name} onChange={handleNameChange} />
+                </div>
+                <div className={`govuk-form-group ${saved && !isTemplateCalculationIdValid ? "govuk-form-group--error" : ""}`}>
+                    <label className="govuk-label" htmlFor="calc-template-calculation-id">Calculation ID</label>
+                    {saved && !isTemplateCalculationIdValid && <span id="template-calculation-id-error" className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> {templateCalculationId.length > 0 ? 'This calculation ID is already in use.' : 'Calculation ID is required.'}
+                    </span>}
+                    <input className="govuk-input" id="template-calculation-id" name="template-calculation-id" type="text" value={templateCalculationId} onChange={handleTemplateCalculationIdChange} />
                 </div>
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calc-type">Type</label>

@@ -1,6 +1,6 @@
 import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf } from "../../services/templateBuilderDatasourceService";
-import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel } from "../../types/TemplateBuilderDefinitions";
+import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf, getAllTemplateCalculationIds, getAllTemplateLineIds } from "../../services/templateBuilderDatasourceService";
+import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationUpdateModel, CalculationType, AggregrationType, ValueFormatType, Calculation } from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
 import { v4 as uuidv4 } from 'uuid';
 jest.mock('uuid');
@@ -79,12 +79,13 @@ it("adds new node", async () => {
     expect(incrementNextId).toBeCalledTimes(1);
 });
 
-it("updates node", async () => {
+it("updates funding line node", async () => {
     const updateModel: FundingLineUpdateModel = {
         id: key1RootId,
         type: FundingLineType.Payment,
         kind: NodeType.FundingLine,
         name: "New Name",
+        templateLineId: 2,
         fundingLineCode: "1"
     };
 
@@ -93,7 +94,41 @@ it("updates node", async () => {
     const updatedNode = ds.find(d => d.key === 1)?.value;
 
     expect(updatedNode?.name).toBe("New Name");
+    expect(updatedNode?.templateLineId).toBe(2);
     expect(updatedNode?.type).toBe(FundingLineType.Payment);
+});
+
+it("updates calculation node", async () => {
+    const calc: Calculation = {
+        id: "n4",
+        type: CalculationType.Cash,
+        kind: NodeType.Calculation,
+        name: "Original Name",
+        templateCalculationId: 1,
+        aggregationType: AggregrationType.None,
+        formulaText: "",
+        valueFormat: ValueFormatType.Currency
+    };
+
+    await addNode(ds, key1RootId, calc, incrementNextId);
+
+    const updateModel: CalculationUpdateModel = {
+        id: "n4",
+        type: CalculationType.Cash,
+        kind: NodeType.Calculation,
+        name: "New Name",
+        aggregationType: AggregrationType.None,
+        valueFormat: ValueFormatType.Currency,
+        formulaText: "",
+        templateCalculationId: 2
+    };
+
+    await updateNode(ds, updateModel);
+
+    const updatedNode = (ds.find(d => d.key === 1)?.value.children?.find(c => c.id === "n4"));
+    if (!updatedNode) throw new Error('Unexpected undefined value');
+
+    expect((updatedNode as Calculation).templateCalculationId).toBe(2);
 });
 
 it("finds all cloned nodes correctly", async () => {
@@ -426,4 +461,22 @@ it("calculates isChildOf correctly", async () => {
     expect(await isChildOf(multipleCalculationsDs, "n5", "n3")).toBeTruthy();
     expect(await isChildOf(multipleCalculationsDs, "n5", "n7")).toBeFalsy();
     expect(await isChildOf(multipleCalculationsDs, "n7", "n6")).toBeTruthy();
+});
+
+it("calculates all templateCalculationIds correctly", () => {
+    expect(getAllTemplateCalculationIds(singleNodeDs)).toEqual([]);
+    expect(getAllTemplateCalculationIds(multipleCalculationsDs)).toEqual([2,3,4,6]);
+    expect(getAllTemplateCalculationIds(withChildFundingLineAndCalculationDs)).toEqual([3]);
+    expect(getAllTemplateCalculationIds(withChildFundingLineDs)).toEqual([]);
+    expect(getAllTemplateCalculationIds(multipleFundingLinesDs)).toEqual([4]);
+    expect(getAllTemplateCalculationIds(clonedNodeDs)).toEqual([4]);
+});
+
+it("calculates all templateLineIds correctly", () => {
+    expect(getAllTemplateLineIds(singleNodeDs)).toEqual([0]);
+    expect(getAllTemplateLineIds(multipleCalculationsDs)).toEqual([0,1,5,7]);
+    expect(getAllTemplateLineIds(withChildFundingLineAndCalculationDs)).toEqual([0,1,2]);
+    expect(getAllTemplateLineIds(withChildFundingLineDs)).toEqual([0,1]);
+    expect(getAllTemplateLineIds(multipleFundingLinesDs)).toEqual([0,1,2,3]);
+    expect(getAllTemplateLineIds(clonedNodeDs)).toEqual([0,1,2,3]);
 });
