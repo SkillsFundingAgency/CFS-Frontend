@@ -33,6 +33,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-enum-values')).toHaveLength(0);
@@ -55,6 +56,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         expect(wrapper.find('#add-tag')).toHaveLength(0);
@@ -73,6 +75,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -92,6 +95,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -114,6 +118,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Enum" } });
@@ -135,6 +140,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-type').simulate("change", { target: { value: "Boolean" } });
@@ -152,6 +158,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-numerator')).toHaveLength(0);
@@ -172,6 +179,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-aggregation-type').simulate("change", { target: { value: "GroupRate" } });
@@ -196,6 +204,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         expect(wrapper.find('#calc-calculation-a')).toHaveLength(0);
@@ -216,6 +225,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={jest.fn()}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#calc-aggregation-type').simulate("change", { target: { value: "PercentageChangeBetweenAandB" } });
@@ -242,6 +252,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#template-calculation-id').simulate("change", { target: { value: "2" } });
@@ -263,6 +274,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+            refreshNextId={jest.fn()}
         />);
 
         wrapper.find('#template-calculation-id').simulate("change", { target: { value: "" } });
@@ -275,6 +287,7 @@ describe('<CalculationItem />', () => {
 
     it("does not show error if editing template calculation id and value is valid", async () => {
         const checkIfTemplateCalculationIdInUseMock = jest.fn().mockReturnValue(false);
+        const refreshNextIdMock = jest.fn();
 
         const wrapper = mount(<CalculationItem
             node={calc}
@@ -284,6 +297,7 @@ describe('<CalculationItem />', () => {
             deleteNode={jest.fn()}
             cloneCalculation={jest.fn()}
             checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUseMock}
+            refreshNextId={refreshNextIdMock}
         />);
 
         wrapper.find('#template-calculation-id').simulate("change", { target: { value: "2" } });
@@ -292,5 +306,7 @@ describe('<CalculationItem />', () => {
         await waitFor(() => {
             expect(wrapper.find('.govuk-error-message')).toHaveLength(0);
         });
+
+        expect(refreshNextIdMock).toHaveBeenCalled();
     });
 });

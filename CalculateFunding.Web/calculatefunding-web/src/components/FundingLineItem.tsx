@@ -8,9 +8,17 @@ export interface FundingLineItemProps {
     openSideBar: (open: boolean) => void,
     deleteNode: (id: string) => Promise<void>,
     checkIfTemplateLineIdInUse: (templateLineId: number) => boolean,
+    refreshNextId: () => void,
 }
 
-export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, checkIfTemplateLineIdInUse }: FundingLineItemProps) {
+export function FundingLineItem({
+    node,
+    updateNode,
+    openSideBar,
+    deleteNode,
+    checkIfTemplateLineIdInUse,
+    refreshNextId
+}: FundingLineItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<FundingLineType>(node.type);
     const [code, setCode] = useState<string | undefined>(node.fundingLineCode);
@@ -53,7 +61,7 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, che
         openSideBar(false);
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         var updatedNode: FundingLineUpdateModel = {
             id: node.id,
             kind: node.kind,
@@ -63,7 +71,8 @@ export function FundingLineItem({ node, updateNode, openSideBar, deleteNode, che
             fundingLineCode: type === FundingLineType.Payment ? code : undefined
         };
 
-        updateNode(updatedNode);
+        await updateNode(updatedNode);
+        refreshNextId();
         openSideBar(false);
     }
 

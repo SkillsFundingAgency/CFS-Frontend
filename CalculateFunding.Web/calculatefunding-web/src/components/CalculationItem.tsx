@@ -12,9 +12,19 @@ export interface CalculationItemProps {
     deleteNode: (id: string) => Promise<void>,
     cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
     checkIfTemplateCalculationIdInUse: (templateCalculationId: number) => boolean,
+    refreshNextId: () => void,
 }
 
-export function CalculationItem({node, calcs, updateNode, openSideBar, deleteNode, cloneCalculation, checkIfTemplateCalculationIdInUse}: CalculationItemProps) {
+export function CalculationItem({
+    node,
+    calcs,
+    updateNode,
+    openSideBar,
+    deleteNode,
+    cloneCalculation,
+    checkIfTemplateCalculationIdInUse,
+    refreshNextId
+}: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string>(node.allowedEnumTypeValues || "");
@@ -135,7 +145,7 @@ export function CalculationItem({node, calcs, updateNode, openSideBar, deleteNod
         openSideBar(false);
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setSaved(true);
         if (!isFormValid()) return;
 
@@ -164,7 +174,8 @@ export function CalculationItem({node, calcs, updateNode, openSideBar, deleteNod
             percentageChangeBetweenAandB: aggregationType !== AggregrationType.PercentageChangeBetweenAandB ? undefined : percentageChangeBetweenAandB
         };
 
-        updateNode(updatedNode);
+        await updateNode(updatedNode);
+        refreshNextId();
         openSideBar(false);
     }
 

@@ -221,6 +221,10 @@ export function EditTemplate() {
         setNextId(nextId + 1);
     }
 
+    const refreshNextId = () => {
+        setNextId(getLastUsedId(ds) + 1);
+    }
+
     const onClickAdd = async (id: string, newChild: FundingLine | Calculation) => {
         await addNode(ds, id, newChild, incrementNextId);
         update((deepClone(ds)));
@@ -374,7 +378,7 @@ export function EditTemplate() {
             return (prev.key > current.key ? prev : current)
         }).key : 0;
         const id = nextId;
-        setNextId(nextId + 1);
+        incrementNextId();
 
         const fundingLine: FundingLine = {
             id: `n${id}`,
@@ -711,6 +715,7 @@ export function EditTemplate() {
                             cloneCalculation={onCloneCalculation}
                             checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUse}
                             checkIfTemplateLineIdInUse={checkIfTemplateLineIdInUse}
+                            refreshNextId={refreshNextId}
                         />}
                              open={openSidebar}
                              onSetOpen={openSideBar}

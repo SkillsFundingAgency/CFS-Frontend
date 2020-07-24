@@ -403,7 +403,7 @@ export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionary
     return templateFundingLines;
 }
 
-export function getLastUsedId(fundingLines: TemplateFundingLine[]): number {
+export function getLastUsedId(fundingLines: TemplateFundingLine[] | FundingLineDictionaryEntry[]): number {
     let ids = [];
     const flString = JSON.stringify(fundingLines);
     const flMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
