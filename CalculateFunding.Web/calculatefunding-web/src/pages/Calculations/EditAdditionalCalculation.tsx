@@ -15,6 +15,7 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -298,7 +299,11 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
                     </button>
+
                     <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
+                </div>
+                <div className="govuk-form-group">
+                    <CalculationResultsLink calculationId={calculationId} />
                 </div>
                 <div className="govuk-panel govuk-panel--confirmation"
                      hidden={!additionalCalculationBuildSuccess.buildSuccess}>
@@ -306,14 +311,12 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                         Build successful
                     </div>
                 </div>
-
                 <div
                     className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <div
                         className="govuk-body">Your calculation’s build output must be successful before you can save it
                     </div>
                 </div>
-
                 <div
                     hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>

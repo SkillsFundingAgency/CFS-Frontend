@@ -25,6 +25,7 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
 import {DateFormatter} from "../../components/DateFormatter";
+import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -297,7 +298,9 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         Build calculation
                     </button>
                 </div>
-
+                <div className="govuk-form-group">
+                    <CalculationResultsLink calculationId={calculationId} />
+                </div>
                 <div className="govuk-panel govuk-panel--confirmation"
                      hidden={!templateCalculationBuildSuccess.buildSuccess}>
                     <div className="govuk-panel__body">
