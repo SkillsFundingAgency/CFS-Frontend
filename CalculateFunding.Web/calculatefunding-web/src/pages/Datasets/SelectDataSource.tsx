@@ -162,7 +162,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                     {selectDatasets.content.map(d =>
                                             <>
                                                 <div className="govuk-radios__item">
-                                                    <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-${d.id}`} type="radio" value={d.id} aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false" onChange={(e) => populateVersions(e)}/>
+                                                    <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio" value={d.id} aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false" onChange={(e) => populateVersions(e)}/>
                                                     <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
                                                         {d.datasetName}
                                                         <span className="govuk-hint">
@@ -170,14 +170,14 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                         </span>
                                                     </label>
                                                 </div>
-                                                <div className="govuk-radios__conditional" id="conditional-how-contacted-conditional" hidden={datasourceVersions.datasets.filter(x => x.id === d.datasetId).length === 0}>
+                                                <div className="govuk-radios__conditional" id="dataset-datasource-radioset" hidden={datasourceVersions.datasets === null || datasourceVersions.datasets.filter(x => x.id === d.datasetId).length === 0}>
                                                     <div className="govuk-form-group">
                                                         <fieldset className="govuk-fieldset">
                                                             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
                                                                 <h4 className="govuk-heading-s">Select data source version</h4>
                                                             </legend>
                                                             <div className="govuk-radios govuk-radios--small">
-                                                                {datasourceVersions.datasets.slice(0, 5).map((ds, index) =>
+                                                                {datasourceVersions.datasets !== null ? datasourceVersions.datasets.slice(0, 5).map((ds, index) =>
                                                                         <div className="govuk-radios__item" key={index}>
                                                                             <input className="govuk-radios__input" id={`datasource-${ds.id}`} name={`datasource-${ds.id}`} type="radio" value={ds.id} onChange={(e) => saveSelection(e)}/>
                                                                             <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${ds.id}`}>
@@ -198,12 +198,12 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                                                 </div>
                                                                             </label>
                                                                         </div>
-                                                                )}
+                                                                ) : ""}
                                                             </div>
                                                         </fieldset>
                                                     </div>
-                                                    <p className="govuk-body govuk-!-margin-top-5" hidden={datasourceVersions.datasets.length <= 5}>
-                                                        <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${d.datasetId}`} className="govuk-link">View {datasourceVersions.datasets.length - 5} more versions</Link>
+                                                    <p className="govuk-body govuk-!-margin-top-5" hidden={datasourceVersions.datasets === null || datasourceVersions.datasets.length <= 5}>
+                                                        <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${d.datasetId}`} className="govuk-link">View {datasourceVersions.datasets !== null ? datasourceVersions.datasets.length - 5 : ""} more versions</Link>
                                                     </p>
                                                 </div>
                                             </>
