@@ -40,7 +40,7 @@ export function MapDataSourceFiles() {
         endItemNumber: 0,
         pagerState: {
             currentPage: 0,
-            displayNumberOfPages:0,
+            displayNumberOfPages: 0,
             lastPage: 0,
             nextPage: 0,
             pages: [],
@@ -55,7 +55,7 @@ export function MapDataSourceFiles() {
     const [filterFundingPeriodsInitialResult, setFilterFundingPeriodsInitialResult] = useState<string[]>(initialFacets);
     const [datasetRelationships, setDatasetRelationships] = useState<SpecificationDatasourceRelationshipViewModel>(initialDatasetRelationships);
 
-    useEffect(()=>{
+    useEffect(() => {
         searchDatasetRelationships(searchRequest);
     }, [searchRequest]);
 
@@ -66,13 +66,12 @@ export function MapDataSourceFiles() {
                 const result = response.data as SpecificationDatasourceRelationshipViewModel;
                 setDatasetRelationships(result);
 
-                if (result.items.length > 0)
-                {
+                if (result.items.length > 0) {
                     const items = result.items;
                     let fundingStreamsResult: string[] = [];
-                    items.map(item=> {
+                    items.map(item => {
                         if (item.fundingStreamNames != null) {
-                            item.fundingStreamNames.map(f=>{
+                            item.fundingStreamNames.map(f => {
                                 fundingStreamsResult.push(f)
                             })
                         }
@@ -82,7 +81,7 @@ export function MapDataSourceFiles() {
                     setFilterFundingStreams(fundingStreamsResult);
 
                     let fundingPeriodsResult: string[] = [];
-                    items.map(item=> {
+                    items.map(item => {
                         if (item.fundingPeriodName != null) {
                             fundingPeriodsResult.push(item.fundingPeriodName)
                         }
@@ -148,14 +147,12 @@ export function MapDataSourceFiles() {
         }
     }
 
-    function filterSearch(keywords: string, originalFilters: string[], currentFilters: string[])
-    {
+    function filterSearch(keywords: string, originalFilters: string[], currentFilters: string[]) {
         if (keywords.length >= 3) {
             const copyOfFilters: string[] = originalFilters as string[];
             return copyOfFilters.filter(x => x.toLowerCase().includes(keywords.toLowerCase()));
         }
-        if (keywords.length === 0)
-        {
+        if (keywords.length === 0) {
             return originalFilters;
         }
         return currentFilters;
@@ -168,8 +165,7 @@ export function MapDataSourceFiles() {
                 return {...prevState, searchTerm: term}
             });
         }
-        if (term.length === 0)
-        {
+        if (term.length === 0) {
             setSearchRequest(prevState => {
                 return {...prevState, searchTerm: ""}
             });
@@ -179,6 +175,7 @@ export function MapDataSourceFiles() {
     function searchFundingStreamFilters(e: React.ChangeEvent<HTMLInputElement>) {
         setFilterFundingStreams(filterSearch(e.target.value, filterFundingStreamsInitialResult, filterFundingStreams));
     }
+
     function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
         filterResults("fundingStreamNames", e.target.value, e.target.checked);
     }
@@ -186,6 +183,7 @@ export function MapDataSourceFiles() {
     function searchFundingPeriodFilters(e: React.ChangeEvent<HTMLInputElement>) {
         setFilterFundingPeriods(filterSearch(e.target.value, filterFundingPeriodsInitialResult, filterFundingPeriods));
     }
+
     function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
         filterResults("fundingPeriodName", e.target.value, e.target.checked);
     }
@@ -232,6 +230,7 @@ export function MapDataSourceFiles() {
                                                    id={`fundingstream-${f}`}
                                                    name={`fundingstream-${f}`}
                                                    type="checkbox" value={f}
+                                                   checked={searchRequest.filters["fundingStreamNames"] !== undefined &&  searchRequest.filters["fundingStreamNames"].includes(f)}
                                                    onChange={(e) => filterByFundingStream(e)}/>
                                             <label className="govuk-label govuk-checkboxes__label"
                                                    htmlFor={`fundingstream-${f}`}>
@@ -257,6 +256,7 @@ export function MapDataSourceFiles() {
                                                    id={`fundingperiod-${f}`}
                                                    name={`fundingperiod-${f}`}
                                                    type="checkbox" value={f}
+                                                   checked={searchRequest.filters["fundingPeriodName"] !== undefined &&  searchRequest.filters["fundingPeriodName"].includes(f)}
                                                    onChange={(e) => filterByFundingPeriod(e)}/>
                                             <label className="govuk-label govuk-checkboxes__label"
                                                    htmlFor={`fundingperiod-${f}`}>
@@ -275,7 +275,7 @@ export function MapDataSourceFiles() {
 
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatus title={"Loading data source file results"} hidden={!isLoading}/>
-                    <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading} />
+                    <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading}/>
                     <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
                         <thead className="govuk-table__head">
                         <tr className="govuk-table__row">
@@ -292,7 +292,7 @@ export function MapDataSourceFiles() {
                                     <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
                                         {dr.specificationName}
                                     </Link>
-                                    <p className="govuk-body">{dr.definitionRelationshipCount > 0? dr.definitionRelationshipCount : "no" } datasets exist for specification</p>
+                                    <p className="govuk-body">{dr.definitionRelationshipCount > 0 ? dr.definitionRelationshipCount : "no"} datasets exist for specification</p>
                                 </th>
                                 <td className="govuk-table__cell"></td>
 
@@ -300,7 +300,7 @@ export function MapDataSourceFiles() {
                         )}
                         </tbody>
                     </table>
-                    <BackToTop id={"top"} />
+                    <BackToTop id={"top"}/>
                     <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">
                         <div className="pagination__summary">Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of {datasetRelationships.totalCount} results</div>
