@@ -457,7 +457,7 @@ namespace CalculateFunding.Frontend.Controllers
                 
                 PagedDatasetSearchResults searchPagedResult = new PagedDatasetSearchResults
                 {
-                    Items = result.Content.Datasets,
+                    Items = result.Content.Datasets.Skip(startNumber - 1).Take(5),
                     TotalCount = result.Content.Datasets.Count(),
                     PagerState = new PagerState(search.PageNumber, totalPages),
                     StartItemNumber = startNumber,

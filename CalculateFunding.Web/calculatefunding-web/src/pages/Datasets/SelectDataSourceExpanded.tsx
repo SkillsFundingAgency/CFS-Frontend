@@ -59,7 +59,10 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
             id: "",
             name: ""
         },
-        fundingStreams: [],
+        fundingStreams: [{
+            id: "",
+            name: ""
+        }],
         id: "",
         isSelectedForFunding: false,
         name: "",
@@ -70,12 +73,12 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         facets: [],
         items: [],
         pagerState: {
-            previousPage:0,
-            nextPage:0,
-            displayNumberOfPages:0,
-            pages:[],
-            currentPage:0,
-            lastPage:0
+            previousPage: 0,
+            nextPage: 0,
+            displayNumberOfPages: 0,
+            pages: [],
+            currentPage: 0,
+            lastPage: 0
         },
         startItemNumber: 0,
         totalCount: 0
@@ -93,15 +96,9 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                 const result = response.data as SpecificationSummary;
                 setSpecificationSummary(result);
             }
-        });
-        getDatasetBySpecificationIdService(match.params.specificationId).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as SelectDatasetResponseViewModel;
-                setSelectedDataset(result.content.filter(x => x.datasetId === match.params.datasetId)[0]);
-                setDatasourceIsLoading(false);
 
-                populateExpandedDatasources(result.content.filter(x => x.datasetId === match.params.datasetId)[0].id, searchRequest);
-            }
+            populateExpandedDatasources(match.params.datasetId, searchRequest);
+            setDatasourceIsLoading(false);
         });
     });
 
@@ -109,7 +106,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         history.goBack();
     }
 
-    function populateExpandedDatasources(relationshipId: string, searchRequest : DatasourceVersionSearchModel) {
+    function populateExpandedDatasources(relationshipId: string, searchRequest: DatasourceVersionSearchModel) {
         getExpandedDataSources(relationshipId, searchRequest).then((response) => {
             if (response.status === 200) {
                 const result = response.data as DatasetRelationshipPagedResponseViewModel;
@@ -129,7 +126,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         if (selectedVersion !== "") {
             setErrorState(false);
             setSaveErrorState(false);
-            assignDataSourceService(selectedDataset.id, specificationSummary.id, selectedVersion).then((response) => {
+            assignDataSourceService(match.params.datasetId, specificationSummary.id, selectedVersion).then((response) => {
                 if (response.status === 200) {
                     history.push("");
                 } else {
@@ -145,7 +142,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         let search = searchRequest;
         search.pageNumber = e;
         setSearchRequest(search);
-        populateExpandedDatasources(selectedDataset.id, searchRequest);
+        populateExpandedDatasources(match.params.datasetId, searchRequest);
     }
 
     return (<div>
@@ -164,7 +161,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                 </div>
                 <div className="govuk-grid-row" hidden={!datasourceIsLoading}>
                     <div className="govuk-grid-column-full">
-                    <LoadingStatus title={"Loading datasources"}/>
+                        <LoadingStatus title={"Loading datasources"}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row" hidden={datasourceIsLoading}>
@@ -176,7 +173,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                         <h3 className="govuk-heading-m">
                             {selectedDataset.name}
                             <span className="govuk-hint">
-                                <strong>Description:</strong> {selectedDataset.relationshipDescription}
+                                <strong>Description:</strong> {specificationSummary.description}
                             </span>
                         </h3>
                         <div className="govuk-form-group">

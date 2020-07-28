@@ -113,7 +113,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
 
                                     <tr key={index} className="govuk-table__row">
                                         <th scope="row" className="govuk-table__header">
-                                            {sdr.datasetName}
+                                            {sdr.relationName}
                                             {sdr.isProviderData ? <span className="govuk-body-s govuk-!-margin-left-1">(Provider data)</span> : ""}
                                             <details className="govuk-details govuk-!-margin-bottom-0 govuk-!-margin-top-2" data-module="govuk-details">
                                                 <summary className="govuk-details__summary">
@@ -133,7 +133,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                         </th>
                                         <td className="govuk-table__cell">{sdr.datasetPhrase}</td>
                                         <td className="govuk-table__cell">
-                                                <Link to={`/Datasets/SelectDataSource/${datasetRelationships.specification.id}`} className="govuk-link">{sdr.linkPhrase}</Link>
+                                                <Link to={`/Datasets/SelectDataSource/${sdr.relationshipId}`} className="govuk-link">{sdr.linkPhrase}</Link>
                                         </td>
                                     </tr>
                             )}

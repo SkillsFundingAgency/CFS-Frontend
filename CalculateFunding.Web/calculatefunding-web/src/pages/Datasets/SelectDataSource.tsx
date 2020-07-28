@@ -3,23 +3,21 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {assignDataSourceService, getDatasetBySpecificationIdService, getDatasourcesByRelationshipIdService} from "../../services/datasetService";
 import {RouteComponentProps, useHistory} from "react-router";
 import {DateFormatter} from "../../components/DateFormatter";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {getSpecificationSummaryService} from "../../services/specificationService";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {SelectDatasetResponseViewModel} from "../../types/Datasets/SelectDatasetResponseViewModel";
 import {DatasourceRelationshipResponseViewModel} from "../../types/Datasets/DatasourceRelationshipResponseViewModel";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
+import {assignDataSourceService, getDatasourcesByRelationshipIdService} from "../../services/datasetService";
+import {getSpecificationSummaryService} from "../../services/specificationService";
 
 export interface SelectDataSourceRouteProps {
     specificationId: string
 }
 
 export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRouteProps>) {
-    const [selectDatasets, setSelectDatasets] = useState<SelectDatasetResponseViewModel>({content: [], statusCode: 0});
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         approvalStatus: "",
         description: "",
@@ -46,7 +44,8 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                 date: new Date(),
                 id: "",
                 version: 0
-            }]
+            }],
+            description:""
         }],
         definitionId: "",
         definitionName: "",
@@ -59,33 +58,30 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [selectedVersion, setSelectedVersion] = useState<string>("");
     const [errorState, setErrorState] = useState<boolean>(false);
     const [saveErrorState, setSaveErrorState] = useState<boolean>(false);
+    const [selectedDataset, setSelectedDataset] = useState<string>("");
 
     let history = useHistory();
 
     useEffectOnce(() => {
-        getSpecificationSummaryService(match.params.specificationId).then((response) => {
+        getDatasourcesByRelationshipIdService(match.params.specificationId).then((response) => {
             if (response.status === 200) {
-                const result = response.data as SpecificationSummary;
-                setSpecificationSummary(result);
+                const result = response.data as DatasourceRelationshipResponseViewModel;
+                setDatasourceVersions(result);
+
+                getSpecificationSummaryService(result.specificationId).then((response) => {
+                    if (response.status === 200) {
+                        const result = response.data as SpecificationSummary;
+                        setSpecificationSummary(result);
+                    }
+                });
             }
-        });
-        getDatasetBySpecificationIdService(match.params.specificationId).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as SelectDatasetResponseViewModel;
-                setSelectDatasets(result);
-                setDatasourceIsLoading(false);
-            }
+            setDatasourceIsLoading(false);
         });
     });
 
     function populateVersions(e: React.ChangeEvent<HTMLInputElement>) {
-        const relationshipId = e.target.value;
-        getDatasourcesByRelationshipIdService(relationshipId).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as DatasourceRelationshipResponseViewModel;
-                setDatasourceVersions(result);
-            }
-        });
+        const selectedRadioButton = e.target.value;
+        setSelectedDataset(selectedRadioButton);
     }
 
     function changeSelection() {
@@ -104,13 +100,13 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
             setErrorState(false);
             setSaveErrorState(false);
             assignDataSourceService(datasourceVersions.relationshipId, specificationSummary.id, selectedVersion).then((response) => {
-                    if (response.status === 200) {
-                        history.push("");
-                    } else {
-                        setErrorState(true);
-                    }
-                }).catch((e) => {
-                    setSaveErrorState(true);
+                if (response.status === 200) {
+                    history.push("");
+                } else {
+                    setErrorState(true);
+                }
+            }).catch((e) => {
+                setSaveErrorState(true);
             });
         }
     }
@@ -135,7 +131,6 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                     </div>
                 </div>
                 <div className="govuk-grid-row" hidden={datasourceIsLoading}>
-
                     <div className="govuk-grid-column-full">
                         <h1 className="govuk-heading-xl">
                             {specificationSummary.name}
@@ -159,61 +154,61 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
       Select one option.
     </span>
                                 <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                                    {selectDatasets.content.map(d =>
-                                            <>
-                                                <div className="govuk-radios__item">
-                                                    <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio" value={d.id} aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false" onChange={(e) => populateVersions(e)}/>
-                                                    <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
-                                                        {d.datasetName}
-                                                        <span className="govuk-hint">
-                                        <strong>Description:</strong> {d.relationshipDescription}
+                                    {datasourceVersions.datasets.map(d =>
+                                        <>
+                                            <div className="govuk-radios__item">
+                                                <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio" value={d.id} aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false" onChange={(e) => populateVersions(e)}/>
+                                                <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
+                                                    {d.name}
+                                                    <span className="govuk-hint">
+                                        <strong>Description:</strong> {d.description}
                                         </span>
-                                                    </label>
-                                                </div>
-                                                <div className="govuk-radios__conditional" id="dataset-datasource-radioset" hidden={datasourceVersions.datasets === null || datasourceVersions.datasets.filter(x => x.id === d.datasetId).length === 0}>
-                                                    <div className="govuk-form-group">
-                                                        <fieldset className="govuk-fieldset">
-                                                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                                                <h4 className="govuk-heading-s">Select data source version</h4>
-                                                            </legend>
-                                                            <div className="govuk-radios govuk-radios--small">
-                                                                {datasourceVersions.datasets !== null ? datasourceVersions.datasets.slice(0, 5).map((ds, index) =>
-                                                                        <div className="govuk-radios__item" key={index}>
-                                                                            <input className="govuk-radios__input" id={`datasource-${ds.id}`} name={`datasource-${ds.id}`} type="radio" value={ds.id} onChange={(e) => saveSelection(e)}/>
-                                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${ds.id}`}>
-                                                                                {ds.name}
-                                                                                <div className="govuk-!-margin-top-1">
-                                                                                    <details className="govuk-details  summary-margin-removal" data-module="govuk-details">
-                                                                                        <div className="govuk-details__text summary-margin-removal">
-                                                                                            <p className="govuk-body-s">
-                                                                                                <strong>Version notes:</strong>
-                                                                                            </p>
-                                                                                            <p className="govuk-body-s">
-                                                                                                <strong>Last updated:</strong> <DateFormatter date={ds.versions[0].date} utc={true}/></p>
-                                                                                            <p className="govuk-body-s">
-                                                                                                <strong>Last updated by:</strong> {ds.versions[0].author.name}
-                                                                                            </p>
-                                                                                        </div>
-                                                                                    </details>
+                                                </label>
+                                            </div>
+                                            <div className="govuk-radios__conditional" id="conditional-how-contacted-conditional" hidden={d.id !== selectedDataset}>
+                                                <div className="govuk-form-group">
+                                                    <fieldset className="govuk-fieldset">
+                                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                                            <h4 className="govuk-heading-s">Select data source version</h4>
+                                                        </legend>
+                                                        <div className="govuk-radios govuk-radios--small">
+                                                            {datasourceVersions.datasets.slice(0, 5).map((ds, index) =>
+                                                                <div className="govuk-radios__item" key={index}>
+                                                                    <input className="govuk-radios__input" id={`datasource-${ds.id}`} name={`datasource-${ds.id}`} type="radio" value={ds.id} onChange={(e) => saveSelection(e)}/>
+                                                                    <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${ds.id}`}>
+                                                                        {ds.name}
+                                                                        <div className="govuk-!-margin-top-1">
+                                                                            <details className="govuk-details  summary-margin-removal" data-module="govuk-details">
+                                                                                <div className="govuk-details__text summary-margin-removal">
+                                                                                    <p className="govuk-body-s">
+                                                                                        <strong>Version notes:</strong>
+                                                                                    </p>
+                                                                                    <p className="govuk-body-s">
+                                                                                        <strong>Last updated:</strong> <DateFormatter date={ds.versions[0].date} utc={true}/></p>
+                                                                                    <p className="govuk-body-s">
+                                                                                        <strong>Last updated by:</strong> {ds.versions[0].author.name}
+                                                                                    </p>
                                                                                 </div>
-                                                                            </label>
+                                                                            </details>
                                                                         </div>
-                                                                ) : ""}
-                                                            </div>
-                                                        </fieldset>
-                                                    </div>
-                                                    <p className="govuk-body govuk-!-margin-top-5" hidden={datasourceVersions.datasets === null || datasourceVersions.datasets.length <= 5}>
-                                                        <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${d.datasetId}`} className="govuk-link">View {datasourceVersions.datasets !== null ? datasourceVersions.datasets.length - 5 : ""} more versions</Link>
-                                                    </p>
+                                                                    </label>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </fieldset>
                                                 </div>
-                                            </>
+                                                <p className="govuk-body govuk-!-margin-top-5" hidden={datasourceVersions.datasets.length <= 5}>
+                                                    <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${datasourceVersions.relationshipId}`} className="govuk-link">View {datasourceVersions.datasets.length - 5} more versions</Link>
+                                                </p>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </fieldset>
                         </div>
                         <div className="govuk-form-group" hidden={datasourceIsLoading}>
-                        <button className="govuk-button govuk-!-margin-right-1" onClick={saveVersion} disabled={selectedVersion === ""}>Save</button>
-                        <button className="govuk-button govuk-button--secondary" onClick={changeSelection}>Cancel</button>
+                            <button className="govuk-button govuk-!-margin-right-1" onClick={saveVersion} disabled={selectedVersion === ""}>Save</button>
+                            <button className="govuk-button govuk-button--secondary" onClick={changeSelection}>Cancel</button>
                         </div>
                     </div>
                 </div>

@@ -29,7 +29,7 @@
             {
                 if (string.IsNullOrWhiteSpace(DatasetName))
                 {
-                    return string.Empty;
+                    return "No data source file mapped";
                 }
 
                 return $"{DatasetName} (version {DatasetVersion})  ";
@@ -42,10 +42,10 @@
             {
                 if (string.IsNullOrWhiteSpace(DatasetName))
                 {
-                    return "Map";
+                    return "Map data source file";
                 }
 
-                return "Change";
+                return "Change data source file";
             }
         }
 

@@ -1,6 +1,7 @@
 import {Version} from "./Version";
 
 export interface Dataset {
+    description: string;
     selectedVersion: number;
     versions: Version[];
     id: string;
