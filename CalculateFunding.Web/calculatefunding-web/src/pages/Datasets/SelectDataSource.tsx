@@ -172,11 +172,11 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                             <h4 className="govuk-heading-s">Select data source version</h4>
                                                         </legend>
                                                         <div className="govuk-radios govuk-radios--small">
-                                                            {datasourceVersions.datasets.slice(0, 5).map((ds, index) =>
+                                                            {d.versions.slice(0, 5).map((v, index) =>
                                                                 <div className="govuk-radios__item" key={index}>
-                                                                    <input className="govuk-radios__input" id={`datasource-${ds.id}`} name={`datasource-${ds.id}`} type="radio" value={ds.id} onChange={(e) => saveSelection(e)}/>
-                                                                    <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${ds.id}`}>
-                                                                        {ds.name}
+                                                                    <input className="govuk-radios__input" id={`datasource-${v.id}`} name={`datasource-${v.id}`} type="radio" value={`${d.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
+                                                                    <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.id}`}>
+                                                                        {d.name} (version {v.version})
                                                                         <div className="govuk-!-margin-top-1">
                                                                             <details className="govuk-details  summary-margin-removal" data-module="govuk-details">
                                                                                 <div className="govuk-details__text summary-margin-removal">
@@ -184,9 +184,9 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                                                         <strong>Version notes:</strong>
                                                                                     </p>
                                                                                     <p className="govuk-body-s">
-                                                                                        <strong>Last updated:</strong> <DateFormatter date={ds.versions[0].date} utc={true}/></p>
+                                                                                        <strong>Last updated:</strong> <DateFormatter date={v.date} utc={true}/></p>
                                                                                     <p className="govuk-body-s">
-                                                                                        <strong>Last updated by:</strong> {ds.versions[0].author.name}
+                                                                                        <strong>Last updated by:</strong> {v.author.name}
                                                                                     </p>
                                                                                 </div>
                                                                             </details>
@@ -197,8 +197,8 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                         </div>
                                                     </fieldset>
                                                 </div>
-                                                <p className="govuk-body govuk-!-margin-top-5" hidden={datasourceVersions.datasets.length <= 5}>
-                                                    <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${datasourceVersions.relationshipId}`} className="govuk-link">View {datasourceVersions.datasets.length - 5} more versions</Link>
+                                                <p className="govuk-body govuk-!-margin-top-5" hidden={d.versions.length <= 5}>
+                                                    <Link to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${d.id}/${datasourceVersions.relationshipId}`} className="govuk-link">View {datasourceVersions.datasets.length - 5} more versions</Link>
                                                 </p>
                                             </div>
                                         </>

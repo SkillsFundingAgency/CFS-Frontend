@@ -96,7 +96,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships} />
                 <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
                 <Route path="/Datasets/SelectDataSource/:specificationId" component={SelectDataSource} />
-                <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId" component={SelectDataSourceExpanded} />
+                <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId" component={SelectDataSourceExpanded} />
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
                 <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification} />
                 {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates} />}

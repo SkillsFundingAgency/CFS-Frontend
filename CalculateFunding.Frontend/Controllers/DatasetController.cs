@@ -432,33 +432,39 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/datasets/expanded-datasources/{relationshipId}")]
+        [Route("api/datasets/expanded-datasources/{relationshipId}/{datasetId}")]
         public async Task<IActionResult> GetExpandedDataSourcesSearch(
             [FromRoute]string relationshipId,
+            [FromRoute]string datasetId,
             [FromBody]SearchModel search)
         {
             ApiResponse<SelectDatasourceModel> result =
                 await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
 
-            if (result.StatusCode == HttpStatusCode.OK)
+            DatasetVersions datasetVersions = result.Content.Datasets.SingleOrDefault(d => d.Id == datasetId);
+
+            if (datasetVersions != null)
             {
-                int totalPages = result.Content.Datasets.Count() / search.Top;
-                if (result.Content.Datasets.Count() % search.Top > 0)
+                int totalPages = datasetVersions.Versions.Count() / search.Top;
+                if (datasetVersions.Versions.Count() % search.Top > 0)
                 {
                     totalPages++;
                 }
 
                 int startNumber = ((search.Top * search.PageNumber) - search.Top) + 1;
                 int endNumber = (search.Top * search.PageNumber);
-                if (endNumber > result.Content.Datasets.Count())
+                if (endNumber > datasetVersions.Versions.Count())
                 {
-                    endNumber = result.Content.Datasets.Count();
+                    endNumber = datasetVersions.Versions.Count();
                 }
                 
                 PagedDatasetSearchResults searchPagedResult = new PagedDatasetSearchResults
                 {
-                    Items = result.Content.Datasets.Skip(startNumber - 1).Take(5),
-                    TotalCount = result.Content.Datasets.Count(),
+                    Name = datasetVersions.Name,
+                    Id = datasetVersions.Id,
+                    Description = datasetVersions.Description,
+                    Items = datasetVersions.Versions.Skip(startNumber - 1).Take(5),
+                    TotalCount = datasetVersions.Versions.Count(),
                     PagerState = new PagerState(search.PageNumber, totalPages),
                     StartItemNumber = startNumber,
                     EndItemNumber = endNumber

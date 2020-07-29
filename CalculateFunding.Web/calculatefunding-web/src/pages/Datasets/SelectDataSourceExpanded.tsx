@@ -19,6 +19,7 @@ import {DatasourceVersionSearchModel} from "../../types/Datasets/DatasourceVersi
 export interface SelectDataSourceExpandedRouteProps {
     specificationId: string;
     datasetId: string;
+    relationshipId:string
 }
 
 export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectDataSourceExpandedRouteProps>) {
@@ -80,6 +81,9 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
             currentPage: 0,
             lastPage: 0
         },
+        description:"",
+        id:"",
+        name:"",
         startItemNumber: 0,
         totalCount: 0
     });
@@ -95,9 +99,9 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
             if (response.status === 200) {
                 const result = response.data as SpecificationSummary;
                 setSpecificationSummary(result);
-            }
 
             populateExpandedDatasources(match.params.datasetId, searchRequest);
+            }
             setDatasourceIsLoading(false);
         });
     });
@@ -107,7 +111,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
     }
 
     function populateExpandedDatasources(relationshipId: string, searchRequest: DatasourceVersionSearchModel) {
-        getExpandedDataSources(relationshipId, searchRequest).then((response) => {
+        getExpandedDataSources(match.params.relationshipId, match.params.datasetId, searchRequest).then((response) => {
             if (response.status === 200) {
                 const result = response.data as DatasetRelationshipPagedResponseViewModel;
                 setDatasourceVersions(result);
@@ -197,11 +201,11 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                             </legend>
 
                                             <div className="govuk-radios govuk-radios--small">
-                                                {datasourceVersions.items.map(d =>
+                                                {datasourceVersions.items.map(v =>
                                                         <div className="govuk-radios__item">
-                                                            <input className="govuk-radios__input" id={`datasource-${d.id}`} name={`datasource-${d.id}`} type="radio" value={`${d.id}_${d.versions[0].version}`} onChange={(e) => saveSelection(e)}/>
-                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${d.id}`}>
-                                                                {d.name}
+                                                            <input className="govuk-radios__input" id={`datasource-${v.id}`} name={`datasource-${v.id}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
+                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.id}`}>
+                                                                {datasourceVersions.name} (Version {v.version})
                                                                 <div className="govuk-!-margin-top-1">
                                                                     <details className="govuk-details summary-margin-removal" data-module="govuk-details">
                                                                         <summary className="govuk-details__summary">
@@ -212,10 +216,10 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                                                         <div className="govuk-details__text">
                                                                             <p className="govuk-body-s">
                                                                                 <strong>Last updated:</strong>
-                                                                                <DateFormatter date={d.versions[0].date} utc={false}/>
+                                                                                <DateFormatter date={v.date} utc={false}/>
                                                                             </p>
                                                                             <p className="govuk-body-s">
-                                                                                <strong>Last updated by:</strong> {d.versions[0].author.name}
+                                                                                <strong>Last updated by:</strong> {v.author.name}
                                                                             </p>
                                                                         </div>
                                                                     </details>

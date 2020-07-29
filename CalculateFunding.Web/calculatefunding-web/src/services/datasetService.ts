@@ -209,8 +209,8 @@ export async function assignDataSourceService(relationshipId: string, specificat
     })
 }
 
-export async function getExpandedDataSources(relationshipId:string, searchRequest: DatasourceVersionSearchModel) {
-    return axios(`${baseUrl}/expanded-datasources/${relationshipId}`, {
+export async function getExpandedDataSources(relationshipId: string, datasetId: string, searchRequest: DatasourceVersionSearchModel) {
+    return axios(`${baseUrl}/expanded-datasources/${relationshipId}/${datasetId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
