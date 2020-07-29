@@ -119,7 +119,7 @@ export function MapDataSourceFiles() {
         if (enableFilter) {
             if (filters.indexOf(filterValue) === -1) {
                 filters.push(filterValue);
-                let newFiltersValue = {};
+                let newFiltersValue: any = {};
                 newFiltersValue[filterKey] = filters;
                 setSearchRequest(prevState => {
                     return {...prevState, filters: newFiltersValue, pageNumber: 1}
@@ -137,7 +137,7 @@ export function MapDataSourceFiles() {
                 }
                 else
                 {
-                    let newFiltersValue = {};
+                    let newFiltersValue: any = {};
                     newFiltersValue[filterKey] = filters;
                     setSearchRequest(prevState => {
                         return {...prevState, filters: newFiltersValue, pageNumber: 1}

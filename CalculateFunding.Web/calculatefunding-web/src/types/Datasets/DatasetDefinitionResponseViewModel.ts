@@ -1,4 +1,6 @@
-    export interface DatasetDefinition {
+import {SearchFacet, SearchFacetValue} from "../TemplateBuilderDefinitions";
+
+export interface DatasetDefinition {
         description: string;
         providerIdentifier: string;
         lastUpdatedDate: Date;
@@ -25,5 +27,5 @@
         startItemNumber: number;
         endItemNumber: number;
         pagerState: PagerState;
-        facets: any[];
+        facets: SearchFacet[];
     }

@@ -1,5 +1,7 @@
 ﻿
 
+using System.Collections.Generic;
+
 namespace CalculateFunding.Frontend.Controllers
 {
     using System.Threading.Tasks;
@@ -24,7 +26,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/dataset-definitions/search")]
-        public async Task<IActionResult> SearchDatasetDefinitions(SearchRequestViewModel request)
+        public async Task<IActionResult> SearchDatasetDefinitions([FromBody]SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 

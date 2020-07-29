@@ -43,16 +43,11 @@ export async function assignDatasetSchemaUpdateService(name: string, description
 
 export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
     return axios(`/api/dataset-definitions/search`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        params: {
-            searchTerm: request.searchTerm,
-            pageNumber: request.pageNumber,
-            includeFacets: request.includeFacets,
-            pageSize: request.pageSize
-        }
+        data: request
     })
 }
 

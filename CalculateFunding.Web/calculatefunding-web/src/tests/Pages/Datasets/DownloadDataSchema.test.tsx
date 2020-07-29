@@ -18,16 +18,6 @@ describe("<DownloadDataSchema />", () => {
         expect(wrapper.find("h1.govuk-heading-xl").text()).toBe("Download data schema template");
     });
 
-    it('will have the correct <Button /> for searching the download schema', () => {
-        const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
-        expect(wrapper.find("button#submit-search").text()).toBe("Search");
-    });
-
-    it('will have the correct <label /> for Search data schema templates', () => {
-        const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
-        expect(wrapper.find("label.govuk-label").text()).toBe("Search data schema templates");
-    });
-
     it('will have the correct <Breadcrumb /> for Calculate funding', () => {
         const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
         expect(wrapper.find("Breadcrumb").at(0).text()).toBe("Calculate funding");
@@ -43,5 +33,18 @@ describe("<DownloadDataSchema />", () => {
         expect(wrapper.find("Breadcrumb").at(2).text()).toBe("Download data schema template");
     });
 
+    it('will have the correct number of collapsible panels', () => {
+        const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
+        expect(wrapper.find("CollapsiblePanel").length).toBe(2);
+    });
 
+    it('will have the correct collapsible panel for searching', () => {
+        const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
+        expect(wrapper.find("CollapsiblePanel").at(0).prop("title")).toBe("Search");
+    });
+
+    it('will have the correct collapsible panel for filtering by funding stream', () => {
+        const wrapper = mount(<MemoryRouter><DownloadDataSchema /></MemoryRouter>);
+        expect(wrapper.find("CollapsiblePanel").at(1).prop("title")).toBe("Filter by funding stream");
+    });
 });
