@@ -9,6 +9,7 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Frontend.Controllers;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Modules;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetFundingStructures_ReturnsFlatStructureWithCorrectLevelsAndInCorrectOrder()
         {
-            ValidScenarioSetup();
+            ValidScenarioSetup(FundingStreamId.ToLowerInvariant());
             FundingLineStructureController controller = new FundingLineStructureController(
                 _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 
@@ -50,14 +51,27 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             fundingStructureItems.Should().BeEquivalentTo(expectedFundingStructureItems);
         }
 
-        private void ValidScenarioSetup()
+        [TestMethod]
+        public async Task GetFundingStructures_ThrowsInternalErrorIfTemplateIdNotSet()
+        {
+            ValidScenarioSetup(FundingStreamId);
+            FundingLineStructureController controller = new FundingLineStructureController(
+                _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
+
+            IActionResult apiResponseResult = await controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
+
+            var expectedFundingStructureItems = GetValidMappedFundingStructureItems();
+            apiResponseResult.Should().BeOfType<InternalServerErrorResult>();
+        }
+
+        private void ValidScenarioSetup(string fundingStreamId)
         {
             var specificationSummary = new SpecificationSummary
             {
                 Id = SpecificationId,
                 TemplateIds = new Dictionary<string, string>
                 {
-                    [FundingStreamId] = TemplateVersion
+                    [fundingStreamId] = TemplateVersion
                 }
             };
 
