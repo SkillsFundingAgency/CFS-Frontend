@@ -57,6 +57,7 @@ import {EditDescriptionModal} from '../../components/EditDescriptionModal';
 import deepClone from 'lodash/cloneDeep';
 import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
+import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import {ErrorMessage} from '../../types/ErrorMessage';
 import {useHistory} from "react-router";
 import {AutoComplete} from '../../components/AutoComplete';
@@ -109,6 +110,8 @@ export function EditTemplate() {
         }
     }
     useEventListener('keydown', keyPressHandler);
+    
+    useConfirmLeavePage(isDirty);
 
     useEffect(() => {
         const initialisePage = () => {
@@ -501,12 +504,12 @@ export function EditTemplate() {
                                subTitle={"Please wait while the template loads."}/>
                 {!version && <Breadcrumbs>
                     <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link'/>
                     <Breadcrumb name={template ? template.name : ""}/>
                 </Breadcrumbs>}
                 {version && <Breadcrumbs>
                     <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link'/>
                     <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`}/>
                     <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`}/>
                     <Breadcrumb name={isLoading ? "Loading..." : template ? `${template.majorVersion}.${template.minorVersion}` : ""}/>
@@ -593,6 +596,7 @@ export function EditTemplate() {
                             <div className="govuk-body">
                                 <Link id="versions-link"
                                       to={`/Templates/${templateId}/Versions`}
+                                      data-testid='template-versions-link'
                                       className="govuk-link--no-visited-state">
                                     View all versions
                                 </Link>

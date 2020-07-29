@@ -50,6 +50,7 @@ import {ProfilingArchive} from "./pages/FundingApprovals/ProfilingArchive";
 import {SelectDataSource} from "./pages/Datasets/SelectDataSource";
 import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpanded";
 import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
+import {UserConfirmLeavePageModal} from "./components/UserConfirmLeavePageModal";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -67,7 +68,8 @@ const App: React.FunctionComponent = () => {
     }, []);
     
     return (
-        <BrowserRouter basename="/app">
+        <BrowserRouter basename="/app" 
+                       getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
             <Switch>
                 <Route exact path="/"><Home featureFlags={featureFlagsState} /></Route>
                 <Route path="/ViewFunding" component={FundingApprovalSelection} />

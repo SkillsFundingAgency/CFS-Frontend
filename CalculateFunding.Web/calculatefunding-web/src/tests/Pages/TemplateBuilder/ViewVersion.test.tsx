@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {MemoryRouter, Route, Switch} from "react-router";
-import { waitFor, render } from "@testing-library/react";
+import {waitFor, render, cleanup} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {EditTemplate} from "../../../pages/Templates/EditTemplate";
 
@@ -87,6 +87,9 @@ beforeAll(() => {
     }
     jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions());
 });
+
+afterEach(cleanup);
+
 const renderTemplateVersionPage = () =>
 {
     const { EditTemplate } = require('../../../pages/Templates/EditTemplate');

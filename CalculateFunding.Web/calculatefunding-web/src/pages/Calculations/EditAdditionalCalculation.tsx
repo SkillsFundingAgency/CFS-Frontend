@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
@@ -16,6 +16,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
+import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -40,6 +41,8 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
         dataDefinitionRelationshipIds: [],
         templateIds: {"": [""]}
     });
+    const [originalAdditionalCalculation, setOriginalAdditionalCalculation] = useState<EditAdditionalCalculationViewModel>(null);
+    const [isDirty, setIsDirty] = useState<boolean>(false);
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
@@ -81,6 +84,8 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
     let history = useHistory();
 
+    useConfirmLeavePage(isDirty);
+
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
             const specificationResult = await getSpecificationSummaryService(e);
@@ -92,9 +97,9 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             return additionalCalculationResult;
         };
 
-
         getAdditionalCalculation().then((result) => {
             const additionalCalculationResult = result.data as EditAdditionalCalculationViewModel;
+            setOriginalAdditionalCalculation(additionalCalculationResult);
             setAdditionalCalculationSourceCode(additionalCalculationResult.sourceCode);
             setAdditionalCalculationName(additionalCalculationResult.name);
             setAdditionalCalculationType(additionalCalculationResult.valueType);
@@ -105,9 +110,20 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 setSpecificationSummary(specificationResult);
                 setSpecificationId(specificationResult.id);
             });
-
         })
     });
+    
+    useEffect(() =>
+    {
+        if (originalAdditionalCalculation &&
+            originalAdditionalCalculation.sourceCode &&
+            originalAdditionalCalculation.name &&
+            originalAdditionalCalculation.valueType) {
+            setIsDirty(originalAdditionalCalculation.sourceCode !== additionalCalculationSourceCode ||
+                originalAdditionalCalculation.name !== additionalCalculationName ||
+                originalAdditionalCalculation.valueType !== additionalCalculationType);
+        }
+    }, [additionalCalculationType, additionalCalculationName, additionalCalculationSourceCode, originalAdditionalCalculation])
 
     function submitAdditionalCalculation() {
         if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
@@ -115,7 +131,10 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
         } else if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
             setNameErrorMessage("Please use a name between 4 and 180 characters");
             setFormValid({formSubmitted: true, formValid: false});
-        } else if ((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) && additionalCalculationSourceCode !== "" && additionalCalculationBuildSuccess.buildSuccess && additionalCalculationBuildSuccess.compileRun) {
+        } else if ((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) && 
+                additionalCalculationSourceCode !== "" && 
+                additionalCalculationBuildSuccess.buildSuccess && 
+                additionalCalculationBuildSuccess.compileRun) {
             setFormValid({formSubmitted: true, formValid: true});
             setNameErrorMessage("");
             setIsLoading(true);
@@ -126,13 +145,14 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             };
 
             const editAdditionalCalculation = async () => {
-                const updateAdditionalCalculationResult = await updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId);
+                const updateAdditionalCalculationResult = await 
+                    updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId);
                 return updateAdditionalCalculationResult;
             };
 
             editAdditionalCalculation().then((result) => {
-
                 if (result.status === 200) {
+                    setIsDirty(false);
                     let response = result.data as Calculation;
                     history.push(`/ViewSpecification/${response.specificationId}`);
                 } else {

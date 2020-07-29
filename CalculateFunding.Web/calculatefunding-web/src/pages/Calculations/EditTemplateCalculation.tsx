@@ -26,6 +26,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel";
 import {DateFormatter} from "../../components/DateFormatter";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
+import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -55,6 +56,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
+    const [originalTemplateCalculationSourceCode, setOriginalTemplateCalculationSourceCode] = useState<string>("");
     const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
     const [templateCalculationLastUpdated, setTemplateCalculationLastUpdated] = useState<Date>(new Date());
     const initialBuildSuccess = {
@@ -87,6 +89,8 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     let history = useHistory();
+    
+    useConfirmLeavePage(originalTemplateCalculationSourceCode !== templateCalculationSourceCode);
 
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
@@ -102,6 +106,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
         getTemplateCalculation().then((result) => {
             const templateCalculationResult = result.data as EditAdditionalCalculationViewModel;
+            setOriginalTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
             setTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
             setTemplateCalculationName(templateCalculationResult.name);
             setTemplateCalculationType(templateCalculationResult.valueType);
