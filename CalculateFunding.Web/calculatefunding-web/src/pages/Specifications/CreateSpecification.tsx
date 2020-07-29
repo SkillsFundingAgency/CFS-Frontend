@@ -36,6 +36,7 @@ export function CreateSpecification() {
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [formValid, setFormValid] = useState({
         formSubmitted: false,
@@ -97,6 +98,7 @@ export function CreateSpecification() {
                         {
                             setDefaultTemplateVersionId(defaultTemplateVersionId);
                             setTemplateVersionData(publishedFundingTemplates);
+                            setSelectedTemplateVersion(defaultTemplateVersionId);
                         }
                         else
                         {
@@ -128,7 +130,7 @@ export function CreateSpecification() {
     function selectFundingPeriod(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingPeriodId = e.target.value;
         setSelectedFundingPeriod(fundingPeriodId);
-        //populateTemplateVersion(selectedFundingStream, fundingPeriodId);
+        populateTemplateVersion(selectedFundingStream, fundingPeriodId);
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -138,6 +140,7 @@ export function CreateSpecification() {
 
     function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
         const templateVersionId = e.target.value;
+        setSelectedTemplateVersion(templateVersionId);
     }
 
     function saveDescriptionName(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -150,12 +153,15 @@ export function CreateSpecification() {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
             setCreateSpecificationFailed(false);
+            let assignedTemplateIdsValue: any = {};
+            assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
             let createSpecificationViewModel: CreateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriod,
                 fundingStreamId: selectedFundingStream,
                 name: selectedName,
-                providerVersionId: selectedProviderVersionId
+                providerVersionId: selectedProviderVersionId,
+                assignedTemplateIds: assignedTemplateIdsValue
             };
 
             const createSpecification = async () => {
@@ -283,7 +289,7 @@ export function CreateSpecification() {
                                                                          value={cp.providerVersionId}>{cp.name}</option>)}
                         </select>
                     </div>
-                    {/*
+
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="sort">
                             Template version
@@ -296,7 +302,7 @@ export function CreateSpecification() {
                             >{publishedFundingTemplate.templateVersion}</option>)}
                         </select>
                     </div>
-                    */}
+
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
                             Can you provide more detail?

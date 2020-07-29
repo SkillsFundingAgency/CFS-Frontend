@@ -4,5 +4,6 @@ export interface CreateSpecificationViewModel {
     providerVersionId: string;
     description: string;
     fundingPeriodId: string;
+    assignedTemplateIds: { [key: string]: string[] };
 }
 

@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Specs
+﻿using System.Collections.Generic;
+
+namespace CalculateFunding.Frontend.ViewModels.Specs
 {
     using System.ComponentModel.DataAnnotations;
     using Properties;
@@ -18,5 +20,7 @@
 
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingPeriodRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string FundingPeriodId { get; set; }
+
+        public IDictionary<string, string> AssignedTemplateIds { get; set; }
     }
 }
