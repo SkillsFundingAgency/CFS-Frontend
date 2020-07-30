@@ -111,7 +111,7 @@ export function EditTemplate() {
     }
     useEventListener('keydown', keyPressHandler);
     
-    useConfirmLeavePage(isDirty);
+    useConfirmLeavePage(isDirty && !isSaving);
 
     useEffect(() => {
         const initialisePage = () => {
@@ -341,6 +341,7 @@ export function EditTemplate() {
                 showSaveMessage("Template saved successfully.");
             } else {
                 if (saveResponse.status === 200) {
+                    setIsDirty(false);
                     history.push(`/Templates/${template.templateId}/Versions/${saveResponse.data}`);
                 } else {
                     addErrorMessage(`Template save failed: ${saveResponse.status} ${saveResponse.statusText}`);

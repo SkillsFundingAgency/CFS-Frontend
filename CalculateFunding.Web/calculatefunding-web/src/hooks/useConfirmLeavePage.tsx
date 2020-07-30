@@ -1,4 +1,4 @@
-﻿﻿import {useMemo, useRef} from 'react';
+﻿﻿import {useEffect, useRef} from 'react';
 import {UnregisterCallback} from "history";
 import {useHistory} from "react-router";
 
@@ -23,8 +23,9 @@ export const useConfirmLeavePage = (preventDefault: boolean,
         return message;
     };
 
-    useMemo(() => {
+    useEffect(() => {
         self.current = preventDefault ? history.block(message) : null;
+        preventDefault = false;
 
         window.addEventListener('beforeunload', onWindowOrTabClose);
 
@@ -36,7 +37,7 @@ export const useConfirmLeavePage = (preventDefault: boolean,
 
             window.removeEventListener('beforeunload', onWindowOrTabClose);
         };
-    }, [message, preventDefault, history, onWindowOrTabClose]);
+    }, [message, preventDefault]);
     
     return {
         history,
