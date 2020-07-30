@@ -414,6 +414,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok(apiResponse.Content);
             }
 
+            if (apiResponse.StatusCode == HttpStatusCode.NoContent)
+            {
+                return NoContent();
+            }
+
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
                 return new BadRequestResult();

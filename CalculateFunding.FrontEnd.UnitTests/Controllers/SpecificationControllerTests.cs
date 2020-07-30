@@ -223,6 +223,20 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task GetProfileVariationPointers_Returns_NoContent_Given_No_ProfilePointers()
+        {
+            string aValidSpecificationId = "ABC";
+            _specificationsApiClient
+                .GetProfileVariationPointers(aValidSpecificationId)
+                .Returns(Task.FromResult(
+                    new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.NoContent)));
+
+            IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [TestMethod]
         public async Task SetProfileVariationPointers_Returns_OK_Given_A_Valid_SpecificationId_And_ProfileVariationPointers()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
