@@ -46,24 +46,6 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/results/searchproviders")]
-        public async Task<IActionResult> SearchProviders([FromBody] SearchRequestViewModel request)
-        {
-            Guard.ArgumentNotNull(request, nameof(request));
-
-            ProviderSearchResultViewModel result = await _providerSearchService.PerformSearch(request);
-            if (result != null)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return new InternalServerErrorResult($"Find providers HTTP request failed");
-            }
-        }
-
-
-        [HttpPost]
         [Route("api/results/calculation-provider-results-search")]
         public async Task<IActionResult> SearchCalculationProviderResults([FromBody] SearchRequestViewModel request, [FromQuery] string calculationValueType = null)
         {

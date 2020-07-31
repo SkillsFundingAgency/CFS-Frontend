@@ -50,14 +50,6 @@ export async function GetProvidersByFundingStreamService(fundingStreamId: string
     });
 }
 
-export async function getProviderDetailsService(providerId: string) {
-    return axios(`${baseURL}/getproviderbyid/${providerId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-}
 export async function getProviderResultsService(providerId: string) {
     return axios(`${baseURL}/getproviderresults/${providerId}`, {
         method: 'GET',

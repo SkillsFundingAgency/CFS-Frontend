@@ -99,28 +99,6 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/provider/getproviderbyid/{providerId}")]
-        public async Task<IActionResult> GetProviderById(string providerId)
-        {
-            Guard.ArgumentNotNull(providerId, nameof(providerId));
-
-            ApiResponse<ProviderVersionSearchResult> result =
-                await _providersApiClient.GetProviderByIdFromMaster(providerId);
-
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(result.Content);
-            }
-            
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(result.Content);
-            }
-            
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
-        }
-
-        [HttpGet]
         [Route("/api/provider/getproviderresults/{providerId}")]
         public async Task<IActionResult> GetProviderResults(string providerId)
         {

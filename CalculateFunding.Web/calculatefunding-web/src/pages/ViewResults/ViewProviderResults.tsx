@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {ProviderDetailsViewModel} from "../../types/Provider/ProviderDetailsViewModel";
-import {getProviderDetailsService, getProviderResultsService} from "../../services/providerService";
+import {getProviderByIdAndVersionService, getProviderResultsService} from "../../services/providerService";
 import {RouteComponentProps} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Header} from "../../components/Header";
@@ -26,6 +26,7 @@ import {BackToTop} from "../../components/BackToTop";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {expandCalculationsByName, getDistinctOrderedFundingLineCalculations, updateFundingLineExpandStatus} from "../../components/fundingLineStructure/FundingLineStructure";
 import {NoData} from "../../components/NoData";
+import {isMainThread} from "worker_threads";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -132,25 +133,6 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     useEffectOnce(() => {
         const providerId = match.params.providerId;
 
-        getProviderDetailsService(providerId).then((response) => {
-            if (response.status === 200) {
-                setProviderDetails(response.data as ProviderDetailsViewModel);
-                setIsLoading(prevState => {
-                    return {
-                        ...prevState,
-                        providerDetails: false
-                    }
-                })
-            }
-        }).catch((e) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    providerDetails: false
-                }
-            })
-        });
-
         getProviderResultsService(providerId).then((response) => {
             if (response.status === 200) {
                 const specificationInformation = response.data as SpecificationInformation[];
@@ -229,6 +211,33 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             });
         }
     }, [fundingLines]);
+
+    useEffect(() => {
+        if (specificationSummary.providerVersionId !== "") {
+            populateProviderResults(specificationSummary.providerVersionId);
+        }
+    }, [specificationSummary.providerVersionId])
+
+    function populateProviderResults(providerVersion: string) {
+        getProviderByIdAndVersionService(match.params.providerId, providerVersion).then((response) => {
+            if (response.status === 200) {
+                setProviderDetails(response.data as ProviderDetailsViewModel);
+                setIsLoading(prevState => {
+                    return {
+                        ...prevState,
+                        providerDetails: false
+                    }
+                })
+            }
+        }).catch((e) => {
+            setIsLoading(prevState => {
+                return {
+                    ...prevState,
+                    providerDetails: false
+                }
+            })
+        });
+    }
 
     function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
         getCalculationsService({specificationId: specificationId, status: status, pageNumber: pageNumber, searchTerm: searchTerm, calculationType: "Additional"}).then((response) => {
@@ -362,7 +371,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                 </div>
 
             </div>
-            <NoData hidden={isLoading.providerResults || specificationSummary.id !== ""} />
+            <NoData hidden={isLoading.providerResults || specificationSummary.id !== ""}/>
             <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === ""}>
                 <div className="govuk-grid-column-two-thirds">
                     <div className="govuk-form-group">

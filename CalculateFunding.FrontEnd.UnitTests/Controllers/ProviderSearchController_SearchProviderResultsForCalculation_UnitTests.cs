@@ -29,9 +29,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _mockCalculationProviderResultsSearchService.Setup(x => x.PerformSearch(It.IsAny<SearchRequestViewModel>()))
 	            .ReturnsAsync(Builder<CalculationProviderResultSearchResultViewModel>.CreateNew().Build);
 
-            _mockProviderSearchService.Setup(x => x.PerformSearch(It.IsAny<SearchRequestViewModel>()))
-	            .ReturnsAsync(() => Builder<ProviderSearchResultViewModel>.CreateNew().Build());
-
             _sut = new ProviderSearchController(_mockProviderSearchService.Object, _mockCalculationProviderResultsSearchService.Object);
 	    }
 
