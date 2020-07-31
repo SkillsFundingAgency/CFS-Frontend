@@ -1,5 +1,5 @@
-import {PagerState} from "./publishedProvider";
 import {Facet} from "./Facet";
+import {PagerState} from "./PagerState";
 
 export interface CalculationProviderResultList {
     calculationProviderResults: CalculationProviderResult[];

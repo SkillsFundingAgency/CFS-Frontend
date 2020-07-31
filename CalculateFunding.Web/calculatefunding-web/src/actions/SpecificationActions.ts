@@ -2,7 +2,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {ThunkAction} from "redux-thunk";
 import {SpecificationState} from "../states/SpecificationState";
 import {getAllSpecificationsService} from "../services/specificationService";
-import {SpecificationListResults} from "../types/SpecificationListResults";
+import {SpecificationListResults} from "../types/Specifications/SpecificationListResults";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 
 export enum SpecificationActionTypes {

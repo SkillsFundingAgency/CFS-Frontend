@@ -1,4 +1,5 @@
-import {Facet} from "./Facet";
+import {Facet} from "../Facet";
+import {PagerState} from "../PagerState";
 
 export interface SpecificationListResultsItem {
     fundingPeriodName: string;
@@ -13,12 +14,11 @@ export interface SpecificationListResultsItem {
 }
 
 export interface SpecificationListResults {
-    pageSize: number;
-    pageNumber: number;
-    totalPages: number;
-    totalItems: number;
-    totalErrorItems: number;
     items: SpecificationListResultsItem[];
     facets: Facet[];
+    endItemNumber:number;
+    startItemNumber:number;
+    totalCount:number;
+    pagerState: PagerState;
 }
 

@@ -15,8 +15,6 @@ import { SelectSpecificationState } from "../states/SelectSpecificationState";
 import { reduceCalculationResultsState } from "./viewCalculationResultsReducer";
 import { ProviderState } from "../states/ProviderState";
 import { reduceProvider } from "./providerReducer";
-import { reduceSpecificationState } from "./specificationReducer";
-import { SpecificationState } from "../states/SpecificationState";
 import { reduceDatasetState } from "./datasetReducer";
 import { DatasetState } from "../states/DatasetState";
 import { FeatureFlagsState } from "../states/FeatureFlagsState";
@@ -46,7 +44,6 @@ export interface IStoreState {
     viewCalculationResults: ViewCalculationState
     selectSpecification: SelectSpecificationState,
     provider: ProviderState,
-    specifications: SpecificationState,
     datasets: DatasetState,
     featureFlags: FeatureFlagsState
 }
@@ -67,7 +64,6 @@ export const rootReducer: Reducer<IStoreState, Actions> = combineReducers({
     selectSpecification: reduceSelectSpecificationState,
     viewCalculationResults: reduceCalculationResultsState,
     provider: reduceProvider,
-    specifications: reduceSpecificationState,
     datasets: reduceDatasetState,
     featureFlags: reduceFeatureFlagsState
 });

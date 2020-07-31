@@ -31,7 +31,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
 	        var data = Builder<SpecificationSearchRequestViewModel>.CreateNew().Build();
 
-            _mockSpecificationsApiClient.Setup(x => x.FindSpecifications(It.IsAny<SearchFilterRequest>())).ReturnsAsync(Builder<PagedResult<SpecificationSearchResultItem>>.CreateNew().Build());
+            _mockSpecificationsApiClient.Setup(x => 
+	            x.FindSpecifications(It.IsAny<SearchFilterRequest>()))
+	            .ReturnsAsync(Builder<PagedResult<SpecificationSearchResultItem>>
+		            .CreateNew()
+		            .With(x => 
+			            x.Items = Builder<SpecificationSearchResultItem>.CreateListOfSize(10).Build()).Build());
 			
 	        _sut = new SpecificationController(_mockSpecificationsApiClient.Object, _mockAuthorizationHelper.Object);
 

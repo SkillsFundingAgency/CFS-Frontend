@@ -1,3 +1,5 @@
+import {PagerState} from "./PagerState";
+
 export interface PublishedProviderItems {
     currentPage: number;
     endItemNumber: number;
@@ -28,14 +30,6 @@ export interface ProvidersEntity {
     specificationId: string;
     fundingStreamId: string;
     fundingPeriodId: string;
-}
-export interface PagerState {
-    currentPage: number;
-    displayNumberOfPages: number;
-    lastPage: number;
-    nextPage: number;
-    pages: number[];
-    previousPage: number;
 }
 export interface FacetsEntity {
     name: string;

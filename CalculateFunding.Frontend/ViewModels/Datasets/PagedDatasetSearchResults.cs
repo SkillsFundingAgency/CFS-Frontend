@@ -8,17 +8,17 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
 {
     public class PagedDatasetSearchResults
     {
-		public int TotalCount { get; set; }
+        public int TotalCount { get; set; }
 		
-		public int StartItemNumber { get; set; }
+        public int StartItemNumber { get; set; }
 		
-		public int EndItemNumber { get; set; }
+        public int EndItemNumber { get; set; }
 		
-		public IEnumerable<DatasetVersionModel> Items { get; set; }
+        public IEnumerable<DatasetVersionModel> Items { get; set; }
 		
-		public IEnumerable<Facet> Facets { get; set; }
+        public IEnumerable<Facet> Facets { get; set; }
         
-		public PagerState PagerState { get; set; }
+        public PagerState PagerState { get; set; }
         
         public string Name { get; set; }
         

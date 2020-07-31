@@ -1,5 +1,5 @@
 import {Facet} from "../Facet";
-import {PagerState} from "./PagerState";
+import {PagerState} from "../PagerState";
 
 export interface Provider {
     id: string;

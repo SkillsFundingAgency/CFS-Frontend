@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -343,9 +344,32 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (result != null)
             {
-                return new OkObjectResult(result);
-            }
+                int totalPages = result.Items.Count() / viewModel.PageSize;
+                if (result.Items.Count() % viewModel.PageSize > 0)
+                {
+                    totalPages++;
+                }
 
+                int startNumber = ((viewModel.PageSize * viewModel.Page) - viewModel.PageSize) + 1;
+                int endNumber = (viewModel.PageSize * viewModel.Page);
+                if (endNumber > result.TotalItems)
+                {
+                    endNumber = result.TotalItems;
+                }
+                
+                PagedSpecficationSearchResults searchPagedResult = new PagedSpecficationSearchResults
+                {
+                    Items = result.Items,
+                    TotalCount = result.TotalItems,
+                    PagerState = new PagerState(viewModel.Page, result.TotalPages),
+                    StartItemNumber = startNumber,
+                    EndItemNumber = endNumber,
+                    Facets = result.Facets
+                };
+
+                return Ok(searchPagedResult);
+            }
+            
             return new BadRequestResult();
         }
 

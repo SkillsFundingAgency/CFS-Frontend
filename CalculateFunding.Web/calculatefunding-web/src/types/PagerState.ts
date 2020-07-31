@@ -1,8 +1,8 @@
 export interface PagerState {
-    displayNumberOfPages: number;
-    previousPage?: any;
-    nextPage?: any;
-    lastPage: number;
-    pages: number[];
     currentPage: number;
+    displayNumberOfPages: number;
+    lastPage: number;
+    nextPage: number;
+    pages: number[];
+    previousPage: number;
 }

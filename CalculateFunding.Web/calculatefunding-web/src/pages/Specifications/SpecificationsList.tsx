@@ -10,7 +10,7 @@ import {SpecificationSearchRequestViewModel} from "../../types/SpecificationSear
 import {Section} from "../../types/Sections";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {getAllSpecificationsService} from "../../services/specificationService";
-import {SpecificationListResults} from "../../types/SpecificationListResults";
+import {SpecificationListResults} from "../../types/Specifications/SpecificationListResults";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {FacetValue} from "../../types/Facet";
@@ -20,11 +20,17 @@ export function SpecificationsList() {
     const [specificationListResults, setSpecificationListResults] = useState<SpecificationListResults>({
         items: [],
         facets: [],
-        pageNumber: 0,
-        pageSize: 0,
-        totalErrorItems: 0,
-        totalItems: 0,
-        totalPages: 0
+        endItemNumber: 0,
+        startItemNumber: 0,
+        totalCount: 0,
+        pagerState:{
+            lastPage:0,
+            currentPage:0,
+            pages:[],
+            displayNumberOfPages:0,
+            nextPage:0,
+            previousPage:0
+        }
     });
     const initialSearch: SpecificationSearchRequestViewModel = {
         searchText: "",
@@ -61,10 +67,10 @@ export function SpecificationsList() {
     });
 
     useEffect(() => {
-        if (!singleFire && specificationListResults.totalItems > 0) {
+        if (!singleFire && specificationListResults.totalCount > 0) {
             setSingleFire(true);
         }
-    }, [specificationListResults.totalItems]);
+    }, [specificationListResults.totalCount]);
 
     useEffect(() => {
         if (specificationListResults.facets.length > 0) {
@@ -329,11 +335,11 @@ export function SpecificationsList() {
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
                                 <Pagination callback={movePage}
-                                            currentPage={specificationListResults.pageNumber}
-                                            lastPage={specificationListResults.totalPages}/>
+                                            currentPage={specificationListResults.pagerState.currentPage}
+                                            lastPage={specificationListResults.pagerState.lastPage}/>
                             </div>
                             <div className="govuk-grid-column-one-third">
-                                <p className="govuk-body-s">Showing {(specificationListResults.pageNumber * specificationListResults.pageSize) - (specificationListResults.pageSize - 1)} - {specificationListResults.pageSize * specificationListResults.pageNumber} of {specificationListResults.totalItems} results</p>
+                                <p className="govuk-body-s">Showing {(specificationListResults.startItemNumber)} - {specificationListResults.endItemNumber} of {specificationListResults.totalCount} results</p>
                             </div>
                         </div>
                     </div>
