@@ -5,26 +5,29 @@ namespace CalculateFunding.Frontend.Helpers
 {
     public static class HtmlHelperExtensions
     {
-        public static string AsFormatCalculationType(this decimal? value, CalculationValueTypeViewModel calculationValueTypeViewModel)
+        public static string AsFormatCalculationType(this object value, CalculationValueTypeViewModel calculationValueTypeViewModel)
         {
-            if (value.HasValue)
-            {
-                switch (calculationValueTypeViewModel)
-                {
-                    case CalculationValueTypeViewModel.Number:
-                        return value.Value.AsFormattedNumber();
-                    case CalculationValueTypeViewModel.Percentage:
-                        return value.Value.AsFormattedPercentage();
-                    case CalculationValueTypeViewModel.Currency:
-                        return value.Value.AsFormattedMoney();
-                    default:
-                        throw new InvalidOperationException("Unknown calculation type");
-                }
+	        if (value != null)
+	        {
+		        if (decimal.TryParse(value.ToString(), out decimal decimalValue))
+	            {
+		            switch (calculationValueTypeViewModel)
+		            {
+			            case CalculationValueTypeViewModel.Number:
+				            return decimalValue.AsFormattedNumber();
+			            case CalculationValueTypeViewModel.Percentage:
+				            return decimalValue.AsFormattedPercentage();
+			            case CalculationValueTypeViewModel.Currency:
+				            return decimalValue.AsFormattedMoney();
+			            default:
+				            throw new InvalidOperationException("Unknown calculation type");
+		            }
+	            }
+
+		        return value.ToString();
             }
-            else
-            {
-                return Properties.PageText.ExcludedText;
-            }
+
+	        return Properties.PageText.ExcludedText;
         }
 
         public static string AsFormatCalculationTypeText(this decimal? value, string textType)

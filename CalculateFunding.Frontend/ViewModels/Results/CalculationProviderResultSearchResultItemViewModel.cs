@@ -38,7 +38,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string CalculationName { get; set; }
 
-        public decimal? CalculationResult { get; set; }
+        public object CalculationResult { get; set; }
 
         public string CalculationExceptionType { get; set; }
 

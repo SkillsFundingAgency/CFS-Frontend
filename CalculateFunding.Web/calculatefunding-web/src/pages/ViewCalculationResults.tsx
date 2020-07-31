@@ -377,52 +377,53 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                     className="govuk-visually-hidden"> sections</span></button>
 
                             </div>
-
-                            {calculationSummary.providers.calculationProviderResults.map(cpr =>
-                                <AccordianPanel id={cpr.id} expanded={false} title={cpr.providerName}
-                                                subtitle={"Total value:"} boldSubtitle={cpr.calculationResultDisplay}
-                                                key={cpr.id} autoExpand={autoExpand}>
-                                    <div id={"accordion-default-content-" + cpr.id}
-                                         className="govuk-accordion__section-content">
-                                        <a className="govuk-link"
-                                           href={"/results/ProviderTemplateCalculations?providerId=" + cpr.providerId + "&fundingPeriodId=" + specificationResults.specification.fundingPeriod.id + "&specificationProviderVersion=" + specificationResults.specification.providerVersionId}>View
-                                            provider calculations</a>
-                                        <dl className="govuk-summary-list govuk-!-margin-top-5">
-                                            <div className="govuk-summary-list__row">
-                                                <dt className="govuk-summary-list__key">
-                                                    Updated
-                                                </dt>
-                                                <dd className="govuk-summary-list__value">
-                                                    {cpr.lastUpdatedDateDisplay}
-                                                </dd>
-                                            </div>
-                                            <div className="govuk-summary-list__row">
-                                                <dt className="govuk-summary-list__key">
-                                                    UKPRN
-                                                </dt>
-                                                <dd className="govuk-summary-list__value">
-                                                    {cpr.ukprn}
-                                                </dd>
-                                            </div>
-                                            <div className="govuk-summary-list__row">
-                                                <dt className="govuk-summary-list__key">
-                                                    Provider type
-                                                </dt>
-                                                <dd className="govuk-summary-list__value">
-                                                    {cpr.providerType}
-                                                </dd>
-                                            </div>
-                                            <div className="govuk-summary-list__row">
-                                                <dt className="govuk-summary-list__key">
-                                                    Local authority
-                                                </dt>
-                                                <dd className="govuk-summary-list__value">
-                                                    {cpr.localAuthority}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-                                </AccordianPanel>
+                            {calculationSummary.providers.calculationProviderResults.map(cpr => {
+                                    let value = cpr.calculationResultDisplay;
+                                    return <AccordianPanel id={cpr.id} expanded={false} title={cpr.providerName}
+                                                    subtitle={"Value:"} boldSubtitle={` ${value}`}
+                                                    key={cpr.id} autoExpand={autoExpand}>
+                                        <div id={"accordion-default-content-" + cpr.id}
+                                             className="govuk-accordion__section-content">
+                                            <a className="govuk-link"
+                                               href={"/results/ProviderTemplateCalculations?providerId=" + cpr.providerId + "&fundingPeriodId=" + specificationResults.specification.fundingPeriod.id + "&specificationProviderVersion=" + specificationResults.specification.providerVersionId}>View
+                                                provider calculations</a>
+                                            <dl className="govuk-summary-list govuk-!-margin-top-5">
+                                                <div className="govuk-summary-list__row">
+                                                    <dt className="govuk-summary-list__key">
+                                                        Updated
+                                                    </dt>
+                                                    <dd className="govuk-summary-list__value">
+                                                        {cpr.lastUpdatedDateDisplay}
+                                                    </dd>
+                                                </div>
+                                                <div className="govuk-summary-list__row">
+                                                    <dt className="govuk-summary-list__key">
+                                                        UKPRN
+                                                    </dt>
+                                                    <dd className="govuk-summary-list__value">
+                                                        {cpr.ukprn}
+                                                    </dd>
+                                                </div>
+                                                <div className="govuk-summary-list__row">
+                                                    <dt className="govuk-summary-list__key">
+                                                        Provider type
+                                                    </dt>
+                                                    <dd className="govuk-summary-list__value">
+                                                        {cpr.providerType}
+                                                    </dd>
+                                                </div>
+                                                <div className="govuk-summary-list__row">
+                                                    <dt className="govuk-summary-list__key">
+                                                        Local authority
+                                                    </dt>
+                                                    <dd className="govuk-summary-list__value">
+                                                        {cpr.localAuthority}
+                                                    </dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </AccordianPanel>
+                                }
                             )}
 
 
