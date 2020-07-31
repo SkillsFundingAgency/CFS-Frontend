@@ -2,8 +2,8 @@ import axios from "axios"
 
 let baseURL = "/api/policy";
 
-export async function getFundingStreamsService() {
-    return axios(`${baseURL}/fundingstreams`, {
+export async function getFundingStreamsService(securityTrimmed: boolean = false) {
+    return axios(`${baseURL}/fundingstreams/${securityTrimmed}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -53,7 +53,7 @@ export function CreateSpecification() {
         createHubConnection();
 
         const getStreams = async () => {
-            const streamResult = await getFundingStreamsService();
+            const streamResult = await getFundingStreamsService(true);
             setFundingStreamData(streamResult.data as FundingStream[]);
         };
         getStreams().then(result => {

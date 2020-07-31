@@ -2,9 +2,11 @@
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,11 +19,15 @@ namespace CalculateFunding.Frontend.Controllers
     public class PolicyController : Controller
     {
         private readonly IPoliciesApiClient _policiesApiClient;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public PolicyController(IPoliciesApiClient policiesApiClient)
+        public PolicyController(IPoliciesApiClient policiesApiClient, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _policiesApiClient = policiesApiClient;
+            _authorizationHelper = authorizationHelper;
         }
 
         [HttpGet]
@@ -85,14 +91,27 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/policy/fundingstreams")]
-        public async Task<IActionResult> GetFundingStreams()
+        [Route("api/policy/fundingstreams/{securityTrimmed}")]
+        public async Task<IActionResult> GetFundingStreams(bool securityTrimmed)
         {
             ApiResponse<IEnumerable<FundingStream>> response = await _policiesApiClient.GetFundingStreams();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(response.Content.OrderBy(x => x.Name));
+                IEnumerable<FundingStream> fundingStreams = response.Content.OrderBy(x => x.Name);
+
+                if (securityTrimmed)
+                {
+                    IEnumerable<Task<FundingStream>> tasks = fundingStreams.Select(async (_) =>
+                    {
+                        FundingStreamPermission permission = await _authorizationHelper.GetUserFundingStreamPermissions(User, _.Id);
+                        return permission.CanCreateSpecification ? _ : null;
+                    });
+
+                    fundingStreams = await Task.WhenAll(tasks);
+                }
+
+                return Ok(fundingStreams.Where(_ => _ != null));
             }
 
             throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
