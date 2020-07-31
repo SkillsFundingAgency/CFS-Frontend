@@ -1,9 +1,20 @@
 import React from "react";
-import OrganisationChart from "../../components/OrganisationChart";
-import NodeTemplate from "../../components/TemplateBuilderNode";
-import { mount } from "enzyme";
-import { FundingLineOrCalculation, NodeType, FundingLineType, AggregrationType, CalculationType, FundingLineDictionaryEntry, ValueFormatType, FundingLineOrCalculationSelectedItem, FundingLine, Calculation } from "../../types/TemplateBuilderDefinitions";
-import { sendDragInfo, clearDragInfo, getDragInfo, sendSelectedNodeInfo, clearSelectedNodeInfo, getSelectedNodeInfo } from "../../services/templateBuilderService";
+import NodeTemplate from "../../../components/TemplateBuilder/TemplateBuilderNode";
+import OrganisationChart from "../../../components/TemplateBuilder/OrganisationChart";
+import {mount} from "enzyme";
+import {
+    FundingLineOrCalculation,
+    NodeType,
+    FundingLineType,
+    AggregrationType,
+    CalculationType,
+    FundingLineDictionaryEntry,
+    ValueFormatType,
+    FundingLineOrCalculationSelectedItem,
+    FundingLine,
+    Calculation
+} from "../../../types/TemplateBuilderDefinitions";
+import {sendDragInfo, clearDragInfo} from "../../../services/templateBuilderService";
 
 const data: FundingLineOrCalculation = {
     id: "n1",
@@ -13,7 +24,7 @@ const data: FundingLineOrCalculation = {
     name: "Funding Line 1",
     fundingLineCode: "Code",
     children: [
-        { id: "n2", templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code" },
+        {id: "n2", templateLineId: 2, kind: NodeType.FundingLine, type: FundingLineType.Information, name: "Funding Line 2", fundingLineCode: "code"},
         {
             id: "n3",
             templateLineId: 3,
@@ -22,7 +33,16 @@ const data: FundingLineOrCalculation = {
             name: "Funding Line 3",
             fundingLineCode: "Code 3",
             children: [
-                { id: "n4", templateCalculationId: 4, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 1", formulaText: "formula", valueFormat: ValueFormatType.Currency, aggregationType: AggregrationType.Sum },
+                {
+                    id: "n4",
+                    templateCalculationId: 4,
+                    kind: NodeType.Calculation,
+                    type: CalculationType.Number,
+                    name: "Calculation 1",
+                    formulaText: "formula",
+                    valueFormat: ValueFormatType.Currency,
+                    aggregationType: AggregrationType.Sum
+                },
                 {
                     id: "n5",
                     templateLineId: 5,
@@ -31,18 +51,45 @@ const data: FundingLineOrCalculation = {
                     name: "Funding Line 4",
                     fundingLineCode: "code",
                     children: [
-                        { id: "n6", templateCalculationId: 6, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 2", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number },
-                        { id: "n7", templateCalculationId: 7, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 3", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number }
+                        {
+                            id: "n6",
+                            templateCalculationId: 6,
+                            kind: NodeType.Calculation,
+                            type: CalculationType.Number,
+                            name: "Calculation 2",
+                            formulaText: "formula",
+                            aggregationType: AggregrationType.None,
+                            valueFormat: ValueFormatType.Number
+                        },
+                        {
+                            id: "n7",
+                            templateCalculationId: 7,
+                            kind: NodeType.Calculation,
+                            type: CalculationType.Number,
+                            name: "Calculation 3",
+                            formulaText: "formula",
+                            aggregationType: AggregrationType.None,
+                            valueFormat: ValueFormatType.Number
+                        }
                     ]
                 },
-                { id: "n8", templateCalculationId: 8, kind: NodeType.Calculation, type: CalculationType.Number, name: "Calculation 4", formulaText: "formula", aggregationType: AggregrationType.None, valueFormat: ValueFormatType.Number }
+                {
+                    id: "n8",
+                    templateCalculationId: 8,
+                    kind: NodeType.Calculation,
+                    type: CalculationType.Number,
+                    name: "Calculation 4",
+                    formulaText: "formula",
+                    aggregationType: AggregrationType.None,
+                    valueFormat: ValueFormatType.Number
+                }
             ]
         }
     ]
 };
 
 const datasource: FundingLineDictionaryEntry[] = [
-    { key: 0, value: data }
+    {key: 0, value: data}
 ];
 
 let onClickNode: (node: FundingLineOrCalculationSelectedItem) => void;
@@ -71,7 +118,7 @@ it("renders all nodes in datasource", () => {
         changeHierarchy={changeHierarchy}
         cloneNode={cloneNode}
         openSideBar={openSideBar}
-        editMode={true}
+        isEditMode={true}
         nextId={9}
         pan={true}
         zoom={true}
@@ -79,7 +126,7 @@ it("renders all nodes in datasource", () => {
         collapsible={true}
         multipleSelect={false}
         addNodeToRefs={addNodeToRefs}
-        itemRefs={{ current: {} }}
+        itemRefs={{current: {}}}
     />);
 
     expect(wrapper.find('OrganisationChartNode')).toHaveLength(8);
@@ -94,7 +141,7 @@ it("adds new lines", () => {
         changeHierarchy={changeHierarchy}
         cloneNode={cloneNode}
         openSideBar={openSideBar}
-        editMode={true}
+        isEditMode={true}
         nextId={9}
         pan={true}
         zoom={true}
@@ -102,7 +149,7 @@ it("adds new lines", () => {
         collapsible={true}
         multipleSelect={false}
         addNodeToRefs={addNodeToRefs}
-        itemRefs={{ current: {} }}
+        itemRefs={{current: {}}}
     />);
 
     const button = wrapper.find("[data-testid='n1-add-line']");
@@ -121,7 +168,7 @@ it("handles drag and drop of a Funding Line (clone)", () => {
         changeHierarchy={changeHierarchy}
         cloneNode={cloneNode}
         openSideBar={openSideBar}
-        editMode={true}
+        isEditMode={true}
         nextId={9}
         pan={true}
         zoom={true}
@@ -129,15 +176,24 @@ it("handles drag and drop of a Funding Line (clone)", () => {
         collapsible={true}
         multipleSelect={false}
         addNodeToRefs={addNodeToRefs}
-        itemRefs={{ current: {} }}
+        itemRefs={{current: {}}}
     />);
 
     const sourceNode = wrapper.find("div#n2");
     const targetNode = wrapper.find("div#n5");
     const targetNodeCss = targetNode.getDOMNode().classList;
 
-    sourceNode.simulate('dragStart', { dataTransfer: { setData: (format: string, data: string) => { } } });
-    targetNode.simulate('drop', { ctrlKey: true, dataTransfer: { getData: () => "{ \"dsKey\": 1 }" }, currentTarget: { classList: targetNodeCss.add("allowedDrop") } });
+    sourceNode.simulate('dragStart', {
+        dataTransfer: {
+            setData: (format: string, data: string) => {
+            }
+        }
+    });
+    targetNode.simulate('drop', {
+        ctrlKey: true,
+        dataTransfer: {getData: () => "{ \"dsKey\": 1 }"},
+        currentTarget: {classList: targetNodeCss.add("allowedDrop")}
+    });
 
     expect(sendDragInfo).toHaveBeenCalledTimes(1);
     expect(sendDragInfo).toHaveBeenCalledWith("n2", "FundingLine");
@@ -155,7 +211,7 @@ it("handles drag and drop of a Funding Line (copy)", () => {
         changeHierarchy={changeHierarchy}
         cloneNode={cloneNode}
         openSideBar={openSideBar}
-        editMode={true}
+        isEditMode={true}
         nextId={9}
         pan={true}
         zoom={true}
@@ -163,15 +219,24 @@ it("handles drag and drop of a Funding Line (copy)", () => {
         collapsible={true}
         multipleSelect={false}
         addNodeToRefs={addNodeToRefs}
-        itemRefs={{ current: {} }}
+        itemRefs={{current: {}}}
     />);
 
     const sourceNode = wrapper.find("div#n2");
     const targetNode = wrapper.find("div#n5");
     const targetNodeCss = targetNode.getDOMNode().classList;
 
-    sourceNode.simulate('dragStart', { dataTransfer: { setData: (format: string, data: string) => { } } });
-    targetNode.simulate('drop', { ctrlKey: false, dataTransfer: { getData: () => "{ \"dsKey\": 1 }" }, currentTarget: { classList: targetNodeCss.add("allowedDrop") } });
+    sourceNode.simulate('dragStart', {
+        dataTransfer: {
+            setData: (format: string, data: string) => {
+            }
+        }
+    });
+    targetNode.simulate('drop', {
+        ctrlKey: false,
+        dataTransfer: {getData: () => "{ \"dsKey\": 1 }"},
+        currentTarget: {classList: targetNodeCss.add("allowedDrop")}
+    });
 
     expect(sendDragInfo).toHaveBeenCalledTimes(1);
     expect(sendDragInfo).toHaveBeenCalledWith("n2", "FundingLine");
@@ -189,7 +254,7 @@ it("handles drag and drop of a Calculation", () => {
         changeHierarchy={changeHierarchy}
         cloneNode={cloneNode}
         openSideBar={openSideBar}
-        editMode={true}
+        isEditMode={true}
         nextId={9}
         pan={true}
         zoom={true}
@@ -197,11 +262,16 @@ it("handles drag and drop of a Calculation", () => {
         collapsible={true}
         multipleSelect={false}
         addNodeToRefs={addNodeToRefs}
-        itemRefs={{ current: {} }}
+        itemRefs={{current: {}}}
     />);
 
     const node = wrapper.find("div#n4");
-    node.simulate('dragStart', { dataTransfer: { setData: (format: string, data: string) => { } } });
+    node.simulate('dragStart', {
+        dataTransfer: {
+            setData: (format: string, data: string) => {
+            }
+        }
+    });
 
     expect(sendDragInfo).toHaveBeenCalledTimes(1);
     expect(sendDragInfo).toHaveBeenCalledWith("n4", "Calculation");

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import "../styles/EditDescriptionModal.scss";
+import "../../styles/EditDescriptionModal.scss";
 
 export interface EditDescriptionModalProps {
     originalDescription: string,

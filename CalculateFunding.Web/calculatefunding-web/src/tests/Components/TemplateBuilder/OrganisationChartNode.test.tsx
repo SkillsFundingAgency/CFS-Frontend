@@ -1,9 +1,9 @@
 import React from "react";
-import OrganisationChartNode from "../../components/OrganisationChartNode";
-import NodeTemplate from "../../components/TemplateBuilderNode";
+import OrganisationChartNode from "../../../components/TemplateBuilder/OrganisationChartNode";
+import NodeTemplate from "../../../components/TemplateBuilder/TemplateBuilderNode";
 import { mount } from "enzyme";
-import { FundingLine, NodeType, FundingLineType, FundingLineOrCalculation, FundingLineOrCalculationSelectedItem, Calculation } from "../../types/TemplateBuilderDefinitions";
-import { sendDragInfo, clearDragInfo, getDragInfo, sendSelectedNodeInfo, clearSelectedNodeInfo, getSelectedNodeInfo } from "../../services/templateBuilderService";
+import { FundingLine, NodeType, FundingLineType, FundingLineOrCalculation, FundingLineOrCalculationSelectedItem, Calculation } from "../../../types/TemplateBuilderDefinitions";
+import { sendDragInfo, clearDragInfo, getDragInfo, sendSelectedNodeInfo, clearSelectedNodeInfo, getSelectedNodeInfo } from "../../../services/templateBuilderService";
 
 let changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
 let cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
@@ -43,7 +43,7 @@ it("sends drag event info to component", () => {
             onClickNode={onClickNode}
             addNode={addNode}
             openSideBar={openSideBar}
-            editMode={true}
+            isEditMode={true}
             nextId={1}
             dsKey={0}
             addNodeToRefs={addNodeToRefs}
@@ -77,7 +77,7 @@ it("does not collapse a non-cloned node on initial render", () => {
             onClickNode={onClickNode}
             addNode={addNode}
             openSideBar={openSideBar}
-            editMode={true}
+            isEditMode={true}
             nextId={1}
             dsKey={0}
             addNodeToRefs={addNodeToRefs}
@@ -107,7 +107,7 @@ it("collapses a cloned node on initial render", () => {
             onClickNode={onClickNode}
             addNode={addNode}
             openSideBar={openSideBar}
-            editMode={true}
+            isEditMode={true}
             nextId={1}
             dsKey={0}
             addNodeToRefs={addNodeToRefs}

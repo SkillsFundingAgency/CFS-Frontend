@@ -1,10 +1,19 @@
 import React from "react";
-import { FundingLineItem } from "./FundingLineItem";
-import { CalculationItem } from "./CalculationItem";
-import { Calculation, NodeType, FundingLine, FundingLineUpdateModel, CalculationUpdateModel, FundingLineOrCalculationSelectedItem, CalculationDictionaryItem } from '../types/TemplateBuilderDefinitions';
+import {FundingLineItem} from "./FundingLineItem";
+import {CalculationItem} from "./CalculationItem";
+import {
+    Calculation,
+    NodeType,
+    FundingLine,
+    FundingLineUpdateModel,
+    CalculationUpdateModel,
+    FundingLineOrCalculationSelectedItem,
+    CalculationDictionaryItem
+} from '../../types/TemplateBuilderDefinitions';
 
 export interface SidebarContentProps {
     data: Set<FundingLineOrCalculationSelectedItem>,
+    isEditMode: boolean,
     calcs: CalculationDictionaryItem[],
     updateNode: (p: FundingLineUpdateModel | CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
@@ -15,17 +24,19 @@ export interface SidebarContentProps {
     refreshNextId: () => void,
 }
 
-export function SidebarContent({
-    data,
-    calcs,
-    updateNode,
-    openSideBar,
-    deleteNode,
-    cloneCalculation,
-    checkIfTemplateCalculationIdInUse,
-    checkIfTemplateLineIdInUse,
-    refreshNextId,
-}: SidebarContentProps) {
+export function SidebarContent(
+    {
+        data,
+        isEditMode,
+        calcs,
+        updateNode,
+        openSideBar,
+        deleteNode,
+        cloneCalculation,
+        checkIfTemplateCalculationIdInUse,
+        checkIfTemplateLineIdInUse,
+        refreshNextId,
+    }: SidebarContentProps) {
     const dataArray = Array.from(data);
     return (
         <div className="sidebar-content">
@@ -36,6 +47,7 @@ export function SidebarContent({
                         <FundingLineItem
                             key={node.id}
                             node={node}
+                            isEditMode={isEditMode}
                             updateNode={updateNode}
                             openSideBar={openSideBar}
                             deleteNode={deleteNode}
@@ -51,6 +63,7 @@ export function SidebarContent({
                         key={node.id}
                         node={node}
                         calcs={calcs}
+                        isEditMode={isEditMode}
                         cloneCalculation={cloneCalculation}
                         updateNode={updateNode}
                         openSideBar={openSideBar}

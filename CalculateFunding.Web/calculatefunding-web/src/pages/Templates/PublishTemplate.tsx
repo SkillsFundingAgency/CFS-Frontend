@@ -9,8 +9,8 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import OrganisationChart from "../../components/OrganisationChart";
-import TemplateBuilderNode from "../../components/TemplateBuilderNode";
+import OrganisationChart from "../../components/TemplateBuilder/OrganisationChart";
+import TemplateBuilderNode from "../../components/TemplateBuilder/TemplateBuilderNode";
 import {
     FundingLineDictionaryEntry,
     Template,
@@ -213,6 +213,7 @@ export const PublishTemplate = () => {
                                     <OrganisationChart
                                         ref={orgchart}
                                         NodeTemplate={TemplateBuilderNode}
+                                        isEditMode={false}
                                         datasource={ds}
                                         chartClass="myChart"
                                         collapsible={true}
@@ -220,7 +221,6 @@ export const PublishTemplate = () => {
                                         pan={true}
                                         zoom={true}
                                         multipleSelect={false}
-                                        editMode={false}
                                     />
                                     {errors.map(error => error.fieldName === "content" &&
                                         <span id={"status-error-" + error.id} className="govuk-error-message">

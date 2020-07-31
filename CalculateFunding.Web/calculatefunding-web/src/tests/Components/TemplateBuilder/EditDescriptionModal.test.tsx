@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditDescriptionModal } from "../../components/EditDescriptionModal";
+import { EditDescriptionModal } from "../../../components/TemplateBuilder/EditDescriptionModal";
 import { mount } from 'enzyme';
 import { waitFor } from "@testing-library/react";
 

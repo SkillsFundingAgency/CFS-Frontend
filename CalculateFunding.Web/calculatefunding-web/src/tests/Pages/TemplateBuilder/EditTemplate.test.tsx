@@ -1,11 +1,10 @@
 import React from "react";
-import {mount} from "enzyme";
-import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
 import {waitFor, fireEvent, render, act} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
+import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {UserConfirmLeavePageModal} from "../../../components/UserConfirmLeavePageModal";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
@@ -101,7 +100,6 @@ beforeAll(() => {
             }))
         }
     }
-
     jest.mock('../../../services/templateBuilderDatasourceService', () => mockFunctions(mockTemplate));
 });
 
@@ -112,29 +110,30 @@ describe("Template Builder when I have no permissions ", () => {
     });
 
     it("fetches template data getTemplateById", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
         const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
-
-        mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
+        renderEditTemplatePage();
         await waitFor(() => expect(getTemplateById).toBeCalled());
     });
 
     it("renders a permission status warning", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
+        const {getByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(getByTestId('permission-alert-message')).toBeInTheDocument();
+        });
     });
 
     it("does not render a publish button", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='publish-button']")).toHaveLength(0));
+        const {queryByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(queryByTestId('publish-button')).toBeNull();
+        });
     });
 
-    it("does not render add button", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='add']")).toHaveLength(0));
+    it("does not render Add Funding Line button", async () => {
+        const {queryByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(queryByTestId('add-funding-line')).toBeNull();
+        });
     });
 });
 
@@ -145,76 +144,127 @@ describe("Template Builder when I request current version and have edit permissi
     });
 
     it("fetches template data getTemplateById", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
         const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
+        renderEditTemplatePage();
 
-        mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
         await waitFor(() => expect(getTemplateById).toBeCalled());
     });
 
-    it("does not render a permission status warning", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
-    });
-
-    it("adds new funding line to page when button clicked", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        expect(wrapper.find('OrganisationChartNode')).toHaveLength(0);
-        wrapper.find("[data-testid='add-funding-line']").simulate('click');
-        await waitFor(() => expect(wrapper.find('OrganisationChartNode')).toHaveLength(1));
-    });
-
-    it("funding line displays add buttons", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        wrapper.find("[data-testid='add-funding-line']").simulate('click');
+    it("does render a save button", async () => {
+        const {getByTestId} = renderEditTemplatePage();
         await waitFor(() => {
-            expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-line']")).toHaveLength(1);
-            expect(wrapper.find('TemplateBuilderNode').find("[data-testid='n0-add-calc']")).toHaveLength(1);
+            expect(getByTestId('save-button')).toBeInTheDocument();
         });
     });
 
-    it("displays edit window when clicking on funding line", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        wrapper.find("[data-testid='add-funding-line']").simulate('click');
+    it("does not render a permission status warning", async () => {
+        const {container} = renderEditTemplatePage();
         await waitFor(() => {
-            expect(wrapper.find('Sidebar').prop('open')).toBe(false);
-            wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');
-            expect(wrapper.find('Sidebar').prop('open')).toBe(true);
+            expect(container.querySelector("#permission-alert-message")).not.toBeInTheDocument();
+        });
+    });
+
+    it("funding line displays add buttons", async () => {
+        const {getByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(getByTestId('add-funding-line')).toBeInTheDocument();
+        });
+        
+        act(() => {
+            fireEvent.click(getByTestId('add-funding-line'));
+        });
+        
+        await waitFor(() => {
+            expect(getByTestId("n0-add-line")).toBeInTheDocument();
+            expect(getByTestId("n0-add-calc")).toBeInTheDocument();
+        });
+    });
+
+    it("adds new funding line to page when button clicked", async () => {
+        const {getByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(getByTestId('add-funding-line')).toBeInTheDocument();
+        });
+        
+        act(() => {
+            fireEvent.click(getByTestId('add-funding-line'));
+        });
+        
+        await waitFor(() => {
+            expect(getByTestId('node-n0')).toBeInTheDocument();
+        });
+    });
+
+    it("displays edit funding line sidebar when clicking on funding line", async () => {
+        const {getByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(getByTestId('add-funding-line')).toBeInTheDocument();
+        });
+        act(() => {
+            fireEvent.click(getByTestId('add-funding-line'));
+        });
+        await waitFor(() => {
+            expect(getByTestId('node-n0')).toBeInTheDocument();
+        });
+        
+        // click on funding line
+        act(() => {
+            fireEvent.click(getByTestId("node-n0"));
+        });
+        
+        await waitFor(() => {
+            expect(getByTestId('sidebar-fundingline')).toBeInTheDocument();
+        });
+    });
+
+    it("displays confirmation when deleting a funding line", async () => {
+        const {getByTestId} = renderEditTemplatePage();
+        await waitFor(() => {
+            expect(getByTestId('add-funding-line')).toBeInTheDocument();
+        });
+        act(() => {
+            fireEvent.click(getByTestId('add-funding-line'));
+        });
+        await waitFor(() => {
+            expect(getByTestId('node-n0')).toBeInTheDocument();
+        });
+        act(() => {
+            fireEvent.click(getByTestId("node-n0"));
+        });
+        await waitFor(() => {
+            expect(getByTestId('node-n0-delete')).toBeInTheDocument();
+        });
+        
+        // delete the node
+        act(() => {
+            fireEvent.click(getByTestId("node-n0-delete"));
+        });
+        
+        await waitFor(() => {
+            expect(getByTestId("node-n0-confirm-delete")).toBeInTheDocument();
         });
     });
 
     it("displays blocking modal when user navigates away from unsaved changes", async () => {
         const {getByTestId, getByText} = renderEditTemplatePage();
-        waitFor(() => {
-            const buttonToClick = getByTestId('add-funding-line');
-            expect(buttonToClick).toBeInTheDocument();
-            const linkToAnotherPage = getByTestId('template-versions-link');
-            expect(linkToAnotherPage).toBeInTheDocument();
-            act(() => {
-                fireEvent.click(buttonToClick); // change something
-                fireEvent.click(linkToAnotherPage); // try to navigate away without saving
-            });
-        }).then(async () => {
-            await waitFor(() => {
-                expect(getByTestId("user-leave-page-confirmation-placeholder")).toBeInTheDocument();
-                expect(getByText("Are you sure you want to leave without saving your changes?")).toBeInTheDocument();
-            });
-        });
-    });
-
-    it("displays confirmation when deleting a funding line", async () => {
-        const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        let wrapper = mount(<MemoryRouter><EditTemplate/></MemoryRouter>);
-        wrapper.find("[data-testid='add-funding-line']").simulate('click');
-        wrapper.find('TemplateBuilderNode').find("[data-testid='node-n0']").simulate('click');
         await waitFor(() => {
-            expect(wrapper.find('FundingLineItem').find("[data-testid='node-n0-confirm-delete']")).toHaveLength(0);
-            wrapper.find('FundingLineItem').find("[data-testid='node-n0-delete']").simulate('click');
-            expect(wrapper.find('FundingLineItem').find("[data-testid='node-n0-confirm-delete']")).toHaveLength(1);
+            expect(getByTestId('add-funding-line')).toBeInTheDocument();
+        });
+        act(() => {
+            fireEvent.click(getByTestId('add-funding-line'));
+        });
+        await waitFor(() => {
+            expect(getByTestId('node-n0')).toBeInTheDocument();
+        });
+
+        // try to navigate away without saving
+        act(() => {
+            fireEvent.click(getByTestId('template-versions-link')); 
+        });
+        
+        await waitFor(() => {
+            expect(getByTestId("user-leave-page-confirmation-placeholder")).toBeInTheDocument();
+            expect(getByText("Are you sure you want to leave without saving your changes?")).toBeInTheDocument();
         });
     });
 

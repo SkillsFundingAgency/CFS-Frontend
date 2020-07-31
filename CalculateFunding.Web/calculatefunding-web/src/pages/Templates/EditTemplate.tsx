@@ -2,13 +2,13 @@ import React, {useState, useRef, useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import {useTemplatePermissions} from '../../hooks/useTemplatePermissions';
-import {SidebarContent} from "../../components/SidebarContent";
+import {SidebarContent} from "../../components/TemplateBuilder/SidebarContent";
 import {Section} from '../../types/Sections';
 import {Header} from '../../components/Header';
 import {Footer} from '../../components/Footer';
-import OrganisationChart from "../../components/OrganisationChart";
-import TemplateBuilderNode from "../../components/TemplateBuilderNode";
-import {TemplateButtons} from "../../components/TemplateButtons";
+import OrganisationChart from "../../components/TemplateBuilder/OrganisationChart";
+import TemplateBuilderNode from "../../components/TemplateBuilder/TemplateBuilderNode";
+import {TemplateButtons} from "../../components/TemplateBuilder/TemplateButtons";
 import {
     addNode,
     removeNode,
@@ -53,7 +53,7 @@ import "../../styles/EditTemplate.scss";
 import {DateFormatter} from '../../components/DateFormatter';
 import {Breadcrumbs, Breadcrumb} from '../../components/Breadcrumbs';
 import {LoadingStatus} from '../../components/LoadingStatus';
-import {EditDescriptionModal} from '../../components/EditDescriptionModal';
+import {EditDescriptionModal} from '../../components/TemplateBuilder/EditDescriptionModal';
 import deepClone from 'lodash/cloneDeep';
 import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -80,7 +80,7 @@ export function EditTemplate() {
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [nextId, setNextId] = useState(0);
     const [template, setTemplate] = useState<TemplateResponse>();
-    const [mode, setMode] = useState<string>(Mode.Edit);
+    const [mode, setMode] = useState<string>(Mode.View);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
     const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -129,12 +129,12 @@ export function EditTemplate() {
     }, [templateId, version]);
 
     useEffect(() => {
-        if (canEditTemplate) {
+        if (template && template.isCurrentVersion && canEditTemplate) {
             setMode(Mode.Edit);
         } else {
             setMode(Mode.View);
         }
-    }, [canEditTemplate]);
+    }, [template, canEditTemplate]);
 
     useEffect(() => {
         const allCalcs = getCalculations().map(c => `CAL: ${c.name} (${c.templateCalculationId})`);
@@ -181,11 +181,6 @@ export function EditTemplate() {
                 } else {
                     addErrorMessage("The template content could not be loaded.");
                 }
-            }
-            if (!templateResponse.isCurrentVersion) {
-                setMode(Mode.View);
-            } else {
-                setMode(Mode.Edit);
             }
         } catch (err) {
             addErrorMessage(err.message);
@@ -653,7 +648,8 @@ export function EditTemplate() {
                     </div>}
                     <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
                         <div id="template"
-                             className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                             className={`govuk-form-group govuk-!-margin-bottom-0 ${
+                                 errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map((error, i) => error.fieldName === "template" &&
                                 <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1">
                                     <span className="govuk-visually-hidden">Error:</span> {error.message}
@@ -670,10 +666,10 @@ export function EditTemplate() {
                                 pan={true}
                                 zoom={true}
                                 multipleSelect={false}
+                                isEditMode={mode === Mode.Edit}
                                 onClickNode={readSelectedNode}
                                 onClickChart={clearSelectedNode}
                                 openSideBar={openSideBar}
-                                editMode={mode === Mode.Edit}
                                 onClickAdd={onClickAdd}
                                 changeHierarchy={changeHierarchy}
                                 cloneNode={cloneNode}
@@ -709,12 +705,12 @@ export function EditTemplate() {
                           className="govuk-link govuk-back-link govuk-link--no-visited-state">
                         Back
                     </Link>
-                    {mode === Mode.Edit &&
                     <Sidebar sidebar={
                         <SidebarContent
                             data={selectedNodes}
                             calcs={getCalculations()}
                             updateNode={updateNode}
+                            isEditMode={mode === Mode.Edit}
                             openSideBar={openSideBar}
                             deleteNode={onClickDelete}
                             cloneCalculation={onCloneCalculation}
@@ -739,7 +735,7 @@ export function EditTemplate() {
                                      bottom: "undefined"
                                  }
                              }}
-                    ><span></span></Sidebar>}
+                    ><span></span></Sidebar>
                 </div>
             </div>
             {mode === Mode.Edit && canEditTemplate && !isLoading &&
