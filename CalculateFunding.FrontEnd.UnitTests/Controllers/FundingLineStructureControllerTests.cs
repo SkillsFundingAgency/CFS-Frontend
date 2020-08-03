@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetFundingStructures_ReturnsFlatStructureWithCorrectLevelsAndInCorrectOrder()
         {
-            ValidScenarioSetup(FundingStreamId.ToLowerInvariant());
+            ValidScenarioSetup(FundingStreamId);
             FundingLineStructureController controller = new FundingLineStructureController(
                 _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 
@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetFundingStructures_ThrowsInternalErrorIfTemplateIdNotSet()
         {
-            ValidScenarioSetup(FundingStreamId);
+            ValidScenarioSetup(FundingStreamId.ToLowerInvariant());
             FundingLineStructureController controller = new FundingLineStructureController(
                 _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 

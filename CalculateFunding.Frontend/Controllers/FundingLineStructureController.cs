@@ -62,7 +62,7 @@ namespace CalculateFunding.Frontend.Controllers
 					$"There was an issue with retrieving specification '{specificationId}'");
 			}
 
-			string templateVersion = (specificationSummary.TemplateIds.ContainsKey(fundingStreamId.ToLowerInvariant()) ? specificationSummary.TemplateIds[fundingStreamId.ToLowerInvariant()] : null);
+			string templateVersion = (specificationSummary.TemplateIds.ContainsKey(fundingStreamId) ? specificationSummary.TemplateIds[fundingStreamId] : null);
 			if (templateVersion == null)
 				return new InternalServerErrorResult(
 					$"Specification contains no matching template version for funding stream '{fundingStreamId}'");
