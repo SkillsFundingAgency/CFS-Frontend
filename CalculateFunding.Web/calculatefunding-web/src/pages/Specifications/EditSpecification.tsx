@@ -168,11 +168,17 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
                                 const fundingStreamKey = specificationSummary.fundingStreams[0].id.toString().toLowerCase();
                                 publishedFundingTemplates.forEach(publishedFundingTemplate => {
+                                    let selected = false;
+                                    if (fundingStreamKey != null) {
+                                        const existingTemplate = specificationSummary.templateIds[fundingStreamKey];
+                                        if (existingTemplate != undefined) {
+                                            selected = parseFloat(existingTemplate[0]) === parseFloat(publishedFundingTemplate.templateVersion)
+                                        }
+                                    }
                                     let item: EditSpecificationTemplateVersion = {
                                         name: publishedFundingTemplate.templateVersion,
                                         value: publishedFundingTemplate.templateVersion,
-                                        selected: fundingStreamKey!= null
-                                            && (parseFloat(specificationSummary.templateIds[fundingStreamKey][0])===parseFloat(publishedFundingTemplate.templateVersion))
+                                        selected: selected
                                     };
 
                                     setTemplateVersionData(prevState => [...prevState, item]);
