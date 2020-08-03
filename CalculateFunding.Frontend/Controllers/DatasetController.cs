@@ -421,7 +421,7 @@ namespace CalculateFunding.Frontend.Controllers
             HttpStatusCode httpStatusCode =
                 await _datasetApiClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
 
-            if (httpStatusCode.IsSuccess())
+            if (httpStatusCode == HttpStatusCode.OK || httpStatusCode == HttpStatusCode.NoContent)
             {
                 return new OkObjectResult(true);
             }

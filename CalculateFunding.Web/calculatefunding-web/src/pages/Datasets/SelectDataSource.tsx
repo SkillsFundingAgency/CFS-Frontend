@@ -45,7 +45,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                 id: "",
                 version: 0
             }],
-            description:""
+            description: ""
         }],
         definitionId: "",
         definitionName: "",
@@ -59,7 +59,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [errorState, setErrorState] = useState<boolean>(false);
     const [saveErrorState, setSaveErrorState] = useState<boolean>(false);
     const [selectedDataset, setSelectedDataset] = useState<string>("");
-
+    const [isAssigning, setIsAssigning] = useState<boolean>(false);
     let history = useHistory();
 
     useEffectOnce(() => {
@@ -99,14 +99,17 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
         if (selectedVersion !== "") {
             setErrorState(false);
             setSaveErrorState(false);
+            setIsAssigning(true);
             assignDataSourceService(datasourceVersions.relationshipId, specificationSummary.id, selectedVersion).then((response) => {
                 if (response.status === 200) {
-                    history.push("");
+                    history.push(`/Datasets/DataRelationships/${specificationSummary.id}`);
                 } else {
                     setErrorState(true);
+                    setIsAssigning(false);
                 }
             }).catch((e) => {
                 setSaveErrorState(true);
+                setIsAssigning(false);
             });
         }
     }
@@ -130,7 +133,10 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         <LoadingStatus title={"Loading datasources"}/>
                     </div>
                 </div>
-                <div className="govuk-grid-row" hidden={datasourceIsLoading}>
+                <div className="govuk-grid-row">
+                    <LoadingStatus title={"Assigning version to dataset"} hidden={!isAssigning} />
+                </div>
+                <div className="govuk-grid-row" hidden={datasourceIsLoading || isAssigning}>
                     <div className="govuk-grid-column-full">
                         <h1 className="govuk-heading-xl">
                             {specificationSummary.name}
