@@ -166,7 +166,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         getTemplatesService(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id).then(templatesResult =>{
                             if (templatesResult.status === 200 || templatesResult.status === 201) {
                                 const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
-                                const fundingStreamKey = specificationSummary.fundingStreams[0].id.toString().toLowerCase();
+                                const fundingStreamKey = specificationSummary.fundingStreams[0].id.toString();
                                 publishedFundingTemplates.forEach(publishedFundingTemplate => {
                                     let selected = false;
                                     if (fundingStreamKey != null) {

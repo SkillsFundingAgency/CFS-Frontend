@@ -93,7 +93,7 @@ export function CreateSpecification() {
                 if (templatesResult.status === 200 || templatesResult.status === 201) {
                     const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
                     getDefaultTemplateVersionService(fundingStreamId, fundingPeriodId).then(result => {
-                        const defaultTemplateVersionId = result.data as string;
+                        const defaultTemplateVersionId = parseFloat(result.data).toFixed(1) as string;
                         if (defaultTemplateVersionId != null && defaultTemplateVersionId !== "")
                         {
                             setDefaultTemplateVersionId(defaultTemplateVersionId);
@@ -110,7 +110,6 @@ export function CreateSpecification() {
                     });
                 }
             })
-
         }
     }
 
