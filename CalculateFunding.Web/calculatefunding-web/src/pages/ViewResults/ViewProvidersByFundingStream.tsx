@@ -17,6 +17,8 @@ import {FacetValue} from "../../types/Facet";
 import {BackToTop} from "../../components/BackToTop";
 import {DateFormatter} from "../../components/DateFormatter";
 import {NoData} from "../../components/NoData";
+import {getFundingStreamByIdService} from "../../services/policyService";
+import {FundingStream} from "../../types/viewFundingTypes";
 export interface ViewProvidersByFundingStreamRouteProps {
     fundingStreamId: string;
 }
@@ -54,6 +56,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchRequest, setSearchRequest] = useState<ProviderVersionSearchModel>(initialSearchRequest);
     const [providerVersionSearchResults, setProviderVersionSearchResults] = useState<PagedProviderVersionSearchResults>(initialProviderVersionSearchResults);
+    const [fundingStreamName, setFundingStreamName] = useState<string>("");
     const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([]);
     const [resultsProviderType, setResultsProviderType] = useState<FacetValue[]>([]);
     const [filterProviderSubType, setFilterProviderSubType] = useState<FacetValue[]>([]);
@@ -68,6 +71,15 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     function GetProvidersByFundingStream(searchModel: ProviderVersionSearchModel)
     {
         setIsLoading(true);
+        getFundingStreamByIdService(match.params.fundingStreamId).then((fundingStreamResponse) => {
+            if (fundingStreamResponse.status === 200 || fundingStreamResponse.status === 201) {
+                const fundingStream = fundingStreamResponse.data as FundingStream;
+                if (fundingStream != null)
+                {
+                    setFundingStreamName(fundingStream.name)
+                }
+            }
+        });
         GetProvidersByFundingStreamService(match.params.fundingStreamId, searchModel).then( (response)=>{
             if (response.status === 200 || response.status === 201) {
                 const result = response.data as PagedProviderVersionSearchResults;
@@ -187,8 +199,12 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                         <Breadcrumb name={"View provider results"} />
                     </Breadcrumbs>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">View provider results</h1>
-                    <span className="govuk-caption-m">Funding stream</span>
-                    <h3 className="govuk-heading-m">General annual grant</h3>
+                    {
+                        fundingStreamName !== "" ?
+                            <span className="govuk-caption-m">Funding stream</span>
+                            : null
+                    }
+                    <h3 className="govuk-heading-m">{fundingStreamName}</h3>
                 </div>
             </div>
             <div className="govuk-grid-row">

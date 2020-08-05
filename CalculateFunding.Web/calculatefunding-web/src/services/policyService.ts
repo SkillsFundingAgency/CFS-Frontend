@@ -28,3 +28,12 @@ export async function getTemplatesService(fundingStreamId: string, fundingPeriod
         },
     });
 }
+
+export async function getFundingStreamByIdService(fundingStreamId: string) {
+    return axios(`${baseURL}/fundingstream-by-id/${fundingStreamId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}

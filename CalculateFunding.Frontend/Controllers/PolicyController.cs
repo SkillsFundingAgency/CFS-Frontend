@@ -118,6 +118,17 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
+        [Route("api/policy/fundingstream-by-id/{fundingStreamId}")]
+        public async Task<IActionResult> GetFundingStreamById(string fundingStreamId)
+        {
+            ApiResponse<FundingStream> apiResponse = await _policiesApiClient.GetFundingStreamById(fundingStreamId);
+
+		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
+
+		    return errorResult ?? Ok(apiResponse.Content);
+        }
+
+        [HttpGet]
         [Route("api/policy/fundingperiods/{fundingStreamId}")]
         public async Task<IActionResult> GetFundingPeriods(string fundingStreamId)
         {
