@@ -180,7 +180,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             fundingStreams
                 .Should()
-                .HaveCount(2);
+                .HaveCount(3);
         }
 
         [TestMethod]
@@ -199,6 +199,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             authorizationHelper
                 .GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), "PSG")
                 .Returns(new FundingStreamPermission { CanCreateSpecification = true });
+            authorizationHelper
+                .GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), "Missing")
+                .Returns((FundingStreamPermission)null);
 
             PolicyController policyController = CreateController(policiesApiClient, authorizationHelper);
 
@@ -251,7 +254,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             return new[] {
                     new FundingStream { Id = "DSG", Name = "DSG" },
-                    new FundingStream { Id = "PSG", Name = "PSG" }
+                    new FundingStream { Id = "PSG", Name = "PSG" },
+                    new FundingStream { Id = "Missing", Name = "Missing"}
                 };
         }
     }

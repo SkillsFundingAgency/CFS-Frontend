@@ -105,7 +105,7 @@ namespace CalculateFunding.Frontend.Controllers
                     IEnumerable<Task<FundingStream>> tasks = fundingStreams.Select(async (_) =>
                     {
                         FundingStreamPermission permission = await _authorizationHelper.GetUserFundingStreamPermissions(User, _.Id);
-                        return permission.CanCreateSpecification ? _ : null;
+                        return permission != null ? (permission.CanCreateSpecification ? _ : null) : null;
                     });
 
                     fundingStreams = await Task.WhenAll(tasks);
