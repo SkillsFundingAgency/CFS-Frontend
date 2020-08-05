@@ -19,8 +19,8 @@ interface OrganisationChartProps {
     datasource: Array<FundingLineDictionaryEntry>,
     pan: boolean,
     zoom: boolean,
-    zoomoutLimit?: number,
-    zoominLimit?: number,
+    zoomOutLimit?: number,
+    zoomInLimit?: number,
     containerClass?: string,
     chartClass?: string,
     NodeTemplate: React.ReactType,
@@ -35,31 +35,33 @@ interface OrganisationChartProps {
     cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
     openSideBar: (open: boolean) => void,
     nextId: number,
-    addNodeToRefs?: (id: string, ref: React.MutableRefObject<any>) => void | undefined,
+    addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
     focusNodeId?: string | undefined,
     itemRefs?: React.MutableRefObject<{}> | undefined,
+    chartScale?: number,
+    targetScale?: number,
 };
 
 const defaultProps = {
     pan: false,
     zoom: false,
-    zoomoutLimit: 0.05,
-    zoominLimit: 1,
+    zoomOutLimit: 0.05,
+    zoomInLimit: 1,
     containerClass: "",
     chartClass: "",
     draggable: false,
     collapsible: true,
-    multipleSelect: false
+    multipleSelect: false,
 };
 
-const OrganisationChart = forwardRef<any, OrganisationChartProps>(
+const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
     (
         {
             datasource,
             pan,
             zoom,
-            zoomoutLimit,
-            zoominLimit,
+            zoomOutLimit,
+            zoomInLimit,
             containerClass,
             chartClass,
             NodeTemplate,
@@ -77,10 +79,12 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
             addNodeToRefs,
             focusNodeId,
             itemRefs,
-        }, ref
+            chartScale,
+            targetScale,
+        }, orgChartRef
     ) => {
         const container = useRef<HTMLDivElement>(null);
-        const chart = useRef<HTMLDivElement>(null);
+        const chart: React.RefObject<HTMLDivElement> = orgChartRef as React.RefObject<HTMLDivElement>;
 
         const [startX, setStartX] = useState(0);
         const [startY, setStartY] = useState(0);
@@ -95,7 +99,42 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
             setTimeout(() => {
                 (itemRefs.current as any)[focusNodeId].current.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
             }, 500);
-        }, [focusNodeId]);
+        }, [focusNodeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+        useEffect(() => {
+            if (!chartScale) return;
+            const newScale: number = chartScale < 0 ? 0.9 : 1.05;
+            updateChartScale(newScale);
+        }, [chartScale]); // eslint-disable-line react-hooks/exhaustive-deps
+
+        useEffect(() => {
+            if (!targetScale || !zoomOutLimit || !zoomInLimit) return;
+            if (targetScale > zoomInLimit) {
+                targetScale = zoomInLimit;
+            }
+            if (targetScale < zoomOutLimit) {
+                targetScale = zoomOutLimit;
+            }
+            let matrix: Array<any> = [];
+            if (transform === "") {
+                setTransform("matrix(" + targetScale + ", 0, 0, " + targetScale + ", 0, 0)");
+            } else {
+                matrix = transform.split(",");
+                if (transform.indexOf("3d") === -1) {
+                    matrix[0] = "matrix(" + targetScale;
+                    matrix[3] = targetScale;
+                    matrix[4] = 0;
+                    matrix[5] = 0;
+                    setTransform(matrix.join(","));
+                } else {
+                    matrix[0] = "matrix3d(" + targetScale;
+                    matrix[5] = targetScale;
+                    matrix[12] = 0;
+                    matrix[13] = 0;
+                    setTransform(matrix.join(","));
+                }
+            }
+        }, [targetScale]); // eslint-disable-line react-hooks/exhaustive-deps
 
         const attachRel = (data: FundingLineOrCalculation, flags: string) => {
             data.relationship =
@@ -191,7 +230,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
         };
 
         const updateChartScale = (newScale: number) => {
-            if (zoominLimit && zoomoutLimit) {
+            if (zoomInLimit && zoomOutLimit) {
                 let matrix: Array<any> = [];
                 let targetScale = 1;
                 if (transform === "") {
@@ -200,14 +239,14 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
                     matrix = transform.split(",");
                     if (transform.indexOf("3d") === -1) {
                         targetScale = Math.abs(Number.parseFloat(matrix[3]) * newScale);
-                        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
+                        if (targetScale > zoomOutLimit && targetScale < zoomInLimit) {
                             matrix[0] = "matrix(" + targetScale;
                             matrix[3] = targetScale;
                             setTransform(matrix.join(","));
                         }
                     } else {
                         targetScale = Math.abs(Number.parseFloat(matrix[5]) * newScale);
-                        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
+                        if (targetScale > zoomOutLimit && targetScale < zoomInLimit) {
                             matrix[0] = "matrix3d(" + targetScale;
                             matrix[5] = targetScale;
                             setTransform(matrix.join(","));
@@ -218,8 +257,8 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
             chart && chart.current && chart.current.scrollIntoView({block: "center", inline: "center"});
         };
 
-        const zoomHandler = (e: { deltaY: number; }) => {
-            let newScale = 1 + (e.deltaY > 0 ? -0.2 : 0.2);
+        const zoomHandler = (e: {deltaY: number;}) => {
+            let newScale = 1 + (e.deltaY > 0 ? -0.1 : 0.05);
             updateChartScale(newScale);
         };
 
@@ -228,7 +267,6 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
                 id="org-container"
                 ref={container}
                 className={"orgchart-container " + containerClass}
-                style={{cursor: cursor}}
                 onWheel={zoom ? zoomHandler : undefined}
                 onMouseUp={pan && panning ? panEndHandler : undefined}>
                 <div>
@@ -256,7 +294,7 @@ const OrganisationChart = forwardRef<any, OrganisationChartProps>(
                                         openSideBar={openSideBar}
                                         nextId={nextId}
                                         dsKey={ds.key}
-                                        addNodeToRefs={addNodeToRefs}/>
+                                        addNodeToRefs={addNodeToRefs} />
                                 </ul>
                             </div>
                         )}

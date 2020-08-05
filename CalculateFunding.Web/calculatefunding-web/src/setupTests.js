@@ -7,6 +7,7 @@ require('jest-localstorage-mock');
 
 window.scrollTo = jest.fn();
 window.MutationObserver = MutationObserver;
+window.HTMLElement.prototype.scrollIntoView = function() {};
 
 configure({ adapter: new Adapter() });
 

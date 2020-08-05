@@ -3,7 +3,7 @@ import OrganisationChartNode from "../../../components/TemplateBuilder/Organisat
 import NodeTemplate from "../../../components/TemplateBuilder/TemplateBuilderNode";
 import { mount } from "enzyme";
 import { FundingLine, NodeType, FundingLineType, FundingLineOrCalculation, FundingLineOrCalculationSelectedItem, Calculation } from "../../../types/TemplateBuilderDefinitions";
-import { sendDragInfo, clearDragInfo, getDragInfo, sendSelectedNodeInfo, clearSelectedNodeInfo, getSelectedNodeInfo } from "../../../services/templateBuilderService";
+import { sendDragInfo } from "../../../services/templateBuilderService";
 
 let changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
 let cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;

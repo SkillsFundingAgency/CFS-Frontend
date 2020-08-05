@@ -9,6 +9,7 @@ import {Footer} from '../../components/Footer';
 import OrganisationChart from "../../components/TemplateBuilder/OrganisationChart";
 import TemplateBuilderNode from "../../components/TemplateBuilder/TemplateBuilderNode";
 import {TemplateButtons} from "../../components/TemplateBuilder/TemplateButtons";
+import {TemplateBuilderToolBar} from "../../components/TemplateBuilder/TemplateBuilderToolBar";
 import {
     addNode,
     removeNode,
@@ -86,7 +87,9 @@ export function EditTemplate() {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [allFundingLinesAndCalculations, setAllFundingLinesAndCalculations] = useState<string[]>([]);
     const [focusNodeId, setFocusNodeId] = useState<string>('');
-    const {canEditTemplate, canApproveTemplate, canCreateTemplate, missingPermissions} = 
+    const [chartScale, setChartScale] = useState<number>(1);
+    const [targetScale, setTargetScale] = useState<number>(1);
+    const {canEditTemplate, canApproveTemplate, canCreateTemplate, missingPermissions} =
         useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     const {
         initialiseState,
@@ -110,7 +113,7 @@ export function EditTemplate() {
         }
     }
     useEventListener('keydown', keyPressHandler);
-    
+
     useConfirmLeavePage(isDirty && !isSaving);
 
     useEffect(() => {
@@ -251,7 +254,7 @@ export function EditTemplate() {
     function showSaveMessage(message: string) {
         setSaveMessage(message);
     }
-    
+
     const handleRestoreTemplateClick = async (templateVersion: number) => {
         try {
             clearErrorMessages();
@@ -395,6 +398,7 @@ export function EditTemplate() {
 
         ds.push(fundingLineEntry);
         update((deepClone(ds)));
+        setFocusNodeId(`n${id}`);
     }
 
     const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -493,88 +497,88 @@ export function EditTemplate() {
 
     return (
         <div>
-            <Header location={Section.Templates}/>
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
-                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []}/>
+                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
                 <LoadingStatus title={"Loading Template"} hidden={!isLoading} id={"template-builder-loader"}
-                               subTitle={"Please wait while the template loads."}/>
+                    subTitle={"Please wait while the template loads."} />
                 {!version && <Breadcrumbs>
-                    <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link'/>
-                    <Breadcrumb name={template ? template.name : ""}/>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link' />
+                    <Breadcrumb name={template ? template.name : ""} />
                 </Breadcrumbs>}
                 {version && <Breadcrumbs>
-                    <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link'/>
-                    <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`}/>
-                    <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`}/>
-                    <Breadcrumb name={isLoading ? "Loading..." : template ? `${template.majorVersion}.${template.minorVersion}` : ""}/>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid='template-listing-link' />
+                    <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
+                    <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`} />
+                    <Breadcrumb name={isLoading ? "Loading..." : template ? `${template.majorVersion}.${template.minorVersion}` : ""} />
                 </Breadcrumbs>}
                 <div className="govuk-main-wrapper">
                     {errors.length > 0 &&
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-two-thirds">
-                            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
-                                <h2 className="govuk-error-summary__title" id="error-summary-title">
-                                    There is a problem
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-two-thirds">
+                                <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
+                                    <h2 className="govuk-error-summary__title" id="error-summary-title">
+                                        There is a problem
                                 </h2>
-                                <div className="govuk-error-summary__body">
-                                    <ul className="govuk-list govuk-error-summary__list">
-                                        {errors.map((error, i) =>
-                                            <li key={i}>
-                                                {error.fieldName &&
-                                                <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
-                                                {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
-                                            </li>
-                                        )}
-                                    </ul>
+                                    <div className="govuk-error-summary__body">
+                                        <ul className="govuk-list govuk-error-summary__list">
+                                            {errors.map((error, i) =>
+                                                <li key={i}>
+                                                    {error.fieldName &&
+                                                        <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
+                                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     }
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-0" data-testid="template-name">{template && template.name}</h1>
                     <h3 className="govuk-caption-l govuk-!-padding-top-0">{template &&
-                    <span>{template.fundingStreamName} for {template.fundingPeriodName}</span>
+                        <span>{template.fundingStreamName} for {template.fundingPeriodName}</span>
                     }
                     </h3>
 
                     {template && ((template.isCurrentVersion && canEditTemplate) || (template.description && template.description.trim().length > 0)) &&
-                    <details className="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-3" data-module="govuk-details">
-                        <summary className="govuk-details__summary">
+                        <details className="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-3" data-module="govuk-details">
+                            <summary className="govuk-details__summary">
                                 <span className="govuk-details__summary-text">
                                     What is {template.fundingStreamId} {template.fundingPeriodId}?
                             </span>
-                        </summary>
-                        <div
-                            className={`govuk-details__text ${errors.filter(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                            <span className="govuk-caption-m" id="description" ref={descriptionRef}>Description</span>
-                            {errors.map(error => error.fieldName === "description" &&
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                            </summary>
+                            <div
+                                className={`govuk-details__text ${errors.filter(error => error.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                                <span className="govuk-caption-m" id="description" ref={descriptionRef}>Description</span>
+                                {errors.map(error => error.fieldName === "description" &&
+                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
                                         <span className="govuk-visually-hidden">Error:</span> {error.message}
                                     </span>
-                            )}
-                            <p className="govuk-body">
-                                {`${(template.description && template.description.trim()) || ''} `}
-                                {template.isCurrentVersion && canEditTemplate &&
-                                <>
-                                    {template.description && template.description.trim().length > 0 &&
-                                    <button id="edit-description-link"
-                                            onClick={toggleEditDescription}
-                                            className="govuk-link govuk-link--no-visited-state">
-                                        Edit
+                                )}
+                                <p className="govuk-body">
+                                    {`${(template.description && template.description.trim()) || ''} `}
+                                    {template.isCurrentVersion && canEditTemplate &&
+                                        <>
+                                            {template.description && template.description.trim().length > 0 &&
+                                                <button id="edit-description-link"
+                                                    onClick={toggleEditDescription}
+                                                    className="govuk-link govuk-link--no-visited-state">
+                                                    Edit
                                     </button>}
-                                    {(!template.description || (template.description.trim().length === 0)) &&
-                                    <button id="add-description-link"
-                                            onClick={toggleEditDescription}
-                                            className="govuk-link govuk-link--no-visited-state">
-                                        Add
+                                            {(!template.description || (template.description.trim().length === 0)) &&
+                                                <button id="add-description-link"
+                                                    onClick={toggleEditDescription}
+                                                    className="govuk-link govuk-link--no-visited-state">
+                                                    Add
                                     </button>}
-                                </>
-                                }
-                            </p>
-                        </div>
-                    </details>}
+                                        </>
+                                    }
+                                </p>
+                            </div>
+                        </details>}
 
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
@@ -582,101 +586,113 @@ export function EditTemplate() {
                             <span
                                 className="govuk-heading-m govuk-!-margin-bottom-2">{template && `${template.majorVersion}.${template.minorVersion}`} &nbsp;</span>
                             {template && template.status === TemplateStatus.Draft && template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--blue">IN PROGRESS</strong></span>}
+                                <span><strong className="govuk-tag govuk-tag--blue">IN PROGRESS</strong></span>}
                             {template && template.status === TemplateStatus.Draft && !template.isCurrentVersion &&
-                            <span><strong className="govuk-tag govuk-tag--grey">DRAFT</strong></span>}
+                                <span><strong className="govuk-tag govuk-tag--grey">DRAFT</strong></span>}
                             {template && template.status === TemplateStatus.Published &&
-                            <span><strong className="govuk-tag govuk-tag--green">PUBLISHED</strong><br/>
+                                <span><strong className="govuk-tag govuk-tag--green">PUBLISHED</strong><br />
                                 </span>}
                             {template &&
-                            <div className="govuk-body">
-                                <Link id="versions-link"
-                                      to={`/Templates/${templateId}/Versions`}
-                                      data-testid='template-versions-link'
-                                      className="govuk-link--no-visited-state">
-                                    View all versions
+                                <div className="govuk-body">
+                                    <Link id="versions-link"
+                                        to={`/Templates/${templateId}/Versions`}
+                                        data-testid='template-versions-link'
+                                        className="govuk-link--no-visited-state">
+                                        View all versions
                                 </Link>
-                            </div>}
+                                </div>}
                         </div>
                     </div>
                     {template && template.status === TemplateStatus.Published &&
-                    <>
-                        <span className="govuk-caption-m">Publish Notes</span>
-                        <p className="govuk-body">
-                            {template && template.comments}
-                        </p>
-                    </>}
+                        <>
+                            <span className="govuk-caption-m">Publish Notes</span>
+                            <p className="govuk-body">
+                                {template && template.comments}
+                            </p>
+                        </>}
                     {mode === Mode.Edit && canEditTemplate &&
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-full">
-                            <label className="govuk-label" htmlFor="textarea">
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                <label className="govuk-label" htmlFor="textarea">
                                     Search
                                 </label>
                                 <div className="govuk-grid-column-one-third govuk-!-padding-left-0 search-container">
                                     <AutoComplete suggestions={allFundingLinesAndCalculations} callback={search} />
+                                </div>
+                                <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
+                                    <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
+                                    <ul className="govuk-list inline-block-list">
+                                        <li>
+                                            <a href="#"
+                                                data-testid='redo'
+                                                onClick={handleRedo}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
+                                                <span>↪</span> Redo ({redoCount()})
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <a href="#"
+                                                data-testid='undo'
+                                                onClick={handleUndo}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                                <span>↩</span> Undo ({undoCount()})
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <a href="#"
+                                                data-testid='add-funding-line'
+                                                onClick={handleAddFundingLineClick}
+                                                className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+                                                <span>+</span> Add a new funding line
+                                        </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
-                                <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
-                                <ul className="govuk-list inline-block-list">
-                                    <li>
-                                        <a href="#"
-                                           data-testid='redo'
-                                           onClick={handleRedo}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
-                                            <span>↪</span> Redo ({redoCount()})
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           data-testid='undo'
-                                           onClick={handleUndo}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-                                            <span>↩</span> Undo ({undoCount()})
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           data-testid='add-funding-line'
-                                           onClick={handleAddFundingLineClick}
-                                           className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-                                            <span>+</span> Add a new funding line
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>}
+                        </div>}
                     <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
                         <div id="template"
-                             className={`govuk-form-group govuk-!-margin-bottom-0 ${
-                                 errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            className={`govuk-form-group govuk-!-margin-bottom-0 ${
+                                errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map((error, i) => error.fieldName === "template" &&
                                 <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1">
                                     <span className="govuk-visually-hidden">Error:</span> {error.message}
                                 </span>
                             )}
-                            <OrganisationChart
-                                ref={orgchart}
-                                itemRefs={itemRefs}
-                                NodeTemplate={TemplateBuilderNode}
-                                datasource={ds}
-                                chartClass="myChart"
-                                collapsible={true}
-                                draggable={true}
-                                pan={true}
-                                zoom={true}
-                                multipleSelect={false}
-                                isEditMode={mode === Mode.Edit}
-                                onClickNode={readSelectedNode}
-                                onClickChart={clearSelectedNode}
-                                openSideBar={openSideBar}
-                                onClickAdd={onClickAdd}
-                                changeHierarchy={changeHierarchy}
-                                cloneNode={cloneNode}
-                                nextId={nextId}
-                                addNodeToRefs={addNodeToRefs}
-                                focusNodeId={focusNodeId}
-                            />
+                            <div id="template-builder-container" className="template-builder-container">
+                                <OrganisationChart
+                                    ref={orgchart}
+                                    itemRefs={itemRefs}
+                                    NodeTemplate={TemplateBuilderNode}
+                                    datasource={ds}
+                                    chartClass="myChart"
+                                    collapsible={true}
+                                    draggable={true}
+                                    pan={true}
+                                    zoom={true}
+                                    multipleSelect={false}
+                                    isEditMode={mode === Mode.Edit}
+                                    onClickNode={readSelectedNode}
+                                    onClickChart={clearSelectedNode}
+                                    openSideBar={openSideBar}
+                                    onClickAdd={onClickAdd}
+                                    changeHierarchy={changeHierarchy}
+                                    cloneNode={cloneNode}
+                                    nextId={nextId}
+                                    addNodeToRefs={addNodeToRefs}
+                                    focusNodeId={focusNodeId}
+                                    chartScale={chartScale}
+                                    targetScale={targetScale}
+                                />
+                                <TemplateBuilderToolBar
+                                    containerClassName="template-builder-container"
+                                    orgChart={orgchart}
+                                    setChartScale={setChartScale}
+                                    chartScale={chartScale}
+                                    setTargetScale={setTargetScale}
+                                    targetScale={targetScale}
+                                />
+                            </div>
                         </div>
                     </div>
                     {template && <TemplateButtons
@@ -696,13 +712,13 @@ export function EditTemplate() {
                         handlePublish={handlePublishClick}
                     />}
                     <p className="govuk-body">
-                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false}/>
+                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false} />
                         {` by ${template && template.authorName}`}
                     </p>
                     {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                     <Link to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"}
-                          id="back-button"
-                          className="govuk-link govuk-back-link govuk-link--no-visited-state">
+                        id="back-button"
+                        className="govuk-link govuk-back-link govuk-link--no-visited-state">
                         Back
                     </Link>
                     <Sidebar sidebar={
@@ -718,34 +734,34 @@ export function EditTemplate() {
                             checkIfTemplateLineIdInUse={checkIfTemplateLineIdInUse}
                             refreshNextId={refreshNextId}
                         />}
-                             open={openSidebar}
-                             onSetOpen={openSideBar}
-                             pullRight={true}
-                             styles={{
-                                 sidebar: {
-                                     background: "white",
-                                     position: "fixed",
-                                     padding: "20px 20px",
-                                     width: "500px"
-                                 }, root: {position: "undefined"}, content: {
-                                     position: "undefined",
-                                     top: "undefined",
-                                     left: "undefined",
-                                     right: "undefined",
-                                     bottom: "undefined"
-                                 }
-                             }}
+                        open={openSidebar}
+                        onSetOpen={openSideBar}
+                        pullRight={true}
+                        styles={{
+                            sidebar: {
+                                background: "white",
+                                position: "fixed",
+                                padding: "20px 20px",
+                                width: "500px"
+                            }, root: {position: "undefined"}, content: {
+                                position: "undefined",
+                                top: "undefined",
+                                left: "undefined",
+                                right: "undefined",
+                                bottom: "undefined"
+                            }
+                        }}
                     ><span></span></Sidebar>
                 </div>
             </div>
             {mode === Mode.Edit && canEditTemplate && !isLoading &&
-            <EditDescriptionModal
-                originalDescription={template && template.description ? template.description : ""}
-                showModal={showModal}
-                toggleModal={setShowModal}
-                saveDescription={saveDescription}/>
+                <EditDescriptionModal
+                    originalDescription={template && template.description ? template.description : ""}
+                    showModal={showModal}
+                    toggleModal={setShowModal}
+                    saveDescription={saveDescription} />
             }
-            <Footer/>
+            <Footer />
         </div>
     )
 }

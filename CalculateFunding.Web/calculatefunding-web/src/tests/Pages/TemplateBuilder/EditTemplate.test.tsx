@@ -7,6 +7,8 @@ import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {UserConfirmLeavePageModal} from "../../../components/UserConfirmLeavePageModal";
 
+jest.useFakeTimers();
+
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
