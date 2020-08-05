@@ -178,10 +178,20 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         getPublishedProviderResultsService(searchRequestViewModel).then((result) => {
             const response = result.data as PublishProviderSearchResultViewModel;
             setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
-            setFilterProviderType(response.facets[0].facetValues);
-            setFilterProviderSubType(response.facets[1].facetValues);
-            setFilterLocalAuthority(response.facets[2].facetValues)
-            setFilterStatus(response.facets[3].facetValues)
+            if (response.facets != null) {
+                if (response.facets.length > 0) {
+                    setFilterProviderType(response.facets[0].facetValues);
+                }
+                if (response.facets.length > 1) {
+                    setFilterProviderSubType(response.facets[1].facetValues);
+                }
+                if (response.facets.length > 2) {
+                    setFilterLocalAuthority(response.facets[2].facetValues)
+                }
+                if (response.facets.length > 3) {
+                    setFilterStatus(response.facets[3].facetValues)
+                }
+            }
             setTableIsLoading(false);
         });
     }
