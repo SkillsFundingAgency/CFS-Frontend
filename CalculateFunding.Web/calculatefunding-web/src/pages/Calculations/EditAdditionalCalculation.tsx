@@ -5,8 +5,18 @@ import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {CalculationTypes, EditAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {approveCalculationService, compileCalculationPreviewService, getCalculationByIdService, getIsUserAllowedToApproveCalculationService, updateAdditionalCalculationService} from "../../services/calculationService";
+import {
+    CalculationTypes,
+    EditAdditionalCalculationViewModel,
+    UpdateAdditionalCalculationViewModel
+} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {
+    approveCalculationService,
+    compileCalculationPreviewService,
+    getCalculationByIdService,
+    getIsUserAllowedToApproveCalculationService,
+    updateAdditionalCalculationService
+} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
@@ -43,6 +53,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     });
     const [originalAdditionalCalculation, setOriginalAdditionalCalculation] = useState<EditAdditionalCalculationViewModel>(null);
     const [isDirty, setIsDirty] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
@@ -84,7 +95,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
     let history = useHistory();
 
-    useConfirmLeavePage(isDirty);
+    useConfirmLeavePage(isDirty && !isSaving);
 
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
@@ -112,9 +123,8 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             });
         })
     });
-    
-    useEffect(() =>
-    {
+
+    useEffect(() => {
         if (originalAdditionalCalculation &&
             originalAdditionalCalculation.sourceCode &&
             originalAdditionalCalculation.name &&
@@ -127,47 +137,46 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
     function submitAdditionalCalculation() {
         if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
-            setFormValid({formSubmitted: true, formValid: false});
-        } else if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
+            return setFormValid({formSubmitted: true, formValid: false});
+        }
+        if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
             setNameErrorMessage("Please use a name between 4 and 180 characters");
-            setFormValid({formSubmitted: true, formValid: false});
-        } else if ((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) && 
-                additionalCalculationSourceCode !== "" && 
-                additionalCalculationBuildSuccess.buildSuccess && 
-                additionalCalculationBuildSuccess.compileRun) {
-            setFormValid({formSubmitted: true, formValid: true});
-            setNameErrorMessage("");
-            setIsLoading(true);
-            let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
-                calculationName: additionalCalculationName,
-                calculationType: additionalCalculationType,
-                sourceCode: additionalCalculationSourceCode,
-            };
+            return setFormValid({formSubmitted: true, formValid: false});
+        }
+        if (!((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) &&
+            additionalCalculationSourceCode !== "" &&
+            additionalCalculationBuildSuccess.buildSuccess &&
+            additionalCalculationBuildSuccess.compileRun)) {
+            return setFormValid({formSubmitted: true, formValid: false});
+        }
 
-            const editAdditionalCalculation = async () => {
-                const updateAdditionalCalculationResult = await 
-                    updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId);
-                return updateAdditionalCalculationResult;
-            };
-
-            editAdditionalCalculation().then((result) => {
+        setFormValid({formSubmitted: true, formValid: true});
+        setNameErrorMessage("");
+        setIsLoading(true);
+        setIsSaving(true);
+        
+        let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
+            calculationName: additionalCalculationName,
+            calculationType: additionalCalculationType,
+            sourceCode: additionalCalculationSourceCode,
+        };
+        debugger
+        updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
+            .then((result) => {
+                debugger
                 if (result.status === 200) {
                     setIsDirty(false);
                     let response = result.data as Calculation;
                     history.push(`/ViewSpecification/${response.specificationId}`);
-                } else {
-                    setIsLoading(false);
                 }
-            }).catch(() => {
+            })
+            .finally(() => {
                 setIsLoading(false);
+                setIsSaving(false);
             });
-        } else {
-            setFormValid({formSubmitted: true, formValid: false})
-        }
     }
 
     function approveTemplateCalculation() {
-
         setIsLoading(true);
         setCalculationApproveError("");
 
@@ -323,7 +332,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
                 </div>
                 <div className="govuk-form-group">
-                    <CalculationResultsLink calculationId={calculationId} />
+                    <CalculationResultsLink calculationId={calculationId}/>
                 </div>
                 <div className="govuk-panel govuk-panel--confirmation"
                      hidden={!additionalCalculationBuildSuccess.buildSuccess}>
@@ -379,7 +388,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitAdditionalCalculation}
-                        disabled={!additionalCalculationBuildSuccess.buildSuccess}>
+                        disabled={!isDirty && isSaving && !additionalCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
