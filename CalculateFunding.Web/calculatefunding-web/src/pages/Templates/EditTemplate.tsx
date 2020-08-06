@@ -485,14 +485,14 @@ export function EditTemplate() {
         }
     }
 
-    const checkIfTemplateCalculationIdInUse = (templateCalculationId: number) => {
-        const allTemplateCalculationIds: number[] = getAllTemplateCalculationIds(ds);
-        return allTemplateCalculationIds.includes(templateCalculationId);
-    }
-
     const checkIfTemplateLineIdInUse = (templateLineId: number) => {
         const allTemplateLineIds: number[] = getAllTemplateLineIds(ds);
         return allTemplateLineIds.includes(templateLineId);
+    }
+    
+    const checkFundingLineNameInUse = (name: string) => {
+        const allNames: string[] = ds.map(fl => fl.value.name);
+        return allNames.includes(name);
     }
 
     return (
@@ -730,8 +730,8 @@ export function EditTemplate() {
                             openSideBar={openSideBar}
                             deleteNode={onClickDelete}
                             cloneCalculation={onCloneCalculation}
-                            checkIfTemplateCalculationIdInUse={checkIfTemplateCalculationIdInUse}
                             checkIfTemplateLineIdInUse={checkIfTemplateLineIdInUse}
+                            checkFundingLineNameInUse={checkFundingLineNameInUse}
                             refreshNextId={refreshNextId}
                         />}
                         open={openSidebar}

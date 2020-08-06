@@ -1,25 +1,28 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, {useState, useMemo, useEffect} from "react";
 import "../styles/TagEditor.scss";
-import { useEventListener } from "../hooks/useEventListener";
-import { getStringArray } from "../services/templateBuilderDatasourceService";
+import {useEventListener} from "../hooks/useEventListener";
+import {getStringArray} from "../services/templateBuilderDatasourceService";
 
 export interface TagEditorProps {
     allowDuplicates: boolean,
     tagValuesCsv: string,
+    label: string,
     duplicateErrorMessage?: string,
     showErrorMessageOnRender?: string,
     onAddNewValue: (newValue: string) => void,
     onRemoveValue: (valueToRemove: string) => void
 }
 
-export function TagEditor({
-    allowDuplicates,
-    tagValuesCsv,
-    showErrorMessageOnRender,
-    duplicateErrorMessage,
-    onAddNewValue,
-    onRemoveValue
-}: TagEditorProps) {
+export function TagEditor(
+    {
+        allowDuplicates,
+        tagValuesCsv,
+        label,
+        showErrorMessageOnRender,
+        duplicateErrorMessage,
+        onAddNewValue,
+        onRemoveValue
+    }: TagEditorProps) {
 
     const [newTagValue, setNewTagValue] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>(showErrorMessageOnRender ? showErrorMessageOnRender : "");
@@ -29,7 +32,7 @@ export function TagEditor({
         if (e.keyCode === 13) {
             handleAddNewTagValueClick();
         }
-    }
+    };
     useEventListener('keydown', keyPressHandler);
 
     useEffect(() => {
@@ -38,7 +41,7 @@ export function TagEditor({
 
     const handleNewTagValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewTagValue(e.target.value);
-    }
+    };
 
     const passesValidityCheck = (): boolean => {
         const existingTagsArray = getStringArray(tagValuesCsv);
@@ -47,15 +50,15 @@ export function TagEditor({
             return false;
         }
         return true;
-    }
+    };
 
     const resetValidity = () => {
         setErrorMessage('');
-    }
+    };
 
     const resetTagValue = () => {
         setNewTagValue('');
-    }
+    };
 
     const handleAddNewTagValueClick = () => {
         resetValidity();
@@ -63,15 +66,15 @@ export function TagEditor({
             onAddNewValue(newTagValue);
             resetTagValue();
         }
-    }
+    };
 
     const handleRemoveTagValueClick = (valueToRemove: string) => {
         onRemoveValue(valueToRemove);
-    }
+    };
 
     return (
         <div className={`govuk-form-group ${errorMessage.length === 0 ? "" : "govuk-form-group--error"}`}>
-            <label className="govuk-label" htmlFor="add-tag" aria-labelledby="add-tag">Allowed Enum Values</label>
+            <label className="govuk-label" htmlFor="add-tag" aria-labelledby="add-tag">{label}</label>
             <div className="govuk-!-margin-top-2">{
                 tagsArray && tagsArray.map((t, i) =>
                     <strong
@@ -80,11 +83,11 @@ export function TagEditor({
                         className="govuk-tag govuk-tag--grey govuk-!-margin-bottom-1 enum-tag"
                         onClick={() => handleRemoveTagValueClick(t)}>✕ {t}
                     </strong>)
-                }
+            }
             </div>
-            <br />
+            <br/>
             {errorMessage.length > 0 &&
-                <span id="tag-error" className="govuk-error-message">
+            <span id="tag-error" className="govuk-error-message">
                     <span className="govuk-visually-hidden">Error: </span>{errorMessage}
                 </span>}
             <input
@@ -93,10 +96,10 @@ export function TagEditor({
                 name="add-tag"
                 type="text"
                 value={newTagValue}
-                onChange={handleNewTagValue} />
+                onChange={handleNewTagValue}/>
             <button className="govuk-button govuk-!-margin-bottom-1 govuk-!-margin-left-1"
-                data-testid="add-tag-button"
-                onClick={handleAddNewTagValueClick}>
+                    data-testid="add-tag-button"
+                    onClick={handleAddNewTagValueClick}>
                 Add
             </button>
         </div>
