@@ -57,6 +57,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
+    const [initialSourceCode, setInitialSourceCode] = useState<string>("");
     const [additionalCalculationStatus, setAdditionalCalculationStatus] = useState<PublishStatus>();
     const initialBuildSuccess: CompilerOutputViewModel = {
         buildSuccess: false,
@@ -98,25 +99,15 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     useConfirmLeavePage(isDirty && !isSaving);
 
     useEffectOnce(() => {
-        const getSpecification = async (e: string) => {
-            const specificationResult = await getSpecificationSummaryService(e);
-            return specificationResult;
-        };
-
-        const getAdditionalCalculation = async () => {
-            const additionalCalculationResult = await getCalculationByIdService(calculationId);
-            return additionalCalculationResult;
-        };
-
-        getAdditionalCalculation().then((result) => {
+        getCalculationByIdService(calculationId).then((result) => {
             const additionalCalculationResult = result.data as EditAdditionalCalculationViewModel;
             setOriginalAdditionalCalculation(additionalCalculationResult);
             setAdditionalCalculationSourceCode(additionalCalculationResult.sourceCode);
             setAdditionalCalculationName(additionalCalculationResult.name);
             setAdditionalCalculationType(additionalCalculationResult.valueType);
             setAdditionalCalculationStatus(additionalCalculationResult.publishStatus);
-
-            getSpecification(additionalCalculationResult.specificationId).then((result) => {
+            setInitialSourceCode(additionalCalculationResult.sourceCode);
+            getSpecificationSummaryService(additionalCalculationResult.specificationId).then((result) => {
                 const specificationResult = result.data as EditSpecificationViewModel;
                 setSpecificationSummary(specificationResult);
                 setSpecificationId(specificationResult.id);
@@ -154,12 +145,13 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
         setNameErrorMessage("");
         setIsLoading(true);
         setIsSaving(true);
-        
+
         let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
             calculationName: additionalCalculationName,
             calculationType: additionalCalculationType,
             sourceCode: additionalCalculationSourceCode,
         };
+
         updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
                 if (result.status === 200) {
@@ -386,7 +378,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitAdditionalCalculation}
-                        disabled={!isDirty && isSaving && !additionalCalculationBuildSuccess.buildSuccess}>
+                        disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess || additionalCalculationSourceCode === initialSourceCode}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

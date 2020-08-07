@@ -55,6 +55,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
+    const [initialSourceCode, setInitialSourceCode] = useState<string>("");
     const [originalTemplateCalculationSourceCode, setOriginalTemplateCalculationSourceCode] = useState<string>("");
     const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
     const [templateCalculationLastUpdated, setTemplateCalculationLastUpdated] = useState<Date>(new Date());
@@ -95,18 +96,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     useConfirmLeavePage(!isSaving && isDirty);
 
     useEffectOnce(() => {
-        const getSpecification = async (e: string) => {
-            const specificationResult = await getSpecificationSummaryService(e);
-            return specificationResult;
-        };
-
-        const getTemplateCalculation = async () => {
-            const templateCalculationResult = await getCalculationByIdService(calculationId);
-            return templateCalculationResult;
-        };
-
-
-        getTemplateCalculation().then((result) => {
+        getCalculationByIdService(calculationId).then((result) => {
             const templateCalculationResult = result.data as EditAdditionalCalculationViewModel;
             setOriginalTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
             setTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
@@ -114,8 +104,9 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             setTemplateCalculationType(templateCalculationResult.valueType);
             setTemplateCalculationStatus(templateCalculationResult.publishStatus);
             setTemplateCalculationLastUpdated(new Date(templateCalculationResult.lastUpdated));
+            setInitialSourceCode(templateCalculationResult.sourceCode);
 
-            getSpecification(templateCalculationResult.specificationId).then((result) => {
+            getSpecificationSummaryService(templateCalculationResult.specificationId).then((result) => {
                 const specificationResult = result.data as EditSpecificationViewModel;
                 setSpecificationSummary(specificationResult);
                 setSpecificationId(specificationResult.id);
@@ -370,7 +361,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitTemplateCalculation}
-                        disabled={isDirty && !isSaving && !templateCalculationBuildSuccess.buildSuccess}>
+                        disabled={isDirty || !isSaving || !templateCalculationBuildSuccess.buildSuccess || templateCalculationSourceCode === initialSourceCode}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

@@ -73,12 +73,8 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
     let history = useHistory();
 
     useEffectOnce(() => {
-        const getSpecification = async () => {
-            const specificationResult = await getSpecificationSummaryService(specificationId);
-            return specificationResult;
-        };
-
-        getSpecification().then((result) => {
+        getSpecificationSummaryService(specificationId)
+        .then((result) => {
             const specificationResult = result.data as EditSpecificationViewModel;
             setSpecificationSummary(specificationResult);
         });
