@@ -88,9 +88,11 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
+    const [isDirty, setIsDirty] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     let history = useHistory();
-    
-    useConfirmLeavePage(originalTemplateCalculationSourceCode !== templateCalculationSourceCode);
+
+    useConfirmLeavePage(!isSaving && isDirty);
 
     useEffectOnce(() => {
         const getSpecification = async (e: string) => {
@@ -125,37 +127,37 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     function submitTemplateCalculation() {
         if (templateCalculationName === "" || templateCalculationSourceCode === "" || !templateCalculationBuildSuccess.buildSuccess) {
             setFormValid({formSubmitted: true, formValid: false});
+            return;
         }
 
-        if (templateCalculationName !== "" && templateCalculationSourceCode !== "" && templateCalculationBuildSuccess.buildSuccess && templateCalculationBuildSuccess.compileRun) {
-            setFormValid({formSubmitted: true, formValid: true});
+        if (!(templateCalculationName !== "" && templateCalculationSourceCode !== "" && templateCalculationBuildSuccess.buildSuccess && templateCalculationBuildSuccess.compileRun)) {
+            setFormValid({formSubmitted: true, formValid: false});
+            return;
+        }
+        
+        setFormValid({formSubmitted: true, formValid: true});
 
-            setIsLoading(true);
-            let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
-                calculationName: templateCalculationName,
-                calculationType: templateCalculationType,
-                sourceCode: templateCalculationSourceCode,
-            };
+        setIsLoading(true);
+        setIsSaving(true);
+        
+        let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
+            calculationName: templateCalculationName,
+            calculationType: templateCalculationType,
+            sourceCode: templateCalculationSourceCode,
+        };
 
-            const editTemplateCalculation = async () => {
-                const updateTemplateCalculationResult = await updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId);
-                return updateTemplateCalculationResult;
-            };
-
-            editTemplateCalculation().then((result) => {
-
+        updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
+            .then((result) => {
                 if (result.status === 200) {
+                    setIsDirty(false);
                     let response = result.data as Calculation;
                     history.push(`/ViewSpecification/${response.specificationId}`);
-                } else {
-                    setIsLoading(false);
                 }
-            }).catch(() => {
+            })
+            .finally(() => {
                 setIsLoading(false);
+                setIsSaving(false);
             });
-        } else {
-            setFormValid({formSubmitted: true, formValid: false})
-        }
     }
 
     function approveTemplateCalculation() {
@@ -191,6 +193,8 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
     function buildCalculation() {
         setIsBuildingCalculationCode(true);
+        setIsDirty(originalTemplateCalculationSourceCode !== templateCalculationSourceCode);
+        
         compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode).then((result) => {
             if (result.status === 200) {
                 let response = result.data as PreviewResponse;
@@ -235,13 +239,13 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
                 <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
-                <Breadcrumb name={"Edit template calculation"} />
+                <Breadcrumb name={"Edit template calculation"}/>
             </Breadcrumbs>
             <LoadingStatus title={"Updating template calculation"} hidden={!isLoading}
                            subTitle={"Please wait whilst the calculation is updated"}/>
 
             <div hidden={(calculationApproveError == null || calculationApproveError === "" || isLoading)}
-                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
                  data-module="govuk-error-summary">
                 <h2 className="govuk-error-summary__title">
                     There is a problem
@@ -262,20 +266,20 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     </h1>
                 </legend>
                 <div id="calculation-status"
-                      className={"govuk-form-group" + (calculationApproveError != null && calculationApproveError !== "" ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (calculationApproveError != null && calculationApproveError !== "" ? " govuk-form-group--error" : "")}>
                         <span className="govuk-error-message">
                           <span className="govuk-visually-hidden">Error:</span> {calculationApproveError}
                         </span>
-                        <span className="govuk-caption-m">Calculation status</span>
-                        <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2">{templateCalculationStatus} </strong>
+                    <span className="govuk-caption-m">Calculation status</span>
+                    <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2">{templateCalculationStatus} </strong>
                 </div>
                 <div className="govuk-form-group">
-                        <span className="govuk-caption-m">Name</span>
-                        <h2 className="govuk-heading-m">{templateCalculationName}</h2>
+                    <span className="govuk-caption-m">Name</span>
+                    <h2 className="govuk-heading-m">{templateCalculationName}</h2>
                 </div>
                 <div className="govuk-form-group">
-                        <span className="govuk-caption-m">Value type</span>
-                        <h2 className="govuk-heading-m">{templateCalculationType}</h2>
+                    <span className="govuk-caption-m">Value type</span>
+                    <h2 className="govuk-heading-m">{templateCalculationType}</h2>
                 </div>
 
                 <div className="govuk-form-group">
@@ -289,7 +293,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     <label className="govuk-label" htmlFor="sort">
                         Last saved
                     </label>
-                    <h2 className="govuk-heading-m"><DateFormatter date={templateCalculationLastUpdated} utc={false} /></h2>
+                    <h2 className="govuk-heading-m"><DateFormatter date={templateCalculationLastUpdated} utc={false}/></h2>
                     <Link to={`/Calculations/CalculationVersionHistory/${calculationId}`} className="govuk-link">View calculation history</Link>
                 </div>
 
@@ -308,7 +312,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
                 </div>
                 <div className="govuk-form-group">
-                    <CalculationResultsLink calculationId={calculationId} />
+                    <CalculationResultsLink calculationId={calculationId}/>
                 </div>
                 <div className="govuk-panel govuk-panel--confirmation"
                      hidden={!templateCalculationBuildSuccess.buildSuccess}>
@@ -317,13 +321,15 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     </div>
                 </div>
 
-                <div className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                <div
+                    className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <div className="govuk-body">
                         Your calculation’s build output must be successful before you can save it
                     </div>
                 </div>
 
-                <div hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
+                <div
+                    hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
@@ -364,7 +370,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitTemplateCalculation}
-                        disabled={!templateCalculationBuildSuccess.buildSuccess}>
+                        disabled={isDirty && !isSaving && !templateCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

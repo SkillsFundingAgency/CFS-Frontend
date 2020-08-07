@@ -160,10 +160,8 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             calculationType: additionalCalculationType,
             sourceCode: additionalCalculationSourceCode,
         };
-        debugger
         updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
-                debugger
                 if (result.status === 200) {
                     setIsDirty(false);
                     let response = result.data as Calculation;
