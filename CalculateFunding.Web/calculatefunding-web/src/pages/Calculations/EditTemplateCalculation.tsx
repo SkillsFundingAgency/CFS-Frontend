@@ -27,6 +27,7 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {DateFormatter} from "../../components/DateFormatter";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -49,9 +50,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
         isSelectedForFunding: false,
         fundingStreams: [],
         dataDefinitionRelationshipIds: [],
-        templateIds: {
-            PSG: ""
-        }
+        templateIds: {"": [""]}
     });
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
@@ -88,6 +87,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
     let history = useHistory();
     
     useConfirmLeavePage(originalTemplateCalculationSourceCode !== templateCalculationSourceCode);
@@ -190,6 +190,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     }
 
     function buildCalculation() {
+        setIsBuildingCalculationCode(true);
         compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode).then((result) => {
             if (result.status === 200) {
                 let response = result.data as PreviewResponse;
@@ -213,10 +214,12 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 });
                 setErrorMessage((result.data as SourceFile).sourceCode);
             }
+            setIsBuildingCalculationCode(false);
         }).catch(() => {
             setTemplateCalculationBuildSuccess(prevState => {
                 return {...prevState, compileRun: true, buildSuccess: false}
             });
+            setIsBuildingCalculationCode(false);
         });
     }
 
@@ -299,9 +302,10 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                                      language="vbs" change={updateSourceCode}
                                      minimap={true} key={'1'}/>
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
-                            onClick={buildCalculation}>
+                            onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
                     </button>
+                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
                 </div>
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId} />
