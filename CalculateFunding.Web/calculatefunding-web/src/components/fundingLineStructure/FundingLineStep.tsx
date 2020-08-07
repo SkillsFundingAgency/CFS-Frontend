@@ -19,7 +19,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                     }
                     let linkValue = "";
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId !== '') {
-                        linkValue = `/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`;
+                        linkValue = encodeURI(`/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`);
                     }
                     return (
                         <CollapsibleSteps
