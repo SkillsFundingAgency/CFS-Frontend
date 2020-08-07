@@ -81,26 +81,28 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
     const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState();
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState();
+    const [errors, setErrors] = useState<string[]>([]);
+    const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const fundingLineStepReactRef = useRef(null);
 
     const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>([]);
     const [releaseTimetable, setReleaseTimetable] = useState<ReleaseTimetableViewModel>({
         navisionDate: {
-            time:"00:00",
-            year:"2000",
-            month:"1",
-            day:"1"
+            time: "00:00",
+            year: "2000",
+            month: "1",
+            day: "1"
         },
-        releaseDate:{
-            time:"00:00",
-            year:"2000",
-            month:"1",
-            day:"1"
+        releaseDate: {
+            time: "00:00",
+            year: "2000",
+            month: "1",
+            day: "1"
         }
     });
     const [datasets, setDatasets] = useState<DatasetSummary>({
-        content:[],
-        statusCode:0
+        content: [],
+        statusCode: 0
     });
     const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSummary>({
         results: [],
@@ -156,7 +158,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     useEffect(() => {
         if (fundingLines.length !== 0) {
             if (fundingLinesOriginalData.length === 0) {
-
                 setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
                 setFundingLinesOriginalData(fundingLines);
             }
@@ -203,25 +204,25 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
         getReleaseTimetableForSpecificationService(specificationId).then((response) => {
             if (response.status === 200) {
-                const result  =  response.data as ReleaseTimetableSummary;
+                const result = response.data as ReleaseTimetableSummary;
 
-                let request : ReleaseTimetableViewModel = {
+                let request: ReleaseTimetableViewModel = {
                     releaseDate:
-                        {
-                            day: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getDate().toString() : "1",
-                            month: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getMonth().toString()  : "1",
-                            year: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getFullYear().toString()  : "2000",
-                            time: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getTime().toString()  : "00:00",
+                    {
+                        day: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getDate().toString() : "1",
+                        month: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getMonth().toString() : "1",
+                        year: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getFullYear().toString() : "2000",
+                        time: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getTime().toString() : "00:00",
 
-                        },
+                    },
                     navisionDate:
-                        {
-                            day: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getDate().toString() : "1",
-                            month: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getMonth().toString()  : "1",
-                            year: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getFullYear().toString()  : "2000",
-                            time: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getTime().toString()  : "00:00",
+                    {
+                        day: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getDate().toString() : "1",
+                        month: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getMonth().toString() : "1",
+                        year: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getFullYear().toString() : "2000",
+                        time: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getTime().toString() : "00:00",
 
-                        }
+                    }
                 }
 
                 setReleaseTimetable(request);
@@ -237,33 +238,35 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     }, [specificationId]);
 
+    const resetErrors = () => {
+        setFundingLineStructureError(false);
+        setErrors([]);
+    }
+
+    const fetchData = async () => {
+        try {
+            setIsLoading(Object.assign({}, isLoading, {fundingLineStructure: true}));
+            const specificationSummaryResponse = await getSpecificationSummaryService(specificationId);
+            const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
+            setSpecification(specificationSummary);
+
+            const fundingLineStructureResponse = await getFundingLineStructureService(specificationSummary.id,
+                specificationSummary.fundingPeriod.id, specificationSummary.fundingStreams[0].id);
+            const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];
+            setFundingLines(fundingStructureItem);
+        }
+        catch(err) {
+            setFundingLineStructureError(true);
+            setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
+        }
+        finally {
+            setIsLoading(Object.assign({}, isLoading, {fundingLineStructure: false}));
+        }
+    }
+
     useEffectOnce(() => {
-        getSpecificationSummaryService(specificationId).then((response) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: true
-                }
-            })
-            if (response.status === 200) {
-                const result = response.data as SpecificationSummary;
-                setSpecification(response.data);
-
-                getFundingLineStructureService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id).then((response) => {
-                    if (response.status === 200) {
-                        const result = response.data as IFundingStructureItem[];
-                        setFundingLines(result);
-
-                    }
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            fundingLineStructure: false
-                        }
-                    })
-                });
-            }
-        });
+        resetErrors();
+        fetchData();
     });
 
     useEffect(() => {
@@ -322,10 +325,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     function updateFundingLineState(specificationId: string) {
-        changeFundingLineStateService(specificationId).then((response) =>{
-            if(response.status===200)
-            {
-setFundingLinePublishStatus(response.data as PublishStatus)
+        changeFundingLineStateService(specificationId).then((response) => {
+            if (response.status === 200) {
+                setFundingLinePublishStatus(response.data as PublishStatus)
             }
         });
     }
@@ -356,13 +358,31 @@ setFundingLinePublishStatus(response.data as PublishStatus)
     }
 
     return <div>
-        <Header location={Section.Specifications}/>
+        <Header location={Section.Specifications} />
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specification.name}/>
+                <Breadcrumb name={"Calculate funding"} url={"/"} />
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
+                <Breadcrumb name={specification.name} />
             </Breadcrumbs>
+            {errors.length > 0 &&
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column">
+                        <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
+                            <h2 className="govuk-error-summary__title" id="error-summary-title">
+                                There is a problem
+                                </h2>
+                            <div className="govuk-error-summary__body">
+                                <ul className="govuk-list govuk-error-summary__list">
+                                    {errors.map((error, i) =>
+                                        <li key={i}>{error}</li>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-l">Specification Name</span>
@@ -392,7 +412,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
             </div>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
-                    <Details title={`What is ${specification.name}`} body={specification.description}/>
+                    <Details title={`What is ${specification.name}`} body={specification.description} />
                     <Tabs initialTab="fundingline-structure">
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
@@ -403,37 +423,42 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
                                 <LoadingStatus title={"Loading funding line structure"}
-                                               hidden={!isLoading.fundingLineStructure}
-                                               description={"Please wait whilst funding line structure is loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
+                                    hidden={!isLoading.fundingLineStructure}
+                                    description={"Please wait whilst funding line structure is loading"} />
+                                <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
+                                    <div className="govuk-grid-column-two-thirds">
+                                        <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
+                                    </div>
+                                </div>
+                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <ApproveStatusButton id={specification.id}
-                                                             status={fundingLineStatus}
-                                                             callback={updateFundingLineState}/>
+                                            status={fundingLineStatus}
+                                            callback={updateFundingLineState} />
                                     </div>
                                     <div className="govuk-grid-column-two-thirds">
                                         <div className="govuk-form-group search-container">
                                             <label className="govuk-label">
                                                 Search by calculation
                                             </label>
-                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
+                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure}>
+                                <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
-                                            aria-expanded="false"
-                                            onClick={openCloseAllFundingLines}
-                                            hidden={fundingLinesExpandedStatus}>Open all<span
-                                        className="govuk-visually-hidden"> sections</span></button>
+                                        aria-expanded="false"
+                                        onClick={openCloseAllFundingLines}
+                                        hidden={fundingLinesExpandedStatus}>Open all<span
+                                            className="govuk-visually-hidden"> sections</span></button>
                                     <button type="button" className="govuk-accordion__open-all"
-                                            aria-expanded="true"
-                                            onClick={openCloseAllFundingLines}
-                                            hidden={!fundingLinesExpandedStatus}>Close all<span
-                                        className="govuk-visually-hidden"> sections</span></button>
+                                        aria-expanded="true"
+                                        onClick={openCloseAllFundingLines}
+                                        hidden={!fundingLinesExpandedStatus}>Close all<span
+                                            className="govuk-visually-hidden"> sections</span></button>
                                 </div>
                                 <ul className="collapsible-steps">
                                     {
@@ -455,28 +480,28 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                                 link={linkValue}
                                                 hasChildren={f.fundingStructureItems != null}>
                                                 <FundingLineStep key={f.name.replace(" ", "") + index}
-                                                                 expanded={fundingLinesExpandedStatus}
-                                                                 fundingStructureItem={f}/>
+                                                    expanded={fundingLinesExpandedStatus}
+                                                    fundingStructureItem={f} />
                                             </CollapsibleSteps>
                                             </li>
                                         })}
                                 </ul>
                                 <BackToTop id={"fundingline-structure"} hidden={fundingLines == null ||
-                                fundingLines.length === 0}/>
+                                    fundingLines.length === 0} />
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
                                 <LoadingStatus title={"Loading additional calculations"}
-                                               hidden={!isLoading.additionalCalculations}
-                                               description={"Please wait whilst additional calculations are loading"}/>
+                                    hidden={!isLoading.additionalCalculations}
+                                    description={"Please wait whilst additional calculations are loading"} />
                                 <div className="govuk-grid-row" hidden={isLoading.additionalCalculations}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third ">
                                         <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
+                                            hidden={additionalCalculations.totalResults === 0}>
                                             Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults}
                                             calculations
@@ -487,7 +512,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                     <div className="govuk-grid-column-two-thirds">
                                         <div className="govuk-form-group search-container">
                                             <input className="govuk-input input-search" id="event-name"
-                                                   name="event-name" type="text"/>
+                                                name="event-name" type="text" />
                                         </div>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
@@ -496,30 +521,30 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                 </div>
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                        <th scope="col" className="govuk-table__header">Status</th>
-                                        <th scope="col" className="govuk-table__header">Value type</th>
-                                        <th scope="col" className="govuk-table__header">Last edited date</th>
-                                    </tr>
+                                        <tr className="govuk-table__row">
+                                            <th scope="col" className="govuk-table__header">Additional calculation name</th>
+                                            <th scope="col" className="govuk-table__header">Status</th>
+                                            <th scope="col" className="govuk-table__header">Value type</th>
+                                            <th scope="col" className="govuk-table__header">Last edited date</th>
+                                        </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                    {additionalCalculations.results.map((ac, index) =>
-                                        <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell text-overflow">
-                                                <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
-                                            </td>
-                                            <td className="govuk-table__cell">{ac.status}</td>
-                                            <td className="govuk-table__cell">{ac.valueType}</td>
-                                            <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
-                                                                                             utc={false}/></td>
-                                        </tr>
-                                    )}
+                                        {additionalCalculations.results.map((ac, index) =>
+                                            <tr className="govuk-table__row" key={index}>
+                                                <td className="govuk-table__cell text-overflow">
+                                                    <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
+                                                </td>
+                                                <td className="govuk-table__cell">{ac.status}</td>
+                                                <td className="govuk-table__cell">{ac.valueType}</td>
+                                                <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
+                                                    utc={false} /></td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
 
                                 <div className="govuk-warning-text"
-                                     hidden={additionalCalculations.totalCount > 0}>
+                                    hidden={additionalCalculations.totalCount > 0}>
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
@@ -532,65 +557,65 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
                                     <div className="pagination__summary">
                                         <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
+                                            hidden={additionalCalculations.totalResults === 0}>
                                             Showing
                                             {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults} calculations
                                         </p>
                                     </div>
                                     <Pagination currentPage={additionalCalculations.currentPage}
-                                                lastPage={additionalCalculations.lastPage}
-                                                callback={movePage}/>
+                                        lastPage={additionalCalculations.lastPage}
+                                        callback={movePage} />
                                 </nav>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
                                 <LoadingStatus title={"Loading datasets"}
-                                               hidden={!isLoading.datasets}
-                                               description={"Please wait whilst datasets are loading"}/>
+                                    hidden={!isLoading.datasets}
+                                    description={"Please wait whilst datasets are loading"} />
                                 <div className="govuk-grid-row" hidden={isLoading.datasets}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <Link to={`/Datasets/DataRelationships/${specificationId}`}
-                                              id={"dataset-specification-relationship-button"}
-                                              className="govuk-link govuk-button" data-module="govuk-button">
+                                            id={"dataset-specification-relationship-button"}
+                                            className="govuk-link govuk-button" data-module="govuk-button">
                                             Map data source file to data set</Link>
                                     </div>
                                 </div>
                                 <table className="govuk-table">
                                     <caption className="govuk-table__caption">Dataset and schemas</caption>
                                     <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset
+                                        <tr className="govuk-table__row">
+                                            <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset
                                         </th>
-                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data
+                                            <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data
                                             schema
                                         </th>
-                                    </tr>
+                                        </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                    {datasets.content.map(ds =>
-                                        <tr className="govuk-table__row" key={ds.id}>
-                                            <td scope="row" className="govuk-table__cell">{ds.name}
-                                                <div className="govuk-!-margin-top-2">
-                                                    <details className="govuk-details govuk-!-margin-bottom-0"
-                                                             data-module="govuk-details">
-                                                        <summary className="govuk-details__summary">
-                                                        <span
-                                                            className="govuk-details__summary-text">Dataset Description</span>
-                                                        </summary>
-                                                        <div className="govuk-details__text">
-                                                            {ds.relationshipDescription}
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            </td>
-                                            <td className="govuk-table__cell">{ds.definition.name}</td>
-                                        </tr>
-                                    )}
+                                        {datasets.content.map(ds =>
+                                            <tr className="govuk-table__row" key={ds.id}>
+                                                <td scope="row" className="govuk-table__cell">{ds.name}
+                                                    <div className="govuk-!-margin-top-2">
+                                                        <details className="govuk-details govuk-!-margin-bottom-0"
+                                                            data-module="govuk-details">
+                                                            <summary className="govuk-details__summary">
+                                                                <span
+                                                                    className="govuk-details__summary-text">Dataset Description</span>
+                                                            </summary>
+                                                            <div className="govuk-details__text">
+                                                                {ds.relationshipDescription}
+                                                            </div>
+                                                        </details>
+                                                    </div>
+                                                </td>
+                                                <td className="govuk-table__cell">{ds.definition.name}</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </section>
@@ -604,40 +629,40 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                 </div>
                                 <div className="govuk-form-group">
                                     <fieldset className="govuk-fieldset" role="group"
-                                              aria-describedby="passport-issued-hint">
+                                        aria-describedby="passport-issued-hint">
                                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                                             <h3 className="govuk-heading-m">Release date of funding to Navison?</h3>
                                         </legend>
                                         <span id="passport-issued-hint"
-                                              className="govuk-hint">Set the date and time that the statement will be
-                                            published externally for this funding stream. <br/>For example, 12 11 2019</span>
+                                            className="govuk-hint">Set the date and time that the statement will be
+                                            published externally for this funding stream. <br />For example, 12 11 2019</span>
                                         <DateInput year={parseInt(releaseTimetable.navisionDate.year)}
-                                                   month={parseInt(releaseTimetable.navisionDate.month)}
-                                                   day={parseInt(releaseTimetable.navisionDate.day)}
-                                                   callback={updateNavisionDate}/>
+                                            month={parseInt(releaseTimetable.navisionDate.month)}
+                                            day={parseInt(releaseTimetable.navisionDate.day)}
+                                            callback={updateNavisionDate} />
                                     </fieldset>
                                 </div>
                                 <div className="govuk-form-group govuk-!-margin-bottom-9">
                                     <TimeInput time={releaseTimetable.navisionDate.time}
-                                               callback={updateNavisionTime}/>
+                                        callback={updateNavisionTime} />
                                 </div>
                                 <div className="govuk-form-group">
                                     <fieldset className="govuk-fieldset" role="group"
-                                              aria-describedby="passport-issued-hint">
+                                        aria-describedby="passport-issued-hint">
                                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                                             <h3 className="govuk-heading-m">Release date of statement to providers?</h3>
                                         </legend>
                                         <span id="passport-issued-hint"
-                                              className="govuk-hint">Set the date and time that the statement will be published externally for this funding stream. <br/>For example, 12 11 2019</span>
+                                            className="govuk-hint">Set the date and time that the statement will be published externally for this funding stream. <br />For example, 12 11 2019</span>
                                         <DateInput year={parseInt(releaseTimetable.releaseDate.year)}
-                                                   month={parseInt(releaseTimetable.releaseDate.month)}
-                                                   day={parseInt(releaseTimetable.releaseDate.day)}
-                                                   callback={updateReleaseDate}/>
+                                            month={parseInt(releaseTimetable.releaseDate.month)}
+                                            day={parseInt(releaseTimetable.releaseDate.day)}
+                                            callback={updateReleaseDate} />
                                     </fieldset>
                                 </div>
                                 <div className="govuk-form-group govuk-!-margin-bottom-9">
                                     <TimeInput time={releaseTimetable.releaseDate.time}
-                                               callback={updateReleaseTime}/>
+                                        callback={updateReleaseTime} />
                                 </div>
                                 <div className="govuk-form-group">
                                     <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated}>Confirm changes</button>
@@ -661,7 +686,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                                                                         {f.fundingLineId}
                                                                     </dt>
                                                                     <dd className="govuk-summary-list__value">
-                                                                        {f.typeValue} {f.year} <br/>
+                                                                        {f.typeValue} {f.year} <br />
                                                                         Installment {f.occurrence}
                                                                     </dd>
                                                                     <dd className="govuk-summary-list__actions">
@@ -684,7 +709,7 @@ setFundingLinePublishStatus(response.data as PublishStatus)
                 </div>
             </div>
         </div>
-        <Footer/>
+        <Footer />
     </div>
 }
 
