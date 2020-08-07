@@ -249,7 +249,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             const specificationSummaryResponse = await getSpecificationSummaryService(specificationId);
             const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
             setSpecification(specificationSummary);
-
             const fundingLineStructureResponse = await getFundingLineStructureService(specificationSummary.id,
                 specificationSummary.fundingPeriod.id, specificationSummary.fundingStreams[0].id);
             const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];

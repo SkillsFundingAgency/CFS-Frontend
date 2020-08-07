@@ -31,7 +31,6 @@ export function CreateSpecification() {
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<CoreProviderSummary[]>([]);
     const [templateVersionData, setTemplateVersionData] = useState<PublishedFundingTemplate[]>([]);
-    const [defaultTemplateVersionId, setDefaultTemplateVersionId] = useState<string>("");
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("");
@@ -63,7 +62,7 @@ export function CreateSpecification() {
 
     function populateFundingPeriods(fundingStream: string) {
         if (fundingStream !== "") {
-        setFundingPeriodIsLoading(true);
+            setFundingPeriodIsLoading(true);
             const getFundingPeriods = async () => {
                 const periodResult = await getFundingPeriodsByFundingStreamIdService(fundingStream);
                 setFundingPeriodData(periodResult.data)
@@ -89,23 +88,19 @@ export function CreateSpecification() {
 
     function populateTemplateVersion(fundingStreamId: string, fundingPeriodId: string) {
         if (fundingPeriodId !== "" && fundingStreamId !== "") {
-            getTemplatesService(fundingStreamId, fundingPeriodId).then(templatesResult =>{
+            getTemplatesService(fundingStreamId, fundingPeriodId).then(templatesResult => {
                 if (templatesResult.status === 200 || templatesResult.status === 201) {
                     const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
                     getDefaultTemplateVersionService(fundingStreamId, fundingPeriodId).then(result => {
                         const defaultTemplateVersionId = (result.data != null && result.data !== "" ? parseFloat(result.data).toFixed(1) : "") as string;
-                        if (defaultTemplateVersionId !== "")
-                        {
-                            setDefaultTemplateVersionId(defaultTemplateVersionId);
+                        if (defaultTemplateVersionId !== "") {
                             setTemplateVersionData(publishedFundingTemplates);
                             setSelectedTemplateVersion(defaultTemplateVersionId);
                         }
-                        else
-                        {
+                        else {
                             setTemplateVersionData(publishedFundingTemplates);
                         }
-
-                    }).catch(()=>{
+                    }).catch(() => {
                         setTemplateVersionData(publishedFundingTemplates);
                     });
                 }
@@ -170,7 +165,7 @@ export function CreateSpecification() {
             createSpecification().then((result) => {
                 if (result.status === 200) {
                     let response = result.data as SpecificationSummary;
-                                        history.push(`/ViewSpecification/${response.id}`);
+                    history.push(`/ViewSpecification/${response.id}`);
                 } else {
                     setCreateSpecificationFailed(true);
                     setIsLoading(false);
@@ -206,22 +201,22 @@ export function CreateSpecification() {
     }
 
     return <div>
-        <Header location={Section.Specifications}/>
+        <Header location={Section.Specifications} />
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={"Calculate funding"} url={"/"} />
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
                 <Breadcrumb name={"Create specification"} />
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <LoadingStatus title={"Creating Specification"}
                                subTitle={"Please wait whilst we create the specification"}
                                description={"This can take a few minutes"} id={"create-specification"}
-                               hidden={!isLoading}/>
+                               hidden={!isLoading} />
                 <div hidden={!createSpecificationFailed}
-                     className="govuk-error-summary"
-                     aria-labelledby="error-summary-title" role="alert"
-                     data-module="govuk-error-summary">
+                    className="govuk-error-summary"
+                    aria-labelledby="error-summary-title" role="alert"
+                    data-module="govuk-error-summary">
                     <h2 className="govuk-error-summary__title">
                         There is a problem
                     </h2>
@@ -246,15 +241,15 @@ export function CreateSpecification() {
                         </h1>
                     </legend>
                     <div className="govuk-form-group"
-                         hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
-                        <ErrorSummary title="Form not valid" error="Please complete all fields" suggestion=""/>
+                        hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
+                        <ErrorSummary title="Form not valid" error="Please complete all fields" suggestion="" />
                     </div>
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="address-line-1">
                             Specification name
                         </label>
                         <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
-                               onChange={(e) => saveSpecificationName(e)}/>
+                            onChange={(e) => saveSpecificationName(e)} />
                     </div>
 
                     <div className="govuk-form-group">
@@ -285,7 +280,7 @@ export function CreateSpecification() {
                         <select className="govuk-select" id="sort" name="sort" disabled={coreProviderData.length === 0} onChange={(e) => selectCoreProvider(e)}>
                             <option value="-1">Select core provider</option>
                             {coreProviderData.map((cp, index) => <option key={index}
-                                                                         value={cp.providerVersionId}>{cp.name}</option>)}
+                                value={cp.providerVersionId}>{cp.name}</option>)}
                         </select>
                     </div>
 
@@ -293,12 +288,13 @@ export function CreateSpecification() {
                         <label className="govuk-label" htmlFor="sort">
                             Template version
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0} onChange={(e) => selectTemplateVersion(e)}>
+                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0}
+                            onChange={(e) => selectTemplateVersion(e)} value={selectedTemplateVersion || "-1"}>
                             <option value="-1">Select template version</option>
-                            {templateVersionData.map((publishedFundingTemplate, index) => <option key={index}
-                                                                          value={publishedFundingTemplate.templateVersion}
-                                                                          selected={parseFloat(defaultTemplateVersionId)===parseFloat(publishedFundingTemplate.templateVersion)}
-                            >{publishedFundingTemplate.templateVersion}</option>)}
+                            {templateVersionData.map((publishedFundingTemplate, index) =>
+                                <option key={index} value={publishedFundingTemplate.templateVersion}>
+                                    {publishedFundingTemplate.templateVersion}
+                                </option>)}
                         </select>
                     </div>
 
@@ -307,22 +303,22 @@ export function CreateSpecification() {
                             Can you provide more detail?
                         </label>
                         <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8}
-                                  aria-describedby="more-detail-hint"
-                                  onChange={(e) => saveDescriptionName(e)}></textarea>
+                            aria-describedby="more-detail-hint"
+                            onChange={(e) => saveDescriptionName(e)}></textarea>
                     </div>
                     <div className="govuk-form-group">
                         <button id="submit-specification-button" className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                                onClick={submitSaveSpecification}>
+                            onClick={submitSaveSpecification}>
                             Save and continue
                         </button>
                         <Link id="cancel-create-specification" to="/SpecificationsList" className="govuk-button govuk-button--secondary"
-                           data-module="govuk-button">
+                            data-module="govuk-button">
                             Cancel
                         </Link>
                     </div>
                 </fieldset>
             </div>
         </div>
-        <Footer/>
+        <Footer />
     </div>
 }
