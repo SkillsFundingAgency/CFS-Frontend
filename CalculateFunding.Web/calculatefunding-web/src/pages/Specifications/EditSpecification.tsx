@@ -82,6 +82,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         formSubmitted: false,
         formValid: false
     });
+    const [errorSummary, setErrorSummary] = useState({
+        title: "",
+        error: ""
+    });
     const [isLoading, setIsLoading] = useState(false);
 
     let history = useHistory();
@@ -257,6 +261,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     }
 
     function submitUpdateSpecification() {
+        setErrorSummary({title: "", error: ""});
         if (selectedName !== "" && selectedFundingStream !== "" && selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
@@ -275,7 +280,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 const updateSpecificationResult = await updateSpecificationService(updateSpecificationViewModel, specificationId);
                 return updateSpecificationResult;
             };
-
+            
             updateSpecification().then((result) => {
 
                 if (result.status === 200) {
@@ -286,6 +291,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 }
             }).catch(() => {
                 setIsLoading(false);
+                setFormValid({formValid: true, formSubmitted: false});
+                setErrorSummary({title: "There is a problem", error: "Specification failed to update, please try again"});
             });
         } else {
             setFormValid({formSubmitted: true, formValid: false})
@@ -313,7 +320,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     </legend>
                     <div className="govuk-form-group"
                          hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
-                        <ErrorSummary title="Form not valid" error="Please complete all fields" suggestion=""/>
+                        <ErrorSummary title={errorSummary.title === "" ? "Form not valid" : errorSummary.title}
+                                      error={errorSummary.error === "" ? "Please complete all fields" : errorSummary.error} suggestion=""/>
                     </div>
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="address-line-1">
