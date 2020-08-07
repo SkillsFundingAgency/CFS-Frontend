@@ -96,23 +96,37 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     useConfirmLeavePage(!isSaving && isDirty);
 
     useEffectOnce(() => {
-        getCalculationByIdService(calculationId).then((result) => {
-            const templateCalculationResult = result.data as EditAdditionalCalculationViewModel;
-            setOriginalTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
-            setTemplateCalculationSourceCode(templateCalculationResult.sourceCode);
-            setTemplateCalculationName(templateCalculationResult.name);
-            setTemplateCalculationType(templateCalculationResult.valueType);
-            setTemplateCalculationStatus(templateCalculationResult.publishStatus);
-            setTemplateCalculationLastUpdated(new Date(templateCalculationResult.lastUpdated));
-            setInitialSourceCode(templateCalculationResult.sourceCode);
+        setIsLoading(true);
+        const getSpecification = async (e: string) => {
+            const result = await getSpecificationSummaryService(e);
+            return result.data as EditSpecificationViewModel;
+        };
 
-            getSpecificationSummaryService(templateCalculationResult.specificationId).then((result) => {
-                const specificationResult = result.data as EditSpecificationViewModel;
-                setSpecificationSummary(specificationResult);
-                setSpecificationId(specificationResult.id);
-            });
+        const getTemplateCalculation = async (calcId: string) => {
+            const result = await getCalculationByIdService(calcId);
+            return result.data as EditAdditionalCalculationViewModel;
+        };
+        getTemplateCalculation(calculationId)
+            .then((calc) => {
+                setOriginalTemplateCalculationSourceCode(calc.sourceCode);
+                setTemplateCalculationSourceCode(calc.sourceCode);
+                setTemplateCalculationName(calc.name);
+                setTemplateCalculationType(calc.valueType);
+                setTemplateCalculationStatus(calc.publishStatus);
+                setTemplateCalculationLastUpdated(new Date(calc.lastUpdated));
+                setInitialSourceCode(calc.sourceCode);
 
-        })
+                getSpecification(calc.specificationId)
+                    .then((spec) => {
+                        setSpecificationSummary(spec);
+                        setSpecificationId(spec.id);
+                    })
+                    .finally(() =>
+                    {
+                        setIsLoading(false);
+                        setIsDirty(false);
+                    });
+            })
     });
 
     function submitTemplateCalculation() {
@@ -125,12 +139,12 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
             setFormValid({formSubmitted: true, formValid: false});
             return;
         }
-        
+
         setFormValid({formSubmitted: true, formValid: true});
 
         setIsLoading(true);
         setIsSaving(true);
-        
+
         let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
             calculationName: templateCalculationName,
             calculationType: templateCalculationType,
@@ -152,7 +166,6 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     }
 
     function approveTemplateCalculation() {
-
         setIsLoading(true);
         setCalculationApproveError("");
 
@@ -184,8 +197,8 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
 
     function buildCalculation() {
         setIsBuildingCalculationCode(true);
-        setIsDirty(originalTemplateCalculationSourceCode !== templateCalculationSourceCode);
-        
+        setIsDirty(initialSourceCode !== templateCalculationSourceCode);
+
         compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode).then((result) => {
             if (result.status === 200) {
                 let response = result.data as PreviewResponse;
@@ -221,6 +234,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
     function updateSourceCode(sourceCode: string) {
         setTemplateCalculationBuildSuccess(initialBuildSuccess);
         setTemplateCalculationSourceCode(sourceCode);
+        setIsDirty(initialSourceCode !== sourceCode);
     }
 
     return <div>
@@ -293,9 +307,12 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                     <label className="govuk-label" htmlFor="more-detail">
                         Calculation script
                     </label>
-                    <GdsMonacoEditor specificationId={specificationId} value={templateCalculationSourceCode}
-                                     language="vbs" change={updateSourceCode}
-                                     minimap={true} key={'1'}/>
+                    <GdsMonacoEditor specificationId={specificationId}
+                                     value={templateCalculationSourceCode}
+                                     language="vbs"
+                                     change={updateSourceCode}
+                                     minimap={true}
+                                     key={'1'}/>
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
@@ -305,20 +322,22 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
-                <div className="govuk-panel govuk-panel--confirmation"
-                     hidden={!templateCalculationBuildSuccess.buildSuccess}>
+                {templateCalculationBuildSuccess.buildSuccess &&
+                <div className="govuk-panel govuk-panel--confirmation">
                     <div className="govuk-panel__body">
                         Build successful
                     </div>
-                </div>
-
-                <div
-                    className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <div className="govuk-body">
-                        Your calculation’s build output must be successful before you can save it
-                    </div>
-                </div>
-
+                </div>}
+                {isDirty && templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess &&
+                <div className={"govuk-form-group" +
+                ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ?
+                    " govuk-form-group--error" : "")}>
+                    <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
+                </div>}
+                {isDirty &&
+                <div className="govuk-form-group">
+                    <div className="govuk-body">Your calculation must be saved before you can approve it</div>
+                </div>}
                 <div
                     hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
@@ -361,12 +380,12 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitTemplateCalculation}
-                        disabled={isDirty || !isSaving || !templateCalculationBuildSuccess.buildSuccess || templateCalculationSourceCode === initialSourceCode}>
+                        disabled={!isDirty || isSaving || !templateCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={approveTemplateCalculation}
-                        disabled={templateCalculationStatus === PublishStatus.Approved}>
+                        disabled={isDirty || templateCalculationStatus === PublishStatus.Approved}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">

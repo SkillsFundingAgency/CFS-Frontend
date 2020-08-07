@@ -27,6 +27,8 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
+import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
+import {TemplateSearchResponse} from "../../types/TemplateBuilderDefinitions";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -35,7 +37,6 @@ export interface EditAdditionalCalculationRouteProps {
 export function EditAdditionalCalculation({match}: RouteComponentProps<EditAdditionalCalculationRouteProps>) {
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
-
     const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
         id: "",
         name: "",
@@ -98,33 +99,35 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
 
     useConfirmLeavePage(isDirty && !isSaving);
 
-    useEffectOnce(() => {
-        getCalculationByIdService(calculationId).then((result) => {
-            const additionalCalculationResult = result.data as EditAdditionalCalculationViewModel;
-            setOriginalAdditionalCalculation(additionalCalculationResult);
-            setAdditionalCalculationSourceCode(additionalCalculationResult.sourceCode);
-            setAdditionalCalculationName(additionalCalculationResult.name);
-            setAdditionalCalculationType(additionalCalculationResult.valueType);
-            setAdditionalCalculationStatus(additionalCalculationResult.publishStatus);
-            setInitialSourceCode(additionalCalculationResult.sourceCode);
-            getSpecificationSummaryService(additionalCalculationResult.specificationId).then((result) => {
-                const specificationResult = result.data as EditSpecificationViewModel;
-                setSpecificationSummary(specificationResult);
-                setSpecificationId(specificationResult.id);
-            });
-        })
-    });
-
     useEffect(() => {
-        if (originalAdditionalCalculation &&
-            originalAdditionalCalculation.sourceCode &&
-            originalAdditionalCalculation.name &&
-            originalAdditionalCalculation.valueType) {
-            setIsDirty(originalAdditionalCalculation.sourceCode !== additionalCalculationSourceCode ||
-                originalAdditionalCalculation.name !== additionalCalculationName ||
-                originalAdditionalCalculation.valueType !== additionalCalculationType);
-        }
-    }, [additionalCalculationType, additionalCalculationName, additionalCalculationSourceCode, originalAdditionalCalculation])
+        setIsLoading(true);
+        const loadCalculation = async () => {
+            const result = await getCalculationByIdService(calculationId);
+            return result.data as EditAdditionalCalculationViewModel;
+        };
+        const loadSpec = async (specificationId: string) => {
+            const result = await getSpecificationSummaryService(specificationId);
+            return result.data as EditSpecificationViewModel;
+        };
+        loadCalculation().then((calc) => {
+            setOriginalAdditionalCalculation(calc);
+            setAdditionalCalculationSourceCode(calc.sourceCode);
+            setAdditionalCalculationName(calc.name);
+            setAdditionalCalculationType(calc.valueType);
+            setAdditionalCalculationStatus(calc.publishStatus);
+            setInitialSourceCode(calc.sourceCode);
+            loadSpec(calc.specificationId)
+                .then((spec) => {
+                    setSpecificationSummary(spec);
+                    setSpecificationId(spec.id);
+                })
+                .finally(() =>
+                {
+                    setIsLoading(false);
+                    setIsDirty(false);
+                });
+        });
+    }, [calculationId]);
 
     function submitAdditionalCalculation() {
         if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
@@ -235,6 +238,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     function updateSourceCode(sourceCode: string) {
         setAdditionalCalculationBuildSuccess(initialBuildSuccess);
         setAdditionalCalculationSourceCode(sourceCode);
+        setIsDirty(initialSourceCode !== sourceCode);
     }
 
     return <div>
@@ -324,18 +328,21 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
-                <div className="govuk-panel govuk-panel--confirmation"
-                     hidden={!additionalCalculationBuildSuccess.buildSuccess}>
+                {additionalCalculationBuildSuccess.buildSuccess &&
+                <div className="govuk-panel govuk-panel--confirmation">
                     <div className="govuk-panel__body">
                         Build successful
                     </div>
-                </div>
-                <div
-                    className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <div
-                        className="govuk-body">Your calculation’s build output must be successful before you can save it
-                    </div>
-                </div>
+                </div>}
+                {isDirty && !additionalCalculationBuildSuccess.buildSuccess &&
+                <div className={"govuk-form-group" +
+                ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
+                </div>}
+                {isDirty &&
+                <div className="govuk-form-group">
+                    <div className="govuk-body">Your calculation must be saved before you can approve it</div>
+                </div>}
                 <div
                     hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
@@ -378,12 +385,12 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitAdditionalCalculation}
-                        disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess || additionalCalculationSourceCode === initialSourceCode}>
+                        disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={approveTemplateCalculation}
-                        disabled={additionalCalculationStatus === PublishStatus.Approved}>
+                        disabled={isDirty || additionalCalculationStatus === PublishStatus.Approved}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
