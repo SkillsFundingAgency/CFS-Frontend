@@ -169,8 +169,6 @@ namespace CalculateFunding.Frontend.Controllers
 	            {
 		            return new ForbidResult();
 	            }
-
-	            return Ok(true);
             }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
