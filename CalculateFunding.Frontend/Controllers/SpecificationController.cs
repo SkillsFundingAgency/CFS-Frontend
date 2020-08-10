@@ -133,6 +133,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok(apiResponse.Content.OrderBy(c => c.Name));
             }
 
+            if (apiResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return NoContent();
+            }
+
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
             {
                 return new BadRequestResult();

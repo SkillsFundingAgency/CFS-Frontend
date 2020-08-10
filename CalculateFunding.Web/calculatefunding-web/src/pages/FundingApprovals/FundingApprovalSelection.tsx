@@ -3,7 +3,7 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {
     getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications,
-    getSpecificationsByFundingPeriodAndStreamIdService
+    getSpecificationsSelectedForFundingByPeriod
 } from "../../services/specificationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
@@ -72,7 +72,7 @@ export function FundingApprovalSelection() {
                     }
                 }
             });
-            getSpecificationsByFundingPeriodAndStreamIdService(selectedFundingStream, fundingPeriod).then((result) => {
+            getSpecificationsSelectedForFundingByPeriod(fundingPeriod).then((result) => {
                 if (result.data.length > 0) {
                     setSelectedSpecification(result.data[0] as SpecificationSummary)
                 }
