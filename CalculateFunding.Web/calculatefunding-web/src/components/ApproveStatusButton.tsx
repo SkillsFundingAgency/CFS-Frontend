@@ -18,7 +18,7 @@ export function ApproveStatusButton(props: { id: string, status: string, callbac
             {currentStatus.status}
         </strong>
         <div className="approve-button-container" hidden={props.status === "Approved"}>
-            <button className="govuk-button"
+            <button className="govuk-button govuk-!-margin-right-1"
                     type="button"
                     hidden={props.status === "Approved"}
                     aria-label="Approval Status"

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
 import {
@@ -27,8 +26,6 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
-import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
-import {TemplateSearchResponse} from "../../types/TemplateBuilderDefinitions";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -121,8 +118,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     setSpecificationSummary(spec);
                     setSpecificationId(spec.id);
                 })
-                .finally(() =>
-                {
+                .finally(() => {
                     setIsLoading(false);
                     setIsDirty(false);
                 });
@@ -169,34 +165,33 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
             });
     }
 
-    function approveTemplateCalculation() {
+    const approveTemplateCalculation = async () => {
         setIsLoading(true);
         setCalculationApproveError("");
 
-        getIsUserAllowedToApproveCalculationService(calculationId)
-            .then((userPermissionResult) => {
-                if (userPermissionResult.status === 200) {
-                    const userCanApprove = userPermissionResult.data as boolean;
-                    if (userCanApprove) {
-                        const publishStatusModel: PublishStatusModel = {
-                            publishStatus: PublishStatus.Approved
-                        };
-                        approveCalculationService(publishStatusModel, specificationId, calculationId)
-                            .then((result) => {
-                                if (result.status === 200) {
-                                    const response: PublishStatusModel = result.data as PublishStatusModel;
-                                    setAdditionalCalculationStatus(response.publishStatus);
-                                }
-                            });
-                    } else {
-                        setCalculationApproveError("Calculation can not be approved by calculation writer");
-                    }
-                }
-            }).catch(() => {
+        const checkCanApproveCalculation = async (id: string) => {
+            const result = await getIsUserAllowedToApproveCalculationService(id);
+            return result.data as boolean;
+        };
+
+        const approveSpecification = async (specId: string, calcId: string) => {
+            const result = await approveCalculationService({publishStatus: PublishStatus.Approved} as PublishStatusModel, specId, calcId);
+            return result.data;
+        };
+
+        try {
+            const canUserApprove = await checkCanApproveCalculation(calculationId);
+            if (canUserApprove) {
+                const publishStatus = await approveSpecification(specificationId, calculationId);
+                setAdditionalCalculationStatus(publishStatus);
+            } else {
+                setCalculationApproveError("Calculation can not be approved by calculation writer");
+            }
+        } catch (e) {
                 setCalculationApproveError("There is a problem, calculation can not be approved, please try again");
-        }).finally(() => {
+        } finally {
             setIsLoading(false);
-        });
+        }
     }
 
     function buildCalculation() {
