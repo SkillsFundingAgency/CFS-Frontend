@@ -193,7 +193,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     }
                 }
             }).catch(() => {
-            setCalculationApproveError("Calculation can not be approved by calculation writer");
+                setCalculationApproveError("There is a problem, calculation can not be approved, please try again");
         }).finally(() => {
             setIsLoading(false);
         });
@@ -260,7 +260,7 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 <div className="govuk-error-summary__body">
                     <ul className="govuk-list govuk-error-summary__list">
                         <li>
-                            <a href="#calculation-status">Calculation can not be approved by calculation writer</a>
+                            <a href="#calculation-status">{calculationApproveError}</a>
                         </li>
                     </ul>
                 </div>

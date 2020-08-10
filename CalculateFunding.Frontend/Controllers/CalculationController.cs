@@ -151,13 +151,26 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            if(publishStatusEditModel.PublishStatus == PublishStatus.Approved)
+            if (publishStatusEditModel.PublishStatus == PublishStatus.Approved)
             {
-                var (canApprove, _) = await CanUserAllowedToApproveCalculation(calculationId);
-                if (!canApprove)
-                {
-                    return new ForbidResult();
-                }
+
+	            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+
+	            IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
+
+	            if (errorResult != null)
+	            {
+		            return errorResult;
+	            }
+
+	            bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
+
+	            if (!canApprove)
+	            {
+		            return new ForbidResult();
+	            }
+
+	            return Ok(true);
             }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
@@ -174,12 +187,27 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/calcs/{calculationId}/approvepermission")]
         [HttpGet]
-        public async Task<IActionResult> GetIsUserAllowedToApproveCalculation([FromRoute]string calculationId)
+        public async Task<IActionResult> GetIsUserAllowedToApproveCalculation([FromRoute] string calculationId)
         {
-            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+	        Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            var (canApprove, content) = await CanUserAllowedToApproveCalculation(calculationId);
-            return canApprove ? Ok(true) : (IActionResult)BadRequest(content);
+	        ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+
+	        IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
+
+	        if (errorResult != null)
+	        {
+		        return errorResult;
+	        }
+
+	        bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
+
+	        if (!canApprove)
+	        {
+		        return new ForbidResult();
+	        }
+
+	        return Ok(true);
         }
 
         [HttpPost]
@@ -327,19 +355,15 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestObjectResult(response.Content);
         }
 
-        private async Task<(bool, object)> CanUserAllowedToApproveCalculation(string calculationId)
+        private async Task<bool> CanUserApproveCalculation(Calculation calculation)
         {
-            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+	        FundingStreamPermission permissions =
+		        await _authorizationHelper.GetUserFundingStreamPermissions(User,
+			        calculation.FundingStreamId);
 
-            if (calculationResult.StatusCode == HttpStatusCode.OK)
-            {
-                FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, calculationResult.Content.FundingStreamId);
+	        return permissions.CanApproveAnyCalculations ||
+	               permissions.CanApproveCalculations && User.GetUserProfile()?.Id != calculation.Author.Id;
 
-                return (permissions.CanApproveAnyCalculations || (permissions.CanApproveCalculations && User.GetUserProfile()?.Id != calculationResult.Content.Author.Id), null);
-               
-            }
-
-            return (false, calculationResult.Content);
         }
     }
 }
