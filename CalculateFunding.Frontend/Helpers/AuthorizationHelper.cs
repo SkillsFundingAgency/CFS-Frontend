@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
@@ -23,10 +24,16 @@ namespace CalculateFunding.Frontend.Helpers
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
+        private readonly IPoliciesApiClient _policyClient;
         private readonly ILogger _logger;
         private readonly PermissionOptions _permissionOptions;
 
-        public AuthorizationHelper(IAuthorizationService authorizationService, IUsersApiClient usersClient, ILogger logger, IOptions<PermissionOptions> permissionOptions)
+        public AuthorizationHelper(
+            IAuthorizationService authorizationService,
+            IUsersApiClient usersClient,
+            IPoliciesApiClient policyClient,
+            ILogger logger,
+            IOptions<PermissionOptions> permissionOptions)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
             Guard.ArgumentNotNull(usersClient, nameof(usersClient));
@@ -35,13 +42,15 @@ namespace CalculateFunding.Frontend.Helpers
 
             _authorizationService = authorizationService;
             _usersClient = usersClient;
+            _policyClient = policyClient;
             _logger = logger;
             _permissionOptions = permissionOptions.Value;
         }
 
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
         {
-            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, specificationId, new SpecificationRequirement(permissionRequired));
+            AuthorizationResult authorizationResult =
+                await _authorizationService.AuthorizeAsync(user, specificationId, new SpecificationRequirement(permissionRequired));
             return authorizationResult.Succeeded;
         }
 
@@ -53,41 +62,82 @@ namespace CalculateFunding.Frontend.Helpers
 
             return allFundingStreamPerms.SingleOrDefault(x => x.FundingStreamId == fundingStreamId);
         }
-        
+
         public async Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user)
         {
             Guard.ArgumentNotNull(user, nameof(user));
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
-            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+            if (IsAdminUser(user))
+            {
+                ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policyClient.GetFundingStreams();
+
+                if (fundingStreamsResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    List<FundingStreamPermission> permissions = new List<FundingStreamPermission>();
+                    foreach (PolicyModels.FundingStream fundingStream in fundingStreamsResponse.Content)
+                    {
+                        permissions.Add(new FundingStreamPermission
+                        {
+                            FundingStreamId = fundingStream.Id,
+                            CanAdministerFundingStream = true,
+                            CanApproveFunding = true,
+                            CanApproveSpecification = true,
+                            CanChooseFunding = true,
+                            CanCreateQaTests = true,
+                            CanCreateSpecification = true,
+                            CanEditCalculations = true,
+                            CanEditQaTests = true,
+                            CanEditSpecification = true,
+                            CanMapDatasets = true,
+                            CanReleaseFunding = true,
+                            CanRefreshFunding = true,
+                            CanCreateTemplates = true,
+                            CanEditTemplates = true,
+                            CanDeleteTemplates = true,
+                            CanApproveTemplates = true,
+                            UserId = user.GetUserProfile()?.Id
+                        });
+                    }
+
+                    return permissions;
+                }
+            }
+
+            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse =
+                await _usersClient.GetFundingStreamPermissionsForUser(userId);
 
             if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
             {
-                _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", user.Identity.Name,
+                    fundingStreamPermissionsResponse.StatusCode);
                 return new List<FundingStreamPermission>();
             }
 
             return fundingStreamPermissionsResponse.Content;
         }
 
-        public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
+        public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user,
+            IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(fundingStreams, nameof(fundingStreams));
 
-            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            if (IsAdminUser(user))
             {
                 return fundingStreams;
             }
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
-            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse =
+                await _usersClient.GetFundingStreamPermissionsForUser(userId);
 
             if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
             {
-                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name,
+                    fundingStreamPermissionsResponse.StatusCode);
                 return Enumerable.Empty<PolicyModels.FundingStream>();
             }
 
@@ -107,23 +157,26 @@ namespace CalculateFunding.Frontend.Helpers
             return fundingStreams.Where(fs => allowedFundingStreamIds.Contains(fs.Id));
         }
 
-        public async Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications, SpecificationActionTypes permissionRequired)
+        public async Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications,
+            SpecificationActionTypes permissionRequired)
         {
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(specifications, nameof(specifications));
 
-            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            if (IsAdminUser(user))
             {
                 return specifications;
             }
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
 
-            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse = await _usersClient.GetFundingStreamPermissionsForUser(userId);
+            ApiResponse<IEnumerable<FundingStreamPermission>> fundingStreamPermissionsResponse =
+                await _usersClient.GetFundingStreamPermissionsForUser(userId);
 
             if (fundingStreamPermissionsResponse.StatusCode != HttpStatusCode.OK)
             {
-                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name, fundingStreamPermissionsResponse.StatusCode);
+                _logger.Error("Failed to get funding stream permissions for user for security trimming ({user}) - {statuscode}", user.Identity.Name,
+                    fundingStreamPermissionsResponse.StatusCode);
                 return Enumerable.Empty<SpecificationSummary>();
             }
 
@@ -139,7 +192,8 @@ namespace CalculateFunding.Frontend.Helpers
             }
             else
             {
-                throw new NotSupportedException($"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
+                throw new NotSupportedException(
+                    $"Security trimming specifications by this permission ({permissionRequired} is not currently supported");
             }
 
             IEnumerable<string> allowedFundingStreamIds = allowedFundingStreams.Select(p => p.FundingStreamId);
@@ -152,7 +206,7 @@ namespace CalculateFunding.Frontend.Helpers
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            if (user.HasClaim(c => c.Type == Common.Identity.Constants.GroupsClaimType && c.Value.ToLowerInvariant() == _permissionOptions.AdminGroupId.ToString().ToLowerInvariant()))
+            if (IsAdminUser(user))
             {
                 return new EffectiveSpecificationPermission
                 {
@@ -184,7 +238,6 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 _logger.Error("Failed to get effective permissions for user ({user}) - {statuscode}", user.Identity.Name, response.StatusCode);
 
-
                 return new EffectiveSpecificationPermission
                 {
                     CanAdministerFundingStream = false,
@@ -207,6 +260,13 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 return response.Content;
             }
+        }
+
+        private bool IsAdminUser(ClaimsPrincipal user)
+        {
+            return user.HasClaim(c =>
+                c.Type == Common.Identity.Constants.GroupsClaimType &&
+                c.Value == _permissionOptions.AdminGroupId.ToString());
         }
 
         private static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal user)
