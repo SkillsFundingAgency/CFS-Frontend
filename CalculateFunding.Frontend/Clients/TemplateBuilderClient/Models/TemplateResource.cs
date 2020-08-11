@@ -48,11 +48,6 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models
         public TemplateStatus Status { get; set; }
         
         /// <summary>
-        /// Template Publish Status
-        /// </summary>
-        public PublishStatus PublishStatus { get; set; }
-        
-        /// <summary>
         /// Comments added to template
         /// </summary>
         public string Comments { get; set; }

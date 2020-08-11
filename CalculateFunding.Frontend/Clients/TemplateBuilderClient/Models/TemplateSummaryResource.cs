@@ -40,11 +40,6 @@ namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models
         /// Status of Template Build
         /// </summary>
         public TemplateStatus Status { get; set; }
-        
-        /// <summary>
-        /// Template Publish Status
-        /// </summary>
-        public PublishStatus PublishStatus { get; set; }
 
         /// <summary>
         /// Template minor version

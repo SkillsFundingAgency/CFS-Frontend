@@ -120,7 +120,6 @@ export interface TemplateResponse {
     fundingPeriodName: string,
     name: string,
     status: string,
-    publishStatus: string,
     description: string,
     minorVersion: number,
     majorVersion: number,
