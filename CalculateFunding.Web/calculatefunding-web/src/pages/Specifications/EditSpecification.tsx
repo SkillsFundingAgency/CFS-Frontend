@@ -193,7 +193,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 });
 
                             }
-                        })
+                        });
 
                         setSelectedDescription(specificationSummary.description);
                     }

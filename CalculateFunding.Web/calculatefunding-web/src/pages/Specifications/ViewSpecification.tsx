@@ -11,7 +11,7 @@ import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
-import {changeFundingLineStateService, getProfileVariationPointersService, getSpecificationSummaryService} from "../../services/specificationService";
+import {approveFundingLineStructureService, getProfileVariationPointersService, getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {DateFormatter} from "../../components/DateFormatter";
@@ -123,7 +123,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         totalErrorResults: 0,
         totalResults: 0
     });
-    const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<PublishStatus>(PublishStatus.Draft);
+    const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
 
     useEffect(() => {
         if (!fundingLineRenderInternalState) {
@@ -288,10 +288,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         populateAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
     }
 
-    const updateFundingLineState = async (specificationId: string) => {
-        const response = await changeFundingLineStateService(specificationId);
+    const handleApproveFundingLineStructure = async (specificationId: string) => {
+        const response = await approveFundingLineStructureService(specificationId);
         if (response.status === 200) {
-            setFundingLinePublishStatus(response.data as PublishStatus)
+            setFundingLinePublishStatus(PublishStatus.Approved);
+        } else {
+            setErrors(errors => [...errors, 
+                `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
+            setFundingLinePublishStatus(specification.approvalStatus as PublishStatus);
         }
     };
 
@@ -402,8 +406,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <ApproveStatusButton id={specification.id}
-                                                             status={fundingLinePublishStatus.toString()}
-                                                             callback={updateFundingLineState}/>
+                                                             status={fundingLinePublishStatus}
+                                                             callback={handleApproveFundingLineStructure}/>
                                     </div>
                                     <div className="govuk-grid-column-two-thirds">
                                         <div className="govuk-form-group search-container">

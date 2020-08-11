@@ -8,7 +8,7 @@ import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {SpecificationInformation} from "../../types/Provider/SpecificationInformation";
-import {changeFundingLineStateService, getSpecificationSummaryService} from "../../services/specificationService";
+import {approveFundingLineStructureService, getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Tabs} from "../../components/Tabs";
 import {DateFormatter} from "../../components/DateFormatter";
@@ -266,14 +266,14 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }
 
     function updateFundingLineState(specificationId: string) {
-        changeFundingLineStateService(specificationId).then((response) => {
+        approveFundingLineStructureService(specificationId).then((response) => {
             if (response.status === 200) {
                 setFundingLinePublishStatus(response.data as PublishStatus)
             }
         });
     }
 
-    let fundingLineStatus = specificationSummary.approvalStatus;
+    let fundingLineStatus = specificationSummary.approvalStatus as PublishStatus;
     if (fundingLines != null)
         fundingLineStatus = fundingLinePublishStatus;
 
@@ -409,7 +409,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <ApproveStatusButton id={specificationSummary.id}
-                                                             status={fundingLineStatus}
+                                                             status={fundingLineStatus.toString()}
                                                              callback={updateFundingLineState}/>
                                     </div>
                                 </div>

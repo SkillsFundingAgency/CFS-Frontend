@@ -68,7 +68,7 @@ export async function getAllSpecificationsService(searchRequest: SpecificationSe
     });
 }
 
-export async function changeFundingLineStateService(specificationId: string) {
+export async function approveFundingLineStructureService(specificationId: string) {
     const publishStatusEditModel: PublishStatusModel = {
         publishStatus: PublishStatus.Approved
     };

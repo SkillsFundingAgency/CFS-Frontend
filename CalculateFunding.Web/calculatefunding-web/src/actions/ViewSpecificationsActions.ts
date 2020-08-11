@@ -3,7 +3,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {CalculationSummary} from "../types/CalculationSummary";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {
-    changeFundingLineStateService,
+    approveFundingLineStructureService,
     getProfileVariationPointersService,
     getSpecificationSummaryService, setProfileVariationPointersService
 } from "../services/specificationService";
@@ -189,7 +189,7 @@ export const setProfileVariationPointers: ActionCreator<ThunkAction<Promise<any>
 export const changeFundingLineState:
     ActionCreator<ThunkAction<Promise<any>, IFundingLineStructureState, null, FundingLineStructureAction>> = (specificationId: string) => {
     return async (dispatch: Dispatch) => {
-        const response = await changeFundingLineStateService(specificationId);
+        const response = await approveFundingLineStructureService(specificationId);
         let publishStatusModelResult = response.data as PublishStatusModel;
         dispatch({
             type: ViewSpecificationActionTypes.CHANGE_FUNDINGLINESTATUS,
