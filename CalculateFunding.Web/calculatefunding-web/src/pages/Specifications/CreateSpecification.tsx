@@ -1,7 +1,6 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {
     createSpecificationService,
     getFundingPeriodsByFundingStreamIdService
@@ -22,7 +21,7 @@ import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
-import {HubConnectionBuilder} from "@aspnet/signalr";
+import {HubConnectionBuilder, HubConnection} from "@aspnet/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 
@@ -45,20 +44,55 @@ export function CreateSpecification() {
     const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
     const [createSpecificationFailOutcome, setCreateSpecificationFailOutcome] = useState<string>("");
     const [createSpecificationFailed, setCreateSpecificationFailed] = useState<boolean>(false);
+    const [newSpecificationId, setNewSpecificationId] = useState<string>('');
     let history = useHistory();
 
-    useEffectOnce(() => {
-
-        createHubConnection();
-
+    useEffect(() => {
         const getStreams = async () => {
             const streamResult = await getFundingStreamsService(true);
             setFundingStreamData(streamResult.data as FundingStream[]);
         };
-        getStreams().then(result => {
-            return true;
-        });
-    });
+
+        getStreams();
+    }, []);
+
+    useEffect(() => {
+        if (newSpecificationId.length === 0) return;
+
+        const createHubConnection = async () => {
+            const hubConnect = new HubConnectionBuilder()
+                .withUrl(`/api/notifications`)
+                .build();
+
+            try {
+                await hubConnect.start();
+
+                hubConnect.on('NotificationEvent', (message: JobMessage) => {
+                    if (message.jobType === "AssignTemplateCalculationsJob" &&
+                        message.runningStatus === "Completed" &&
+                        message.specificationId === newSpecificationId) {
+                        setIsLoading(false);
+                        hubConnect.invoke("StopWatchingForAllNotifications").then(() => {
+                            hubConnect.stop();
+                        });
+                        if (message.completionStatus !== "Succeeded") {
+                            setCreateSpecificationFailOutcome(message.outcome);
+                            setCreateSpecificationFailed(true);
+                        } else {
+                            history.push(`/ViewSpecification/${newSpecificationId}`);
+                        }
+                    }
+                });
+
+                await hubConnect.invoke("StartWatchingForAllNotifications");
+
+            } catch (err) {
+                await hubConnect.stop();
+            }
+        }
+
+        createHubConnection();
+    }, [newSpecificationId])
 
     function populateFundingPeriods(fundingStream: string) {
         if (fundingStream !== "") {
@@ -142,11 +176,13 @@ export function CreateSpecification() {
         setSelectedDescription(specificationDescription);
     }
 
-    function submitSaveSpecification() {
-        if (selectedName !== "" && selectedFundingStream !== "" && selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
+    async function submitSaveSpecification() {
+        if (selectedName !== "" && selectedFundingStream !== "" &&
+            selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
             setCreateSpecificationFailed(false);
+            setNewSpecificationId('');
             let assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
             let createSpecificationViewModel: CreateSpecificationViewModel = {
@@ -158,45 +194,16 @@ export function CreateSpecification() {
                 assignedTemplateIds: assignedTemplateIdsValue
             };
 
-            const createSpecification = async () => {
+            try {
                 const createSpecificationResult = await createSpecificationService(createSpecificationViewModel);
-                return createSpecificationResult;
-            };
-            createSpecification().then((result) => {
-                if (result.status === 200) {
-                    let response = result.data as SpecificationSummary;
-                    history.push(`/ViewSpecification/${response.id}`);
-                } else {
-                    setCreateSpecificationFailed(true);
-                    setIsLoading(false);
-                }
-            }).catch(() => {
+                const specificationSummary = createSpecificationResult.data as SpecificationSummary;
+                setNewSpecificationId(specificationSummary.id);
+            } catch {
                 setCreateSpecificationFailed(true);
                 setIsLoading(false);
-            });
+            }
         } else {
             setFormValid({formSubmitted: true, formValid: false})
-        }
-    }
-
-    async function createHubConnection() {
-        const hubConnect = new HubConnectionBuilder()
-            .withUrl(`/api/notifications`)
-            .build();
-        try {
-            await hubConnect.start();
-
-            hubConnect.on('NotificationEvent', (message: JobMessage) => {
-                if (message.jobType === "CreateSpecificationJob" && message.completionStatus !== "Succeeded") {
-                    setCreateSpecificationFailOutcome(message.outcome);
-                    hubConnect.stop();
-                }
-            });
-
-            await hubConnect.invoke("StartWatchingForAllNotifications");
-
-        } catch (err) {
-            await hubConnect.stop();
         }
     }
 
@@ -210,9 +217,9 @@ export function CreateSpecification() {
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <LoadingStatus title={"Creating Specification"}
-                               subTitle={"Please wait whilst we create the specification"}
-                               description={"This can take a few minutes"} id={"create-specification"}
-                               hidden={!isLoading} />
+                    subTitle={"Please wait whilst we create the specification"}
+                    description={"This can take a few minutes"} id={"create-specification"}
+                    hidden={!isLoading} />
                 <div hidden={!createSpecificationFailed}
                     className="govuk-error-summary"
                     aria-labelledby="error-summary-title" role="alert"
