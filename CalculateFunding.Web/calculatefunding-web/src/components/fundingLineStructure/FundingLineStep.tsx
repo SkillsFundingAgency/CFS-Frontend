@@ -7,10 +7,10 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType: string = "";
-    const parentFundingLineName :string = fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
+    const parentFundingLineName :string = fundingStructureItems && fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
     return <div>
         {
-            (fundingStructureItems != null && fundingStructureItems.length > 0)? fundingStructureItems.map((innerFundingLineItem, index) => {
+            (fundingStructureItems && fundingStructureItems.length > 0) ? fundingStructureItems.map((innerFundingLineItem, index) => {
                     let displayFundingType = false;
                     if (fundingType !== FundingStructureType[innerFundingLineItem.type])
                     {
