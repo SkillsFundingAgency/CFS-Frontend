@@ -55,7 +55,7 @@ function TemplateBuilderNode({nodeData, addNode, openSideBar, onClickNode, isEdi
     const handleClick = () => {
         openSideBar(true);
         onClickNode();
-    }
+    };
 
     const isClone = nodeData.id.includes(":");
 

@@ -75,9 +75,10 @@ export const setupGetTemplate = function () {
                 publishStatus: "",
                 comments: ""
             }
-        }))
+        })),
+        getAllCalculations: jest.fn()
     }));
-}
+};
 describe("Publish Template page when I don't have approve permissions ", () => {
     beforeEach(() => {
         useSelectorSpy.mockClear();

@@ -12,26 +12,31 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import OrganisationChart from "../../components/TemplateBuilder/OrganisationChart";
 import TemplateBuilderNode from "../../components/TemplateBuilder/TemplateBuilderNode";
 import {
-    FundingLineDictionaryEntry,
+    CalculationDictionaryItem, FundingLine,
+    FundingLineDictionaryEntry, FundingLineOrCalculationSelectedItem,
     Template,
     TemplateFundingLine,
     TemplateResponse
 } from "../../types/TemplateBuilderDefinitions";
 import {
-    datasourceToTemplateFundingLines,
+    datasourceToTemplateFundingLines, getAllCalculations,
     getTemplateById,
     publishTemplate,
     templateFundingLinesToDatasource
 } from "../../services/templateBuilderDatasourceService";
+import {SidebarContent} from "../../components/TemplateBuilder/SidebarContent";
+import Sidebar from "react-sidebar";
 
 export const PublishTemplate = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isPublishing, setIsPublishing] = useState<boolean>(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [publishMessage, setPublishMessage] = useState<string>('');
     const [publishErrorMessage, setPublishErrorMessage] = useState<string>('');
     const [publishNote, setPublishNote] = useState<string>('');
-    const orgchart = useRef();
+    const [selectedNodes, setSelectedNodes] = useState<Set<FundingLineOrCalculationSelectedItem>>(new Set());
+    const orgchart = useRef<HTMLDivElement>(null);
     const [ds, setDS] = useState<Array<FundingLineDictionaryEntry>>([]);
     const [template, setTemplate] = useState<TemplateResponse>();
     const {canApproveTemplate, missingPermissions} = useTemplatePermissions(["approve"], template ? [template.fundingStreamId] : []);
@@ -132,7 +137,26 @@ export const PublishTemplate = () => {
         }
     };
 
+    function getCalculations(): CalculationDictionaryItem[] {
+        const fundingLines: FundingLine[] = ds.map(fl => fl.value);
+        return getAllCalculations(fundingLines);
+    }
 
+    const openSideBar = (open: boolean) => {
+        setIsSidebarOpen(open);
+        if (!open) {
+            clearSelectedNode();
+        }
+    };
+
+    const readSelectedNode = (node: FundingLineOrCalculationSelectedItem) => {
+        setSelectedNodes(new Set([node]));
+    };
+
+    const clearSelectedNode = () => {
+        setSelectedNodes(new Set());
+    };
+    
     return (
         <div>
             <Header location={Section.Templates}/>
@@ -145,7 +169,7 @@ export const PublishTemplate = () => {
 
                 {errors.length > 0 &&
                 <div className="govuk-error-summary"
-                     aria-labelledby="error-summary-title" role="alert" tabIndex="-1" data-module="govuk-error-summary">
+                     aria-labelledby="error-summary-title" role="alert" tabIndex={-1} data-module="govuk-error-summary">
                     <h2 className="govuk-error-summary__title" id="error-summary-title">
                         There is a problem
                     </h2>
@@ -213,6 +237,9 @@ export const PublishTemplate = () => {
                                     <OrganisationChart
                                         ref={orgchart}
                                         NodeTemplate={TemplateBuilderNode}
+                                        onClickNode={readSelectedNode}
+                                        onClickChart={clearSelectedNode}
+                                        openSideBar={openSideBar}
                                         isEditMode={false}
                                         datasource={ds}
                                         chartClass="myChart"
@@ -248,6 +275,31 @@ export const PublishTemplate = () => {
                                 <Link id="continue" to="/Templates/List" className="govuk-button govuk-button--primary" data-module="govuk-button">
                                     Continue
                                 </Link>}
+                                <Sidebar sidebar={
+                                    <SidebarContent
+                                        data={selectedNodes}
+                                        calcs={getCalculations()}
+                                        isEditMode={false}
+                                        openSideBar={openSideBar}
+                                    />}
+                                         open={isSidebarOpen}
+                                         onSetOpen={openSideBar}
+                                         pullRight={true}
+                                         styles={{
+                                             sidebar: {
+                                                 background: "white",
+                                                 position: "fixed",
+                                                 padding: "20px 20px",
+                                                 width: "500px"
+                                             }, root: {position: "undefined"}, content: {
+                                                 position: "undefined",
+                                                 top: "undefined",
+                                                 left: "undefined",
+                                                 right: "undefined",
+                                                 bottom: "undefined"
+                                             }
+                                         }}
+                                ><span></span></Sidebar>
                             </form>
                         </div>
                     </div>
