@@ -10,16 +10,15 @@ using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Datasets;
+using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Interfaces.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Interfaces.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Specs;
-    using Microsoft.AspNetCore.Mvc;
-
     public class DatasetRelationshipsSearchController : Controller
     {
         private IDatasetRelationshipsSearchService _searchService;

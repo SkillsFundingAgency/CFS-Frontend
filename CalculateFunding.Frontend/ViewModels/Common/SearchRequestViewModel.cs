@@ -1,8 +1,8 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Common
-{
-    using CalculateFunding.Common.ApiClient.Models;
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CalculateFunding.Common.Models.Search;
 
+namespace CalculateFunding.Frontend.ViewModels.Common
+{
     public class SearchRequestViewModel
     {
         public int? PageNumber { get; set; }

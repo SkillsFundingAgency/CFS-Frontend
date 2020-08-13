@@ -1,5 +1,4 @@
-﻿using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Providers.Models;
+﻿using CalculateFunding.Common.ApiClient.Providers.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
@@ -86,7 +85,7 @@ namespace CalculateFunding.Frontend.Controllers
 	            IncludeFacets = viewModel.IncludeFacets,
 	            PageNumber = viewModel.PageNumber,
 	            PageSize = viewModel.PageSize,
-	            SearchMode = SearchMode.All,
+	            SearchMode = viewModel.SearchMode
             };
 
             if (!string.IsNullOrEmpty(viewModel.SearchTerm))

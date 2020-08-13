@@ -8,7 +8,6 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Interfaces;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
-using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient

@@ -76,7 +76,7 @@
                         adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
                     })
                     .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-                    .AddCookie();                                     
+                    .AddCookie();
 
                     services.AddAuthorization();
 
@@ -154,18 +154,18 @@
 
             services.AddOptions();
 
-            if (EnableSwagger())
+            if (IsSwaggerEnabled())
             {
                 services.AddSwaggerGen(
                     options =>
                     {
+                        options.UseInlineDefinitionsForEnums();
+                        options.CustomSchemaIds(x => x.FullName);
                         options.SwaggerDoc("v1", new OpenApiInfo { Title = "Calculations Funding Frontend API", Version = "v1" });
-
                     });
             }
 
             services.AddFeatureManagement();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -226,7 +226,7 @@
                 endpoints.MapHub<Notifications>("/api/notifications");
             });
 
-            if (EnableSwagger())
+            if (IsSwaggerEnabled())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(
@@ -238,10 +238,9 @@
             }
         }
 
-        private bool EnableSwagger()
+        private bool IsSwaggerEnabled()
         {
-            bool enableSwagger = Configuration.GetValue<bool>("FeatureManagement:TemplateBuilderVisible");
-            return enableSwagger;
+            return Configuration.GetValue("FeatureManagement:EnableSwagger", false);
         }
     }
 }

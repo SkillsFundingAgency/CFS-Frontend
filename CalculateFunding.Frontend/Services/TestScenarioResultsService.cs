@@ -16,6 +16,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using Serilog;
+using SearchMode = CalculateFunding.Common.Models.Search.SearchMode;
 
 namespace CalculateFunding.Frontend.Services
 {

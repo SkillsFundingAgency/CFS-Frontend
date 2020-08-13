@@ -7,10 +7,12 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Extensions;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Serilog;
 using CalculateFunding.Common.Models.Search;
+using SearchMode = CalculateFunding.Common.Models.Search.SearchMode;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -43,7 +45,7 @@ namespace CalculateFunding.Frontend.Services
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = Common.Models.Search.SearchMode.All
+                SearchMode = request.SearchMode.AsMatchingEnum<SearchMode>()
             };
 
 	        ApiResponse<SearchResults<DatasetDefinitionIndex>> searchRequestResult = await _datasetsClient.SearchDatasetDefinitions(requestOptions);

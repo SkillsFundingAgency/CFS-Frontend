@@ -1,18 +1,13 @@
-﻿
-
-using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using CalculateFunding.Common.Models.Search;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-
-
     public class DatasetDefinitionSearchController : Controller
     {
         private IDatasetDefinitionSearchService _datasetDefinitionSearchService;
@@ -26,7 +21,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/dataset-definitions/search")]
-        public async Task<IActionResult> SearchDatasetDefinitions([FromBody]SearchRequestViewModel request)
+        public async Task<IActionResult> SearchDatasetDefinitions([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
@@ -56,10 +51,9 @@ namespace CalculateFunding.Frontend.Controllers
                 PageSize = pageSize,
                 SearchMode = SearchMode.All
             };
-            
-            
+
             DatasetDefinitionSearchResultViewModel result = await _datasetDefinitionSearchService.PerformSearch(request);
-            
+
             if (result != null)
             {
                 return Ok(result);

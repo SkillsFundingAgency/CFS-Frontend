@@ -1,17 +1,14 @@
 ﻿using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
+using System.Net;
+using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Common.ApiClient.Models;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System.Net;
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
-    using Microsoft.AspNetCore.Mvc;
-    using Serilog;
-
     public class DownloadDatasourceController : Controller
     {
         private readonly IDatasetsApiClient _datasetApiClient;

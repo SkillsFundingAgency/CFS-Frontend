@@ -34,7 +34,5 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult(500);
             }
         }
-
-
     }
 }

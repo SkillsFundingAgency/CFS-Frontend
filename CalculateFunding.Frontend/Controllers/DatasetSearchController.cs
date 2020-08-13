@@ -2,16 +2,18 @@
 using System.Linq;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
+using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Extensions;
+using CalculateFunding.Common.Models.Search;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Services;
+using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
 {
-    using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Frontend.Services;
-    using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Datasets;
-    using Microsoft.AspNetCore.Mvc;
-
     public class DatasetSearchController : Controller
     {
         private IDatasetSearchService _datasetSearchService;
@@ -60,7 +62,6 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult(500);
             }
         }
-
 
         [HttpGet]
         [Route("api/datasets/getdatasetversions/{datasetId}")]

@@ -6,6 +6,8 @@ using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {

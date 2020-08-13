@@ -1,4 +1,4 @@
-﻿using CalculateFunding.Common.ApiClient.Models;
+﻿using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.ViewModels.Common
 {

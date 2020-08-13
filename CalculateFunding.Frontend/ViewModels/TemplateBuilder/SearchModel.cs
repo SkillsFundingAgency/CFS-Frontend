@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.ViewModels.TemplateBuilder
 {
