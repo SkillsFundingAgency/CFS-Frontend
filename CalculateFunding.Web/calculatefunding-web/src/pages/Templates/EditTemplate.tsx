@@ -527,8 +527,12 @@ export function EditTemplate() {
                                             {errors.map((error, i) =>
                                                 <li key={i}>
                                                     {error.fieldName &&
-                                                        <a href={"#" + error.fieldName} onClick={() => handleScroll(error.fieldName)}>{error.message}</a>}
-                                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
+                                                        <button onClick={() => handleScroll(error.fieldName)} 
+                                                                className="govuk-link govuk-link-red">
+                                                            {error.message}
+                                                        </button>}
+                                                    {!error.fieldName && 
+                                                    <span className="govuk-error-message">{error.message}</span>}
                                                 </li>
                                             )}
                                         </ul>

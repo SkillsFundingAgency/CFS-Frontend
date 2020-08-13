@@ -571,3 +571,17 @@ svg.app-back-to-top__icon {
 .providerResults-details span {
   margin-right: 10px;
 }
+
+.govuk-link-red:hover:focus:active,
+button.govuk-link-red,
+button.govuk-link-red:hover:focus:active,
+a.govuk-link-red:hover:focus:active,
+{
+  color: govuk-colour("red");
+}
+
+.govuk-error-summary__list  button
+{
+  font-weight: 700;
+  text-align: left;
+}
