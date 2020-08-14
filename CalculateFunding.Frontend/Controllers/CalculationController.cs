@@ -1,18 +1,17 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Common.ApiClient.Users.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -83,22 +82,22 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/{specificationId}/calculations/{calculationId}/compilePreview")]
         [HttpPost]
-        public async Task<IActionResult> CompilePreview([FromRoute]string specificationId, [FromRoute] string calculationId, [FromBody]PreviewCompileRequestViewModel vm)
+        public async Task<IActionResult> CompilePreview([FromRoute] string specificationId, [FromRoute] string calculationId, [FromBody] PreviewCompileRequestViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-				PreviewResponse errorResponse = new PreviewResponse();
+                PreviewResponse errorResponse = new PreviewResponse();
 
-				foreach (var modelStateValue in ModelState.Values)
-				{
-					errorResponse.CompilerOutput = new Build
-					{
-						CompilerMessages = new List<CompilerMessage>
-						{
-							new CompilerMessage {Message = modelStateValue.Errors[0].ErrorMessage}
-						}
-					};
-				}
+                foreach (var modelStateValue in ModelState.Values)
+                {
+                    errorResponse.CompilerOutput = new Build
+                    {
+                        CompilerMessages = new List<CompilerMessage>
+                        {
+                            new CompilerMessage {Message = modelStateValue.Errors[0].ErrorMessage}
+                        }
+                    };
+                }
 
                 return BadRequest(errorResponse);
             }
@@ -139,36 +138,46 @@ namespace CalculateFunding.Frontend.Controllers
             }
         }
 
+        /// <summary>
+        /// Approve calculation
+        /// </summary>
+        /// <param name="specificationId">Specification ID</param>
+        /// <param name="calculationId">CalculationId</param>
+        /// <param name="publishStatusEditModel">Calculation status</param>
+        /// <returns></returns>
         [Route("api/specs/{specificationId}/calculations/{calculationId}/status")]
         [HttpPut]
-        public async Task<IActionResult> EditCalculationStatus([FromRoute]string specificationId, [FromRoute]string calculationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        public async Task<IActionResult> ApproveCalculation([FromRoute] string specificationId, [FromRoute] string calculationId, [FromBody] PublishStatusEditModel publishStatusEditModel)
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
 
-            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanEditCalculations))
+            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+
+            IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            if (calculationResult.Content.SpecificationId != specificationId)
+            {
+                return new PreconditionFailedResult("The calculation requested is not contained within the specification requested");
+            }
+
+            bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
+            if (!canApprove)
             {
                 return new ForbidResult();
             }
 
             if (publishStatusEditModel.PublishStatus == PublishStatus.Approved)
             {
-
-	            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
-
-	            IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
-
-	            if (errorResult != null)
-	            {
-		            return errorResult;
-	            }
-
-	            bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
-
-	            if (!canApprove)
-	            {
-		            return new ForbidResult();
-	            }
+                return Ok(new PublishStatusResult()
+                {
+                    PublishStatus = PublishStatus.Approved
+                });
             }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
@@ -187,25 +196,25 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetIsUserAllowedToApproveCalculation([FromRoute] string calculationId)
         {
-	        Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-	        ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calculationResult = await _calcClient.GetCalculationById(calculationId);
 
-	        IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
+            IActionResult errorResult = calculationResult.IsSuccessOrReturnFailureResult("GetCalculationById");
 
-	        if (errorResult != null)
-	        {
-		        return errorResult;
-	        }
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
 
-	        bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
+            bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
 
-	        if (!canApprove)
-	        {
-		        return new ForbidResult();
-	        }
+            if (!canApprove)
+            {
+                return new ForbidResult();
+            }
 
-	        return Ok(true);
+            return Ok(true);
         }
 
         [HttpPost]
@@ -311,8 +320,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{pageNumber}")]
-        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId, 
-	        CalculationType calculationType, int pageNumber, [FromQuery]string searchTerm, [FromQuery]string status)
+        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId,
+            CalculationType calculationType, int pageNumber, [FromQuery] string searchTerm, [FromQuery] string status)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
@@ -325,8 +334,8 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ApiResponse<SearchResults<CalculationSearchResult>> result =
-                await _calcClient.SearchCalculationsForSpecification(specificationId, 
-	                calculationType, publishStatus, searchTerm, pageNumber);
+                await _calcClient.SearchCalculationsForSpecification(specificationId,
+                    calculationType, publishStatus, searchTerm, pageNumber);
 
 
             if (result.StatusCode == HttpStatusCode.OK)
@@ -355,13 +364,17 @@ namespace CalculateFunding.Frontend.Controllers
 
         private async Task<bool> CanUserApproveCalculation(Calculation calculation)
         {
-	        FundingStreamPermission permissions =
-		        await _authorizationHelper.GetUserFundingStreamPermissions(User,
-			        calculation.FundingStreamId);
+            if (await _authorizationHelper.DoesUserHavePermission(User, calculation.SpecificationId, SpecificationActionTypes.CanApproveAnyCalculations))
+            {
+                return true;
+            }
 
-	        return permissions.CanApproveAnyCalculations ||
-	               permissions.CanApproveCalculations && User.GetUserProfile()?.Id != calculation.Author.Id;
+            if (!await _authorizationHelper.DoesUserHavePermission(User, calculation.SpecificationId, SpecificationActionTypes.CanApproveCalculations))
+            {
+                return false;
+            }
 
+            return User.GetUserProfile()?.Id != calculation.Author.Id;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace CalculateFunding.Frontend.Controllers
     using CalculateFunding.Common.ApiClient.Models;
     using CalculateFunding.Common.Identity.Authorization.Models;
     using CalculateFunding.Common.Models;
+    using CalculateFunding.Frontend.Extensions;
     using CalculateFunding.Frontend.Helpers;
     using CalculateFunding.Frontend.UnitTests.Helpers;
     using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -317,7 +318,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [TestMethod]
-        public void EditCalculationStatus_GivenFailedStatusCode_ThrowsInvalidOperationException()
+        public void EditCalculationStatus_GivenFailedStatusCodeFromApprovingCalc_ThrowsInvalidOperationException()
         {
             //Arrange
             string specificationId = "abc123";
@@ -325,95 +326,32 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel();
 
-            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.BadRequest);
+
             calcsClient
                 .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
                 .Returns(response);
 
+            ValidatedApiResponse<Calculation> calculation = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = specificationId });
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(calculation);
+
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
-            IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
+            IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveAnyCalculations);
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
 
             // Act
-            Func<Task> test = async () => await controller.EditCalculationStatus(specificationId, calculationId, model);
+            Func<Task> test = async () => await controller.ApproveCalculation(specificationId, calculationId, model);
 
             // Assert
             test
                 .Should()
                 .Throw<InvalidOperationException>();
-        }
-
-        [TestMethod]
-        public async Task EditCalculationStatus_GivenOKResponseFromApi_ReturnsOK()
-        {
-            //Arrange
-            string specificationId = "abc123";
-            string calculationId = "5";
-
-            PublishStatusEditModel model = new PublishStatusEditModel();
-
-            PublishStatusResult publishStatusResult = new PublishStatusResult();
-
-            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
-
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            calcsClient
-                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
-                .Returns(response);
-
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
-
-            // Act
-            IActionResult result = await controller.EditCalculationStatus(specificationId, calculationId, model);
-
-            // Assert
-            result
-                .Should()
-                .BeOfType<OkObjectResult>()
-                .Which
-                .Value
-                .Should()
-                .Be(publishStatusResult);
-        }
-
-        [TestMethod]
-        public async Task EditCalculationStatus_GivenUserDoesNotHaveEditCalculationPermission_Returns403()
-        {
-            //Arrange
-            string specificationId = "abc123";
-            string calculationId = "5";
-
-            PublishStatusEditModel model = new PublishStatusEditModel();
-
-            PublishStatusResult publishStatusResult = new PublishStatusResult();
-
-            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, publishStatusResult);
-
-            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
-            calcsClient
-                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
-                .Returns(response);
-
-            IMapper mapper = MappingHelper.CreateFrontEndMapper();
-
-            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanEditCalculations))
-                .Returns(false);
-
-
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
-
-            // Act
-            IActionResult result = await controller.EditCalculationStatus(specificationId, calculationId, model);
-
-            // Assert
-            result.Should().BeOfType<ForbidResult>();
         }
 
         [TestMethod]
@@ -425,7 +363,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Approved };
 
-            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1" });
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = specificationId });
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
@@ -445,14 +383,22 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
 
             // Act
-            IActionResult result = await controller.EditCalculationStatus(specificationId, calculationId, model);
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
 
             // Assert
             result.Should().BeOfType<ForbidResult>();
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations));
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
         }
 
         [TestMethod]
-        public async Task EditCalculationStatus_GivenUserHaveCanApproveAnyCalculationPermission_ReturnsOK()
+        public async Task EditCalculationStatus_GivenRequestContainsACalculationInADifferentSpecification_ReturnsError()
         {
             //Arrange
             string specificationId = "abc123";
@@ -460,15 +406,12 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Approved };
 
-            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1" });
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = "anotherSpec" });
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
                 .GetCalculationById(Arg.Is(calculationId))
                 .Returns(response);
-            calcsClient
-                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
-                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult()));
 
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
@@ -477,21 +420,81 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(true);
 
             authorizationHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>())
-                .Returns(Task.FromResult(new Common.ApiClient.Users.Models.FundingStreamPermission() { CanApproveAnyCalculations = true }));
+                .Returns(Task.FromResult(new Common.ApiClient.Users.Models.FundingStreamPermission()));
 
 
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
 
             // Act
-            IActionResult result = await controller.EditCalculationStatus(specificationId, calculationId, model);
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
 
             // Assert
-            result.Should()
-                .BeOfType<OkObjectResult>();
+            result
+                .Should()
+                .BeOfType<PreconditionFailedResult>()
+                .Which
+                .Value
+                .Should()
+                .Be("The calculation requested is not contained within the specification requested");
         }
 
         [TestMethod]
-        public async Task EditCalculationStatus_GivenUserHaveCanApproveCalculationPermission_ReturnsOK()
+        public async Task EditCalculationStatus_GivenUserHaveCanApproveAnyCalculationPermissionAndCalcIsNotAlreadyApproved_ReturnsOK()
+        {
+            //Arrange
+            string specificationId = "abc123";
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Draft };
+
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = specificationId, });
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(response);
+
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult() { PublishStatus = PublishStatus.Approved }));
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations))
+                .Returns(true);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
+
+            // Act
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
+
+            // Assert
+            result.Should()
+                .BeOfType<OkObjectResult>()
+                .Which
+                .Value
+                .Should()
+                .BeOfType<PublishStatusResult>()
+                .Which
+                .Should()
+                .BeEquivalentTo(new PublishStatusResult()
+                {
+                    PublishStatus = PublishStatus.Approved
+                });
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations));
+
+            await authorizationHelper
+                .Received(0)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
+        }
+
+        [TestMethod]
+        public async Task EditCalculationStatus_GivenUserHaveCanApproveAnyCalculationPermissionAndCalcIsAlreadyApproved_ReturnsOK()
         {
             //Arrange
             string specificationId = "abc123";
@@ -499,7 +502,62 @@ namespace CalculateFunding.Frontend.Controllers
 
             PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Approved };
 
-            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", Author = new Reference() { Id = "SomeOne" } });
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = specificationId, });
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(response);
+
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult() { PublishStatus = PublishStatus.Approved }));
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations))
+                .Returns(true);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper);
+
+            // Act
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
+
+            // Assert
+            result.Should()
+                .BeOfType<OkObjectResult>()
+                .Which
+                .Value
+                .Should()
+                .BeOfType<PublishStatusResult>()
+                .Which
+                .Should()
+                .BeEquivalentTo(new PublishStatusResult()
+                {
+                    PublishStatus = PublishStatus.Approved
+                });
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations));
+
+            await authorizationHelper
+                .Received(0)
+                .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
+        }
+
+        [TestMethod]
+        public async Task EditCalculationStatus_GivenUserHaveCanApproveCalculationPermissionAndIsNotLastAuthor_ReturnsOK()
+        {
+            //Arrange
+            string specificationId = "abc123";
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Approved };
+
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", Author = new Reference() { Id = "SomeOne" }, SpecificationId = specificationId });
 
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
             calcsClient
@@ -515,31 +573,101 @@ namespace CalculateFunding.Frontend.Controllers
             ClaimsPrincipal user = new ClaimsPrincipal(new List<ClaimsIdentity>()
             {
                 new ClaimsIdentity(identity,
-                    new []{ 
+                    new []{
                     new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier","UId1"),
                     new Claim(ClaimTypes.GivenName , "Bob"),
                     new Claim(ClaimTypes.Surname, "Sir")
                 })
             });
-            
+
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanEditCalculations))
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations))
                 .Returns(true);
 
-            authorizationHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Any<string>())
-                .Returns(Task.FromResult(new Common.ApiClient.Users.Models.FundingStreamPermission() { CanApproveCalculations = true }));
-
-
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, user);
-          
+
             // Act
-            IActionResult result = await controller.EditCalculationStatus(specificationId, calculationId, model);
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
 
             // Assert
             result.Should()
-                .BeOfType<OkObjectResult>();
+                .BeOfType<OkObjectResult>()
+                .Which
+                .Value
+                .Should()
+                .BeOfType<PublishStatusResult>()
+                .Which
+                .Should()
+                .BeEquivalentTo(new PublishStatusResult()
+                {
+                    PublishStatus = PublishStatus.Approved
+                });
+
+            await authorizationHelper
+               .Received(1)
+               .DoesUserHavePermission(Arg.Is(user), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations));
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Is(user), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
+        }
+
+        [TestMethod]
+        public async Task EditCalculationStatus_GivenUserHaveCanApproveCalculationPermissionAndIsLastAuthor_ReturnsForbid()
+        {
+            //Arrange
+            string specificationId = "abc123";
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel() { PublishStatus = PublishStatus.Approved };
+
+            ValidatedApiResponse<Calculation> response = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", Author = new Reference() { Id = "SomeOne" }, SpecificationId = specificationId });
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(response);
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult()));
+
+            var identity = Substitute.For<IIdentity>();
+            identity.Name.Returns("BSir");
+
+            ClaimsPrincipal user = new ClaimsPrincipal(new List<ClaimsIdentity>()
+            {
+                new ClaimsIdentity(identity,
+                    new []{
+                    new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier","SomeOne"),
+                    new Claim(ClaimTypes.GivenName , "Bob"),
+                    new Claim(ClaimTypes.Surname, "Sir")
+                })
+            });
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations))
+                .Returns(true);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, user);
+
+            // Act
+            IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
+
+            // Assert
+            result.Should()
+                .BeOfType<ForbidResult>();
+
+            await authorizationHelper
+               .Received(1)
+               .DoesUserHavePermission(Arg.Is(user), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations));
+
+            await authorizationHelper
+                .Received(1)
+                .DoesUserHavePermission(Arg.Is(user), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
         }
 
         private static CalculationController CreateCalculationController(ICalculationsApiClient calcsClient, IMapper mapper, IAuthorizationHelper authorizationHelper, ClaimsPrincipal user = null)

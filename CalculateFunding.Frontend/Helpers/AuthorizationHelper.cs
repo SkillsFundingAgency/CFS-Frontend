@@ -210,6 +210,7 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 return new EffectiveSpecificationPermission
                 {
+                    UserId = user.GetUserProfile()?.Id,
                     CanAdministerFundingStream = true,
                     CanApproveFunding = true,
                     CanApproveSpecification = true,
@@ -222,12 +223,10 @@ namespace CalculateFunding.Frontend.Helpers
                     CanMapDatasets = true,
                     CanReleaseFunding = true,
                     CanRefreshFunding = true,
-                    CanCreateTemplates = true,
-                    CanEditTemplates = true,
-                    CanDeleteTemplates = true,
-                    CanApproveTemplates = true,
                     SpecificationId = specificationId,
-                    UserId = user.GetUserProfile()?.Id,
+                    CanDeleteCalculations = true,
+                    CanDeleteQaTests = true,
+                    CanDeleteSpecification = true,
                 };
             }
 
@@ -240,6 +239,8 @@ namespace CalculateFunding.Frontend.Helpers
 
                 return new EffectiveSpecificationPermission
                 {
+                    UserId = user.GetUserProfile()?.Id,
+                    SpecificationId = specificationId,
                     CanAdministerFundingStream = false,
                     CanApproveFunding = false,
                     CanApproveSpecification = false,
@@ -252,8 +253,9 @@ namespace CalculateFunding.Frontend.Helpers
                     CanMapDatasets = false,
                     CanReleaseFunding = false,
                     CanRefreshFunding = false,
-                    SpecificationId = specificationId,
-                    UserId = user.GetUserProfile()?.Id,
+                    CanDeleteCalculations = false,
+                    CanDeleteQaTests = false,
+                    CanDeleteSpecification = false,
                 };
             }
             else
