@@ -97,6 +97,16 @@ namespace CalculateFunding.Frontend.Helpers
                             CanEditTemplates = true,
                             CanDeleteTemplates = true,
                             CanApproveTemplates = true,
+                            CanApplyCustomProfilePattern = true,
+                            CanApproveAnyCalculations = true,
+                            CanApproveCalculations = true,
+                            CanAssignProfilePattern = true,
+                            CanCreateProfilePattern = true,
+                            CanDeleteCalculations = true,
+                            CanDeleteProfilePattern = true,
+                            CanDeleteQaTests = true,
+                            CanDeleteSpecification = true,
+                            CanEditProfilePattern = true,
                             UserId = user.GetUserProfile()?.Id
                         });
                     }
@@ -210,6 +220,7 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 return new EffectiveSpecificationPermission
                 {
+                    SpecificationId = specificationId,
                     UserId = user.GetUserProfile()?.Id,
                     CanAdministerFundingStream = true,
                     CanApproveFunding = true,
@@ -223,10 +234,13 @@ namespace CalculateFunding.Frontend.Helpers
                     CanMapDatasets = true,
                     CanReleaseFunding = true,
                     CanRefreshFunding = true,
-                    SpecificationId = specificationId,
                     CanDeleteCalculations = true,
                     CanDeleteQaTests = true,
                     CanDeleteSpecification = true,
+                    CanApplyCustomProfilePattern = true,
+                    CanApproveAnyCalculations = true,
+                    CanApproveCalculations = true,
+                    CanAssignProfilePattern = true,
                 };
             }
 
@@ -256,6 +270,10 @@ namespace CalculateFunding.Frontend.Helpers
                     CanDeleteCalculations = false,
                     CanDeleteQaTests = false,
                     CanDeleteSpecification = false,
+                    CanApplyCustomProfilePattern = false,
+                    CanApproveAnyCalculations = false,
+                    CanApproveCalculations = false,
+                    CanAssignProfilePattern = false,
                 };
             }
             else
