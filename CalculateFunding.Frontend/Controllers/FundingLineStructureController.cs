@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
@@ -67,9 +69,17 @@ namespace CalculateFunding.Frontend.Controllers
 				return new InternalServerErrorResult(
 					$"Specification contains no matching template version for funding stream '{fundingStreamId}'");
 
-			ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
-				await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion);
+            string etag = Request.ReadETagHeaderValue();
 
+			ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
+				await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion, etag);
+
+            Response.CopyCacheControlHeaders(fundingTemplateContentsApiResponse.Headers);
+
+            if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.NotModified)
+            {
+                return new StatusCodeResult(304);
+            }
 			if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.OK)
 			{
 				ApiResponse<TemplateMapping> templateMapping =
@@ -108,16 +118,16 @@ namespace CalculateFunding.Frontend.Controllers
 					templateMapping.Content.TemplateMappingItems.ToList(),
 					calculationMetadata.Content.ToList());
 
-				return Ok(fundingStructures);
-			}
+                return Ok(fundingStructures);
+            }
 
 			if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.BadRequest)
 			{
 				return new BadRequestResult();
 			}
 
-			return new StatusCodeResult(500);
-		}
+            return new StatusCodeResult(500);
+        }
 
 		private static FundingStructureItem RecursivelyAddFundingLines(
 			IEnumerable<FundingLine> fundingLines,

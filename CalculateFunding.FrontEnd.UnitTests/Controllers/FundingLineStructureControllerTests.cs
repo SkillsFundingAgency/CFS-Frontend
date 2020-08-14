@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
@@ -12,6 +13,7 @@ using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Modules;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
@@ -32,41 +34,75 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private readonly ISpecificationsApiClient _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
         private readonly IPoliciesApiClient _policiesApiClient = Substitute.For<IPoliciesApiClient>();
         private readonly ICalculationsApiClient _calculationsApiClient = Substitute.For<ICalculationsApiClient>();
-        
+        private FundingLineStructureController _controller;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _controller = new FundingLineStructureController(
+                            _policiesApiClient, _specificationsApiClient, _calculationsApiClient);   
+        }
 
         [TestMethod]
         public async Task GetFundingStructures_ReturnsFlatStructureWithCorrectLevelsAndInCorrectOrder()
         {
             ValidScenarioSetup(FundingStreamId);
-            FundingLineStructureController controller = new FundingLineStructureController(
-                _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 
-            IActionResult apiResponseResult = await controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
+            IActionResult apiResponseResult = await _controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
 
-            var expectedFundingStructureItems = GetValidMappedFundingStructureItems();
+            List<FundingStructureItem> expectedFundingStructureItems = GetValidMappedFundingStructureItems();
             apiResponseResult.Should().BeOfType<OkObjectResult>();
             OkObjectResult typedResult = apiResponseResult as OkObjectResult;
             List<FundingStructureItem> fundingStructureItems = typedResult?.Value as List<FundingStructureItem>;
             fundingStructureItems?.Count.Should().Be(3);
             fundingStructureItems.Should().BeEquivalentTo(expectedFundingStructureItems);
         }
+        
+        [TestMethod]
+        public async Task GetFundingStructures_Returns304IfNoChangeForETag()
+        {
+            string etag = Guid.NewGuid().ToString();
+            
+            ValidScenarioSetup(FundingStreamId, HttpStatusCode.NotModified, etag);
+
+            IActionResult apiResponseResult = await _controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
+
+            apiResponseResult
+                .Should()
+                .BeOfType<StatusCodeResult>()
+                .Which
+                .StatusCode
+                .Should()
+                .Be((int) HttpStatusCode.NotModified);
+        }
 
         [TestMethod]
         public async Task GetFundingStructures_ThrowsInternalErrorIfTemplateIdNotSet()
         {
             ValidScenarioSetup(FundingStreamId.ToLowerInvariant());
-            FundingLineStructureController controller = new FundingLineStructureController(
-                _policiesApiClient, _specificationsApiClient, _calculationsApiClient);
 
-            IActionResult apiResponseResult = await controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
+            IActionResult apiResponseResult = await _controller.GetFundingStructures(FundingStreamId, FundingPeriodId, SpecificationId);
 
-            var expectedFundingStructureItems = GetValidMappedFundingStructureItems();
             apiResponseResult.Should().BeOfType<InternalServerErrorResult>();
         }
 
-        private void ValidScenarioSetup(string fundingStreamId)
+        private void ValidScenarioSetup(string fundingStreamId, HttpStatusCode metaDaStatusCode = HttpStatusCode.OK, string etag = null)
         {
-            var specificationSummary = new SpecificationSummary
+            if (etag != null)
+            {
+                _controller.ControllerContext = new ControllerContext()
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        Request =
+                        {
+                            Headers = { {"If-None-Match", etag } }
+                        }
+                    }
+                };    
+            }
+            
+            SpecificationSummary specificationSummary = new SpecificationSummary
             {
                 Id = SpecificationId,
                 TemplateIds = new Dictionary<string, string>
@@ -76,7 +112,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             };
 
 
-            var templateMetadataContents = new TemplateMetadataContents
+            TemplateMetadataContents templateMetadataContents = new TemplateMetadataContents
             {
                 RootFundingLines = new List<FundingLine>
                 {
@@ -127,8 +163,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _specificationsApiClient.GetSpecificationSummaryById(SpecificationId)
                 .Returns(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
 
-            _policiesApiClient.GetFundingTemplateContents(FundingStreamId, FundingPeriodId, TemplateVersion)
-                .Returns(new ApiResponse<TemplateMetadataContents>(HttpStatusCode.OK, templateMetadataContents));
+            _policiesApiClient.GetFundingTemplateContents(FundingStreamId, FundingPeriodId, TemplateVersion, etag)
+                .Returns(new ApiResponse<TemplateMetadataContents>(metaDaStatusCode, templateMetadataContents));
 
             _calculationsApiClient.GetTemplateMapping(SpecificationId, FundingStreamId)
                 .Returns(new ApiResponse<TemplateMapping>(HttpStatusCode.OK, new TemplateMapping
@@ -165,7 +201,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
         private static List<FundingStructureItem> GetValidMappedFundingStructureItems()
         {
-	        var result = new List<FundingStructureItem>
+	        List<FundingStructureItem> result = new List<FundingStructureItem>
 	        {
 		        new FundingStructureItem(1, "FundingLine-1", null, null, FundingStructureType.FundingLine),
 		        new FundingStructureItem(1, "FundingLine-2-withFundingLines", null, null, FundingStructureType.FundingLine,
