@@ -76,25 +76,36 @@ function isRootNode(ds: Array<FundingLineDictionaryEntry>, id: string): boolean 
     return rootNodeIds.includes(id);
 }
 
+function isClonedNode(id: string): boolean {
+    return id.includes(":");
+}
+
 export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: string) => {
     const rootNodesToDelete: Array<number> = [];
+    const isNodeToDeleteAClone: boolean = isClonedNode(id);
+
+    if (isNodeToDeleteAClone) throw new Error("Cannot delete a clone");
 
     for (let i = 0; i < ds.length; i++) {
         const fundingLine = ds[i];
         if (!fundingLine) return;
 
         const digger = new JSONDigger(fundingLine.value, fundingLineIdField, fundingLineChildrenField);
+        const clonedNodeIds = await findAllClonedNodeIds(fundingLine.value, id);
 
-        try {
-            if (isRootNode(ds, id)) {
-                rootNodesToDelete.push(fundingLine.key);
-                break;
+        for (let j = 0; j < clonedNodeIds.length; j++) {
+            try {
+                const clonedNodeId = clonedNodeIds[j];
+                if (isRootNode(ds, clonedNodeId)) {
+                    rootNodesToDelete.push(fundingLine.key);
+                    break;
+                }
+                await digger.removeNode(clonedNodeId);
             }
-            await digger.removeNode(id);
-        }
-        catch {
-            // ignore
-        }
+            catch {
+                // ignore
+            }
+        };
     }
 
     rootNodesToDelete.forEach(k => {

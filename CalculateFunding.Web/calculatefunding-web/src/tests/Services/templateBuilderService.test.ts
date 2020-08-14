@@ -1,14 +1,16 @@
-import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs } from "./templateBuilderTestData";
+import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs, cloneWithChildrenNodeDs } from "./templateBuilderTestData";
 import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf, getAllTemplateCalculationIds, getAllTemplateLineIds } from "../../services/templateBuilderDatasourceService";
 import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationUpdateModel, CalculationType, AggregrationType, ValueFormatType, Calculation } from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
 import { v4 as uuidv4 } from 'uuid';
+import {find} from "lodash";
 jest.mock('uuid');
 
 const key1RootId = "n1";
 const cloneOfKey1RootId = "n1:12345";
 
 let ds: Array<FundingLineDictionaryEntry>;
+let cloneDs: Array<FundingLineDictionaryEntry>;
 
 let incrementNextId: () => void;
 
@@ -55,6 +57,7 @@ beforeEach(() => {
             }
         }
     ];
+    cloneDs = cloneDeep(cloneWithChildrenNodeDs);
     incrementNextId = jest.fn();
 });
 
@@ -161,7 +164,8 @@ it("updates all cloned nodes when original is updated", async () => {
         type: FundingLineType.Payment,
         kind: NodeType.FundingLine,
         name: "New Name",
-        fundingLineCode: "1"
+        fundingLineCode: "1",
+        templateLineId: 1
     };
 
     await updateNode(ds, updateModel);
@@ -183,7 +187,8 @@ it("updates all cloned nodes when a clone is updated", async () => {
         type: FundingLineType.Payment,
         kind: NodeType.FundingLine,
         name: "New Name",
-        fundingLineCode: "1"
+        fundingLineCode: "1",
+        templateLineId: 1
     };
 
     await updateNode(ds, updateModel);
@@ -264,16 +269,49 @@ it("deletes a node", async () => {
     expect(ds.length).toBe(1);
 });
 
-it("does not delete cloned nodes", async () => {
-    await removeNode(ds, key1RootId);
-    expect(ds.length).toBe(1);
-    expect(ds[0].value?.children?.length).toBe(2);
+it("deletes cloned nodes when original is deleted", async () => {
+    const firstFundingLineChildren = cloneDs.find(d => d.key === 1)?.value.children;
+    const secondFundingLineChildren = cloneDs.find(d => d.key === 2)?.value.children;
+
+    if (!firstFundingLineChildren) throw new Error("Unexpected undefined value");
+    if (!secondFundingLineChildren) throw new Error("Unexpected undefined value");
+
+    expect(firstFundingLineChildren.find(fl => fl.id === "n0")).toBeDefined();
+    expect(secondFundingLineChildren.find(fl => fl.id === "n0:12345")).toBeDefined();
+
+    await removeNode(cloneDs, "n0");
+
+    expect(firstFundingLineChildren.length).toBe(0);
+    expect(firstFundingLineChildren.find(fl => fl.id === "n0")).toBeUndefined();
+    expect(secondFundingLineChildren.length).toBe(1);
+    expect(firstFundingLineChildren.find(fl => fl.id === "n0:12345")).toBeUndefined();
 });
 
-it("does not delete original node when clone is deleted", async () => {
-    await removeNode(ds, cloneOfKey1RootId);
-    expect(ds.length).toBe(2);
-    expect(ds[1].value?.children?.length).toBe(1);
+it("does not allow deletion of clones (must be deleted on original)", async () => {
+    await expect(removeNode(ds, cloneOfKey1RootId)).rejects.toThrowError("Cannot delete a clone");
+});
+
+it("deletes child node from all cloned nodes (delete original)", async () => {
+    const firstFundingLineChildren = cloneDs.find(d => d.key === 1)?.value.children;
+    const secondFundingLineChildren = cloneDs.find(d => d.key === 2)?.value.children;
+
+    if (!firstFundingLineChildren) throw new Error("Unexpected undefined value");
+    if (!secondFundingLineChildren) throw new Error("Unexpected undefined value");
+
+    expect(firstFundingLineChildren[0].children?.find(fl => fl.id === "n5")).toBeDefined();
+    expect(secondFundingLineChildren[1].children?.find(fl => fl.id === "n5:12345")).toBeDefined();
+
+    await removeNode(cloneDs, "n5");
+
+    expect(firstFundingLineChildren.length).toBe(1);
+    expect(firstFundingLineChildren.find(fl => fl.id === "n0")?.children?.length).toBe(0);
+
+    expect(secondFundingLineChildren.length).toBe(2);
+    expect(secondFundingLineChildren.find(fl => fl.id === "n0:12345")?.children?.length).toBe(0);
+});
+
+it("cannot delete a child cloned node", async () => {
+    await expect(removeNode(ds, "n5:12345")).rejects.toThrowError("Cannot delete a clone");
 });
 
 it("moves nodes", async () => {

@@ -232,8 +232,12 @@ export function EditTemplate() {
     }
 
     const onClickDelete = async (id: string) => {
-        await removeNode(ds, id);
-        update((deepClone(ds)));
+        try {
+            await removeNode(ds, id);
+            update((deepClone(ds)));
+        } catch(err) {
+            addErrorMessage(err.message);
+        }
     }
 
     const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
@@ -489,7 +493,7 @@ export function EditTemplate() {
         const allTemplateLineIds: number[] = getAllTemplateLineIds(ds);
         return allTemplateLineIds.includes(templateLineId);
     }
-    
+
     const checkFundingLineNameInUse = (name: string) => {
         const allNames: string[] = ds.map(fl => fl.value.name);
         return allNames.includes(name);
@@ -527,12 +531,12 @@ export function EditTemplate() {
                                             {errors.map((error, i) =>
                                                 <li key={i}>
                                                     {error.fieldName &&
-                                                        <button onClick={() => handleScroll(error.fieldName)} 
-                                                                className="govuk-link govuk-link-red">
+                                                        <button onClick={() => handleScroll(error.fieldName)}
+                                                            className="govuk-link govuk-link-red">
                                                             {error.message}
                                                         </button>}
-                                                    {!error.fieldName && 
-                                                    <span className="govuk-error-message">{error.message}</span>}
+                                                    {!error.fieldName &&
+                                                        <span className="govuk-error-message">{error.message}</span>}
                                                 </li>
                                             )}
                                         </ul>

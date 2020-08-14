@@ -71,7 +71,7 @@ function TemplateBuilderNode({nodeData, addNode, openSideBar, onClickNode, isEdi
                     <div className="fundingLine govuk-body-s">{fundingLineName}</div>
                     <div className="box govuk-body-s">{node.type}</div>
                 </div>
-                {isEditMode &&
+                {isEditMode && !isClone &&
                 <div className="buttons">
                     <button className="govuk-button" onClick={handleAddLine} data-testid={`${node.id}-add-line`}>Add Line</button>
                     <button className="govuk-button" onClick={handleAddCalc} data-testid={`${node.id}-add-calc`}>Add Calculation</button>
@@ -88,7 +88,7 @@ function TemplateBuilderNode({nodeData, addNode, openSideBar, onClickNode, isEdi
                 <div className="calculation govuk-body-s">{`${node.name}${isClone ? "*" : ""}`}</div>
                 <div className="box govuk-body-s">{node.valueFormat !== undefined ? node.type + " (" + node.valueFormat + ")" : node.type}</div>
             </div>
-            {isEditMode &&
+            {isEditMode && !isClone &&
             <div className="buttons">
                 <button className="govuk-button" onClick={handleAddCalc}>Add Calculation</button>
             </div>

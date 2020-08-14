@@ -1,4 +1,4 @@
-import { FundingLineDictionaryEntry, NodeType, FundingLineType, CalculationType, AggregrationType, ValueFormatType, TemplateFundingLine } from "../../types/TemplateBuilderDefinitions";
+import {FundingLineDictionaryEntry, NodeType, FundingLineType, CalculationType, AggregrationType, ValueFormatType, TemplateFundingLine} from "../../types/TemplateBuilderDefinitions";
 
 export const singleNodeDs: Array<FundingLineDictionaryEntry> = [
     {
@@ -573,6 +573,122 @@ export const clonedFundingLinesDs: Array<FundingLineDictionaryEntry> = [
                 "dsKey": 2,
                 "children": []
             }]
+        }
+    }
+];
+
+export const cloneWithChildrenNodeDs: Array<FundingLineDictionaryEntry> = [
+    {
+        "key": 1,
+        "value": {
+            "id": "n1",
+            "templateLineId": 0,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 0",
+            "fundingLineCode": "Code 0",
+            "dsKey": 1,
+            "children": [
+                {
+                    "id": "n0",
+                    "templateCalculationId": 4,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Cash,
+                    "name": "Calculation 4",
+                    "aggregationType": AggregrationType.Sum,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
+                    "dsKey": 1,
+                    "children": [
+                        {
+                            "id": "n5",
+                            "dsKey": 1,
+                            "templateCalculationId": 5,
+                            "kind": NodeType.Calculation,
+                            "type": CalculationType.Enum,
+                            "name": "Calculation 5",
+                            "aggregationType": AggregrationType.None,
+                            "formulaText": "",
+                            "valueFormat": ValueFormatType.Currency,
+                            "allowedEnumTypeValues": "Option1,Option2,Option3",
+                            "groupRate": undefined,
+                            "percentageChangeBetweenAandB": undefined,
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "key": 2,
+        "value": {
+            "id": "n3",
+            "templateLineId": 1,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Information,
+            "name": "Funding Line 1",
+            "fundingLineCode": "Code 1",
+            "dsKey": 2,
+            "children": [
+                {
+                    "id": "n2",
+                    "templateLineId": 3,
+                    "kind": NodeType.FundingLine,
+                    "type": FundingLineType.Information,
+                    "name": "Funding Line 3",
+                    "fundingLineCode": "Code 3",
+                    "dsKey": 2,
+                    "children": []
+                },
+                {
+                    "id": "n0:12345",
+                    "templateCalculationId": 4,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Cash,
+                    "name": "Calculation 4",
+                    "aggregationType": AggregrationType.Sum,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Number,
+                    "allowedEnumTypeValues": undefined,
+                    "groupRate": undefined,
+                    "percentageChangeBetweenAandB": undefined,
+                    "dsKey": 2,
+                    "children": [
+                        {
+                            "id": "n5:12345",
+                            "dsKey": 2,
+                            "templateCalculationId": 5,
+                            "kind": NodeType.Calculation,
+                            "type": CalculationType.Enum,
+                            "name": "Calculation 5",
+                            "aggregationType": AggregrationType.None,
+                            "formulaText": "",
+                            "valueFormat": ValueFormatType.Currency,
+                            "allowedEnumTypeValues": "Option1,Option2,Option3",
+                            "groupRate": undefined,
+                            "percentageChangeBetweenAandB": undefined,
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "key": 3,
+        "value": {
+            "id": "n4",
+            "templateLineId": 2,
+            "kind": NodeType.FundingLine,
+            "type": FundingLineType.Payment,
+            "name": "Funding Line 2",
+            "fundingLineCode": "Code 2",
+            "dsKey": 3,
+            "children": []
         }
     }
 ];

@@ -31,6 +31,8 @@ export function FundingLineItem({
     const [fundingLineId, setFundingLineId] = useState<string>(node.templateLineId.toString());
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
 
+    const isClone = node.id.includes(":");
+
     function IsSameAsInitialName(name: string) {
         return node.name === name;
     }
@@ -253,25 +255,27 @@ export function FundingLineItem({
                                 Save and continue
                             </button>
                         </div>
-                        <div className="govuk-warning-text">
-                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                            <strong className="govuk-warning-text__text">
-                                <span className="govuk-warning-text__assistive">Warning</span>
-                                Be careful. This will delete all child nodes.
-                            </strong>
-                        </div>
-                        <div className="govuk-form-group">
-                            {confirmDelete ? <>
-                                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                            onClick={handleConfirmDelete} data-testid={`node-${node.id}-confirm-delete`}>Confirm delete
-                                    </button>
-                                    <button className="govuk-button govuk-button--secondary" onClick={handleCancelDelete}>Cancel</button>
-                                </>
-                                :
-                                <button className="govuk-button govuk-button--warning"
-                                        onClick={handleDelete} data-testid={`node-${node.id}-delete`}>Delete funding line</button>}
-                            }
-                        </div>
+                        {!isClone &&
+                        <>
+                            <div className="govuk-warning-text">
+                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                <strong className="govuk-warning-text__text">
+                                    <span className="govuk-warning-text__assistive">Warning</span>
+                                    Be careful. This will delete all child nodes and clones.
+                                </strong>
+                            </div>
+                            <div className="govuk-form-group">
+                                {confirmDelete ? <>
+                                        <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+                                                onClick={handleConfirmDelete} data-testid={`node-${node.id}-confirm-delete`}>Confirm delete
+                                        </button>
+                                        <button className="govuk-button govuk-button--secondary" onClick={handleCancelDelete}>Cancel</button>
+                                    </>
+                                    :
+                                    <button className="govuk-button govuk-button--warning"
+                                            onClick={handleDelete} data-testid={`node-${node.id}-delete`}>Delete funding line</button>}
+                            </div>
+                        </>}
                     </>
                     :
                     <button className="govuk-button" onClick={handleCancel}>Close</button>
