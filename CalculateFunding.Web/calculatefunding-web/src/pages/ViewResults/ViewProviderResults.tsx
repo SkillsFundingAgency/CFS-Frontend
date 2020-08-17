@@ -795,6 +795,26 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         </dd>
                                     </div>
                                 </dl>
+                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
+                                <h4 className="govuk-heading-m">Payment organisation details</h4>
+                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                    <div className="govuk-summary-list__row">
+                                        <dt className="govuk-summary-list__key">
+                                            Name
+                                        </dt>
+                                        <dd className="govuk-summary-list__value">
+                                            {providerDetails.paymentOrganisationName}
+                                        </dd>
+                                    </div>
+                                    <div className="govuk-summary-list__row">
+                                        <dt className="govuk-summary-list__key">
+                                            Identifier
+                                        </dt>
+                                        <dd className="govuk-summary-list__value">
+                                            {providerDetails.paymentOrganisationIdentifier}
+                                        </dd>
+                                    </div>
+                                </dl>
                             </section>
                         </Tabs.Panel>
                     </Tabs>

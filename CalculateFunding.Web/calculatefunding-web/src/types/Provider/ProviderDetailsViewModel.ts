@@ -34,4 +34,6 @@ export interface ProviderDetailsViewModel {
     localGovernmentGroupTypeCode: string;
     countryName: string;
     countryCode: string;
+    paymentOrganisationIdentifier: string;
+    paymentOrganisationName: string;
 }
