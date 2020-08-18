@@ -1,9 +1,8 @@
-import { singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs, cloneWithChildrenNodeDs } from "./templateBuilderTestData";
-import { addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf, getAllTemplateCalculationIds, getAllTemplateLineIds } from "../../services/templateBuilderDatasourceService";
-import { FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationUpdateModel, CalculationType, AggregrationType, ValueFormatType, Calculation } from "../../types/TemplateBuilderDefinitions";
+import {singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs, cloneWithChildrenNodeDs} from "./templateBuilderTestData";
+import {addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf, getAllTemplateCalculationIds, getAllTemplateLineIds, findParentId, isCloneRoot} from "../../services/templateBuilderDatasourceService";
+import {FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationUpdateModel, CalculationType, AggregrationType, ValueFormatType, Calculation} from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
-import { v4 as uuidv4 } from 'uuid';
-import {find} from "lodash";
+import {v4 as uuidv4} from 'uuid';
 jest.mock('uuid');
 
 const key1RootId = "n1";
@@ -287,10 +286,6 @@ it("deletes cloned nodes when original is deleted", async () => {
     expect(firstFundingLineChildren.find(fl => fl.id === "n0:12345")).toBeUndefined();
 });
 
-it("does not allow deletion of clones (must be deleted on original)", async () => {
-    await expect(removeNode(ds, cloneOfKey1RootId)).rejects.toThrowError("Cannot delete a clone");
-});
-
 it("deletes child node from all cloned nodes (delete original)", async () => {
     const firstFundingLineChildren = cloneDs.find(d => d.key === 1)?.value.children;
     const secondFundingLineChildren = cloneDs.find(d => d.key === 2)?.value.children;
@@ -310,8 +305,63 @@ it("deletes child node from all cloned nodes (delete original)", async () => {
     expect(secondFundingLineChildren.find(fl => fl.id === "n0:12345")?.children?.length).toBe(0);
 });
 
-it("cannot delete a child cloned node", async () => {
-    await expect(removeNode(ds, "n5:12345")).rejects.toThrowError("Cannot delete a clone");
+it("can delete clone if it's a clone root but only deletes that clone instance (top-level funding line was cloned)", async () => {
+    const firstFundingLine = ds[0].value;
+    const secondFundingLineChildren = ds[1].value.children;
+
+    if (!firstFundingLine) throw new Error("Unexpected undefined value");
+    if (!secondFundingLineChildren) throw new Error("Unexpected undefined value");
+
+    expect(secondFundingLineChildren.length).toBe(2);
+    expect(secondFundingLineChildren.find(fl => fl.id === cloneOfKey1RootId)).toBeDefined();
+
+    await removeNode(ds, cloneOfKey1RootId);
+
+    expect(secondFundingLineChildren.length).toBe(1);
+    expect(secondFundingLineChildren.find(fl => fl.id === cloneOfKey1RootId)).toBeUndefined();
+    expect(ds.length).toEqual(2);
+});
+
+it("can delete clone if it's a clone root but only deletes that clone instance (child calc was cloned)", async () => {
+    const originalNode = cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0");
+    if (!originalNode) throw new Error("Unexpected undefined value");
+
+    const clonedNodeToDelete = cloneDs.find(d => d.key === 2)?.value.children?.find(c => c.id === "n0:12345");
+    if (!clonedNodeToDelete) throw new Error("Unexpected undefined value");
+
+    await removeNode(cloneDs, "n0:12345");
+
+    expect(cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0")).toBeDefined();
+    expect(cloneDs.find(d => d.key === 2)?.value.children?.find(c => c.id === "n0:12345")).toBeUndefined();
+});
+
+it("cannot delete a child cloned node (must be deleted on original)", async () => {
+    await expect(removeNode(cloneDs, "n5:12345")).rejects.toThrowError("Cannot delete a clone child");
+});
+
+it("clones nodes", async () => {
+    const draggedItem = {
+        id: "n3",
+        type: FundingLineType.Information,
+        kind: NodeType.FundingLine,
+        fundingLineCode: "Code 3",
+        name: "Test 3",
+        templateLineId: 3
+    };
+
+    const sourceNodeParentChildren = ds[1].value?.children;
+    if (!sourceNodeParentChildren) throw new Error("Unexpected undefined value");
+    expect(sourceNodeParentChildren.length).toBe(2);
+
+    await cloneNode(ds, draggedItem, 2, key1RootId, 1);
+
+    const parentOfClonedNodeChildren = ds[0].value?.children;
+    if (!parentOfClonedNodeChildren) throw new Error("Unexpected undefined value");
+    const clonedNode = parentOfClonedNodeChildren[0];
+
+    expect(parentOfClonedNodeChildren.length).toBe(1);
+    expect(sourceNodeParentChildren.length).toBe(2);
+    expect(clonedNode.id).toMatch(/n3:/);
 });
 
 it("moves nodes", async () => {
@@ -339,29 +389,45 @@ it("moves nodes", async () => {
     expect(movedNode.id).toBe("n3");
 });
 
-it("clones nodes", async () => {
-    const draggedItem = {
-        id: "n3",
-        type: FundingLineType.Information,
-        kind: NodeType.FundingLine,
-        fundingLineCode: "Code 3",
-        name: "Test 3",
-        templateLineId: 3
+it("updates clones when new child node is moved onto original", async () => {
+    const draggedItem: Calculation = {
+        id: "n6",
+        type: CalculationType.Number,
+        kind: NodeType.Calculation,
+        templateCalculationId: 6,
+        name: "Calculation 6",
+        aggregationType: AggregrationType.None,
+        formulaText: "",
+        valueFormat: ValueFormatType.Currency,
     };
 
-    const sourceNodeParentChildren = ds[1].value?.children;
-    if (!sourceNodeParentChildren) throw new Error("Unexpected undefined value");
-    expect(sourceNodeParentChildren.length).toBe(2);
+    expect(cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0")?.children?.length).toEqual(1);
 
-    await cloneNode(ds, draggedItem, 2, key1RootId, 1);
+    await moveNode(cloneDs, draggedItem, 3, "n0", 1);
 
-    const parentOfClonedNodeChildren = ds[0].value?.children;
-    if (!parentOfClonedNodeChildren) throw new Error("Unexpected undefined value");
-    const clonedNode = parentOfClonedNodeChildren[0];
+    expect(cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0")?.children?.length).toEqual(2);
+    expect(cloneDs.find(d => d.key === 2)?.value.children?.find(c => c.id === "n0:12345")?.children?.length).toEqual(2);
+});
 
-    expect(parentOfClonedNodeChildren.length).toBe(1);
-    expect(sourceNodeParentChildren.length).toBe(2);
-    expect(clonedNode.id).toMatch(/n3:/);
+it("updates clones when child node is moved off original", async () => {
+    const draggedItem: Calculation = {
+        id: "n5",
+        type: CalculationType.Enum,
+        kind: NodeType.Calculation,
+        templateCalculationId: 5,
+        name: "Calculation 5",
+        aggregationType: AggregrationType.None,
+        formulaText: "",
+        valueFormat: ValueFormatType.Currency,
+        allowedEnumTypeValues: "Option1,Option2,Option3"
+    };
+
+    expect(cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0")?.children?.length).toEqual(1);
+
+    await moveNode(cloneDs, draggedItem, 1, "n4", 3);
+
+    expect(cloneDs.find(d => d.key === 1)?.value.children?.find(c => c.id === "n0")?.children?.length).toEqual(0);
+    expect(cloneDs.find(d => d.key === 2)?.value.children?.find(c => c.id === "n0:12345")?.children?.length).toEqual(0);
 });
 
 it("clones calculations", async () => {
@@ -503,7 +569,7 @@ it("calculates isChildOf correctly", async () => {
 
 it("calculates all templateCalculationIds correctly", () => {
     expect(getAllTemplateCalculationIds(singleNodeDs)).toEqual([]);
-    expect(getAllTemplateCalculationIds(multipleCalculationsDs)).toEqual([2,3,4,6]);
+    expect(getAllTemplateCalculationIds(multipleCalculationsDs)).toEqual([2, 3, 4, 6]);
     expect(getAllTemplateCalculationIds(withChildFundingLineAndCalculationDs)).toEqual([3]);
     expect(getAllTemplateCalculationIds(withChildFundingLineDs)).toEqual([]);
     expect(getAllTemplateCalculationIds(multipleFundingLinesDs)).toEqual([4]);
@@ -512,9 +578,39 @@ it("calculates all templateCalculationIds correctly", () => {
 
 it("calculates all templateLineIds correctly", () => {
     expect(getAllTemplateLineIds(singleNodeDs)).toEqual([0]);
-    expect(getAllTemplateLineIds(multipleCalculationsDs)).toEqual([0,1,5,7]);
-    expect(getAllTemplateLineIds(withChildFundingLineAndCalculationDs)).toEqual([0,1,2]);
-    expect(getAllTemplateLineIds(withChildFundingLineDs)).toEqual([0,1]);
-    expect(getAllTemplateLineIds(multipleFundingLinesDs)).toEqual([0,1,2,3]);
-    expect(getAllTemplateLineIds(clonedNodeDs)).toEqual([0,1,2,3]);
+    expect(getAllTemplateLineIds(multipleCalculationsDs)).toEqual([0, 1, 5, 7]);
+    expect(getAllTemplateLineIds(withChildFundingLineAndCalculationDs)).toEqual([0, 1, 2]);
+    expect(getAllTemplateLineIds(withChildFundingLineDs)).toEqual([0, 1]);
+    expect(getAllTemplateLineIds(multipleFundingLinesDs)).toEqual([0, 1, 2, 3]);
+    expect(getAllTemplateLineIds(clonedNodeDs)).toEqual([0, 1, 2, 3]);
+});
+
+it("calculates parentId correctly", () => {
+    expect(findParentId(singleNodeDs.map(d => d.value), "n0")).toEqual("");
+    expect(findParentId(withChildFundingLineDs.map(d => d.value), "n0")).toEqual("n1");
+    expect(findParentId(withChildFundingLineDs.map(d => d.value), "n1")).toEqual("");
+    expect(findParentId(withChildFundingLineAndCalculationDs.map(d => d.value), "n0")).toEqual("n1");
+    expect(findParentId(withChildFundingLineAndCalculationDs.map(d => d.value), "n1")).toEqual("n3");
+    expect(findParentId(withChildFundingLineAndCalculationDs.map(d => d.value), "n2")).toEqual("n3");
+    expect(findParentId(withChildFundingLineAndCalculationDs.map(d => d.value), "n3")).toEqual("");
+    expect(findParentId(multipleFundingLinesDs.map(d => d.value), "n0")).toEqual("");
+    expect(findParentId(multipleFundingLinesDs.map(d => d.value), "n1")).toEqual("n3");
+    expect(findParentId(multipleFundingLinesDs.map(d => d.value), "n2")).toEqual("n3");
+    expect(findParentId(multipleFundingLinesDs.map(d => d.value), "n3")).toEqual("");
+    expect(findParentId(multipleFundingLinesDs.map(d => d.value), "n4")).toEqual("");
+    expect(findParentId(clonedNodeDs.map(d => d.value), "n0:12345")).toEqual("n3");
+    expect(findParentId(multipleCalculationsDs.map(d => d.value), "n3")).toEqual("n4");
+    expect(findParentId(cloneWithChildrenNodeDs.map(d => d.value), "n0:12345")).toEqual("n3");
+});
+
+it("calculates isCloneRoot correctly", () => {
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n0")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n1")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n2")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n3")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n4")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n5")).toEqual(false);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n0:12345")).toEqual(true);
+    expect(isCloneRoot(cloneWithChildrenNodeDs.map(d => d.value), "n5:12345")).toEqual(false);
+
 });

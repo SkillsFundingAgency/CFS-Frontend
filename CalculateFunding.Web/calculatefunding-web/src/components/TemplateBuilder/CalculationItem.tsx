@@ -24,18 +24,20 @@ export interface CalculationItemProps {
     deleteNode: (id: string) => Promise<void>,
     cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
     refreshNextId: () => void,
+    allowDelete: boolean,
 }
 
 export function CalculationItem({
-                                    node,
-                                    calcs,
-                                    updateNode,
-                                    isEditMode,
-                                    openSideBar,
-                                    deleteNode,
-                                    cloneCalculation,
-                                    refreshNextId
-                                }: CalculationItemProps) {
+    node,
+    calcs,
+    updateNode,
+    isEditMode,
+    openSideBar,
+    deleteNode,
+    cloneCalculation,
+    refreshNextId,
+    allowDelete,
+}: CalculationItemProps) {
     const [name, setName] = useState<string>(node.name);
     const [type, setType] = useState<CalculationType>(node.type);
     const [allowedEnumTypeValues, setAllowedEnumTypeValues] = useState<string>(node.allowedEnumTypeValues || "");
@@ -400,11 +402,11 @@ export function CalculationItem({
                                 <span id="calculation-name-hint" className="govuk-hint">The name of the calculation</span>
                                 : errors.map(error => error.fieldName === "calculation-name" &&
                                     <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
+                                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                    </span>
                                 )}
                             <input className="govuk-input" id="calculation-name" name="calculation-name" type="text" value={name}
-                                   onChange={handleNameChange}/>
+                                onChange={handleNameChange} />
                         </>
                         :
                         <div className="govuk-form-group govuk-!-margin-bottom-6">
@@ -423,7 +425,7 @@ export function CalculationItem({
                                 </span>
                             )}
                             <input className="govuk-input" id="calculation-id" name="calculation-id" type="text"
-                                   value={calculationId} onChange={handleTemplateCalculationIdChange}/>
+                                value={calculationId} onChange={handleTemplateCalculationIdChange} />
                         </>
                         :
                         <div className="govuk-form-group govuk-!-margin-bottom-6">
@@ -452,32 +454,32 @@ export function CalculationItem({
                     }
                 </div>
                 {type === CalculationType.Enum &&
-                <>
-                    {isEditMode ?
-                        <TagEditor
-                            allowDuplicates={false}
-                            tagValuesCsv={allowedEnumTypeValues}
-                            label={"Allowed enum values"}
-                            showErrorMessageOnRender={enumValuesError()}
-                            duplicateErrorMessage={"You cannot add the same enum value twice"}
-                            onAddNewValue={handleAddAllowedEnumTypeValue}
-                            onRemoveValue={handleRemoveAllowedEnumTypeValue}
-                        />
-                        :
-                        <div className="govuk-form-group govuk-!-margin-bottom-6">
-                            <label className="govuk-label" htmlFor="add-tag" aria-labelledby="add-tag">Allowed enum values</label>
-                            <span id="calculation-allowed-enum-values" className="govuk-hint">{allowedEnumTypeValues}</span>
-                        </div>
-                    }
-                </>
+                    <>
+                        {isEditMode ?
+                            <TagEditor
+                                allowDuplicates={false}
+                                tagValuesCsv={allowedEnumTypeValues}
+                                label={"Allowed enum values"}
+                                showErrorMessageOnRender={enumValuesError()}
+                                duplicateErrorMessage={"You cannot add the same enum value twice"}
+                                onAddNewValue={handleAddAllowedEnumTypeValue}
+                                onRemoveValue={handleRemoveAllowedEnumTypeValue}
+                            />
+                            :
+                            <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                <label className="govuk-label" htmlFor="add-tag" aria-labelledby="add-tag">Allowed enum values</label>
+                                <span id="calculation-allowed-enum-values" className="govuk-hint">{allowedEnumTypeValues}</span>
+                            </div>
+                        }
+                    </>
                 }
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="calculation-formula-text">Formula Text</label>
                     {isEditMode ?
                         <>
                             <input className="govuk-input govuk-!-width-two-thirds" id="calculation-formula-text" name="calculation-formula-text"
-                                   type="text"
-                                   value={formulaText} placeholder="Enter formula text" onChange={handleFormulaTextChange}/>
+                                type="text"
+                                value={formulaText} placeholder="Enter formula text" onChange={handleFormulaTextChange} />
                         </>
                         :
                         <div className="govuk-form-group govuk-!-margin-bottom-6">
@@ -491,7 +493,7 @@ export function CalculationItem({
                         <>
                             <span id="calculation-value-format-hint" className="govuk-hint">The way the value should show</span>
                             <select className="govuk-select" id="calculation-value-format" name="calculation-value-format" value={valueFormat}
-                                    onChange={handleValueFormatChange}>
+                                onChange={handleValueFormatChange}>
                                 {renderValueFormatOptions()}
                             </select>
                         </>
@@ -506,18 +508,18 @@ export function CalculationItem({
                     {isEditMode ?
                         <>
                             <select className="govuk-select"
-                                    id="calculation-aggregation-type"
-                                    name="calculation-aggregation-type"
-                                    value={aggregationType}
-                                    onChange={handleAggregationChange}>
+                                id="calculation-aggregation-type"
+                                name="calculation-aggregation-type"
+                                value={aggregationType}
+                                onChange={handleAggregationChange}>
                                 <option value={AggregrationType.None}>None</option>
                                 {type !== CalculationType.Enum &&
-                                <>
-                                    <option value={AggregrationType.Average}>Average</option>
-                                    <option value={AggregrationType.Sum}>Sum</option>
-                                    <option value={AggregrationType.GroupRate}>GroupRate</option>
-                                    <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
-                                </>
+                                    <>
+                                        <option value={AggregrationType.Average}>Average</option>
+                                        <option value={AggregrationType.Sum}>Sum</option>
+                                        <option value={AggregrationType.GroupRate}>GroupRate</option>
+                                        <option value={AggregrationType.PercentageChangeBetweenAandB}>PercentageChangeBetweenAandB</option>
+                                    </>
                                 }
                             </select>
                         </>
@@ -528,143 +530,143 @@ export function CalculationItem({
                     }
                 </div>
                 {aggregationType === AggregrationType.GroupRate &&
-                <>
-                    <div className={`govuk-form-group ${errors.filter(e =>
-                        e.fieldName === "group-rate-numerator").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="group-rate-numerator">Numerator</label>
-                        {isEditMode ?
-                            <>
-                                {errors.map(error => error.fieldName === "group-rate-numerator" &&
-                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                                )}
-                                <select className="govuk-select" id="group-rate-numerator" name="group-rate-numerator" value={numerator}
+                    <>
+                        <div className={`govuk-form-group ${errors.filter(e =>
+                            e.fieldName === "group-rate-numerator").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            <label className="govuk-label" htmlFor="group-rate-numerator">Numerator</label>
+                            {isEditMode ?
+                                <>
+                                    {errors.map(error => error.fieldName === "group-rate-numerator" &&
+                                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                                    )}
+                                    <select className="govuk-select" id="group-rate-numerator" name="group-rate-numerator" value={numerator}
                                         onChange={handleNumeratorChange}>
-                                    <option value="0">Please select</option>
-                                    {calcs && calcs
-                                        .filter(c => c.templateCalculationId !== node.templateCalculationId &&
-                                            c.aggregationType === AggregrationType.Sum &&
-                                            c.templateCalculationId !== denominator)
-                                        .map(c => <option key={c.templateCalculationId}
-                                                          value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
-                                </select>
-                            </>
-                            :
-                            <div className="govuk-form-group govuk-!-margin-bottom-6">
-                                <span id="group-rate-numerator" className="govuk-hint">{numerator}</span>
-                            </div>
-                        }
-                    </div>
-                    <div className={`govuk-form-group ${errors.filter(e =>
-                        e.fieldName === "group-rate-denominator").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="group-rate-denominator">Denominator</label>
-                        {isEditMode ?
-                            <>
-                                {errors.map(error => error.fieldName === "group-rate-denominator" &&
-                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                                )}
-                                <select className="govuk-select" id="group-rate-denominator" name="group-rate-denominator" value={denominator}
+                                        <option value="0">Please select</option>
+                                        {calcs && calcs
+                                            .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                                c.aggregationType === AggregrationType.Sum &&
+                                                c.templateCalculationId !== denominator)
+                                            .map(c => <option key={c.templateCalculationId}
+                                                value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
+                                    </select>
+                                </>
+                                :
+                                <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                    <span id="group-rate-numerator" className="govuk-hint">{numerator}</span>
+                                </div>
+                            }
+                        </div>
+                        <div className={`govuk-form-group ${errors.filter(e =>
+                            e.fieldName === "group-rate-denominator").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            <label className="govuk-label" htmlFor="group-rate-denominator">Denominator</label>
+                            {isEditMode ?
+                                <>
+                                    {errors.map(error => error.fieldName === "group-rate-denominator" &&
+                                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                                    )}
+                                    <select className="govuk-select" id="group-rate-denominator" name="group-rate-denominator" value={denominator}
                                         onChange={handleDenominatorChange}>
-                                    <option value="0">Please select</option>
-                                    {calcs && calcs
-                                        .filter(c => c.templateCalculationId !== node.templateCalculationId &&
-                                            c.aggregationType === AggregrationType.Sum &&
-                                            c.templateCalculationId !== numerator)
-                                        .map(c => <option key={c.templateCalculationId}
-                                                          value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
-                                </select>
-                            </>
-                            :
-                            <div className="govuk-form-group govuk-!-margin-bottom-6">
-                                <span id="group-rate-denominator" className="govuk-hint">{denominator}</span>
-                            </div>
-                        }
-                    </div>
-                </>
+                                        <option value="0">Please select</option>
+                                        {calcs && calcs
+                                            .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                                c.aggregationType === AggregrationType.Sum &&
+                                                c.templateCalculationId !== numerator)
+                                            .map(c => <option key={c.templateCalculationId}
+                                                value={c.templateCalculationId}>{`${c.name} (${c.templateCalculationId})`}</option>)}
+                                    </select>
+                                </>
+                                :
+                                <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                    <span id="group-rate-denominator" className="govuk-hint">{denominator}</span>
+                                </div>
+                            }
+                        </div>
+                    </>
                 }
                 {aggregationType === AggregrationType.PercentageChangeBetweenAandB &&
-                <>
-                    <div className={`govuk-form-group ${errors.filter(e =>
-                        e.fieldName === "percentage-change-calculation-a").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="percentage-change-calculation-a">Calculation A</label>
-                        {isEditMode ?
-                            <>
-                                {errors.map(error => error.fieldName === "percentage-change-calculation-a" &&
-                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                                )}
-                                <select className="govuk-select"
+                    <>
+                        <div className={`govuk-form-group ${errors.filter(e =>
+                            e.fieldName === "percentage-change-calculation-a").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            <label className="govuk-label" htmlFor="percentage-change-calculation-a">Calculation A</label>
+                            {isEditMode ?
+                                <>
+                                    {errors.map(error => error.fieldName === "percentage-change-calculation-a" &&
+                                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                                    )}
+                                    <select className="govuk-select"
                                         id="percentage-change-calculation-a"
                                         value={calculationA}
                                         onChange={handleCalculationAChange}>
-                                    <option value="">Please select</option>
-                                    {calcs && calcs
-                                        .filter(c => c.templateCalculationId !== node.templateCalculationId &&
-                                            c.templateCalculationId !== calculationB)
-                                        .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
-                                </select>
-                            </>
-                            :
-                            <div className="govuk-form-group govuk-!-margin-bottom-6">
-                                <span id="percentage-change-calculation-a" className="govuk-hint">{calculationA}</span>
-                            </div>
-                        }
-                    </div>
-                    <div className={`govuk-form-group ${errors.filter(e =>
-                        e.fieldName === "percentage-change-calculation-b").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="percentage-change-calculation-b">Calculation B</label>
-                        {isEditMode ?
-                            <>
-                                {errors.map(error => error.fieldName === "percentage-change-calculation-b" &&
-                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                                )}
-                                <select className="govuk-select"
+                                        <option value="">Please select</option>
+                                        {calcs && calcs
+                                            .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                                c.templateCalculationId !== calculationB)
+                                            .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                                    </select>
+                                </>
+                                :
+                                <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                    <span id="percentage-change-calculation-a" className="govuk-hint">{calculationA}</span>
+                                </div>
+                            }
+                        </div>
+                        <div className={`govuk-form-group ${errors.filter(e =>
+                            e.fieldName === "percentage-change-calculation-b").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            <label className="govuk-label" htmlFor="percentage-change-calculation-b">Calculation B</label>
+                            {isEditMode ?
+                                <>
+                                    {errors.map(error => error.fieldName === "percentage-change-calculation-b" &&
+                                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                                    )}
+                                    <select className="govuk-select"
                                         id="percentage-change-calculation-b"
                                         value={calculationB}
                                         onChange={handleCalculationBChange}>
-                                    <option value="">Please select</option>
-                                    {calcs && calcs
-                                        .filter(c => c.templateCalculationId !== node.templateCalculationId &&
-                                            c.templateCalculationId !== calculationA)
-                                        .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
-                                </select>
-                            </>
-                            :
-                            <div className="govuk-form-group govuk-!-margin-bottom-6">
-                                <span id="percentage-change-calculation-b" className="govuk-hint">{calculationB}</span>
-                            </div>
-                        }
-                    </div>
-                    <div className={`govuk-form-group ${errors.filter(e =>
-                        e.fieldName === "percentage-change-calculation-aggregation-type").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="percentage-change-calculation-aggregation-type">Calculation Aggregation Type</label>
-                        {isEditMode ?
-                            <>
-                                {errors.map(error => error.fieldName === "percentage-change-calculation-aggregation-type" &&
-                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                                )}
-                                <select className="govuk-select"
+                                        <option value="">Please select</option>
+                                        {calcs && calcs
+                                            .filter(c => c.templateCalculationId !== node.templateCalculationId &&
+                                                c.templateCalculationId !== calculationA)
+                                            .map(c => <option key={c.templateCalculationId} value={c.templateCalculationId}>{c.name}</option>)}
+                                    </select>
+                                </>
+                                :
+                                <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                    <span id="percentage-change-calculation-b" className="govuk-hint">{calculationB}</span>
+                                </div>
+                            }
+                        </div>
+                        <div className={`govuk-form-group ${errors.filter(e =>
+                            e.fieldName === "percentage-change-calculation-aggregation-type").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            <label className="govuk-label" htmlFor="percentage-change-calculation-aggregation-type">Calculation Aggregation Type</label>
+                            {isEditMode ?
+                                <>
+                                    {errors.map(error => error.fieldName === "percentage-change-calculation-aggregation-type" &&
+                                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                                    )}
+                                    <select className="govuk-select"
                                         id="percentage-change-calculation-aggregation-type"
                                         value={calculationAggregationType} onChange={handleCalculationAggregationTypeChange}>
-                                    <option value={CalculationAggregationType.Average}>Average</option>
-                                    <option value={CalculationAggregationType.Sum}>Sum</option>
-                                </select>
-                            </>
-                            :
-                            <div className="govuk-form-group govuk-!-margin-bottom-6">
-                                <span id="percentage-change-calculation-aggregation-type" className="govuk-hint">{calculationAggregationType}</span>
-                            </div>
-                        }
-                    </div>
-                </>
+                                        <option value={CalculationAggregationType.Average}>Average</option>
+                                        <option value={CalculationAggregationType.Sum}>Sum</option>
+                                    </select>
+                                </>
+                                :
+                                <div className="govuk-form-group govuk-!-margin-bottom-6">
+                                    <span id="percentage-change-calculation-aggregation-type" className="govuk-hint">{calculationAggregationType}</span>
+                                </div>
+                            }
+                        </div>
+                    </>
                 }
                 {isEditMode ?
                     <>
@@ -672,37 +674,42 @@ export function CalculationItem({
                             Save and continue
                         </button>
                         {!isClone &&
-                        <>
-                            <div className="govuk-form-group">
-                                <select className="govuk-select" id="calc-clones" name="calc-clones" value={cloneId} onChange={handleCloneChange}>
-                                    <option value=''>Select a calculation</option>
-                                    {calcs && calcs
-                                        .filter(c => c.templateCalculationId !== node.templateCalculationId)
-                                        .map(c => <option key={c.templateCalculationId} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </div>
-                            <button className="govuk-button" data-module="govuk-button" onClick={handleCloneClick}>
-                                Clone
+                            <>
+                                <div className="govuk-form-group">
+                                    <select className="govuk-select" id="calc-clones" name="calc-clones" value={cloneId} onChange={handleCloneChange}>
+                                        <option value=''>Select a calculation</option>
+                                        {calcs && calcs
+                                            .filter(c => c.templateCalculationId !== node.templateCalculationId)
+                                            .map(c => <option key={c.templateCalculationId} value={c.id}>{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <button className="govuk-button" data-module="govuk-button" onClick={handleCloneClick}>
+                                    Clone
                             </button>
-                        
-                            <div className="govuk-warning-text">
-                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                <strong className="govuk-warning-text__text">
-                                    <span className="govuk-warning-text__assistive">Warning</span>
-                                    Be careful. This will delete all child nodes and clones.
-                                </strong>
-                            </div>
-                            <div className="govuk-form-group">
-                                {!confirmDelete &&
-                                <button className="govuk-button govuk-button--warning" onClick={handleDelete}>Delete calculation</button>}
-                                {confirmDelete && <>
-                                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" onClick={handleConfirmDelete}>Confirm
-                                        delete
+                            </>}
+                        {allowDelete &&
+                            <>
+                                <div className="govuk-warning-text">
+                                    <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong className="govuk-warning-text__text">
+                                        <span className="govuk-warning-text__assistive">Warning</span>
+                                        {isClone ? 'NB: This will delete this clone instance only.' : 'Be careful. This will delete all child nodes and clones.'}
+                                    </strong>
+                                </div>
+                                <div className="govuk-form-group">
+                                    {!confirmDelete &&
+                                        <button className="govuk-button govuk-button--warning" onClick={handleDelete} data-testid="delete-button">
+                                            Delete calculation
+                                        </button>}
+                                    {confirmDelete &&
+                                        <>
+                                            <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" onClick={handleConfirmDelete}>Confirm
+                                            delete
                                     </button>
-                                    <button className="govuk-button govuk-button--secondary" onClick={handleCancelDelete}>Cancel</button>
-                                </>}
-                            </div>
-                        </>}
+                                            <button className="govuk-button govuk-button--secondary" onClick={handleCancelDelete}>Cancel</button>
+                                        </>}
+                                </div>
+                            </>}
                     </>
                     :
                     <button className="govuk-button" onClick={handleCancel}>Close</button>

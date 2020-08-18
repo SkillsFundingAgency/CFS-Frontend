@@ -688,7 +688,19 @@ export const cloneWithChildrenNodeDs: Array<FundingLineDictionaryEntry> = [
             "name": "Funding Line 2",
             "fundingLineCode": "Code 2",
             "dsKey": 3,
-            "children": []
+            "children": [
+                {
+                    "id": "n6",
+                    "dsKey": 3,
+                    "templateCalculationId": 6,
+                    "kind": NodeType.Calculation,
+                    "type": CalculationType.Number,
+                    "name": "Calculation 6",
+                    "aggregationType": AggregrationType.None,
+                    "formulaText": "",
+                    "valueFormat": ValueFormatType.Currency
+                }
+            ]
         }
     }
 ];

@@ -76,15 +76,12 @@ function isRootNode(ds: Array<FundingLineDictionaryEntry>, id: string): boolean 
     return rootNodeIds.includes(id);
 }
 
-function isClonedNode(id: string): boolean {
-    return id.includes(":");
-}
-
 export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: string) => {
     const rootNodesToDelete: Array<number> = [];
     const isNodeToDeleteAClone: boolean = isClonedNode(id);
+    const isNodeToDeleteACloneRoot: boolean = isCloneRoot(ds.map(d => d.value), id);
 
-    if (isNodeToDeleteAClone) throw new Error("Cannot delete a clone");
+    if (isNodeToDeleteAClone && !isNodeToDeleteACloneRoot) throw new Error("Cannot delete a clone child");
 
     for (let i = 0; i < ds.length; i++) {
         const fundingLine = ds[i];
@@ -96,11 +93,13 @@ export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: stri
         for (let j = 0; j < clonedNodeIds.length; j++) {
             try {
                 const clonedNodeId = clonedNodeIds[j];
-                if (isRootNode(ds, clonedNodeId)) {
+                if (!isNodeToDeleteAClone && isRootNode(ds, clonedNodeId)) {
                     rootNodesToDelete.push(fundingLine.key);
                     break;
                 }
-                await digger.removeNode(clonedNodeId);
+                if (!isNodeToDeleteACloneRoot || (isNodeToDeleteACloneRoot && clonedNodeId === id)) {
+                    await digger.removeNode(clonedNodeId);
+                }
             }
             catch {
                 // ignore
@@ -114,8 +113,19 @@ export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: stri
     });
 }
 
+export const isClonedNode = (id: string): boolean => {
+    return id.includes(":");
+}
+
 function getNewCloneId(id: string) {
     return `${id.split(":")[0]}:${uuidv4()}`.replace(/-/gi, "");
+}
+
+export const isCloneRoot = (fundingLines: FundingLine[], id: string) => {
+    const isClone = id.includes(":");
+    if (!isClone) return false;
+    const parentId = findParentId(fundingLines, id);
+    return parentId.length === 0 || !parentId.includes(":");
 }
 
 export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
@@ -130,8 +140,7 @@ export const cloneNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIt
         cloneChildNodes(draggedItemData.children, dropTargetDsKey);
     }
 
-    const destinationDsDigger = new JSONDigger(destinationFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-    await destinationDsDigger.addChildren(dropTargetId, cloneDeep(draggedItemData));
+    await addNode(ds, dropTargetId, cloneDeep(draggedItemData), () => {});
 }
 
 export const cloneCalculation = async (ds: Array<FundingLineDictionaryEntry>, targetCalculationId: string, sourceCalculationId: string) => {
@@ -181,9 +190,8 @@ export const moveNode = async (ds: Array<FundingLineDictionaryEntry>, draggedIte
         ds.splice(fundingLineKeyIndex, 1);
     }
     else {
-        const sourceDsDigger = new JSONDigger(sourceFundingLine.value, fundingLineIdField, fundingLineChildrenField);
-        await sourceDsDigger.removeNode(draggedItemData.id);
-        await destinationDsDigger.addChildren(dropTargetId, draggedItemData);
+        await removeNode(ds, draggedItemData.id)
+        await addNode(ds, dropTargetId, draggedItemData, () => {});
     }
 }
 
@@ -446,6 +454,28 @@ export function getAllTemplateLineIds(fundingLines: FundingLineDictionaryEntry[]
         ids.push(parseInt(match[1].replace(',', ''), 10));
     }
     return [...new Set(ids)].sort();
+}
+
+export const findParentId = (fundingLines: FundingLine[], childId: string) => {
+    for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
+        let stack: FundingLineOrCalculation[] = [];
+
+        stack.push(fundingLines[fundingLine]);
+
+        while (stack.length !== 0) {
+            const node = stack.pop();
+            if (node && node.children && node.children.length > 0) {
+                const parentId = node.id;
+                for (let i: number = node.children.length - 1; i >= 0; i--) {
+                    const childNode = node.children[i];
+                    if (childNode.id === childId) return parentId;
+                    stack.push(node.children[i]);
+                }
+            }
+        }
+    }
+
+    return "";
 }
 
 export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDictionaryItem[] => {

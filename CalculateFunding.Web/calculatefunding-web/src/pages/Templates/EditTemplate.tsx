@@ -29,7 +29,9 @@ import {
     restoreTemplateContent,
     findNodeById,
     getAllTemplateCalculationIds,
-    getAllTemplateLineIds
+    getAllTemplateLineIds,
+    isCloneRoot,
+    isClonedNode
 } from "../../services/templateBuilderDatasourceService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {
@@ -499,6 +501,11 @@ export function EditTemplate() {
         return allNames.includes(name);
     }
 
+    const canBeDeleted = (id: string) => {
+        const fundingLines: FundingLine[] = ds.map(fl => fl.value);
+        return !isClonedNode(id) || isCloneRoot(fundingLines, id);
+    }
+
     return (
         <div>
             <Header location={Section.Templates} />
@@ -732,15 +739,16 @@ export function EditTemplate() {
                     <Sidebar sidebar={
                         <SidebarContent
                             data={selectedNodes}
+                            isEditMode={mode === Mode.Edit}
                             calcs={getCalculations()}
                             updateNode={updateNode}
-                            isEditMode={mode === Mode.Edit}
                             openSideBar={openSideBar}
                             deleteNode={onClickDelete}
                             cloneCalculation={onCloneCalculation}
                             checkIfTemplateLineIdInUse={checkIfTemplateLineIdInUse}
                             checkFundingLineNameInUse={checkFundingLineNameInUse}
                             refreshNextId={refreshNextId}
+                            canBeDeleted={canBeDeleted}
                         />}
                         open={openSidebar}
                         onSetOpen={openSideBar}

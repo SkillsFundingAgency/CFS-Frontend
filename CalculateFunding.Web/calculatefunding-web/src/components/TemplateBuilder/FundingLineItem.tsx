@@ -12,18 +12,20 @@ export interface FundingLineItemProps {
     isTemplateLineIdInUse: (templateLineId: number) => boolean,
     isFundingLineNameInUse: (name: string) => boolean,
     refreshNextId: () => void,
+    allowDelete: boolean,
 }
 
 export function FundingLineItem({
-                                    node,
-                                    updateNode,
-                                    isEditMode,
-                                    openSideBar,
-                                    deleteNode,
-                                    isTemplateLineIdInUse,
-                                    isFundingLineNameInUse,
-                                    refreshNextId
-                                }: FundingLineItemProps) {
+    node,
+    updateNode,
+    isEditMode,
+    openSideBar,
+    deleteNode,
+    isTemplateLineIdInUse,
+    isFundingLineNameInUse,
+    refreshNextId,
+    allowDelete,
+}: FundingLineItemProps) {
     const [fundingLineName, setFundingLineName] = useState<string>(node.name);
     const [fundingLineType, setFundingLineType] = useState<FundingLineType>(node.type);
     const [fundingLineCode, setFundingLineCode] = useState<string | undefined>(node.fundingLineCode);
@@ -183,14 +185,14 @@ export function FundingLineItem({
                     {isEditMode ?
                         <>
                             {errors.filter(e => e.fieldName === "fl-name").length === 0 ?
-                            <span id="fl-name-hint" className="govuk-hint">The name of the funding line (e.g. 'Total Funding Line')</span>
-                            : errors.map(error => error.fieldName === "fl-name" &&
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                            )}
-                                <input className="govuk-input" id="fl-name" name="fl-name" type="text" value={fundingLineName}
-                                       onChange={handleNameChange}/>
+                                <span id="fl-name-hint" className="govuk-hint">The name of the funding line (e.g. 'Total Funding Line')</span>
+                                : errors.map(error => error.fieldName === "fl-name" &&
+                                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                    </span>
+                                )}
+                            <input className="govuk-input" id="fl-name" name="fl-name" type="text" value={fundingLineName}
+                                onChange={handleNameChange} />
                         </> :
                         <span id="fl-name" className="govuk-hint">{fundingLineName}</span>
                     }
@@ -206,7 +208,7 @@ export function FundingLineItem({
                                 </span>
                             )}
                             <input className="govuk-input" id="funding-line-id" name="funding-line-id" type="text"
-                                   value={fundingLineId} onChange={handleFundingLineIdChange}/>
+                                value={fundingLineId} onChange={handleFundingLineIdChange} />
                         </>
                         :
                         <span id="funding-line-id" className="govuk-hint">{fundingLineId}</span>
@@ -224,29 +226,29 @@ export function FundingLineItem({
                     }
                 </div>
                 {fundingLineType === FundingLineType.Payment &&
-                <div className={`govuk-form-group ${errors.filter(e =>
-                    e.fieldName === "fl-code").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                    <label className="govuk-label" htmlFor="fl-code">Funding Line Code</label>
-                    {isEditMode ?
-                        <>
-                            {errors.filter(e => e.fieldName === "fl-code").length === 0 ?
-                            <span id="fl-code-hint" className="govuk-hint">The funding line code (e.g. PSG-0001)</span>
-                            :
+                    <div className={`govuk-form-group ${errors.filter(e =>
+                        e.fieldName === "fl-code").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="fl-code">Funding Line Code</label>
+                        {isEditMode ?
                             <>
-                                {errors.map(error => error.fieldName === "fl-code" &&
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                            )}
-                            </>}
-                            <input className="govuk-input govuk-!-width-two-thirds" id="fl-code" name="fl-code" type="text"
-                                   value={fundingLineCode}
-                                   onChange={handleFundingLineCodeChange}/>
-                        </>
-                        :
-                        <span id="fl-code" className="govuk-hint">{fundingLineCode}</span>
-                    }
-                </div>
+                                {errors.filter(e => e.fieldName === "fl-code").length === 0 ?
+                                    <span id="fl-code-hint" className="govuk-hint">The funding line code (e.g. PSG-0001)</span>
+                                    :
+                                    <>
+                                        {errors.map(error => error.fieldName === "fl-code" &&
+                                            <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                                <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                            </span>
+                                        )}
+                                    </>}
+                                <input className="govuk-input govuk-!-width-two-thirds" id="fl-code" name="fl-code" type="text"
+                                    value={fundingLineCode}
+                                    onChange={handleFundingLineCodeChange} />
+                            </>
+                            :
+                            <span id="fl-code" className="govuk-hint">{fundingLineCode}</span>
+                        }
+                    </div>
                 }
                 {isEditMode ?
                     <>
@@ -255,27 +257,27 @@ export function FundingLineItem({
                                 Save and continue
                             </button>
                         </div>
-                        {!isClone &&
-                        <>
-                            <div className="govuk-warning-text">
-                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                <strong className="govuk-warning-text__text">
-                                    <span className="govuk-warning-text__assistive">Warning</span>
-                                    Be careful. This will delete all child nodes and clones.
-                                </strong>
-                            </div>
-                            <div className="govuk-form-group">
-                                {confirmDelete ? <>
+                        {allowDelete &&
+                            <>
+                                <div className="govuk-warning-text">
+                                    <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong className="govuk-warning-text__text">
+                                        <span className="govuk-warning-text__assistive">Warning</span>
+                                        {isClone ? 'NB: This will delete this clone instance only.' : 'Be careful. This will delete all child nodes and clones.'}
+                                    </strong>
+                                </div>
+                                <div className="govuk-form-group">
+                                    {confirmDelete ? <>
                                         <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                                onClick={handleConfirmDelete} data-testid={`node-${node.id}-confirm-delete`}>Confirm delete
+                                            onClick={handleConfirmDelete} data-testid={`node-${node.id}-confirm-delete`}>Confirm delete
                                         </button>
                                         <button className="govuk-button govuk-button--secondary" onClick={handleCancelDelete}>Cancel</button>
                                     </>
-                                    :
-                                    <button className="govuk-button govuk-button--warning"
+                                        :
+                                        <button className="govuk-button govuk-button--warning"
                                             onClick={handleDelete} data-testid={`node-${node.id}-delete`}>Delete funding line</button>}
-                            </div>
-                        </>}
+                                </div>
+                            </>}
                     </>
                     :
                     <button className="govuk-button" onClick={handleCancel}>Close</button>

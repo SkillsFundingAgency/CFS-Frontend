@@ -34,21 +34,21 @@ const defaultProps = {
 };
 
 function OrganisationChartNode({
-                                   datasource,
-                                   NodeTemplate,
-                                   draggable,
-                                   collapsible,
-                                   multipleSelect,
-                                   changeHierarchy,
-                                   cloneNode,
-                                   isEditMode,
-                                   onClickNode,
-                                   addNode,
-                                   openSideBar,
-                                   nextId,
-                                   dsKey,
-                                   addNodeToRefs,
-                               }: OrganisationChartNodeProps) {
+    datasource,
+    NodeTemplate,
+    draggable,
+    collapsible,
+    multipleSelect,
+    changeHierarchy,
+    cloneNode,
+    isEditMode,
+    onClickNode,
+    addNode,
+    openSideBar,
+    nextId,
+    dsKey,
+    addNodeToRefs,
+}: OrganisationChartNodeProps) {
     const node = useRef<HTMLDivElement>(null);
 
     const [isChildrenCollapsed, setIsChildrenCollapsed] = useState<boolean>(datasource.id.includes(":"));
@@ -60,10 +60,12 @@ function OrganisationChartNode({
         addNodeToRefs && addNodeToRefs(datasource.id, node);
     }, []);
 
+    const isClone = datasource.id.includes(":");
+
     const nodeClass = [
         "oc-node",
         isChildrenCollapsed ? "isChildrenCollapsed" : "",
-        allowedDrop ? "allowedDrop" : "",
+        allowedDrop && !isClone ? "allowedDrop" : "",
         selected ? "selected" : ""
     ]
         .filter(item => item)
@@ -126,7 +128,7 @@ function OrganisationChartNode({
         setBottomEdgeExpanded(undefined);
     };
 
-    const bottomEdgeClickHandler = (e: { stopPropagation: () => void; }) => {
+    const bottomEdgeClickHandler = (e: {stopPropagation: () => void;}) => {
         e.stopPropagation();
         setIsChildrenCollapsed(!isChildrenCollapsed);
         setBottomEdgeExpanded(!bottomEdgeExpanded);
@@ -145,7 +147,7 @@ function OrganisationChartNode({
     };
 
     const dragstartHandler = (event: React.DragEvent<HTMLDivElement>) => {
-        if (!isEditMode) { 
+        if (!isEditMode || isClone) {
             return;
         }
         const copyDS = {...datasource};
@@ -172,7 +174,7 @@ function OrganisationChartNode({
     };
 
     const dropHandler = (event: React.DragEvent<HTMLDivElement>) => {
-        if (!isEditMode || !event.currentTarget.classList.contains("allowedDrop")) {
+        if (!isEditMode || !event.currentTarget.classList.contains("allowedDrop") || isClone) {
             return;
         }
         clearDragInfo();
@@ -205,7 +207,7 @@ function OrganisationChartNode({
                 id={datasource.id}
                 data-kind={datasource.kind}
                 className={nodeClass}
-                draggable={draggable}
+                draggable={draggable && !isClone}
                 onDragStart={dragstartHandler}
                 onDragOver={dragoverHandler}
                 onDragEnd={dragendHandler}
@@ -219,15 +221,15 @@ function OrganisationChartNode({
                     openSideBar={openSideBar}
                     onClickNode={clickNodeHandler}
                     dsKey={dsKey}
-                    nextId={nextId}/>
+                    nextId={nextId} />
                 {collapsible &&
-                datasource.relationship &&
-                datasource.relationship.charAt(2) === "1" && (
-                    <i
-                        className={`oc-edge verticalEdge bottomEdge oci ${
-                            bottomEdgeExpanded === undefined ? "" : bottomEdgeExpanded ? "oci-chevron-up" : "oci-chevron-down"}`}
-                        onClick={bottomEdgeClickHandler} />
-                )}
+                    datasource.relationship &&
+                    datasource.relationship.charAt(2) === "1" && (
+                        <i
+                            className={`oc-edge verticalEdge bottomEdge oci ${
+                                bottomEdgeExpanded === undefined ? "" : bottomEdgeExpanded ? "oci-chevron-up" : "oci-chevron-down"}`}
+                            onClick={bottomEdgeClickHandler} />
+                    )}
             </div>
             {datasource.children && datasource.children.length > 0 && (
                 <ul className={isChildrenCollapsed ? "hidden" : ""}>

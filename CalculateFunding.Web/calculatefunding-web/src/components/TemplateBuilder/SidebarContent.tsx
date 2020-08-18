@@ -19,11 +19,10 @@ export interface SidebarContentProps {
     openSideBar: (open: boolean) => void,
     deleteNode: (id: string) => Promise<void>,
     cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
-    checkIfCalculationIdInUse: (id: number) => boolean,
     checkIfTemplateLineIdInUse: (id: number) => boolean,
-    checkIfCalculationNameInUse: (name: string) => boolean,
     checkFundingLineNameInUse: (name: string) => boolean,
     refreshNextId: () => void,
+    canBeDeleted: (id: string) => boolean,
 }
 
 export function SidebarContent(
@@ -38,6 +37,7 @@ export function SidebarContent(
         checkIfTemplateLineIdInUse,
         checkFundingLineNameInUse,
         refreshNextId,
+        canBeDeleted,
     }: SidebarContentProps) {
     const dataArray = Array.from(data);
     return (
@@ -56,6 +56,7 @@ export function SidebarContent(
                             isTemplateLineIdInUse={checkIfTemplateLineIdInUse}
                             isFundingLineNameInUse={checkFundingLineNameInUse}
                             refreshNextId={refreshNextId}
+                            allowDelete={canBeDeleted(node.id)}
                         />
                     )
                 }
@@ -72,6 +73,7 @@ export function SidebarContent(
                         openSideBar={openSideBar}
                         deleteNode={deleteNode}
                         refreshNextId={refreshNextId}
+                        allowDelete={canBeDeleted(node.id)}
                     />
                 )
             })}
