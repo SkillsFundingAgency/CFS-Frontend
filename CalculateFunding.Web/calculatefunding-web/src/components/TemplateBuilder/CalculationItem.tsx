@@ -154,7 +154,9 @@ export function CalculationItem({
     const handleAddAllowedEnumTypeValue = (newValue: string) => {
         validateAllowedEnumTypeValues(newValue);
         if (newValue.length > 0) {
-            setAllowedEnumTypeValues(allowedEnumTypeValues.concat(",", newValue));
+            allowedEnumTypeValues.length > 0 ?
+            setAllowedEnumTypeValues(allowedEnumTypeValues.concat(",", newValue)) :
+            setAllowedEnumTypeValues(newValue);
         }
     };
 
