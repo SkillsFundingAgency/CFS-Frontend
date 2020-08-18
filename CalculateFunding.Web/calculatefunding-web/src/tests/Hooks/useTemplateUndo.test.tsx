@@ -1,34 +1,33 @@
-import {
-    useTemplateUndo,
-    templateBuilderStateKey,
-    templateBuilderPastStateKey,
-    templateBuilderFutureStateKey
-} from "../../hooks/useTemplateUndo";
+import * as React from "react";
+import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import { singleNodeDs, withChildFundingLineDs } from "../Services/templateBuilderTestData";
 import { renderHook, act } from '@testing-library/react-hooks';
+
+const useStateSpy = jest.spyOn(React, 'useState');
+useStateSpy.mockImplementation(() => ['12345', ()=>{}]);
 
 beforeEach(() => {
     localStorage.clear();
 });
 
-it("returns false for canUndo and canRedo on initial render", () => {
+it("returns zero undo and redo count on initial render", () => {
     const updateMock = jest.fn();
     const { result } = renderHook(() => useTemplateUndo(updateMock));
 
-    expect(result.current.canUndo).toBeFalsy();
-    expect(result.current.canRedo).toBeFalsy();
+    expect(result.current.undoCount()).toEqual(0);
+    expect(result.current.redoCount()).toEqual(0);
 });
 
-it("setPresentState calls update function and saves to localstorage", () => {
+it("initialiseState calls update function and saves to localstorage", () => {
     const updateMock = jest.fn();
     const { result } = renderHook(() => useTemplateUndo(updateMock));
 
     result.current.initialiseState(singleNodeDs);
 
     expect(updateMock).toBeCalled();
-    expect(localStorage.__STORE__[templateBuilderStateKey]).toBe(JSON.stringify(singleNodeDs));
-    expect(result.current.canUndo).toBeFalsy();
-    expect(result.current.canRedo).toBeFalsy();
+    expect(localStorage.__STORE__['templateBuilderState-12345']).toBe(JSON.stringify(singleNodeDs));
+    expect(result.current.undoCount()).toEqual(0);
+    expect(result.current.redoCount()).toEqual(0);
 });
 
 it("updatePresentState calls update function and sets correct current and past state", () => {
@@ -39,8 +38,10 @@ it("updatePresentState calls update function and sets correct current and past s
     result.current.updatePresentState(withChildFundingLineDs);
 
     expect(updateMock).toBeCalled();
-    expect(localStorage.__STORE__[templateBuilderStateKey]).toBe(JSON.stringify(withChildFundingLineDs));
-    expect(localStorage.__STORE__[templateBuilderPastStateKey]).toBe(JSON.stringify([singleNodeDs]));
+    expect(localStorage.__STORE__['templateBuilderState-12345']).toBe(JSON.stringify(withChildFundingLineDs));
+    expect(localStorage.__STORE__['templateBuilderPastState-12345']).toBe(JSON.stringify([singleNodeDs]));
+    expect(result.current.undoCount()).toEqual(1);
+    expect(result.current.redoCount()).toEqual(0);
 });
 
 it("undo calls update function and sets correct past, current and future state", () => {
@@ -52,9 +53,11 @@ it("undo calls update function and sets correct past, current and future state",
     result.current.undo();
 
     expect(updateMock).toBeCalled();
-    expect(localStorage.__STORE__[templateBuilderStateKey]).toBe(JSON.stringify(singleNodeDs));
-    expect(localStorage.__STORE__[templateBuilderPastStateKey]).toBe(JSON.stringify([]));
-    expect(localStorage.__STORE__[templateBuilderFutureStateKey]).toBe(JSON.stringify([withChildFundingLineDs]));
+    expect(localStorage.__STORE__['templateBuilderState-12345']).toBe(JSON.stringify(singleNodeDs));
+    expect(localStorage.__STORE__['templateBuilderPastState-12345']).toBe(JSON.stringify([]));
+    expect(localStorage.__STORE__['templateBuilderFutureState-12345']).toBe(JSON.stringify([withChildFundingLineDs]));
+    expect(result.current.undoCount()).toEqual(0);
+    expect(result.current.redoCount()).toEqual(1);
 });
 
 it("redo calls update function and sets correct past, current and future state", () => {
@@ -67,9 +70,11 @@ it("redo calls update function and sets correct past, current and future state",
     result.current.redo();
 
     expect(updateMock).toBeCalled();
-    expect(localStorage.__STORE__[templateBuilderStateKey]).toBe(JSON.stringify(withChildFundingLineDs));
-    expect(localStorage.__STORE__[templateBuilderPastStateKey]).toBe(JSON.stringify([singleNodeDs]));
-    expect(localStorage.__STORE__[templateBuilderFutureStateKey]).toBe(JSON.stringify([]));
+    expect(localStorage.__STORE__['templateBuilderState-12345']).toBe(JSON.stringify(withChildFundingLineDs));
+    expect(localStorage.__STORE__['templateBuilderPastState-12345']).toBe(JSON.stringify([singleNodeDs]));
+    expect(localStorage.__STORE__['templateBuilderFutureState-12345']).toBe(JSON.stringify([]));
+    expect(result.current.undoCount()).toEqual(1);
+    expect(result.current.redoCount()).toEqual(0);
 });
 
 
