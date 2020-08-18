@@ -1,23 +1,19 @@
-﻿import React, {useEffect, useState} from 'react';
+﻿import React, {useState} from 'react';
 import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
 import {Section} from "../../types/Sections";
 import {PermissionStatus} from "../../components/PermissionStatus";
-import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
-import {useSelector} from "react-redux";
-import {AppState} from "../../states/AppState";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {TemplateSearchRequest} from "../../types/searchRequestViewModel";
 import {DateFormatter} from "../../components/DateFormatter";
-import {TemplateSearchResponse, TemplateStatus} from "../../types/TemplateBuilderDefinitions";
+import {TemplatePermissions, TemplateSearchResponse, TemplateStatus} from "../../types/TemplateBuilderDefinitions";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
 
 export const ListTemplates = () => {
-    const [canCreateTemplate, setCanCreateTemplate] = useState<boolean>(false);
-    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [haveResults, setHaveResults] = useState<boolean>(false);
     const [templateListResults, setTemplateListResults] = useState<TemplateSearchResponse>({
         facets: [], results: [], totalCount: 0, totalErrorCount: 0
@@ -25,29 +21,7 @@ export const ListTemplates = () => {
     const initialSearch: { pageNumber: number; top: number } = {pageNumber: 1, top: 100};
     const [searchCriteria, setSearchCriteria] = useState(initialSearch);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
-
-    function getEffectiveCanCreateTemplate(fundingStreamPermissions: FundingStreamPermissions[]) {
-        return fundingStreamPermissions.some(resolveCreateTemplates);
-    }
-
-    function resolveCreateTemplates(permission: FundingStreamPermissions) {
-        return permission.canCreateTemplates;
-    }
-
-    useEffect(() => {
-        let missingPermissions = [];
-        if (!canCreateTemplate) {
-            missingPermissions.push("create");
-        }
-        setMissingPermissions(missingPermissions);
-    }, [canCreateTemplate]);
-
-    useEffect(() => {
-        const permissionsToApply = permissions ? permissions : [];
-        setCanCreateTemplate(getEffectiveCanCreateTemplate(permissionsToApply));
-    }, [permissions]);
+    const {canCreateTemplate, missingPermissions} = useTemplatePermissions([TemplatePermissions.Create]);
 
     function populateTemplates(criteria: TemplateSearchRequest) {
         const getAllTemplates = async () => {

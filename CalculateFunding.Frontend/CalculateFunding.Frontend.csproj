@@ -170,6 +170,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Core\Middleware" />
+    <Folder Include="Pages\Users" />
     <Folder Include="wwwroot\assets\libs\js\monaco\" />
     <Folder Include="wwwroot\js\Tests\" />
   </ItemGroup>

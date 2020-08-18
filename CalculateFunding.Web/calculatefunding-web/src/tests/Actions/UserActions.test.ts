@@ -3,10 +3,10 @@ import thunk from "redux-thunk";
 import axios from "axios"
 import MockAdapter from "axios-mock-adapter";
 import { IStoreState } from "../../reducers/rootReducer";
-import {getUserFundingStreamPermissions, UserPermissionsActionTypes} from "../../actions/UserPermissionsActions";
+import {getUserFundingStreamPermissions, UserActionTypes} from '../../actions/userAction';
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 const fetchMock = new MockAdapter(axios);
 
 describe("user-permissions-actions", () => {
@@ -42,21 +42,23 @@ describe("user-permissions-actions", () => {
         fetchMock.onGet("/api/users/permissions/fundingstreams").reply(200, payload);
 
         const expectedActions = [
-            { type: UserPermissionsActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: payload},
+            { type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: payload},
         ];
 
         const store = mockStore(storeWithData);
 
-        await getUserFundingStreamPermissions()(store.dispatch, () => storeWithData.userPermissions, null);
+        await getUserFundingStreamPermissions()(store.dispatch, () => storeWithData.userState, null);
 
         expect(store.getActions()).toEqual(expectedActions);
     });
-})
+});
 
 const storeWithData: IStoreState = {
     userState: {
         isLoggedIn: false,
-        userName: ''
+        userName: '',
+        fundingStreamPermissions: [],
+        hasConfirmedSkills: true
     },
     viewFundingState: {
         fundingStreams: [],
@@ -273,9 +275,6 @@ const storeWithData: IStoreState = {
                 tableDefinitions: []
             }
         ]
-    },
-    userPermissions: {
-        fundingStreamPermissions: []
     },
     featureFlags: {
         templateBuilderVisible: false

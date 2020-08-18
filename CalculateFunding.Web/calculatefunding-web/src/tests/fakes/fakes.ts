@@ -2,9 +2,6 @@ import {createBrowserHistory, createLocation} from 'history'
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import {ProvidersEntity} from "../../types/publishedProvider";
-import {fundingStreamPermissionsAction} from "../../actions/UserPermissionsActions";
-import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
-//require('./jsdom');
 
 export const store: Store<IStoreState> = createStore(
     rootReducer
@@ -113,7 +110,31 @@ export const fakeInitialState: IStoreState = {
     },
     userState: {
         isLoggedIn: false,
-        userName: ''
+        userName: '',
+        hasConfirmedSkills: true,
+        fundingStreamPermissions:
+            [{  canAdministerFundingStream: false,
+                canApproveFunding: false,
+                canApproveSpecification: false,
+                canChooseFunding: false,
+                canCreateQaTests: false,
+                canCreateSpecification: false,
+                canDeleteCalculations: false,
+                canDeleteQaTests: false,
+                canDeleteSpecification: false,
+                canEditCalculations: false,
+                canEditQaTests: false,
+                canEditSpecification: false,
+                canMapDatasets: false,
+                canRefreshFunding: false,
+                canReleaseFunding: false,
+                canCreateTemplates: false,
+                canEditTemplates: false,
+                canDeleteTemplates: false,
+                canApproveTemplates: false,
+                fundingStreamId: "DSG",
+                userId: ""
+            }]
     },
     fundingLineStructureState: {
         specificationResult: {
@@ -362,31 +383,8 @@ export const fakeInitialState: IStoreState = {
             totalPages: 0
         }
     },
-    userPermissions: {
-    fundingStreamPermissions: 
-    [{  canAdministerFundingStream: false,
-        canApproveFunding: false,
-        canApproveSpecification: false,
-        canChooseFunding: false,
-        canCreateQaTests: false,
-        canCreateSpecification: false,
-        canDeleteCalculations: false,
-        canDeleteQaTests: false,
-        canDeleteSpecification: false,
-        canEditCalculations: false,
-        canEditQaTests: false,
-        canEditSpecification: false,
-        canMapDatasets: false,
-        canRefreshFunding: false,
-        canReleaseFunding: false,
-        canCreateTemplates: false,
-        canEditTemplates: false,
-        canDeleteTemplates: false,
-        canApproveTemplates: false,
-        fundingStreamId: "DSG",
-        userId: ""
-    }]},
     featureFlags: {
-        templateBuilderVisible: false
+        templateBuilderVisible: false,
+        releaseTimetableVisible: false
     }
 };

@@ -1,5 +1,5 @@
-﻿import {UserPermissionsActionTypes} from "../../actions/UserPermissionsActions";
-import {reduceUserPermissionsState} from "../../reducers/userPermissionsReducer";
+﻿import {UserActionTypes} from "../../actions/userAction";
+import {reduceUserState} from "../../reducers/userReducer";
 
 const payload = [{
     "userId": "",
@@ -48,17 +48,35 @@ const fundingStreamPermissionsDsgState = {
     userId: ""
 };
 
-describe("user-permissions-reducer", () => {
+describe("user-reducer", () => {
     it("Should return the initial state", () => {
-        expect(reduceUserPermissionsState(undefined, {type: UserPermissionsActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: []}))
-            .toEqual({"fundingStreamPermissions": []});
+        expect(reduceUserState(undefined, {type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: []}))
+            .toEqual({
+                "fundingStreamPermissions": [],
+                "hasConfirmedSkills": undefined,
+                "isLoggedIn": false,
+                "userName": ""
+            });
     });
 
     it("Should handle updated state", () => {
-        expect(reduceUserPermissionsState({fundingStreamPermissions: [fundingStreamPermissionsDsgState]}, {
-            type: UserPermissionsActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
-            payload: payload
-        })).toEqual({fundingStreamPermissions: [fundingStreamPermissionsDsgState]})
+        expect(reduceUserState(
+            {
+                fundingStreamPermissions: [fundingStreamPermissionsDsgState],
+                hasConfirmedSkills: true,
+                isLoggedIn: true,
+                userName: "test-user"
+            },
+            {
+                type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
+                payload: payload
+            }))
+            .toEqual({
+                "fundingStreamPermissions": [fundingStreamPermissionsDsgState],
+                "hasConfirmedSkills": true,
+                "isLoggedIn": true,
+                "userName": "test-user"
+            });
     })
 });
 

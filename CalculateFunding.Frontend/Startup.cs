@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend
+﻿using CalculateFunding.Frontend.Core.Middleware;
+
+namespace CalculateFunding.Frontend
 {
     using System;
     using System.IO;
@@ -6,7 +8,6 @@
     using Common.Identity.Authorization;
     using Common.Utility;
     using CalculateFunding.Common.Interfaces;
-    using Core.Middleware;
     using Extensions;
     using Helpers;
     using Hubs;

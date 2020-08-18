@@ -5,7 +5,7 @@ import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import { TemplatePermissions } from "../types/TemplateBuilderDefinitions";
 
 export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
-    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.userPermissions.fundingStreamPermissions);
+    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.user && state.user.fundingStreamPermissions);
 
     const canCreateTemplate = useMemo(() => {
         if (!permissions) {
@@ -57,6 +57,9 @@ export const useTemplatePermissions = (requiredPermissions: string[], requiredFu
     }, [canEditTemplate, canCreateTemplate, canDeleteTemplate, canApproveTemplate, requiredPermissions]);
 
     const fundingStreamPermissions = useMemo(() => {
+        if (!permissions) {
+            return;
+        }
         let permissibleFundingStreams: { "fundingStreamId": string, "permission": string }[] = permissions.map(p => {
             return [{
                 "fundingStreamId": p.fundingStreamId,

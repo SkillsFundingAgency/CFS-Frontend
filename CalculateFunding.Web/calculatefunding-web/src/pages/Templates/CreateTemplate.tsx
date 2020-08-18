@@ -19,7 +19,6 @@ export const CreateTemplate = () => {
     const [permittedFundingStreamsWithPeriods, setPermittedFundingStreamsWithPeriods] = useState<FundingStreamWithPeriodsResponse[]>([]);
     const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
     const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
-
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string>();
     const [selectedFundingPeriodId, setSelectedFundingPeriodId] = useState<string>();
