@@ -27,9 +27,6 @@ export const useTemplateUndo = (updateFunction: Function) => {
 
     const undo = () => {
         const present = getPresentState();
-        if (present.length === 0) {
-            return;
-        }
 
         const futureState = getTimeItems(templateBuilderFutureStateKey());
         futureState.unshift(present);
