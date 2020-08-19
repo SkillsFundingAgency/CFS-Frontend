@@ -3,9 +3,11 @@ import { useSelector } from "react-redux";
 import { AppState } from "../states/AppState";
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import { TemplatePermissions } from "../types/TemplateBuilderDefinitions";
+import {IUserState} from "../states/IUserState";
+import {IStoreState} from "../reducers/rootReducer";
 
 export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
-    let permissions: FundingStreamPermissions[] = useSelector((state: AppState) => state.user && state.user.fundingStreamPermissions);
+    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
 
     const canCreateTemplate = useMemo(() => {
         if (!permissions) {

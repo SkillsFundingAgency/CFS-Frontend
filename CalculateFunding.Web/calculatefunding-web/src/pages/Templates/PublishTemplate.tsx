@@ -77,9 +77,14 @@ export const PublishTemplate = () => {
         setErrors(errors => [...errors, error]);
     }
 
-    function clearErrorMessages() {
-        errorCount = 0;
-        setErrors([]);
+    function clearErrorMessages(fieldName?: string) {
+        if (errors.length > 0) {
+            if (fieldName === undefined) {
+                setErrors([]);
+            } else if (errors.some(e => e.fieldName === fieldName)) {
+                setErrors(errors.filter(e => e.fieldName !== fieldName))
+            }
+        }
     }
 
     function validateForm() {
@@ -108,10 +113,13 @@ export const PublishTemplate = () => {
     }
 
     const handlePublishNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        clearErrorMessages("publishNote");
         const note = e.target.value;
         setPublishNote(note);
-        validateForm();
-    }
+        if (!note && note.length === 0) {
+            addErrorMessage("You must enter a publish note.", "publishNote");
+        }
+    };
 
     const handlePublishClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

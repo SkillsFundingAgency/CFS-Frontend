@@ -28,7 +28,6 @@ import {
     getTemplateVersion,
     restoreTemplateContent,
     findNodeById,
-    getAllTemplateCalculationIds,
     getAllTemplateLineIds,
     isCloneRoot,
     isClonedNode
@@ -113,7 +112,8 @@ export function EditTemplate() {
         if (e.keyCode === 89 && e.ctrlKey) {
             redo();
         }
-    }
+    };
+    
     useEventListener('keydown', keyPressHandler);
 
     useConfirmLeavePage(isDirty && !isSaving);
@@ -129,7 +129,7 @@ export function EditTemplate() {
             clearPresentState();
             clearUndoState();
             clearRedoState();
-        }
+        };
         initialisePage();
     }, [templateId, version]);
 
@@ -149,7 +149,7 @@ export function EditTemplate() {
 
     const addNodeToRefs = (id: string, ref: React.MutableRefObject<any>) => {
         (itemRefs.current as any)[id] = ref;
-    }
+    };
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
         const errorCount: number = errors.length;
@@ -198,14 +198,14 @@ export function EditTemplate() {
         updatePresentState(ds);
         setIsDirty(true);
         showSaveMessage("");
-    }
+    };
 
     const openSideBar = (open: boolean) => {
         setOpenSidebar(open);
         if (!open) {
             clearSelectedNode();
         }
-    }
+    };
 
     const readSelectedNode = (node: FundingLineOrCalculationSelectedItem) => {
         setSelectedNodes(new Set([node]));
@@ -218,20 +218,20 @@ export function EditTemplate() {
     const updateNode = async (node: FundingLineUpdateModel | CalculationUpdateModel) => {
         await updateDatasource(ds, node);
         update((deepClone(ds)));
-    }
+    };
 
     const incrementNextId = () => {
         setNextId(nextId + 1);
-    }
+    };
 
     const refreshNextId = () => {
         setNextId(getLastUsedId(ds) + 1);
-    }
+    };
 
     const onClickAdd = async (id: string, newChild: FundingLine | Calculation) => {
         await addNode(ds, id, newChild, incrementNextId);
         update((deepClone(ds)));
-    }
+    };
 
     const onClickDelete = async (id: string) => {
         try {
@@ -240,7 +240,7 @@ export function EditTemplate() {
         } catch(err) {
             addErrorMessage(err.message);
         }
-    }
+    };
 
     const cloneNode = async (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => {
         await cloneNodeDatasource(ds, draggedItemData, draggedItemDsKey, dropTargetId, dropTargetDsKey);
@@ -255,7 +255,7 @@ export function EditTemplate() {
     const onCloneCalculation = async (targetCalculationId: string, sourceCalculationId: string) => {
         await cloneCalculation(ds, targetCalculationId, sourceCalculationId);
         update((deepClone(ds)));
-    }
+    };
 
     function showSaveMessage(message: string) {
         setSaveMessage(message);
@@ -278,7 +278,7 @@ export function EditTemplate() {
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
                 templateId: template.templateId,
                 templateFundingLinesJson: JSON.stringify(fundingLines)
-            }
+            };
 
             const restoreResult = await restoreTemplateContent(templateContentUpdateCommand,
                 template.templateId,
@@ -311,7 +311,7 @@ export function EditTemplate() {
         } finally {
             setIsSaving(false);
         }
-    }
+    };
 
     const handleSaveContentClick = async () => {
         try {
@@ -334,7 +334,7 @@ export function EditTemplate() {
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
                 templateId: template.templateId,
                 templateFundingLinesJson: JSON.stringify(fundingLines)
-            }
+            };
 
             const saveResponse = await saveTemplateContent(templateContentUpdateCommand);
             if (!version) {
@@ -378,7 +378,7 @@ export function EditTemplate() {
     const handlePublishClick = () => {
         if (!template) return;
         history.push(`/Templates/Publish/${template.templateId}`);
-    }
+    };
 
     const handleAddFundingLineClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -405,7 +405,7 @@ export function EditTemplate() {
         ds.push(fundingLineEntry);
         update((deepClone(ds)));
         setFocusNodeId(`n${id}`);
-    }
+    };
 
     const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -413,19 +413,19 @@ export function EditTemplate() {
         if (undoCount() === 0) {
             setIsDirty(false);
         }
-    }
+    };
 
     const handleRedo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         redo();
         setIsDirty(true);
-    }
+    };
 
     const toggleEditDescription = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         clearErrorMessages();
         setShowModal(!showModal);
-    }
+    };
 
     const saveDescription = async (description: string) => {
         if (!template) return;
@@ -440,7 +440,7 @@ export function EditTemplate() {
         } catch (err) {
             addErrorMessage(`Description changes could not be saved: ${err.message}.`, "description");
         }
-    }
+    };
 
     const handleScroll = (fieldName: string | undefined) => {
         if (!fieldName) return;
@@ -453,7 +453,7 @@ export function EditTemplate() {
         }
 
         ref && ref.current && ref.current.scrollIntoView({behavior: 'smooth', block: 'start'});
-    }
+    };
 
     const search = async (result: string) => {
         if (!result || result.trim().length === 0) return;
@@ -489,22 +489,22 @@ export function EditTemplate() {
                 setOpenSidebar(true);
             }
         }
-    }
+    };
 
     const checkIfTemplateLineIdInUse = (templateLineId: number) => {
         const allTemplateLineIds: number[] = getAllTemplateLineIds(ds);
         return allTemplateLineIds.includes(templateLineId);
-    }
+    };
 
     const checkFundingLineNameInUse = (name: string) => {
         const allNames: string[] = ds.map(fl => fl.value.name);
         return allNames.includes(name);
-    }
+    };
 
     const canBeDeleted = (id: string) => {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
         return !isClonedNode(id) || isCloneRoot(fundingLines, id);
-    }
+    };
 
     return (
         <div>
