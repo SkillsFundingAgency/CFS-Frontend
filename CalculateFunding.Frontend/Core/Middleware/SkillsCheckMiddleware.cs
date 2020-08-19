@@ -26,8 +26,12 @@ namespace CalculateFunding.Frontend.Core.Middleware
 
             if (context.User.Identity.IsAuthenticated)
             {
+                var path = context.Request.Path.Value;
                 if (!hasConfirmedSkills && 
-                    !context.Request.Path.Value.Contains("api/account/hasConfirmedSkills", StringComparison.InvariantCultureIgnoreCase))
+                    !(path.Contains("account/", StringComparison.InvariantCultureIgnoreCase) || 
+                      path.Contains("featureflags") || 
+                      path.Contains("fundingstreams") || 
+                      path.Length <= 1))
                 {
                     IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
 
@@ -40,13 +44,13 @@ namespace CalculateFunding.Frontend.Core.Middleware
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
                     }
+                    
                     CookieOptions option = new CookieOptions
                     {
                         Expires = DateTime.Now.AddDays(1),
                         Secure = true,
                         HttpOnly = true
                     };
-
                     context.Response.Cookies.Append(UserConstants.SkillsConfirmationCookieName, "true", option);
                 }
             }

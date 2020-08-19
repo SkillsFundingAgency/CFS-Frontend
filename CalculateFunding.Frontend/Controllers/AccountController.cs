@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
+using CalculateFunding.Frontend.Constants;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -61,10 +63,18 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             UserProfile profile = User.GetUserProfile();
+            
             ApiResponse<User> apiResponse = await _usersApiClient.GetUserByUserId(profile.Id);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && apiResponse.Content.HasConfirmedSkills)
             {
+                CookieOptions option = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(1),
+                    Secure = true,
+                    HttpOnly = true
+                };
+                Response.Cookies.Append(UserConstants.SkillsConfirmationCookieName, "true", option);
                 return Ok();
             }
             else
