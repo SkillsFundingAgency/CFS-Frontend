@@ -63,6 +63,8 @@ export function CreateSpecification() {
             const hubConnect = new HubConnectionBuilder()
                 .withUrl(`/api/notifications`)
                 .build();
+            hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
+            hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
 
             try {
                 await hubConnect.start();

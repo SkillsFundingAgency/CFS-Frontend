@@ -143,7 +143,11 @@ namespace CalculateFunding.Frontend
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<HealthCheckOptions>(Configuration.GetSection("healthCheck"));
 
-            services.AddSignalR().AddAzureSignalR();
+            services.AddSignalR(hubOptions =>
+            {
+                hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(3);
+                hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(6);
+            }).AddAzureSignalR();
 
             services.AddHsts((options) =>
             {
