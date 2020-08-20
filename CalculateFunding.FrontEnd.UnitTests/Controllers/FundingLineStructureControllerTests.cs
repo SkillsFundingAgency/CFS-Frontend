@@ -6,6 +6,7 @@ using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.TemplateMetadata.Models;
@@ -34,13 +35,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private readonly ISpecificationsApiClient _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
         private readonly IPoliciesApiClient _policiesApiClient = Substitute.For<IPoliciesApiClient>();
         private readonly ICalculationsApiClient _calculationsApiClient = Substitute.For<ICalculationsApiClient>();
+        private readonly IResultsApiClient _resultsApiClient = Substitute.For<IResultsApiClient>();
         private FundingLineStructureController _controller;
 
         [TestInitialize]
         public void SetUp()
         {
             _controller = new FundingLineStructureController(
-                            _policiesApiClient, _specificationsApiClient, _calculationsApiClient);   
+                            _policiesApiClient, _specificationsApiClient, _calculationsApiClient, _resultsApiClient);   
         }
 
         [TestMethod]
@@ -203,12 +205,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
 	        List<FundingStructureItem> result = new List<FundingStructureItem>
 	        {
-		        new FundingStructureItem(1, "FundingLine-1", null, null, FundingStructureType.FundingLine),
+		        new FundingStructureItem(1, "FundingLine-1", null, null, FundingStructureType.FundingLine, null, null, null),
 		        new FundingStructureItem(1, "FundingLine-2-withFundingLines", null, null, FundingStructureType.FundingLine,
+                    null,
 			        new List<FundingStructureItem>
 			        {
 				        new FundingStructureItem(2, "FundingLine-2-fl-1", null, null, FundingStructureType.FundingLine),
 				        new FundingStructureItem(2, "FundingLine-2-fl-2", null, null, FundingStructureType.FundingLine,
+                            null,
 					        new List<FundingStructureItem>
 					        {
 						        new FundingStructureItem(3, "FundingLine-2-fl-2-fl-1", null, null,
@@ -217,6 +221,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 			        }),
 		        new FundingStructureItem(1, "FundingLine-3-withCalculationsAndFundingLines", null, null,
 			        FundingStructureType.FundingLine,
+                    null,
 			        new List<FundingStructureItem>
 			        {
 				        new FundingStructureItem(
@@ -231,6 +236,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 					        CalculationId,
 							CalculationExpectedPublishStatus.ToString(),
 					        FundingStructureType.Calculation,
+                            null,
 						        new List<FundingStructureItem>
 						        {
 							        new FundingStructureItem(

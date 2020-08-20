@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="4.8.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="4.9.0" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.RazorPages" Version="2.2.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />

@@ -3,14 +3,13 @@ import {
     FundingStructureType, IFundingStructureItem
 } from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
-export function FundingLineStep(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean}) {
+export function FundingLineStepProviderResults(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean}) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType: string = "";
-    const parentFundingLineName :string = fundingStructureItems && fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
     return <div>
         {
-            (fundingStructureItems && fundingStructureItems.length > 0) ? fundingStructureItems.map((innerFundingLineItem, index) => {
+            (fundingStructureItems != null && fundingStructureItems.length > 0)? fundingStructureItems.map((innerFundingLineItem, index) => {
                     let displayFundingType = false;
                     if (fundingType !== FundingStructureType[innerFundingLineItem.type])
                     {
@@ -19,7 +18,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                     }
                     let linkValue = "";
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId !== '') {
-                        linkValue = encodeURI(`/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`);
+                        linkValue = encodeURI(`/viewcalculationresults/${innerFundingLineItem.calculationId}`);
                     }
                     return (
                         <CollapsibleSteps
@@ -38,7 +37,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                             hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
                             {
                                 innerFundingLineItem.fundingStructureItems ?
-                                    (<FundingLineStep fundingStructureItem={innerFundingLineItem} expanded={expanded} />)
+                                    (<FundingLineStepProviderResults fundingStructureItem={innerFundingLineItem} expanded={expanded} />)
                                     : null
                             }
                         </CollapsibleSteps>

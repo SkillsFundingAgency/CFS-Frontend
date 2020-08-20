@@ -25,7 +25,7 @@
 
         public static string AsFormattedMoney(this decimal money)
         {
-            return $"£{money:###,###,###,###,##0.00}";
+            return (money % 1) == 0 ? $"£{money:###,###,###,###,##0}" : $"£{money:###,###,###,###,##0.00}";
         }
 
         public static string AsFormattedNumber(this decimal number)

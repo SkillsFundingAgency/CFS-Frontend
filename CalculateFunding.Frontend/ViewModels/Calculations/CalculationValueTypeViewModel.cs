@@ -9,5 +9,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
         Number,
         Percentage,
         Currency,
+        Boolean,
+        String
     }
 }

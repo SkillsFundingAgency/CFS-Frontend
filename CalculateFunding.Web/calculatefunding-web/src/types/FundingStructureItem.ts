@@ -6,6 +6,8 @@ export interface IFundingStructureItem {
     calculationId : string;
     calculationPublishStatus : string;
     type : FundingStructureType;
+    value?: string;
+    calculationType?: string;
     fundingStructureItems: IFundingStructureItem[];
     parentName: string;
     expanded: boolean;

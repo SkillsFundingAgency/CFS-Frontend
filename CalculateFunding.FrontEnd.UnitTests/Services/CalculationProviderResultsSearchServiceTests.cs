@@ -19,6 +19,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
+using CalculationValueType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationValueType;
 
 namespace CalculateFunding.Frontend.UnitTests.Services
 {

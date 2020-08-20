@@ -16,7 +16,9 @@ import {CalculationSummary} from "../../types/CalculationSummary";
 import {getCalculationsService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
-import {getFundingLineStructureService} from "../../services/fundingStructuresService";
+import {
+    getFundingLineStructureByProviderService
+} from "../../services/fundingStructuresService";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {AutoComplete} from "../../components/AutoComplete";
@@ -27,6 +29,7 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 import {expandCalculationsByName, getDistinctOrderedFundingLineCalculations, updateFundingLineExpandStatus} from "../../components/fundingLineStructure/FundingLineStructure";
 import {NoData} from "../../components/NoData";
 import {isMainThread} from "worker_threads";
+import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -310,11 +313,10 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                 const result = response.data as SpecificationSummary;
                 setSpecificationSummary(response.data);
 
-                getFundingLineStructureService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id).then((response) => {
+                getFundingLineStructureByProviderService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id, match.params.providerId).then((response) => {
                     if (response.status === 200) {
                         const result = response.data as IFundingStructureItem[];
                         setFundingLines(result);
-
                     }
                     setIsLoading(prevState => {
                         return {
@@ -404,17 +406,12 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                hidden={!isLoading.fundingLineStructure}
                                                description={"Please wait whilst funding line structure is loading"}/>
                                 <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
-                                    <div className="govuk-grid-column-two-thirds">
+                                    <div className="govuk-grid-column-full">
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <ApproveStatusButton id={specificationSummary.id}
-                                                             status={fundingLineStatus.toString()}
-                                                             callback={updateFundingLineState}/>
                                     </div>
                                 </div>
                                 <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
-                                    <div className="govuk-grid-column-two-thirds">
+                                    <div className="govuk-grid-column-full">
                                         <div className="govuk-form-group search-container">
                                             <label className="govuk-label">
                                                 Search by calculation
@@ -442,13 +439,15 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                 fundingLines.map((f, index) => {
                                                     let linkValue = '';
                                                     if (f.calculationId != null && f.calculationId !== '') {
-                                                        linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
+                                                        linkValue = `/app/viewcalculationresults/${f.calculationId}`;
                                                     }
                                                     return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown"><CollapsibleSteps
                                                         customRef={f.customRef}
                                                         key={"collapsible-steps" + index}
                                                         uniqueKey={index.toString()}
                                                         title={FundingStructureType[f.type]}
+                                                        calculationType={f.calculationType != null ? f.calculationType : ""}
+                                                        value={f.value != null? f.value : ""}
                                                         description={f.name}
                                                         status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
                                                             f.calculationPublishStatus : ""}
@@ -456,7 +455,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                         expanded={fundingLinesExpandedStatus || f.expanded}
                                                         link={linkValue}
                                                         hasChildren={f.fundingStructureItems != null}>
-                                                        <FundingLineStep key={f.name.replace(" ", "") + index}
+                                                        <FundingLineStepProviderResults key={f.name.replace(" ", "") + index}
                                                                          expanded={fundingLinesExpandedStatus}
                                                                          fundingStructureItem={f}/>
                                                     </CollapsibleSteps>

@@ -458,7 +458,6 @@ input:disabled{
     width: 200px;
     display: inline-block;
   }
-
   .collapsible-step-header-description {
     width: 720px;
     display: inline-block;
@@ -467,7 +466,29 @@ input:disabled{
     width: 150px;
     display: inline-block;
   }
-
+  .collapsible-step-header-value-container {
+    display: none;
+  }
+  .collapsible-step-header-with-calculation-value .collapsible-step-header-description {
+    width: 505px;
+    display: inline-block;
+  }
+  .collapsible-step-header-with-calculation-value .collapsible-step-header-status {
+    width: 125px;
+    display: inline-block;
+  }
+  .collapsible-step-header-with-calculation-value .collapsible-step-header-value-container {
+    width: 240px;
+    display: inline-block;
+  }
+  .collapsible-step-header-with-calculation-value .collapsible-step-header-value-type {
+    width: 120px;
+    display: inline-block;
+  }
+  .collapsible-step-header-with-calculation-value .collapsible-step-header-value {
+    width: 120px;
+    display: inline-block;
+  }
   .collapsible-step-panel-button {
     width: 30px;
   }

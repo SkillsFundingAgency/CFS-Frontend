@@ -9,6 +9,8 @@ namespace CalculateFunding.Frontend.Modules
 		public string CalculationId { get; }
 		public string CalculationPublishStatus { get; }
 		public FundingStructureType Type { get; }
+		public string Value { get; set; }
+		public string CalculationType { get; set; }
 
 		public List<FundingStructureItem> FundingStructureItems { get; set; }
 
@@ -18,7 +20,9 @@ namespace CalculateFunding.Frontend.Modules
 			string calculationId,
 			string calculationPublishStatus, 
 			FundingStructureType type, 
-			List<FundingStructureItem> fundingStructureItems = null)
+			string calculationType = null,
+			List<FundingStructureItem> fundingStructureItems = null,
+			string value = null)
 		{
 			Level = level;
 			Name = name;
@@ -26,6 +30,8 @@ namespace CalculateFunding.Frontend.Modules
 			Type = type;
 			CalculationPublishStatus = calculationPublishStatus;
 			FundingStructureItems = fundingStructureItems;
+			Value = value;
+			CalculationType = calculationType;
 		}
 	}
 }

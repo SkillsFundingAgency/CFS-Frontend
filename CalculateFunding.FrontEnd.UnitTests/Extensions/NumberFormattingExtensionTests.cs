@@ -16,7 +16,7 @@ namespace CalculateFunding.Frontend.UnitTests.Extensions
             string output = ExtensionMethods.AsFormattedMoney(input);
 
             // Assert
-            output.Should().Be("£0.00");
+            output.Should().Be("£0");
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests.Extensions
             string output = ExtensionMethods.AsFormattedMoney(input);
 
             // Assert
-            output.Should().Be("£10,050.00");
+            output.Should().Be("£10,050");
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.UnitTests.Extensions
             string output = ExtensionMethods.AsFormattedMoney(input);
 
             // Assert
-            output.Should().Be("£12,345,678.00");
+            output.Should().Be("£12,345,678");
         }
 
         [TestMethod]
