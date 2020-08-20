@@ -24,6 +24,7 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {HubConnectionBuilder, HubConnection} from "@aspnet/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
+import {ErrorMessage} from "../../types/ErrorMessage";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
@@ -42,19 +43,95 @@ export function CreateSpecification() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
-    const [createSpecificationFailOutcome, setCreateSpecificationFailOutcome] = useState<string>("");
-    const [createSpecificationFailed, setCreateSpecificationFailed] = useState<boolean>(false);
     const [newSpecificationId, setNewSpecificationId] = useState<string>('');
+    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     let history = useHistory();
 
     useEffect(() => {
         const getStreams = async () => {
-            const streamResult = await getFundingStreamsService(true);
-            setFundingStreamData(streamResult.data as FundingStream[]);
+            try {
+                const streamResult = await getFundingStreamsService(true);
+                setFundingStreamData(streamResult.data as FundingStream[]);
+            } catch {
+                addErrorMessage("There was a problem loading the funding streams. Please try refreshing the page.");
+            }
         };
 
         getStreams();
     }, []);
+
+    useEffect(() => {
+        const updateFundingPeriods = async () => {
+            try {
+                setFundingPeriodIsLoading(true);
+                setFundingPeriodData([]);
+                const periodResult = await getFundingPeriodsByFundingStreamIdService(selectedFundingStream);
+                setFundingPeriodData(periodResult.data);
+            } catch (err) {
+                if (err.response.status !== 404) {
+                    addErrorMessage("There was a problem loading the funding periods. Please try again.");
+                }
+            } finally {
+                setFundingPeriodIsLoading(false);
+            }
+        };
+
+        const updateCoreProviderData = async () => {
+            try {
+                setCoreProviderData([]);
+                const coreProviderResult = await getProviderByFundingStreamIdService(selectedFundingStream);
+                setCoreProviderData(coreProviderResult.data);
+            } catch (err) {
+                if (err.response.status !== 404) {
+                    addErrorMessage("There was a problem loading the core providers. Please try again.");
+                }
+            }
+        };
+
+        if (selectedFundingStream !== "") {
+            updateFundingPeriods();
+            updateCoreProviderData();
+        }
+    }, [selectedFundingStream]);
+
+    useEffect(() => {
+        const updateTemplateVersions = async () => {
+            try {
+                setTemplateVersionData([]);
+                const templatesResult = await getTemplatesService(selectedFundingStream, selectedFundingPeriod);
+                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
+                setTemplateVersionData(publishedFundingTemplates);
+            } catch (err) {
+                if (err.response.status !== 404) {
+                    addErrorMessage("There was a problem loading the template versions. Please try again.");
+                }
+            };
+        };
+
+        if (selectedFundingPeriod !== "" && selectedFundingStream !== "") {
+            updateTemplateVersions();
+        }
+    }, [selectedFundingPeriod]);
+
+    useEffect(() => {
+        const updateDefaultTemplateVersionIfAvailable = async () => {
+            try {
+                const defaultTemplatesResult = await getDefaultTemplateVersionService(selectedFundingStream, selectedFundingPeriod);
+                const defaultTemplateVersionId = (defaultTemplatesResult.data != null &&
+                    defaultTemplatesResult.data !== "" ? parseFloat(defaultTemplatesResult.data).toFixed(1) : "") as string;
+                if (defaultTemplateVersionId.trim().length > 0) {
+                    setSelectedTemplateVersion(defaultTemplateVersionId);
+                }
+            }
+            catch {
+                // Ignore as couldn't retrieve default template version but not essential
+            }
+        };
+
+        if (templateVersionData.length > 0) {
+            updateDefaultTemplateVersionIfAvailable();
+        }
+    }, [templateVersionData]);
 
     useEffect(() => {
         if (newSpecificationId.length === 0) return;
@@ -78,8 +155,7 @@ export function CreateSpecification() {
                             hubConnect.stop();
                         });
                         if (message.completionStatus !== "Succeeded") {
-                            setCreateSpecificationFailOutcome(message.outcome);
-                            setCreateSpecificationFailed(true);
+                            addErrorMessage(message.outcome);
                         } else {
                             history.push(`/ViewSpecification/${newSpecificationId}`);
                         }
@@ -90,58 +166,21 @@ export function CreateSpecification() {
 
             } catch (err) {
                 await hubConnect.stop();
+                history.push(`/ViewSpecification/${newSpecificationId}`);
             }
         }
 
         createHubConnection();
-    }, [newSpecificationId])
+    }, [newSpecificationId]);
 
-    function populateFundingPeriods(fundingStream: string) {
-        if (fundingStream !== "") {
-            setFundingPeriodIsLoading(true);
-            const getFundingPeriods = async () => {
-                const periodResult = await getFundingPeriodsByFundingStreamIdService(fundingStream);
-                setFundingPeriodData(periodResult.data)
-                setFundingPeriodIsLoading(false);
-            };
-            getFundingPeriods().then(result => {
-                return true;
-            });
-        }
+    function addErrorMessage(errorMessage: string, fieldName?: string) {
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
+        setErrors(errors => [...errors, error]);
     }
 
-    function populateCoreProviders(fundingPeriod: string) {
-        if (fundingPeriod !== "") {
-            const getCoreProviders = async () => {
-                const coreProviderResult = await getProviderByFundingStreamIdService(fundingPeriod);
-                setCoreProviderData(coreProviderResult.data)
-            };
-            getCoreProviders().then(result => {
-                return true;
-            });
-        }
-    }
-
-    function populateTemplateVersion(fundingStreamId: string, fundingPeriodId: string) {
-        if (fundingPeriodId !== "" && fundingStreamId !== "") {
-            getTemplatesService(fundingStreamId, fundingPeriodId).then(templatesResult => {
-                if (templatesResult.status === 200 || templatesResult.status === 201) {
-                    const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
-                    getDefaultTemplateVersionService(fundingStreamId, fundingPeriodId).then(result => {
-                        const defaultTemplateVersionId = (result.data != null && result.data !== "" ? parseFloat(result.data).toFixed(1) : "") as string;
-                        if (defaultTemplateVersionId !== "") {
-                            setTemplateVersionData(publishedFundingTemplates);
-                            setSelectedTemplateVersion(defaultTemplateVersionId);
-                        }
-                        else {
-                            setTemplateVersionData(publishedFundingTemplates);
-                        }
-                    }).catch(() => {
-                        setTemplateVersionData(publishedFundingTemplates);
-                    });
-                }
-            })
-        }
+    function clearErrorMessages() {
+        setErrors([]);
     }
 
     function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
@@ -151,16 +190,19 @@ export function CreateSpecification() {
 
     function selectFundingStream(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingStreamId = e.target.value;
+        clearErrorMessages();
+        setSelectedFundingPeriod("");
+        setSelectedProviderVersionId("");
+        setSelectedTemplateVersion("");
         setSelectedFundingStream(fundingStreamId);
-        populateFundingPeriods(fundingStreamId);
-        populateCoreProviders(fundingStreamId);
-
+        setTemplateVersionData([]);
     }
 
     function selectFundingPeriod(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingPeriodId = e.target.value;
+        clearErrorMessages();
+        setSelectedTemplateVersion("");
         setSelectedFundingPeriod(fundingPeriodId);
-        populateTemplateVersion(selectedFundingStream, fundingPeriodId);
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -183,7 +225,7 @@ export function CreateSpecification() {
             selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
-            setCreateSpecificationFailed(false);
+            clearErrorMessages();
             setNewSpecificationId('');
             let assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
@@ -201,8 +243,8 @@ export function CreateSpecification() {
                 const specificationSummary = createSpecificationResult.data as SpecificationSummary;
                 setNewSpecificationId(specificationSummary.id);
             } catch {
-                setCreateSpecificationFailed(true);
                 setIsLoading(false);
+                addErrorMessage("Specification failed to create. Please try again.");
             }
         } else {
             setFormValid({formSubmitted: true, formValid: false})
@@ -222,7 +264,7 @@ export function CreateSpecification() {
                     subTitle={"Please wait whilst we create the specification"}
                     description={"This can take a few minutes"} id={"create-specification"}
                     hidden={!isLoading} />
-                <div hidden={!createSpecificationFailed}
+                <div hidden={errors.length === 0}
                     className="govuk-error-summary"
                     aria-labelledby="error-summary-title" role="alert"
                     data-module="govuk-error-summary">
@@ -231,14 +273,13 @@ export function CreateSpecification() {
                     </h2>
                     <div className="govuk-error-summary__body">
                         <ul className="govuk-list govuk-error-summary__list">
-                            <li>
-                                <p className="govuk-body">
-                                    Specification failed to create, please try again
-                                </p>
-                            </li>
-                            <li>
-                                {createSpecificationFailOutcome}
-                            </li>
+                            {errors.map((error, i) =>
+                                <li key={i}>
+                                    <p className="govuk-body">
+                                        {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
+                                    </p>
+                                </li>
+                            )}
                             <li>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></li>
                         </ul>
                     </div>
@@ -254,52 +295,54 @@ export function CreateSpecification() {
                         <ErrorSummary title="Form not valid" error="Please complete all fields" suggestion="" />
                     </div>
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="address-line-1">
+                        <label className="govuk-label" htmlFor="specification-name">
                             Specification name
                         </label>
-                        <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
-                            onChange={(e) => saveSpecificationName(e)} />
+                        <input className="govuk-input" id="aspecification-name" name="specification-name" type="text"
+                            onChange={saveSpecificationName} />
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                        <label className="govuk-label" htmlFor="funding-stream">
                             Funding streams
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" onChange={(e) => selectFundingStream(e)}>
-                            <option value="-1">Select funding Stream</option>
+                        <select className="govuk-select" id="funding-stream" name="funding-stream" onChange={selectFundingStream}>
+                            <option value="">Select funding Stream</option>
                             {fundingStreamData.map((fs, index) => <option key={index} value={fs.id}>{fs.name}</option>)}
                         </select>
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                        <label className="govuk-label" htmlFor="funding-period">
                             Funding period
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={fundingPeriodData.length === 0 || fundingPeriodIsLoading} onChange={(e) => selectFundingPeriod(e)}>
-                            <option value="-1">Select funding period</option>
+                        <select className="govuk-select" id="funding-period" name="funding-period"
+                            disabled={fundingPeriodData.length === 0 || fundingPeriodIsLoading} onChange={selectFundingPeriod}>
+                            <option value="">Select funding period</option>
                             {fundingPeriodData.map((fp, index) => <option key={index} value={fp.id}>{fp.name}</option>)}
                         </select>
-                        <LoadingFieldStatus title={"Funding streams loading"} hidden={!fundingPeriodIsLoading} />
+                        <LoadingFieldStatus title={"Funding periods loading"} hidden={!fundingPeriodIsLoading} />
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                        <label className="govuk-label" htmlFor="core-provider-data">
                             Core provider data
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={coreProviderData.length === 0} onChange={(e) => selectCoreProvider(e)}>
-                            <option value="-1">Select core provider</option>
+                        <select className="govuk-select" id="core-provider-data" name="core-provider-data"
+                            disabled={coreProviderData.length === 0} onChange={selectCoreProvider}>
+                            <option value="">Select core provider</option>
                             {coreProviderData.map((cp, index) => <option key={index}
                                 value={cp.providerVersionId}>{cp.name}</option>)}
                         </select>
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                        <label className="govuk-label" htmlFor="template-version">
                             Template version
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0}
-                            onChange={(e) => selectTemplateVersion(e)} value={selectedTemplateVersion || "-1"}>
-                            <option value="-1">Select template version</option>
+                        <select className="govuk-select" id="template-version" name="template-version" disabled={templateVersionData.length === 0}
+                            onChange={selectTemplateVersion} value={selectedTemplateVersion || ""}>
+                            <option value="">Select template version</option>
                             {templateVersionData.map((publishedFundingTemplate, index) =>
                                 <option key={index} value={publishedFundingTemplate.templateVersion}>
                                     {publishedFundingTemplate.templateVersion}

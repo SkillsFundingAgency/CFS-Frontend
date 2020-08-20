@@ -191,7 +191,6 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                         setSelectedTemplateVersion(publishedFundingTemplate.templateVersion);
                                     }
                                 });
-
                             }
                         });
 
