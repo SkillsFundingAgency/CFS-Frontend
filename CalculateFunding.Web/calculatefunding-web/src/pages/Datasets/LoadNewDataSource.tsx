@@ -46,11 +46,7 @@ export function LoadNewDataSource() {
         filenameValid: true,
         fundingStreamValid: true
     });
-    const [errorResponse, setErrorResponse] = useState<NewDatasetVersionResponseErrorModel>({
-            Filename: [],
-            FundingStreamId: []
-        }
-    );
+    const [errorResponse, setErrorResponse] = useState<NewDatasetVersionResponseErrorModel>();
     let history = useHistory();
 
     function getDatasetValidateStatus(operationId: string) {
@@ -73,7 +69,7 @@ export function LoadNewDataSource() {
                         setLoadingStatus(message);
                     }
                 } else {
-                    setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
+                    setValidationFailures({"error-message": ["Unable to get validation status"]});
                     setIsLoading(false);
                     return;
                 }
@@ -82,10 +78,12 @@ export function LoadNewDataSource() {
                     getDatasetValidateStatus(operationId);
                 }, 2500);
             })
-            .catch(() => setValidationFailures({"error-message": ["Unable to get dataset validation status"]}))
-            .finally(() => setIsLoading(false));
+            .catch(() => {
+                setValidationFailures({"error-message": ["Unable to get validation status"]});
+                setIsLoading(false);
+            });
     }
-    
+
     function updateFundingStreamSelection(e: string) {
         const result = fundingStreamSuggestions.filter(x => x.name === e)[0];
         if (result != null) {
@@ -129,6 +127,7 @@ export function LoadNewDataSource() {
 
     function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
         if (uploadFile !== undefined) {
+            debugger
             uploadDataSourceService(
                 request.blobUrl,
                 uploadFile,
@@ -139,26 +138,33 @@ export function LoadNewDataSource() {
                 selectedDataSchema,
                 datasetSourceFileName,
                 description)
-                .then(() => validateDatasetService(
-                    request.datasetId,
-                    request.fundingStreamId,
-                    request.filename,
-                    request.version.toString(),
-                    description,
-                    "")
-                    .then((validateDatasetResponse) => {
-                        const validateOperationId: any = validateDatasetResponse.data.operationId;
-                        if (!validateOperationId) {
-                            setValidationFailures({"error-message": ["Unable to locate dataset validate operationId"]});
-                            setIsLoading(false);
-                            return;
-                        }
-                        getDatasetValidateStatus(validateOperationId)
-                    })
-                    .catch(() => {
-                        setValidationFailures({"error-message": ["Unable to validate dataset"]});
+                .then((uploadResponse) => {
+                    if (uploadResponse.status !== 201) {
+                        setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
                         setIsLoading(false);
-                    }));
+                        return;
+                    }
+                    validateDatasetService(
+                        request.datasetId,
+                        request.fundingStreamId,
+                        request.filename,
+                        request.version.toString(),
+                        description,
+                        "")
+                })
+                .then((validateDatasetResponse) => {
+                    const validateOperationId: any = validateDatasetResponse.data.operationId;
+                    if (!validateOperationId) {
+                        setValidationFailures({"error-message": ["Failed to get validation progress tracking ID"]});
+                        setIsLoading(false);
+                        return;
+                    }
+                    getDatasetValidateStatus(validateOperationId)
+                })
+                .catch((err: AxiosError) => {
+                    setValidationFailures({"error-message": ["Unable to validate dataset: " + err.message]});
+                    setIsLoading(false);
+                });
         }
     }
 
@@ -183,17 +189,20 @@ export function LoadNewDataSource() {
                     dataDefinitionIdValid: true
                 }
             });
-            createDatasetService(request).then((result) => {
-                if (result.status === 200) {
+            createDatasetService(request)
+                .then((result) => {
                     const response = result.data as NewDatasetVersionResponseViewModel;
                     uploadFileToServer(response);
-                }
-            }).catch((error: AxiosError) => {
-                if (error.response !== undefined) {
-                    const response = error.response.data as NewDatasetVersionResponseErrorModel;
-                    setErrorResponse(response);
-                }
-            });
+                })
+                .catch((error: AxiosError) => {
+                    if (error.response !== undefined) {
+                        const response = error.response.data as NewDatasetVersionResponseErrorModel;
+                        debugger
+                        setErrorResponse(response);
+                        setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
+                    }
+                    setIsLoading(false);
+                });
         } else {
             if (request.name === "") {
                 setValidateForm(prevState => {
@@ -353,6 +362,11 @@ export function LoadNewDataSource() {
         }
     }
 
+    const uploadErrorMessage = errorResponse &&
+        (errorResponse.Filename && errorResponse.Filename.length > 0 ? errorResponse.Filename[0] : ""
+        + errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0 ? errorResponse.DefinitionId : ""
+            + errorResponse.FundingStreamId);
+
     return (<div>
             <Header location={Section.Datasets}/>
             <div className="govuk-width-container">
@@ -398,10 +412,12 @@ export function LoadNewDataSource() {
                     <div className="govuk-grid-column-two-thirds">
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
                         <p className="govuk-body">Load a new data source file to create a dataset to use in calculations.</p>
-                        <div className="govuk-form-group" hidden={errorResponse.Filename.length === 0}>
+                        {uploadErrorMessage &&
+                        <div className="govuk-form-group">
                             <ErrorSummary title={"Correct errors to continue with the process"}
-                                          error={errorResponse.Filename.length > 0 ? errorResponse.Filename[0] : ""} suggestion={""}/>
-                        </div>
+                                          error={uploadErrorMessage}
+                                          suggestion={""}/>
+                        </div>}
                         <div className={"govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")}>
                             <label className="govuk-label" htmlFor="sort">
                                 Funding stream

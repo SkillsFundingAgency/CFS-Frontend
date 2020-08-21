@@ -1,4 +1,3 @@
-import { FundingLineUpdateModel } from "../TemplateBuilderDefinitions";
 import {Author} from "../Calculations/Author";
 
 export interface NewDatasetVersionResponseViewModel {
@@ -11,6 +10,7 @@ export interface NewDatasetVersionResponseViewModel {
 }
 
 export interface NewDatasetVersionResponseErrorModel {
+    DefinitionId: string;
     Filename: string[];
     FundingStreamId: string[];
 }
