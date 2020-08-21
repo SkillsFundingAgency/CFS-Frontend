@@ -132,7 +132,7 @@ const App: React.FunctionComponent = () => {
                 <Route path="*">
                     <ConfirmSkills/>
                 </Route>
-            </Switch>}
+            </Switch>
         </BrowserRouter>
     }
 };
