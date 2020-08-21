@@ -104,6 +104,9 @@ export function CalculationItem({
             case CalculationType.Cash:
                 setValueFormat(ValueFormatType.Currency);
                 break;
+            default:
+                setValueFormat("");
+                break;
         }
 
         setType(newType);
@@ -155,8 +158,8 @@ export function CalculationItem({
         validateAllowedEnumTypeValues(newValue);
         if (newValue.length > 0) {
             allowedEnumTypeValues.length > 0 ?
-            setAllowedEnumTypeValues(allowedEnumTypeValues.concat(",", newValue)) :
-            setAllowedEnumTypeValues(newValue);
+                setAllowedEnumTypeValues(allowedEnumTypeValues.concat(",", newValue)) :
+                setAllowedEnumTypeValues(newValue);
         }
     };
 
@@ -290,6 +293,7 @@ export function CalculationItem({
 
         return (
             <>
+                <option value="">Please select</option>
                 <option value={ValueFormatType.Number}>Number</option>
                 <option value={ValueFormatType.Percentage}>Percentage</option>
                 <option value={ValueFormatType.Currency}>Currency</option>
@@ -368,6 +372,18 @@ export function CalculationItem({
         return true;
     };
 
+    const validateValueFormat = (value: ValueFormatType) => {
+        const fieldName = "calculation-value-format";
+        clearErrorMessages(fieldName);
+
+        if (value.length === 0) {
+            addErrorMessage("Please select a value format", fieldName);
+            return false;
+        }
+
+        return true;
+    }
+
     const validateForm = () => {
         clearErrorMessages();
         const isValidCalc = validateCalculationId(calculationId);
@@ -378,9 +394,10 @@ export function CalculationItem({
         const isValidCalculationA = validatePercentageChangeCalculationA(calculationA);
         const isValidCalculationB = validatePercentageChangeCalculationB(calculationB);
         const isValidEnumTypeValues = validateAllowedEnumTypeValues(allowedEnumTypeValues);
+        const isValidValueFormat = validateValueFormat(valueFormat);
 
         return isValidEnumTypeValues && isValidCalc && isValidName && isValidEnums &&
-            isValidNumerator && isValidDenominator && isValidCalculationA && isValidCalculationB;
+            isValidNumerator && isValidDenominator && isValidCalculationA && isValidCalculationB && isValidValueFormat;
     };
 
     const enumValuesError = () => {
@@ -489,10 +506,16 @@ export function CalculationItem({
                         </div>
                     }
                 </div>
-                <div className="govuk-form-group">
+                <div className={`govuk-form-group ${errors.filter(e =>
+                    e.fieldName === "calculation-value-format").length > 0 ? 'govuk-form-group--error' : ''}`}>
                     <label className="govuk-label" htmlFor="calculation-value-format">Value Format</label>
                     {isEditMode ?
                         <>
+                            {errors.map(error => error.fieldName === "calculation-value-format" &&
+                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                </span>
+                            )}
                             <span id="calculation-value-format-hint" className="govuk-hint">The way the value should show</span>
                             <select className="govuk-select" id="calculation-value-format" name="calculation-value-format" value={valueFormat}
                                 onChange={handleValueFormatChange}>
