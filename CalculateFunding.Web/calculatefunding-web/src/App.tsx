@@ -102,21 +102,17 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles}/>
                     <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
                     <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
-                    <Route path="/Datasets/SelectDataSource/:specificationId" component={SelectDataSource}/>
+                    <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
                     <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId" component={SelectDataSourceExpanded}/>
                     <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
                     <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
-                    {featureFlagsState.templateBuilderVisible &&
-                    <>
-                        <Route path="/Templates/List" component={ListTemplates}/>
-                        <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>
-                        <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>
-                        <Route path="/Templates/Create" component={CreateTemplate}/>
-                        <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>
-                        <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>
-                        <Route path="/Templates/:templateId/Versions" component={ListVersions}/>
-                    </>
-                    }
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
                     <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
                     <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation}/>
                     <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation}/>

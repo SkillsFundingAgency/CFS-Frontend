@@ -11,7 +11,7 @@ jest.useFakeTimers();
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
-export const noPermissionsState: FundingStreamPermissions[] = [{
+const noPermissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
     userId: "",
     canAdministerFundingStream: false,
@@ -35,7 +35,7 @@ export const noPermissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: false
 }];
 
-export const permissionsState: FundingStreamPermissions[] = [{
+const permissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
     userId: "",
     canAdministerFundingStream: false,
@@ -77,7 +77,6 @@ const mockTemplate: TemplateResponse = {
     authorId: "",
     authorName: "",
     lastModificationDate: new Date(),
-    publishStatus: "",
     comments: ""
 };
 

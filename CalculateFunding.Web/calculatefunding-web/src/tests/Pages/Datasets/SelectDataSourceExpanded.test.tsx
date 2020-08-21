@@ -13,13 +13,13 @@ const history = createMemoryHistory();
 const location = createLocation("", "", "");
 const matchMock: match<SelectDataSourceRouteProps> = {
     params: {
-        specificationId: "123"
+        datasetRelationshipId: "123"
     },
     path: "",
     isExact: true,
 };
 
-describe("<DatasetHistory />", () => {
+describe("<SelectDataSourceExpanded />", () => {
     it('will have the correct breadcrumbs', () => {
         const wrapper = mount(<MemoryRouter><SelectDataSourceExpanded match={matchMock} location={location} history={history}/></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(5);
@@ -28,10 +28,5 @@ describe("<DatasetHistory />", () => {
     it('will have the correct sub-title', () => {
         const wrapper = mount(<MemoryRouter><SelectDataSourceExpanded match={matchMock} location={location} history={history}/></MemoryRouter>);
         expect(wrapper.find("h4.govuk-heading-s").at(0).text()).toBe("Select data source version");
-    });
-
-    it('will have the correct breadcrumbs', () => {
-        const wrapper = mount(<MemoryRouter><SelectDataSourceExpanded match={matchMock} location={location} history={history}/></MemoryRouter>);
-        expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(5);
     });
 });
