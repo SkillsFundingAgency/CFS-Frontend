@@ -179,7 +179,8 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                 <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio"
                                                        aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false"
                                                        value={d.id}
-                                                       disabled={!canMapDatasets} />
+                                                       disabled={!canMapDatasets}
+                                                       onChange={(e) => populateVersions(e)} />
                                                 <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
                                                     {d.name}
                                                     <span className="govuk-hint">
