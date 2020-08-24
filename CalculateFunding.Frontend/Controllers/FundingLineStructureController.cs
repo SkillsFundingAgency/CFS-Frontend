@@ -12,6 +12,7 @@ using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Extensions;
+using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Common.TemplateMetadata.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
@@ -121,9 +122,101 @@ namespace CalculateFunding.Frontend.Controllers
 		        fundingTemplateContentsApiResponse.Content.RootFundingLines,
 		        templateMappingResponse.Content.TemplateMappingItems.ToList(),
 		        calculationMetadata.Content.ToList(),
-		        providerResultResponse.Content);
+		        providerResultResponse.Content,
+                null);
 
 	        return Ok(fundingStructures);
+        }
+
+        [Route(
+            "api/fundingstructures/results/specifications/{specificationId}/fundingperiods/{fundingPeriodId}/fundingstreams/{fundingStreamId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetFundingStructuresWithCalculationResult(
+            [FromRoute] string fundingStreamId,
+            [FromRoute] string fundingPeriodId,
+            [FromRoute] string specificationId,
+            [FromRoute] string providerId)
+        {
+            ApiResponse<SpecificationSummary> specificationSummaryApiResponse =
+                await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+            IActionResult specificationSummaryApiResponseErrorResult =
+                specificationSummaryApiResponse.IsSuccessOrReturnFailureResult("GetSpecificationSummaryById");
+            if (specificationSummaryApiResponseErrorResult != null)
+            {
+                return specificationSummaryApiResponseErrorResult;
+            }
+
+            string templateVersion = specificationSummaryApiResponse.Content.TemplateIds.ContainsKey(fundingStreamId)
+                ? specificationSummaryApiResponse.Content.TemplateIds[fundingStreamId]
+                : null;
+            if (templateVersion == null)
+                return new InternalServerErrorResult(
+                    $"Specification contains no matching template version for funding stream '{fundingStreamId}'");
+
+            string etag = Request.ReadETagHeaderValue();
+
+            ApiResponse<TemplateMetadataContents> fundingTemplateContentsApiResponse =
+                await _policiesApiClient.GetFundingTemplateContents(fundingStreamId, fundingPeriodId, templateVersion,
+                    etag);
+
+            Response.CopyCacheControlHeaders(fundingTemplateContentsApiResponse.Headers);
+
+            if (fundingTemplateContentsApiResponse.StatusCode == HttpStatusCode.NotModified)
+            {
+                return new StatusCodeResult(304);
+            }
+
+            IActionResult fundingTemplateContentsApiResponseErrorResult =
+                fundingTemplateContentsApiResponse.IsSuccessOrReturnFailureResult("GetFundingTemplateContents");
+            if (fundingTemplateContentsApiResponseErrorResult != null)
+            {
+                return fundingTemplateContentsApiResponseErrorResult;
+            }
+
+            ApiResponse<TemplateMapping> templateMappingResponse =
+                await _calculationsApiClient.GetTemplateMapping(specificationId, fundingStreamId);
+            IActionResult templateMappingResponseErrorResult =
+                templateMappingResponse.IsSuccessOrReturnFailureResult("GetTemplateMapping");
+            if (templateMappingResponseErrorResult != null)
+            {
+                return templateMappingResponseErrorResult;
+            }
+
+            ApiResponse<IEnumerable<CalculationMetadata>> calculationMetadata =
+                await _calculationsApiClient.GetCalculationMetadataForSpecification(specificationId);
+            IActionResult calculationMetadataErrorResult =
+                calculationMetadata.IsSuccessOrReturnFailureResult("calculationMetadata");
+            if (calculationMetadataErrorResult != null)
+            {
+                return calculationMetadataErrorResult;
+            }
+
+            ApiResponse<CalculationProviderResultSearchResults> calculationProviderResultsResponse =
+                await _resultsApiClient.SearchCalculationProviderResults(new SearchModel
+                {
+                    PageNumber = 1,
+                    Top = 10000,
+                    SearchTerm = "",
+                    IncludeFacets = false,
+                    Filters = new Dictionary<string, string[]> {{"specificationId", new[] {specificationId}}}
+                });
+            IActionResult calculationProviderResultsErrorResult =
+                calculationProviderResultsResponse.IsSuccessOrReturnFailureResult("SearchCalculationProviderResults");
+            if (calculationProviderResultsErrorResult != null)
+            {
+                return calculationProviderResultsErrorResult;
+            }
+
+            List<FundingStructureItem> fundingStructures = new List<FundingStructureItem>();
+            RecursivelyAddFundingLineToFundingStructure(
+                fundingStructures,
+                fundingTemplateContentsApiResponse.Content.RootFundingLines,
+                templateMappingResponse.Content.TemplateMappingItems.ToList(),
+                calculationMetadata.Content.ToList(),
+                null,
+                calculationProviderResultsResponse.Content);
+
+            return Ok(fundingStructures);
         }
 
         [Route(
@@ -193,7 +286,8 @@ namespace CalculateFunding.Frontend.Controllers
 		        fundingTemplateContentsApiResponse.Content.RootFundingLines,
 		        templateMappingResponse.Content.TemplateMappingItems.ToList(),
 		        calculationMetadata.Content.ToList(),
-		        null);
+		        null,
+                null);
 
 	        return Ok(fundingStructures);
         }
@@ -203,7 +297,8 @@ namespace CalculateFunding.Frontend.Controllers
 	        List<CalculationMetadata> calculationMetadata,
 	        int level,
 	        FundingLine fundingLine, 
-	        ProviderResultResponse providerResult)
+	        ProviderResultResponse providerResult,
+            CalculationProviderResultSearchResults calculationProviderResultSearchResults)
         {
             level++;
 
@@ -220,7 +315,8 @@ namespace CalculateFunding.Frontend.Controllers
                             level,
                             templateMappingItems,
                             calculationMetadata,
-                            providerResult));
+                            providerResult,
+                            calculationProviderResultSearchResults));
                 }
             }
 
@@ -235,7 +331,7 @@ namespace CalculateFunding.Frontend.Controllers
                         calculationMetadata,
                         level,
                         line,
-                        providerResult));
+                        providerResult, calculationProviderResultSearchResults));
                 }
             }
 
@@ -267,7 +363,8 @@ namespace CalculateFunding.Frontend.Controllers
 	        List<TemplateMappingItem> templateMappingItems,
 	        List<CalculationMetadata> calculationMetadata,
 	        ProviderResultResponse providerResult,
-	        int level = 0) =>
+            CalculationProviderResultSearchResults calculationProviderResultSearchResults,
+            int level = 0) =>
             fundingStructures.AddRange(fundingLines.Select(fundingLine =>
                 RecursivelyAddFundingLines(
                     fundingLine.FundingLines,
@@ -275,26 +372,27 @@ namespace CalculateFunding.Frontend.Controllers
                     calculationMetadata,
                     level,
                     fundingLine,
-                    providerResult)));
+                    providerResult,
+                    calculationProviderResultSearchResults)));
 
 
-        private static FundingStructureItem MapToFundingStructureItem(
-            int level,
+        private static FundingStructureItem MapToFundingStructureItem(int level,
             string name,
             FundingStructureType type,
             string calculationType = null,
             string calculationId = null,
             string calculationPublishStatus = null,
             List<FundingStructureItem> fundingStructureItems = null,
-            string value = null) =>
+            string value = null, 
+            DateTimeOffset? lastUpdatedDate = null) =>
             new FundingStructureItem(
-                level, name, calculationId, calculationPublishStatus, type, calculationType, fundingStructureItems, value);
+                level, name, calculationId, calculationPublishStatus, type, calculationType, fundingStructureItems, value, lastUpdatedDate);
 
         private static FundingStructureItem RecursivelyMapCalculationsToFundingStructureItem(Calculation calculation,
-	        int level, List<TemplateMappingItem> templateMappingItems,
-	        List<CalculationMetadata> calculationMetadata,
-	        ProviderResultResponse providerResult)
-
+            int level, List<TemplateMappingItem> templateMappingItems,
+            List<CalculationMetadata> calculationMetadata,
+            ProviderResultResponse providerResult,
+            CalculationProviderResultSearchResults calculationProviderResultSearchResults)
         {
             level++;
 
@@ -315,6 +413,13 @@ namespace CalculateFunding.Frontend.Controllers
 	            CalculationValueTypeViewModel calculationValueTypeViewModel = calculationType.AsEnum<CalculationValueTypeViewModel>();
                 calculationValue = calculationResult.Value.AsFormatCalculationType(calculationValueTypeViewModel);
             }
+
+            DateTimeOffset? lastUpdatedDate = null;
+            CalculationProviderResultSearchResult calculationProviderResult = calculationProviderResultSearchResults?.Results?.FirstOrDefault(c => c.Id == calculationId);
+            if (calculationProviderResult != null)
+            {
+                lastUpdatedDate = calculationProviderResult.LastUpdatedDate;
+            }
             
             if (calculation.Calculations != null && calculation.Calculations.Any())
             {
@@ -324,7 +429,8 @@ namespace CalculateFunding.Frontend.Controllers
                             level,
                             templateMappingItems,
                             calculationMetadata,
-                            providerResult))
+                            providerResult, 
+                            calculationProviderResultSearchResults))
                     .ToList();
             }
 
@@ -336,7 +442,8 @@ namespace CalculateFunding.Frontend.Controllers
                 calculationId,
                 calculationPublishStatus,
                 innerFundingStructureItems,
-                calculationValue);
+                calculationValue,
+                lastUpdatedDate);
 
             return fundingStructureItem;
         }

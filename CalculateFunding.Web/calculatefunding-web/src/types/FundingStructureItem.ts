@@ -12,6 +12,7 @@ export interface IFundingStructureItem {
     parentName: string;
     expanded: boolean;
     customRef: React.MutableRefObject<null>;
+    lastUpdatedDate?: Date
 }
 
 export enum FundingStructureType{

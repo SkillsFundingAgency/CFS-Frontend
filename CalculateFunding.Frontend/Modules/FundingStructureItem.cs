@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.Modules
 {
@@ -10,9 +11,9 @@ namespace CalculateFunding.Frontend.Modules
 		public string CalculationPublishStatus { get; }
 		public FundingStructureType Type { get; }
 		public string Value { get; set; }
-		public string CalculationType { get; set; }
-
-		public List<FundingStructureItem> FundingStructureItems { get; set; }
+		public string CalculationType { get; }
+        public List<FundingStructureItem> FundingStructureItems { get; }
+        public DateTimeOffset? LastUpdatedDate { get; }
 
 		public FundingStructureItem(
 			int level,
@@ -22,7 +23,8 @@ namespace CalculateFunding.Frontend.Modules
 			FundingStructureType type, 
 			string calculationType = null,
 			List<FundingStructureItem> fundingStructureItems = null,
-			string value = null)
+			string value = null, 
+            DateTimeOffset? lastUpdatedDate = null)
 		{
 			Level = level;
 			Name = name;
@@ -32,6 +34,7 @@ namespace CalculateFunding.Frontend.Modules
 			FundingStructureItems = fundingStructureItems;
 			Value = value;
 			CalculationType = calculationType;
-		}
+            LastUpdatedDate = lastUpdatedDate;
+        }
 	}
 }

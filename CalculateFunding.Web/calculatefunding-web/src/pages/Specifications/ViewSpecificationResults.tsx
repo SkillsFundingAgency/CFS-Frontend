@@ -14,24 +14,46 @@ import {AppState} from "../../states/AppState";
 import {ViewSpecificationResultsState} from "../../states/ViewSpecificationResultsState";
 import Pagination from "../../components/Pagination";
 import {Section} from "../../types/Sections";
-import {getDownloadableReportsService} from "../../services/specificationService";
+import {
+    getDownloadableReportsService
+} from "../../services/specificationService";
 import {ReportMetadataViewModel} from "../../types/Specifications/ReportMetadataViewModel";
 import {DateFormatter} from "../../components/DateFormatter";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {AutoComplete} from "../../components/AutoComplete";
+import {CollapsibleSteps} from "../../components/CollapsibleSteps";
+import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
+import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
+import {BackToTop} from "../../components/BackToTop";
+import {useRef} from "react";
+import {
+    expandCalculationsByName, getDistinctOrderedFundingLineCalculations,
+    updateFundingLineExpandStatus
+} from "../../components/fundingLineStructure/FundingLineStructure";
+import {
+    GetFundingStructuresWithCalculationResultService
+} from "../../services/fundingStructuresService";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
 }
 
-
 export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecificationResultsRoute>) {
     const dispatch = useDispatch();
     const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState('');
-    const [templateCalculationsSearchTerm, setTemplateCalculationsSearchTerm] = useState('');
-    const [templateStatusFilter, setTemplateStatusFilter] = useState("All");
+    const [templateCalculationsSearchTerm] = useState('');
     const [additionalStatusFilter, setAdditionalStatusFilter] = useState("All");
     const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
+    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
+    const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
+    const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
+    const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
+    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
+    const fundingLineStepReactRef = useRef(null);
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
@@ -53,15 +75,11 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                 setDownloadableReports(response);
             }
         });
-            }, [specificationId]);
+    }, [specificationId]);
 
-
-
-    function updateTemplateCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
-        const filter = event.target.value;
-        setTemplateStatusFilter(filter);
-        dispatch(getTemplateCalculations(specificationId, filter, 1, templateCalculationsSearchTerm));
-    }
+    useEffect(() => {
+        fetchData();
+    }, [specificationResults]);
 
     function updateAdditionalCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
@@ -77,12 +95,43 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         setAdditionalCalculationsSearchTerm(e.target.value);
     }
 
-    function searchTemplateCalculations() {
-        dispatch(getTemplateCalculations(specificationId, templateStatusFilter, 1, templateCalculationsSearchTerm));
+    function searchFundingLines(calculationName: string) {
+        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
+        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef);
+        setFundingLines(fundingLinesCopy);
     }
 
-    function templatesCalculationsSearch(e: React.ChangeEvent<HTMLInputElement>) {
-        setTemplateCalculationsSearchTerm(e.target.value);
+    function openCloseAllFundingLines() {
+        setFundingLinesExpandedStatus(!fundingLinesExpandedStatus);
+        updateFundingLineExpandStatus(fundingLines, !fundingLinesExpandedStatus);
+    }
+
+    useEffect(() => {
+        if (fundingLines.length !== 0) {
+            if (fundingLinesOriginalData.length === 0) {
+                setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
+                setFundingLinesOriginalData(fundingLines);
+            }
+            setIsLoadingFundingLineStructure(false);
+        }
+    }, [fundingLines]);
+
+    const fetchData = async () => {
+        if (specificationResults.specification != undefined && specificationResults.specification.fundingPeriod != undefined
+        && specificationResults.specification.fundingStreams[0] != undefined) {
+            try {
+                setIsLoadingFundingLineStructure(true);
+                const fundingLineStructureResponse = await GetFundingStructuresWithCalculationResultService(specificationResults.specification.id,
+                    specificationResults.specification.fundingPeriod.id, specificationResults.specification.fundingStreams[0].id);
+                const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];
+                setFundingLines(fundingStructureItem);
+            } catch (err) {
+                setFundingLineStructureError(true);
+                setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
+            } finally {
+                setIsLoadingFundingLineStructure(false);
+            }
+        }
     }
 
     return <div>
@@ -94,6 +143,24 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
                 <Breadcrumb name={specificationResults.specification.name} />
             </Breadcrumbs>
+            {errors.length > 0 &&
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column">
+                    <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
+                        <h2 className="govuk-error-summary__title" id="error-summary-title">
+                            There is a problem
+                        </h2>
+                        <div className="govuk-error-summary__body">
+                            <ul className="govuk-list govuk-error-summary__list">
+                                {errors.map((error, i) =>
+                                    <li key={i}>{error}</li>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
@@ -103,68 +170,77 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                 </div>
                 <div className="govuk-grid-row govuk-!-padding-top-5">
                     <div className="govuk-grid-column-full">
-                        <Tabs initialTab="template-calculations">
+                        <Tabs initialTab="fundingline-structure">
                             <ul className="govuk-tabs__list">
-                                <Tabs.Tab label="template-calculations">Template Calculations</Tabs.Tab>
+                                <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                                 <Tabs.Tab label="additional-calculations">Additional Calculations</Tabs.Tab>
                                 <Tabs.Tab label="downloadable-reports">Downloadable Reports</Tabs.Tab>
                             </ul>
-                            <Tabs.Panel label="template-calculations">
-                                <section className="govuk-tabs__panel" id="template-calculations">
-                                    <h2 className="govuk-heading-l">Template Calculations</h2>
-                                    <input className="govuk-input govuk-!-width-three-quarters govuk-!-margin-right-1"
-                                           type="text" onChange={(e) => templatesCalculationsSearch(e)}/>
-                                    <button className="govuk-button" onClick={searchTemplateCalculations}>Search
-                                    </button>
-                                    <p className="govuk-body">
-                                        Filter by calculation status
-                                    </p>
-                                    <select name="calculationStatus" id="calculationStatus" className="govuk-select"
-                                            onChange={(e) => {
-                                                updateTemplateCalculations(e)
-                                            }}>
-                                        <option value="All">All</option>
-                                        <option value="Draft">Draft</option>
-                                        <option value="Approved">Approved</option>
-                                        <option value="Updated">Updated</option>
-                                        <option value="Archived">Archived</option>
-                                    </select>
-                                    <table className="govuk-table">
-                                        <thead className="govuk-table__head">
-                                        <tr className="govuk-table__row">
-                                            <th scope="col" className="govuk-table__header">Calculation Name</th>
-                                            <th scope="col" className="govuk-table__header">Status</th>
-                                            <th scope="col" className="govuk-table__header">Updated</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody className="govuk-table__body">
-                                        {specificationResults.templateCalculations.results.map(tc =>
-                                            <tr key={tc.id} className="govuk-table__row">
-                                                <td className="govuk-table__cell">
-                                                    <Link to={`/ViewCalculationResults/${tc.id}`}>{tc.name}</Link>
-                                                </td>
-                                                <td className="govuk-table__cell">{tc.status}</td>
-                                                <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
-                                            </tr>
-                                        )}
-                                        <tr className="govuk-table__row"
-                                            hidden={specificationResults.templateCalculations.totalCount > 0}>
-                                            <td className="govuk-table__cell" colSpan={3}>No results were found.</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <div className="govuk-grid-row">
+                            <Tabs.Panel label="fundingline-structure">
+                                <section className="govuk-tabs__panel" id="fundingline-structure">
+                                    <LoadingStatus title={"Loading funding line structure"}
+                                                   hidden={!isLoadingFundingLineStructure}
+                                                   description={"Please wait whilst funding line structure is loading"}/>
+                                    <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                                         <div className="govuk-grid-column-two-thirds">
-                                            <Pagination
-                                                currentPage={specificationResults.templateCalculations.currentPage}
-                                                lastPage={specificationResults.templateCalculations.lastPage}
-                                                callback={() => {
-                                                }}/>
-                                        </div>
-                                        <div className="govuk-grid-column-one-third govuk-body govuk-!-padding-top-4">
-                                            Showing {specificationResults.templateCalculations.startItemNumber} - {specificationResults.templateCalculations.endItemNumber} of {specificationResults.templateCalculations.totalResults} results
+                                            <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
                                         </div>
                                     </div>
+                                    <div className="govuk-grid-row" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
+                                        <div className="govuk-grid-column-full">
+                                            <h2 className="govuk-heading-l">Funding line structure</h2>
+                                        </div>
+                                        <div className="govuk-grid-column-full">
+                                            <div className="govuk-form-group search-container">
+                                                <label className="govuk-label">
+                                                    Search by calculation
+                                                </label>
+                                                <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
+                                        <button type="button" className="govuk-accordion__open-all"
+                                                aria-expanded="false"
+                                                onClick={openCloseAllFundingLines}
+                                                hidden={fundingLinesExpandedStatus}>Open all<span
+                                            className="govuk-visually-hidden"> sections</span></button>
+                                        <button type="button" className="govuk-accordion__open-all"
+                                                aria-expanded="true"
+                                                onClick={openCloseAllFundingLines}
+                                                hidden={!fundingLinesExpandedStatus}>Close all<span
+                                            className="govuk-visually-hidden"> sections</span></button>
+                                    </div>
+                                    <ul className="collapsible-steps">
+                                        {
+                                            fundingLines.map((f, index) => {
+                                                let linkValue = '';
+                                                if (f.calculationId != null && f.calculationId !== '') {
+                                                    linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
+                                                }
+                                                return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
+                                                    <CollapsibleSteps
+                                                        customRef={f.customRef}
+                                                        key={"collapsible-steps" + index}
+                                                        uniqueKey={index.toString()}
+                                                        title={FundingStructureType[f.type]}
+                                                        description={f.name}
+                                                        status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
+                                                            f.calculationPublishStatus : ""}
+                                                        step={f.level.toString()}
+                                                        expanded={fundingLinesExpandedStatus || f.expanded}
+                                                        link={linkValue}
+                                                        hasChildren={f.fundingStructureItems != null}
+                                                        lastUpdatedDate={f.lastUpdatedDate}>
+                                                        <FundingLineStep key={f.name.replace(" ", "") + index}
+                                                                         expanded={fundingLinesExpandedStatus}
+                                                                         fundingStructureItem={f}/>
+                                                    </CollapsibleSteps>
+                                                </li>
+                                            })}
+                                    </ul>
+                                    <BackToTop id={"fundingline-structure"} hidden={fundingLines == null ||
+                                    fundingLines.length === 0}/>
                                 </section>
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">

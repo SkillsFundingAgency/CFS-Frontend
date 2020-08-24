@@ -1,6 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import {DateFormatter} from "./DateFormatter";
 interface ICollapsibleStepsProps {
     uniqueKey: string;
     step: string;
@@ -13,6 +14,7 @@ interface ICollapsibleStepsProps {
     expanded: boolean;
     hasChildren: boolean;
     customRef: React.MutableRefObject<null>;
+    lastUpdatedDate?: Date;
 }
 
 export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleStepsProps>) {
@@ -33,7 +35,10 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
     return (
         <ul>
         <li ref={props.customRef} key={"step" + listKey} className="collapsible-step step-is-shown">
-            <div key={listKey + "header"} className={`collapsible-step-header-container ${props.value != null && props.value !=="" ? " collapsible-step-header-with-calculation-value" : ""}`}>
+            <div key={listKey + "header"}
+                 className={`collapsible-step-header-container 
+                 ${props.value != null && props.value !=="" ? " collapsible-step-header-with-calculation-value" : ""}
+                 ${props.lastUpdatedDate != null && props.lastUpdatedDate !=="" ? " collapsible-step-header-with-updated-date" : ""}`}>
                 <h2 className={props.step === "1" ? "govuk-heading-s first-step-title" : "govuk-heading-s"}>
                     <span className="collapsible-step-circle collapsible-step-circle-number" hidden={props.step === ""}>
                         <span className="collapsible-step-circle-inner">
@@ -67,6 +72,9 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
                                 </span>
                             : null
                         }
+                    </span>
+                    <span className="collapsible-step-header-updated-date">
+                        <DateFormatter date={props.lastUpdatedDate} utc={true} />
                     </span>
                     <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={() => setExpanded(!expanded)}>
                         <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}/>

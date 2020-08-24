@@ -19,3 +19,12 @@ export async function getFundingLineStructureByProviderService(specificationId: 
         },
     });
 }
+
+export async function GetFundingStructuresWithCalculationResultService(specificationId: string, fundingPeriodId: string, fundingStreamId: string) {
+    return axios(`${baseURL}/results/specifications/${specificationId}/fundingperiods/${fundingPeriodId}/fundingstreams/${fundingStreamId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}

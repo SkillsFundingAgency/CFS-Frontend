@@ -35,7 +35,8 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                             step={displayFundingType?innerFundingLineItem.level.toString(): ""}
                             expanded={expanded || innerFundingLineItem.expanded}
                             link={linkValue}
-                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
+                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}
+                            lastUpdatedDate={innerFundingLineItem.lastUpdatedDate}>
                             {
                                 innerFundingLineItem.fundingStructureItems ?
                                     (<FundingLineStep fundingStructureItem={innerFundingLineItem} expanded={expanded} />)
