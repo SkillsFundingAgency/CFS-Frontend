@@ -11,6 +11,7 @@ import {CalculationVersionHistorySummary} from "../../types/Calculations/Calcula
 import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {Footer} from "../../components/Footer";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -199,6 +200,6 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                 </div>
             </div>
         </div>
+        <Footer/>
     </div>
-
 }

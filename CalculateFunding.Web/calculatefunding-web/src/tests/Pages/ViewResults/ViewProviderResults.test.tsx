@@ -20,7 +20,6 @@ describe("<ViewProviderResults />", () => {
     it('will render the page', () => {
         const wrapper = mount(<MemoryRouter><ViewProviderResults match={matchMock} location={location} history={history} /></MemoryRouter>);
 
-        expect(wrapper.find(".govuk-width-container").length).toBe(3);
         expect(wrapper.find('#searchProviders')).toBeTruthy();
         expect(wrapper.find('.govuk-form-group').length).toBe(3);
     });

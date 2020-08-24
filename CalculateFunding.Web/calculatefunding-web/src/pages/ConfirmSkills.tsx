@@ -5,8 +5,6 @@ import {Footer} from "../components/Footer";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router";
 import {updateUserConfirmedSkills} from "../actions/userAction";
-import {AppState} from "../states/AppState";
-import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
 import {IStoreState} from "../reducers/rootReducer";
 
 export const ConfirmSkills = () => {

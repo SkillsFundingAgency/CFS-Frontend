@@ -14,6 +14,7 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {getUserPermissionsService} from "../../services/userService";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {PermissionStatus} from "../../components/PermissionStatus";
+import {Footer} from "../../components/Footer";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -244,6 +245,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                     </div>
                 </div>}
             </div>
+            <Footer/>
         </div>
     )
 }

@@ -11,6 +11,7 @@ import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {Footer} from "../../components/Footer";
 
 export function FundingApprovalSelection() {
 
@@ -163,5 +164,6 @@ export function FundingApprovalSelection() {
                 </div>
             </div>
         </div>
+        <Footer/>
     </div>
 }

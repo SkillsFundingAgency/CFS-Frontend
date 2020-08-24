@@ -13,6 +13,7 @@ import {ProfileArchiveViewModel} from "../../types/Profiling/ProfileArchiveViewM
 import {AccordianPanel} from "../../components/AccordianPanel";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Footer} from "../../components/Footer";
 
 export interface ProfilingArchiveRouteProps {
     specificationId: string;
@@ -187,5 +188,6 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
                    className="govuk-back-link">Back</a>
             </div>
         </div>
+        <Footer/>
     </div>
 }

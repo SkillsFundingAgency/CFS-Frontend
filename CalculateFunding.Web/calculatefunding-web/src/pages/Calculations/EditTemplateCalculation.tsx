@@ -28,6 +28,7 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {Footer} from "../../components/Footer";
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
@@ -399,5 +400,6 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 </Link>
             </fieldset>
         </div>
+        <Footer/>
     </div>
 }

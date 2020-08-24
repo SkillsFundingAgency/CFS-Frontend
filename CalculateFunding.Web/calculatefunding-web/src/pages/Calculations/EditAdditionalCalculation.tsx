@@ -28,6 +28,7 @@ import {useEffect, useState} from "react";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import React from "react";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
+import {Footer} from "../../components/Footer";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -444,5 +445,6 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 </Link>
             </fieldset>
         </div>
+        <Footer/>
     </div>
 }

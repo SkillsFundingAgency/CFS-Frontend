@@ -288,6 +288,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         </tr>
                                         </tbody>
                                     </table>
+                                    {specificationResults.additionalCalculations.totalResults > 0 &&
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-two-thirds">
                                             <Pagination
@@ -299,7 +300,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         <div className="govuk-grid-column-one-third govuk-body govuk-!-padding-top-4">
                                             Showing {specificationResults.additionalCalculations.startItemNumber} - {specificationResults.additionalCalculations.endItemNumber} of {specificationResults.additionalCalculations.totalResults} results
                                         </div>
-                                    </div>
+                                    </div>}
                                 </section>
                             </Tabs.Panel>
                             <Tabs.Panel label="downloadable-reports">
@@ -397,6 +398,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                 </div>
             </div>
         </div>
+        &nbsp;
         <Footer/>
     </div>
 }

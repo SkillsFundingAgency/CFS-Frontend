@@ -247,10 +247,11 @@ export function DownloadDataSchema() {
                         </tbody>
                     </table>
                     <BackToTop id={"top"} />
+                    {datasetDefinitions.totalResults > 0 &&
                     <nav role="navigation" aria-label="Pagination">
                         <div className="pagination__summary">Showing {datasetDefinitions.startItemNumber} - {datasetDefinitions.endItemNumber} of {datasetDefinitions.totalResults} results</div>
                         <Pagination currentPage={datasetDefinitions.currentPage} lastPage={datasetDefinitions.pagerState.lastPage} callback={setPagination}/>
-                    </nav>
+                    </nav>}
                 </div>
             </div>
         </div>

@@ -6,7 +6,6 @@ import {Link, RouteComponentProps} from "react-router-dom";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {SearchMode} from "../../types/SearchMode";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {GetProvidersByFundingStreamService} from "../../services/providerService";
 import {
     PagedProviderVersionSearchResults,
@@ -19,6 +18,7 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {NoData} from "../../components/NoData";
 import {getFundingStreamByIdService} from "../../services/policyService";
 import {FundingStream} from "../../types/viewFundingTypes";
+import {Footer} from "../../components/Footer";
 export interface ViewProvidersByFundingStreamRouteProps {
     fundingStreamId: string;
 }
@@ -360,13 +360,15 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                         )
                     }
                     <BackToTop id="top" />
-                    <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                    {!isLoading && providerVersionSearchResults.totalCount > 0 &&
+                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">
                         <div className="pagination__summary">Showing {providerVersionSearchResults.startItemNumber} - {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount} results</div>
                         <Pagination currentPage={providerVersionSearchResults.pagerState.currentPage} lastPage={providerVersionSearchResults.pagerState.lastPage} callback={pageChange}/>
-                    </nav>
+                    </nav>}
                 </div>
             </div>
         </div>
+        <Footer/>
     </div>
 }

@@ -1,15 +1,21 @@
 import React, {useEffect} from 'react';
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {Home} from "./pages/Home";
+import {IStoreState} from './reducers/rootReducer';
+import {IUserState} from "./states/IUserState";
+import {FeatureFlagsState} from './states/FeatureFlagsState';
+import {getHasUserConfirmedSkills, getUserFundingStreamPermissions} from "./actions/userAction";
+import {initialiseAxios} from './services/axiosInterceptor';
 import './App.scss'
 import {Footer} from "./components/Footer";
+import {Section} from "./types/Sections";
+import {Home} from "./pages/Home";
 import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
 import {ViewCalculationResults} from "./pages/ViewCalculationResults";
 import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
-import {CreateDatasetPage} from "./pages/CreateDatasetPage";
+import {CreateDataset} from "./pages/Datasets/CreateDataset";
 import {EditSpecification} from "./pages/Specifications/EditSpecification";
 import {ListTemplates} from "./pages/Templates/ListTemplates";
 import {PublishTemplate} from "./pages/Templates/PublishTemplate";
@@ -17,7 +23,6 @@ import {EditTemplate} from "./pages/Templates/EditTemplate";
 import {CreateTemplate} from "./pages/Templates/CreateTemplate";
 import {CloneTemplate} from "./pages/Templates/CloneTemplate";
 import {ListVersions} from "./pages/Templates/ListVersions";
-import {Section} from "./types/Sections";
 import {SelectSpecification} from "./pages/Specifications/SelectSpecification";
 import {SpecificationsList} from "./pages/Specifications/SpecificationsList";
 import {ViewSpecificationResults} from "./pages/Specifications/ViewSpecificationResults";
@@ -26,14 +31,10 @@ import {CreateAdditionalCalculation} from "./pages/Calculations/CreateAdditional
 import {EditAdditionalCalculation} from "./pages/Calculations/EditAdditionalCalculation";
 import {EditTemplateCalculation} from "./pages/Calculations/EditTemplateCalculation";
 import {ManageData} from "./pages/Datasets/ManageData";
-import {Approvals} from "./pages/Approvals";
 import {EditVariationPoints} from "./pages/Specifications/EditVariationPoints";
 import {CalculationVersionHistory} from "./pages/Calculations/CalculationVersionHistory";
 import {FundingApprovalSelection} from "./pages/FundingApprovals/FundingApprovalSelection";
-import {useDispatch} from "react-redux";
 import {getFeatureFlags} from "./actions/FeatureFlagsActions";
-import {IStoreState} from './reducers/rootReducer';
-import {FeatureFlagsState} from './states/FeatureFlagsState';
 import {DownloadDataSchema} from "./pages/Datasets/DownloadDataSchema";
 import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
@@ -41,7 +42,6 @@ import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
 import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
 import {MapDataSourceFiles} from "./pages/Datasets/MapDataSourceFiles";
-import {initialiseAxios} from './services/axiosInterceptor';
 import {ViewProvidersFundingStreamSelection} from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 import {DataRelationships} from "./pages/Datasets/DataRelationships";
@@ -51,8 +51,7 @@ import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpande
 import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
 import {UserConfirmLeavePageModal} from "./components/UserConfirmLeavePageModal";
 import {ConfirmSkills} from "./pages/ConfirmSkills";
-import {IUserState} from "./states/IUserState";
-import {getHasUserConfirmedSkills, getUserFundingStreamPermissions} from "./actions/userAction";
+import {LoadingStatus} from "./components/LoadingStatus";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -67,11 +66,20 @@ const App: React.FunctionComponent = () => {
             dispatch(getFeatureFlags());
             dispatch(getUserFundingStreamPermissions());
         };
-        
+
         initialise();
     }, []);
 
-    if (userState.hasConfirmedSkills) {
+    if (userState.hasConfirmedSkills === undefined) {
+        return (
+            <div>
+                <LoadingStatus title={"Loading"}
+                               subTitle={"Please wait while the page is loading..."}/>
+                <Footer/>
+            </div>
+        );
+    }
+    if (userState.hasConfirmedSkills === true) {
         return (
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
@@ -93,7 +101,7 @@ const App: React.FunctionComponent = () => {
                     <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId"
                            component={ProviderFundingOverview}/>
                     <Route path="/FundingApprovals/ProfilingArchive/:specificationId/:providerId/:providerVersionId" component={ProfilingArchive}/>
-                    <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetPage}/>
+                    <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
                     <Route path="/Datasets/ManageData" component={ManageData}/>
                     <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>
                     <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory}/>
@@ -103,7 +111,8 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
                     <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
                     <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
-                    <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId" component={SelectDataSourceExpanded}/>
+                    <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
+                           component={SelectDataSourceExpanded}/>
                     <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
                     <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
@@ -125,7 +134,7 @@ const App: React.FunctionComponent = () => {
             </BrowserRouter>
         );
     } else {
-        return <BrowserRouter basename="/app" >
+        return <BrowserRouter basename="/app">
             <Switch>
                 <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
                 <Route path="*">

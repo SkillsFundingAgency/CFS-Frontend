@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { AppState } from "../states/AppState";
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import { TemplatePermissions } from "../types/TemplateBuilderDefinitions";
-import {IUserState} from "../states/IUserState";
 import {IStoreState} from "../reducers/rootReducer";
 
 export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {

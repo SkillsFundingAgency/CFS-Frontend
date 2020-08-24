@@ -3,18 +3,19 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {assignDataSourceService, getDatasetBySpecificationIdService, getExpandedDataSources} from "../../services/datasetService";
+import {assignDataSourceService, getExpandedDataSources} from "../../services/datasetService";
 import {RouteComponentProps, useHistory} from "react-router";
 import {DateFormatter} from "../../components/DateFormatter";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {Content, SelectDatasetResponseViewModel} from "../../types/Datasets/SelectDatasetResponseViewModel";
+import {Content} from "../../types/Datasets/SelectDatasetResponseViewModel";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {DatasetRelationshipPagedResponseViewModel} from "../../types/Datasets/DatasetRelationshipPagedResponseViewModel";
 import Pagination from "../../components/Pagination";
 import {SearchMode} from "../../types/SearchMode";
 import {DatasourceVersionSearchModel} from "../../types/Datasets/DatasourceVersionSearchModel";
+import {Footer} from "../../components/Footer";
 
 export interface SelectDataSourceExpandedRouteProps {
     specificationId: string;
@@ -242,6 +243,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                     </div>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 }

@@ -18,6 +18,7 @@ import {
     DatasetValidateStatusResponse, UpdateNewDatasetVersionResponseViewModel,
     ValidationStates
 } from "../../types/Datasets/UpdateDatasetRequestViewModel";
+import {Footer} from "../../components/Footer";
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
     datasetId: string;
@@ -390,5 +391,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 </Link>
             </fieldset>
         </div>
+        <Footer/>
     </div>
 }

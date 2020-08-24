@@ -8,6 +8,7 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useHistory} from "react-router";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import {Footer} from "../../components/Footer";
 
 export function ViewProvidersFundingStreamSelection() {
     const [fundingStreams, setFundingStreams] = useState<string[]>([]);
@@ -106,5 +107,6 @@ export function ViewProvidersFundingStreamSelection() {
                     : null
             }
         </div>
+        <Footer/>
     </div>
 }

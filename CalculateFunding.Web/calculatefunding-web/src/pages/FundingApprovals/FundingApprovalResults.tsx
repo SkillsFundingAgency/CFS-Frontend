@@ -27,6 +27,7 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {NoData} from "../../components/NoData";
 import {FacetValue} from "../../types/Facet";
 import {CollapsibleSearchBox} from "../../components/CollapsibleSearchBox";
+import {Footer} from "../../components/Footer";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;
@@ -521,6 +522,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                         </tbody>
                     </table>
                     <BackToTop id="top"/>
+                    {publishedProviderResults.totalResults > 0 &&
                     <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">
                         <div
@@ -528,7 +530,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                         </div>
                         <Pagination callback={pageChange} currentPage={publishedProviderResults.pagerState.currentPage}
                                     lastPage={publishedProviderResults.pagerState.lastPage}/>
-                    </nav>
+                    </nav>}
                     <div className="right-align">
                         <button className="govuk-button govuk-!-margin-right-1"
                                 disabled={!publishedProviderResults.canApprove || !userPermissions.canApproveFunding}
@@ -757,5 +759,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                     callback={refreshProviderResults}/>
             </div>
         </div>
+        <Footer/>
     </div>
 }

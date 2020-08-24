@@ -1,21 +1,22 @@
 import React, {useEffect, useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
-import {Header} from "../components/Header";
-import {assignDatasetSchemaUpdateService, getDatasetsForFundingStreamService} from "../services/datasetService";
-import {LoadingStatus} from "../components/LoadingStatus";
-import {ConfirmationPanel} from "../components/ConfirmationPanel";
-import {Section} from "../types/Sections";
+import {Header} from "../../components/Header";
+import {assignDatasetSchemaUpdateService, getDatasetsForFundingStreamService} from "../../services/datasetService";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {ConfirmationPanel} from "../../components/ConfirmationPanel";
+import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
-import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
-import {getSpecificationSummaryService} from "../services/specificationService";
-import {SpecificationSummary} from "../types/SpecificationSummary";
-import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsViewModel";
+import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+import {getSpecificationSummaryService} from "../../services/specificationService";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
+import {Footer} from "../../components/Footer";
 
 interface CreateDatasetPageRoute {
     specificationId: string
 }
 
-export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPageRoute>) {
+export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRoute>) {
     const specificationId = match.params.specificationId;
     let history = useHistory();
 
@@ -321,5 +322,6 @@ export function CreateDatasetPage({match}: RouteComponentProps<CreateDatasetPage
                 </div>
             </div>
         </div>
+        <Footer/>
     </div>
 }

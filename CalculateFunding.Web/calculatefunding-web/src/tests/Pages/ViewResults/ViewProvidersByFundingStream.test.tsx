@@ -23,7 +23,6 @@ describe("<ViewProvidersByFundingStream />", () => {
     it('will render the page', () => {
         const wrapper = mount(<MemoryRouter><ViewProvidersByFundingStream match={matchMock} location={location} history={history} /></MemoryRouter>);
 
-        expect(wrapper.find(".govuk-width-container").length).toBe(3);
         expect(wrapper.find('#searchProviders')).toBeTruthy();
         expect(wrapper.find('.govuk-form-group').length).toBe(4);
         expect(wrapper.find('h1').text()).toBe("View provider results");

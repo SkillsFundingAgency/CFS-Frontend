@@ -20,7 +20,7 @@ import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpe
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
-import {getDefaultTemplateVersionService, getTemplatesService} from "../../services/policyService";
+import {getTemplatesService} from "../../services/policyService";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;

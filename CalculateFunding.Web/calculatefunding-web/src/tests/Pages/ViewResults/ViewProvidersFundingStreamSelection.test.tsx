@@ -7,7 +7,6 @@ describe("<ViewProvidersFundingStreamSelection />", () => {
     it('will render the page', () => {
         const wrapper = mount(<MemoryRouter><ViewProvidersFundingStreamSelection/></MemoryRouter>);
 
-        expect(wrapper.find(".govuk-width-container").length).toBe(3);
         expect(wrapper.find('#funding-stream-selection')).toBeTruthy();
     });
 

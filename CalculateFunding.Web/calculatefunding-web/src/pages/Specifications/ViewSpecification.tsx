@@ -519,16 +519,16 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
-                                        No additional calculations available.
+                                        No additional calculations available. &nbsp;
                                         <Link to={`/specifications/createadditionalcalculation/${specificationId}`}>
                                             Create a calculation
                                         </Link>
                                     </strong>
                                 </div>
+                                {additionalCalculations.totalResults > 0 &&
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
                                     <div className="pagination__summary">
-                                        <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
+                                        <p className="govuk-body right-align">
                                             Showing
                                             {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults} calculations
@@ -537,7 +537,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <Pagination currentPage={additionalCalculations.currentPage}
                                                 lastPage={additionalCalculations.lastPage}
                                                 callback={movePage}/>
-                                </nav>
+                                </nav>}
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
@@ -677,6 +677,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 </div>
             </div>
         </div>
+        &nbsp;
         <Footer/>
     </div>
 }

@@ -14,6 +14,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {FacetValue} from "../../types/Facet";
 import {NoData} from "../../components/NoData";
+import {Footer} from "../../components/Footer";
 
 export function ManageDataSourceFiles() {
     const initialSearch: DatasetSearchRequestViewModel = {
@@ -160,7 +161,8 @@ export function ManageDataSourceFiles() {
 
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-two-thirds">
-                        <Link to="/Datasets/LoadNewDataSource" id={"upload-dataset-link"} className="govuk-button govuk-button--primary button-createSpecification" data-module="govuk-button">
+                        <Link to="/Datasets/LoadNewDataSource" id={"upload-dataset-link"}
+                              className="govuk-button govuk-button--primary button-createSpecification" data-module="govuk-button">
                             Upload a new data source
                         </Link>
                     </div>
@@ -176,7 +178,8 @@ export function ManageDataSourceFiles() {
                                 <label className="govuk-label filterLabel" htmlFor="filter-by-type">
                                     Search
                                 </label>
-                                <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)}/>
+                                <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off"
+                                       name="search" type="text" onChange={(e) => searchText(e)}/>
 
                             </CollapsiblePanel>
                             <CollapsiblePanel title={"Filter by funding stream"} expanded={false}>
@@ -249,7 +252,8 @@ export function ManageDataSourceFiles() {
                                                         <p className="govuk-body-s"><strong>Data source version:</strong> {ds.version}</p>
                                                         <p className="govuk-body-s"><strong>Last updated by:</strong> {ds.lastUpdatedByName}</p>
                                                         <p className="govuk-body-s"><strong>Change note for this version:</strong> {ds.changeNote}</p>
-                                                        <p className="govuk-body-s"><Link className="govuk-link" to={`/Datasets/DatasetHistory/${ds.id}`}>View all versions</Link></p>
+                                                        <p className="govuk-body-s"><Link className="govuk-link" to={`/Datasets/DatasetHistory/${ds.id}`}>View
+                                                            all versions</Link></p>
                                                     </div>
                                                 </details>
                                             </div>
@@ -259,7 +263,9 @@ export function ManageDataSourceFiles() {
                                         <td className="govuk-table__cell">
                                             <div>
                                                 <p className="govuk-body">
-                                                    <a className="govuk-link" target="_self" href={`/api/datasets/download-dataset-file/${ds.id}`}>{`${ds.definitionName.replace(/\s/g, "").toLowerCase()}.xlsx`}</a></p>
+                                                    <a className="govuk-link" target="_self"
+                                                       href={`/api/datasets/download-dataset-file/${ds.id}`}>{`${ds.definitionName.replace(/\s/g, "").toLowerCase()}.xlsx`}</a>
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
@@ -269,20 +275,25 @@ export function ManageDataSourceFiles() {
                         <NoData hidden={datasetSearchData.datasets.length > 0 || isLoading}/>
                         <div className="app-back-to-top app-back-to-top--fixed govuk-!-margin-top-9" data-module="app-back-to-top">
                             <a className="govuk-link govuk-link--no-visited-state app-back-to-top__link" href="#top">
-                                <svg role="presentation" focusable="false" className="app-back-to-top__icon" xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17">
+                                <svg role="presentation" focusable="false" className="app-back-to-top__icon" xmlns="http://www.w3.org/2000/svg"
+                                     width="13" height="17" viewBox="0 0 13 17">
                                     <path fill="currentColor" d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"></path>
                                 </svg>
                                 Back to top
                             </a>
                         </div>
-
+                        {datasetSearchData.totalResults > 0 &&
                         <nav role="navigation" aria-label="Pagination">
-                            <div className="pagination__summary">Showing {datasetSearchData.startItemNumber} - {datasetSearchData.endItemNumber} of {datasetSearchData.totalResults} results</div>
-                            <Pagination currentPage={datasetSearchData.pagerState.currentPage} lastPage={datasetSearchData.pagerState.lastPage} callback={setPagination}/>
-                        </nav>
+                            <div
+                                className="pagination__summary">Showing {datasetSearchData.startItemNumber} - {datasetSearchData.endItemNumber} of {datasetSearchData.totalResults} results
+                            </div>
+                            <Pagination currentPage={datasetSearchData.pagerState.currentPage} lastPage={datasetSearchData.pagerState.lastPage}
+                                        callback={setPagination}/>
+                        </nav>}
                     </div>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 }

@@ -27,6 +27,7 @@ import {expandCalculationsByName, getDistinctOrderedFundingLineCalculations, upd
 import {NoData} from "../../components/NoData";
 import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
+import {Footer} from "../../components/Footer";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -524,8 +525,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     </tbody>
                                 </table>
 
-                                <div className="govuk-warning-text"
-                                     hidden={additionalCalculations.totalCount > 0}>
+                                <div className="govuk-warning-text" hidden={additionalCalculations.totalCount > 0}>
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
@@ -535,10 +535,10 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         </Link>
                                     </strong>
                                 </div>
+                                {additionalCalculations.totalResults > 0 &&
                                 <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
                                     <div className="pagination__summary">
-                                        <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
+                                        <p className="govuk-body right-align">
                                             Showing
                                             {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults} calculations
@@ -547,7 +547,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     <Pagination currentPage={additionalCalculations.currentPage}
                                                 lastPage={additionalCalculations.lastPage}
                                                 callback={movePage}/>
-                                </nav>
+                                </nav>}
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label={"provider-data"}>
@@ -823,5 +823,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                 </div>
             </div>
         </div>
+        &nbsp;
+        <Footer/>
     </div>
 }

@@ -23,6 +23,7 @@ import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
 import {DatasetValidateStatusResponse, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {getFundingStreamsService} from "../../services/policyService";
+import {Footer} from "../../components/Footer";
 
 export function LoadNewDataSource() {
 
@@ -497,6 +498,7 @@ export function LoadNewDataSource() {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 }

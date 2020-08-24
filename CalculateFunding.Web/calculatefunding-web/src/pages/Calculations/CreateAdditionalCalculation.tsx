@@ -14,6 +14,7 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
+import {Footer} from "../../components/Footer";
 
 export interface CreateAdditionalCalculationRouteProps {
     specificationId: string;
@@ -294,5 +295,6 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                 </Link>
             </fieldset>
         </div>
+        <Footer/>
     </div>
 }

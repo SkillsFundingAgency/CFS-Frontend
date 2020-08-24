@@ -3,7 +3,6 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchDatasetRelationshipsService} from "../../services/datasetService";
 import {SearchMode} from "../../types/SearchMode";
 import Pagination from "../../components/Pagination";
@@ -13,6 +12,7 @@ import {Link} from "react-router-dom";
 import {SpecificationDatasourceRelationshipViewModel} from "../../types/Datasets/SpecificationDatasourceRelationshipViewModel";
 import {BackToTop} from "../../components/BackToTop";
 import {NoData} from "../../components/NoData";
+import {Footer} from "../../components/Footer";
 
 export function MapDataSourceFiles() {
     const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -301,13 +301,15 @@ export function MapDataSourceFiles() {
                         </tbody>
                     </table>
                     <BackToTop id={"top"}/>
-                    <nav hidden={isLoading} className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                    {!isLoading && datasetRelationships.totalCount > 0 &&
+                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">
                         <div className="pagination__summary">Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of {datasetRelationships.totalCount} results</div>
                         <Pagination currentPage={datasetRelationships.pagerState.currentPage} lastPage={datasetRelationships.pagerState.lastPage} callback={pageChange}/>
-                    </nav>
+                    </nav>}
                 </div>
             </div>
         </div>
+        <Footer/>
     </div>
 }

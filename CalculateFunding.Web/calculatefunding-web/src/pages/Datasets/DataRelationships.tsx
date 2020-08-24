@@ -10,6 +10,7 @@ import {searchDatasetRelationships} from "../../services/datasetRelationshipsSer
 import {SpecificationDatasetRelationshipsViewModel} from "../../types/Datasets/SpecificationDatasetRelationshipsViewModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {NoData} from "../../components/NoData";
+import {Footer} from "../../components/Footer";
 
 export interface DataRelationshipsRouteProps {
     specificationId: string
@@ -142,10 +143,11 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                         <NoData hidden={datasetRelationships.items.length > 0 || isLoading} />
                     </div>
                 </div>
-                <div className="govuk-grid-row">
+                <div className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-0">
                     <div className="govuk-grid-column-full"><BackToTop id={"top"}/></div>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 }
