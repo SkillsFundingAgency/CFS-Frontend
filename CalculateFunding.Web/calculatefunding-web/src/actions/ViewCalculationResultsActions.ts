@@ -11,7 +11,6 @@ export enum ViewCalculationResultsActionTypes {
     GET_CALCULATIONBYID='getCalculationById'
 }
 
-
 export interface GetCalculationResults {
     type: ViewCalculationResultsActionTypes.GET_CALCULATIONRESULTS;
     payload: CalculationProviderResultList

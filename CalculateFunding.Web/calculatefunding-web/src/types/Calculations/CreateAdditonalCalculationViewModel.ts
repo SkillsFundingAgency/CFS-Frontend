@@ -7,6 +7,7 @@ export interface CreateAdditionalCalculationViewModel {
 }
 
 export interface EditAdditionalCalculationViewModel {
+    fundingStreamId: string;
     sourceCode:string;
     specificationId: string;
     valueType: CalculationTypes;

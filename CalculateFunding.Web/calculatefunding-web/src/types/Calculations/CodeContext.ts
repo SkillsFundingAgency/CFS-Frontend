@@ -30,3 +30,36 @@ export interface CodeContext {
     properties: Property[];
     type: string;
 }
+
+export interface ITypeInformationResponse {
+    name: string;
+    description: string;
+    type: string;
+    methods: Array<IMethodInformationResponse>;
+    properties: Array<IPropertyInformationResponse>;
+}
+
+export interface IMethodInformationResponse {
+    name: string;
+    friendlyName: string;
+    description: string;
+    returnType: string;
+    entityId: string;
+    isCustom: boolean;
+    parameters: Array<IParameterInformationResponse>;
+}
+
+export interface IParameterInformationResponse {
+    name: string;
+    description: string;
+    type: string;
+}
+
+export interface IPropertyInformationResponse {
+    name: string;
+    friendlyName: string;
+    description: string;
+    type: string;
+    isAggregable: string;
+    children: Array<IPropertyInformationResponse>;
+}

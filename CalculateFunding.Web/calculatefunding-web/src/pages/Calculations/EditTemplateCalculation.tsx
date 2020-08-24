@@ -53,6 +53,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
         templateIds: {"": [""]}
     });
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
+    const [templateCalculationFundingStreamId, setTemplateCalculationFundingStreamId] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
     const [initialSourceCode, setInitialSourceCode] = useState<string>("");
@@ -115,6 +116,7 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                 setTemplateCalculationStatus(calc.publishStatus);
                 setTemplateCalculationLastUpdated(new Date(calc.lastUpdated));
                 setInitialSourceCode(calc.sourceCode);
+                setTemplateCalculationFundingStreamId(calc.fundingStreamId)
 
                 getSpecification(calc.specificationId)
                     .then((spec) => {
@@ -308,11 +310,15 @@ export function EditTemplateCalculation({match}: RouteComponentProps<EditTemplat
                         Calculation script
                     </label>
                     <GdsMonacoEditor specificationId={specificationId}
+                                     calculationType="TemplateCalculations"
                                      value={templateCalculationSourceCode}
                                      language="vbs"
                                      change={updateSourceCode}
                                      minimap={true}
-                                     key={'1'}/>
+                                     key={'1'}
+                                     calculationName={templateCalculationName}
+                                     fundingStreamId={templateCalculationFundingStreamId}
+                    />
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation

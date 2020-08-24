@@ -1,4 +1,3 @@
-import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
@@ -18,7 +17,6 @@ import {
 } from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
-import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -26,6 +24,10 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
+import {useEffect, useState} from "react";
+import {useEffectOnce} from "../../hooks/useEffectOnce";
+import React from "react";
+import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 
 export interface EditAdditionalCalculationRouteProps {
     calculationId: string
@@ -49,7 +51,15 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
         dataDefinitionRelationshipIds: [],
         templateIds: {"": [""]}
     });
-    const [originalAdditionalCalculation, setOriginalAdditionalCalculation] = useState<EditAdditionalCalculationViewModel>(null);
+    const [originalAdditionalCalculation, setOriginalAdditionalCalculation] = useState<EditAdditionalCalculationViewModel>({
+        publishStatus:PublishStatus.Draft,
+        lastUpdated:new Date(),
+        specificationId:"",
+        name:"",
+        sourceCode:"",
+        valueType: CalculationTypes.Number,
+        fundingStreamId: ""
+    });
     const [isDirty, setIsDirty] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
@@ -92,8 +102,6 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
     const [nameErrorMessage, setNameErrorMessage] = useState("");
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
 
-    let history = useHistory();
-
     useConfirmLeavePage(isDirty && !isSaving);
 
     useEffect(() => {
@@ -124,6 +132,38 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                 });
         });
     }, [calculationId]);
+
+
+    let history = useHistory();
+
+    useEffectOnce(() => {
+        getCalculationByIdService(calculationId).then((result) => {
+            const additionalCalculationResult = result.data as EditAdditionalCalculationViewModel;
+            setOriginalAdditionalCalculation(additionalCalculationResult);
+            setAdditionalCalculationSourceCode(additionalCalculationResult.sourceCode);
+            setAdditionalCalculationName(additionalCalculationResult.name);
+            setAdditionalCalculationType(additionalCalculationResult.valueType);
+            setAdditionalCalculationStatus(additionalCalculationResult.publishStatus);
+
+            getSpecificationSummaryService(additionalCalculationResult.specificationId).then((result) => {
+                const specificationResult = result.data as EditSpecificationViewModel;
+                setSpecificationSummary(specificationResult);
+                setSpecificationId(specificationResult.id);
+            });
+        })
+    });
+    
+    useEffect(() =>
+    {
+        if (originalAdditionalCalculation &&
+            originalAdditionalCalculation.sourceCode &&
+            originalAdditionalCalculation.name &&
+            originalAdditionalCalculation.valueType) {
+            setIsDirty(originalAdditionalCalculation.sourceCode !== additionalCalculationSourceCode ||
+                originalAdditionalCalculation.name !== additionalCalculationName ||
+                originalAdditionalCalculation.valueType !== additionalCalculationType);
+        }
+    }, [additionalCalculationType, additionalCalculationName, additionalCalculationSourceCode, originalAdditionalCalculation])
 
     function submitAdditionalCalculation() {
         if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
@@ -235,6 +275,10 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
         setAdditionalCalculationSourceCode(sourceCode);
         setIsDirty(initialSourceCode !== sourceCode);
     }
+    function updateSourceCodeForEditor(updatedSourceCode: string)
+    {
+        setAdditionalCalculationSourceCode(updatedSourceCode);
+    }
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -310,9 +354,15 @@ export function EditAdditionalCalculation({match}: RouteComponentProps<EditAddit
                     <label className="govuk-label" htmlFor="more-detail">
                         Calculation script
                     </label>
-                    <GdsMonacoEditor specificationId={specificationId} value={additionalCalculationSourceCode}
-                                     language="vbs" change={updateSourceCode}
-                                     minimap={true} key={'1'}/>
+                    <GdsMonacoEditor
+                        value={additionalCalculationSourceCode}
+                        change={updateSourceCode}
+                        language={"vb"}
+                        minimap={false}
+                        specificationId={specificationId}
+                        calculationType={"AdditionalCalculation"}
+                        calculationName={additionalCalculationName}
+                    />
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation

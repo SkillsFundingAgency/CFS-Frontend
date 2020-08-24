@@ -9,11 +9,11 @@ import {CalculationTypes, CreateAdditionalCalculationViewModel} from "../../type
 import {compileCalculationPreviewService, createAdditionalCalculationService} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
-import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 
 export interface CreateAdditionalCalculationRouteProps {
     specificationId: string;
@@ -74,10 +74,10 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
 
     useEffectOnce(() => {
         getSpecificationSummaryService(specificationId)
-        .then((result) => {
-            const specificationResult = result.data as EditSpecificationViewModel;
-            setSpecificationSummary(specificationResult);
-        });
+            .then((result) => {
+                const specificationResult = result.data as EditSpecificationViewModel;
+                setSpecificationSummary(specificationResult);
+            });
     });
 
     function submitAdditionalCalculation() {
@@ -219,8 +219,14 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                     <label className="govuk-label" htmlFor="more-detail">
                         Calculation script
                     </label>
-                    <GdsMonacoEditor specificationId={specificationId} value="" language="vbs" change={updateSourceCode}
-                                     minimap={true} key={'1'}/>
+                    <GdsMonacoEditor
+                        value={additionalCalculationSourceCode}
+                        change={updateSourceCode}
+                        language={'vb'}
+                        minimap={false}
+                        specificationId={specificationId}
+                        calculationType={"AdditionalCalculation"}
+                        calculationName={additionalCalculationName}/>
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation

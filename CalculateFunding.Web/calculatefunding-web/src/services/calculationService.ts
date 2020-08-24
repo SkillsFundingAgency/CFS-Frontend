@@ -38,7 +38,7 @@ export async function getCalculationProvidersService(calculationProviderSearchRe
     })
 }
 
-export async function createAdditionalCalculationService(createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel, specificationId:string) {
+export async function createAdditionalCalculationService(createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel, specificationId: string) {
     return axios(`/api/specs/${specificationId}/calculations/createadditionalcalculation`, {
         method: 'POST',
         headers: {
@@ -47,7 +47,8 @@ export async function createAdditionalCalculationService(createAdditionalCalcula
         data: createAdditionalCalculationViewModel
     })
 }
-export async function updateAdditionalCalculationService(updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel, specificationId:string, calculationId:string) {
+
+export async function updateAdditionalCalculationService(updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel, specificationId: string, calculationId: string) {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/editadditionalcalculation`, {
         method: 'POST',
         headers: {
@@ -57,11 +58,10 @@ export async function updateAdditionalCalculationService(updateAdditionalCalcula
     })
 }
 
-export async function compileCalculationPreviewService(specificationId:string, calculationId:string, sourceCode:string)
-{
+export async function compileCalculationPreviewService(specificationId: string, calculationId: string, sourceCode: string) {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
         method: 'POST',
-        headers:{
+        headers: {
             'Content-Type': 'application/json'
         },
         data: {
@@ -71,12 +71,15 @@ export async function compileCalculationPreviewService(specificationId:string, c
 }
 
 export async function getCodeContextService(specificationId: string) {
-    return axios(`/api/specs/${specificationId}/codeContext`, {
+    console.log("Going to call " + specificationId);
+    let response = await axios(`/api/specs/${specificationId}/codeContext`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
-    })
+    });
+
+    return response.data;
 }
 export async function getCalculationVersionHistoryService(calculationId: string) {
     return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
