@@ -20,12 +20,15 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
+using CalculateFunding.Frontend.ViewModels.Graph;
 using CalculateFunding.Frontend.ViewModels.Jobs;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
 using IEnumerableExtensions = System.Linq.IEnumerableExtensions;
+using GraphApiModels = CalculateFunding.Common.ApiClient.Graph.Models;
+using Newtonsoft.Json.Linq;
 
 namespace CalculateFunding.Frontend.ViewModels
 {
@@ -40,6 +43,25 @@ namespace CalculateFunding.Frontend.ViewModels
             MapCalcs();
             MapScenario();
             MapTestEngine();
+            MapGraph();
+        }
+
+        private void MapGraph()
+        {
+            CreateMap<GraphApiModels.Calculation, GraphCalculationViewModel>();
+            CreateMap<GraphApiModels.Relationship, GraphCalculationRelationshipEntityViewModel>()
+                .ForMember(m => m.Source, opt => opt.MapFrom(src => src.One))
+                .ForMember(m => m.Target, opt => opt.MapFrom(src => src.Two));
+            CreateMap<JObject, GraphCalculationViewModel>()
+                .ForMember(m => m.CalculationId, opt => opt.MapFrom(src => src["calculationid"].ToString()))
+                .ForMember(m => m.SpecificationId, opt => opt.MapFrom(src => src["specificationid"].ToString()))
+                .ForMember(m => m.CalculationName, opt => opt.MapFrom(src => src["calculationname"].ToString()))
+                .ForMember(m => m.CalculationType, opt => opt.MapFrom(src => src["calculationtype"].ToString()))
+                .ForMember(m => m.FundingStream, opt => opt.MapFrom(src => src["fundingstream"].ToString()));
+
+            CreateMap<GraphApiModels.Entity<GraphApiModels.Calculation>, GraphCalculationEntityViewModel<GraphCalculationViewModel>>()
+                .ForMember(m => m.Node, opt => opt.MapFrom(src => src.Node))
+                .ForMember(m => m.Relationships, opt => opt.MapFrom(src => src.Relationships));
         }
 
         private void MapResults()
