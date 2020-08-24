@@ -118,7 +118,6 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation}/>
                     <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
                     <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
-                    <Route path="/Approvals" component={Approvals}/>
                     <Route path="*">
                         <NoMatch/>
                     </Route>

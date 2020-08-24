@@ -62,7 +62,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }){
                                 <div className="govuk-grid-row">
                                     <div className="govuk-grid-column-one-third">
                                         <div className="govuk-heading-m">
-                                            <Link to="/Approvals" className="govuk-link">Funding approvals</Link>
+                                            <Link to="/ViewFunding" className="govuk-link">Funding approvals</Link>
                                         </div>
                                         <p className="govuk-body">Approve funding for providers and view how it's been
                                             calculated.</p>
