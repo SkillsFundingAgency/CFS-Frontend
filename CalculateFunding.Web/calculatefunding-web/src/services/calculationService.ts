@@ -19,6 +19,21 @@ export async function getCalculationsService(calculationSearchRequestViewModel: 
     );
 }
 
+export async function getCalculationsByProviderService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel, providerId: string) {
+    return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}/provider/${providerId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params:
+                {
+                    status: calculationSearchRequestViewModel.status,
+                    searchTerm: calculationSearchRequestViewModel.searchTerm
+                }
+        }
+    );
+}
+
 export async function getCalculationByIdService(calculationId: string) {
     return axios(`/api/calcs/getcalculationbyid/${calculationId}`, {
         method: 'GET',

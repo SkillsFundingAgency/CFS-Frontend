@@ -12,24 +12,21 @@ import {approveFundingLineStructureService, getSpecificationSummaryService} from
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Tabs} from "../../components/Tabs";
 import {DateFormatter} from "../../components/DateFormatter";
-import {CalculationSummary} from "../../types/CalculationSummary";
-import {getCalculationsService} from "../../services/calculationService";
+import {getCalculationsByProviderService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import {
     getFundingLineStructureByProviderService
 } from "../../services/fundingStructuresService";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
-import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {AutoComplete} from "../../components/AutoComplete";
 import {CollapsibleSteps} from "../../components/CollapsibleSteps";
-import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
 import {BackToTop} from "../../components/BackToTop";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {expandCalculationsByName, getDistinctOrderedFundingLineCalculations, updateFundingLineExpandStatus} from "../../components/fundingLineStructure/FundingLineStructure";
 import {NoData} from "../../components/NoData";
-import {isMainThread} from "worker_threads";
 import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
+import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -71,7 +68,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         trustStatus: "",
         ukprn: "",
         upin: "",
-        urn: ""
+        urn: "",
+        paymentOrganisationIdentifier: "",
+        paymentOrganisationName: ""
     });
     const [providerResults, setProviderResults] = useState<SpecificationInformation[]>([{
         fundingPeriod: "",
@@ -80,7 +79,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         lastEditDate: new Date(),
         name: ""
     }])
-    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSummary>({
+    const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>({
         currentPage: 0,
         endItemNumber: 0,
         facets: [],
@@ -243,18 +242,25 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }
 
     function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
-        getCalculationsService({specificationId: specificationId, status: status, pageNumber: pageNumber, searchTerm: searchTerm, calculationType: "Additional"}).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as CalculationSummary;
-                setAdditionalCalculations(result)
-                setIsLoading(prevState => {
-                    return {
-                        ...prevState,
-                        additionalCalculations: false
-                    }
-                })
-            }
-        }).catch((e) => {
+        getCalculationsByProviderService({
+            specificationId: specificationId,
+            status: status,
+            pageNumber: pageNumber,
+            searchTerm: searchTerm,
+            calculationType: "Additional"
+        }, match.params.providerId)
+            .then((response) => {
+                if (response.status === 200) {
+                    const result = response.data as AdditionalCalculationSearchResultViewModel;
+                    setAdditionalCalculations(result)
+                    setIsLoading(prevState => {
+                        return {
+                            ...prevState,
+                            additionalCalculations: false
+                        }
+                    })
+                }
+            }).catch((e) => {
             setIsLoading(prevState => {
                 return {
                     ...prevState,
@@ -501,9 +507,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     <thead className="govuk-table__head">
                                     <tr className="govuk-table__row">
                                         <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                        <th scope="col" className="govuk-table__header">Status</th>
-                                        <th scope="col" className="govuk-table__header">Value type</th>
-                                        <th scope="col" className="govuk-table__header">Last edited date</th>
+                                        <th scope="col" className="govuk-table__header">Type</th>
+                                        <th scope="col" className="govuk-table__header">Value</th>
                                     </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
@@ -512,10 +517,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                             <td className="govuk-table__cell text-overflow">
                                                 <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
                                             </td>
-                                            <td className="govuk-table__cell">{ac.status}</td>
-                                            <td className="govuk-table__cell">{ac.valueType}</td>
-                                            <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
-                                                                                             utc={false}/></td>
+                                            <td className="govuk-table__cell">{ac.valueType != null && ac.value != null ? ac.valueType : ""}</td>
+                                            <td className="govuk-table__cell">{ac.value}</td>
                                         </tr>
                                     )}
                                     </tbody>

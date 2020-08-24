@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
+using CalculationType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationType;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -20,16 +24,23 @@ namespace CalculateFunding.Frontend.Controllers
         private ICalculationsApiClient _calcClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
+        private readonly IResultsApiClient _resultsApiClient;
 
-        public CalculationController(ICalculationsApiClient calcClient, IMapper mapper, IAuthorizationHelper authorizationHelper)
+        public CalculationController(
+            ICalculationsApiClient calcClient, 
+            IMapper mapper, 
+            IAuthorizationHelper authorizationHelper,
+            IResultsApiClient resultsApiClient)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
 
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
+            _resultsApiClient = resultsApiClient;
         }
 
         [HttpPost]
@@ -330,17 +341,75 @@ namespace CalculateFunding.Frontend.Controllers
             if (!string.IsNullOrEmpty(status) && status != "All")
             {
                 publishStatus = (PublishStatus)Enum.Parse(typeof(PublishStatus), status);
-
             }
 
             ApiResponse<SearchResults<CalculationSearchResult>> result =
                 await _calcClient.SearchCalculationsForSpecification(specificationId,
                     calculationType, publishStatus, searchTerm, pageNumber);
 
-
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(result.Content);
+            }
+
+            return BadRequest(result.Content);
+        }
+
+        [HttpGet]
+        [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{pageNumber}/provider/{providerId}")]
+        public async Task<IActionResult> GetAdditionalCalculationsByProviderId(
+            string specificationId,
+            CalculationType calculationType, 
+            int pageNumber, 
+            [FromQuery] string searchTerm, 
+            [FromQuery] string status, 
+            [FromRoute] string providerId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            PublishStatus? publishStatus = null;
+
+            if (!string.IsNullOrEmpty(status) && status != "All")
+            {
+                publishStatus = (PublishStatus)Enum.Parse(typeof(PublishStatus), status);
+            }
+
+            ApiResponse<SearchResults<CalculationSearchResult>> result =
+                await _calcClient.SearchCalculationsForSpecification(specificationId,
+                    calculationType, publishStatus, searchTerm, pageNumber);
+
+	        ApiResponse<ProviderResultResponse> providerResultResponse =
+		        await _resultsApiClient.GetProviderResults(providerId, specificationId);
+	        IActionResult providerResultResponseErrorResult = providerResultResponse.IsSuccessOrReturnFailureResult("GetProviderResults");
+	        if (providerResultResponseErrorResult != null)
+	        {
+		        return providerResultResponseErrorResult;
+	        }
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                var calcSearchResults = result.Content;
+
+                IEnumerable<AdditionalCalculationSearchResultViewModel> additionalCalcs =
+                    calcSearchResults.Results.Select(c =>
+                        new AdditionalCalculationSearchResultViewModel
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            ValueType = c.ValueType,
+                            Value = providerResultResponse.Content.CalculationResults.FirstOrDefault(calcResult => calcResult.Calculation.Id == c.Id)?.Value,
+                            LastUpdatedDate = c.LastUpdatedDate
+                        });
+                
+                var calcs = new SearchResults<AdditionalCalculationSearchResultViewModel>
+                {
+                    TotalCount = calcSearchResults.TotalCount,
+                    Results = additionalCalcs,
+                    Facets = calcSearchResults.Facets,
+                    TotalErrorCount = calcSearchResults.TotalErrorCount,
+                };
+
+                return Ok(calcs);
             }
 
             return BadRequest(result.Content);

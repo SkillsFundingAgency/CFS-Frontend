@@ -15,6 +15,8 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 
         public DateTimeOffset? LastUpdatedDate { get; set; }
 
+        public object Value { get; set; }
+
         public string LastUpdatedDateDisplay
         {
             get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown"; }
