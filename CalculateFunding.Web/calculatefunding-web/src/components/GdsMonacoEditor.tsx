@@ -12,7 +12,7 @@ import {
     IPropertyInformationResponse,
     ITypeInformationResponse
 } from "../types/Calculations/CodeContext";
-import {IPosition} from "monaco-editor/esm/vs/editor/editor.api";
+import {editor, IPosition} from "monaco-editor/esm/vs/editor/editor.api";
 import {IVariableContainer} from "../types/GdsMonacoEditor/IVariableContainer";
 import {ILocalFunctionContainer} from "../types/GdsMonacoEditor/ILocalFunctionContainer";
 import {IDefaultTypeContainer} from "../types/GdsMonacoEditor/IDefaultTypeContainer";
@@ -321,7 +321,7 @@ export function GdsMonacoEditor(props: {
                         let previousPositionWord = model.getWordAtPosition(previousPosition);
 
                         let word = model.getWordUntilPosition(position);
-                        let range = {
+                        let editorRange = {
                             startLineNumber: position.lineNumber,
                             endLineNumber: position.lineNumber,
                             startColumn: word.startColumn,
@@ -350,7 +350,7 @@ export function GdsMonacoEditor(props: {
                                                 kind: monaco.languages.CompletionItemKind.Field,
                                                 detail: variable.type,
                                                 insertText: variable.name,
-                                                range: range
+                                                range: editorRange
                                             };
 
                                             if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
@@ -411,7 +411,7 @@ export function GdsMonacoEditor(props: {
 
                                     for (let i in variables) {
                                         // @ts-ignore
-                                        results.suggestions.push(createCompletionItem(variables[i], range));
+                                        results.suggestions.push(createCompletionItem(variables[i], editorRange));
                                     }
                                 } else {
                                     for (let key in contextVariables) {
@@ -419,12 +419,12 @@ export function GdsMonacoEditor(props: {
                                         let variable = contextVariables[key];
 
                                         // @ts-ignore
-                                        results.suggestions.push(createCompletionItem(variable, range));
+                                        results.suggestions.push(createCompletionItem(variable, editorRange));
                                     }
                                 }
 
                                 if (isAggregableFunctionDeclared === true) {
-                                    let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, range);
+                                    let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
 
                                     if (defaultTypeCompletionItems) {
                                         defaultTypeCompletionItems.forEach(d => {
@@ -437,21 +437,19 @@ export function GdsMonacoEditor(props: {
                                 let codeWithNoComments = processSourceToRemoveComments(model.getValueInRange(new monaco.Range(1, 1, position.lineNumber, position.column)));
 
                                 let declaredVariables = findDeclaredVariables(codeWithNoComments);
-                                for (let i in declaredVariables) {
-                                    let variable: string = declaredVariables[i];
-                                    let variableItem: {
-                                        // @ts-ignore
-                                        label: variable,
-                                        kind: monaco.languages.CompletionItemKind.Field,
-                                        // @ts-ignore
-                                        insertText: variable,
-                                        // @ts-ignore
-                                        range: range
-                                    };
 
-                                    // @ts-ignore
-                                    results.suggestions.push(variableItem);
-                                }
+                                    declaredVariables.forEach(d => {
+                                        let variableItem = {
+                                            label: d,
+                                            kind: monaco.languages.CompletionItemKind.Field,
+                                            insertText: d,
+                                            // @ts-ignore
+                                            range: editorRange
+                                        };
+
+                                        // @ts-ignore
+                                        results.suggestions.push(variableItem);
+                                    });
 
 
                                 for (let i in contextFunctions) {
@@ -462,7 +460,7 @@ export function GdsMonacoEditor(props: {
                                         kind: monaco.languages.CompletionItemKind.Function,
                                         detail: localFunction.getFunctionAndParameterDescription(),
                                         insertText: localFunction.label,
-                                        range: range
+                                        range: editorRange
                                     };
 
                                     let description = "";
@@ -492,7 +490,7 @@ export function GdsMonacoEditor(props: {
                                     }
 
                                     // @ts-ignore
-                                    let indexOfDuplicateFunction = results.suggestions.findIndex(x => x.name === localFunction.label);
+                                    let indexOfDuplicateFunction = results.suggestions.findIndex(x => x.label === localFunction.label);
 
                                     if (indexOfDuplicateFunction > -1) {
                                         // @ts-ignore
@@ -503,7 +501,7 @@ export function GdsMonacoEditor(props: {
                                     }
                                 }
 
-                                let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, range);
+                                let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
 
                                 if (defaultTypeCompletionItems) {
                                     defaultTypeCompletionItems.forEach(dt => {
@@ -512,7 +510,7 @@ export function GdsMonacoEditor(props: {
                                     })
                                 }
 
-                                let keywordCompletionItems = getKeywordsCompletionItems(lineContentsSoFar, contextKeywords, range);
+                                let keywordCompletionItems = getKeywordsCompletionItems(lineContentsSoFar, contextKeywords, editorRange);
 
                                 if (keywordCompletionItems) {
                                     keywordCompletionItems.forEach(kc => {
