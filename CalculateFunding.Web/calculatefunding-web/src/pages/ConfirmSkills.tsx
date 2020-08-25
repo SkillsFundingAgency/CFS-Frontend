@@ -14,7 +14,7 @@ export const ConfirmSkills = () => {
     const history = useHistory();
 
     const handleConfirm = async () => {
-        await dispatch(await updateUserConfirmedSkills(true));
+        await dispatch(await updateUserConfirmedSkills());
     };
 
     useEffect(() => {

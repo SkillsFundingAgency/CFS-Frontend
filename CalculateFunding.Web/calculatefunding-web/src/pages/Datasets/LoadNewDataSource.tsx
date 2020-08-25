@@ -18,7 +18,7 @@ import {FundingStream} from "../../types/viewFundingTypes";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {NewDatasetVersionResponseErrorModel, NewDatasetVersionResponseViewModel} from "../../types/Datasets/NewDatasetVersionResponseViewModel";
-import {AxiosError} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
 import {DatasetValidateStatusResponse, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
@@ -126,46 +126,43 @@ export function LoadNewDataSource() {
         setFundingStreamIsLoading(false);
     }
 
-    function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
+    async function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
         if (uploadFile !== undefined) {
-            debugger
-            uploadDataSourceService(
-                request.blobUrl,
-                uploadFile,
-                request.datasetId,
-                request.fundingStreamId,
-                request.author.name,
-                request.author.id,
-                selectedDataSchema,
-                datasetSourceFileName,
-                description)
-                .then((uploadResponse) => {
-                    if (uploadResponse.status !== 201) {
-                        setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
-                        setIsLoading(false);
-                        return;
-                    }
-                    validateDatasetService(
-                        request.datasetId,
-                        request.fundingStreamId,
-                        request.filename,
-                        request.version.toString(),
-                        description,
-                        "")
-                })
-                .then((validateDatasetResponse) => {
-                    const validateOperationId: any = validateDatasetResponse.data.operationId;
-                    if (!validateOperationId) {
-                        setValidationFailures({"error-message": ["Failed to get validation progress tracking ID"]});
-                        setIsLoading(false);
-                        return;
-                    }
-                    getDatasetValidateStatus(validateOperationId)
-                })
-                .catch((err: AxiosError) => {
-                    setValidationFailures({"error-message": ["Unable to validate dataset: " + err.message]});
+            try {
+                const uploadResponse = await uploadDataSourceService(
+                    request.blobUrl,
+                    uploadFile,
+                    request.datasetId,
+                    request.fundingStreamId,
+                    request.author.name,
+                    request.author.id,
+                    selectedDataSchema,
+                    datasetSourceFileName,
+                    description);
+                if (uploadResponse.status !== 201) {
+                    setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
                     setIsLoading(false);
-                });
+                    return;
+                }
+                const validationResponse = await validateDatasetService(
+                    request.datasetId,
+                    request.fundingStreamId,
+                    request.filename,
+                    request.version.toString(),
+                    description,
+                    "");
+                if (validationResponse) {
+                    const validateOperationId: any = validationResponse.data.operationId;
+                    if (validateOperationId) {
+                        return await getDatasetValidateStatus(validateOperationId)
+                    }
+                }
+                setValidationFailures({"error-message": ["Failed to get validation progress tracking ID"]});
+                setIsLoading(false);
+            } catch (err) {
+                setValidationFailures({"error-message": ["Unable to validate dataset: " + err.message]});
+                setIsLoading(false);
+            }
         }
     }
 
@@ -198,7 +195,6 @@ export function LoadNewDataSource() {
                 .catch((error: AxiosError) => {
                     if (error.response !== undefined) {
                         const response = error.response.data as NewDatasetVersionResponseErrorModel;
-                        debugger
                         setErrorResponse(response);
                         setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
                     }
@@ -363,10 +359,15 @@ export function LoadNewDataSource() {
         }
     }
 
-    const uploadErrorMessage = errorResponse &&
-        (errorResponse.Filename && errorResponse.Filename.length > 0 ? errorResponse.Filename[0] : ""
-        + errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0 ? errorResponse.DefinitionId : ""
-            + errorResponse.FundingStreamId);
+    let uploadErrorMessage = "";
+    if (errorResponse) {
+        if (errorResponse.Filename && errorResponse.Filename.length > 0) {
+            uploadErrorMessage += errorResponse.Filename[0];
+        }
+        if (errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0) {
+            uploadErrorMessage += errorResponse.DefinitionId;
+        }
+    }
 
     return (<div>
             <Header location={Section.Datasets}/>
@@ -389,25 +390,19 @@ export function LoadNewDataSource() {
                     <h2 className="govuk-error-summary__title">
                         There is a problem
                     </h2>
+                    {validationFailures && Object.keys(validationFailures).length > 0 &&
                     <div className="govuk-error-summary__body">
                         <ul className="govuk-list govuk-error-summary__list">
-                            {
-                                (validationFailures !== undefined && validationFailures["error-message"] != null) ?
-                                    <li>{validationFailures["error-message"]}</li>
-                                    : ""
-                            }
-                            {
-                                (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
-                                    <li>{validationFailures["FundingStreamId"]}</li>
-                                    : ""
-                            }
-                            {
-                                (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
-                                    <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
-                                    : ""
-                            }
+                            {Object.keys(validationFailures).map((errKey, index) =>
+                                errKey === "blobUrl" ?
+                                    <li>
+                                        <span>Please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a>
+                                    </li>
+                                    :
+                                    <li key={index}>{validationFailures[errKey]}</li>
+                            )}
                         </ul>
-                    </div>
+                    </div>}
                 </div>
                 <div className="govuk-grid-row" hidden={isLoading}>
                     <div className="govuk-grid-column-two-thirds">

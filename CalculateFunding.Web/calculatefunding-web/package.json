@@ -44,7 +44,7 @@
     "react-monaco-editor": "^0.30.2",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^3.4.1",
+    "react-scripts": "^3.4.3",
     "react-sidebar": "^3.0.2",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",

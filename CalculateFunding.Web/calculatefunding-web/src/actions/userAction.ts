@@ -85,7 +85,7 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
         }
         let hasConfirmed: boolean | undefined = undefined;
         
-        const valueInLocalStorage = window.localStorage.getItem(hasConfirmedSkillsStateKey);
+        const valueInLocalStorage = localStorage.getItem(hasConfirmedSkillsStateKey);
         if (valueInLocalStorage) {
             hasConfirmed = JSON.parse(valueInLocalStorage as string);
         }
@@ -102,10 +102,9 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
     }
 };
 
-export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = (hasConfirmed: boolean) => {
+export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
     return async dispatch => {
         const response = await axios.put(`/api/account/hasConfirmedSkills`);
-        window.localStorage.setItem(hasConfirmedSkillsStateKey, hasConfirmed.toString());
         dispatch({
             type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
             payload: response.status === 200
