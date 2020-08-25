@@ -10,6 +10,8 @@ export interface Specification {
     templateIds: { [key: string]: string[] };
     id: string;
     name: string;
+    lastEditedDate: Date;
+    dataDefinitionRelationshipIds: string[];
 }
 
 export interface TemplateIds {

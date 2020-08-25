@@ -11,7 +11,12 @@ import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
-import {approveFundingLineStructureService, getProfileVariationPointersService, getSpecificationSummaryService} from "../../services/specificationService";
+import {
+    approveFundingLineStructureService,
+    getProfileVariationPointersService,
+    getSpecificationsSelectedForFundingByPeriodAndStreamService,
+    getSpecificationSummaryService
+} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {DateFormatter} from "../../components/DateFormatter";
@@ -28,7 +33,11 @@ import {
     updateFundingLineExpandStatus
 } from "../../components/fundingLineStructure/FundingLineStructure";
 import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
-import {getReleaseTimetableForSpecificationService, saveReleaseTimetableForSpecificationService} from "../../services/publishService";
+import {
+    getReleaseTimetableForSpecificationService,
+    refreshFundingService,
+    saveReleaseTimetableForSpecificationService
+} from "../../services/publishService";
 import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../../types/ReleaseTimetableSummary";
 import {getDatasetBySpecificationIdService} from "../../services/datasetService";
 import {DatasetSummary} from "../../types/DatasetSummary";
@@ -39,6 +48,10 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
 import {useSelector} from "react-redux";
+import {getUserPermissionsService} from "../../services/userService";
+import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
+import {Specification} from "../../types/viewFundingTypes";
+import {bool} from "prop-types";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -74,9 +87,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     let specificationId = match.params.specificationId;
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
-    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
-    const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
-    const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
@@ -84,7 +94,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [errors, setErrors] = useState<string[]>([]);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const fundingLineStepReactRef = useRef(null);
-
     const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>([]);
     const [releaseTimetable, setReleaseTimetable] = useState<ReleaseTimetableViewModel>({
         navisionDate: {
@@ -124,7 +133,33 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         totalResults: 0
     });
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
-
+    const [selectedSpecificationForFunding, setSelectedSpecificationForFunding] =  useState<Specification>({
+        fundingPeriod: {
+            id: "",
+            name: ""
+        },
+        fundingStreams: [{
+            name: "",
+            id: ""
+        }],
+        providerVersionId: "",
+        description: "",
+        isSelectedForFunding: false,
+        approvalStatus: "",
+        publishedResultsRefreshedAt: null,
+        lastCalculationUpdatedAt: null,
+        templateIds: {"": [""]},
+        id: "",
+        name: "",
+        lastEditedDate: new Date(),
+        dataDefinitionRelationshipIds: [],
+    });
+    const [isLoading, setIsLoading] = useState({
+        fundingLineStructure: true,
+        additionalCalculations: true,
+        datasets: true,
+        selectedSpecification: true,
+    });
     useEffect(() => {
         if (!fundingLineRenderInternalState) {
             return
@@ -138,7 +173,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     useEffect(() => {
         if (additionalCalculations.currentPage !== 0) {
-            setIsLoadingAdditionalCalculations(false);
+            setIsLoading(prevState => {
+                return {
+                    ...prevState,
+                    additionalCalculations: false
+                }
+            })
         }
     }, [additionalCalculations.results]);
 
@@ -149,10 +189,20 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
                 setFundingLinesOriginalData(fundingLines);
             }
-            setIsLoadingFundingLineStructure(false);
+            setIsLoading(prevState => {
+                return {
+                    ...prevState,
+                    fundingLineStructure: false
+                }
+            })
         }
         if (datasets.content.length === 0) {
-            setIsLoadingDatasets(false);
+            setIsLoading(prevState => {
+                return {
+                    ...prevState,
+                    datasets: false
+                }
+            })
         }
     }, [fundingLines]);
 
@@ -212,6 +262,27 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         })
     }, [specificationId]);
 
+    useEffect(() => {
+        if (specification != null) {
+            getSpecificationsSelectedForFundingByPeriodAndStreamService(specification.fundingPeriod.id, specification.fundingStreams[0].id)
+                .then((selectedSpecificationResponse) => {
+                    if (selectedSpecificationResponse.status === 200) {
+                        const selectedSpecification = selectedSpecificationResponse.data as Specification[];
+                        if (selectedSpecification.length > 0) {
+                            setSelectedSpecificationForFunding(selectedSpecification[0]);
+                        }
+                    }
+                }).finally(() => {
+                setIsLoading(prevState => {
+                    return {
+                        ...prevState,
+                        selectedSpecification: false
+                    }
+                })
+            });
+        }
+    }, [specification]);
+
     const resetErrors = () => {
         setFundingLineStructureError(false);
         setErrors([]);
@@ -219,10 +290,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const fetchData = async () => {
         try {
-            setIsLoadingFundingLineStructure(true);
             const specificationSummaryResponse = await getSpecificationSummaryService(specificationId);
             const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
             setSpecification(specificationSummary);
+
             setCanTimetableBeUpdated(true);
             const fundingLineStructureResponse = await getFundingLineStructureService(specificationSummary.id,
                 specificationSummary.fundingPeriod.id, specificationSummary.fundingStreams[0].id);
@@ -233,7 +304,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setFundingLineStructureError(true);
             setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
         } finally {
-            setIsLoadingFundingLineStructure(false);
+            setIsLoading(prevState => {
+                return {
+                    ...prevState,
+                    fundingLineStructure: false
+                }
+            })
         }
     }
 
@@ -293,7 +369,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (response.status === 200) {
             setFundingLinePublishStatus(PublishStatus.Approved);
         } else {
-            setErrors(errors => [...errors, 
+            setErrors(errors => [...errors,
                 `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
             setFundingLinePublishStatus(specification.approvalStatus as PublishStatus);
         }
@@ -323,7 +399,37 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 const result = response.data as CalculationSummary;
                 setAdditionalCalculations(result)
             }
-        }).finally(() => setIsLoadingAdditionalCalculations(false));
+        }).finally(() => setIsLoading(prevState => {
+            return {
+                ...prevState,
+                additionalCalculations: false
+            }
+        }));
+    }
+
+    function chooseForFunding() {
+        setErrors([]);
+        getUserPermissionsService(specificationId).then((result) => {
+            const specificationPermissions = result.data as EffectiveSpecificationPermission;
+            if (!specificationPermissions.canChooseFunding) {
+                setErrors(errors => [...errors, "You do not have permissions to choose this specification for funding",
+                    "Specification must be approved before the specification can be chosen for funding.",
+                    "Template calculations must be approved before the specification can be chosen for funding."]);
+            } else {
+                refreshFundingService(specificationId).then((response) => {
+                    if (response.status === 200) {
+                        getSpecificationSummaryService(specificationId).then((specificationSummaryResponse) => {
+                            const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
+                            setSpecification(specificationSummary);
+                        });
+                    }
+                    else
+                    {
+                        setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
+                    }
+                }).catch(()=>{setErrors(errors => [...errors, "A problem occurred while choosing specification"]);});
+            }
+        }).catch(()=>{setErrors(errors => [...errors, "A problem occurred while getting user permissions"]);});
     }
 
     return <div>
@@ -335,27 +441,29 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
             {errors.length > 0 &&
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column">
-                    <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
-                        <h2 className="govuk-error-summary__title" id="error-summary-title">
-                            There is a problem
-                        </h2>
-                        <div className="govuk-error-summary__body">
-                            <ul className="govuk-list govuk-error-summary__list">
-                                {errors.map((error, i) =>
-                                    <li key={i}>{error}</li>
-                                )}
-                            </ul>
-                        </div>
-                    </div>
+            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex="-1"
+                 data-module="govuk-error-summary">
+                <h2 className="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
+                </h2>
+                <div className="govuk-error-summary__body">
+                    <ul className="govuk-list govuk-error-summary__list">
+                        {errors.map((error, i) =>
+                            <li key={i}>{error}</li>
+                        )}
+                    </ul>
                 </div>
             </div>
             }
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-l">Specification Name</span>
-                    <h2 className="govuk-heading-l">{specification.name}</h2>
+                    <h2 className={`govuk-heading-l ${(!specification.isSelectedForFunding || isLoading.selectedSpecification)? "" : "govuk-!-margin-bottom-2" }`}>{specification.name}</h2>
+                    {
+                        (!(selectedSpecificationForFunding.id === specification.id) || isLoading.selectedSpecification)?
+                            "" : <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                    }
+
                     <span className="govuk-caption-m">Funding period</span>
                     <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
                 </div>
@@ -377,6 +485,15 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
+                        <li>
+                            <button type="button" className="govuk-link"
+                                    onClick={chooseForFunding}
+                                    hidden={specification.isSelectedForFunding || isLoading.selectedSpecification}>Choose for funding</button>
+                            <Link to={`/viewspecificationresults/${specificationId}`}
+                                  hidden={!selectedSpecificationForFunding.isSelectedForFunding || isLoading.selectedSpecification} className="govuk-link">
+                                View funding
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -393,14 +510,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
                                 <LoadingStatus title={"Loading funding line structure"}
-                                               hidden={!isLoadingFundingLineStructure}
+                                               hidden={!isLoading.fundingLineStructure}
                                                description={"Please wait whilst funding line structure is loading"}/>
                                 <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
                                     </div>
                                 </div>
-                                <div className="govuk-grid-row" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
+                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
                                     </div>
@@ -418,7 +535,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         </div>
                                     </div>
                                 </div>
-                                <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
+                                <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="false"
                                             onClick={openCloseAllFundingLines}
@@ -464,9 +581,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
                                 <LoadingStatus title={"Loading additional calculations"}
-                                               hidden={!isLoadingAdditionalCalculations}
+                                               hidden={!isLoading.additionalCalculations}
                                                description={"Please wait whilst additional calculations are loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
+                                <div className="govuk-grid-row" hidden={isLoading.additionalCalculations}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
@@ -543,9 +660,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
                                 <LoadingStatus title={"Loading datasets"}
-                                               hidden={!isLoadingDatasets}
+                                               hidden={!isLoading.datasets}
                                                description={"Please wait whilst datasets are loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoadingDatasets}>
+                                <div className="govuk-grid-row" hidden={isLoading.datasets}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>

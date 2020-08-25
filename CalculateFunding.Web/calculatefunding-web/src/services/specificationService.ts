@@ -147,3 +147,12 @@ export async function getSpecificationsSelectedForFundingByPeriod(fundingPeriodI
     });
 }
 
+export async function getSpecificationsSelectedForFundingByPeriodAndStreamService(fundingPeriodId: string, fundingStreamId:string) {
+    return axios(`${baseURL}/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
