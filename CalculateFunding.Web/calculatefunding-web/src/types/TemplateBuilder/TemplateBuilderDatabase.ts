@@ -6,7 +6,7 @@ export class TemplateBuilderDatabase extends Dexie {
     constructor() {
         super("TemplateBuilderDatabase");
         this.version(1).stores({
-            history: "id, templateJson"
+            history: "++id, key, storageKey, templateJson"
         });
         this.history = this.table("history");
         this.history.mapToClass(TemplateBuilderHistoryItem);
@@ -14,17 +14,23 @@ export class TemplateBuilderDatabase extends Dexie {
 }
 
 export class TemplateBuilderHistoryItem implements ITemplateBuilderHistory {
-    id: string;
+    id: number;
+    key: string;
+    storageKey: string;
     templateJson: string;
 
-    constructor(id: string, templateJson: string) {
+    constructor(id: number, key: string, storageKey: string, templateJson: string) {
         this.id = id;
+        this.key = key;
+        this.storageKey = storageKey;
         this.templateJson = templateJson;
     }
 }
 
 export interface ITemplateBuilderHistory {
-    id: string,
+    id?: number,
+    key: string,
+    storageKey: string,
     templateJson: string
 }
 
