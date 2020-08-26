@@ -117,8 +117,8 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
+                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate}/>}
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
                     {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
