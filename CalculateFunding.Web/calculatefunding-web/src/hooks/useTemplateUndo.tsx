@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {FundingLineDictionaryEntry} from '../types/TemplateBuilderDefinitions';
-import {v4 as uuidv4} from 'uuid';
+import {v4 as uuidv4} from "uuid";
+import {open, clear, update, deleteItem, findById} from "../services/indexedDbWrapper";
 
 export const useTemplateUndo = (updateFunction: Function) => {
     const [localStorageKey] = React.useState<string>(`${uuidv4()}`);
@@ -9,88 +10,109 @@ export const useTemplateUndo = (updateFunction: Function) => {
     const templateBuilderPastStateKey = () => `templateBuilderPastState-${localStorageKey}`;
     const templateBuilderFutureStateKey = () => `templateBuilderFutureState-${localStorageKey}`;
 
-    const initialiseState = (ds: FundingLineDictionaryEntry[]) => {
-        window.localStorage.setItem(templateBuilderStateKey(), JSON.stringify(ds));
+    const initialiseDatabase = async () => {
+        await open();
+    }
+
+    const clearItems = async () => {
+        await clear(localStorageKey);
+    }
+
+    React.useEffect(() => {
+        initialiseDatabase();
+
+        return () => {
+            clearItems();
+        }
+    }, []);
+
+    const initialiseState = async (ds: FundingLineDictionaryEntry[]) => {
+        await update({id: templateBuilderStateKey(), templateJson: JSON.stringify(ds)});
         updateFunction(ds);
     }
 
-    const updatePresentState = (ds: FundingLineDictionaryEntry[]) => {
-        const currentState = getPresentState();
-        const pastState = getTimeItems(templateBuilderPastStateKey());
+    const updatePresentState = async (ds: FundingLineDictionaryEntry[]) => {
+        const currentState = await getPresentState();
+        const pastState = await getTimeItems(templateBuilderPastStateKey());
         pastState.push(currentState);
 
-        window.localStorage.setItem(templateBuilderStateKey(), JSON.stringify(ds));
-        window.localStorage.setItem(templateBuilderPastStateKey(), JSON.stringify(pastState));
+        await update({id: templateBuilderStateKey(), templateJson: JSON.stringify(ds)});
+        await update({id: templateBuilderPastStateKey(), templateJson: JSON.stringify(pastState)});
+        await clearRedoState();
 
         updateFunction(ds);
     }
 
-    const undo = () => {
-        const present = getPresentState();
+    const undo = async () => {
+        const present = await getPresentState();
 
-        const futureState = getTimeItems(templateBuilderFutureStateKey());
+        const futureState = await getTimeItems(templateBuilderFutureStateKey());
         futureState.unshift(present);
 
-        const past = getTimeItems(templateBuilderPastStateKey());
+        const past = await getTimeItems(templateBuilderPastStateKey());
         if (past.length === 0) {
             return;
         }
 
         const pastItem = past.pop();
         if (pastItem) {
-            window.localStorage.setItem(templateBuilderStateKey(), JSON.stringify(pastItem));
-            window.localStorage.setItem(templateBuilderPastStateKey(), JSON.stringify(past));
-            window.localStorage.setItem(templateBuilderFutureStateKey(), JSON.stringify(futureState));
+            await update({id: templateBuilderStateKey(), templateJson: JSON.stringify(pastItem)});
+            await update({id: templateBuilderPastStateKey(), templateJson: JSON.stringify(past)});
+            await update({id: templateBuilderFutureStateKey(), templateJson: JSON.stringify(futureState)});
+
             updateFunction(pastItem);
         }
     }
 
-    const redo = () => {
-        const currentState = getPresentState();
-        const pastState = getTimeItems(templateBuilderPastStateKey());
+    const redo = async () => {
+        const currentState = await getPresentState();
+        const pastState = await getTimeItems(templateBuilderPastStateKey());
         pastState.push(currentState);
-        const futureState = getTimeItems(templateBuilderFutureStateKey());
+        const futureState = await getTimeItems(templateBuilderFutureStateKey());
         const future = futureState.shift();
         if (future) {
-            window.localStorage.setItem(templateBuilderFutureStateKey(), JSON.stringify(futureState));
-            window.localStorage.setItem(templateBuilderPastStateKey(), JSON.stringify(pastState));
+            await update({id: templateBuilderFutureStateKey(), templateJson: JSON.stringify(futureState)});
+            await update({id: templateBuilderPastStateKey(), templateJson: JSON.stringify(pastState)});
+
             initialiseState(future);
         }
     }
 
-    const clearPresentState = () => {
-        window.localStorage.removeItem(templateBuilderStateKey());
+    const clearPresentState = async () => {
+        await deleteItem(templateBuilderStateKey());
     }
 
-    const clearUndoState = () => {
-        window.localStorage.removeItem(templateBuilderPastStateKey());
+    const clearUndoState = async () => {
+        await deleteItem(templateBuilderPastStateKey());
     }
 
-    const clearRedoState = () => {
-        window.localStorage.removeItem(templateBuilderFutureStateKey());
+    const clearRedoState = async () => {
+        await deleteItem(templateBuilderFutureStateKey());
     }
 
-    const undoCount = () => {
-        return getTimeItems(templateBuilderPastStateKey()).length;
+    const undoCount = async () => {
+        const items = await getTimeItems(templateBuilderPastStateKey());
+        return items.length;
     }
 
-    const redoCount = () => {
-        return getTimeItems(templateBuilderFutureStateKey()).length;
+    const redoCount = async () => {
+        const items = await getTimeItems(templateBuilderFutureStateKey());
+        return items.length;
     }
 
-    function getPresentState(): FundingLineDictionaryEntry[] {
-        const presentStateString = window.localStorage.getItem(templateBuilderStateKey());
-        if (presentStateString) {
-            const presentState: FundingLineDictionaryEntry[] = JSON.parse(presentStateString);
+    const getPresentState = async () => {
+        const templateBuilderHistory = await findById(templateBuilderStateKey());
+        if (templateBuilderHistory) {
+            const presentState: FundingLineDictionaryEntry[] = JSON.parse(templateBuilderHistory.templateJson);
             return presentState;
         }
         return [];
     }
 
-    function getTimeItems(state: string): Array<FundingLineDictionaryEntry[]> {
-        const itemsString = window.localStorage.getItem(state);
-        if (itemsString) {
-            const items = JSON.parse(itemsString);
+    const getTimeItems = async (state: string) => {
+        const templateBuilderHistory = await findById(state);
+        if (templateBuilderHistory) {
+            const items = JSON.parse(templateBuilderHistory.templateJson);
             if (!items) {
                 return [];
             }

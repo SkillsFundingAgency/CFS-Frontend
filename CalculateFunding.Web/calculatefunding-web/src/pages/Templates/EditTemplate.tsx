@@ -90,6 +90,8 @@ export function EditTemplate() {
     const [focusNodeId, setFocusNodeId] = useState<string>('');
     const [chartScale, setChartScale] = useState<number>(1);
     const [targetScale, setTargetScale] = useState<number>(1);
+    const [undos, setUndos] = useState<number>(0);
+    const [redos, setRedos] = useState<number>(0);
     const {canEditTemplate, canApproveTemplate, canCreateTemplate, missingPermissions} =
         useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     const {
@@ -142,9 +144,16 @@ export function EditTemplate() {
     }, [template, canEditTemplate]);
 
     useEffect(() => {
+        const calculateUndoCounts = async () => {
+            const undos = await undoCount();
+            const redos = await redoCount();
+            setUndos(undos);
+            setRedos(redos);
+        }
         const allCalcs = getCalculations().map(c => `CAL: ${c.name} (${c.templateCalculationId})`);
         const allFundingLines = getFundingLines().map(fl => `FUN: ${fl.name} (${fl.templateLineId})`);
         setAllFundingLinesAndCalculations(allCalcs.concat(allFundingLines));
+        calculateUndoCounts();
     }, [ds]);
 
     const addNodeToRefs = (id: string, ref: React.MutableRefObject<any>) => {
@@ -180,7 +189,7 @@ export function EditTemplate() {
             if (templateResponse.templateJson) {
                 const templateJson = JSON.parse(templateResponse.templateJson) as Template;
                 if (templateJson) {
-                    const fundingLines = templateFundingLinesToDatasource(templateJson.fundingTemplate.fundingLines)
+                    const fundingLines = templateFundingLinesToDatasource(templateJson.fundingTemplate.fundingLines);
                     initialiseState(fundingLines);
                     setNextId(getLastUsedId(templateJson.fundingTemplate.fundingLines) + 1);
                 } else {
@@ -410,7 +419,7 @@ export function EditTemplate() {
     const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         undo();
-        if (undoCount() === 0) {
+        if (undos === 0) {
             setIsDirty(false);
         }
     };
@@ -642,7 +651,7 @@ export function EditTemplate() {
                                                 data-testid='redo'
                                                 onClick={handleRedo}
                                                 className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0">
-                                                <span>↪</span> Redo ({redoCount()})
+                                                <span>↪</span> Redo ({redos})
                                         </a>
                                         </li>
                                         <li>
@@ -650,7 +659,7 @@ export function EditTemplate() {
                                                 data-testid='undo'
                                                 onClick={handleUndo}
                                                 className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-                                                <span>↩</span> Undo ({undoCount()})
+                                                <span>↩</span> Undo ({undos})
                                         </a>
                                         </li>
                                         <li>

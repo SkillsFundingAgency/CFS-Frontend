@@ -6,7 +6,6 @@ import '@testing-library/jest-dom/extend-expect';
 import {MemoryRouter} from 'react-router-dom';
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import {CloneTemplate} from "../../../pages/Templates/CloneTemplate";
 import {Route, Switch} from "react-router";
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 

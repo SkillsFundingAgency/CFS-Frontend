@@ -6,10 +6,24 @@ import '@testing-library/jest-dom/extend-expect';
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {UserConfirmLeavePageModal} from "../../../components/UserConfirmLeavePageModal";
+import * as hooks from "../../../hooks/useTemplateUndo";
 
 jest.useFakeTimers();
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+
+jest.spyOn(hooks, 'useTemplateUndo').mockImplementation(
+    () => ({
+        initialiseState: jest.fn(),
+        updatePresentState: jest.fn(),
+        undo: jest.fn(),
+        redo: jest.fn(),
+        clearPresentState: jest.fn(),
+        clearUndoState: jest.fn(),
+        clearRedoState: jest.fn(),
+        undoCount: jest.fn(),
+        redoCount: jest.fn()
+    }));
 
 const noPermissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
@@ -87,7 +101,7 @@ const renderEditTemplatePage = () => {
             getUserConfirmation={(message, callback) => {
                 UserConfirmLeavePageModal(message, callback)
             }}>
-            <EditTemplate/>
+            <EditTemplate />
         </MemoryRouter>);
 }
 
@@ -170,11 +184,11 @@ describe("Template Builder when I request current version and have edit permissi
         await waitFor(() => {
             expect(getByTestId('add-funding-line')).toBeInTheDocument();
         });
-        
+
         act(() => {
             fireEvent.click(getByTestId('add-funding-line'));
         });
-        
+
         await waitFor(() => {
             expect(getByTestId("n0-add-line")).toBeInTheDocument();
             expect(getByTestId("n0-add-calc")).toBeInTheDocument();
@@ -186,11 +200,11 @@ describe("Template Builder when I request current version and have edit permissi
         await waitFor(() => {
             expect(getByTestId('add-funding-line')).toBeInTheDocument();
         });
-        
+
         act(() => {
             fireEvent.click(getByTestId('add-funding-line'));
         });
-        
+
         await waitFor(() => {
             expect(getByTestId('node-n0')).toBeInTheDocument();
         });
@@ -207,12 +221,12 @@ describe("Template Builder when I request current version and have edit permissi
         await waitFor(() => {
             expect(getByTestId('node-n0')).toBeInTheDocument();
         });
-        
+
         // click on funding line
         act(() => {
             fireEvent.click(getByTestId("node-n0"));
         });
-        
+
         await waitFor(() => {
             expect(getByTestId('sidebar-fundingline')).toBeInTheDocument();
         });
@@ -235,12 +249,12 @@ describe("Template Builder when I request current version and have edit permissi
         await waitFor(() => {
             expect(getByTestId('node-n0-delete')).toBeInTheDocument();
         });
-        
+
         // delete the node
         act(() => {
             fireEvent.click(getByTestId("node-n0-delete"));
         });
-        
+
         await waitFor(() => {
             expect(getByTestId("node-n0-confirm-delete")).toBeInTheDocument();
         });
@@ -260,9 +274,9 @@ describe("Template Builder when I request current version and have edit permissi
 
         // try to navigate away without saving
         act(() => {
-            fireEvent.click(getByTestId('template-versions-link')); 
+            fireEvent.click(getByTestId('template-versions-link'));
         });
-        
+
         await waitFor(() => {
             expect(getByTestId("user-leave-page-confirmation-placeholder")).toBeInTheDocument();
             expect(getByText("Are you sure you want to leave without saving your changes?")).toBeInTheDocument();
@@ -271,7 +285,7 @@ describe("Template Builder when I request current version and have edit permissi
 
     it("renders a publish button", async () => {
         const {EditTemplate} = require('../../../pages/Templates/EditTemplate');
-        const {getByTestId} = render(<MemoryRouter><EditTemplate/></MemoryRouter>)
+        const {getByTestId} = render(<MemoryRouter><EditTemplate /></MemoryRouter>)
         await waitFor(() => {
             expect(getByTestId("publish-button")).toBeInTheDocument();
         });
