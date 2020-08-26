@@ -13,6 +13,7 @@ import {SpecificationDatasourceRelationshipViewModel} from "../../types/Datasets
 import {BackToTop} from "../../components/BackToTop";
 import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export function MapDataSourceFiles() {
     const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -292,10 +293,27 @@ export function MapDataSourceFiles() {
                                     <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
                                         {dr.specificationName}
                                     </Link>
-                                    <p className="govuk-body">{dr.definitionRelationshipCount > 0 ? dr.definitionRelationshipCount : "no"} datasets exist for specification</p>
+                                    {
+                                        dr.definitionRelationshipCount > 0 ?
+                                            <p className="govuk-body govuk-!-margin-top-2">
+                                                {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for specification
+                                            </p>
+                                            : <span>
+                                                    <p className="govuk-body govuk-!-margin-top-2">
+                                                        No data sets exist for specification
+                                                    </p>
+                                                    <p className="govuk-body-s">
+                                                        <Link to={`/Datasets/CreateDataset/${dr.specificationId}`}>Create new data set</Link>
+                                                    </p>
+                                                </span>
+                                    }
+                                    {
+                                        dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ?
+                                            <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} utc={true}/></p>
+                                            : null
+                                    }
                                 </th>
                                 <td className="govuk-table__cell"></td>
-
                             </tr>
                         )}
                         </tbody>
