@@ -14,7 +14,7 @@ export const deleteDb = async () => {
 
 export const update = async (item: ITemplateBuilderHistory) => {
   const itemToUpdate = await db.history.filter(i => i.key === item.key && i.storageKey === item.storageKey).first();
-  if (itemToUpdate) item.id = itemToUpdate?.id;
+  if (itemToUpdate) item.id = itemToUpdate.id;
   await db.history.put(item);
 }
 
