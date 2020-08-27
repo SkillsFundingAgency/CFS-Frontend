@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
@@ -41,7 +42,8 @@ namespace CalculateFunding.Frontend.Core.Middleware
 
                     if (apiResponse.StatusCode != HttpStatusCode.OK || !apiResponse.Content.HasConfirmedSkills)
                     {
-                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.StatusCode = 451;
+                        context.Response.WriteAsync("Could not verify that user has confirmed skills").Wait();
                         return;
                     }
                     

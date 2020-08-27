@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
             else
             {
-                return NotFound("Could not verify that user has confirmed skills");
+                return StatusCode(451, "Could not verify that user has confirmed skills");
             }
         }
 
