@@ -20,5 +20,8 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     isProviderData: boolean;
     datasetPhrase: string;
     linkPhrase: string;
+    isLatestVersion: boolean,
+    lastUpdatedDate: Date,
+    lastUpdatedAuthorName: string
 }
 

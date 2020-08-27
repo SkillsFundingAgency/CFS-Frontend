@@ -11,6 +11,7 @@ import {SpecificationDatasetRelationshipsViewModel} from "../../types/Datasets/S
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface DataRelationshipsRouteProps {
     specificationId: string
@@ -128,6 +129,12 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                                     </p>
                                                     <p className="govuk-body">
                                                         <strong>Description:</strong> {sdr.definitionDescription}
+                                                    </p>
+                                                    <p className="govuk-body">
+                                                        <strong>Last mapped:</strong> <DateFormatter date={sdr.lastUpdatedDate} utc={true}/>
+                                                    </p>
+                                                    <p className="govuk-body">
+                                                        <strong>Last mapped by:</strong> {sdr.lastUpdatedAuthorName}
                                                     </p>
                                                 </div>
                                             </details>

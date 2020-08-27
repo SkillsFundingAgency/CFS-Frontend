@@ -106,7 +106,9 @@ namespace CalculateFunding.Frontend.Controllers
                 RelationshipId = m.Id,
                 RelationshipDescription = m.RelationshipDescription,
                 IsProviderData = m.IsProviderData,
-                IsLatestVersion = m.IsLatestVersion
+                IsLatestVersion = m.IsLatestVersion,
+                LastUpdatedDate = m.LastUpdatedDate,
+                LastUpdatedAuthorName = m.LastUpdatedAuthor.Name
             });
 
             return viewModel;

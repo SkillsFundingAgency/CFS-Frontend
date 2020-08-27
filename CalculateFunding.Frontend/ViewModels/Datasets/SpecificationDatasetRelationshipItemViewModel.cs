@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Datasets
+﻿using System;
+
+namespace CalculateFunding.Frontend.ViewModels.Datasets
 {
     public class SpecificationDatasetRelationshipItemViewModel
     {
@@ -50,5 +52,9 @@
         }
 
         public bool IsLatestVersion { get; set; }
+
+        public DateTimeOffset? LastUpdatedDate { get; set; }
+        
+        public string LastUpdatedAuthorName { get; set; }
     }
 }
