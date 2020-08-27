@@ -2,14 +2,8 @@ import React, {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {
-    getFundingPeriodsByFundingStreamIdService,
-    getFundingStreamsService,
-    getSpecificationSummaryService, updateSpecificationService
-} from "../../services/specificationService";
-import {FundingPeriod} from "../../types/viewFundingTypes";
+import {getSpecificationSummaryService, updateSpecificationService} from "../../services/specificationService";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
@@ -26,32 +20,17 @@ export interface EditSpecificationRouteProps {
     specificationId: string;
 }
 
-interface EditSpecificationFundingStream {
-    name: string,
-    value: string
-    selected: boolean
-}
-
-interface EditSpecificationFundingPeriod {
-    name: string,
-    value: string
-    selected: boolean
-}
-
 interface EditSpecificationCoreProvider {
     name: string,
     value: string
-    selected: boolean
 }
 
 interface EditSpecificationTemplateVersion {
     name: string,
     value: string
-    selected: boolean
 }
 
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
-
     const specificationId = match.params.specificationId;
     const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
         id: "",
@@ -66,18 +45,18 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         isSelectedForFunding: false,
         fundingStreams: [],
         dataDefinitionRelationshipIds: [],
-        templateIds: {"": [""]}
+        templateIds: {}
     });
-    const [fundingStreamData, setFundingStreamData] = useState<EditSpecificationFundingStream[]>([]);
-    const [fundingPeriodData, setFundingPeriodData] = useState<EditSpecificationFundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<EditSpecificationCoreProvider[]>([]);
     const [templateVersionData, setTemplateVersionData] = useState<EditSpecificationTemplateVersion[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
-    const [selectedFundingStream, setSelectedFundingStream] = useState<string>("fundingStreamDefault");
-    const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("fundingPeriodDefault");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
+    const [loadingMessage, setLoadingMessage] = useState({
+        title: "",
+        subTitle: ""
+    });
     const [formValid, setFormValid] = useState({
         formSubmitted: false,
         formValid: false
@@ -92,156 +71,74 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     useEffectOnce(() => {
         const getSpecification = async () => {
-            const specificationResult = await getSpecificationSummaryService(specificationId);
-            return specificationResult;
+            try {
+                setLoadingMessage({title: "Loading Specification", subTitle: "Please wait whilst we load the specification"});
+                setIsLoading(true);
+                const specificationResult = await getSpecificationSummaryService(specificationId);
+                const editSpecificationViewModel = specificationResult.data as EditSpecificationViewModel;
+                if (editSpecificationViewModel.fundingStreams.length === 0) {
+                    throw new Error("Specification has no funding streams.");
+                }
+                if (editSpecificationViewModel.fundingPeriod.id.length === 0) {
+                    throw new Error("Specification has no funding period.");
+                }
+                setSpecificationSummary(editSpecificationViewModel);
+                setSelectedDescription(editSpecificationViewModel.description);
+            }
+            catch (error) {
+                setErrorSummary({
+                    title: "There is a problem",
+                    error: `Specification failed to load for the following reason: ${error.message}. Please try again.`
+                });
+                setIsLoading(false);
+            }
         };
 
-        getSpecification().then((result) => {
-            const specificationResult = result.data as EditSpecificationViewModel;
-            setSpecificationSummary(specificationResult);
-            setSelectedDescription(specificationResult.description);
-        });
+        getSpecification();
     });
 
     useEffect(() => {
-        if (specificationSummary.id !== "") {
+        const fetchData = async () => {
+            try {
+                const fundingStreamId = specificationSummary.fundingStreams[0].id;
 
-            setSelectedName(specificationSummary.name);
-            const getFundingStreams = async () => {
-                const fundingStreamResult = await getFundingStreamsService();
-                return fundingStreamResult;
-            };
-            const getFundingPeriods = async (fundingStreamId: string) => {
-                const fundingPeriodResult = await getFundingPeriodsByFundingStreamIdService(fundingStreamId);
-                return fundingPeriodResult;
-            };
-
-            const getCoreProviders = async (fundingStreamId: string) => {
                 const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
-                return coreProviderResult;
-            };
+                const coreProviderSummaries = coreProviderResult.data as CoreProviderSummary[];
+                const providerData = coreProviderSummaries.map(coreProviderItem => ({
+                    name: coreProviderItem.name,
+                    value: coreProviderItem.providerVersionId
+                }));
+                setCoreProviderData(providerData);
+                const selectedProviderVersion = providerData.find(p => p.value === specificationSummary.providerVersionId);
+                selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
 
-            getFundingStreams().then((result) => {
-                const fundingStreams = result.data as string[];
-                fundingStreams.forEach(fundingStreamItem => {
-                    let item: EditSpecificationFundingStream = {
-                        name: fundingStreamItem,
-                        value: fundingStreamItem,
-                        selected: fundingStreamItem === specificationSummary.fundingStreams[0].id
-                    };
-                    setFundingStreamData(prevState => [...prevState, item]);
-
-                    if (item.selected) {
-                        setSelectedFundingStream(item.value);
-
-                        getFundingPeriods(item.value).then((result) => {
-                            const fundingPeriods = result.data as FundingPeriod[];
-                            fundingPeriods.forEach(fundingPeriodItem => {
-                                let item: EditSpecificationFundingPeriod = {
-                                    name: fundingPeriodItem.name,
-                                    value: fundingPeriodItem.id,
-                                    selected: fundingPeriodItem.id === specificationSummary.fundingPeriod.id
-                                };
-
-                                setFundingPeriodData(prevState => [...prevState, item]);
-                                if (item.selected) {
-                                    setSelectedFundingPeriod(item.value)
-                                }
-                            });
-                        });
-
-                        getCoreProviders(item.value).then((result) => {
-                            const fundingPeriods = result.data as CoreProviderSummary[];
-                            fundingPeriods.forEach(coreProviderItem => {
-                                let item: EditSpecificationCoreProvider = {
-                                    name: coreProviderItem.name,
-                                    value: coreProviderItem.providerVersionId,
-                                    selected: coreProviderItem.providerVersionId === specificationSummary.providerVersionId
-                                };
-
-                                setCoreProviderData(prevState => [...prevState, item]);
-
-                                if (item.selected) {
-                                    setSelectedProviderVersionId(coreProviderItem.providerVersionId);
-                                }
-                            });
-                        });
-
-                        getTemplatesService(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id).then(templatesResult =>{
-                            if (templatesResult.status === 200 || templatesResult.status === 201) {
-                                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
-                                const fundingStreamKey = specificationSummary.fundingStreams[0].id.toString();
-                                publishedFundingTemplates.forEach(publishedFundingTemplate => {
-                                    let selected = false;
-                                    if (fundingStreamKey != null) {
-                                        const existingTemplate = specificationSummary.templateIds[fundingStreamKey];
-                                        if (existingTemplate != undefined) {
-                                            selected = parseFloat(existingTemplate[0]) === parseFloat(publishedFundingTemplate.templateVersion)
-                                        }
-                                    }
-                                    let item: EditSpecificationTemplateVersion = {
-                                        name: publishedFundingTemplate.templateVersion,
-                                        value: publishedFundingTemplate.templateVersion,
-                                        selected: selected
-                                    };
-
-                                    setTemplateVersionData(prevState => [...prevState, item]);
-
-                                    if (item.selected) {
-                                        setSelectedTemplateVersion(publishedFundingTemplate.templateVersion);
-                                    }
-                                });
-                            }
-                        });
-
-                        setSelectedDescription(specificationSummary.description);
-                    }
-                });
-            });
-
-
+                const templatesResult = await getTemplatesService(fundingStreamId, specificationSummary.fundingPeriod.id);
+                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
+                const templateVersionData = publishedFundingTemplates.map(publishedFundingTemplate => ({
+                    name: publishedFundingTemplate.templateVersion,
+                    value: publishedFundingTemplate.templateVersion
+                }));
+                setTemplateVersionData(templateVersionData);
+                const selectedVersion = templateVersionData.find(t => t.value === specificationSummary.templateIds[fundingStreamId]);
+                selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
+            }
+            catch (err) {
+                setErrorSummary({title: "There is a problem", error: "Specification failed to load, please try again."});
+            }
+            finally {
+                setIsLoading(false);
+            }
         }
-    }, [specificationSummary.id]);
 
-    function populateFundingPeriods(fundingStream: string) {
-        if (fundingStream !== "") {
-            const getFundingPeriods = async () => {
-                const periodResult = await getFundingPeriodsByFundingStreamIdService(fundingStream);
-                setFundingPeriodData(periodResult.data)
-            };
-            getFundingPeriods().then(result => {
-                return true;
-            });
+        if (specificationSummary.id !== "") {
+            setSelectedName(specificationSummary.name);
+            fetchData();
         }
-    }
-
-    function populateCoreProviders(fundingPeriod: string) {
-        if (fundingPeriod !== "") {
-            const getCoreProviders = async () => {
-                const coreProviderResult = await getProviderByFundingStreamIdService(fundingPeriod);
-                setCoreProviderData(coreProviderResult.data)
-            };
-            getCoreProviders().then(result => {
-                return true;
-            });
-        }
-    }
+    }, [specificationSummary]);
 
     function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
         setSelectedName(specificationName);
-    }
-
-    function selectFundingStream(e: React.ChangeEvent<HTMLSelectElement>) {
-        const fundingStreamId = e.target.value;
-        setSelectedFundingStream(fundingStreamId);
-        populateFundingPeriods(fundingStreamId);
-        populateCoreProviders(fundingStreamId);
-    }
-
-    function selectFundingPeriod(e: React.ChangeEvent<HTMLSelectElement>) {
-        const fundingPeriodId = e.target.value;
-        setSelectedFundingPeriod(fundingPeriodId);
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -259,58 +156,52 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         setSelectedDescription(specificationDescription);
     }
 
-    function submitUpdateSpecification() {
+    async function submitUpdateSpecification() {
         setErrorSummary({title: "", error: ""});
-        if (selectedName !== "" && selectedFundingStream !== "" && selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
+        if (selectedName !== "" && selectedProviderVersionId !== "" && selectedDescription !== "" && selectedTemplateVersion !== "") {
             setFormValid({formValid: true, formSubmitted: true});
+            setLoadingMessage({title: "Updating Specification", subTitle: "Please wait whilst we update the specification"});
             setIsLoading(true);
             let assignedTemplateIdsValue: any = {};
-            assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
+            assignedTemplateIdsValue[specificationSummary.fundingStreams[0].id] = selectedTemplateVersion;
+
             let updateSpecificationViewModel: UpdateSpecificationViewModel = {
                 description: selectedDescription,
-                fundingPeriodId: selectedFundingPeriod,
-                fundingStreamId: selectedFundingStream,
+                fundingPeriodId: specificationSummary.fundingPeriod.id,
+                fundingStreamId: specificationSummary.fundingStreams[0].id,
                 name: selectedName,
                 providerVersionId: selectedProviderVersionId,
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
 
-            const updateSpecification = async () => {
-                const updateSpecificationResult = await updateSpecificationService(updateSpecificationViewModel, specificationId);
-                return updateSpecificationResult;
-            };
-            
-            updateSpecification().then((result) => {
-
-                if (result.status === 200) {
-                    let response = result.data as SpecificationSummary;
-                    history.push(`/ViewSpecification/${specificationId}`);
-                } else {
-                    setIsLoading(false);
-                }
-            }).catch(() => {
+            try {
+                await updateSpecificationService(updateSpecificationViewModel, specificationId);
                 setIsLoading(false);
+                history.push(`/ViewSpecification/${specificationId}`);
+            }
+            catch {
                 setFormValid({formValid: true, formSubmitted: false});
-                setErrorSummary({title: "There is a problem", error: "Specification failed to update, please try again"});
-            });
+                setErrorSummary({title: "There is a problem", error: "Specification failed to update, please try again."});
+                setIsLoading(false);
+            }
         } else {
             setFormValid({formSubmitted: true, formValid: false})
         }
     }
 
     return <div>
-        <Header location={Section.Specifications}/>
+        <Header location={Section.Specifications} />
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={"Calculate funding"} url={"/"} />
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
                 <Breadcrumb name={"Edit specification"} />
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
-                <LoadingStatus title={"Updating Specification"}
-                               subTitle={"Please wait whilst we update the specification"}
-                               description={"This can take a few minutes"} id={"update-specification"}
-                               hidden={!isLoading}/>
+                <LoadingStatus title={loadingMessage.title}
+                    subTitle={loadingMessage.subTitle}
+                    description={"This can take a few minutes"} id={"update-specification"}
+                    hidden={!isLoading} />
                 <fieldset className="govuk-fieldset" id="update-specification-fieldset" hidden={isLoading}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
@@ -318,31 +209,31 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </h1>
                     </legend>
                     <div className="govuk-form-group"
-                         hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
+                        hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
                         <ErrorSummary title={errorSummary.title === "" ? "Form not valid" : errorSummary.title}
-                                      error={errorSummary.error === "" ? "Please complete all fields" : errorSummary.error} suggestion=""/>
+                            error={errorSummary.error === "" ? "Please complete all fields" : errorSummary.error} suggestion="" />
                     </div>
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="address-line-1">
                             Specification name
                         </label>
                         <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
-                               value={selectedName}
-                               onChange={(e) => saveSpecificationName(e)}/>
+                            value={selectedName}
+                            onChange={saveSpecificationName} />
                     </div>
 
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="sort">
                             Funding streams
                         </label>
-                        {fundingStreamData.filter(fs => fs.selected).map(fs => <h3 className="govuk-heading-m">{fs.name}</h3>)}
+                        <h3 className="govuk-heading-m">{specificationSummary.fundingStreams.length > 0 && specificationSummary.fundingStreams[0].id}</h3>
                     </div>
 
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="sort">
                             Funding period
                         </label>
-                        {fundingPeriodData.filter(fp => fp.selected).map(fp => <h3 className="govuk-heading-m">{fp.name}</h3>)}
+                        <h3 className="govuk-heading-m">{specificationSummary.fundingStreams.length > 0 && specificationSummary.fundingPeriod.name}</h3>
                     </div>
 
                     <div className="govuk-form-group">
@@ -350,10 +241,12 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             Core provider data
                         </label>
                         <select className="govuk-select" id="sort" name="sort" disabled={coreProviderData.length === 0}
-                                onChange={(e) => selectCoreProvider(e)}>
-                            <option value="-1">Select core provider</option>
-                            {coreProviderData.map((cp, index) => <option key={index}
-                                                                         value={cp.value} selected={cp.selected}>{cp.name}</option>)}
+                            value={selectedProviderVersionId}
+                            onChange={selectCoreProvider}>
+                            <option value="">Select core provider</option>
+                            {coreProviderData.map((cp, index) => <option key={`provider-${index}`}
+                                value={cp.value}>{cp.name}
+                            </option>)}
                         </select>
                     </div>
 
@@ -362,10 +255,12 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             Template version
                         </label>
                         <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0}
-                                onChange={(e) => selectTemplateVersion(e)}>
-                            <option value="-1">Select template version</option>
-                            {templateVersionData.map((cp, index) => <option key={index}
-                                                                         value={cp.value} selected={cp.selected}>{cp.name}</option>)}
+                            value={selectedTemplateVersion}
+                            onChange={selectTemplateVersion}>
+                            <option value="">Select template version</option>
+                            {templateVersionData.map((cp, index) => <option key={`template-version-${index}`}
+                                value={cp.value}>{cp.name}
+                            </option>)}
                         </select>
                     </div>
 
@@ -374,24 +269,24 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             Can you provide more detail?
                         </label>
                         <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8}
-                                  aria-describedby="more-detail-hint"
-                                  onChange={(e) => saveDescriptionName(e)} value={selectedDescription}/>
+                            aria-describedby="more-detail-hint"
+                            onChange={(e) => saveDescriptionName(e)} value={selectedDescription} />
                     </div>
                     <div className="govuk-form-group">
                         <button id="submit-specification-button" className="govuk-button govuk-!-margin-right-1"
-                                data-module="govuk-button"
-                                onClick={submitUpdateSpecification}>
+                            data-module="govuk-button"
+                            onClick={submitUpdateSpecification}>
                             Save and continue
                         </button>
                         <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationSummary.id}`}
-                           className="govuk-button govuk-button--secondary"
-                           data-module="govuk-button">
+                            className="govuk-button govuk-button--secondary"
+                            data-module="govuk-button">
                             Cancel
                         </Link>
                     </div>
                 </fieldset>
             </div>
         </div>
-        <Footer/>
+        <Footer />
     </div>
 }
