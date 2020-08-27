@@ -51,7 +51,6 @@ import {useSelector} from "react-redux";
 import {getUserPermissionsService} from "../../services/userService";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {Specification} from "../../types/viewFundingTypes";
-import {bool} from "prop-types";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -61,10 +60,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [additionalCalculationsSearchTerm,] = useState('');
     const [statusFilter] = useState("");
-    const [navisionDate, setNavisionDate] = useState();
-    const [releaseDate, setReleaseDate] = useState();
-    const [navisionTime, setNavisionTime] = useState();
-    const [releaseTime, setReleaseTime] = useState();
+    const [navisionDate, setNavisionDate] = useState<Date>(new Date());
+    const [releaseDate, setReleaseDate] = useState<Date>(new Date());
+    const [navisionTime, setNavisionTime] = useState<string>("");
+    const [releaseTime, setReleaseTime] = useState<string>("");
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
@@ -90,7 +89,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
-    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState();
+    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const [errors, setErrors] = useState<string[]>([]);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const fundingLineStepReactRef = useRef(null);
@@ -263,7 +262,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [specificationId]);
 
     useEffect(() => {
-        if (specification != null) {
+        if (specification != null && specification.fundingPeriod.id !== "" && specification.fundingStreams[0].id !== "")
+        {
             getSpecificationsSelectedForFundingByPeriodAndStreamService(specification.fundingPeriod.id, specification.fundingStreams[0].id)
                 .then((selectedSpecificationResponse) => {
                     if (selectedSpecificationResponse.status === 200) {
@@ -441,7 +441,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
             {errors.length > 0 &&
-            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex="-1"
+            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}
                  data-module="govuk-error-summary">
                 <h2 className="govuk-error-summary__title" id="error-summary-title">
                     There is a problem
@@ -574,8 +574,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                             </li>
                                         })}
                                 </ul>
-                                <BackToTop id={"fundingline-structure"} hidden={fundingLines == null ||
-                                fundingLines.length === 0}/>
+                                <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0}/>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
