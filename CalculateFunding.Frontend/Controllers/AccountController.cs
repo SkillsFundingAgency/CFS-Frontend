@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
             else
             {
-                return Forbid();
+                return NotFound("Could not verify that user has confirmed skills");
             }
         }
 
