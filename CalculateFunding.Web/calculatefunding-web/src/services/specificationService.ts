@@ -56,6 +56,15 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(funding
     });
 }
 
+export async function getSpecificationsByFundingPeriodAndStreamIdWithResultsService(fundingStreamId: string, fundingPeriodId: string) {
+    return axios(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}/with-results`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
 export async function getAllSpecificationsService(searchRequest: SpecificationSearchRequestViewModel) {
     const queryString = require("query-string");
     const stringSearchRequest = queryString.stringify(searchRequest);

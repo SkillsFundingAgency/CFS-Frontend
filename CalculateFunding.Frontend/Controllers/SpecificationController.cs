@@ -191,6 +191,29 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
+        [Route(
+            "api/specs/specifications-by-fundingperiod-and-fundingstream/{fundingPeriodId}/{fundingStreamId}/with-results")]
+        public async Task<IActionResult> GetApprovedSpecificationsWithResults(string fundingPeriodId, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<SpecificationSummary>> response = await _specificationsApiClient.GetSpecificationResultsByFundingPeriodIdAndFundingStreamId(fundingPeriodId, fundingStreamId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content.OrderBy(c => c.Name));
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
+            }
+
+            return new StatusCodeResult(500);
+        }
+
+        [HttpGet]
         [Route("api/specs/specifications-by-fundingperiod-and-fundingstream-trimmed/{fundingPeriodId}/{fundingStreamId}")]
         public async Task<IActionResult> GetApprovedSpecificationsTrimmed(string fundingPeriodId, string fundingStreamId)
         {

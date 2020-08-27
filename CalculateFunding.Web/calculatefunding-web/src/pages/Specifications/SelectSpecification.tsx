@@ -8,7 +8,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications, getSpecificationsByFundingPeriodAndStreamIdService} from "../../services/specificationService";
+import {getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications, getSpecificationsByFundingPeriodAndStreamIdService, getSpecificationsByFundingPeriodAndStreamIdWithResultsService} from "../../services/specificationService";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export function SelectSpecification() {
@@ -65,7 +65,7 @@ export function SelectSpecification() {
                 }
             });
         setSpecificationId("");
-        getSpecificationsByFundingPeriodAndStreamIdService(selectedFundingStreamId, selectedFundingPeriodId).then((response) => {
+        getSpecificationsByFundingPeriodAndStreamIdWithResultsService(selectedFundingStreamId, selectedFundingPeriodId).then((response) => {
             setSpecifications(response.data as SpecificationSummary[]);
             setLoadingState({
                     specification: {
