@@ -52,7 +52,10 @@ namespace CalculateFunding.Frontend
             bool enablePlatformAuth = Configuration.GetValue<bool>("features:enablePlatformAuth");
                 
             services.AddControllers()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(options => {
+                    options.SerializerSettings.ReferenceLoopHandling =
+                        Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                });
 
             services.AddRazorPages(options =>
             {
