@@ -61,40 +61,39 @@ export function updateUserConfirmedSkillsAction(success: boolean): IUpdateUserCo
 }
 
 export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
-        return async (dispatch, getState) => {
-            const state = getState();
-            if (state.fundingStreamPermissions && state.fundingStreamPermissions.length > 0) {
-                return;
-            }
-            const response = await axios(`/api/users/permissions/fundingstreams`, {
-                method: 'GET',
-                headers: {'Content-Type': 'application/json'},
-            });
-            dispatch({
-                type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
-                payload: response.data as FundingStreamPermissions[]
-            });
+    return async (dispatch, getState) => {
+        const state = getState();
+        if (state.fundingStreamPermissions && state.fundingStreamPermissions.length > 0) {
+            return;
         }
+        const response = await axios(`/api/users/permissions/fundingstreams`, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'},
+        });
+        dispatch({
+            type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
+            payload: response.data as FundingStreamPermissions[]
+        });
     }
-;
+};
 
 export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
     return async (dispatch, getState) => {
-        if (getState().hasConfirmedSkills !== undefined) {
+        if (getState().hasConfirmedSkills === true) {
             return;
         }
         let hasConfirmed: boolean | undefined = undefined;
-        
+
         const valueInLocalStorage = localStorage.getItem(hasConfirmedSkillsStateKey);
         if (valueInLocalStorage) {
             hasConfirmed = JSON.parse(valueInLocalStorage as string);
         }
-        
-        if (hasConfirmed === undefined) {
+
+        if (hasConfirmed !== true) {
             const response = await axios.get(`/api/account/hasConfirmedSkills`);
             hasConfirmed = response.status === 200;
         }
-        
+
         dispatch({
             type: UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS,
             payload: hasConfirmed
@@ -102,12 +101,19 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
     }
 };
 
-export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
+export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = (hasConfirmed: boolean) => {
     return async dispatch => {
-        const response = await axios.put(`/api/account/hasConfirmedSkills`);
-        dispatch({
-            type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
-            payload: response.status === 200
-        });
+        if (hasConfirmed) {
+            const response = await axios.put(`/api/account/hasConfirmedSkills`);
+            dispatch({
+                type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
+                payload: response.status === 200
+            });
+        } else {
+            dispatch({
+                type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
+                payload: false
+            });
+        }
     }
 };

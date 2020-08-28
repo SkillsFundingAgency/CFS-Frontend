@@ -23,16 +23,11 @@ namespace CalculateFunding.Frontend.Core.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            bool hasConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
-
             if (context.User.Identity.IsAuthenticated)
             {
-                var path = context.Request.Path.Value;
-                if (!hasConfirmedSkills && 
-                    !(path.Contains("account/", StringComparison.InvariantCultureIgnoreCase) || 
-                      path.Contains("featureflags") || 
-                      path.Contains("fundingstreams") || 
-                      path.Length <= 1))
+                bool haveCookieForConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
+                
+                if (!haveCookieForConfirmedSkills && DoesRequestRequireSkills(context.Request))
                 {
                     IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
 
@@ -58,6 +53,19 @@ namespace CalculateFunding.Frontend.Core.Middleware
             }
 
             await _next(context);
+        }
+
+        private bool DoesRequestRequireSkills(HttpRequest request)
+        {
+            string path = request.Path.Value.ToLower();
+            path = path.EndsWith("/") ? path.Substring(0, path.Length - 1) : path;
+
+            return path.Length > 0 &&
+                   !path.EndsWith("/app") && 
+                   !path.Contains("assets/") && 
+                   !path.Contains("api/account") && 
+                   !path.EndsWith("api/featureflags") && 
+                   !path.EndsWith("api/users/permissions/fundingstreams");
         }
     }
 }

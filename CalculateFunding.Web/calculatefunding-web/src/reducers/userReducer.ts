@@ -11,18 +11,26 @@ const initialState: IUserState = {
 
 export const reduceUserState: Reducer<IUserState, UserActions> =
     (state: IUserState = initialState, action: UserActions): IUserState => {
-    
-    switch (action.type) {
-        case UserActionTypes.CREATE_ACCOUNT:
-            return {...state, isLoggedIn: true, userName: action.userName};
-        case UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS:
-            return {...state, fundingStreamPermissions: action.payload};
-        case UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS:
-            localStorage.setItem(hasConfirmedSkillsStateKey, action.payload.toString());
-            return {...state, hasConfirmedSkills: action.payload};
-        case UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS:
-            return {...state, hasConfirmedSkills: action.payload};
-        default:
-            return state;
+        switch (action.type) {
+            case UserActionTypes.CREATE_ACCOUNT:
+                return {...state, isLoggedIn: true, userName: action.userName};
+            case UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS:
+                return {...state, fundingStreamPermissions: action.payload};
+            case UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS:
+                updateSkillsInLocalStorage(action.payload);
+                return {...state, hasConfirmedSkills: action.payload};
+            case UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS:
+                updateSkillsInLocalStorage(action.payload);
+                return {...state, hasConfirmedSkills: action.payload};
+            default:
+                return state;
+        }
+    };
+
+const updateSkillsInLocalStorage = (hasConfirmedSkills: boolean) => {
+    if (hasConfirmedSkills) {
+        localStorage.setItem(hasConfirmedSkillsStateKey, hasConfirmedSkills.toString());
+    } else {
+        localStorage.removeItem(hasConfirmedSkillsStateKey);
     }
-};
+}

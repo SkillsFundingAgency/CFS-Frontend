@@ -63,12 +63,21 @@ const App: React.FunctionComponent = () => {
     useEffect(() => {
         const initialise = () => {
             dispatch(getHasUserConfirmedSkills());
-            dispatch(getFeatureFlags());
-            dispatch(getUserFundingStreamPermissions());
         };
 
         initialise();
     }, []);
+
+    useEffect(() => {
+        const load = () => {
+            dispatch(getFeatureFlags());
+            dispatch(getUserFundingStreamPermissions());
+        };
+
+        if (userState.hasConfirmedSkills) {
+            load();
+        }
+    }, [userState.hasConfirmedSkills]);
 
     if (userState.hasConfirmedSkills === undefined) {
         return (
