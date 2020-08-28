@@ -82,6 +82,7 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
         if (getState().hasConfirmedSkills === true) {
             return;
         }
+        
         let hasConfirmed: boolean | undefined = undefined;
 
         const valueInLocalStorage = localStorage.getItem(hasConfirmedSkillsStateKey);
@@ -96,7 +97,7 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
 
         dispatch({
             type: UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS,
-            payload: hasConfirmed
+            payload: hasConfirmed === true
         });
     }
 };

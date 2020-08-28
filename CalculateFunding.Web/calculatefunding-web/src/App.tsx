@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from "react-redux";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {IStoreState} from './reducers/rootReducer';
-import {IUserState} from "./states/IUserState";
 import {FeatureFlagsState} from './states/FeatureFlagsState';
 import {getHasUserConfirmedSkills, getUserFundingStreamPermissions} from "./actions/userAction";
 import {initialiseAxios} from './services/axiosInterceptor';
@@ -59,7 +58,7 @@ const App: React.FunctionComponent = () => {
     const dispatch = useDispatch();
 
     initialiseAxios();
-
+    
     useEffect(() => {
         dispatch(getHasUserConfirmedSkills());
     }, []);

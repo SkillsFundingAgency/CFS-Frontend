@@ -28,7 +28,9 @@ export function initialiseAxios() {
 
                 // api says user hasn't confirmed skills
                 if (error.response.status === 451) {
-                    store.dispatch({ type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS, payload: false });
+                    if (store.getState().userState.hasConfirmedSkills) {
+                        store.dispatch({ type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS, payload: false });
+                    }
                 }
                 
                 const originalRequest = error.config;

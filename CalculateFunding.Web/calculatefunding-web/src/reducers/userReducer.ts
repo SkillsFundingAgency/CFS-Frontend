@@ -33,4 +33,4 @@ const updateSkillsInLocalStorage = (hasConfirmedSkills: boolean) => {
     } else {
         localStorage.removeItem(hasConfirmedSkillsStateKey);
     }
-}
+};
